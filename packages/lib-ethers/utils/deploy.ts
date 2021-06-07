@@ -291,10 +291,14 @@ const connectContracts = async (
       })
   ];
 
-  const txs = await Promise.all(connections.map((connect, i) => connect(txCount + i)));
-
-  let i = 0;
-  await Promise.all(txs.map(tx => tx.wait().then(() => log(`Connected ${++i}`))));
+  // RSK node cannot accept more than 4 pending txs so we cannot send all the
+  // connections in parallel
+  log(`${connections.length} connections need to be made`);
+  for (let connectionIndex = 0; connectionIndex < connections.length; connectionIndex++) {
+    log(`Connecting ${connectionIndex}`);
+    const connectionTx = await connections[connectionIndex](txCount + connectionIndex);
+    await connectionTx.wait().then(() => log(`Connected ${connectionIndex}`));
+  }
 };
 
 const deployMockUniToken = (
