@@ -112,6 +112,12 @@ const config: HardhatUserConfig = {
       accounts: [deployerAccount, devChainRichAccount, ...generateRandomAccounts(numAccounts - 2)]
     },
 
+    rskdev: {
+      url: "http://localhost:4444",
+      // regtest default prefunded account
+      from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+    },
+
     ...infuraNetwork("ropsten"),
     ...infuraNetwork("rinkeby"),
     ...infuraNetwork("goerli"),
