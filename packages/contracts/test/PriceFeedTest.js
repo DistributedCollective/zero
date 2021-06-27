@@ -4,6 +4,7 @@ const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
 
 const testHelpers = require("../utils/testHelpers.js");
 const th = testHelpers.TestHelper;
+const testHelpers = require("../utils/testHelpers.js")
 
 const { dec, assertRevert, getEventArgByName, getAllEventsByName } = th;
 
@@ -21,9 +22,9 @@ contract("PriceFeed", async accounts => {
     });
   };
 
-  beforeEach(async () => {
-    priceFeedTestnet = await PriceFeedTestnet.new();
-    PriceFeedTestnet.setAsDeployed(priceFeedTestnet);
+  before(async () => {
+    priceFeedTestnet = await PriceFeedTestnet.new()
+    PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
 
     priceFeed = await PriceFeed.new();
     PriceFeed.setAsDeployed(priceFeed);
@@ -41,6 +42,18 @@ contract("PriceFeed", async accounts => {
     await mockedMoCPriceFeed.setLatestAnswer(dec(100, 18), true);
     await mockedRskOracle.setLatestAnswer(dec(100, 18), true);
   });
+
+  let revertToSnapshot;
+
+  beforeEach(async() => {
+    let snapshot = await timeMachine.takeSnapshot();
+    revertToSnapshot = () => timeMachine.revertToSnapshot(snapshot['result'])
+  });
+
+  afterEach(async() => {
+    await revertToSnapshot();
+  });
+
 
   describe("PriceFeed internal testing contract", async accounts => {
     it("fetchPrice before setPrice should return the default price", async () => {
