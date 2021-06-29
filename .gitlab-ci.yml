@@ -1,0 +1,27 @@
+variables:
+  # Common variables to be able to build and push docker images
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-disabled
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  # Hardhat variables
+  INFURA_API_KEY: "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+  MNEMONIC: "here is where your twelve words mnemonic should be put my friend"
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - test
+
+.install-deps: &install-deps
+  - apk add --upgrade coreutils
+  - yarn install --frozen-lockfile 
+
+image: atixlabs/node:12.18.1-alpine-build
+
+test-contracts:
+  stage: test
+  script:
+    - *install-deps
+    - yarn test-contracts 
