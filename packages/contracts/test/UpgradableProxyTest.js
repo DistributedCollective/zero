@@ -3,6 +3,8 @@ const ProxiableContract2 = artifacts.require('ProxiableContract2');
 const UpgradableProxyTester = artifacts.require('UpgradableProxyTester');
 const testHelpers = require('../utils/testHelpers.js');
 const th = testHelpers.TestHelper;
+const BN = require('bn.js');
+require('chai').use(require('chai-bn')(BN)).should();
 
 contract('UpgradableProxy', async (accounts) => {
   let proxyControl;
@@ -12,7 +14,6 @@ contract('UpgradableProxy', async (accounts) => {
   beforeEach(async () => {
     const someProxiableContract = await ProxiableContract.new();
     proxy = await UpgradableProxyTester.new();
-    await proxy.setProxyOwner(owner);
     await proxy.setImplementation(someProxiableContract.address);
     proxyControl = await ProxiableContract.at(proxy.address);
   });
@@ -57,19 +58,23 @@ contract('UpgradableProxy', async (accounts) => {
       const initialValue = await proxyControl.getSomeVar();
       assert.equal(initialValue, 0);
       await proxyControl.setSomeVar(20);
-      const someValue = await proxyControl.getSomeVar();
-      assert.equal(someValue, 20);
+      const someVar = await proxyControl.getSomeVar();
+      assert.equal(someVar, 20);
       
       // simulate upgrade
       const newProxiableContractContract = await ProxiableContract2.new();
       await proxy.setImplementation(newProxiableContractContract.address);
 
       proxyControl = await ProxiableContract2.at(proxy.address);
-      await proxyControl.setAnotherVar(proxy.address);
+      await proxyControl.setAnotherVar(30);
 
       // check storage is intact
-      const afterUpgradeValue = await proxyControl.getSomeVar();
-      th.assertIsApproximatelyEqual(someValue, afterUpgradeValue);
+      const someVarAfterUpgrade = await proxyControl.getSomeVar();
+      someVar.should.be.a.bignumber.that.equals(someVarAfterUpgrade);
+
+      const anotherVar = await proxyControl.getAnotherVar();
+      const mulAfterUpgrade = await proxyControl.mulVars();
+      mulAfterUpgrade.should.be.a.bignumber.that.equals(anotherVar.mul(someVarAfterUpgrade));
     });
   });
 });
