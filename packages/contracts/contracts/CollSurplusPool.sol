@@ -4,25 +4,12 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Dependencies/SafeMath.sol";
-import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "./CollSurplusPoolStorage.sol";
 
 
-contract CollSurplusPool is Ownable, CheckContract, ICollSurplusPool {
-    using SafeMath for uint256;
-
-    string constant public NAME = "CollSurplusPool";
-
-    address public borrowerOperationsAddress;
-    address public troveManagerAddress;
-    address public activePoolAddress;
-
-    // deposited ether tracker
-    uint256 internal ETH;
-    // Collateral surplus claimable by trove owners
-    mapping (address => uint) internal balances;
-
+contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusPool {
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
