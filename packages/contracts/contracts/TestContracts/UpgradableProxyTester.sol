@@ -19,17 +19,21 @@ contract ProxiableContract is Storage {
 }
 
 contract Storage2 {
-    address anotherVar;
+    uint anotherVar;
 }
 
 contract ProxiableContract2 is ProxiableContract, Storage2 {
 
-    function getAnotherVar() public view returns (address) {
+    function getAnotherVar() public view returns (uint) {
         return anotherVar;
     }
 
-    function setAnotherVar(address value) public {
+    function setAnotherVar(uint value) public {
         anotherVar = value;
+    }
+
+    function mulVars() public view returns (uint) {
+        return someVar * anotherVar;
     }
 }
 
