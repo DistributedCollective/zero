@@ -5,9 +5,10 @@ pragma experimental ABIEncoderV2;
 
 import "./TroveManager.sol";
 import "./SortedTroves.sol";
+import "./MultiTroveGetterStorage.sol";
 
 /*  Helper contract for grabbing Trove data for the front end. Not part of the core Liquity system. */
-contract MultiTroveGetter {
+contract MultiTroveGetter is MultiTroveGetterStorage {
     struct CombinedTroveData {
         address owner;
 
@@ -19,11 +20,16 @@ contract MultiTroveGetter {
         uint snapshotLUSDDebt;
     }
 
-    TroveManager public troveManager; // XXX Troves missing from ITroveManager?
-    ISortedTroves public sortedTroves;
-
     constructor(TroveManager _troveManager, ISortedTroves _sortedTroves) public {
         troveManager = _troveManager;
+        sortedTroves = _sortedTroves;
+    }
+
+    function setTroveManager(TroveManager _troveManager) public onlyOwner {
+        troveManager = _troveManager;
+    }
+
+    function setSortedTroves(ISortedTroves _sortedTroves) public onlyOwner {
         sortedTroves = _sortedTroves;
     }
 
