@@ -3,10 +3,10 @@
 pragma solidity 0.6.11;
 
 import "./Interfaces/IPriceFeed.sol";
-import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/PriceFeed/MocMedianizer.sol";
 import "./Dependencies/PriceFeed/RskOracle.sol";
+import "./PriceFeedStorage.sol";
 
 /*
  * PriceFeed for mainnet deployment, to be connected to MoC's  medianizer live rBTC:USD aggregator reference
@@ -14,19 +14,8 @@ import "./Dependencies/PriceFeed/RskOracle.sol";
  *
  * The PriceFeed uses the medianizer as primary oracle, and RSK one as fallback.
  */
-contract PriceFeed is Ownable, CheckContract, IPriceFeed {
-    string public constant NAME = "PriceFeed";
-
-    IExternalPriceFeed[2] priceFeeds;
-    //MoCMedianizer public medianizer;
-    //RskOracle public rskOracle;
-
-    // The last good price seen from an oracle by Liquity
-    uint256 public lastGoodPrice;
-
-    event LastGoodPriceUpdated(uint256 _lastGoodPrice);
-    event PriceFeedBroken(uint8 index);
-
+contract PriceFeed is PriceFeedStorage, CheckContract, IPriceFeed {
+    
     // --- Dependency setters ---
 
     function setAddresses(address _medianizer, address _rskOracle) external onlyOwner {
