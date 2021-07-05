@@ -26,7 +26,7 @@ import "./LUSDTokenStorage.sol";
 */
 
 contract LUSDToken is LUSDTokenStorage, CheckContract, ILUSDToken {
-    
+    using SafeMath for uint256;
     // --- Events ---
     event TroveManagerAddressChanged(address _troveManagerAddress);
     event StabilityPoolAddressChanged(address _newStabilityPoolAddress);

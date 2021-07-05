@@ -10,6 +10,7 @@ import "./CollSurplusPoolStorage.sol";
 
 
 contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusPool {
+    using SafeMath for uint256;
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);

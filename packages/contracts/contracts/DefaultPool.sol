@@ -4,7 +4,6 @@ pragma solidity 0.6.11;
 
 import './Interfaces/IDefaultPool.sol';
 import "./Dependencies/SafeMath.sol";
-import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
@@ -17,6 +16,8 @@ import "./DefaultPoolStorage.sol";
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
+    using SafeMath for uint256;
+    
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event DefaultPoolLUSDDebtUpdated(uint _LUSDDebt);
     event DefaultPoolETHBalanceUpdated(uint _ETH);
