@@ -3,7 +3,6 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/IActivePool.sol";
 import "./Dependencies/SafeMath.sol";
-import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
@@ -17,6 +16,7 @@ import "./ActivePoolStorage.sol";
  *
  */
 contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
+    using SafeMath for uint256;
     // --- Events ---
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);

@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
-import './Dependencies/SafeMath.sol';
-
 contract LUSDTokenStorage {
-    using SafeMath for uint256;
-
     uint256 internal _totalSupply;
     string internal constant _NAME = 'LUSD Stablecoin';
     string internal constant _SYMBOL = 'LUSD';

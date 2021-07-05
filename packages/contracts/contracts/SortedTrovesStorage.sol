@@ -5,14 +5,11 @@ pragma solidity 0.6.11;
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IBorrowerOperations.sol";
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
 contract SortedTrovesStorage is Ownable {
-    using SafeMath for uint256;
-
     string constant public NAME = "SortedTroves";
 
     address public borrowerOperationsAddress;
