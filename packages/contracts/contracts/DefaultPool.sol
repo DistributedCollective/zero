@@ -7,6 +7,7 @@ import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "./DefaultPoolStorage.sol";
 
 /*
  * The Default Pool holds the ETH and LUSD debt (but not LUSD tokens) from liquidations that have been redistributed
@@ -15,16 +16,7 @@ import "./Dependencies/console.sol";
  * When a trove makes an operation that applies its pending ETH and LUSD debt, its pending ETH and LUSD debt is moved
  * from the Default Pool to the Active Pool.
  */
-contract DefaultPool is Ownable, CheckContract, IDefaultPool {
-    using SafeMath for uint256;
-
-    string constant public NAME = "DefaultPool";
-
-    address public troveManagerAddress;
-    address public activePoolAddress;
-    uint256 internal ETH;  // deposited ETH tracker
-    uint256 internal LUSDDebt;  // debt
-
+contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event DefaultPoolLUSDDebtUpdated(uint _LUSDDebt);
     event DefaultPoolETHBalanceUpdated(uint _ETH);
