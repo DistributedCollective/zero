@@ -1,12 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
-import "./Interfaces/IActivePool.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
-import "./Dependencies/CheckContract.sol";
-import "./Dependencies/console.sol";
-
 contract ActivePoolStorage is Ownable {
     using SafeMath for uint256;
 
