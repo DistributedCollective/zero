@@ -6,8 +6,6 @@ import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 
 contract DefaultPoolStorage is Ownable {
-    using SafeMath for uint256;
-
     string constant public NAME = "DefaultPool";
 
     address public troveManagerAddress;

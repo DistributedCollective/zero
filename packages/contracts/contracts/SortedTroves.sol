@@ -44,7 +44,8 @@ import "./Dependencies/console.sol";
 * - Public functions with parameters have been made internal to save gas, and given an external wrapper function for external access
 */
 contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
-    
+    using SafeMath for uint256;
+
     event TroveManagerAddressChanged(address _troveManagerAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
     event NodeAdded(address _id, uint _NICR);
