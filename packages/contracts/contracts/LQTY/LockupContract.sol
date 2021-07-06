@@ -4,7 +4,6 @@ pragma solidity 0.6.11;
 
 import "../Dependencies/SafeMath.sol";
 import "../Interfaces/ILQTYToken.sol";
-import "./LockupContractStorage.sol";
 
 /*
 * The lockup contract architecture utilizes a single LockupContract, with an unlockTime. The unlockTime is passed as an argument 
@@ -17,8 +16,20 @@ import "./LockupContractStorage.sol";
 * The above two restrictions ensure that until one year after system deployment, LQTY tokens originating from Liquity AG cannot 
 * enter circulating supply and cannot be staked to earn system revenue.
 */
-contract LockupContract is LockupContractStorage {
+contract LockupContract {
     using SafeMath for uint;
+
+    // --- Data ---
+    string constant public NAME = "LockupContract";
+
+    uint constant public SECONDS_IN_ONE_YEAR = 31536000; 
+
+    address public immutable beneficiary;
+
+    ILQTYToken public lqtyToken;
+
+    // Unlock time is the Unix point in time at which the beneficiary can withdraw.
+    uint public unlockTime;
 
     // --- Events ---
 
@@ -33,8 +44,7 @@ contract LockupContract is LockupContractStorage {
         address _beneficiary, 
         uint _unlockTime
     )
-        public
-        LockupContractStorage(_beneficiary)
+        public 
     {
         lqtyToken = ILQTYToken(_lqtyTokenAddress);
 
@@ -45,6 +55,7 @@ contract LockupContract is LockupContractStorage {
         _requireUnlockTimeIsAtLeastOneYearAfterSystemDeployment(_unlockTime);
         unlockTime = _unlockTime;
         
+        beneficiary =  _beneficiary;
         emit LockupContractCreated(_beneficiary, _unlockTime);
     }
 
