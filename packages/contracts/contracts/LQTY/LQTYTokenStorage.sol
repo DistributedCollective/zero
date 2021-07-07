@@ -3,8 +3,9 @@
 pragma solidity 0.6.11;
 
 import "../Interfaces/ILockupContractFactory.sol";
+import "../Dependencies/Initializable.sol";
 
-contract LQTYTokenStorage {
+contract LQTYTokenStorage is Initializable {
     // --- ERC20 Data ---
 
     string constant internal _NAME = "LQTY";

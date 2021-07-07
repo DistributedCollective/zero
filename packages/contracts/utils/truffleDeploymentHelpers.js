@@ -18,7 +18,8 @@ const deployLiquity = async () => {
   const defaultPool = await DefaultPool.new()
   const functionCaller = await FunctionCaller.new()
   const borrowerOperations = await BorrowerOperations.new()
-  const lusdToken = await LUSDToken.new(
+  const lusdToken = await LUSDToken.new()
+  await lusdToken.initialize(
     troveManager.address,
     stabilityPool.address,
     borrowerOperations.address
