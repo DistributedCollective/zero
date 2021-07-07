@@ -59,17 +59,14 @@ contract LQTYToken is LQTYTokenStorage, CheckContract, ILQTYToken {
 
     // --- Functions ---
 
-    constructor
-    (
+    function initialize (
         address _communityIssuanceAddress, 
         address _lqtyStakingAddress,
         address _lockupFactoryAddress,
         address _bountyAddress,
         address _lpRewardsAddress,
         address _multisigAddress
-    ) 
-        public 
-    {
+    ) initializer public {
         checkContract(_communityIssuanceAddress);
         checkContract(_lqtyStakingAddress);
         checkContract(_lockupFactoryAddress);

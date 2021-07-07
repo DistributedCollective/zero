@@ -15,16 +15,16 @@ contract LQTYTokenTester is LQTYToken {
         address _multisigAddress
     ) 
         public 
-        LQTYToken 
-    (
-        _communityIssuanceAddress,
-        _lqtyStakingAddress,
-        _lockupFactoryAddress,
-        _bountyAddress,
-        _lpRewardsAddress,
-        _multisigAddress
-    )
-    {} 
+    {
+        initialize(
+            _communityIssuanceAddress,
+            _lqtyStakingAddress, 
+            _lockupFactoryAddress, 
+            _bountyAddress, 
+            _lpRewardsAddress, 
+            _multisigAddress
+        );
+    } 
 
     function unprotectedMint(address account, uint256 amount) external {
         // No check for the caller here

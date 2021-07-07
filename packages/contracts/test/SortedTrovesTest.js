@@ -61,7 +61,8 @@ contract('SortedTroves', async accounts => {
     before(async () => {
       contracts = await deploymentHelper.deployLiquityCore()
       contracts.troveManager = await TroveManagerTester.new()
-      contracts.lusdToken = await LUSDToken.new(
+      contracts.lusdToken = await LUSDToken.new()
+      await contracts.lusdToken.initialize(
         contracts.troveManager.address,
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address

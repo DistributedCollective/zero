@@ -32,14 +32,11 @@ contract LUSDToken is LUSDTokenStorage, CheckContract, ILUSDToken {
     event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
 
-    constructor
-    ( 
+    function initialize( 
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
-    ) 
-        public 
-    {  
+    ) initializer public {  
         checkContract(_troveManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_borrowerOperationsAddress);

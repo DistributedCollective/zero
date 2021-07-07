@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
-contract LUSDTokenStorage {
+import "./Dependencies/Initializable.sol";
+
+contract LUSDTokenStorage is Initializable {
     uint256 internal _totalSupply;
-    string internal constant _NAME = 'LUSD Stablecoin';
-    string internal constant _SYMBOL = 'LUSD';
-    string internal constant _VERSION = '1';
+    string internal constant _NAME = "LUSD Stablecoin";
+    string internal constant _SYMBOL = "LUSD";
+    string internal constant _VERSION = "1";
     uint8 internal constant _DECIMALS = 18;
 
     // --- Data for EIP2612 ---
@@ -35,5 +37,4 @@ contract LUSDTokenStorage {
     address internal troveManagerAddress;
     address internal stabilityPoolAddress;
     address internal borrowerOperationsAddress;
-
 }

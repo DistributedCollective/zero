@@ -97,7 +97,8 @@ class DeploymentHelper {
     const functionCaller = await FunctionCaller.new()
     const borrowerOperations = await BorrowerOperations.new()
     const hintHelpers = await HintHelpers.new()
-    const lusdToken = await LUSDToken.new(
+    const lusdToken = await LUSDToken.new()
+    await lusdToken.initialize(
       troveManager.address,
       stabilityPool.address,
       borrowerOperations.address
@@ -168,12 +169,13 @@ class DeploymentHelper {
     CommunityIssuance.setAsDeployed(communityIssuance)
 
     // Deploy LQTY Token, passing Community Issuance and Factory addresses to the constructor 
-    const lqtyToken = await LQTYToken.new(
+    const lqtyToken = await LQTYToken.new()
+    await lqtyToken.initialize(
       communityIssuance.address, 
       lqtyStaking.address,
       lockupContractFactory.address,
       bountyAddress,
-      lpRewardsAddress,
+      lpRewardsAddress, 
       multisigAddress
     )
     LQTYToken.setAsDeployed(lqtyToken)
@@ -228,7 +230,8 @@ class DeploymentHelper {
     const functionCaller = await FunctionCaller.new()
     const borrowerOperations = await BorrowerOperations.new()
     const hintHelpers = await HintHelpers.new()
-    const lusdToken = await LUSDToken.new(
+    const lusdToken = await LUSDToken.new()
+    await lusdToken.initialize(
       troveManager.address,
       stabilityPool.address,
       borrowerOperations.address
@@ -257,7 +260,8 @@ class DeploymentHelper {
 
     /* Deploy LQTY Token, passing Community Issuance,  LQTYStaking, and Factory addresses 
     to the constructor  */
-    const lqtyToken = await LQTYToken.new(
+    const lqtyToken = await LQTYToken.new()
+    await lqtyToken.initialize(
       communityIssuance.address, 
       lqtyStaking.address,
       lockupContractFactory.address,
@@ -276,7 +280,8 @@ class DeploymentHelper {
   }
 
   static async deployLUSDToken(contracts) {
-    contracts.lusdToken = await LUSDToken.new(
+    contracts.lusdToken = await LUSDToken.new()
+    await contracts.lusdToken.initialize(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
