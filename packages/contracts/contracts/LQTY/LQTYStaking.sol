@@ -64,7 +64,7 @@ contract LQTYStaking is LQTYStakingStorage, ILQTYStaking, CheckContract, BaseMat
         emit BorrowerOperationsAddressSet(_borrowerOperationsAddress);
         emit ActivePoolAddressSet(_activePoolAddress);
 
-        _renounceOwnership();
+        
     }
 
     // If caller has a pre-existing stake, send any accumulated ETH and LUSD gains to them. 

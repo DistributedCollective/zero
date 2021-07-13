@@ -39,7 +39,7 @@ contract LQTYTokenStorage is Initializable {
     uint public constant ONE_YEAR_IN_SECONDS = 31536000;  // 60 * 60 * 24 * 365
 
     // uint for use with SafeMath
-    uint internal _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
+    uint internal constant _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
 
     uint internal deploymentStartTime;
     address public multisigAddress;

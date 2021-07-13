@@ -73,8 +73,6 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     // Owner can successfully set any address
     const txOwner = await contract.setAddresses(...params, { from: owner })
     assert.isTrue(txOwner.receipt.status)
-    // fails if called twice
-    await th.assertRevert(contract.setAddresses(...params, { from: owner }))
   }
 
   describe('TroveManager', async accounts => {
@@ -124,8 +122,9 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
       const txOwner = await sortedTroves.setParams(...params, { from: owner })
       assert.isTrue(txOwner.receipt.status)
 
-      // fails if called twice
-      await th.assertRevert(sortedTroves.setParams(...params, { from: owner }))
+      // Owner can set any address more than once
+      const secondTxOwner = await sortedTroves.setParams(...params, { from: owner })
+      assert.isTrue(secondTxOwner.receipt.status)
     })
   })
 
@@ -141,10 +140,11 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
       // Owner can successfully set any address
       const txOwner = await communityIssuance.setAddresses(...params, { from: owner })
-
       assert.isTrue(txOwner.receipt.status)
-      // fails if called twice
-      await th.assertRevert(communityIssuance.setAddresses(...params, { from: owner }))
+
+      // Owner can set any address more than once
+      const secondTxOwner = await communityIssuance.setAddresses(...params, { from: owner })
+      assert.isTrue(secondTxOwner.receipt.status)
     })
   })
 
@@ -167,10 +167,11 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
       // Owner can successfully set any address
       const txOwner = await lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, { from: owner })
-
       assert.isTrue(txOwner.receipt.status)
-      // fails if called twice
-      await th.assertRevert(lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, { from: owner }))
+
+      // Owner can set any address more than once
+      const secondTxOwner = await lockupContractFactory.setLQTYTokenAddress(...params, { from: owner })
+      assert.isTrue(secondTxOwner.receipt.status)
     })
   })
 })

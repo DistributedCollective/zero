@@ -148,7 +148,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         emit LUSDTokenAddressChanged(_lusdTokenAddress);
         emit LQTYStakingAddressChanged(_lqtyStakingAddress);
 
-        _renounceOwnership();
+        
     }
 
     // --- Borrower Trove Operations ---

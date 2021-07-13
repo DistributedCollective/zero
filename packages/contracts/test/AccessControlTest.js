@@ -405,6 +405,7 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
         const txAlice = await sortedTroves.insert(bob, '150000000000000000000', bob, bob, { from: alice })
         
       } catch (err) {
+        console.log(err);
         assert.include(err.message, "revert")
         assert.include(err.message, " Caller is neither BO nor TroveM")
       }
@@ -431,6 +432,7 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
         const txAlice = await sortedTroves.reInsert(bob, '150000000000000000000', bob, bob, { from: alice })
         
       } catch (err) {
+        console.log(err);
         assert.include(err.message, "revert")
         assert.include(err.message, "Caller is neither BO nor TroveM")
       }

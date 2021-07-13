@@ -37,7 +37,7 @@ contract('Deploying the LQTY contracts: LCF, CI, LQTYStaking, and LQTYToken ', a
 
   describe('CommunityIssuance deployment', async accounts => {
     it("Stores the deployer's address", async () => {
-      const storedDeployerAddress = await communityIssuance.owner()
+      const storedDeployerAddress = await communityIssuance.getOwner()
 
       assert.equal(liquityAG, storedDeployerAddress)
     })
@@ -45,7 +45,7 @@ contract('Deploying the LQTY contracts: LCF, CI, LQTYStaking, and LQTYToken ', a
 
   describe('LQTYStaking deployment', async accounts => {
     it("Stores the deployer's address", async () => {
-      const storedDeployerAddress = await lqtyStaking.owner()
+      const storedDeployerAddress = await lqtyStaking.getOwner()
 
       assert.equal(liquityAG, storedDeployerAddress)
     })
@@ -106,7 +106,7 @@ contract('Deploying the LQTY contracts: LCF, CI, LQTYStaking, and LQTYToken ', a
   describe('Community Issuance deployment', async accounts => {
     it("Stores the deployer's address", async () => {
 
-      const storedDeployerAddress = await communityIssuance.owner()
+      const storedDeployerAddress = await communityIssuance.getOwner()
 
       assert.equal(storedDeployerAddress, liquityAG)
     })
