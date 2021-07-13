@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
+import "../Dependencies/Ownable.sol";
 /**
  * @title Base Proxy contract.
  * 
@@ -16,7 +17,7 @@ pragma solidity 0.6.11;
  * delegated to the logic contract.
  *
  * Proxy contract is meant to be inherited and its internal functions
- * _setImplementation and _setProxyOwner to be called when upgrades become
+ * _setImplementation and _setOwner to be called when upgrades become
  * neccessary.
  *
  * The loan token (iToken) contract as well as the protocol contract act as
@@ -29,30 +30,13 @@ pragma solidity 0.6.11;
  * @dev UpgradableProxy is the contract that inherits Proxy and wraps these
  * functions.
  * */
-contract Proxy {
+contract Proxy is Ownable {
     bytes32 private constant KEY_IMPLEMENTATION = keccak256("key.implementation");
-    bytes32 private constant KEY_OWNER = keccak256("key.proxy.owner");
 
-    event OwnershipTransferred(address indexed _oldOwner, address indexed _newOwner);
     event ImplementationChanged(
         address indexed _oldImplementation,
         address indexed _newImplementation
     );
-
-    /**
-     * @notice Set sender as an owner.
-     * */
-    constructor() public {
-        _setProxyOwner(msg.sender);
-    }
-
-    /**
-     * @notice Throw error if called not by an owner.
-     * */
-    modifier onlyProxyOwner() {
-        require(msg.sender == getProxyOwner(), "Proxy:: access denied");
-        _;
-    }
 
     /**
      * @notice Set address of the implementation.
@@ -76,31 +60,6 @@ contract Proxy {
         bytes32 key = KEY_IMPLEMENTATION;
         assembly {
             _implementation := sload(key)
-        }
-    }
-
-    /**
-     * @notice Set address of the owner.
-     * @param _owner Address of the owner.
-     * */
-    function _setProxyOwner(address _owner) internal {
-        require(_owner != address(0), "Proxy::setProxyOwner: invalid address");
-        emit OwnershipTransferred(getProxyOwner(), _owner);
-
-        bytes32 key = KEY_OWNER;
-        assembly {
-            sstore(key, _owner)
-        }
-    }
-
-    /**
-     * @notice Return address of the owner.
-     * @return _owner Address of the owner.
-     * */
-    function getProxyOwner() public view returns (address _owner) {
-        bytes32 key = KEY_OWNER;
-        assembly {
-            _owner := sload(key)
         }
     }
 

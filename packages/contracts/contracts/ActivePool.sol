@@ -45,7 +45,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
 
-        _renounceOwnership();
+        
     }
 
     // --- Getters for public variables. Required by IPool interface ---

@@ -217,7 +217,7 @@ class MainnetDeploymentHelper {
   // --- Connector methods ---
 
   async isOwnershipRenounced(contract) {
-    const owner = await contract.owner()
+    const owner = await contract.getOwner()
     return owner == ZERO_ADDRESS
   }
   // Connect contracts to their dependencies

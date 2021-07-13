@@ -284,7 +284,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         emit LQTYTokenAddressChanged(_lqtyTokenAddress);
         emit LQTYStakingAddressChanged(_lqtyStakingAddress);
 
-        _renounceOwnership();
+        
     }
 
     // --- Getters ---

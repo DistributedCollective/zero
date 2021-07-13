@@ -36,21 +36,21 @@ contract('UpgradableProxy', async (accounts) => {
       await th.assertRevert(txAlice, 'Proxy:: access denied');
     });
 
-    it('setProxyOwner(): only owner can change proxy owner', async () => {
-      const tx = await proxy.setProxyOwner(alice, {
+    it('setOwner(): only owner can change proxy owner', async () => {
+      const tx = await proxy.setOwner(alice, {
         from: owner,
       });
       const newOwnerAddress = th
-        .getEventArgByName(tx, 'OwnershipTransferred', '_newOwner')
+        .getEventArgByName(tx, 'OwnershipTransferred', 'newOwner')
         .toString();
       assert.equal(alice, newOwnerAddress);
 
       const oldOwner = owner;
-      const txOldOwner = proxy.setProxyOwner(oldOwner, {
+      const txOldOwner = proxy.setOwner(oldOwner, {
         from: oldOwner,
       });
       await th.assertRevert(txOldOwner, 'Proxy:: access denied');
-      await proxy.setProxyOwner(owner, {
+      await proxy.setOwner(owner, {
         from: alice,
       });
     });
