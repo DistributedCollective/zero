@@ -20,16 +20,8 @@ contract MultiTroveGetter is MultiTroveGetterStorage {
         uint snapshotLUSDDebt;
     }
 
-    constructor(TroveManager _troveManager, ISortedTroves _sortedTroves) public {
+    function setAddresses(TroveManager _troveManager, ISortedTroves _sortedTroves) public onlyOwner {
         troveManager = _troveManager;
-        sortedTroves = _sortedTroves;
-    }
-
-    function setTroveManager(TroveManager _troveManager) public onlyOwner {
-        troveManager = _troveManager;
-    }
-
-    function setSortedTroves(ISortedTroves _sortedTroves) public onlyOwner {
         sortedTroves = _sortedTroves;
     }
 

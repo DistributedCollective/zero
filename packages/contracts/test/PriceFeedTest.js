@@ -89,27 +89,7 @@ contract("PriceFeed", async accounts => {
     it("setAddresses should fail whe called by nonOwner", async () => {
       await assertRevert(
         priceFeed.setAddresses(mockedMoCPriceFeed.address, mockedRskOracle.address, { from: alice }),
-        "Ownable: caller is not the owner"
-      );
-    });
-
-    it("setAddresses should fail after address has already been set", async () => {
-      // Owner can successfully set any address
-      const txOwner = await priceFeed.setAddresses(
-        mockedMoCPriceFeed.address,
-        mockedRskOracle.address,
-        { from: owner }
-      );
-      assert.isTrue(txOwner.receipt.status);
-
-      await assertRevert(
-        priceFeed.setAddresses(mockedMoCPriceFeed.address, mockedRskOracle.address, { from: owner }),
-        "Ownable: caller is not the owner"
-      );
-
-      await assertRevert(
-        priceFeed.setAddresses(mockedMoCPriceFeed.address, mockedRskOracle.address, { from: alice }),
-        "Ownable: caller is not the owner"
+        "Ownable:: access denied"
       );
     });
 
@@ -134,7 +114,7 @@ contract("PriceFeed", async accounts => {
 
       await assertRevert(
         priceFeed.setAddresses(mockedMoCPriceFeed.address, mockedRskOracle.address, { from: alice }),
-        "Ownable: caller is not the owner"
+        "Ownable:: access denied"
       );
     });
   });

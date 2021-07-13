@@ -26,7 +26,7 @@ contract CommunityIssuanceStorage is Ownable {
     * F = 0.5 ** (1/525600)
     * F = 0.999998681227695000 
     */
-    uint public ISSUANCE_FACTOR = 999998681227695000;
+    uint public constant ISSUANCE_FACTOR = 999998681227695000;
 
     /* 
     * The community LQTY supply cap is the starting balance of the Community Issuance contract.
@@ -34,7 +34,7 @@ contract CommunityIssuanceStorage is Ownable {
     * 
     * Set to 32M (slightly less than 1/3) of total LQTY supply.
     */
-    uint public LQTYSupplyCap = 32e24; // 32 million
+    uint public constant LQTYSupplyCap = 32e24; // 32 million
 
     ILQTYToken public lqtyToken;
 

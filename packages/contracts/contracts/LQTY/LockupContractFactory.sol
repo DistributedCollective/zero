@@ -39,7 +39,7 @@ contract LockupContractFactory is LockupContractFactoryStorage, ILockupContractF
         lqtyTokenAddress = _lqtyTokenAddress;
         emit LQTYTokenAddressSet(_lqtyTokenAddress);
 
-        _renounceOwnership();
+        
     }
 
     function deployLockupContract(address _beneficiary, uint _unlockTime) external override {

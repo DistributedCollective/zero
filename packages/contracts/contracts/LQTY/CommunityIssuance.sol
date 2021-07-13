@@ -46,7 +46,7 @@ contract CommunityIssuance is CommunityIssuanceStorage, ICommunityIssuance, Chec
         emit LQTYTokenAddressSet(_lqtyTokenAddress);
         emit StabilityPoolAddressSet(_stabilityPoolAddress);
 
-        _renounceOwnership();
+        
     }
 
     function issueLQTY() external override returns (uint) {

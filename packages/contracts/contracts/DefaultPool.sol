@@ -40,7 +40,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
 
-        _renounceOwnership();
+        
     }
 
     // --- Getters for public variables. Required by IPool interface ---

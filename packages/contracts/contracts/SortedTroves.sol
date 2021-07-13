@@ -66,7 +66,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
 
-        _renounceOwnership();
+        
     }
 
     /*

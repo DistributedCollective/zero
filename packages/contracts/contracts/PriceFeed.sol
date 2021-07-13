@@ -31,7 +31,7 @@ contract PriceFeed is PriceFeedStorage, CheckContract, IPriceFeed {
 
         _storePrice(medianizerPrice);
 
-        _renounceOwnership();
+        
     }
 
     // --- Functions ---

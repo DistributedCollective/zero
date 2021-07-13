@@ -15,7 +15,7 @@ pragma solidity 0.6.11;
  * the owner.
  */
 contract Ownable {
-    address private _owner;
+    bytes32 private constant KEY_OWNER = keccak256("key.ownable.owner");
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -23,44 +23,47 @@ contract Ownable {
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
     constructor () internal {
-        _owner = msg.sender;
-        emit OwnershipTransferred(address(0), msg.sender);
-    }
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view returns (address) {
-        return _owner;
+        _setOwner(msg.sender);
     }
 
     /**
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(isOwner(), "Ownable: caller is not the owner");
+        require(msg.sender == getOwner(), "Ownable:: access denied");
         _;
     }
 
     /**
-     * @dev Returns true if the caller is the current owner.
-     */
-    function isOwner() public view returns (bool) {
-        return msg.sender == _owner;
+     * @notice Set address of the owner.
+     * @param _owner Address of the owner.
+     * */
+    function _setOwner(address _owner) internal {
+        require(_owner != address(0), "Ownable::setOwner: invalid address");
+        emit OwnershipTransferred(getOwner(), _owner);
+
+        bytes32 key = KEY_OWNER;
+        assembly {
+            sstore(key, _owner)
+        }
     }
 
     /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     *
-     * NOTE: This function is not safe, as it doesn’t check owner is calling it.
-     * Make sure you check it before calling it.
-     */
-    function _renounceOwnership() internal {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
+     * @notice Set address of the owner (only owner can call this function)
+     * @param _owner Address of the owner.
+     * */
+    function setOwner(address _owner) public onlyOwner {
+        _setOwner(_owner);
+    }
+
+    /**
+     * @notice Return address of the owner.
+     * @return _owner Address of the owner.
+     * */
+    function getOwner() public view returns (address _owner) {
+        bytes32 key = KEY_OWNER;
+        assembly {
+            _owner := sload(key)
+        }
     }
 }

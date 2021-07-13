@@ -306,7 +306,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
 
-        _renounceOwnership();
+        
     }
 
     // --- Getters for public variables. Required by IPool interface ---

@@ -29,15 +29,8 @@ contract UpgradableProxy is Proxy {
      * contract as current pointing implementation.
      * @param _implementation Address of the implementation.
      * */
-    function setImplementation(address _implementation) public onlyProxyOwner {
+    function setImplementation(address _implementation) public onlyOwner {
         _setImplementation(_implementation);
     }
 
-    /**
-     * @notice Set address of the owner.
-     * @param _owner Address of the owner.
-     * */
-    function setProxyOwner(address _owner) public onlyProxyOwner {
-        _setProxyOwner(_owner);
-    }
 }

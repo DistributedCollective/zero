@@ -113,7 +113,7 @@ contract Unipool is LPTokenWrapper, Ownable, CheckContract, IUnipool {
         emit LQTYTokenAddressChanged(_lqtyTokenAddress);
         emit UniTokenAddressChanged(_uniTokenAddress);
 
-        _renounceOwnership();
+        
     }
 
     // Returns current timestamp if the rewards program has not finished yet, end time otherwise
