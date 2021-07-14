@@ -5,14 +5,10 @@ pragma solidity 0.6.11;
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Dependencies/LiquityBase.sol";
-import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
+import "./HintHelpersStorage.sol";
 
-contract HintHelpers is LiquityBase, Ownable, CheckContract {
-    string constant public NAME = "HintHelpers";
-
-    ISortedTroves public sortedTroves;
-    ITroveManager public troveManager;
+contract HintHelpers is HintHelpersStorage, LiquityBase, CheckContract {
 
     // --- Events ---
 
