@@ -1,19 +1,22 @@
 [
   {
+    "anonymous": false,
     "inputs": [
       {
-        "internalType": "contract TroveManager",
-        "name": "_troveManager",
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
         "type": "address"
       },
       {
-        "internalType": "contract ISortedTroves",
-        "name": "_sortedTroves",
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
         "type": "address"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
     "inputs": [
@@ -69,6 +72,50 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract TroveManager",
+        "name": "_troveManager",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ISortedTroves",
+        "name": "_sortedTroves",
+        "type": "address"
+      }
+    ],
+    "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "setOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

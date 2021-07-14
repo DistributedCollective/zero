@@ -270,6 +270,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     // --- Contract setters ---
 
     function setAddresses(
+        address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
@@ -282,6 +283,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         override
         onlyOwner
     {
+        checkContract(_liquityBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
@@ -290,6 +292,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         checkContract(_priceFeedAddress);
         checkContract(_communityIssuanceAddress);
 
+        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
@@ -950,7 +953,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         uint price = priceFeed.fetchPrice();
         address lowestTrove = sortedTroves.getLast();
         uint ICR = troveManager.getCurrentICR(lowestTrove, price);
-        require(ICR >= MCR, "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
+        require(ICR >= liquityBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
     }
 
     function _requireUserHasDeposit(uint _initialDeposit) internal pure {

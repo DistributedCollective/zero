@@ -13,7 +13,7 @@ contract TroveManagerTester is TroveManager {
         return LiquityMath._computeCR(_coll, _debt, _price);
     }
 
-    function getCollGasCompensation(uint _coll) external pure returns (uint) {
+    function getCollGasCompensation(uint _coll) external view returns (uint) {
         return _getCollGasCompensation(_coll);
     }
 

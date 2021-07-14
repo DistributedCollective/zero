@@ -238,19 +238,6 @@
   },
   {
     "inputs": [],
-    "name": "CCR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "DECIMAL_PRECISION",
     "outputs": [
       {
@@ -265,19 +252,6 @@
   {
     "inputs": [],
     "name": "LUSD_GAS_COMPENSATION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MCR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -309,19 +283,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "PERCENT_DIVISOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -452,7 +413,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -483,12 +444,25 @@
   },
   {
     "inputs": [],
-    "name": "isOwner",
+    "name": "getOwner",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquityBaseParams",
+    "outputs": [
+      {
+        "internalType": "contract LiquityBaseParams",
         "name": "",
-        "type": "bool"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -586,19 +560,6 @@
   },
   {
     "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "priceFeed",
     "outputs": [
       {
@@ -635,6 +596,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_liquityBaseParamsAddress",
+        "type": "address"
+      },
       {
         "internalType": "address",
         "name": "_troveManagerAddress",
@@ -687,6 +653,19 @@
       }
     ],
     "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "setOwner",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

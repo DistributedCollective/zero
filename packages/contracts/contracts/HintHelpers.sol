@@ -22,15 +22,18 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     // --- Dependency setters ---
 
     function setAddresses(
+        address _liquityBaseParamsAddress,
         address _sortedTrovesAddress,
         address _troveManagerAddress
     )
         external
         onlyOwner
     {
+        checkContract(_liquityBaseParamsAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_troveManagerAddress);
 
+        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         troveManager = ITroveManager(_troveManagerAddress);
 
@@ -77,7 +80,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
         uint remainingLUSD = _LUSDamount;
         address currentTroveuser = sortedTrovesCached.getLast();
 
-        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < MCR) {
+        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < liquityBaseParams.MCR()) {
             currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
         }
 

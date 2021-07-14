@@ -25,6 +25,7 @@ interface IBorrowerOperations {
     // --- Functions ---
 
     function setAddresses(
+        address _liquityBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,
@@ -55,5 +56,7 @@ interface IBorrowerOperations {
 
     function claimCollateral() external;
 
-    function getCompositeDebt(uint _debt) external pure returns (uint);
+    function getCompositeDebt(uint _debt) external view returns (uint);
+
+    function BORROWING_FEE_FLOOR() external view returns (uint);
 }

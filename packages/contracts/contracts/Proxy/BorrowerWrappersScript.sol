@@ -31,7 +31,11 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
     constructor(
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
-        address _lqtyStakingAddress
+        address _lqtyStakingAddress,
+        address _stabilityPoolAddress,
+        address _priceFeedAddress,
+        address _lusdTokenAddress,
+        address _lqtyTokenAddress
     )
         BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress))
         LQTYStakingScript(_lqtyStakingAddress)
@@ -41,24 +45,22 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
         troveManager = troveManagerCached;
 
-        IStabilityPool stabilityPoolCached = troveManagerCached.stabilityPool();
-        checkContract(address(stabilityPoolCached));
+        IStabilityPool stabilityPoolCached = IStabilityPool(_stabilityPoolAddress);
+        checkContract(_stabilityPoolAddress);
         stabilityPool = stabilityPoolCached;
 
-        IPriceFeed priceFeedCached = troveManagerCached.priceFeed();
-        checkContract(address(priceFeedCached));
+        IPriceFeed priceFeedCached = IPriceFeed(_priceFeedAddress); 
+        checkContract(_priceFeedAddress);
         priceFeed = priceFeedCached;
 
-        address lusdTokenCached = address(troveManagerCached.lusdToken());
-        checkContract(lusdTokenCached);
-        lusdToken = IERC20(lusdTokenCached);
+        checkContract(_lusdTokenAddress);
+        lusdToken = IERC20(_lusdTokenAddress);
 
-        address lqtyTokenCached = address(troveManagerCached.lqtyToken());
-        checkContract(lqtyTokenCached);
-        lqtyToken = IERC20(lqtyTokenCached);
+        checkContract(_lqtyTokenAddress);
+        lqtyToken = IERC20(_lqtyTokenAddress);
 
-        ILQTYStaking lqtyStakingCached = troveManagerCached.lqtyStaking();
-        require(_lqtyStakingAddress == address(lqtyStakingCached), "BorrowerWrappersScript: Wrong LQTYStaking address");
+        ILQTYStaking lqtyStakingCached = ILQTYStaking(_lqtyStakingAddress);
+        checkContract(_lqtyStakingAddress);
         lqtyStaking = lqtyStakingCached;
     }
 

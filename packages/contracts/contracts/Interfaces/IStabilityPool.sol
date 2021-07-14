@@ -75,6 +75,7 @@ interface IStabilityPool {
      * Callable only by owner, renounces ownership at the end
      */
     function setAddresses(
+        address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
