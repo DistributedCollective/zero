@@ -54,7 +54,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   it('Sets the correct LUSDToken address in TroveManager', async () => {
     const lusdTokenAddress = lusdToken.address
 
-    const recordedClvTokenAddress = await troveManager.lusdToken()
+    const recordedClvTokenAddress = await troveManager._lusdToken()
 
     assert.equal(lusdTokenAddress, recordedClvTokenAddress)
   })
@@ -97,7 +97,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   it('Sets the correct StabilityPool address in TroveManager', async () => {
     const stabilityPoolAddress = stabilityPool.address
 
-    const recordedStabilityPoolAddresss = await troveManager.stabilityPool()
+    const recordedStabilityPoolAddresss = await troveManager._stabilityPool()
 
     assert.equal(stabilityPoolAddress, recordedStabilityPoolAddresss)
   })
@@ -106,7 +106,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   it('Sets the correct LQTYStaking address in TroveManager', async () => {
     const lqtyStakingAddress = lqtyStaking.address
 
-    const recordedLQTYStakingAddress = await troveManager.lqtyStaking()
+    const recordedLQTYStakingAddress = await troveManager._lqtyStaking()
     assert.equal(lqtyStakingAddress, recordedLQTYStakingAddress)
   })
 

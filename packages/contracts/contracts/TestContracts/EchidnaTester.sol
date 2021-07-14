@@ -2,7 +2,10 @@
 
 pragma solidity 0.6.11;
 
+import "../LiquityBaseParams.sol";
 import "../TroveManager.sol";
+import "../TroveManagerStorage.sol";
+import "../Dependencies/TroveManagerRedeemOps.sol";
 import "../BorrowerOperations.sol";
 import "../ActivePool.sol";
 import "../DefaultPool.sol";
@@ -28,6 +31,8 @@ contract EchidnaTester {
     uint private CCR;
     uint private LUSD_GAS_COMPENSATION;
 
+    LiquityBaseParams public liquityBaseParams;
+    TroveManagerRedeemOps public troveManagerRedeemOps;
     TroveManager public troveManager;
     BorrowerOperations public borrowerOperations;
     ActivePool public activePool;
@@ -44,6 +49,8 @@ contract EchidnaTester {
     uint private numberOfTroves;
 
     constructor() public payable {
+        liquityBaseParams = new LiquityBaseParams();
+        troveManagerRedeemOps = new TroveManagerRedeemOps();
         troveManager = new TroveManager();
         borrowerOperations = new BorrowerOperations();
         activePool = new ActivePool();
@@ -62,13 +69,16 @@ contract EchidnaTester {
 
         sortedTroves = new SortedTroves();
 
-        troveManager.setAddresses(address(borrowerOperations), 
+        troveManager.setAddresses(
+            address(troveManagerRedeemOps),
+            address(liquityBaseParams), address(borrowerOperations), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),
             address(priceFeedTestnet), address(lusdToken), 
             address(sortedTroves), address(0), address(0));
        
-        borrowerOperations.setAddresses(address(troveManager), 
+        borrowerOperations.setAddresses(
+            address(liquityBaseParams), address(troveManager), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),
             address(priceFeedTestnet), address(sortedTroves), 
@@ -79,7 +89,8 @@ contract EchidnaTester {
 
         defaultPool.setAddresses(address(troveManager), address(activePool));
         
-        stabilityPool.setAddresses(address(borrowerOperations), 
+        stabilityPool.setAddresses(
+            address(liquityBaseParams), address(borrowerOperations), 
             address(troveManager), address(activePool), address(lusdToken), 
             address(sortedTroves), address(priceFeedTestnet), address(0));
 
@@ -94,8 +105,8 @@ contract EchidnaTester {
             require(success);
         }
 
-        MCR = borrowerOperations.MCR();
-        CCR = borrowerOperations.CCR();
+        MCR = borrowerOperations.liquityBaseParams().MCR();
+        CCR = borrowerOperations.liquityBaseParams().CCR();
         LUSD_GAS_COMPENSATION = borrowerOperations.LUSD_GAS_COMPENSATION();
         require(MCR > 0);
         require(CCR > 0);
@@ -328,7 +339,7 @@ contract EchidnaTester {
         address currentTrove = sortedTroves.getFirst();
         while (currentTrove != address(0)) {
             // Status
-            if (TroveManager.Status(troveManager.getTroveStatus(currentTrove)) != TroveManager.Status.active) {
+            if (TroveManagerStorage.Status(troveManager.getTroveStatus(currentTrove)) != TroveManagerStorage.Status.active) {
                 return false;
             }
             // Uncomment to check that the condition is meaningful

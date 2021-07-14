@@ -434,19 +434,6 @@
   },
   {
     "inputs": [],
-    "name": "BORROWING_FEE_FLOOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "CCR",
     "outputs": [
       {
@@ -512,19 +499,6 @@
   },
   {
     "inputs": [],
-    "name": "MAX_BORROWING_FEE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "MCR",
     "outputs": [
       {
@@ -570,32 +544,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "PERCENT_DIVISOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "REDEMPTION_FEE_FLOOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -659,7 +607,7 @@
         "type": "uint256"
       },
       {
-        "internalType": "enum TroveManager.Status",
+        "internalType": "enum TroveManagerStorage.Status",
         "name": "status",
         "type": "uint8"
       },
@@ -680,6 +628,58 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_lqtyStaking",
+    "outputs": [
+      {
+        "internalType": "contract ILQTYStaking",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_lqtyToken",
+    "outputs": [
+      {
+        "internalType": "contract ILQTYToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_lusdToken",
+    "outputs": [
+      {
+        "internalType": "contract ILUSDToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_stabilityPool",
+    "outputs": [
+      {
+        "internalType": "contract IStabilityPool",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1037,6 +1037,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -1315,19 +1328,6 @@
   },
   {
     "inputs": [],
-    "name": "isOwner",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "lastETHError_Redistribution",
     "outputs": [
       {
@@ -1393,49 +1393,10 @@
   },
   {
     "inputs": [],
-    "name": "lqtyStaking",
+    "name": "liquityBaseParams",
     "outputs": [
       {
-        "internalType": "contract ILQTYStaking",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lqtyToken",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lusdToken",
-    "outputs": [
-      {
-        "internalType": "contract ILUSDToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
+        "internalType": "contract LiquityBaseParams",
         "name": "",
         "type": "address"
       }
@@ -1540,6 +1501,11 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_liquityBaseParamsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_borrowerOperationsAddress",
         "type": "address"
       },
@@ -1603,6 +1569,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "setOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_borrower",
         "type": "address"
       },
@@ -1623,19 +1602,6 @@
     "outputs": [
       {
         "internalType": "contract ISortedTroves",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stabilityPool",
-    "outputs": [
-      {
-        "internalType": "contract IStabilityPool",
         "name": "",
         "type": "address"
       }

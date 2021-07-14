@@ -13,7 +13,9 @@ import "./ILQTYStaking.sol";
 interface ITroveManager is ILiquityBase {
     
     // --- Events ---
-
+    
+    event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
+    event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event LUSDTokenAddressChanged(address _newLUSDTokenAddress);
@@ -41,6 +43,8 @@ interface ITroveManager is ILiquityBase {
     // --- Functions ---
 
     function setAddresses(
+        address _troveManagerRedeemOps,
+        address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,
@@ -53,11 +57,6 @@ interface ITroveManager is ILiquityBase {
         address _lqtyTokenAddress,
         address _lqtyStakingAddress
     ) external;
-
-    function stabilityPool() external view returns (IStabilityPool);
-    function lusdToken() external view returns (ILUSDToken);
-    function lqtyToken() external view returns (ILQTYToken);
-    function lqtyStaking() external view returns (ILQTYStaking);
 
     function getTroveOwnersCount() external view returns (uint);
 
@@ -139,6 +138,10 @@ interface ITroveManager is ILiquityBase {
     function decreaseTroveDebt(address _borrower, uint _collDecrease) external returns (uint); 
 
     function getTCR(uint _price) external view returns (uint);
+
+    function MCR() external view returns (uint);
+
+    function CCR() external view returns (uint);
 
     function checkRecoveryMode(uint _price) external view returns (bool);
 }

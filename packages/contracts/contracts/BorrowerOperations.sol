@@ -96,6 +96,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     // --- Dependency setters ---
 
     function setAddresses(
+        address _liquityBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,
@@ -114,6 +115,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         // This makes impossible to open a trove with zero withdrawn LUSD
         assert(MIN_NET_DEBT > 0);
 
+        checkContract(_liquityBaseParamsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
         checkContract(_defaultPoolAddress);
@@ -125,6 +127,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         checkContract(_lusdTokenAddress);
         checkContract(_lqtyStakingAddress);
 
+        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
         defaultPool = IDefaultPool(_defaultPoolAddress);
@@ -532,20 +535,20 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         }
     }
 
-    function _requireICRisAboveMCR(uint _newICR) internal pure {
-        require(_newICR >= MCR, "BorrowerOps: An operation that would result in ICR < MCR is not permitted");
+    function _requireICRisAboveMCR(uint _newICR) internal view {
+        require(_newICR >= liquityBaseParams.MCR(), "BorrowerOps: An operation that would result in ICR < MCR is not permitted");
     }
 
-    function _requireICRisAboveCCR(uint _newICR) internal pure {
-        require(_newICR >= CCR, "BorrowerOps: Operation must leave trove with ICR >= CCR");
+    function _requireICRisAboveCCR(uint _newICR) internal view {
+        require(_newICR >= liquityBaseParams.CCR(), "BorrowerOps: Operation must leave trove with ICR >= CCR");
     }
 
     function _requireNewICRisAboveOldICR(uint _newICR, uint _oldICR) internal pure {
         require(_newICR >= _oldICR, "BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode");
     }
 
-    function _requireNewTCRisAboveCCR(uint _newTCR) internal pure {
-        require(_newTCR >= CCR, "BorrowerOps: An operation that would result in TCR < CCR is not permitted");
+    function _requireNewTCRisAboveCCR(uint _newTCR) internal view {
+        require(_newTCR >= liquityBaseParams.CCR(), "BorrowerOps: An operation that would result in TCR < CCR is not permitted");
     }
 
     function _requireAtLeastMinNetDebt(uint _netDebt) internal pure {
@@ -564,12 +567,12 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         require(_lusdToken.balanceOf(_borrower) >= _debtRepayment, "BorrowerOps: Caller doesnt have enough LUSD to make repayment");
     }
 
-    function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isRecoveryMode) internal pure {
+    function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isRecoveryMode) internal view {
         if (_isRecoveryMode) {
             require(_maxFeePercentage <= DECIMAL_PRECISION,
                 "Max fee percentage must less than or equal to 100%");
         } else {
-            require(_maxFeePercentage >= BORROWING_FEE_FLOOR && _maxFeePercentage <= DECIMAL_PRECISION,
+            require(_maxFeePercentage >= liquityBaseParams.BORROWING_FEE_FLOOR() && _maxFeePercentage <= DECIMAL_PRECISION,
                 "Max fee percentage must be between 0.5% and 100%");
         }
     }
@@ -660,7 +663,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         return newTCR;
     }
 
-    function getCompositeDebt(uint _debt) external pure override returns (uint) {
+    function getCompositeDebt(uint _debt) external view override returns (uint) {
         return _getCompositeDebt(_debt);
+    }
+
+    function BORROWING_FEE_FLOOR() override external view returns (uint) {
+        return liquityBaseParams.BORROWING_FEE_FLOOR();
     }
 }
