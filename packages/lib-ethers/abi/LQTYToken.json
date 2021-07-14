@@ -1,41 +1,5 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_communityIssuanceAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lqtyStakingAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lockupFactoryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_bountyAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lpRewardsAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_multisigAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -314,6 +278,44 @@
         "type": "bool"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_communityIssuanceAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lqtyStakingAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lockupFactoryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_bountyAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lpRewardsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_multisigAddress",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

@@ -8,6 +8,7 @@ import "../Interfaces/IActivePool.sol";
 import "../Interfaces/IDefaultPool.sol";
 import "../Interfaces/IPriceFeed.sol";
 import "../Interfaces/ILiquityBase.sol";
+import "../Interfaces/ILiquityBaseParams.sol";
 
 /* 
 * Base contract for TroveManager, BorrowerOperations and StabilityPool. Contains global system constants and
@@ -18,28 +19,19 @@ contract LiquityBase is BaseMath, ILiquityBase {
 
     uint constant public _100pct = 1000000000000000000; // 1e18 == 100%
 
-    // Minimum collateral ratio for individual troves
-    uint constant public MCR = 1100000000000000000; // 110%
-
-    // Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.
-    uint constant public CCR = 1500000000000000000; // 150%
-
     // Amount of LUSD to be locked in gas pool on opening troves
     uint constant public LUSD_GAS_COMPENSATION = 200e18;
 
     // Minimum amount of net LUSD debt a trove must have
     uint constant public MIN_NET_DEBT = 1800e18;
-    // uint constant public MIN_NET_DEBT = 0; 
-
-    uint constant public PERCENT_DIVISOR = 200; // dividing by 200 yields 0.5%
-
-    uint constant public BORROWING_FEE_FLOOR = DECIMAL_PRECISION / 1000 * 5; // 0.5%
 
     IActivePool public activePool;
 
     IDefaultPool public defaultPool;
 
     IPriceFeed public override priceFeed;
+
+    ILiquityBaseParams public override liquityBaseParams;
 
     // --- Gas compensation functions ---
 
@@ -53,8 +45,8 @@ contract LiquityBase is BaseMath, ILiquityBase {
     }
 
     // Return the amount of ETH to be drawn from a trove's collateral and sent as gas compensation.
-    function _getCollGasCompensation(uint _entireColl) internal pure returns (uint) {
-        return _entireColl / PERCENT_DIVISOR;
+    function _getCollGasCompensation(uint _entireColl) internal view returns (uint) {
+        return _entireColl / liquityBaseParams.PERCENT_DIVISOR();
     }
 
     function getEntireSystemColl() public view returns (uint entireSystemColl) {
@@ -83,7 +75,7 @@ contract LiquityBase is BaseMath, ILiquityBase {
     function _checkRecoveryMode(uint _price) internal view returns (bool) {
         uint TCR = _getTCR(_price);
 
-        return TCR < CCR;
+        return TCR < liquityBaseParams.CCR();
     }
 
     function _requireUserAcceptsFee(uint _fee, uint _amount, uint _maxFeePercentage) internal pure {
