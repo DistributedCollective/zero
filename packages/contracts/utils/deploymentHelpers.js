@@ -107,6 +107,7 @@ class DeploymentHelper {
       stabilityPool.address,
       borrowerOperations.address
     )
+    await liquityBaseParams.initialize()
     LUSDToken.setAsDeployed(lusdToken)
     DefaultPool.setAsDeployed(defaultPool)
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
@@ -166,6 +167,7 @@ class DeploymentHelper {
       testerContracts.stabilityPool.address,
       testerContracts.borrowerOperations.address
     )
+    await testerContracts.liquityBaseParams.initialize();
     return testerContracts
   }
 
@@ -248,6 +250,7 @@ class DeploymentHelper {
       stabilityPool.address,
       borrowerOperations.address
     )
+    await liquityBaseParams.initialize()
     const coreContracts = {
       priceFeedTestnet,
       lusdToken,
