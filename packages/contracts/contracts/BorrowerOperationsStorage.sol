@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.6.11;
+
+import "./Interfaces/IActivePool.sol";
+import "./Interfaces/IBorrowerOperations.sol";
+import "./Interfaces/ITroveManager.sol";
+import "./Interfaces/ILUSDToken.sol";
+import "./Interfaces/ICollSurplusPool.sol";
+import "./Interfaces/ISortedTroves.sol";
+import "./Interfaces/ILQTYStaking.sol";
+import "./Dependencies/Ownable.sol";
+
+contract BorrowerOperationsStorage is Ownable {
+    string constant public NAME = "BorrowerOperations";
+
+    // --- Connected contract declarations ---
+
+    ITroveManager public troveManager;
+
+    address stabilityPoolAddress;
+
+    address gasPoolAddress;
+
+    ICollSurplusPool collSurplusPool;
+
+    ILQTYStaking public lqtyStaking;
+    address public lqtyStakingAddress;
+
+    ILUSDToken public lusdToken;
+
+    // A doubly linked list of Troves, sorted by their collateral ratios
+    ISortedTroves public sortedTroves;
+
+}

@@ -9,31 +9,11 @@ import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ILQTYStaking.sol";
 import "./Dependencies/LiquityBase.sol";
-import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "./BorrowerOperationsStorage.sol";
 
-contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOperations {
-    string constant public NAME = "BorrowerOperations";
-
-    // --- Connected contract declarations ---
-
-    ITroveManager public troveManager;
-
-    address stabilityPoolAddress;
-
-    address gasPoolAddress;
-
-    ICollSurplusPool collSurplusPool;
-
-    ILQTYStaking public lqtyStaking;
-    address public lqtyStakingAddress;
-
-    ILUSDToken public lusdToken;
-
-    // A doubly linked list of Troves, sorted by their collateral ratios
-    ISortedTroves public sortedTroves;
-
+contract BorrowerOperations is BorrowerOperationsStorage, LiquityBase, CheckContract, IBorrowerOperations {
     /* --- Variable container structs  ---
 
     Used to hold, return and assign variables inside a function, in order to avoid the error:
@@ -77,7 +57,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         closeTrove,
         adjustTrove
     }
-
+    
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolAddressChanged(address _activePoolAddress);
     event DefaultPoolAddressChanged(address _defaultPoolAddress);
