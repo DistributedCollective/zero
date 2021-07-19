@@ -1151,7 +1151,7 @@ class TestHelper {
       // console.log("tx succeeded")
       assert.isFalse(tx.receipt.status) // when this assert fails, the expected revert didn't occur, i.e. the tx succeeded
     } catch (err) {
-      // console.log("tx failed")
+      // console.log("tx failed", err)
       assert.include(err.message, "revert")
       // TODO !!!
       
