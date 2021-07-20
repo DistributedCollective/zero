@@ -144,7 +144,7 @@ import "./StabilityPoolStorage.sol";
  * The product P (and snapshot P_t) is re-used, as the ratio P/P_t tracks a deposit's depletion due to liquidations.
  *
  */
-contract StabilityPool is StabilityPoolStorage, LiquityBase, CheckContract, IStabilityPool {
+contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, IStabilityPool {
     using LiquitySafeMath128 for uint128;
 
     // --- Events ---

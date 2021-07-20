@@ -8,7 +8,7 @@ import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./HintHelpersStorage.sol";
 
-contract HintHelpers is HintHelpersStorage, LiquityBase, CheckContract {
+contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
 
     // --- Events ---
 
