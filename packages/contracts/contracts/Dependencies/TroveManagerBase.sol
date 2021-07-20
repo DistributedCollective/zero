@@ -11,7 +11,7 @@ import "../Interfaces/ICollSurplusPool.sol";
 import "../TroveManagerStorage.sol";
 import "./LiquityBase.sol";
 
-contract TroveManagerBase is TroveManagerStorage, LiquityBase {
+contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
