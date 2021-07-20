@@ -13,7 +13,7 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./BorrowerOperationsStorage.sol";
 
-contract BorrowerOperations is BorrowerOperationsStorage, LiquityBase, CheckContract, IBorrowerOperations {
+contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckContract, IBorrowerOperations {
     /* --- Variable container structs  ---
 
     Used to hold, return and assign variables inside a function, in order to avoid the error:
