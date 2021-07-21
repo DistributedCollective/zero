@@ -205,6 +205,8 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         checkContract(_priceFeedAddress);
         checkContract(_communityIssuanceAddress);
 
+        P = DECIMAL_PRECISION;
+        
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);

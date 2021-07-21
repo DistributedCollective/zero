@@ -1,16 +1,14 @@
 import { Signer } from "@ethersproject/abstract-signer";
-import { ContractTransaction, ContractFactory, Overrides } from "@ethersproject/contracts";
+import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
 import { Wallet } from "@ethersproject/wallet";
-
 import { Decimal } from "@liquity/lib-base";
-
+import { Contract } from "ethers";
 import {
-  _LiquityContractAddresses,
+  _connectToContracts, _LiquityContractAddresses,
   _LiquityContracts,
-  _LiquityDeploymentJSON,
-  _connectToContracts
+  _LiquityDeploymentJSON
 } from "../src/contracts";
-
+import { PriceFeed } from "../types";
 import { createUniswapV2Pair } from "./UniswapV2Factory";
 
 let silent = true;
@@ -30,7 +28,7 @@ const deployContractAndGetBlockNumber = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   contractName: string,
   ...args: unknown[]
-): Promise<[address: string, blockNumber: number]> => {
+): Promise<[contract: Contract, blockNumber: number]> => {
   log(`Deploying ${contractName} ...`);
   const contract = await (await getContractFactory(contractName, deployer)).deploy(...args);
 
@@ -45,12 +43,41 @@ const deployContractAndGetBlockNumber = async (
 
   log();
 
-  return [contract.address, receipt.blockNumber];
+  return [contract, receipt.blockNumber];
 };
 
 const deployContract: (
   ...p: Parameters<typeof deployContractAndGetBlockNumber>
-) => Promise<string> = (...p) => deployContractAndGetBlockNumber(...p).then(([a]) => a);
+) => Promise<string> = (...p) =>
+  deployContractAndGetBlockNumber(...p).then(([contract]) => contract.address);
+
+const deployContractWithProxy: (
+  ...p: Parameters<typeof deployContractAndGetBlockNumber>
+) => Promise<string> = async (...p) => {
+  const [contract] = await deployContractAndGetBlockNumber(...p);
+
+  log(`Deploying Proxy for ${p[2]} ...`);
+  const proxyContract = await (await p[1]("UpgradableProxy", p[0])).deploy(p[3]);
+
+  log(`Waiting for transaction ${proxyContract.deployTransaction.hash} ...`);
+  const receipt = await proxyContract.deployTransaction.wait();
+
+  log(`Setting implementation address to proxy: ${contract.address} ...`);
+  const setImplementation = await proxyContract.setImplementation(contract.address);
+
+  log(`Waiting for transaction ${setImplementation.hash} ...`);
+  const setImplementationReceipt = await setImplementation.wait();
+
+  log({
+    contractAddress: proxyContract.address,
+    blockNumber: receipt.blockNumber,
+    gasUsed: receipt.gasUsed.toNumber() + setImplementationReceipt.gasUsed.toNumber()
+  });
+
+  log();
+
+  return proxyContract.address;
+};
 
 const deployContracts = async (
   deployer: Signer,
@@ -58,107 +85,77 @@ const deployContracts = async (
   priceFeedIsTestnet = true,
   overrides?: Overrides
 ): Promise<[addresses: Omit<_LiquityContractAddresses, "uniToken">, startBlock: number]> => {
-  const [activePoolAddress, startBlock] = await deployContractAndGetBlockNumber(
-    deployer,
-    getContractFactory,
-    "ActivePool",
-    { ...overrides }
-  );
+
+  const [gasPool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, "GasPool", {
+    ...overrides
+  })
 
   const addresses = {
-    activePool: activePoolAddress,
-    borrowerOperations: await deployContract(deployer, getContractFactory, "BorrowerOperations", {
+    activePool: await deployContractWithProxy(deployer, getContractFactory, "ActivePool", {
       ...overrides
     }),
-    troveManager: await deployContract(deployer, getContractFactory, "TroveManager", {
+    borrowerOperations: await deployContractWithProxy(deployer, getContractFactory, "BorrowerOperations", {
       ...overrides
     }),
-    collSurplusPool: await deployContract(deployer, getContractFactory, "CollSurplusPool", {
+    troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
       ...overrides
     }),
-    communityIssuance: await deployContract(deployer, getContractFactory, "CommunityIssuance", {
+    troveManagerRedeemOps: await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides }),
+    collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),
-    defaultPool: await deployContract(deployer, getContractFactory, "DefaultPool", { ...overrides }),
-    hintHelpers: await deployContract(deployer, getContractFactory, "HintHelpers", { ...overrides }),
-    lockupContractFactory: await deployContract(
+    communityIssuance: await deployContractWithProxy(deployer, getContractFactory, "CommunityIssuance", {
+      ...overrides
+    }),
+    defaultPool: await deployContractWithProxy(deployer, getContractFactory, "DefaultPool", {
+      ...overrides
+    }),
+    hintHelpers: await deployContractWithProxy(deployer, getContractFactory, "HintHelpers", { ...overrides }),
+    lockupContractFactory: await deployContractWithProxy(
       deployer,
       getContractFactory,
       "LockupContractFactory",
       { ...overrides }
     ),
-    lqtyStaking: await deployContract(deployer, getContractFactory, "LQTYStaking", { ...overrides }),
-    priceFeed: await deployContract(
-      deployer,
-      getContractFactory,
-      priceFeedIsTestnet ? "PriceFeedTestnet" : "PriceFeed",
-      { ...overrides }
-    ),
-    sortedTroves: await deployContract(deployer, getContractFactory, "SortedTroves", {
+    lqtyStaking: await deployContractWithProxy(deployer, getContractFactory, "LQTYStaking", { ...overrides }),
+    priceFeed: priceFeedIsTestnet ? 
+      await deployContract(deployer, getContractFactory, "PriceFeedTestnet", { ...overrides }) :
+      await deployContractWithProxy(deployer, getContractFactory, "PriceFeed", { ...overrides }),
+    sortedTroves: await deployContractWithProxy(deployer, getContractFactory, "SortedTroves", {
       ...overrides
     }),
-    stabilityPool: await deployContract(deployer, getContractFactory, "StabilityPool", {
+    stabilityPool: await deployContractWithProxy(deployer, getContractFactory, "StabilityPool", {
       ...overrides
     }),
-    gasPool: await deployContract(deployer, getContractFactory, "GasPool", {
+    gasPool: gasPool.address,
+    unipool: await deployContract(deployer, getContractFactory, "Unipool", { ...overrides }),
+    liquityBaseParams: await deployContractWithProxy(deployer, getContractFactory, "LiquityBaseParams", {
       ...overrides
     }),
-    unipool: await deployContract(deployer, getContractFactory, "Unipool", { ...overrides })
   };
 
   return [
     {
       ...addresses,
-      lusdToken: await deployContract(
-        deployer,
-        getContractFactory,
-        "LUSDToken",
-        addresses.troveManager,
-        addresses.stabilityPool,
-        addresses.borrowerOperations,
-        { ...overrides }
-      ),
+      lusdToken: await deployContractWithProxy(deployer, getContractFactory, "LUSDToken", { ...overrides }),
 
-      lqtyToken: await deployContract(
-        deployer,
-        getContractFactory,
-        "LQTYToken",
-        addresses.communityIssuance,
-        addresses.lqtyStaking,
-        addresses.lockupContractFactory,
-        Wallet.createRandom().address, // _bountyAddress (TODO: parameterize this)
-        addresses.unipool, // _lpRewardsAddress
-        Wallet.createRandom().address, // _multisigAddress (TODO: parameterize this)
-        { ...overrides }
-      ),
+      lqtyToken: await deployContractWithProxy(deployer, getContractFactory, "LQTYToken", { ...overrides }),
 
-      multiTroveGetter: await deployContract(
-        deployer,
-        getContractFactory,
-        "MultiTroveGetter",
-        addresses.troveManager,
-        addresses.sortedTroves,
-        { ...overrides }
-      )
+      multiTroveGetter: await deployContractWithProxy(deployer, getContractFactory, "MultiTroveGetter", {
+        ...overrides
+      })
     },
 
     startBlock
   ];
 };
 
-export const deployTellorCaller = (
-  deployer: Signer,
-  getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
-  tellorAddress: string,
-  overrides?: Overrides
-): Promise<string> =>
-  deployContract(deployer, getContractFactory, "TellorCaller", tellorAddress, { ...overrides });
-
 const connectContracts = async (
   {
     activePool,
     borrowerOperations,
     troveManager,
+    troveManagerRedeemOps,
     lusdToken,
     collSurplusPool,
     communityIssuance,
@@ -167,12 +164,14 @@ const connectContracts = async (
     hintHelpers,
     lockupContractFactory,
     lqtyStaking,
+    multiTroveGetter,
     priceFeed,
     sortedTroves,
     stabilityPool,
     gasPool,
     unipool,
-    uniToken
+    uniToken,
+    liquityBaseParams
   }: _LiquityContracts,
   deployer: Signer,
   overrides?: Overrides
@@ -184,14 +183,42 @@ const connectContracts = async (
   const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
 
   const connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
+    nonce => 
+      lusdToken.initialize(troveManager.address, stabilityPool.address, borrowerOperations.address, {
+        ...overrides,
+        nonce
+      }),
+    
     nonce =>
-      sortedTroves.setParams(1e6, troveManager.address, borrowerOperations.address, {
+      liquityBaseParams.initialize({
         ...overrides,
         nonce
       }),
 
     nonce =>
+      lqtyToken.initialize(
+        communityIssuance.address,
+        lqtyStaking.address,
+        lockupContractFactory.address,
+        Wallet.createRandom().address, // _bountyAddress (TODO: parameterize this)
+        unipool.address, // _lpRewardsAddress
+        Wallet.createRandom().address, // _multisigAddress (TODO: parameterize this)
+        {
+          ...overrides,
+          nonce
+        }
+      ),
+    
+    nonce =>
+        sortedTroves.setParams(1e6, troveManager.address, borrowerOperations.address, {
+          ...overrides,
+          nonce
+        }),
+
+    nonce =>
       troveManager.setAddresses(
+        troveManagerRedeemOps.address,
+        liquityBaseParams.address,
         borrowerOperations.address,
         activePool.address,
         defaultPool.address,
@@ -208,6 +235,7 @@ const connectContracts = async (
 
     nonce =>
       borrowerOperations.setAddresses(
+        liquityBaseParams.address,
         troveManager.address,
         activePool.address,
         defaultPool.address,
@@ -223,6 +251,7 @@ const connectContracts = async (
 
     nonce =>
       stabilityPool.setAddresses(
+        liquityBaseParams.address,
         borrowerOperations.address,
         troveManager.address,
         activePool.address,
@@ -257,7 +286,7 @@ const connectContracts = async (
       ),
 
     nonce =>
-      hintHelpers.setAddresses(sortedTroves.address, troveManager.address, {
+      hintHelpers.setAddresses(liquityBaseParams.address, sortedTroves.address, troveManager.address, {
         ...overrides,
         nonce
       }),
@@ -278,6 +307,7 @@ const connectContracts = async (
         nonce
       }),
 
+
     nonce =>
       communityIssuance.setAddresses(lqtyToken.address, stabilityPool.address, {
         ...overrides,
@@ -285,10 +315,16 @@ const connectContracts = async (
       }),
 
     nonce =>
+      multiTroveGetter.setAddresses(troveManager.address, sortedTroves.address, {
+        ...overrides,
+        nonce
+      }),
+    
+    nonce =>
       unipool.setParams(lqtyToken.address, uniToken.address, 2 * 30 * 24 * 60 * 60, {
         ...overrides,
         nonce
-      })
+      }),
   ];
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
@@ -300,6 +336,121 @@ const connectContracts = async (
     await connectionTx.wait().then(() => log(`Connected ${connectionIndex}`));
   }
 };
+
+const transferOwnership = async (
+  {
+    activePool,
+    borrowerOperations,
+    troveManager,
+    collSurplusPool,
+    communityIssuance,
+    defaultPool,
+    hintHelpers,
+    lockupContractFactory,
+    lqtyStaking,
+    multiTroveGetter,
+    priceFeed,
+    sortedTroves,
+    stabilityPool,
+    liquityBaseParams
+  }: _LiquityContracts,
+  deployer: Signer,
+  governanceAddress: string,
+  priceFeedIsTestnet: boolean,
+  overrides?: Overrides
+) => {
+  if (!deployer.provider) {
+    throw new Error("Signer must have a provider.");
+  }
+
+  const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
+
+  let transactions: ((nonce: number) => Promise<ContractTransaction>)[] = [
+    nonce =>
+    activePool.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    borrowerOperations.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    troveManager.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    collSurplusPool.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    communityIssuance.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    defaultPool.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    hintHelpers.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    lockupContractFactory.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    lqtyStaking.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    multiTroveGetter.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    stabilityPool.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    sortedTroves.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    liquityBaseParams.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+  ];
+  if (!priceFeedIsTestnet) {
+    transactions = [...transactions, 
+      nonce =>
+      (priceFeed as PriceFeed).setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      })
+    ];
+}
+  
+  // RSK node cannot accept more than 4 pending txs so we cannot send all the
+  // connections in parallel
+  log(`Transferring ownership to ${transactions.length} contracts`);
+  for (let transactionsIndex = 0; transactionsIndex < transactions.length; transactionsIndex++) {
+    log(`Transferring ownership ${transactionsIndex}`);
+    const tx = await transactions[transactionsIndex](txCount + transactionsIndex);
+    await tx.wait().then(() => log(`Transferred ownership ${transactionsIndex}`));
+  }
+}
 
 const deployMockUniToken = (
   deployer: Signer,
@@ -319,6 +470,7 @@ const deployMockUniToken = (
 
 export const deployAndSetupContracts = async (
   deployer: Signer,
+  governanceAddress: string,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   _priceFeedIsTestnet = true,
   _isDev = true,
@@ -362,6 +514,9 @@ export const deployAndSetupContracts = async (
 
   log("Connecting contracts...");
   await connectContracts(contracts, deployer, overrides);
+
+  log("Transferring Ownership...");
+  await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
 
   const lqtyTokenDeploymentTime = await contracts.lqtyToken.getDeploymentStartTime();
   const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();

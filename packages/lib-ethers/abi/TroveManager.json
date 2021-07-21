@@ -183,6 +183,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_borrowerOperationsAddress",
+        "type": "address"
+      }
+    ],
+    "name": "LiquityBaseParamsAddressChanges",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -342,12 +355,25 @@
       },
       {
         "indexed": false,
-        "internalType": "enum TroveManager.TroveManagerOperation",
-        "name": "_operation",
+        "internalType": "uint8",
+        "name": "operation",
         "type": "uint8"
       }
     ],
     "name": "TroveLiquidated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_troveManagerRedeemOps",
+        "type": "address"
+      }
+    ],
+    "name": "TroveManagerRedeemOpsAddressChanged",
     "type": "event"
   },
   {
@@ -393,13 +419,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_stake",
+        "name": "stake",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "enum TroveManager.TroveManagerOperation",
-        "name": "_operation",
+        "internalType": "uint8",
+        "name": "operation",
         "type": "uint8"
       }
     ],
@@ -628,6 +654,100 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "_getCurrentICR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      }
+    ],
+    "name": "_getPendingETHReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      }
+    ],
+    "name": "_getPendingLUSDDebtReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_getRedemptionRate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      }
+    ],
+    "name": "_hasPendingRewards",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1396,7 +1516,7 @@
     "name": "liquityBaseParams",
     "outputs": [
       {
-        "internalType": "contract LiquityBaseParams",
+        "internalType": "contract ILiquityBaseParams",
         "name": "",
         "type": "address"
       }
@@ -1499,6 +1619,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_troveManagerRedeemOps",
+        "type": "address"
+      },
       {
         "internalType": "address",
         "name": "_liquityBaseParamsAddress",
@@ -1643,6 +1768,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "troveManagerRedeemOps",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

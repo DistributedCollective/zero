@@ -64,7 +64,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
     * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
     */
-    uint public P = DECIMAL_PRECISION;
+    uint public P;
 
     uint public constant SCALE_FACTOR = 1e9;
 
