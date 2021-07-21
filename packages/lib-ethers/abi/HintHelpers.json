@@ -310,7 +310,7 @@
     "name": "liquityBaseParams",
     "outputs": [
       {
-        "internalType": "contract LiquityBaseParams",
+        "internalType": "contract ILiquityBaseParams",
         "name": "",
         "type": "address"
       }

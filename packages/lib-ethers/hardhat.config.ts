@@ -15,7 +15,7 @@ import "@nomiclabs/hardhat-ethers";
 
 import { Decimal } from "@liquity/lib-base";
 
-import { deployAndSetupContracts, deployTellorCaller, setSilent } from "./utils/deploy";
+import { deployAndSetupContracts, setSilent } from "./utils/deploy";
 import { _connectToContracts, _LiquityDeploymentJSON, _priceFeedIsTestnet } from "./src/contracts";
 
 import accounts from "./accounts.json";
@@ -49,7 +49,6 @@ const generateRandomAccounts = (numberOfAccounts: number) => {
 
   return accounts;
 };
-
 const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey;
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
 
@@ -62,21 +61,24 @@ const infuraNetwork = (name: string): { [name: string]: NetworkUserConfig } => (
   }
 });
 
-// https://docs.chain.link/docs/ethereum-addresses
-// https://docs.tellor.io/tellor/integration/reference-page
+const governanceAddress = {
+  mainnet: "0x0000000000000000000000000000000000000001",
+  testnet: "0x0000000000000000000000000000000000000002",
+  dev: "0x0000000000000000000000000000000000000003",
+}
 
 const oracleAddresses = {
   mainnet: {
-    chainlink: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
-    tellor: "0x88dF592F8eb5D7Bd38bFeF7dEb0fBc02cf3778a0"
+    mocOracleAddress: "", 
+    rskOracleAddress: ""
   },
-  rinkeby: {
-    chainlink: "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e",
-    tellor: "0x88dF592F8eb5D7Bd38bFeF7dEb0fBc02cf3778a0" // Core
+  testnet: {
+    mocOracleAddress: "", 
+    rskOracleAddress: ""
   },
-  kovan: {
-    chainlink: "0x9326BFA02ADD2366b30bacB125260Af641031331",
-    tellor: "0x20374E579832859f180536A69093A126Db1c8aE9" // Playground
+  dev: {
+    mocOracleAddress: "", 
+    rskOracleAddress: ""
   }
 };
 
@@ -108,14 +110,14 @@ const config: HardhatUserConfig = {
     },
 
     dev: {
-      url: "http://localhost:8545",
+      url: "http://localhost:4444",
       accounts: [deployerAccount, devChainRichAccount, ...generateRandomAccounts(numAccounts - 2)]
     },
 
     rskdev: {
       url: "http://localhost:4444",
       // regtest default prefunded account
-      from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+      from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
     },
 
     ...infuraNetwork("ropsten"),
@@ -135,6 +137,7 @@ declare module "hardhat/types/runtime" {
   interface HardhatRuntimeEnvironment {
     deployLiquity: (
       deployer: Signer,
+      governanceAddress: string,
       useRealPriceFeed?: boolean,
       wethAddress?: string,
       overrides?: Overrides
@@ -157,12 +160,14 @@ const getContractFactory: (
 extendEnvironment(env => {
   env.deployLiquity = async (
     deployer,
+    governanceAddress,
     useRealPriceFeed = false,
     wethAddress = undefined,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
       deployer,
+      governanceAddress,
       getContractFactory(env),
       !useRealPriceFeed,
       env.network.name === "dev",
@@ -218,8 +223,11 @@ task("deploy", "Deploys the contracts to the network")
       }
 
       setSilent(false);
-
-      const deployment = await env.deployLiquity(deployer, useRealPriceFeed, wethAddress, overrides);
+      const governanceNetworkAddress = env.network.name === 'mainnet' ?
+        governanceAddress['mainnet'] : env.network.name === 'testnet' ?
+        governanceAddress['testnet'] : governanceAddress['dev'];
+        
+      const deployment = await env.deployLiquity(deployer, governanceNetworkAddress, useRealPriceFeed, wethAddress, overrides);
 
       if (useRealPriceFeed) {
         const contracts = _connectToContracts(deployer, deployment);
@@ -227,22 +235,15 @@ task("deploy", "Deploys the contracts to the network")
         assert(!_priceFeedIsTestnet(contracts.priceFeed));
 
         if (hasOracles(env.network.name)) {
-          const tellorCallerAddress = await deployTellorCaller(
-            deployer,
-            getContractFactory(env),
-            oracleAddresses[env.network.name].tellor,
-            overrides
-          );
-
           console.log(`Hooking up PriceFeed with oracles ...`);
 
-          const tx = await contracts.priceFeed.setAddresses(
-            oracleAddresses[env.network.name].chainlink,
-            tellorCallerAddress,
-            overrides
-          );
-
-          await tx.wait();
+          // TODO set oracles deployed addresses
+          // const tx = await contracts.priceFeed.setAddresses(
+          //   oracleAddresses[env.network.name].chainlink,
+          //   tellorCallerAddress,
+          //   overrides
+          // );
+          // await tx.wait();
         }
       }
 

@@ -3,19 +3,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_lqtyTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LQTYTokenAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -32,30 +19,30 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
+    "inputs": [],
+    "name": "BORROWING_FEE_FLOOR",
+    "outputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_stabilityPoolAddress",
-        "type": "address"
-      }
-    ],
-    "name": "StabilityPoolAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
-        "name": "_totalLQTYIssued",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "TotalLQTYIssuedUpdated",
-    "type": "event"
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "CCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -72,7 +59,7 @@
   },
   {
     "inputs": [],
-    "name": "ISSUANCE_FACTOR",
+    "name": "MAX_BORROWING_FEE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -85,7 +72,7 @@
   },
   {
     "inputs": [],
-    "name": "LQTYSupplyCap",
+    "name": "MCR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -98,20 +85,7 @@
   },
   {
     "inputs": [],
-    "name": "NAME",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SECONDS_IN_ONE_MINUTE",
+    "name": "PERCENT_DIVISOR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -124,7 +98,7 @@
   },
   {
     "inputs": [],
-    "name": "deploymentTime",
+    "name": "REDEMPTION_FEE_FLOOR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -150,44 +124,7 @@
   },
   {
     "inputs": [],
-    "name": "issueLQTY",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lqtyToken",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_account",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_LQTYamount",
-        "type": "uint256"
-      }
-    ],
-    "name": "sendLQTY",
+    "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -195,17 +132,51 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_lqtyTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_stabilityPoolAddress",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "BORROWING_FEE_FLOOR_",
+        "type": "uint256"
       }
     ],
-    "name": "setAddresses",
+    "name": "setBorrowingFeeFloor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "CCR_",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCCR",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "MCR_",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMCR",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "MAX_BORROWING_FEE_",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxBorrowingFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -224,29 +195,29 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "stabilityPoolAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalLQTYIssued",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "PERCENT_DIVISOR_",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "setPercentDivisor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "REDEMPTION_FEE_FLOOR_",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRedemptionFeeFloor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
