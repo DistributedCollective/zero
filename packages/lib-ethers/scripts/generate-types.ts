@@ -23,6 +23,9 @@ import SortedTroves from "../../contracts/artifacts/contracts/SortedTroves.sol/S
 import StabilityPool from "../../contracts/artifacts/contracts/StabilityPool.sol/StabilityPool.json";
 import TroveManager from "../../contracts/artifacts/contracts/TroveManager.sol/TroveManager.json";
 import Unipool from "../../contracts/artifacts/contracts/LPRewards/Unipool.sol/Unipool.json";
+import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
+import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
+import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
 
 const getTupleType = (components: ParamType[], flexible: boolean) => {
   if (components.every(component => component.name)) {
@@ -162,7 +165,10 @@ const contractArtifacts = [
   SortedTroves,
   StabilityPool,
   TroveManager,
-  Unipool
+  TroveManagerRedeemOps,
+  Unipool,
+  UpgradeableProxy,
+  LiquityBaseParams
 ];
 
 const contracts = contractArtifacts.map(({ contractName, abi }) => ({

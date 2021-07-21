@@ -27,6 +27,8 @@
     "lusdToken": "0x99Fda92878c1d2f1e0971D1937C50CC578A33E3D",
     "lqtyToken": "0x25fE5Ed43aD2370f31414AC9De11E028A699a40e",
     "multiTroveGetter": "0xDA7Aa96fC750B456a63af90D894063009e26f6ba",
+    "troveManagerRedeemOps": "",
+    "liquityBaseParams": "",
     "uniToken": "0x14E87Db22A5a402a0A1461FAE94fade1976AAaF7"
   }
 }

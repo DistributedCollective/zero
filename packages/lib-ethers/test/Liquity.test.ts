@@ -1061,7 +1061,7 @@ describe("EthersLiquity", () => {
       const gasIncrease = newGasEstimate.sub(originalGasEstimate).toNumber();
 
       await waitForSuccess(tx.send());
-      expect(gasIncrease).to.be.within(10000, 25000);
+      expect(gasIncrease).to.be.within(10000, 30000);
 
       assertDefined(rudeCreation.borrowLUSD);
       const lusdShortage = rudeTrove.debt.sub(rudeCreation.borrowLUSD);
@@ -1093,7 +1093,7 @@ describe("EthersLiquity", () => {
       const gasIncrease = newGasEstimate.sub(originalGasEstimate).toNumber();
 
       await waitForSuccess(tx.send());
-      expect(gasIncrease).to.be.within(15000, 30000);
+      expect(gasIncrease).to.be.within(15000, 35000);
     });
   });
 

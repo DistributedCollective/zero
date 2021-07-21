@@ -15,6 +15,7 @@ import {
 import activePoolAbi from "../abi/ActivePool.json";
 import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
 import troveManagerAbi from "../abi/TroveManager.json";
+import troveManagerRedeemOpsAbi from "../abi/TroveManagerRedeemOps.json";
 import lusdTokenAbi from "../abi/LUSDToken.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
 import communityIssuanceAbi from "../abi/CommunityIssuance.json";
@@ -32,11 +33,13 @@ import gasPoolAbi from "../abi/GasPool.json";
 import unipoolAbi from "../abi/Unipool.json";
 import iERC20Abi from "../abi/IERC20.json";
 import erc20MockAbi from "../abi/ERC20Mock.json";
+import liquityBaseParamsAbi from "../abi/LiquityBaseParams.json";
 
 import {
   ActivePool,
   BorrowerOperations,
   TroveManager,
+  TroveManagerRedeemOps,
   LUSDToken,
   CollSurplusPool,
   CommunityIssuance,
@@ -53,7 +56,8 @@ import {
   GasPool,
   Unipool,
   ERC20Mock,
-  IERC20
+  IERC20,
+  LiquityBaseParams
 } from "../types";
 
 import { EthersProvider, EthersSigner } from "./types";
@@ -156,6 +160,7 @@ export interface _LiquityContracts {
   activePool: ActivePool;
   borrowerOperations: BorrowerOperations;
   troveManager: TroveManager;
+  troveManagerRedeemOps: TroveManagerRedeemOps;
   lusdToken: LUSDToken;
   collSurplusPool: CollSurplusPool;
   communityIssuance: CommunityIssuance;
@@ -171,6 +176,7 @@ export interface _LiquityContracts {
   gasPool: GasPool;
   unipool: Unipool;
   uniToken: IERC20 | ERC20Mock;
+  liquityBaseParams: LiquityBaseParams;
 }
 
 /** @internal */
@@ -193,6 +199,7 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   activePool: activePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
   troveManager: troveManagerAbi,
+  troveManagerRedeemOps: troveManagerRedeemOpsAbi,
   lusdToken: lusdTokenAbi,
   communityIssuance: communityIssuanceAbi,
   defaultPool: defaultPoolAbi,
@@ -207,7 +214,8 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,
   unipool: unipoolAbi,
-  uniToken: uniTokenIsMock ? erc20MockAbi : iERC20Abi
+  uniToken: uniTokenIsMock ? erc20MockAbi : iERC20Abi,
+  liquityBaseParams: liquityBaseParamsAbi
 });
 
 const mapLiquityContracts = <T, U>(
