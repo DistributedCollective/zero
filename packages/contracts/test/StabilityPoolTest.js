@@ -28,7 +28,7 @@ contract('StabilityPool', async accounts => {
     frontEnd_1, frontEnd_2, frontEnd_3,
   ] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
 
   const frontEnds = [frontEnd_1, frontEnd_2, frontEnd_3]
   let contracts
@@ -64,7 +64,7 @@ contract('StabilityPool', async accounts => {
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
       )
-      const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig)
+      const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
 
       priceFeed = contracts.priceFeedTestnet
       lusdToken = contracts.lusdToken

@@ -8,7 +8,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   const [owner, alice, bob] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
   
   let contracts
   let lusdToken
@@ -28,7 +28,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     contracts = await deploymentHelper.deployLiquityCore()
     contracts.borrowerOperations = await BorrowerOperationsTester.new()
     contracts = await deploymentHelper.deployLUSDToken(contracts)
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig)
+    const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
 
     lusdToken = contracts.lusdToken
     sortedTroves = contracts.sortedTroves
@@ -131,19 +131,19 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   describe('CommunityIssuance', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
       const params = [lqtyToken.address, stabilityPool.address]
-      await th.assertRevert(communityIssuance.setAddresses(...params, { from: alice }))
+      await th.assertRevert(communityIssuance.initialize(...params, { from: alice }))
 
       // Attempt to use zero address
-      await testZeroAddress(communityIssuance, params)
+      await testZeroAddress(communityIssuance, params, "initialize")
       // Attempt to use non contract
-      await testNonContractAddress(communityIssuance, params)
+      await testNonContractAddress(communityIssuance, params, "initialize")
 
       // Owner can successfully set any address
-      const txOwner = await communityIssuance.setAddresses(...params, { from: owner })
+      const txOwner = await communityIssuance.initialize(...params, { from: owner })
       assert.isTrue(txOwner.receipt.status)
 
       // Owner can set any address more than once
-      const secondTxOwner = await communityIssuance.setAddresses(...params, { from: owner })
+      const secondTxOwner = await communityIssuance.initialize(...params, { from: owner })
       assert.isTrue(secondTxOwner.receipt.status)
     })
   })

@@ -7,12 +7,16 @@ interface ICommunityIssuance {
     // --- Events ---
     
     event LQTYTokenAddressSet(address _lqtyTokenAddress);
-    event StabilityPoolAddressSet(address _stabilityPoolAddress);
+    event CommunityPotAddressSet(address _communityPotAddress);
     event TotalLQTYIssuedUpdated(uint _totalLQTYIssued);
 
     // --- Functions ---
 
-    function setAddresses(address _lqtyTokenAddress, address _stabilityPoolAddress) external;
+    function initialize
+    (
+        address _lqtyTokenAddress, 
+        address _communityPotAddress
+    ) external;
 
     function issueLQTY() external returns (uint);
 
