@@ -45,6 +45,7 @@ contract LQTYTokenStorage is Initializable {
     address public multisigAddress;
 
     address public communityIssuanceAddress;
+    address public sovStakersIssuanceAddress;
     address public lqtyStakingAddress;
 
     uint internal lpRewardsEntitlement;

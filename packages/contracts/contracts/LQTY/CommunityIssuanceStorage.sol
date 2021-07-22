@@ -31,14 +31,12 @@ contract CommunityIssuanceStorage is Ownable {
     /* 
     * The community LQTY supply cap is the starting balance of the Community Issuance contract.
     * It should be minted to this contract by LQTYToken, when the token is deployed.
-    * 
-    * Set to 32M (slightly less than 1/3) of total LQTY supply.
     */
-    uint public constant LQTYSupplyCap = 32e24; // 32 million
+    uint public LQTYSupplyCap;
 
     ILQTYToken public lqtyToken;
 
-    address public stabilityPoolAddress;
+    address public communityPotAddress;
 
     uint public totalLQTYIssued;
     uint public deploymentTime;

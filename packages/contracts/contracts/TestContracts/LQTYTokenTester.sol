@@ -8,20 +8,18 @@ contract LQTYTokenTester is LQTYToken {
     constructor
     (
         address _communityIssuanceAddress, 
+        address _sovStakersIssuanceAddress,
         address _lqtyStakingAddress,
         address _lockupFactoryAddress,
-        address _bountyAddress,
-        address _lpRewardsAddress,
         address _multisigAddress
     ) 
         public 
     {
         initialize(
-            _communityIssuanceAddress,
-            _lqtyStakingAddress, 
-            _lockupFactoryAddress, 
-            _bountyAddress, 
-            _lpRewardsAddress, 
+            _communityIssuanceAddress, 
+            _sovStakersIssuanceAddress,
+            _lqtyStakingAddress,
+            _lockupFactoryAddress,
             _multisigAddress
         );
     } 

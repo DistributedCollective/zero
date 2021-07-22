@@ -29,15 +29,13 @@ import "./LQTYTokenStorage.sol";
 *
 * 4) CommunityIssuance and LockupContractFactory addresses are set at deployment
 *
-* 5) The bug bounties / hackathons allocation of 2 million tokens is minted at deployment to an EOA
+* 5) 45 million tokens are minted at deployment to SOV holders
 
-* 6) 32 million tokens are minted at deployment to the CommunityIssuance contract
+* 6) 35 million tokens are minted at deployment to the CommunityIssuance contract
 *
-* 7) The LP rewards allocation of (1 + 1/3) million tokens is minted at deployent to a Staking contract
+* 7) 20 million tokens are minted at deployment to the Liquity multisig
 *
-* 8) (64 + 2/3) million tokens are minted at deployment to the Liquity multisig
-*
-* 9) Until one year from deployment:
+* 8) Until one year from deployment:
 * -Liquity multisig may only transfer() tokens to LockupContracts that have been deployed via & registered in the 
 *  LockupContractFactory 
 * -approve(), increaseAllowance(), decreaseAllowance() revert when called by the multisig
@@ -54,27 +52,27 @@ contract LQTYToken is LQTYTokenStorage, CheckContract, ILQTYToken {
     // --- Events ---
 
     event CommunityIssuanceAddressSet(address _communityIssuanceAddress);
-    event LQTYStakingAddressSet(address _lqtyStakingAddress);
+    event SovStakersAddressSet(address _sovStakersIssuanceAddress);
     event LockupContractFactoryAddressSet(address _lockupContractFactoryAddress);
 
     // --- Functions ---
 
     function initialize (
         address _communityIssuanceAddress, 
+        address _sovStakersIssuanceAddress,
         address _lqtyStakingAddress,
         address _lockupFactoryAddress,
-        address _bountyAddress,
-        address _lpRewardsAddress,
         address _multisigAddress
     ) initializer public {
         checkContract(_communityIssuanceAddress);
-        checkContract(_lqtyStakingAddress);
+        checkContract(_sovStakersIssuanceAddress);
         checkContract(_lockupFactoryAddress);
 
         multisigAddress = _multisigAddress;
         deploymentStartTime  = block.timestamp;
         
         communityIssuanceAddress = _communityIssuanceAddress;
+        sovStakersIssuanceAddress = _sovStakersIssuanceAddress;
         lqtyStakingAddress = _lqtyStakingAddress;
         lockupContractFactory = ILockupContractFactory(_lockupFactoryAddress);
 
@@ -88,23 +86,23 @@ contract LQTYToken is LQTYTokenStorage, CheckContract, ILQTYToken {
         
         // --- Initial LQTY allocations ---
      
-        uint bountyEntitlement = _1_MILLION.mul(2); // Allocate 2 million for bounties/hackathons
-        _mint(_bountyAddress, bountyEntitlement);
+        uint sovStakersEntitlement = _1_MILLION.mul(45); // Allocate 45 million to the algorithmic issuance schedule
+        _mint(_sovStakersIssuanceAddress, sovStakersEntitlement);
 
-        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(32); // Allocate 32 million to the algorithmic issuance schedule
+        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(35); // Allocate 35 million to the algorithmic issuance schedule
         _mint(_communityIssuanceAddress, depositorsAndFrontEndsEntitlement);
 
-        uint _lpRewardsEntitlement = _1_MILLION.mul(4).div(3);  // Allocate 1.33 million for LP rewards
-        lpRewardsEntitlement = _lpRewardsEntitlement;
-        _mint(_lpRewardsAddress, _lpRewardsEntitlement);
-        
-        // Allocate the remainder to the LQTY Multisig: (100 - 2 - 32 - 1.33) million = 64.66 million
+        // Allocate the remainder to the LQTY Multisig: (100 - 45 - 35) million = 20 million
+        // This amount will be distributed to founders 
         uint multisigEntitlement = _1_MILLION.mul(100)
-            .sub(bountyEntitlement)
-            .sub(depositorsAndFrontEndsEntitlement)
-            .sub(_lpRewardsEntitlement);
+            .sub(sovStakersEntitlement)
+            .sub(depositorsAndFrontEndsEntitlement);
 
         _mint(_multisigAddress, multisigEntitlement);
+
+        emit CommunityIssuanceAddressSet(_communityIssuanceAddress);
+        emit SovStakersAddressSet(_sovStakersIssuanceAddress);
+        emit LockupContractFactoryAddressSet(_lockupFactoryAddress);
     }
 
     // --- External functions ---
@@ -273,8 +271,9 @@ contract LQTYToken is LQTYTokenStorage, CheckContract, ILQTYToken {
         );
         require(
             _recipient != communityIssuanceAddress &&
+            _recipient != sovStakersIssuanceAddress &&
             _recipient != lqtyStakingAddress,
-            "LQTY: Cannot transfer tokens directly to the community issuance or staking contract"
+            "LQTY: Cannot transfer tokens directly to the community issuance, sov stakers or staking contract"
         );
     }
 
