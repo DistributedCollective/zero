@@ -33,7 +33,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     F
   ] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
 
   let contracts
 
@@ -60,7 +60,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     before(async () => {
       contracts = await deploymentHelper.deployLiquityCore()
-      const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig)
+      const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
       contracts.troveManager = await TroveManagerTester.new()
       contracts = await deploymentHelper.deployLUSDToken(contracts)
 

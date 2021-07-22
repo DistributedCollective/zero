@@ -12,7 +12,7 @@ const { dec, toBN, assertRevert } = th
 contract('Deploying and funding One Year Lockup Contracts', async accounts => {
   const [liquityAG, A, B, C, D, E, F, G, H, I, J] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
 
   const SECONDS_IN_ONE_MONTH = timeValues.SECONDS_IN_ONE_MONTH
 
@@ -34,7 +34,7 @@ contract('Deploying and funding One Year Lockup Contracts', async accounts => {
 
   beforeEach(async () => {
     // Deploy all contracts from the first account
-    LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig)
+    LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
     await deploymentHelper.connectLQTYContracts(LQTYContracts)
 
     lqtyStaking = LQTYContracts.lqtyStaking

@@ -2,92 +2,22 @@
 
 pragma solidity 0.6.11;
 
-import "../Interfaces/ILQTYToken.sol";
-import "../Interfaces/ICommunityIssuance.sol";
-import "../Dependencies/BaseMath.sol";
-import "../Dependencies/LiquityMath.sol";
-import "../Dependencies/Ownable.sol";
-import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
-import "./CommunityIssuanceStorage.sol";
+import "./CommunityIssuanceBase.sol";
 
 
-contract CommunityIssuance is CommunityIssuanceStorage, ICommunityIssuance, CheckContract, BaseMath {
-    using SafeMath for uint;
-
-    // --- Events ---
-
-    event LQTYTokenAddressSet(address _lqtyTokenAddress);
-    event StabilityPoolAddressSet(address _stabilityPoolAddress);
-    event TotalLQTYIssuedUpdated(uint _totalLQTYIssued);
-
-    // --- Functions ---
-
-    function setAddresses
-    (
-        address _lqtyTokenAddress, 
-        address _stabilityPoolAddress
-    ) 
-        external 
-        onlyOwner 
-        override 
-    {
-        checkContract(_lqtyTokenAddress);
-        checkContract(_stabilityPoolAddress);
-
-        deploymentTime = block.timestamp;
-        lqtyToken = ILQTYToken(_lqtyTokenAddress);
-        stabilityPoolAddress = _stabilityPoolAddress;
-
-        // When LQTYToken deployed, it should have transferred CommunityIssuance's LQTY entitlement
-        uint LQTYBalance = lqtyToken.balanceOf(address(this));
-        assert(LQTYBalance >= LQTYSupplyCap);
-
-        emit LQTYTokenAddressSet(_lqtyTokenAddress);
-        emit StabilityPoolAddressSet(_stabilityPoolAddress);
-
-        
-    }
-
-    function issueLQTY() external override returns (uint) {
-        _requireCallerIsStabilityPool();
-
-        uint latestTotalLQTYIssued = LQTYSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint issuance = latestTotalLQTYIssued.sub(totalLQTYIssued);
-
-        totalLQTYIssued = latestTotalLQTYIssued;
-        emit TotalLQTYIssuedUpdated(latestTotalLQTYIssued);
-        
-        return issuance;
-    }
-
-    /* Gets 1-f^t    where: f < 1
-
-    f: issuance factor that determines the shape of the curve
-    t:  time passed since last LQTY issuance event  */
-    function _getCumulativeIssuanceFraction() internal view returns (uint) {
-        // Get the time passed since deployment
-        uint timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
-
-        // f^t
-        uint power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
-
-        //  (1 - f^t)
-        uint cumulativeIssuanceFraction = (uint(DECIMAL_PRECISION).sub(power));
-        assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
-
-        return cumulativeIssuanceFraction;
-    }
-
-    function sendLQTY(address _account, uint _LQTYamount) external override {
-        _requireCallerIsStabilityPool();
-
-        lqtyToken.transfer(_account, _LQTYamount);
-    }
+contract CommunityIssuance is CommunityIssuanceBase { 
 
     // --- 'require' functions ---
 
+    function _requireBeforeIssue() override internal view {
+        _requireCallerIsStabilityPool();
+    }
+
+    function _requireBeforeSend(address, uint) override internal view {
+        _requireCallerIsStabilityPool();
+    }
+
     function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == stabilityPoolAddress, "CommunityIssuance: caller is not SP");
+        require(msg.sender == communityPotAddress, "CommunityIssuance: caller is not SP");
     }
 }

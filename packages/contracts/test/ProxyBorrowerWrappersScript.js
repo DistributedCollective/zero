@@ -35,7 +35,7 @@ contract('BorrowerWrappers', async accounts => {
     // frontEnd_1, frontEnd_2, frontEnd_3
   ] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
 
   let priceFeed
   let lusdToken
@@ -65,7 +65,7 @@ contract('BorrowerWrappers', async accounts => {
     contracts = await deploymentHelper.deployLiquityCore()
     contracts.troveManager = await TroveManagerTester.new()
     contracts = await deploymentHelper.deployLUSDToken(contracts)
-    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
+    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(multisig)
 
     await deploymentHelper.connectLQTYContracts(LQTYContracts)
     await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
@@ -309,6 +309,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await lqtyStaking.stakes(alice)
 
+    
     const proportionalLUSD = expectedETHGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalLUSD.mul(mv._1e18BN).div(mv._1e18BN.add(borrowingRate))
@@ -316,7 +317,9 @@ contract('BorrowerWrappers', async accounts => {
     // to force LQTY issuance
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
-    const expectedLQTYGain_A = toBN('50373424199406504708132')
+    // Alice has staked 150 LUSD and the whale 2350 therefore she gets 6% of the LQTY gains
+    // ie. 0.06 * 918,265.545302 = 55,095.9327181
+    const expectedLQTYGain_A = toBN('55095932718100000000000')
 
     await priceFeed.setPrice(price.mul(toBN(2)));
 
@@ -349,7 +352,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(lqtyBalanceAfter, lqtyBalanceBefore)
 
     // LQTY staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedLQTYGain_A))
+    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedLQTYGain_A), 1e10)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
@@ -512,7 +515,7 @@ contract('BorrowerWrappers', async accounts => {
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalLUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
 
-    const expectedLQTYGain_A = toBN('839557069990108416000000')
+    const expectedLQTYGain_A = toBN('918265545302000000000000')
 
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
     // Alice claims staking rewards and puts them back in the system through the proxy
@@ -548,7 +551,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(lqtyBalanceBefore, lqtyBalanceAfter)
 
     // LQTY staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedLQTYGain_A))
+    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedLQTYGain_A), 1e13)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
@@ -674,7 +677,7 @@ contract('BorrowerWrappers', async accounts => {
     const netDebtChange = proportionalLUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
     const expectedTotalLUSD = expectedLUSDGain_A.add(netDebtChange)
 
-    const expectedLQTYGain_A = toBN('839557069990108416000000')
+    const expectedLQTYGain_A = toBN('918265545302000000000000')
 
     // Alice claims staking rewards and puts them back in the system through the proxy
     await borrowerWrappers.claimStakingGainsAndRecycle(th._100pct, alice, alice, { from: alice })
@@ -709,7 +712,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(lqtyBalanceBefore, lqtyBalanceAfter)
 
     // LQTY staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedLQTYGain_A))
+    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedLQTYGain_A), 1e13)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)

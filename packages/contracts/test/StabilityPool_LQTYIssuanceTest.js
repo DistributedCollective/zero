@@ -21,12 +21,11 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
     frontEnd_1, frontEnd_2, frontEnd_3
   ] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[997];
 
   let contracts
 
   let priceFeed
-  let lusdToken
   let stabilityPool
   let sortedTroves
   let troveManager
@@ -58,7 +57,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
       )
-      const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
+      const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(multisig)
 
       priceFeed = contracts.priceFeedTestnet
       lusdToken = contracts.lusdToken
@@ -77,7 +76,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
       // Check community issuance starts with 32 million LQTY
       communityLQTYSupply = toBN(await lqtyToken.balanceOf(communityIssuanceTester.address))
-      assert.isAtMost(getDifference(communityLQTYSupply, '32000000000000000000000000'), 1000)
+      assert.isAtMost(getDifference(communityLQTYSupply, '35000000000000000000000000'), 1000)
 
       /* Monthly LQTY issuance
   

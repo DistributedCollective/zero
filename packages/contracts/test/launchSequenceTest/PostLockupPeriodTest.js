@@ -16,7 +16,7 @@ contract('After the initial lockup period has passed', async accounts => {
     investor_3,
     A, B, C, D, E, F, G, H, I, J, K] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
 
   const SECONDS_IN_ONE_DAY = timeValues.SECONDS_IN_ONE_DAY
   const SECONDS_IN_ONE_MONTH = timeValues.SECONDS_IN_ONE_MONTH
@@ -37,17 +37,17 @@ contract('After the initial lockup period has passed', async accounts => {
   let LC_I3
 
   // 1e24 = 1 million tokens with 18 decimal digits
-  const teamMemberInitialEntitlement_1 = dec(1, 24)
-  const teamMemberInitialEntitlement_2 = dec(2, 24)
-  const teamMemberInitialEntitlement_3 = dec(3, 24)
+  const teamMemberInitialEntitlement_1 = dec(1, 23)
+  const teamMemberInitialEntitlement_2 = dec(2, 23)
+  const teamMemberInitialEntitlement_3 = dec(3, 23)
 
-  const investorInitialEntitlement_1 = dec(4, 24)
-  const investorInitialEntitlement_2 = dec(5, 24)
-  const investorInitialEntitlement_3 = dec(6, 24)
+  const investorInitialEntitlement_1 = dec(4, 23)
+  const investorInitialEntitlement_2 = dec(5, 23)
+  const investorInitialEntitlement_3 = dec(6, 23)
 
-  const teamMemberMonthlyVesting_1 = dec(1, 23)
-  const teamMemberMonthlyVesting_2 = dec(2, 23)
-  const teamMemberMonthlyVesting_3 = dec(3, 23)
+  const teamMemberMonthlyVesting_1 = dec(1, 22)
+  const teamMemberMonthlyVesting_2 = dec(2, 22)
+  const teamMemberMonthlyVesting_3 = dec(3, 22)
 
   const LQTYEntitlement_A = dec(1, 24)
   const LQTYEntitlement_B = dec(2, 24)
@@ -62,7 +62,7 @@ contract('After the initial lockup period has passed', async accounts => {
 
   beforeEach(async () => {
     // Deploy all contracts from the first account
-    LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig)
+    LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(multisig)
     coreContracts = await deploymentHelper.deployLiquityCore()
 
     lqtyStaking = LQTYContracts.lqtyStaking

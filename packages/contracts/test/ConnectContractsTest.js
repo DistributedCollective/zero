@@ -3,7 +3,7 @@ const deploymentHelper = require("../utils/deploymentHelpers.js")
 contract('Deployment script - Sets correct contract addresses dependencies after deployment', async accounts => {
   const [owner] = accounts;
 
-  const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000)
+  const multisig = accounts[999];
   
   let priceFeed
   let lusdToken
@@ -21,7 +21,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
 
   before(async () => {
     const coreContracts = await deploymentHelper.deployLiquityCore()
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig)
+    const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
 
     priceFeed = coreContracts.priceFeedTestnet
     lusdToken = coreContracts.lusdToken
@@ -347,7 +347,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   it('Sets the correct StabilityPool address in CommunityIssuance', async () => {
     const stabilityPoolAddress = stabilityPool.address
 
-    const recordedStabilityPoolAddress = await communityIssuance.stabilityPoolAddress()
+    const recordedStabilityPoolAddress = await communityIssuance.communityPotAddress()
     assert.equal(stabilityPoolAddress, recordedStabilityPoolAddress)
   })
 })
