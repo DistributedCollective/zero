@@ -5,6 +5,8 @@
   "bootstrapPeriod": 1209600,
   "totalStabilityPoolLQTYReward": "32000000",
   "liquidityMiningLQTYRewardRate": "0.257201646090534979",
+  "governanceAddress": "",
+  "sovCommunityPotAddress": "",
   "_priceFeedIsTestnet": false,
   "_uniTokenIsMock": false,
   "_isDev": false,
@@ -29,6 +31,7 @@
     "multiTroveGetter": "0x9c5977268592E964784EFF50043BFFC035B6b0C7",
     "troveManagerRedeemOps": "",
     "liquityBaseParams": "",
+    "sovStakersIssuance": "",
     "uniToken": "0x6E14b68E16e4211C06bcc8527D6b92A43AA47806"
   }
 }

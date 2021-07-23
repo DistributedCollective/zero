@@ -61,10 +61,16 @@ const infuraNetwork = (name: string): { [name: string]: NetworkUserConfig } => (
   }
 });
 
-const governanceAddress = {
+const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
   testnet: "0x0000000000000000000000000000000000000002",
   dev: "0x0000000000000000000000000000000000000003",
+}
+
+const sovCommunityPotAddresses = {
+  mainnet: "",
+  testnet: "0x740E6f892C0132D659Abcd2B6146D237A4B6b653",
+  dev: ""
 }
 
 const oracleAddresses = {
@@ -82,18 +88,15 @@ const oracleAddresses = {
   }
 };
 
+
 const hasOracles = (network: string): network is keyof typeof oracleAddresses =>
   network in oracleAddresses;
 
-const wethAddresses = {
-  mainnet: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-  ropsten: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-  rinkeby: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-  goerli: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-  kovan: "0xd0A1E359811322d97991E03f863a0C30C2cF029C"
-};
+const hasSovCommunityPot = (network: string): network is keyof typeof sovCommunityPotAddresses =>
+  network in sovCommunityPotAddresses;
 
-const hasWETH = (network: string): network is keyof typeof wethAddresses => network in wethAddresses;
+const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
+  network in governanceAddresses;
 
 const config: HardhatUserConfig = {
   networks: {
@@ -137,9 +140,9 @@ declare module "hardhat/types/runtime" {
   interface HardhatRuntimeEnvironment {
     deployLiquity: (
       deployer: Signer,
-      governanceAddress: string,
+      governanceAddress?: string,
+      sovCommunityPotAddress?: string,
       useRealPriceFeed?: boolean,
-      wethAddress?: string,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -161,17 +164,17 @@ extendEnvironment(env => {
   env.deployLiquity = async (
     deployer,
     governanceAddress,
+    sovCommunityPotAddress,
     useRealPriceFeed = false,
-    wethAddress = undefined,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
       deployer,
-      governanceAddress,
       getContractFactory(env),
       !useRealPriceFeed,
       env.network.name === "dev",
-      wethAddress,
+      governanceAddress,
+      sovCommunityPotAddress,
       overrides
     );
 
@@ -183,7 +186,8 @@ type DeployParams = {
   channel: string;
   gasPrice?: number;
   useRealPriceFeed?: boolean;
-  createUniswapPair?: boolean;
+  governanceAddress?: string;
+  sovCommunityPotAddress?: string;
 };
 
 const defaultChannel = process.env.CHANNEL || "default";
@@ -193,18 +197,14 @@ task("deploy", "Deploys the contracts to the network")
   .addOptionalParam("gasPrice", "Price to pay for 1 gas [Gwei]", undefined, types.float)
   .addOptionalParam(
     "useRealPriceFeed",
-    "Deploy the production version of PriceFeed and connect it to Chainlink",
+    "Deploy the production version of PriceFeed and connect it to MoC",
     undefined,
     types.boolean
   )
-  .addOptionalParam(
-    "createUniswapPair",
-    "Create a real Uniswap v2 WETH-LUSD pair instead of a mock ERC20 token",
-    undefined,
-    types.boolean
-  )
+  .addOptionalParam("governanceAddress", "Governance contract address to be the owner", undefined, types.string)
+  .addOptionalParam("sovCommunityPotAddress", "SOV Stakers pool contract address", undefined, types.string)
   .setAction(
-    async ({ channel, gasPrice, useRealPriceFeed, createUniswapPair }: DeployParams, env) => {
+    async ({ channel, gasPrice, useRealPriceFeed, governanceAddress, sovCommunityPotAddress }: DeployParams, env) => {
       const overrides = { gasPrice: gasPrice && Decimal.from(gasPrice).div(1000000000).hex };
       const [deployer] = await env.ethers.getSigners();
 
@@ -214,20 +214,11 @@ task("deploy", "Deploys the contracts to the network")
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
       }
 
-      let wethAddress: string | undefined = undefined;
-      if (createUniswapPair) {
-        if (!hasWETH(env.network.name)) {
-          throw new Error(`WETH not deployed on ${env.network.name}`);
-        }
-        wethAddress = wethAddresses[env.network.name];
-      }
-
       setSilent(false);
-      const governanceNetworkAddress = env.network.name === 'mainnet' ?
-        governanceAddress['mainnet'] : env.network.name === 'testnet' ?
-        governanceAddress['testnet'] : governanceAddress['dev'];
+      governanceAddress ??= hasGovernance(env.network.name) ? governanceAddresses[env.network.name] : undefined;
+      sovCommunityPotAddress ??= hasSovCommunityPot(env.network.name) ? sovCommunityPotAddresses[env.network.name] : undefined;
         
-      const deployment = await env.deployLiquity(deployer, governanceNetworkAddress, useRealPriceFeed, wethAddress, overrides);
+      const deployment = await env.deployLiquity(deployer, governanceAddress, sovCommunityPotAddress, useRealPriceFeed, overrides);
 
       if (useRealPriceFeed) {
         const contracts = _connectToContracts(deployer, deployment);
@@ -237,13 +228,12 @@ task("deploy", "Deploys the contracts to the network")
         if (hasOracles(env.network.name)) {
           console.log(`Hooking up PriceFeed with oracles ...`);
 
-          // TODO set oracles deployed addresses
-          // const tx = await contracts.priceFeed.setAddresses(
-          //   oracleAddresses[env.network.name].chainlink,
-          //   tellorCallerAddress,
-          //   overrides
-          // );
-          // await tx.wait();
+          const tx = await contracts.priceFeed.setAddresses(
+            oracleAddresses[env.network.name].mocOracleAddress,
+            oracleAddresses[env.network.name].rskOracleAddress,
+            overrides
+          );
+          await tx.wait();
         }
       }
 

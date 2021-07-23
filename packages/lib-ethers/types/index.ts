@@ -32,6 +32,7 @@ interface ActivePoolTransactions {
 
 export interface ActivePool
   extends _TypedLiquityContract<ActivePoolCalls, ActivePoolTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
     ActivePoolETHBalanceUpdated(_ETH?: null): EventFilter;
@@ -96,6 +97,7 @@ interface BorrowerOperationsTransactions {
 
 export interface BorrowerOperations
   extends _TypedLiquityContract<BorrowerOperationsCalls, BorrowerOperationsTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_activePoolAddress?: null): EventFilter;
     CollSurplusPoolAddressChanged(_collSurplusPoolAddress?: null): EventFilter;
@@ -147,6 +149,7 @@ interface CollSurplusPoolTransactions {
 
 export interface CollSurplusPool
   extends _TypedLiquityContract<CollSurplusPoolCalls, CollSurplusPoolTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
     BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
@@ -169,31 +172,32 @@ interface CommunityIssuanceCalls {
   LQTYSupplyCap(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
   SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
+  communityPotAddress(_overrides?: CallOverrides): Promise<string>;
   deploymentTime(_overrides?: CallOverrides): Promise<BigNumber>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
   lqtyToken(_overrides?: CallOverrides): Promise<string>;
-  stabilityPoolAddress(_overrides?: CallOverrides): Promise<string>;
   totalLQTYIssued(_overrides?: CallOverrides): Promise<BigNumber>;
 }
 
 interface CommunityIssuanceTransactions {
+  initialize(_lqtyTokenAddress: string, _communityPotAddress: string, _overrides?: Overrides): Promise<void>;
   issueLQTY(_overrides?: Overrides): Promise<BigNumber>;
   sendLQTY(_account: string, _LQTYamount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setAddresses(_lqtyTokenAddress: string, _stabilityPoolAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface CommunityIssuance
   extends _TypedLiquityContract<CommunityIssuanceCalls, CommunityIssuanceTransactions> {
+  readonly address: string;
   readonly filters: {
+    CommunityPotAddressSet(_communityPotAddress?: null): EventFilter;
     LQTYTokenAddressSet(_lqtyTokenAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    StabilityPoolAddressSet(_stabilityPoolAddress?: null): EventFilter;
     TotalLQTYIssuedUpdated(_totalLQTYIssued?: null): EventFilter;
   };
+  extractEvents(logs: Log[], name: "CommunityPotAddressSet"): _TypedLogDescription<{ _communityPotAddress: string }>[];
   extractEvents(logs: Log[], name: "LQTYTokenAddressSet"): _TypedLogDescription<{ _lqtyTokenAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolAddressSet"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "TotalLQTYIssuedUpdated"): _TypedLogDescription<{ _totalLQTYIssued: BigNumber }>[];
 }
 
@@ -216,6 +220,7 @@ interface DefaultPoolTransactions {
 
 export interface DefaultPool
   extends _TypedLiquityContract<DefaultPoolCalls, DefaultPoolTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
     DefaultPoolAddressChanged(_newDefaultPoolAddress?: null): EventFilter;
@@ -263,6 +268,7 @@ interface ERC20MockTransactions {
 
 export interface ERC20Mock
   extends _TypedLiquityContract<ERC20MockCalls, ERC20MockTransactions> {
+  readonly address: string;
   readonly filters: {
     Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
     Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
@@ -279,6 +285,7 @@ interface GasPoolTransactions {
 
 export interface GasPool
   extends _TypedLiquityContract<GasPoolCalls, GasPoolTransactions> {
+  readonly address: string;
   readonly filters: {
   };
 }
@@ -311,6 +318,7 @@ interface HintHelpersTransactions {
 
 export interface HintHelpers
   extends _TypedLiquityContract<HintHelpersCalls, HintHelpersTransactions> {
+  readonly address: string;
   readonly filters: {
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
@@ -335,6 +343,7 @@ interface IERC20Transactions {
 
 export interface IERC20
   extends _TypedLiquityContract<IERC20Calls, IERC20Transactions> {
+  readonly address: string;
   readonly filters: {
     Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
     Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
@@ -360,6 +369,7 @@ interface LockupContractFactoryTransactions {
 
 export interface LockupContractFactory
   extends _TypedLiquityContract<LockupContractFactoryCalls, LockupContractFactoryTransactions> {
+  readonly address: string;
   readonly filters: {
     LQTYTokenAddressSet(_lqtyTokenAddress?: null): EventFilter;
     LockupContractDeployedThroughFactory(_lockupContractAddress?: null, _beneficiary?: null, _unlockTime?: null, _deployer?: null): EventFilter;
@@ -399,6 +409,7 @@ interface LUSDTokenTransactions {
 
 export interface LUSDToken
   extends _TypedLiquityContract<LUSDTokenCalls, LUSDTokenTransactions> {
+  readonly address: string;
   readonly filters: {
     Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
     BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
@@ -444,6 +455,7 @@ interface LQTYStakingTransactions {
 
 export interface LQTYStaking
   extends _TypedLiquityContract<LQTYStakingCalls, LQTYStakingTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressSet(_activePoolAddress?: null): EventFilter;
     BorrowerOperationsAddressSet(_borrowerOperationsAddress?: null): EventFilter;
@@ -489,6 +501,7 @@ interface LQTYTokenCalls {
   name(_overrides?: CallOverrides): Promise<string>;
   nonces(owner: string, _overrides?: CallOverrides): Promise<BigNumber>;
   permitTypeHash(_overrides?: CallOverrides): Promise<string>;
+  sovStakersIssuanceAddress(_overrides?: CallOverrides): Promise<string>;
   symbol(_overrides?: CallOverrides): Promise<string>;
   totalSupply(_overrides?: CallOverrides): Promise<BigNumber>;
   version(_overrides?: CallOverrides): Promise<string>;
@@ -498,7 +511,7 @@ interface LQTYTokenTransactions {
   approve(spender: string, amount: BigNumberish, _overrides?: Overrides): Promise<boolean>;
   decreaseAllowance(spender: string, subtractedValue: BigNumberish, _overrides?: Overrides): Promise<boolean>;
   increaseAllowance(spender: string, addedValue: BigNumberish, _overrides?: Overrides): Promise<boolean>;
-  initialize(_communityIssuanceAddress: string, _lqtyStakingAddress: string, _lockupFactoryAddress: string, _bountyAddress: string, _lpRewardsAddress: string, _multisigAddress: string, _overrides?: Overrides): Promise<void>;
+  initialize(_communityIssuanceAddress: string, _sovStakersIssuanceAddress: string, _lqtyStakingAddress: string, _lockupFactoryAddress: string, _multisigAddress: string, _overrides?: Overrides): Promise<void>;
   permit(owner: string, spender: string, amount: BigNumberish, deadline: BigNumberish, v: BigNumberish, r: BytesLike, s: BytesLike, _overrides?: Overrides): Promise<void>;
   sendToLQTYStaking(_sender: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   transfer(recipient: string, amount: BigNumberish, _overrides?: Overrides): Promise<boolean>;
@@ -507,17 +520,18 @@ interface LQTYTokenTransactions {
 
 export interface LQTYToken
   extends _TypedLiquityContract<LQTYTokenCalls, LQTYTokenTransactions> {
+  readonly address: string;
   readonly filters: {
     Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
     CommunityIssuanceAddressSet(_communityIssuanceAddress?: null): EventFilter;
-    LQTYStakingAddressSet(_lqtyStakingAddress?: null): EventFilter;
     LockupContractFactoryAddressSet(_lockupContractFactoryAddress?: null): EventFilter;
+    SovStakersAddressSet(_sovStakersIssuanceAddress?: null): EventFilter;
     Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "Approval"): _TypedLogDescription<{ owner: string; spender: string; value: BigNumber }>[];
   extractEvents(logs: Log[], name: "CommunityIssuanceAddressSet"): _TypedLogDescription<{ _communityIssuanceAddress: string }>[];
-  extractEvents(logs: Log[], name: "LQTYStakingAddressSet"): _TypedLogDescription<{ _lqtyStakingAddress: string }>[];
   extractEvents(logs: Log[], name: "LockupContractFactoryAddressSet"): _TypedLogDescription<{ _lockupContractFactoryAddress: string }>[];
+  extractEvents(logs: Log[], name: "SovStakersAddressSet"): _TypedLogDescription<{ _sovStakersIssuanceAddress: string }>[];
   extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
 }
 
@@ -535,6 +549,7 @@ interface MultiTroveGetterTransactions {
 
 export interface MultiTroveGetter
   extends _TypedLiquityContract<MultiTroveGetterCalls, MultiTroveGetterTransactions> {
+  readonly address: string;
   readonly filters: {
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
   };
@@ -549,20 +564,24 @@ interface PriceFeedCalls {
 
 interface PriceFeedTransactions {
   fetchPrice(_overrides?: Overrides): Promise<BigNumber>;
-  setAddresses(_medianizer: string, _rskOracle: string, _overrides?: Overrides): Promise<void>;
+  setAddress(_index: BigNumberish, _newPriceFeed: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_mainPriceFeed: string, _backupPriceFeed: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface PriceFeed
   extends _TypedLiquityContract<PriceFeedCalls, PriceFeedTransactions> {
+  readonly address: string;
   readonly filters: {
     LastGoodPriceUpdated(_lastGoodPrice?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedBroken(index?: null): EventFilter;
+    PriceFeedBroken(index?: null, priceFeedAddress?: null): EventFilter;
+    PriceFeedUpdated(index?: null, newPriceFeedAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _lastGoodPrice: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedBroken"): _TypedLogDescription<{ index: number }>[];
+  extractEvents(logs: Log[], name: "PriceFeedBroken"): _TypedLogDescription<{ index: number; priceFeedAddress: string }>[];
+  extractEvents(logs: Log[], name: "PriceFeedUpdated"): _TypedLogDescription<{ index: number; newPriceFeedAddress: string }>[];
 }
 
 interface PriceFeedTestnetCalls {
@@ -576,6 +595,7 @@ interface PriceFeedTestnetTransactions {
 
 export interface PriceFeedTestnet
   extends _TypedLiquityContract<PriceFeedTestnetCalls, PriceFeedTestnetTransactions> {
+  readonly address: string;
   readonly filters: {
     LastGoodPriceUpdated(_lastGoodPrice?: null): EventFilter;
   };
@@ -611,6 +631,7 @@ interface SortedTrovesTransactions {
 
 export interface SortedTroves
   extends _TypedLiquityContract<SortedTrovesCalls, SortedTrovesTransactions> {
+  readonly address: string;
   readonly filters: {
     BorrowerOperationsAddressChanged(_borrowerOperationsAddress?: null): EventFilter;
     NodeAdded(_id?: null, _NICR?: null): EventFilter;
@@ -680,6 +701,7 @@ interface StabilityPoolTransactions {
 
 export interface StabilityPool
   extends _TypedLiquityContract<StabilityPoolCalls, StabilityPoolTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_newActivePoolAddress?: null): EventFilter;
     BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
@@ -825,6 +847,7 @@ interface TroveManagerTransactions {
 
 export interface TroveManager
   extends _TypedLiquityContract<TroveManagerCalls, TroveManagerTransactions> {
+  readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_activePoolAddress?: null): EventFilter;
     BaseRateUpdated(_baseRate?: null): EventFilter;
@@ -929,6 +952,7 @@ interface TroveManagerRedeemOpsTransactions {
 
 export interface TroveManagerRedeemOps
   extends _TypedLiquityContract<TroveManagerRedeemOpsCalls, TroveManagerRedeemOpsTransactions> {
+  readonly address: string;
   readonly filters: {
     BaseRateUpdated(_baseRate?: null): EventFilter;
     LTermsUpdated(_L_ETH?: null, _L_LUSDDebt?: null): EventFilter;
@@ -987,6 +1011,7 @@ interface UnipoolTransactions {
 
 export interface Unipool
   extends _TypedLiquityContract<UnipoolCalls, UnipoolTransactions> {
+  readonly address: string;
   readonly filters: {
     LQTYTokenAddressChanged(_lqtyTokenAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
@@ -1017,6 +1042,7 @@ interface UpgradableProxyTransactions {
 
 export interface UpgradableProxy
   extends _TypedLiquityContract<UpgradableProxyCalls, UpgradableProxyTransactions> {
+  readonly address: string;
   readonly filters: {
     ImplementationChanged(_oldImplementation?: string | null, _newImplementation?: string | null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
@@ -1049,8 +1075,45 @@ interface LiquityBaseParamsTransactions {
 
 export interface LiquityBaseParams
   extends _TypedLiquityContract<LiquityBaseParamsCalls, LiquityBaseParamsTransactions> {
+  readonly address: string;
   readonly filters: {
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
   };
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
+}
+
+interface SovStakersIssuanceCalls {
+  DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
+  ISSUANCE_FACTOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  LQTYSupplyCap(_overrides?: CallOverrides): Promise<BigNumber>;
+  NAME(_overrides?: CallOverrides): Promise<string>;
+  SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
+  communityPotAddress(_overrides?: CallOverrides): Promise<string>;
+  deploymentTime(_overrides?: CallOverrides): Promise<BigNumber>;
+  getOwner(_overrides?: CallOverrides): Promise<string>;
+  lqtyToken(_overrides?: CallOverrides): Promise<string>;
+  totalLQTYIssued(_overrides?: CallOverrides): Promise<BigNumber>;
+}
+
+interface SovStakersIssuanceTransactions {
+  initialize(_lqtyTokenAddress: string, _communityPotAddress: string, _overrides?: Overrides): Promise<void>;
+  issueLQTY(_overrides?: Overrides): Promise<BigNumber>;
+  sendLQTY(_account: string, _LQTYamount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
+  transferToFeeSharingProxy(_overrides?: Overrides): Promise<void>;
+}
+
+export interface SovStakersIssuance
+  extends _TypedLiquityContract<SovStakersIssuanceCalls, SovStakersIssuanceTransactions> {
+  readonly address: string;
+  readonly filters: {
+    CommunityPotAddressSet(_communityPotAddress?: null): EventFilter;
+    LQTYTokenAddressSet(_lqtyTokenAddress?: null): EventFilter;
+    OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
+    TotalLQTYIssuedUpdated(_totalLQTYIssued?: null): EventFilter;
+  };
+  extractEvents(logs: Log[], name: "CommunityPotAddressSet"): _TypedLogDescription<{ _communityPotAddress: string }>[];
+  extractEvents(logs: Log[], name: "LQTYTokenAddressSet"): _TypedLogDescription<{ _lqtyTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
+  extractEvents(logs: Log[], name: "TotalLQTYIssuedUpdated"): _TypedLogDescription<{ _totalLQTYIssued: BigNumber }>[];
 }

@@ -104,14 +104,10 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
     const {
       blockTimestamp,
       createFees,
-      calculateRemainingLQTY,
       ...baseState
     } = await promiseAllValues({
       blockTimestamp: _getBlockTimestamp(this.connection, blockTag),
       createFees: this._readable._getFeesFactory({ blockTag }),
-      calculateRemainingLQTY: this._readable._getRemainingLiquidityMiningLQTYRewardCalculator({
-        blockTag
-      }),
 
       price: this._readable.getPrice({ blockTag }),
       numberOfTroves: this._readable.getNumberOfTroves({ blockTag }),
@@ -120,7 +116,6 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       lusdInStabilityPool: this._readable.getLUSDInStabilityPool({ blockTag }),
       totalStakedLQTY: this._readable.getTotalStakedLQTY({ blockTag }),
       _riskiestTroveBeforeRedistribution: this._getRiskiestTroveBeforeRedistribution({ blockTag }),
-      totalStakedUniTokens: this._readable.getTotalStakedUniTokens({ blockTag }),
       remainingStabilityPoolLQTYReward: this._readable.getRemainingStabilityPoolLQTYReward({
         blockTag
       }),
@@ -134,12 +129,6 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
             accountBalance: this._provider.getBalance(userAddress, blockTag).then(decimalify),
             lusdBalance: this._readable.getLUSDBalance(userAddress, { blockTag }),
             lqtyBalance: this._readable.getLQTYBalance(userAddress, { blockTag }),
-            uniTokenBalance: this._readable.getUniTokenBalance(userAddress, { blockTag }),
-            uniTokenAllowance: this._readable.getUniTokenAllowance(userAddress, { blockTag }),
-            liquidityMiningStake: this._readable.getLiquidityMiningStake(userAddress, { blockTag }),
-            liquidityMiningLQTYReward: this._readable.getLiquidityMiningLQTYReward(userAddress, {
-              blockTag
-            }),
             collateralSurplusBalance: this._readable.getCollateralSurplusBalance(userAddress, {
               blockTag
             }),
@@ -179,7 +168,6 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       {
         ...baseState,
         _feesInNormalMode: createFees(blockTimestamp, false),
-        remainingLiquidityMiningLQTYReward: calculateRemainingLQTY(blockTimestamp)
       },
       {
         blockTag,

@@ -43,11 +43,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lqtyStakingAddress",
+        "name": "_lockupContractFactoryAddress",
         "type": "address"
       }
     ],
-    "name": "LQTYStakingAddressSet",
+    "name": "LockupContractFactoryAddressSet",
     "type": "event"
   },
   {
@@ -56,11 +56,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_lockupContractFactoryAddress",
+        "name": "_sovStakersIssuanceAddress",
         "type": "address"
       }
     ],
-    "name": "LockupContractFactoryAddressSet",
+    "name": "SovStakersAddressSet",
     "type": "event"
   },
   {
@@ -290,22 +290,17 @@
       },
       {
         "internalType": "address",
+        "name": "_sovStakersIssuanceAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_lqtyStakingAddress",
         "type": "address"
       },
       {
         "internalType": "address",
         "name": "_lockupFactoryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_bountyAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lpRewardsAddress",
         "type": "address"
       },
       {
@@ -462,6 +457,19 @@
     "name": "sendToLQTYStaking",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sovStakersIssuanceAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

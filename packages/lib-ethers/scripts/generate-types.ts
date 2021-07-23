@@ -26,6 +26,7 @@ import Unipool from "../../contracts/artifacts/contracts/LPRewards/Unipool.sol/U
 import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
 import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
 import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
+import SovStakersIssuance from "../../contracts/artifacts/contracts/LQTY/SovStakersIssuance.sol/SovStakersIssuance.json";
 
 const getTupleType = (components: ParamType[], flexible: boolean) => {
   if (components.every(component => component.name)) {
@@ -123,7 +124,7 @@ const declareInterface = ({
 
     `export interface ${contractName}`,
     `  extends _TypedLiquityContract<${contractName}Calls, ${contractName}Transactions> {`,
-
+    "  readonly address: string;",
     "  readonly filters: {",
     ...Object.values(events).map(({ name, inputs }) => {
       const params = inputs.map(
@@ -168,7 +169,8 @@ const contractArtifacts = [
   TroveManagerRedeemOps,
   Unipool,
   UpgradeableProxy,
-  LiquityBaseParams
+  LiquityBaseParams,
+  SovStakersIssuance
 ];
 
 const contracts = contractArtifacts.map(({ contractName, abi }) => ({

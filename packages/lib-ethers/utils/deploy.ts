@@ -9,7 +9,6 @@ import {
   _LiquityDeploymentJSON
 } from "../src/contracts";
 import { PriceFeed } from "../types";
-import { createUniswapV2Pair } from "./UniswapV2Factory";
 
 let silent = true;
 
@@ -84,7 +83,7 @@ const deployContracts = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
   overrides?: Overrides
-): Promise<[addresses: Omit<_LiquityContractAddresses, "uniToken">, startBlock: number]> => {
+): Promise<{addresses: _LiquityContractAddresses, startBlock: number}> => {
 
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, "GasPool", {
     ...overrides
@@ -128,14 +127,16 @@ const deployContracts = async (
       ...overrides
     }),
     gasPool: gasPool.address,
-    unipool: await deployContract(deployer, getContractFactory, "Unipool", { ...overrides }),
     liquityBaseParams: await deployContractWithProxy(deployer, getContractFactory, "LiquityBaseParams", {
       ...overrides
     }),
+    sovStakersIssuance: await deployContractWithProxy(deployer, getContractFactory, "SovStakersIssuance", {
+      ...overrides
+    })
   };
 
-  return [
-    {
+  return {
+    addresses: {
       ...addresses,
       lusdToken: await deployContractWithProxy(deployer, getContractFactory, "LUSDToken", { ...overrides }),
 
@@ -147,7 +148,7 @@ const deployContracts = async (
     },
 
     startBlock
-  ];
+  };
 };
 
 const connectContracts = async (
@@ -169,11 +170,11 @@ const connectContracts = async (
     sortedTroves,
     stabilityPool,
     gasPool,
-    unipool,
-    uniToken,
-    liquityBaseParams
+    liquityBaseParams,
+    sovStakersIssuance
   }: _LiquityContracts,
   deployer: Signer,
+  sovCommunityPotAddress: string,
   overrides?: Overrides
 ) => {
   if (!deployer.provider) {
@@ -198,10 +199,9 @@ const connectContracts = async (
     nonce =>
       lqtyToken.initialize(
         communityIssuance.address,
+        sovStakersIssuance.address,
         lqtyStaking.address,
         lockupContractFactory.address,
-        Wallet.createRandom().address, // _bountyAddress (TODO: parameterize this)
-        unipool.address, // _lpRewardsAddress
         Wallet.createRandom().address, // _multisigAddress (TODO: parameterize this)
         {
           ...overrides,
@@ -307,9 +307,14 @@ const connectContracts = async (
         nonce
       }),
 
+    nonce =>
+      communityIssuance.initialize(lqtyToken.address, stabilityPool.address, {
+        ...overrides,
+        nonce
+      }),
 
     nonce =>
-      communityIssuance.setAddresses(lqtyToken.address, stabilityPool.address, {
+      sovStakersIssuance.initialize(lqtyToken.address, sovCommunityPotAddress, {
         ...overrides,
         nonce
       }),
@@ -320,11 +325,6 @@ const connectContracts = async (
         nonce
       }),
     
-    nonce =>
-      unipool.setParams(lqtyToken.address, uniToken.address, 2 * 30 * 24 * 60 * 60, {
-        ...overrides,
-        nonce
-      }),
   ];
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
@@ -452,34 +452,21 @@ const transferOwnership = async (
   }
 }
 
-const deployMockUniToken = (
-  deployer: Signer,
-  getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
-  overrides?: Overrides
-) =>
-  deployContract(
-    deployer,
-    getContractFactory,
-    "ERC20Mock",
-    "Mock Uniswap V2",
-    "UNI-V2",
-    Wallet.createRandom().address, // initialAccount
-    0, // initialBalance
-    { ...overrides }
-  );
-
 export const deployAndSetupContracts = async (
   deployer: Signer,
-  governanceAddress: string,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   _priceFeedIsTestnet = true,
   _isDev = true,
-  wethAddress?: string,
+  governanceAddress?: string,
+  sovCommunityPotAddress?: string,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
   if (!deployer.provider) {
     throw new Error("Signer must have a provider.");
   }
+
+  governanceAddress ??= await deployer.getAddress();
+  sovCommunityPotAddress ??= await deployContract(deployer, getContractFactory, "MockFeeSharingProxy", { ...overrides });
 
   log("Deploying contracts...");
   log();
@@ -490,30 +477,18 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     totalStabilityPoolLQTYReward: "0",
-    liquidityMiningLQTYRewardRate: "0",
+    governanceAddress,
+    sovCommunityPotAddress, 
     _priceFeedIsTestnet,
-    _uniTokenIsMock: !wethAddress,
     _isDev,
 
-    ...(await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides).then(
-      async ([addresses, startBlock]) => ({
-        startBlock,
-
-        addresses: {
-          ...addresses,
-
-          uniToken: await (wethAddress
-            ? createUniswapV2Pair(deployer, wethAddress, addresses.lusdToken, overrides)
-            : deployMockUniToken(deployer, getContractFactory, overrides))
-        }
-      })
-    ))
+    ...await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides)
   };
 
   const contracts = _connectToContracts(deployer, deployment);
 
   log("Connecting contracts...");
-  await connectContracts(contracts, deployer, overrides);
+  await connectContracts(contracts, deployer, sovCommunityPotAddress, overrides);
 
   log("Transferring Ownership...");
   await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
@@ -521,7 +496,6 @@ export const deployAndSetupContracts = async (
   const lqtyTokenDeploymentTime = await contracts.lqtyToken.getDeploymentStartTime();
   const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();
   const totalStabilityPoolLQTYReward = await contracts.communityIssuance.LQTYSupplyCap();
-  const liquidityMiningLQTYRewardRate = await contracts.unipool.rewardRate();
 
   return {
     ...deployment,
@@ -530,8 +504,5 @@ export const deployAndSetupContracts = async (
     totalStabilityPoolLQTYReward: `${Decimal.fromBigNumberString(
       totalStabilityPoolLQTYReward.toHexString()
     )}`,
-    liquidityMiningLQTYRewardRate: `${Decimal.fromBigNumberString(
-      liquidityMiningLQTYRewardRate.toHexString()
-    )}`
   };
 };
