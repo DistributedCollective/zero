@@ -10,7 +10,7 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 const TroveManagerTester = artifacts.require("TroveManagerTester")
-const LUSDToken = artifacts.require("LUSDToken")
+const ZUSDToken = artifacts.require("ZUSDToken")
 
 contract('CollSurplusPool', async accounts => {
   const [
@@ -25,27 +25,27 @@ contract('CollSurplusPool', async accounts => {
 
   let contracts
 
-  const getOpenTroveLUSDAmount = async (totalDebt) => th.getOpenTroveLUSDAmount(contracts, totalDebt)
+  const getOpenTroveZUSDAmount = async (totalDebt) => th.getOpenTroveZUSDAmount(contracts, totalDebt)
   const openTrove = async (params) => th.openTrove(contracts, params)
 
   before(async () => {
     contracts = await deploymentHelper.deployLiquityCore()
     contracts.troveManager = await TroveManagerTester.new()
-    contracts.lusdToken = await LUSDToken.new()
-    await contracts.lusdToken.initialize(
+    contracts.zusdToken = await ZUSDToken.new()
+    await contracts.zusdToken.initialize(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     )
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
 
     priceFeed = contracts.priceFeedTestnet
     collSurplusPool = contracts.collSurplusPool
     borrowerOperations = contracts.borrowerOperations
 
-    await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectZEROContracts(ZEROContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
   })
 
   let revertToSnapshot;
@@ -67,7 +67,7 @@ contract('CollSurplusPool', async accounts => {
     await priceFeed.setPrice(price)
 
     const { collateral: B_coll, netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: B } })
-    await openTrove({ extraLUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
+    await openTrove({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -95,11 +95,11 @@ contract('CollSurplusPool', async accounts => {
 
     // open trove from NonPayable proxy contract
     const B_coll = toBN(dec(60, 18))
-    const B_lusdAmount = toBN(dec(3000, 18))
-    const B_netDebt = await th.getAmountWithBorrowingFee(contracts, B_lusdAmount)
-    const openTroveData = th.getTransactionData('openTrove(uint256,uint256,address,address)', ['0xde0b6b3a7640000', web3.utils.toHex(B_lusdAmount), B, B])
+    const B_zusdAmount = toBN(dec(3000, 18))
+    const B_netDebt = await th.getAmountWithBorrowingFee(contracts, B_zusdAmount)
+    const openTroveData = th.getTransactionData('openTrove(uint256,uint256,address,address)', ['0xde0b6b3a7640000', web3.utils.toHex(B_zusdAmount), B, B])
     await nonPayable.forward(borrowerOperations.address, openTroveData, { value: B_coll })
-    await openTrove({ extraLUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
+    await openTrove({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)

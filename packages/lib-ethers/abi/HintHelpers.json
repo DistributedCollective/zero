@@ -59,19 +59,6 @@
   },
   {
     "inputs": [],
-    "name": "LUSD_GAS_COMPENSATION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "MIN_NET_DEBT",
     "outputs": [
       {
@@ -91,6 +78,19 @@
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ZUSD_GAS_COMPENSATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -270,7 +270,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LUSDamount",
+        "name": "_ZUSDamount",
         "type": "uint256"
       },
       {
@@ -298,7 +298,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "truncatedLUSDamount",
+        "name": "truncatedZUSDamount",
         "type": "uint256"
       }
     ],

@@ -11,12 +11,12 @@
 |  [Decimal](./lib-base.decimal.md) | Fixed-point decimal bignumber with 18 digits of precision. |
 |  [Fees](./lib-base.fees.md) | Calculator for fees. |
 |  [LiquityStore](./lib-base.liquitystore.md) | Abstract base class of Liquity data store implementations. |
-|  [LQTYStake](./lib-base.lqtystake.md) | Represents a user's LQTY stake and accrued gains. |
 |  [StabilityDeposit](./lib-base.stabilitydeposit.md) | A Stability Deposit and its accrued gains. |
 |  [TransactionFailedError](./lib-base.transactionfailederror.md) | Thrown by [TransactableLiquity](./lib-base.transactableliquity.md) functions in case of transaction failure. |
 |  [Trove](./lib-base.trove.md) | A combination of collateral and debt. |
 |  [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md) | A Trove in its state after the last direct modification. |
 |  [UserTrove](./lib-base.usertrove.md) | A Trove that is associated with a single owner. |
+|  [ZEROStake](./lib-base.zerostake.md) | Represents a user's ZERO stake and accrued gains. |
 
 ## Interfaces
 
@@ -31,10 +31,10 @@
 |  [PopulatedLiquityTransaction](./lib-base.populatedliquitytransaction.md) | A transaction that has been prepared for sending. |
 |  [PopulatedRedemption](./lib-base.populatedredemption.md) | A redemption transaction that has been prepared for sending. |
 |  [ReadableLiquity](./lib-base.readableliquity.md) | Read the state of the Liquity protocol. |
-|  [RedemptionDetails](./lib-base.redemptiondetails.md) | Details of a [redeemLUSD()](./lib-base.transactableliquity.redeemlusd.md) transaction. |
+|  [RedemptionDetails](./lib-base.redemptiondetails.md) | Details of a [redeemZUSD()](./lib-base.transactableliquity.redeemzusd.md) transaction. |
 |  [SendableLiquity](./lib-base.sendableliquity.md) | Send Liquity transactions. |
 |  [SentLiquityTransaction](./lib-base.sentliquitytransaction.md) | A transaction that has already been sent. |
-|  [StabilityDepositChangeDetails](./lib-base.stabilitydepositchangedetails.md) | Details of a [depositLUSDInStabilityPool()](./lib-base.transactableliquity.depositlusdinstabilitypool.md) or [withdrawLUSDFromStabilityPool()](./lib-base.transactableliquity.withdrawlusdfromstabilitypool.md) transaction. |
+|  [StabilityDepositChangeDetails](./lib-base.stabilitydepositchangedetails.md) | Details of a [depositZUSDInStabilityPool()](./lib-base.transactableliquity.depositzusdinstabilitypool.md) or [withdrawZUSDFromStabilityPool()](./lib-base.transactableliquity.withdrawzusdfromstabilitypool.md) transaction. |
 |  [StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md) | Details of a [withdrawGainsFromStabilityPool()](./lib-base.transactableliquity.withdrawgainsfromstabilitypool.md) transaction. |
 |  [TransactableLiquity](./lib-base.transactableliquity.md) | Send Liquity transactions and wait for them to succeed. |
 |  [TroveAdjustmentDetails](./lib-base.troveadjustmentdetails.md) | Details of an [adjustTrove()](./lib-base.transactableliquity.adjusttrove.md) transaction. |
@@ -47,13 +47,13 @@
 |  Variable | Description |
 |  --- | --- |
 |  [CRITICAL\_COLLATERAL\_RATIO](./lib-base.critical_collateral_ratio.md) | Total collateral ratio below which recovery mode is triggered. |
-|  [LUSD\_LIQUIDATION\_RESERVE](./lib-base.lusd_liquidation_reserve.md) | Amount of LUSD that's reserved for compensating the liquidator of a Trove. |
-|  [LUSD\_MINIMUM\_DEBT](./lib-base.lusd_minimum_debt.md) | A Trove must always have at least this much debt. |
-|  [LUSD\_MINIMUM\_NET\_DEBT](./lib-base.lusd_minimum_net_debt.md) | A Trove must always have at least this much debt on top of the [liquidation reserve](./lib-base.lusd_liquidation_reserve.md)<!-- -->. |
 |  [MAXIMUM\_BORROWING\_RATE](./lib-base.maximum_borrowing_rate.md) | Value that the [borrowing rate](./lib-base.fees.borrowingrate.md) will never exceed. |
 |  [MINIMUM\_BORROWING\_RATE](./lib-base.minimum_borrowing_rate.md) | Value that the [borrowing rate](./lib-base.fees.borrowingrate.md) will never decay below. |
 |  [MINIMUM\_COLLATERAL\_RATIO](./lib-base.minimum_collateral_ratio.md) | Collateral ratio below which a Trove can be liquidated in normal mode. |
 |  [MINIMUM\_REDEMPTION\_RATE](./lib-base.minimum_redemption_rate.md) | Value that the [redemption rate](./lib-base.fees.redemptionrate.md) will never decay below. |
+|  [ZUSD\_LIQUIDATION\_RESERVE](./lib-base.zusd_liquidation_reserve.md) | Amount of ZUSD that's reserved for compensating the liquidator of a Trove. |
+|  [ZUSD\_MINIMUM\_DEBT](./lib-base.zusd_minimum_debt.md) | A Trove must always have at least this much debt. |
+|  [ZUSD\_MINIMUM\_NET\_DEBT](./lib-base.zusd_minimum_net_debt.md) | A Trove must always have at least this much debt on top of the [liquidation reserve](./lib-base.zusd_liquidation_reserve.md)<!-- -->. |
 
 ## Type Aliases
 
@@ -64,7 +64,6 @@
 |  [FrontendStatus](./lib-base.frontendstatus.md) | Represents whether an address has been registered as a Liquity frontend. |
 |  [LiquityReceipt](./lib-base.liquityreceipt.md) | One of either a [PendingReceipt](./lib-base.pendingreceipt.md)<!-- -->, a [FailedReceipt](./lib-base.failedreceipt.md) or a [SuccessfulReceipt](./lib-base.successfulreceipt.md)<!-- -->. |
 |  [LiquityStoreState](./lib-base.liquitystorestate.md) | Type of [LiquityStore](./lib-base.liquitystore.md)<!-- -->'s [state](./lib-base.liquitystore.state.md)<!-- -->. |
-|  [LQTYStakeChange](./lib-base.lqtystakechange.md) | Represents the change between two states of an LQTY Stake. |
 |  [MinedReceipt](./lib-base.minedreceipt.md) | Either a [FailedReceipt](./lib-base.failedreceipt.md) or a [SuccessfulReceipt](./lib-base.successfulreceipt.md)<!-- -->. |
 |  [PendingReceipt](./lib-base.pendingreceipt.md) | Indicates that the transaction hasn't been mined yet. |
 |  [StabilityDepositChange](./lib-base.stabilitydepositchange.md) | Represents the change between two Stability Deposit states. |
@@ -75,4 +74,5 @@
 |  [TroveCreationError](./lib-base.trovecreationerror.md) | Describes why a Trove could not be created. |
 |  [TroveCreationParams](./lib-base.trovecreationparams.md) | Parameters of an [openTrove()](./lib-base.transactableliquity.opentrove.md) transaction. |
 |  [UserTroveStatus](./lib-base.usertrovestatus.md) | Represents whether a UserTrove is open or not, or why it was closed. |
+|  [ZEROStakeChange](./lib-base.zerostakechange.md) | Represents the change between two states of an ZERO Stake. |
 

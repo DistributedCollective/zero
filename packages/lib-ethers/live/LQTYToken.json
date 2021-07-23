@@ -12,7 +12,7 @@
         },
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         },
         {
@@ -83,7 +83,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         }
       ],
@@ -336,7 +336,7 @@
     },
     {
       "inputs": [],
-      "name": "lqtyStakingAddress",
+      "name": "zeroStakingAddress",
       "outputs": [
         {
           "internalType": "address",

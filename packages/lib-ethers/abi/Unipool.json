@@ -3,19 +3,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_lqtyTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LQTYTokenAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -112,6 +99,19 @@
       }
     ],
     "name": "Withdrawn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_zeroTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ZEROTokenAddressChanged",
     "type": "event"
   },
   {
@@ -226,19 +226,6 @@
   },
   {
     "inputs": [],
-    "name": "lqtyToken",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "periodFinish",
     "outputs": [
       {
@@ -325,7 +312,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_lqtyTokenAddress",
+        "name": "_zeroTokenAddress",
         "type": "address"
       },
       {
@@ -420,6 +407,19 @@
     "name": "withdrawAndClaim",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "zeroToken",
+    "outputs": [
+      {
+        "internalType": "contract IZEROToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

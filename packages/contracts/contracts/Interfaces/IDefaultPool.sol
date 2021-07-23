@@ -8,7 +8,7 @@ import "./IPool.sol";
 interface IDefaultPool is IPool {
     // --- Events ---
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolLUSDDebtUpdated(uint _LUSDDebt);
+    event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
     event DefaultPoolETHBalanceUpdated(uint _ETH);
 
     // --- Functions ---

@@ -9,9 +9,9 @@ import "./Dependencies/console.sol";
 import "./ActivePoolStorage.sol";
 
 /*
- * The Active Pool holds the ETH collateral and LUSD debt (but not LUSD tokens) for all active troves.
+ * The Active Pool holds the ETH collateral and ZUSD debt (but not ZUSD tokens) for all active troves.
  *
- * When a trove is liquidated, it's ETH and LUSD debt are transferred from the Active Pool, to either the
+ * When a trove is liquidated, it's ETH and ZUSD debt are transferred from the Active Pool, to either the
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  *
  */
@@ -20,7 +20,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     // --- Events ---
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
+    event ActivePoolZUSDDebtUpdated(uint _ZUSDDebt);
     event ActivePoolETHBalanceUpdated(uint _ETH);
 
     // --- Contract setters ---
@@ -59,8 +59,8 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         return ETH;
     }
 
-    function getLUSDDebt() external view override returns (uint) {
-        return LUSDDebt;
+    function getZUSDDebt() external view override returns (uint) {
+        return ZUSDDebt;
     }
 
     // --- Pool functionality ---
@@ -75,16 +75,16 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         require(success, "ActivePool: sending ETH failed");
     }
 
-    function increaseLUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
-        LUSDDebt = LUSDDebt.add(_amount);
-        ActivePoolLUSDDebtUpdated(LUSDDebt);
+        ZUSDDebt = ZUSDDebt.add(_amount);
+        ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
-    function decreaseLUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        LUSDDebt = LUSDDebt.sub(_amount);
-        ActivePoolLUSDDebtUpdated(LUSDDebt);
+        ZUSDDebt = ZUSDDebt.sub(_amount);
+        ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     // --- 'require' functions ---

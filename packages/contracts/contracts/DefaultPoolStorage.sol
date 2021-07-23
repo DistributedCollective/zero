@@ -11,5 +11,5 @@ contract DefaultPoolStorage is Ownable {
     address public troveManagerAddress;
     address public activePoolAddress;
     uint256 internal ETH;  // deposited ETH tracker
-    uint256 internal LUSDDebt;  // debt
+    uint256 internal ZUSDDebt;  // debt
 }

@@ -8,20 +8,20 @@ import { useLiquity } from "../hooks/LiquityContext";
 import { COIN, GT } from "../strings";
 import { Statistic } from "./Statistic";
 
-const selectBalances = ({ accountBalance, lusdBalance, lqtyBalance }: LiquityStoreState) => ({
+const selectBalances = ({ accountBalance, zusdBalance, lqtyBalance }: LiquityStoreState) => ({
   accountBalance,
-  lusdBalance,
+  zusdBalance,
   lqtyBalance
 });
 
 const Balances: React.FC = () => {
-  const { accountBalance, lusdBalance, lqtyBalance } = useLiquitySelector(selectBalances);
+  const { accountBalance, zusdBalance, lqtyBalance } = useLiquitySelector(selectBalances);
 
   return (
     <Box sx={{ mb: 3 }}>
       <Heading>My Account Balances</Heading>
       <Statistic name="ETH"> {accountBalance.prettify(4)}</Statistic>
-      <Statistic name={COIN}> {lusdBalance.prettify()}</Statistic>
+      <Statistic name={COIN}> {zusdBalance.prettify()}</Statistic>
       <Statistic name={GT}>{lqtyBalance.prettify()}</Statistic>
     </Box>
   );
@@ -43,19 +43,19 @@ const select = ({
   numberOfTroves,
   price,
   total,
-  lusdInStabilityPool,
+  zusdInStabilityPool,
   borrowingRate,
   redemptionRate,
-  totalStakedLQTY,
+  totalStakedZERO,
   frontend
 }: LiquityStoreState) => ({
   numberOfTroves,
   price,
   total,
-  lusdInStabilityPool,
+  zusdInStabilityPool,
   borrowingRate,
   redemptionRate,
-  totalStakedLQTY,
+  totalStakedZERO,
   kickbackRate: frontend.status === "registered" ? frontend.kickbackRate : null
 });
 
@@ -69,15 +69,15 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
   const {
     numberOfTroves,
     price,
-    lusdInStabilityPool,
+    zusdInStabilityPool,
     total,
     borrowingRate,
-    totalStakedLQTY,
+    totalStakedZERO,
     kickbackRate
   } = useLiquitySelector(select);
 
-  const lusdInStabilityPoolPct =
-    total.debt.nonZero && new Percent(lusdInStabilityPool.div(total.debt));
+  const zusdInStabilityPoolPct =
+    total.debt.nonZero && new Percent(zusdInStabilityPool.div(total.debt));
   const totalCollateralRatioPct = new Percent(total.collateralRatio(price));
   const borrowingFeePct = new Percent(borrowingRate);
   const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
@@ -94,7 +94,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
 
       <Statistic
         name="Borrowing Fee"
-        tooltip="The Borrowing Fee is a one-off fee charged as a percentage of the borrowed amount (in LUSD) and is part of a Trove's debt. The fee varies between 0.5% and 5% depending on LUSD redemption volumes."
+        tooltip="The Borrowing Fee is a one-off fee charged as a percentage of the borrowed amount (in ZUSD) and is part of a Trove's debt. The fee varies between 0.5% and 5% depending on ZUSD redemption volumes."
       >
         {borrowingFeePct.toString(2)}
       </Statistic>
@@ -111,24 +111,24 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       <Statistic name="Troves" tooltip="The total number of active Troves in the system.">
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
-      <Statistic name="LUSD supply" tooltip="The total LUSD minted by the Liquity Protocol.">
+      <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Liquity Protocol.">
         {total.debt.shorten()}
       </Statistic>
-      {lusdInStabilityPoolPct && (
+      {zusdInStabilityPoolPct && (
         <Statistic
-          name="LUSD in Stability Pool"
-          tooltip="The total LUSD currently held in the Stability Pool, expressed as an amount and a fraction of the LUSD supply.
+          name="ZUSD in Stability Pool"
+          tooltip="The total ZUSD currently held in the Stability Pool, expressed as an amount and a fraction of the ZUSD supply.
         "
         >
-          {lusdInStabilityPool.shorten()}
-          <Text sx={{ fontSize: 1 }}>&nbsp;({lusdInStabilityPoolPct.toString(1)})</Text>
+          {zusdInStabilityPool.shorten()}
+          <Text sx={{ fontSize: 1 }}>&nbsp;({zusdInStabilityPoolPct.toString(1)})</Text>
         </Statistic>
       )}
       <Statistic
-        name="Staked LQTY"
-        tooltip="The total amount of LQTY that is staked for earning fee revenue."
+        name="Staked ZERO"
+        tooltip="The total amount of ZERO that is staked for earning fee revenue."
       >
-        {totalStakedLQTY.shorten()}
+        {totalStakedZERO.shorten()}
       </Statistic>
       <Statistic
         name="Total Collateral Ratio"
@@ -150,7 +150,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       {kickbackRatePct && (
         <Statistic
           name="Kickback Rate"
-          tooltip="A rate between 0 and 100% set by the Frontend Operator that determines the fraction of LQTY that will be paid out as a kickback to the Stability Providers using the frontend."
+          tooltip="A rate between 0 and 100% set by the Frontend Operator that determines the fraction of ZERO that will be paid out as a kickback to the Stability Providers using the frontend."
         >
           {kickbackRatePct}%
         </Statistic>

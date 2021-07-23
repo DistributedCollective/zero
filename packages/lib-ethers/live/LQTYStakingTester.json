@@ -80,7 +80,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         }
       ],
@@ -93,7 +93,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_zusdTokenAddress",
           "type": "address"
         }
       ],
@@ -371,7 +371,7 @@
     },
     {
       "inputs": [],
-      "name": "lqtyToken",
+      "name": "zeroToken",
       "outputs": [
         {
           "internalType": "contract ILQTYToken",
@@ -384,7 +384,7 @@
     },
     {
       "inputs": [],
-      "name": "lusdToken",
+      "name": "zusdToken",
       "outputs": [
         {
           "internalType": "contract ILUSDToken",
@@ -419,12 +419,12 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_zusdTokenAddress",
           "type": "address"
         },
         {

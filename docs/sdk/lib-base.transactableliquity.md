@@ -23,24 +23,24 @@ Implemented by [EthersLiquity](./lib-ethers.ethersliquity.md)<!-- -->.
 |  Method | Description |
 |  --- | --- |
 |  [adjustTrove(params, maxBorrowingRate)](./lib-base.transactableliquity.adjusttrove.md) | Adjust existing Trove by changing its collateral, debt, or both. |
-|  [borrowLUSD(amount, maxBorrowingRate)](./lib-base.transactableliquity.borrowlusd.md) | Adjust existing Trove by borrowing more LUSD. |
+|  [borrowZUSD(amount, maxBorrowingRate)](./lib-base.transactableliquity.borrowzusd.md) | Adjust existing Trove by borrowing more ZUSD. |
 |  [claimCollateralSurplus()](./lib-base.transactableliquity.claimcollateralsurplus.md) | Claim leftover collateral after a liquidation or redemption. |
 |  [closeTrove()](./lib-base.transactableliquity.closetrove.md) | Close existing Trove by repaying all debt and withdrawing all collateral. |
 |  [depositCollateral(amount)](./lib-base.transactableliquity.depositcollateral.md) | Adjust existing Trove by depositing more collateral. |
-|  [depositLUSDInStabilityPool(amount, frontendTag)](./lib-base.transactableliquity.depositlusdinstabilitypool.md) | Make a new Stability Deposit, or top up existing one. |
+|  [depositZUSDInStabilityPool(amount, frontendTag)](./lib-base.transactableliquity.depositzusdinstabilitypool.md) | Make a new Stability Deposit, or top up existing one. |
 |  [liquidate(address)](./lib-base.transactableliquity.liquidate.md) | Liquidate one or more undercollateralized Troves. |
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate)](./lib-base.transactableliquity.liquidateupto.md) | Liquidate the least collateralized Troves up to a maximum number. |
-|  [openTrove(params, maxBorrowingRate)](./lib-base.transactableliquity.opentrove.md) | Open a new Trove by depositing collateral and borrowing LUSD. |
-|  [redeemLUSD(amount, maxRedemptionRate)](./lib-base.transactableliquity.redeemlusd.md) | Redeem LUSD to native currency (e.g. Ether) at face value. |
+|  [openTrove(params, maxBorrowingRate)](./lib-base.transactableliquity.opentrove.md) | Open a new Trove by depositing collateral and borrowing ZUSD. |
+|  [redeemZUSD(amount, maxRedemptionRate)](./lib-base.transactableliquity.redeemzusd.md) | Redeem ZUSD to native currency (e.g. Ether) at face value. |
 |  [registerFrontend(kickbackRate)](./lib-base.transactableliquity.registerfrontend.md) | Register current wallet address as a Liquity frontend. |
-|  [repayLUSD(amount)](./lib-base.transactableliquity.repaylusd.md) | Adjust existing Trove by repaying some of its debt. |
-|  [sendLQTY(toAddress, amount)](./lib-base.transactableliquity.sendlqty.md) | Send LQTY tokens to an address. |
-|  [sendLUSD(toAddress, amount)](./lib-base.transactableliquity.sendlusd.md) | Send LUSD tokens to an address. |
-|  [stakeLQTY(amount)](./lib-base.transactableliquity.stakelqty.md) | Stake LQTY to start earning fee revenue or increase existing stake. |
+|  [repayZUSD(amount)](./lib-base.transactableliquity.repayzusd.md) | Adjust existing Trove by repaying some of its debt. |
+|  [sendZERO(toAddress, amount)](./lib-base.transactableliquity.sendzero.md) | Send ZERO tokens to an address. |
+|  [sendZUSD(toAddress, amount)](./lib-base.transactableliquity.sendzusd.md) | Send ZUSD tokens to an address. |
+|  [stakeZERO(amount)](./lib-base.transactableliquity.stakezero.md) | Stake ZERO to start earning fee revenue or increase existing stake. |
 |  [transferCollateralGainToTrove()](./lib-base.transactableliquity.transfercollateralgaintotrove.md) | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
-|  [unstakeLQTY(amount)](./lib-base.transactableliquity.unstakelqty.md) | Withdraw LQTY from staking. |
+|  [unstakeZERO(amount)](./lib-base.transactableliquity.unstakezero.md) | Withdraw ZERO from staking. |
 |  [withdrawCollateral(amount)](./lib-base.transactableliquity.withdrawcollateral.md) | Adjust existing Trove by withdrawing some of its collateral. |
-|  [withdrawGainsFromStabilityPool()](./lib-base.transactableliquity.withdrawgainsfromstabilitypool.md) | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [LQTY reward](./lib-base.stabilitydeposit.lqtyreward.md) from Stability Deposit. |
-|  [withdrawGainsFromStaking()](./lib-base.transactableliquity.withdrawgainsfromstaking.md) | Withdraw [collateral gain](./lib-base.lqtystake.collateralgain.md) and [LUSD gain](./lib-base.lqtystake.lusdgain.md) from LQTY stake. |
-|  [withdrawLUSDFromStabilityPool(amount)](./lib-base.transactableliquity.withdrawlusdfromstabilitypool.md) | Withdraw LUSD from Stability Deposit. |
+|  [withdrawGainsFromStabilityPool()](./lib-base.transactableliquity.withdrawgainsfromstabilitypool.md) | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [ZERO reward](./lib-base.stabilitydeposit.zeroreward.md) from Stability Deposit. |
+|  [withdrawGainsFromStaking()](./lib-base.transactableliquity.withdrawgainsfromstaking.md) | Withdraw [collateral gain](./lib-base.zerostake.collateralgain.md) and [ZUSD gain](./lib-base.zerostake.zusdgain.md) from ZERO stake. |
+|  [withdrawZUSDFromStabilityPool(amount)](./lib-base.transactableliquity.withdrawzusdfromstabilitypool.md) | Withdraw ZUSD from Stability Deposit. |
 

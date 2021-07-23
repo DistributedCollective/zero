@@ -14,11 +14,11 @@ type Global @entity {
   numberOfTrovesClosedByOwner: Int!
   totalNumberOfTroves: Int!
 
-  totalNumberOfLQTYStakes: Int!
-  numberOfActiveLQTYStakes: Int!
-  totalLQTYTokensStaked: BigDecimal!
+  totalNumberOfZEROStakes: Int!
+  numberOfActiveZEROStakes: Int!
+  totalZEROTokensStaked: BigDecimal!
 
-  "Total amount of LUSD paid as borrowing fees"
+  "Total amount of ZUSD paid as borrowing fees"
   totalBorrowingFeesPaid: BigDecimal!
   "Total amount of ETH paid as redemption fees"
   totalRedemptionFeesPaid: BigDecimal!
@@ -66,7 +66,7 @@ type User @entity {
 
   trove: Trove
   stabilityDeposit: StabilityDeposit
-  stake: LqtyStake
+  stake: ZeroStake
   frontend: Frontend
 
   collSurplus: BigDecimal!
@@ -268,14 +268,14 @@ type CollSurplusChange implements Change @entity {
   collSurplusAfter: BigDecimal!
 }
 
-type LqtyStake @entity {
+type ZeroStake @entity {
   id: ID!
   owner: User!
   amount: BigDecimal!
-  changes: [LqtyStakeChange!]! @derivedFrom(field: "stake")
+  changes: [ZeroStakeChange!]! @derivedFrom(field: "stake")
 }
 
-enum LQTYStakeOperation {
+enum ZEROStakeOperation {
   stakeCreated
   stakeIncreased
   stakeDecreased
@@ -283,15 +283,15 @@ enum LQTYStakeOperation {
   gainsWithdrawn
 }
 
-type LqtyStakeChange implements Change @entity {
+type ZeroStakeChange implements Change @entity {
   id: ID!
   sequenceNumber: Int!
   transaction: Transaction!
   systemStateBefore: SystemState!
   systemStateAfter: SystemState!
 
-  stake: LqtyStake!
-  stakeOperation: LQTYStakeOperation!
+  stake: ZeroStake!
+  stakeOperation: ZEROStakeOperation!
 
   amountBefore: BigDecimal!
   amountChange: BigDecimal!

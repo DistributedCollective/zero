@@ -7,7 +7,7 @@ def floatToWei(amount):
     return Wei(amount * 1e18)
 
 # Subtracts the borrowing fee
-def get_lusd_amount_from_net_debt(contracts, net_debt):
+def get_zusd_amount_from_net_debt(contracts, net_debt):
     borrowing_rate = contracts.troveManager.getBorrowingRateWithDecay()
     return Wei(net_debt * Wei(1e18) / (Wei(1e18) + borrowing_rate))
 
@@ -16,16 +16,16 @@ def logGlobalState(contracts):
     num_troves = contracts.sortedTroves.getSize()
     print('Num troves      ', num_troves)
     activePoolColl = contracts.activePool.getETH()
-    activePoolDebt = contracts.activePool.getLUSDDebt()
+    activePoolDebt = contracts.activePool.getZUSDDebt()
     defaultPoolColl = contracts.defaultPool.getETH()
-    defaultPoolDebt = contracts.defaultPool.getLUSDDebt()
+    defaultPoolDebt = contracts.defaultPool.getZUSDDebt()
     total_debt = (activePoolDebt + defaultPoolDebt).to("ether")
     total_coll = (activePoolColl + defaultPoolColl).to("ether")
     print('Total Debt      ', total_debt)
     print('Total Coll      ', total_coll)
-    SP_LUSD = contracts.stabilityPool.getTotalLUSDDeposits().to("ether")
+    SP_ZUSD = contracts.stabilityPool.getTotalZUSDDeposits().to("ether")
     SP_ETH = contracts.stabilityPool.getETH().to("ether")
-    print('SP LUSD         ', SP_LUSD)
+    print('SP ZUSD         ', SP_ZUSD)
     print('SP ETH          ', SP_ETH)
     price_ether_current = contracts.priceFeedTestnet.getPrice()
     ETH_price = price_ether_current.to("ether")
@@ -46,4 +46,4 @@ def logGlobalState(contracts):
     print('Last trove’s ICR', last_ICR)
     print(' ----------------------\n')
 
-    return [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_LUSD, SP_ETH]
+    return [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_ETH]

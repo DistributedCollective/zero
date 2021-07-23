@@ -28,10 +28,10 @@ contract('Gas costs for math functions', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore()
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress, lpRewardsAddress)
 
     priceFeed = contracts.priceFeedTestnet
-    lusdToken = contracts.lusdToken
+    zusdToken = contracts.zusdToken
     sortedTroves = contracts.sortedTroves
     troveManager = contracts.troveManager
     activePool = contracts.activePool
@@ -40,14 +40,14 @@ contract('Gas costs for math functions', async accounts => {
     borrowerOperations = contracts.borrowerOperations
     hintHelpers = contracts.hintHelpers
 
-    gtStaking = LQTYContracts.gtStaking
-    lqtyToken = LQTYContracts.lqtyToken
-    communityIssuance = LQTYContracts.communityIssuance
-    lockupContractFactory = LQTYContracts.lockupContractFactory
+    gtStaking = ZEROContracts.gtStaking
+    zeroToken = ZEROContracts.zeroToken
+    communityIssuance = ZEROContracts.communityIssuance
+    lockupContractFactory = ZEROContracts.lockupContractFactory
 
-    await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectZEROContracts(ZEROContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
   })
 
   // performs n runs of exponentiation on a random base

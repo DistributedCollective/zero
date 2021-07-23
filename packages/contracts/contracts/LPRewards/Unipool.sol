@@ -6,7 +6,7 @@ import "../Dependencies/LiquityMath.sol";
 import "../Dependencies/SafeMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
-import "../Interfaces/ILQTYToken.sol";
+import "../Interfaces/IZEROToken.sol";
 import "./Dependencies/SafeERC20.sol";
 import "./Interfaces/ILPTokenWrapper.sol";
 import "./Interfaces/IUnipool.sol";
@@ -51,7 +51,7 @@ contract LPTokenWrapper is ILPTokenWrapper {
 }
 
 /*
- * On deployment a new Uniswap pool will be created for the pair LUSD/ETH and its token will be set here.
+ * On deployment a new Uniswap pool will be created for the pair ZUSD/ETH and its token will be set here.
 
  * Essentially the way it works is:
 
@@ -61,21 +61,21 @@ contract LPTokenWrapper is ILPTokenWrapper {
  * - Liquidity providers can claim their rewards when they want
  * - Liquidity providers can unstake UNIv2 LP tokens to exit the program (i.e., stop earning rewards) when they want
 
- * Funds for rewards will only be added once, on deployment of LQTY token,
+ * Funds for rewards will only be added once, on deployment of ZERO token,
  * which will happen after this contract is deployed and before this `setParams` in this contract is called.
 
  * If at some point the total amount of staked tokens is zero, the clock will be “stopped”,
  * so the period will be extended by the time during which the staking pool is empty,
- * in order to avoid getting LQTY tokens locked.
+ * in order to avoid getting ZERO tokens locked.
  * That also means that the start time for the program will be the event that occurs first:
- * either LQTY token contract is deployed, and therefore LQTY tokens are minted to Unipool contract,
+ * either ZERO token contract is deployed, and therefore ZERO tokens are minted to Unipool contract,
  * or first liquidity provider stakes UNIv2 LP tokens into it.
  */
 contract Unipool is LPTokenWrapper, Ownable, CheckContract, IUnipool {
     string constant public NAME = "Unipool";
 
     uint256 public duration;
-    ILQTYToken public lqtyToken;
+    IZEROToken public zeroToken;
 
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
@@ -84,7 +84,7 @@ contract Unipool is LPTokenWrapper, Ownable, CheckContract, IUnipool {
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
-    event LQTYTokenAddressChanged(address _lqtyTokenAddress);
+    event ZEROTokenAddressChanged(address _zeroTokenAddress);
     event UniTokenAddressChanged(address _uniTokenAddress);
     event RewardAdded(uint256 reward);
     event Staked(address indexed user, uint256 amount);
@@ -93,7 +93,7 @@ contract Unipool is LPTokenWrapper, Ownable, CheckContract, IUnipool {
 
     // initialization function
     function setParams(
-        address _lqtyTokenAddress,
+        address _zeroTokenAddress,
         address _uniTokenAddress,
         uint _duration
     )
@@ -101,16 +101,16 @@ contract Unipool is LPTokenWrapper, Ownable, CheckContract, IUnipool {
         override
         onlyOwner
     {
-        checkContract(_lqtyTokenAddress);
+        checkContract(_zeroTokenAddress);
         checkContract(_uniTokenAddress);
 
         uniToken = IERC20(_uniTokenAddress);
-        lqtyToken = ILQTYToken(_lqtyTokenAddress);
+        zeroToken = IZEROToken(_zeroTokenAddress);
         duration = _duration;
 
-        _notifyRewardAmount(lqtyToken.getLpRewardsEntitlement(), _duration);
+        _notifyRewardAmount(zeroToken.getLpRewardsEntitlement(), _duration);
 
-        emit LQTYTokenAddressChanged(_lqtyTokenAddress);
+        emit ZEROTokenAddressChanged(_zeroTokenAddress);
         emit UniTokenAddressChanged(_uniTokenAddress);
 
         
@@ -186,14 +186,14 @@ contract Unipool is LPTokenWrapper, Ownable, CheckContract, IUnipool {
         require(reward > 0, "Nothing to claim");
 
         rewards[msg.sender] = 0;
-        lqtyToken.transfer(msg.sender, reward);
+        zeroToken.transfer(msg.sender, reward);
         emit RewardPaid(msg.sender, reward);
     }
 
     // Used only on initialization, sets the reward rate and the end time for the program
     function _notifyRewardAmount(uint256 _reward, uint256 _duration) internal {
         assert(_reward > 0);
-        assert(_reward == lqtyToken.balanceOf(address(this)));
+        assert(_reward == zeroToken.balanceOf(address(this)));
         assert(periodFinish == 0);
 
         _updateReward();

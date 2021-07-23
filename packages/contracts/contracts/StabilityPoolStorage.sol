@@ -6,7 +6,7 @@ import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
-import './Interfaces/ILUSDToken.sol';
+import './Interfaces/IZUSDToken.sol';
 import './Interfaces/ISortedTroves.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/Ownable.sol";
@@ -19,7 +19,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     ITroveManager public troveManager;
 
-    ILUSDToken public lusdToken;
+    IZUSDToken public zusdToken;
 
     // Needed to check if there are pending liquidations
     ISortedTroves public sortedTroves;
@@ -28,8 +28,8 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     uint256 internal ETH;  // deposited ether tracker
 
-    // Tracker for LUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
-    uint256 internal totalLUSDDeposits;
+    // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+    uint256 internal totalZUSDDeposits;
 
    // --- Data structures ---
 
@@ -59,7 +59,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     mapping (address => Snapshots) public frontEndSnapshots; // front end address -> snapshots struct
 
     /*  Product 'P': Running product by which to multiply an initial deposit, in order to find the current compounded deposit,
-    * after a series of liquidations have occurred, each of which cancel some LUSD debt with the deposit.
+    * after a series of liquidations have occurred, each of which cancel some ZUSD debt with the deposit.
     *
     * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
     * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
@@ -85,18 +85,18 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     mapping (uint128 => mapping(uint128 => uint)) public epochToScaleToSum;
 
     /*
-    * Similarly, the sum 'G' is used to calculate LQTY gains. During it's lifetime, each deposit d_t earns a LQTY gain of
+    * Similarly, the sum 'G' is used to calculate ZERO gains. During it's lifetime, each deposit d_t earns a ZERO gain of
     *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when  the deposit was made.
     *
-    *  LQTY reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
-    *  In each case, the LQTY reward is issued (i.e. G is updated), before other state changes are made.
+    *  ZERO reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
+    *  In each case, the ZERO reward is issued (i.e. G is updated), before other state changes are made.
     */
     mapping (uint128 => mapping(uint128 => uint)) public epochToScaleToG;
 
-    // Error tracker for the error correction in the LQTY issuance calculation
-    uint public lastLQTYError;
+    // Error tracker for the error correction in the ZERO issuance calculation
+    uint public lastZEROError;
     // Error trackers for the error correction in the offset calculation
     uint public lastETHError_Offset;
-    uint public lastLUSDLossError_Offset;
+    uint public lastZUSDLossError_Offset;
 
 }

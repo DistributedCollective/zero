@@ -4,8 +4,8 @@ pragma solidity 0.6.11;
 
 import "../Interfaces/IActivePool.sol";
 import "../Interfaces/IDefaultPool.sol";
-import "../Interfaces/ILUSDToken.sol";
-import "../Interfaces/ILQTYStaking.sol";
+import "../Interfaces/IZUSDToken.sol";
+import "../Interfaces/IZEROStaking.sol";
 import "../Interfaces/ISortedTroves.sol";
 import "../Interfaces/ICollSurplusPool.sol";
 import "../TroveManagerStorage.sol";
@@ -34,7 +34,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
     struct LocalVariables_OuterLiquidationFunction {
         uint256 price;
-        uint256 LUSDInStabPool;
+        uint256 ZUSDInStabPool;
         bool recoveryModeAtStart;
         uint256 liquidatedDebt;
         uint256 liquidatedColl;
@@ -47,7 +47,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     }
 
     struct LocalVariables_LiquidationSequence {
-        uint256 remainingLUSDInStabPool;
+        uint256 remainingZUSDInStabPool;
         uint256 i;
         uint256 ICR;
         address user;
@@ -60,7 +60,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 entireTroveDebt;
         uint256 entireTroveColl;
         uint256 collGasCompensation;
-        uint256 LUSDGasCompensation;
+        uint256 ZUSDGasCompensation;
         uint256 debtToOffset;
         uint256 collToSendToSP;
         uint256 debtToRedistribute;
@@ -72,7 +72,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 totalCollInSequence;
         uint256 totalDebtInSequence;
         uint256 totalCollGasCompensation;
-        uint256 totalLUSDGasCompensation;
+        uint256 totalZUSDGasCompensation;
         uint256 totalDebtToOffset;
         uint256 totalCollToSendToSP;
         uint256 totalDebtToRedistribute;
@@ -83,8 +83,8 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     struct ContractsCache {
         IActivePool activePool;
         IDefaultPool defaultPool;
-        ILUSDToken lusdToken;
-        ILQTYStaking lqtyStaking;
+        IZUSDToken zusdToken;
+        IZEROStaking zeroStaking;
         ISortedTroves sortedTroves;
         ICollSurplusPool collSurplusPool;
         address gasPoolAddress;
@@ -92,18 +92,18 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     // --- Variable container structs for redemptions ---
 
     struct RedemptionTotals {
-        uint256 remainingLUSD;
-        uint256 totalLUSDToRedeem;
+        uint256 remainingZUSD;
+        uint256 totalZUSDToRedeem;
         uint256 totalETHDrawn;
         uint256 ETHFee;
         uint256 ETHToSendToRedeemer;
         uint256 decayedBaseRate;
         uint256 price;
-        uint256 totalLUSDSupplyAtStart;
+        uint256 totalZUSDSupplyAtStart;
     }
 
     struct SingleRedemptionValues {
-        uint256 LUSDLot;
+        uint256 ZUSDLot;
         uint256 ETHLot;
         bool cancelledPartial;
     }
@@ -114,11 +114,11 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 _liquidatedDebt,
         uint256 _liquidatedColl,
         uint256 _collGasCompensation,
-        uint256 _LUSDGasCompensation
+        uint256 _ZUSDGasCompensation
     );
     event Redemption(
-        uint256 _attemptedLUSDAmount,
-        uint256 _actualLUSDAmount,
+        uint256 _attemptedZUSDAmount,
+        uint256 _actualZUSDAmount,
         uint256 _ETHSent,
         uint256 _ETHFee
     );
@@ -139,8 +139,8 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event TotalStakesUpdated(uint256 _newTotalStakes);
     event SystemSnapshotsUpdated(uint256 _totalStakesSnapshot, uint256 _totalCollateralSnapshot);
-    event LTermsUpdated(uint256 _L_ETH, uint256 _L_LUSDDebt);
-    event TroveSnapshotsUpdated(uint256 _L_ETH, uint256 _L_LUSDDebt);
+    event LTermsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
+    event TroveSnapshotsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
     event TroveIndexUpdated(address _borrower, uint256 _newIndex);
 
     enum TroveManagerOperation {
@@ -152,20 +152,20 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
     // Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
     function _getCurrentICR(address _borrower, uint256 _price) public view returns (uint256) {
-        (uint256 currentETH, uint256 currentLUSDDebt) = _getCurrentTroveAmounts(_borrower);
+        (uint256 currentETH, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint256 ICR = LiquityMath._computeCR(currentETH, currentLUSDDebt, _price);
+        uint256 ICR = LiquityMath._computeCR(currentETH, currentZUSDDebt, _price);
         return ICR;
     }
 
     function _getCurrentTroveAmounts(address _borrower) internal view returns (uint256, uint256) {
         uint256 pendingETHReward = _getPendingETHReward(_borrower);
-        uint256 pendingLUSDDebtReward = _getPendingLUSDDebtReward(_borrower);
+        uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
         uint256 currentETH = Troves[_borrower].coll.add(pendingETHReward);
-        uint256 currentLUSDDebt = Troves[_borrower].debt.add(pendingLUSDDebtReward);
+        uint256 currentZUSDDebt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
 
-        return (currentETH, currentLUSDDebt);
+        return (currentETH, currentZUSDDebt);
     }
 
     // Get the borrower's pending accumulated ETH reward, earned by their stake
@@ -184,10 +184,10 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         return pendingETHReward;
     }
 
-    // Get the borrower's pending accumulated LUSD reward, earned by their stake
-    function _getPendingLUSDDebtReward(address _borrower) public view returns (uint256) {
-        uint256 snapshotLUSDDebt = rewardSnapshots[_borrower].LUSDDebt;
-        uint256 rewardPerUnitStaked = L_LUSDDebt.sub(snapshotLUSDDebt);
+    // Get the borrower's pending accumulated ZUSD reward, earned by their stake
+    function _getPendingZUSDDebtReward(address _borrower) public view returns (uint256) {
+        uint256 snapshotZUSDDebt = rewardSnapshots[_borrower].ZUSDDebt;
+        uint256 rewardPerUnitStaked = L_ZUSDDebt.sub(snapshotZUSDDebt);
 
         if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
             return 0;
@@ -195,9 +195,9 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
         uint256 stake = Troves[_borrower].stake;
 
-        uint256 pendingLUSDDebtReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
+        uint256 pendingZUSDDebtReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
 
-        return pendingLUSDDebtReward;
+        return pendingZUSDDebtReward;
     }
 
     // Add the borrowers's coll and debt rewards earned from redistributions, to their Trove
@@ -211,11 +211,11 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
             // Compute pending rewards
             uint256 pendingETHReward = _getPendingETHReward(_borrower);
-            uint256 pendingLUSDDebtReward = _getPendingLUSDDebtReward(_borrower);
+            uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
             // Apply pending rewards to trove's state
             Troves[_borrower].coll = Troves[_borrower].coll.add(pendingETHReward);
-            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingLUSDDebtReward);
+            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
 
             _updateTroveRewardSnapshots(_borrower);
 
@@ -223,7 +223,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
             _movePendingTroveRewardsToActivePool(
                 _activePool,
                 _defaultPool,
-                pendingLUSDDebtReward,
+                pendingZUSDDebtReward,
                 pendingETHReward
             );
 
@@ -252,19 +252,19 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
     function _updateTroveRewardSnapshots(address _borrower) internal {
         rewardSnapshots[_borrower].ETH = L_ETH;
-        rewardSnapshots[_borrower].LUSDDebt = L_LUSDDebt;
-        emit TroveSnapshotsUpdated(L_ETH, L_LUSDDebt);
+        rewardSnapshots[_borrower].ZUSDDebt = L_ZUSDDebt;
+        emit TroveSnapshotsUpdated(L_ETH, L_ZUSDDebt);
     }
 
     // Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
     function _movePendingTroveRewardsToActivePool(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
-        uint256 _LUSD,
+        uint256 _ZUSD,
         uint256 _ETH
     ) internal {
-        _defaultPool.decreaseLUSDDebt(_LUSD);
-        _activePool.increaseLUSDDebt(_LUSD);
+        _defaultPool.decreaseZUSDDebt(_ZUSD);
+        _activePool.increaseZUSDDebt(_ZUSD);
         _defaultPool.sendETHToActivePool(_ETH);
     }
 
@@ -286,7 +286,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         Troves[_borrower].debt = 0;
 
         rewardSnapshots[_borrower].ETH = 0;
-        rewardSnapshots[_borrower].LUSDDebt = 0;
+        rewardSnapshots[_borrower].ZUSDDebt = 0;
 
         _removeTroveOwner(_borrower, TroveOwnersArrayLength);
         sortedTroves.remove(_borrower);
@@ -409,14 +409,14 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         );
     }
 
-    function _requireLUSDBalanceCoversRedemption(
-        ILUSDToken _lusdToken,
+    function _requireZUSDBalanceCoversRedemption(
+        IZUSDToken _zusdToken,
         address _redeemer,
         uint256 _amount
     ) internal view {
         require(
-            _lusdToken.balanceOf(_redeemer) >= _amount,
-            "TroveManager: Requested redemption amount must be <= user's LUSD token balance"
+            _zusdToken.balanceOf(_redeemer) >= _amount,
+            "TroveManager: Requested redemption amount must be <= user's ZUSD token balance"
         );
     }
 
@@ -439,7 +439,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     }
 
     function _requireAfterBootstrapPeriod() internal view {
-        uint256 systemDeploymentTime = _lqtyToken.getDeploymentStartTime();
+        uint256 systemDeploymentTime = _zeroToken.getDeploymentStartTime();
         require(
             block.timestamp >= systemDeploymentTime.add(BOOTSTRAP_PERIOD),
             "TroveManager: Redemptions are not allowed during bootstrap phase"

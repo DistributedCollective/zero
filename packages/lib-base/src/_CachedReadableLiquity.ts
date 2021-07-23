@@ -1,6 +1,6 @@
 import { Decimal } from "./Decimal";
 import { Fees } from "./Fees";
-import { LQTYStake } from "./LQTYStake";
+import { ZEROStake } from "./ZEROStake";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
 import { FrontendStatus, ReadableLiquity, TroveListingParams } from "./ReadableLiquity";
@@ -101,31 +101,31 @@ export class _CachedReadableLiquity<T extends unknown[]>
     );
   }
 
-  async getRemainingStabilityPoolLQTYReward(...extraParams: T): Promise<Decimal> {
+  async getRemainingStabilityPoolZEROReward(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getRemainingStabilityPoolLQTYReward(...extraParams) ??
-      this._readable.getRemainingStabilityPoolLQTYReward(...extraParams)
+      this._cache.getRemainingStabilityPoolZEROReward(...extraParams) ??
+      this._readable.getRemainingStabilityPoolZEROReward(...extraParams)
     );
   }
 
-  async getLUSDInStabilityPool(...extraParams: T): Promise<Decimal> {
+  async getZUSDInStabilityPool(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLUSDInStabilityPool(...extraParams) ??
-      this._readable.getLUSDInStabilityPool(...extraParams)
+      this._cache.getZUSDInStabilityPool(...extraParams) ??
+      this._readable.getZUSDInStabilityPool(...extraParams)
     );
   }
 
-  async getLUSDBalance(address?: string, ...extraParams: T): Promise<Decimal> {
+  async getZUSDBalance(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLUSDBalance(address, ...extraParams) ??
-      this._readable.getLUSDBalance(address, ...extraParams)
+      this._cache.getZUSDBalance(address, ...extraParams) ??
+      this._readable.getZUSDBalance(address, ...extraParams)
     );
   }
 
-  async getLQTYBalance(address?: string, ...extraParams: T): Promise<Decimal> {
+  async getZEROBalance(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getLQTYBalance(address, ...extraParams) ??
-      this._readable.getLQTYBalance(address, ...extraParams)
+      this._cache.getZEROBalance(address, ...extraParams) ??
+      this._readable.getZEROBalance(address, ...extraParams)
     );
   }
 
@@ -163,17 +163,17 @@ export class _CachedReadableLiquity<T extends unknown[]>
     return this._cache.getFees(...extraParams) ?? this._readable.getFees(...extraParams);
   }
 
-  async getLQTYStake(address?: string, ...extraParams: T): Promise<LQTYStake> {
+  async getZEROStake(address?: string, ...extraParams: T): Promise<ZEROStake> {
     return (
-      this._cache.getLQTYStake(address, ...extraParams) ??
-      this._readable.getLQTYStake(address, ...extraParams)
+      this._cache.getZEROStake(address, ...extraParams) ??
+      this._readable.getZEROStake(address, ...extraParams)
     );
   }
 
-  async getTotalStakedLQTY(...extraParams: T): Promise<Decimal> {
+  async getTotalStakedZERO(...extraParams: T): Promise<Decimal> {
     return (
-      this._cache.getTotalStakedLQTY(...extraParams) ??
-      this._readable.getTotalStakedLQTY(...extraParams)
+      this._cache.getTotalStakedZERO(...extraParams) ??
+      this._readable.getTotalStakedZERO(...extraParams)
     );
   }
 

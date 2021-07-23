@@ -16,14 +16,14 @@ import activePoolAbi from "../abi/ActivePool.json";
 import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
 import troveManagerAbi from "../abi/TroveManager.json";
 import troveManagerRedeemOpsAbi from "../abi/TroveManagerRedeemOps.json";
-import lusdTokenAbi from "../abi/LUSDToken.json";
+import zusdTokenAbi from "../abi/ZUSDToken.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
 import communityIssuanceAbi from "../abi/CommunityIssuance.json";
 import defaultPoolAbi from "../abi/DefaultPool.json";
-import lqtyTokenAbi from "../abi/LQTYToken.json";
+import zeroTokenAbi from "../abi/ZEROToken.json";
 import hintHelpersAbi from "../abi/HintHelpers.json";
 import lockupContractFactoryAbi from "../abi/LockupContractFactory.json";
-import lqtyStakingAbi from "../abi/LQTYStaking.json";
+import zeroStakingAbi from "../abi/ZEROStaking.json";
 import multiTroveGetterAbi from "../abi/MultiTroveGetter.json";
 import priceFeedAbi from "../abi/PriceFeed.json";
 import priceFeedTestnetAbi from "../abi/PriceFeedTestnet.json";
@@ -38,14 +38,14 @@ import {
   BorrowerOperations,
   TroveManager,
   TroveManagerRedeemOps,
-  LUSDToken,
+  ZUSDToken,
   CollSurplusPool,
   CommunityIssuance,
   DefaultPool,
-  LQTYToken,
+  ZEROToken,
   HintHelpers,
   LockupContractFactory,
-  LQTYStaking,
+  ZEROStaking,
   MultiTroveGetter,
   PriceFeed,
   PriceFeedTestnet,
@@ -157,14 +157,14 @@ export interface _LiquityContracts {
   borrowerOperations: BorrowerOperations;
   troveManager: TroveManager;
   troveManagerRedeemOps: TroveManagerRedeemOps;
-  lusdToken: LUSDToken;
+  zusdToken: ZUSDToken;
   collSurplusPool: CollSurplusPool;
   communityIssuance: CommunityIssuance;
   defaultPool: DefaultPool;
-  lqtyToken: LQTYToken;
+  zeroToken: ZEROToken;
   hintHelpers: HintHelpers;
   lockupContractFactory: LockupContractFactory;
-  lqtyStaking: LQTYStaking;
+  zeroStaking: ZEROStaking;
   multiTroveGetter: MultiTroveGetter;
   priceFeed: PriceFeed | PriceFeedTestnet;
   sortedTroves: SortedTroves;
@@ -191,13 +191,13 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   borrowerOperations: borrowerOperationsAbi,
   troveManager: troveManagerAbi,
   troveManagerRedeemOps: troveManagerRedeemOpsAbi,
-  lusdToken: lusdTokenAbi,
+  zusdToken: zusdTokenAbi,
   communityIssuance: communityIssuanceAbi,
   defaultPool: defaultPoolAbi,
-  lqtyToken: lqtyTokenAbi,
+  zeroToken: zeroTokenAbi,
   hintHelpers: hintHelpersAbi,
   lockupContractFactory: lockupContractFactoryAbi,
-  lqtyStaking: lqtyStakingAbi,
+  zeroStaking: zeroStakingAbi,
   multiTroveGetter: multiTroveGetterAbi,
   priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
   sortedTroves: sortedTrovesAbi,
@@ -224,7 +224,7 @@ export interface _LiquityDeploymentJSON {
   readonly deploymentDate: number;
   readonly startBlock: number;
   readonly bootstrapPeriod: number;
-  readonly totalStabilityPoolLQTYReward: string;
+  readonly totalStabilityPoolZEROReward: string;
   readonly governanceAddress: string;
   readonly sovCommunityPotAddress: string;
   readonly _priceFeedIsTestnet: boolean;
