@@ -1,4 +1,3 @@
-import assert from "assert";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
@@ -15,8 +14,8 @@ import "@nomiclabs/hardhat-ethers";
 
 import { Decimal } from "@liquity/lib-base";
 
-import { deployAndSetupContracts, setSilent } from "./utils/deploy";
-import { _connectToContracts, _LiquityDeploymentJSON, _priceFeedIsTestnet } from "./src/contracts";
+import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/deploy";
+import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
 
@@ -63,34 +62,32 @@ const infuraNetwork = (name: string): { [name: string]: NetworkUserConfig } => (
 
 const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  testnet: "0x0000000000000000000000000000000000000002",
-  dev: "0x0000000000000000000000000000000000000003",
-}
+  rsktestnet: "0x0000000000000000000000000000000000000002",
+  dev: "0x0000000000000000000000000000000000000003"
+};
 
 const sovCommunityPotAddresses = {
   mainnet: "",
-  testnet: "0x740E6f892C0132D659Abcd2B6146D237A4B6b653",
+  rsktestnet: "0x740E6f892C0132D659Abcd2B6146D237A4B6b653",
   dev: ""
-}
+};
 
-const oracleAddresses = {
+const oracleAddresses : Record<string, OracleAddresses> = {
   mainnet: {
-    mocOracleAddress: "", 
+    mocOracleAddress: "",
     rskOracleAddress: ""
   },
-  testnet: {
-    mocOracleAddress: "", 
-    rskOracleAddress: ""
+  rsktestnet: {
+    mocOracleAddress: "0x26a00aF444928d689DDEC7b4D17c0E4a8c9D407d",
+    rskOracleAddress: "0xE00243Bc6912BF148302e8478996c98c22fE8739"
   },
   dev: {
-    mocOracleAddress: "", 
+    mocOracleAddress: "",
     rskOracleAddress: ""
   }
 };
 
-
-const hasOracles = (network: string): network is keyof typeof oracleAddresses =>
-  network in oracleAddresses;
+const hasOracles = (network: string): boolean => network in oracleAddresses;
 
 const hasSovCommunityPot = (network: string): network is keyof typeof sovCommunityPotAddresses =>
   network in sovCommunityPotAddresses;
@@ -120,7 +117,12 @@ const config: HardhatUserConfig = {
     rskdev: {
       url: "http://localhost:4444",
       // regtest default prefunded account
-      from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826",
+      from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+    },
+
+    rsktestnet: {
+      url: "https://public-node.testnet.rsk.co",
+      accounts: [deployerAccount]
     },
 
     ...infuraNetwork("ropsten"),
@@ -142,7 +144,7 @@ declare module "hardhat/types/runtime" {
       deployer: Signer,
       governanceAddress?: string,
       sovCommunityPotAddress?: string,
-      useRealPriceFeed?: boolean,
+      externalPriceFeeds?: OracleAddresses,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -165,13 +167,13 @@ extendEnvironment(env => {
     deployer,
     governanceAddress,
     sovCommunityPotAddress,
-    useRealPriceFeed = false,
+    externalPriceFeeds,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
       deployer,
       getContractFactory(env),
-      !useRealPriceFeed,
+      externalPriceFeeds,
       env.network.name === "dev",
       governanceAddress,
       sovCommunityPotAddress,
@@ -201,10 +203,29 @@ task("deploy", "Deploys the contracts to the network")
     undefined,
     types.boolean
   )
-  .addOptionalParam("governanceAddress", "Governance contract address to be the owner", undefined, types.string)
-  .addOptionalParam("sovCommunityPotAddress", "SOV Stakers pool contract address", undefined, types.string)
+  .addOptionalParam(
+    "governanceAddress",
+    "Governance contract address to be the owner",
+    undefined,
+    types.string
+  )
+  .addOptionalParam(
+    "sovCommunityPotAddress",
+    "SOV Stakers pool contract address",
+    undefined,
+    types.string
+  )
   .setAction(
-    async ({ channel, gasPrice, useRealPriceFeed, governanceAddress, sovCommunityPotAddress }: DeployParams, env) => {
+    async (
+      {
+        channel,
+        gasPrice,
+        useRealPriceFeed,
+        governanceAddress,
+        sovCommunityPotAddress
+      }: DeployParams,
+      env
+    ) => {
       const overrides = { gasPrice: gasPrice && Decimal.from(gasPrice).div(1000000000).hex };
       const [deployer] = await env.ethers.getSigners();
 
@@ -215,27 +236,20 @@ task("deploy", "Deploys the contracts to the network")
       }
 
       setSilent(false);
-      governanceAddress ??= hasGovernance(env.network.name) ? governanceAddresses[env.network.name] : undefined;
-      sovCommunityPotAddress ??= hasSovCommunityPot(env.network.name) ? sovCommunityPotAddresses[env.network.name] : undefined;
-        
-      const deployment = await env.deployLiquity(deployer, governanceAddress, sovCommunityPotAddress, useRealPriceFeed, overrides);
+      governanceAddress ??= hasGovernance(env.network.name)
+        ? governanceAddresses[env.network.name]
+        : undefined;
+      sovCommunityPotAddress ??= hasSovCommunityPot(env.network.name)
+        ? sovCommunityPotAddresses[env.network.name]
+        : undefined;
 
-      if (useRealPriceFeed) {
-        const contracts = _connectToContracts(deployer, deployment);
-
-        assert(!_priceFeedIsTestnet(contracts.priceFeed));
-
-        if (hasOracles(env.network.name)) {
-          console.log(`Hooking up PriceFeed with oracles ...`);
-
-          const tx = await contracts.priceFeed.setAddresses(
-            oracleAddresses[env.network.name].mocOracleAddress,
-            oracleAddresses[env.network.name].rskOracleAddress,
-            overrides
-          );
-          await tx.wait();
-        }
-      }
+      const deployment = await env.deployLiquity(
+        deployer,
+        governanceAddress,
+        sovCommunityPotAddress,
+        useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
+        overrides
+      );
 
       fs.mkdirSync(path.join("deployments", channel), { recursive: true });
 

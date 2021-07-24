@@ -4,8 +4,6 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/IPriceFeed.sol";
 import "./Dependencies/CheckContract.sol";
-import "./Dependencies/PriceFeed/MocMedianizer.sol";
-import "./Dependencies/PriceFeed/RskOracle.sol";
 import "./PriceFeedStorage.sol";
 
 /// @title The system price feed adapter
