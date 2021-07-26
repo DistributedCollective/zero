@@ -509,7 +509,8 @@ export const deployAndSetupContracts = async (
     const rskPriceFeedAddress = await deployContract(deployer, getContractFactory, "RskOracle", externalPriceFeeds.rskOracleAddress, {...overrides});
 
     console.log(`Hooking up PriceFeed with oracles: MocMedianizer => ${mocMedianizerAddress}, RskPriceFeed => ${rskPriceFeedAddress}`);
-    await contracts.priceFeed.setAddresses(mocMedianizerAddress, rskPriceFeedAddress);
+    const tx = await contracts.priceFeed.setAddresses(mocMedianizerAddress, rskPriceFeedAddress, {...overrides});
+    await tx.wait();
   }
 
   log("Transferring Ownership...");
