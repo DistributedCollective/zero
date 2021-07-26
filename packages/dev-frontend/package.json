@@ -20,7 +20,7 @@
     "@types/react-copy-to-clipboard": "5.0.0",
     "@types/react-dom": "17.0.2",
     "@types/react-router-dom": "5.1.7",
-    "@types/testing-library__jest-dom": "5.9.5",
+    "@types/testing-library__jest-dom": "5.14.1",
     "@types/testing-library__react": "10.2.0",
     "@types/testing-library__user-event": "4.2.0",
     "@web3-react/core": "6.1.9",
