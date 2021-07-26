@@ -43,6 +43,37 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
         <TroveViewProvider>
           <StabilityViewProvider>
             <StakingViewProvider>
+            <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
+              <Header>
+                <UserAccount />
+                <SystemStatsPopup />
+              </Header>
+    
+              <Container
+                variant="main"
+                sx={{
+                  display: "flex",
+                  flexGrow: 1,
+                  flexDirection: "column",
+                  alignItems: "center"
+                }}
+              >
+                <Switch>
+                  <Route path="/" exact>
+                    <PageSwitcher />
+                  </Route>
+                  <Route path="/farm">
+              
+                  </Route>
+                  <Route path="/risky-troves">
+                    <RiskyTrovesPage />
+                  </Route>
+                  <Route path="/redemption">
+                    <RedemptionPage />
+                  </Route>
+                </Switch>
+              </Container>
+            </Flex>
             </StakingViewProvider>
           </StabilityViewProvider>
         </TroveViewProvider>
