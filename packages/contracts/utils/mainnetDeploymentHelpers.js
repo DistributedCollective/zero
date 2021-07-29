@@ -325,12 +325,6 @@ class MainnetDeploymentHelper {
       ))
   }
 
-  async connectUnipoolMainnet(uniPool, ZEROContracts, ZUSDWETHPairAddr, duration) {
-    const gasPrice = this.configParams.GAS_PRICE
-    await this.isOwnershipRenounced(uniPool) ||
-      await this.sendAndWaitForTransaction(uniPool.setParams(ZEROContracts.zeroToken.address, ZUSDWETHPairAddr, duration, {gasPrice}))
-  }
-
   // --- Verify on Ethrescan ---
   async verifyContract(name, deploymentState, constructorArguments=[]) {
     if (!deploymentState[name] || !deploymentState[name].address) {

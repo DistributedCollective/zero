@@ -18,8 +18,6 @@ const ZEROToken = artifacts.require("./ZEROToken.sol")
 const LockupContractFactory = artifacts.require("./LockupContractFactory.sol")
 const CommunityIssuance = artifacts.require("./CommunityIssuance.sol")
 
-const Unipool =  artifacts.require("./Unipool.sol")
-
 const ZEROTokenTester = artifacts.require("./ZEROTokenTester.sol")
 const CommunityIssuanceTester = artifacts.require("./CommunityIssuanceTester.sol")
 const SovStakersIssuance = artifacts.require("./SovStakersIssuance.sol")
@@ -469,8 +467,5 @@ class DeploymentHelper {
     )
   }
 
-  static async connectUnipool(uniPool, ZEROContracts, uniswapPairAddr, duration) {
-    await uniPool.setParams(ZEROContracts.zeroToken.address, uniswapPairAddr, duration)
-  }
 }
 module.exports = DeploymentHelper
