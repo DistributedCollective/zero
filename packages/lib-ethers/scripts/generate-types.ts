@@ -8,7 +8,6 @@ import BorrowerOperations from "../../contracts/artifacts/contracts/BorrowerOper
 import CollSurplusPool from "../../contracts/artifacts/contracts/CollSurplusPool.sol/CollSurplusPool.json";
 import CommunityIssuance from "../../contracts/artifacts/contracts/ZERO/CommunityIssuance.sol/CommunityIssuance.json";
 import DefaultPool from "../../contracts/artifacts/contracts/DefaultPool.sol/DefaultPool.json";
-import ERC20Mock from "../../contracts/artifacts/contracts/LPRewards/TestContracts/ERC20Mock.sol/ERC20Mock.json";
 import GasPool from "../../contracts/artifacts/contracts/GasPool.sol/GasPool.json";
 import HintHelpers from "../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json";
 import IERC20 from "../../contracts/artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
@@ -22,7 +21,6 @@ import PriceFeedTestnet from "../../contracts/artifacts/contracts/TestContracts/
 import SortedTroves from "../../contracts/artifacts/contracts/SortedTroves.sol/SortedTroves.json";
 import StabilityPool from "../../contracts/artifacts/contracts/StabilityPool.sol/StabilityPool.json";
 import TroveManager from "../../contracts/artifacts/contracts/TroveManager.sol/TroveManager.json";
-import Unipool from "../../contracts/artifacts/contracts/LPRewards/Unipool.sol/Unipool.json";
 import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
 import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
 import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
@@ -152,7 +150,6 @@ const contractArtifacts = [
   CollSurplusPool,
   CommunityIssuance,
   DefaultPool,
-  ERC20Mock,
   GasPool,
   HintHelpers,
   IERC20,
@@ -167,7 +164,6 @@ const contractArtifacts = [
   StabilityPool,
   TroveManager,
   TroveManagerRedeemOps,
-  Unipool,
   UpgradeableProxy,
   LiquityBaseParams,
   SovStakersIssuance

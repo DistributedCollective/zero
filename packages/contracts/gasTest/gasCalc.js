@@ -25,7 +25,6 @@ contract('Gas cost tests', async accounts => {
 
   const whale = accounts[999]
   const bountyAddress = accounts[998]
-  const lpRewardsAddress = accounts[999]
 
   const address_0 = '0x0000000000000000000000000000000000000000'
 
@@ -47,7 +46,7 @@ contract('Gas cost tests', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployTesterContractsHardhat()
-    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress, lpRewardsAddress)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
 
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken
