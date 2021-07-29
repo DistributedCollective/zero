@@ -119,9 +119,6 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         return deploymentStartTime;
     }
 
-    function getLpRewardsEntitlement() external view override returns (uint256) {
-        return lpRewardsEntitlement;
-    }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
         // Restrict the multisig's transfers in first year
