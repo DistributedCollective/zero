@@ -10,7 +10,7 @@ import CommunityIssuance from "../../contracts/artifacts/contracts/ZERO/Communit
 import DefaultPool from "../../contracts/artifacts/contracts/DefaultPool.sol/DefaultPool.json";
 import GasPool from "../../contracts/artifacts/contracts/GasPool.sol/GasPool.json";
 import HintHelpers from "../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json";
-import IERC20 from "../../contracts/artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json";
+import IERC20 from "../../contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json";
 import LockupContractFactory from "../../contracts/artifacts/contracts/ZERO/LockupContractFactory.sol/LockupContractFactory.json";
 import ZUSDToken from "../../contracts/artifacts/contracts/ZUSDToken.sol/ZUSDToken.json";
 import ZEROStaking from "../../contracts/artifacts/contracts/ZERO/ZEROStaking.sol/ZEROStaking.json";
