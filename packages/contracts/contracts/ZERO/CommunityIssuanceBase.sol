@@ -59,7 +59,7 @@ abstract contract CommunityIssuanceBase is CommunityIssuanceStorage, ICommunityI
         return issuance;
     }
 
-    /* Gets 1-f^t    where: f < 1
+    /** Gets 1-f^t    where: f < 1
 
     f: issuance factor that determines the shape of the curve
     t:  time passed since last ZERO issuance event  */

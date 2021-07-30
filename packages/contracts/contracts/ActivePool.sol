@@ -8,7 +8,7 @@ import "./Dependencies/console.sol";
 
 import "./ActivePoolStorage.sol";
 
-/*
+/**
  * The Active Pool holds the ETH collateral and ZUSD debt (but not ZUSD tokens) for all active troves.
  *
  * When a trove is liquidated, it's ETH and ZUSD debt are transferred from the Active Pool, to either the

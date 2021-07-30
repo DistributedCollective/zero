@@ -9,7 +9,7 @@ import "./LockupContract.sol";
 import "../Dependencies/console.sol";
 import "./LockupContractFactoryStorage.sol";
 
-/*
+/**
 * The LockupContractFactory deploys LockupContracts - its main purpose is to keep a registry of valid deployed 
 * LockupContracts. 
 * 

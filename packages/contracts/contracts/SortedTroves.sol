@@ -10,7 +10,7 @@ import "./SortedTrovesStorage.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
-/*
+/**
 * A sorted doubly linked list with nodes sorted in descending order.
 *
 * Nodes map to active Troves in the system - the ID property is the address of a Trove owner.
@@ -69,7 +69,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         
     }
 
-    /*
+    /**
      * @dev Add a node to the list
      * @param _id Node's id
      * @param _NICR Node's NICR
@@ -136,7 +136,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         _remove(_id);
     }
 
-    /*
+    /**
      * @dev Remove a node from the list
      * @param _id Node's id
      */
@@ -177,7 +177,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         NodeRemoved(_id);
     }
 
-    /*
+    /**
      * @dev Re-insert the node at a new position, based on its new NICR
      * @param _id Node's id
      * @param _newNICR Node's new NICR
@@ -199,56 +199,56 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         _insert(troveManagerCached, _id, _newNICR, _prevId, _nextId);
     }
 
-    /*
+    /**
      * @dev Checks if the list contains a node
      */
     function contains(address _id) public view override returns (bool) {
         return data.nodes[_id].exists;
     }
 
-    /*
+    /**
      * @dev Checks if the list is full
      */
     function isFull() public view override returns (bool) {
         return data.size == data.maxSize;
     }
 
-    /*
+    /**
      * @dev Checks if the list is empty
      */
     function isEmpty() public view override returns (bool) {
         return data.size == 0;
     }
 
-    /*
+    /**
      * @dev Returns the current size of the list
      */
     function getSize() external view override returns (uint256) {
         return data.size;
     }
 
-    /*
+    /**
      * @dev Returns the maximum size of the list
      */
     function getMaxSize() external view override returns (uint256) {
         return data.maxSize;
     }
 
-    /*
+    /**
      * @dev Returns the first node in the list (node with the largest NICR)
      */
     function getFirst() external view override returns (address) {
         return data.head;
     }
 
-    /*
+    /**
      * @dev Returns the last node in the list (node with the smallest NICR)
      */
     function getLast() external view override returns (address) {
         return data.tail;
     }
 
-    /*
+    /**
      * @dev Returns the next node (with a smaller NICR) in the list for a given node
      * @param _id Node's id
      */
@@ -256,7 +256,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         return data.nodes[_id].nextId;
     }
 
-    /*
+    /**
      * @dev Returns the previous node (with a larger NICR) in the list for a given node
      * @param _id Node's id
      */
@@ -264,7 +264,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         return data.nodes[_id].prevId;
     }
 
-    /*
+    /**
      * @dev Check if a pair of nodes is a valid insertion point for a new node with the given NICR
      * @param _NICR Node's NICR
      * @param _prevId Id of previous node for the insert position
@@ -292,7 +292,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         }
     }
 
-    /*
+    /**
      * @dev Descend the list (larger NICRs to smaller NICRs) to find a valid insert position
      * @param _troveManager TroveManager contract, passed in as param to save SLOAD’s
      * @param _NICR Node's NICR
@@ -316,7 +316,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         return (prevId, nextId);
     }
 
-    /*
+    /**
      * @dev Ascend the list (smaller NICRs to larger NICRs) to find a valid insert position
      * @param _troveManager TroveManager contract, passed in as param to save SLOAD’s
      * @param _NICR Node's NICR
@@ -340,7 +340,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         return (prevId, nextId);
     }
 
-    /*
+    /**
      * @dev Find the insert position for a new node with the given NICR
      * @param _NICR Node's NICR
      * @param _prevId Id of previous node for the insert position

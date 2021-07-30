@@ -8,7 +8,7 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
 
-/*
+/**
  * The Default Pool holds the ETH and ZUSD debt (but not ZUSD tokens) from liquidations that have been redistributed
  * to active troves but not yet "applied", i.e. not yet recorded on a recipient active trove's struct.
  *
@@ -45,8 +45,8 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     // --- Getters for public variables. Required by IPool interface ---
 
-    /*
-    * Returns the ETH state variable.
+    /**
+    * @return the ETH state variable.
     *
     * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
     */

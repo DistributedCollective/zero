@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-// Common interface for the Trove Manager.
+/// Common interface for the Trove Manager.
 interface IBorrowerOperations {
 
     // --- Events ---

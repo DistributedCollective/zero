@@ -12,17 +12,17 @@ import "./Dependencies/Initializable.sol";
 contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMath {
     using SafeMath for uint;
 
-    // Minimum collateral ratio for individual troves
+    /// Minimum collateral ratio for individual troves
     uint override public MCR;
 
-    // Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.
+    /// Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.
     uint override public CCR;
 
     uint override public PERCENT_DIVISOR;
 
     uint override public BORROWING_FEE_FLOOR;
 
-    /*
+    /**
      * Half-life of 12h. 12h = 720 min
      * (1/2) = d^720 => d = (1/2)^(1/720)
      */

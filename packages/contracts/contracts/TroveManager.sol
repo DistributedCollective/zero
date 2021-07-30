@@ -105,7 +105,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     // --- Trove Liquidation functions ---
 
-    // Single liquidation function. Closes the trove if its ICR is lower than the minimum collateral ratio.
+    /// Single liquidation function. Closes the trove if its ICR is lower than the minimum collateral ratio.
     function liquidate(address _borrower) external override {
         _requireTroveIsActive(_borrower);
 
@@ -116,7 +116,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     // --- Inner single liquidation functions ---
 
-    // Liquidate one trove, in Normal Mode.
+    /// Liquidate one trove, in Normal Mode.
     function _liquidateNormalMode(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
@@ -170,7 +170,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return singleLiquidation;
     }
 
-    // Liquidate one trove, in Recovery Mode.
+    /// Liquidate one trove, in Recovery Mode.
     function _liquidateRecoveryMode(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
@@ -299,7 +299,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return singleLiquidation;
     }
 
-    /* In a full liquidation, returns the values for a trove's coll and debt to be offset, and coll and debt to be
+    /** In a full liquidation, returns the values for a trove's coll and debt to be offset, and coll and debt to be
      * redistributed to active troves.
      */
     function _getOffsetAndRedistributionVals(
@@ -339,7 +339,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         }
     }
 
-    /*
+    /**
      *  Get its offset coll/debt and ETH gas comp, and close the trove.
      */
     function _getCappedOffsetVals(
@@ -361,7 +361,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         singleLiquidation.collToRedistribute = 0;
     }
 
-    /*
+    /**
      * Liquidate a sequence of troves. Closes a maximum number of n under-collateralized Troves,
      * starting from the one with the lowest collateral ratio in the system, and moving upwards
      */
@@ -444,7 +444,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         );
     }
 
-    /*
+    /**
      * This function is used when the liquidateTroves sequence starts during Recovery Mode. However, it
      * handle the case where the system *leaves* Recovery Mode, part way through the liquidation sequence
      */
@@ -565,7 +565,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         }
     }
 
-    /*
+    /**
      * Attempt to liquidate a custom list of troves provided by the caller.
      */
     function batchLiquidateTroves(address[] memory _troveArray) public override {
@@ -642,7 +642,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         );
     }
 
-    /*
+    /**
      * This function is used when the batch liquidation sequence starts during Recovery Mode. However, it
      * handle the case where the system *leaves* Recovery Mode, part way through the liquidation sequence
      */
@@ -809,7 +809,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     // --- Helper functions ---
 
-    // Return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
+    /// @return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
     function getNominalICR(address _borrower) public view override returns (uint256) {
         (uint256 currentETH, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
@@ -822,13 +822,13 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _applyPendingRewards(activePool, defaultPool, _borrower);
     }
 
-    // Update borrower's snapshots of L_ETH and L_ZUSDDebt to reflect the current values
+    /// Update borrower's snapshots of L_ETH and L_ZUSDDebt to reflect the current values
     function updateTroveRewardSnapshots(address _borrower) external override {
         _requireCallerIsBorrowerOperations();
         return _updateTroveRewardSnapshots(_borrower);
     }
 
-    // Return the Troves entire debt and coll, including pending rewards from redistributions.
+    /// Return the Troves entire debt and coll, including pending rewards from redistributions.
     function getEntireDebtAndColl(address _borrower)
         public
         view
@@ -912,7 +912,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _closeTrove(_borrower, Status.closedByOwner);
     }
 
-    /*
+    /**
      * Updates snapshots of system total stakes and total collateral, excluding a given collateral remainder from the calculation.
      * Used in a liquidation sequence.
      *
@@ -935,7 +935,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         emit SystemSnapshotsUpdated(totalStakesSnapshot, totalCollateralSnapshot);
     }
 
-    // Push the owner's address to the Trove owners list, and record the corresponding array index on the Trove struct
+    /// Push the owner's address to the Trove owners list, and record the corresponding array index on the Trove struct
     function addTroveOwnerToArray(address _borrower) external override returns (uint256 index) {
         _requireCallerIsBorrowerOperations();
         return _addTroveOwnerToArray(_borrower);
@@ -1026,7 +1026,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _borrowingRate.mul(_ZUSDDebt).div(DECIMAL_PRECISION);
     }
 
-    // Updates the baseRate state variable based on time elapsed since the last redemption or ZUSD borrowing operation.
+    /// Updates the baseRate state variable based on time elapsed since the last redemption or ZUSD borrowing operation.
     function decayBaseRateFromBorrowing() external override {
         _requireCallerIsBorrowerOperations();
 
@@ -1136,7 +1136,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     }
 
     /// @dev    this function forwards the call to the troveManagerRedeemOps in a delegate call fashion
-    ///         so the parameters are not needed  
+    ///         so the parameters are not needed
     function redeemCollateral(
         uint256 _ZUSDamount,
         address _firstRedemptionHint,

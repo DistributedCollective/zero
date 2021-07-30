@@ -46,7 +46,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         
     }
 
-    /* Returns the ETH state variable at ActivePool address.
+    /** Returns the ETH state variable at ActivePool address.
        Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts. */
     function getETH() external view override returns (uint) {
         return ETH;

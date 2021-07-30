@@ -12,7 +12,7 @@ contract CommunityIssuanceStorage is Ownable {
 
     uint constant public SECONDS_IN_ONE_MINUTE = 60;
 
-   /* The issuance factor F determines the curvature of the issuance curve.
+   /** The issuance factor F determines the curvature of the issuance curve.
     *
     * Minutes in one year: 60*24*365 = 525600
     *
@@ -28,7 +28,7 @@ contract CommunityIssuanceStorage is Ownable {
     */
     uint public constant ISSUANCE_FACTOR = 999998681227695000;
 
-    /* 
+    /** 
     * The community ZERO supply cap is the starting balance of the Community Issuance contract.
     * It should be minted to this contract by ZEROToken, when the token is deployed.
     */

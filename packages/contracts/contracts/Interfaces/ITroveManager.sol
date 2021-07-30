@@ -9,7 +9,7 @@ import "./IZEROToken.sol";
 import "./IZEROStaking.sol";
 
 
-// Common interface for the Trove Manager.
+/// Common interface for the Trove Manager.
 interface ITroveManager is ILiquityBase {
     
     // --- Events ---
