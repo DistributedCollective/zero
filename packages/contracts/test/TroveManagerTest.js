@@ -1133,6 +1133,7 @@ contract('TroveManager', async accounts => {
   it('liquidateTroves(): closes every Trove with ICR < MCR, when n > number of undercollateralized troves', async () => {
     // --- SETUP ---
     await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+    const whaleBalance = await lusdToken.balanceOf(whale)
 
     // create 5 Troves with varying ICRs
     await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: alice } })
@@ -1147,7 +1148,7 @@ contract('TroveManager', async accounts => {
     await openTrove({ ICR: toBN(dec(80, 18)), extraParams: { from: ida } })
 
     // Whale puts some tokens in Stability Pool
-    await stabilityPool.provideToSP(dec(300, 18), ZERO_ADDRESS, { from: whale })
+    await stabilityPool.provideToSP(whaleBalance, ZERO_ADDRESS, { from: whale })
 
     // --- TEST ---
 
@@ -1872,6 +1873,7 @@ contract('TroveManager', async accounts => {
   it('batchLiquidateTroves(): closes every trove with ICR < MCR in the given array', async () => {
     // --- SETUP ---
     await openTrove({ ICR: toBN(dec(100, 18)), extraParams: { from: whale } })
+    const whaleBalance = await lusdToken.balanceOf(whale)
 
     await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: alice } })
     await openTrove({ ICR: toBN(dec(133, 16)), extraParams: { from: bob } })
@@ -1883,7 +1885,7 @@ contract('TroveManager', async accounts => {
     assert.equal((await sortedTroves.getSize()).toString(), '6')
 
     // Whale puts some tokens in Stability Pool
-    await stabilityPool.provideToSP(dec(300, 18), ZERO_ADDRESS, { from: whale })
+    await stabilityPool.provideToSP(whaleBalance, ZERO_ADDRESS, { from: whale })
 
     // --- TEST ---
 
@@ -1926,6 +1928,7 @@ contract('TroveManager', async accounts => {
   it('batchLiquidateTroves(): does not liquidate troves that are not in the given array', async () => {
     // --- SETUP ---
     await openTrove({ ICR: toBN(dec(100, 18)), extraParams: { from: whale } })
+    const whaleBalance = await lusdToken.balanceOf(whale)
 
     await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: alice } })
     await openTrove({ ICR: toBN(dec(180, 16)), extraParams: { from: bob } })
@@ -1937,7 +1940,7 @@ contract('TroveManager', async accounts => {
     assert.equal((await sortedTroves.getSize()).toString(), '6')
 
     // Whale puts some tokens in Stability Pool
-    await stabilityPool.provideToSP(dec(300, 18), ZERO_ADDRESS, { from: whale })
+    await stabilityPool.provideToSP(whaleBalance, ZERO_ADDRESS, { from: whale })
 
     // --- TEST ---
 
@@ -1983,6 +1986,7 @@ contract('TroveManager', async accounts => {
   it('batchLiquidateTroves(): does not close troves with ICR >= MCR in the given array', async () => {
     // --- SETUP ---
     await openTrove({ ICR: toBN(dec(100, 18)), extraParams: { from: whale } })
+    const whaleBalance = await lusdToken.balanceOf(whale)
 
     await openTrove({ ICR: toBN(dec(190, 16)), extraParams: { from: alice } })
     await openTrove({ ICR: toBN(dec(120, 16)), extraParams: { from: bob } })
@@ -1994,7 +1998,7 @@ contract('TroveManager', async accounts => {
     assert.equal((await sortedTroves.getSize()).toString(), '6')
 
     // Whale puts some tokens in Stability Pool
-    await stabilityPool.provideToSP(dec(300, 18), ZERO_ADDRESS, { from: whale })
+    await stabilityPool.provideToSP(whaleBalance, ZERO_ADDRESS, { from: whale })
 
     // --- TEST ---
 
@@ -2037,6 +2041,7 @@ contract('TroveManager', async accounts => {
   it('batchLiquidateTroves(): reverts if array is empty', async () => {
     // --- SETUP ---
     await openTrove({ ICR: toBN(dec(100, 18)), extraParams: { from: whale } })
+    const whaleBalance = await lusdToken.balanceOf(whale)
 
     await openTrove({ ICR: toBN(dec(190, 16)), extraParams: { from: alice } })
     await openTrove({ ICR: toBN(dec(120, 16)), extraParams: { from: bob } })
@@ -2048,7 +2053,7 @@ contract('TroveManager', async accounts => {
     assert.equal((await sortedTroves.getSize()).toString(), '6')
 
     // Whale puts some tokens in Stability Pool
-    await stabilityPool.provideToSP(dec(300, 18), ZERO_ADDRESS, { from: whale })
+    await stabilityPool.provideToSP(whaleBalance, ZERO_ADDRESS, { from: whale })
 
     // --- TEST ---
 
