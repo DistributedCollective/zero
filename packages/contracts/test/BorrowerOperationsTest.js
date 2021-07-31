@@ -1540,7 +1540,7 @@ contract('BorrowerOperations', async accounts => {
       await borrowerOperations.adjustTrove(0, 0, dec(1, 7), true, A, A, { from: A, value: dec(300, 16) })
       await priceFeed.setPrice(dec(1, 18))
       assert.isTrue(await th.checkRecoveryMode(contracts))
-      await borrowerOperations.adjustTrove(1, 0, dec(1, 7), true, A, A, { from: A, value: dec(30000, 16) })
+      await borrowerOperations.adjustTrove(1, 0, dec(1, 7), true, A, A, { from: A, value: dec(30000, 18) })
       await priceFeed.setPrice(dec(1, 16))
       assert.isTrue(await th.checkRecoveryMode(contracts))
       await borrowerOperations.adjustTrove('4999999999999999', 0, dec(1, 9), true, A, A, { from: A, value: dec(3000000, 16) })
