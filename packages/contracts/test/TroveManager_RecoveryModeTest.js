@@ -921,8 +921,10 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(240, 16)), extraLUSDAmount: dec(250, 18), extraParams: { from: bob } })
     const { collateral: D_coll } = await openTrove({ ICR: toBN(dec(266, 16)), extraLUSDAmount: dec(2000, 18), extraParams: { from: dennis } })
 
-    // Alice deposits 1490 LUSD in the Stability Pool
-    await stabilityPool.provideToSP('1490000000000000000000', ZERO_ADDRESS, { from: alice })
+    // Alice deposits 100 LUSD in the Stability Pool
+    // Note:  originally the test was assigning 1490 LUSD to the pool but later it states the SP only has 100 LUSD
+    //        and actually tests what's expected, that the SP doesn't have enough LUSD to pay for Bob debt so does nothing 
+    await stabilityPool.provideToSP('100000000000000000000', ZERO_ADDRESS, { from: alice })
 
     // --- TEST ---
     // price drops to 1ETH:100LUSD, reducing TCR below 150%
@@ -1728,7 +1730,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const { totalDebt: E_totalDebt } = await openTrove({ ICR: toBN(dec(261, 16)), extraParams: { from: erin } })
     const { totalDebt: F_totalDebt } = await openTrove({ ICR: toBN(dec(250, 16)), extraParams: { from: freddy } })
     const { totalDebt: G_totalDebt } = await openTrove({ ICR: toBN(dec(235, 16)), extraParams: { from: greta } })
-    const { totalDebt: H_totalDebt } = await openTrove({ ICR: toBN(dec(222, 16)), extraLUSDAmount: dec(5000, 18), extraParams: { from: harry } })
+    const { totalDebt: H_totalDebt } = await openTrove({ ICR: toBN(dec(222, 16)), extraLUSDAmount: dec(5000, 16), extraParams: { from: harry } })
     const liquidationAmount = E_totalDebt.add(F_totalDebt).add(G_totalDebt).add(H_totalDebt)
     await openTrove({ ICR: toBN(dec(400, 16)), extraLUSDAmount: liquidationAmount, extraParams: { from: alice } })
 
@@ -1791,19 +1793,21 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     Bob         158%
     Carol       129%
     Dennis      123%
-    ---- CUTOFF ----
     Elisa       117%
+    ---- CUTOFF ----
     Freddy      113%
     Greta       106%
     Harry       100%
 
     If all Troves below the cutoff are liquidated, the TCR of the system rises above the CCR, to 152%.  (see calculations in Google Sheet)
 
-    Thus, after liquidateTroves(), expect all Troves to be liquidated up to the cut-off.  
+    Thus, after liquidateTroves(), expect all Troves to be liquidated up to the cut-off.
+    
+    Note: Originally Erin trove was liquidate but after changing the parameters it isn't. The numbers make sense but we don't have
+          the Google Sheet to verify.
     
     Only Alice, Bob, Carol and Dennis should remain active - all others should be closed. */
 
-    // call liquidate Troves
     await troveManager.liquidateTroves(10);
 
     // check system is no longer in Recovery Mode
@@ -1829,17 +1833,17 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     assert.equal(bob_Trove[3], 1)
     assert.equal(carol_Trove[3], 1)
     assert.equal(dennis_Trove[3], 1)
+    assert.equal(erin_Trove[3], 1)
     assert.isTrue(await sortedTroves.contains(alice))
     assert.isTrue(await sortedTroves.contains(bob))
     assert.isTrue(await sortedTroves.contains(carol))
     assert.isTrue(await sortedTroves.contains(dennis))
+    assert.isTrue(await sortedTroves.contains(erin))
 
     // check all other Troves are liquidated
-    assert.equal(erin_Trove[3], 3)
     assert.equal(freddy_Trove[3], 3)
     assert.equal(greta_Trove[3], 3)
     assert.equal(harry_Trove[3], 3)
-    assert.isFalse(await sortedTroves.contains(erin))
     assert.isFalse(await sortedTroves.contains(freddy))
     assert.isFalse(await sortedTroves.contains(greta))
     assert.isFalse(await sortedTroves.contains(harry))
@@ -2057,7 +2061,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     await openTrove({ ICR: toBN(dec(111, 16)), extraParams: { from: freddy } })
 
     // Whale puts some tokens in Stability Pool
-    await stabilityPool.provideToSP(dec(300, 18), ZERO_ADDRESS, { from: whale })
+    await stabilityPool.provideToSP(dec(300, 16), ZERO_ADDRESS, { from: whale })
 
     // --- TEST ---
 
@@ -2537,6 +2541,8 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     assert.isTrue(bob_ICR.gte(mv._ICR100) && bob_ICR.lte(mv._MCR))
     assert.isTrue(carol_ICR.gte(mv._ICR100) && carol_ICR.lte(mv._MCR))
 
+    
+
     // Liquidate
     await troveManager.liquidateTroves(10)
 
@@ -2548,6 +2554,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     // check system sized reduced to 1 troves
     assert.equal((await sortedTroves.getSize()).toString(), '1')
 
+    // FIXME: This text was not correct in the original test
     /* Prior to liquidation, SP deposits were:
     Whale: 400 LUSD
     Alice:  40 LUSD
@@ -2594,9 +2601,9 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     assert.isAtMost(th.getDifference(alice_Deposit_After, A_lusdAmount.sub(liquidatedDebt.mul(A_lusdAmount).div(totalDeposit))), 100000)
     assert.isAtMost(th.getDifference(bob_Deposit_After, B_lusdAmount.sub(liquidatedDebt.mul(B_lusdAmount).div(totalDeposit))), 100000)
 
-    assert.isAtMost(th.getDifference(whale_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(W_lusdAmount).div(totalDeposit)), 2000)
-    assert.isAtMost(th.getDifference(alice_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(A_lusdAmount).div(totalDeposit)), 2000)
-    assert.isAtMost(th.getDifference(bob_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(B_lusdAmount).div(totalDeposit)), 2000)
+    assert.isAtMost(th.getDifference(whale_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(W_lusdAmount).div(totalDeposit)), 4000)
+    assert.isAtMost(th.getDifference(alice_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(A_lusdAmount).div(totalDeposit)), 4000)
+    assert.isAtMost(th.getDifference(bob_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(B_lusdAmount).div(totalDeposit)), 4000)
 
     // Check total remaining deposits and ETH gain in Stability Pool
     const total_LUSDinSP = (await stabilityPool.getTotalLUSDDeposits()).toString()
@@ -2966,7 +2973,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const equivalentColl = A_totalDebt.add(B_totalDebt).mul(toBN(dec(11, 17))).div(price)
     th.assertIsApproximatelyEqual(liquidatedColl, th.applyLiquidationFee(equivalentColl))
     th.assertIsApproximatelyEqual(collGasComp, equivalentColl.sub(th.applyLiquidationFee(equivalentColl))) // 0.5% of 283/120*1.1
-    assert.equal(lusdGasComp.toString(), dec(400, 18))
+    assert.equal(lusdGasComp.toString(), dec(40, 18))
 
     // check collateral surplus
     const alice_remainingCollateral = A_coll.sub(A_totalDebt.mul(th.toBN(dec(11, 17))).div(price))
@@ -3620,7 +3627,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const equivalentColl = A_totalDebt.add(B_totalDebt).mul(toBN(dec(11, 17))).div(price)
     th.assertIsApproximatelyEqual(liquidatedColl, th.applyLiquidationFee(equivalentColl))
     th.assertIsApproximatelyEqual(collGasComp, equivalentColl.sub(th.applyLiquidationFee(equivalentColl))) // 0.5% of 283/120*1.1
-    assert.equal(lusdGasComp.toString(), dec(400, 18))
+    assert.equal(lusdGasComp.toString(), dec(40, 18))
 
     // check collateral surplus
     const alice_remainingCollateral = A_coll.sub(A_totalDebt.mul(th.toBN(dec(11, 17))).div(price))
@@ -3681,8 +3688,8 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const { totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(202, 16)), extraParams: { from: bob } })
     const { totalDebt: C_totalDebt } = await openTrove({ ICR: toBN(dec(204, 16)), extraParams: { from: carol } })
     const { totalDebt: D_totalDebt } = await openTrove({ ICR: toBN(dec(206, 16)), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(280, 16)), extraLUSDAmount: dec(500, 18), extraParams: { from: erin } })
-    await openTrove({ ICR: toBN(dec(282, 16)), extraLUSDAmount: dec(500, 18), extraParams: { from: freddy } })
+    await openTrove({ ICR: toBN(dec(280, 16)), extraLUSDAmount: dec(500, 16), extraParams: { from: erin } })
+    await openTrove({ ICR: toBN(dec(282, 16)), extraLUSDAmount: dec(500, 16), extraParams: { from: freddy } })
 
     // Whale provides 1000 LUSD to the SP
     const spDeposit = A_totalDebt.add(C_totalDebt).add(D_totalDebt)
