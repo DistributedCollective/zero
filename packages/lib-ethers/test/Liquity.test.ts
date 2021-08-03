@@ -202,7 +202,7 @@ describe("EthersLiquity", () => {
         }
       } as unknown) as ReadableEthersLiquity);
 
-      const nominalCollateralRatio = Decimal.from(0.05);
+      const nominalCollateralRatio = Decimal.from(0.5);
 
       const params = Trove.recreate(new Trove(Decimal.from(1), LUSD_MINIMUM_DEBT));
       const trove = Trove.create(params);
@@ -748,7 +748,7 @@ describe("EthersLiquity", () => {
   describe("Redemption (truncation)", () => {
     const troveCreationParams = { depositCollateral: 20, borrowLUSD: 2000 };
     const netDebtPerTrove = Trove.create(troveCreationParams).netDebt;
-    const amountToAttempt = Decimal.from(3000);
+    const amountToAttempt = Decimal.from(3900);
     const expectedRedeemable = netDebtPerTrove.mul(2).sub(LUSD_MINIMUM_NET_DEBT);
 
     before(function () {
@@ -816,7 +816,7 @@ describe("EthersLiquity", () => {
   });
 
   describe("Redemption (gas checks)", function () {
-    this.timeout("5m");
+    this.timeout("10m");
 
     const massivePrice = Decimal.from(1000000);
 
@@ -884,12 +884,13 @@ describe("EthersLiquity", () => {
 
   describe("Gas estimation", () => {
     const troveWithICRBetween = (a: Trove, b: Trove) => a.add(b).multiply(0.5);
-
+    
     let rudeUser: Signer;
     let fiveOtherUsers: Signer[];
     let rudeLiquity: EthersLiquity;
-
+    
     before(async function () {
+      this.timeout("10m");
       if (network.name !== "hardhat") {
         this.skip();
       }
