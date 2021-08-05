@@ -11,7 +11,6 @@ const ZERO_ADDRESS = th.ZERO_ADDRESS
 contract('TroveManager', async accounts => {
   
   const bountyAddress = accounts[998]
-  const lpRewardsAddress = accounts[999]
 
   let contracts 
   let priceFeed
@@ -23,7 +22,7 @@ contract('TroveManager', async accounts => {
   
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore()
-    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress, lpRewardsAddress)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
     
     zusdToken = contracts.zusdToken
     priceFeed = contracts.priceFeedTestnet

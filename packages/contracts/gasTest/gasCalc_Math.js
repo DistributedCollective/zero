@@ -12,7 +12,6 @@ const timeValues = testHelpers.TimeValues
 contract('Gas costs for math functions', async accounts => {
   
   const bountyAddress = accounts[998]
-  const lpRewardsAddress = accounts[999]
 
   let contracts
   let troveManagerTester
@@ -28,7 +27,7 @@ contract('Gas costs for math functions', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore()
-    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress, lpRewardsAddress)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
 
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken

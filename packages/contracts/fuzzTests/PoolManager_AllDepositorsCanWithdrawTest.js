@@ -20,7 +20,6 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
   const whale = accounts[accounts.length - 1]
   const bountyAddress = accounts[998]
-  const lpRewardsAddress = accounts[999]
 
   let priceFeed
   let zusdToken
@@ -215,7 +214,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
     beforeEach(async () => {
       contracts = await deploymentHelper.deployLiquityCore()
-      const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress, lpRewardsAddress)
+      const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
 
       stabilityPool = contracts.stabilityPool
       priceFeed = contracts.priceFeedTestnet

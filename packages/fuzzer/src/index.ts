@@ -15,7 +15,6 @@ import {
 } from "@liquity/lib-base";
 
 import { EthersLiquity as Liquity } from "@liquity/lib-ethers";
-import { SubgraphLiquity } from "@liquity/lib-subgraph";
 
 import {
   checkPoolBalances,
@@ -33,7 +32,6 @@ import { Fixture } from "./Fixture";
 dotenv.config();
 
 const provider = new JsonRpcProvider("http://localhost:8545");
-const subgraph = new SubgraphLiquity("http://localhost:8000/subgraphs/name/liquity/subgraph");
 
 const deployer = process.env.DEPLOYER_PRIVATE_KEY
   ? new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider)
@@ -107,14 +105,9 @@ yargs
         alias: "n",
         default: 25,
         description: "How many times each user should interact with Liquity"
-      },
-      subgraph: {
-        alias: "g",
-        default: false,
-        description: "Check after every round that subgraph data matches layer 1"
       }
     },
-    async ({ rounds: numberOfRounds, users: numberOfUsers, subgraph: shouldCheckSubgraph }) => {
+    async ({ rounds: numberOfRounds, users: numberOfUsers }) => {
       const [frontend, ...randomUsers] = createRandomWallets(numberOfUsers + 1, provider);
 
       const [
@@ -196,12 +189,6 @@ yargs
           await checkPoolBalances(deployerLiquity, listOfTroves, totalRedistributed);
 
           previousListOfTroves = listOfTroves;
-        }
-
-        if (shouldCheckSubgraph) {
-          const blockNumber = await provider.getBlockNumber();
-          await subgraph.waitForBlock(blockNumber);
-          await checkSubgraph(subgraph, deployerLiquity);
         }
       }
 

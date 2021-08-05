@@ -19,7 +19,6 @@ const _100pct = th._100pct
 contract('Gas cost tests', async accounts => {
   const [owner] = accounts;
   const bountyAddress = accounts[998]
-  const lpRewardsAddress = accounts[999]
 
   let priceFeed
   let zusdToken
@@ -35,7 +34,7 @@ contract('Gas cost tests', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployTesterContractsHardhat()
-    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress, lpRewardsAddress)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
 
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken

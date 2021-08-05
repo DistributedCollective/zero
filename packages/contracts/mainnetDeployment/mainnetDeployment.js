@@ -23,48 +23,12 @@ async function mainnetDeploy(configParams) {
   let deployerETHBalance = await ethers.provider.getBalance(deployerWallet.address)
   console.log(`deployerETHBalance before: ${deployerETHBalance}`)
 
-  // Get UniswapV2Factory instance at its deployed address
-  const uniswapV2Factory = new ethers.Contract(
-    configParams.externalAddrs.UNISWAP_V2_FACTORY,
-    UniswapV2Factory.abi,
-    deployerWallet
-  )
-
-  console.log(`Uniswp addr: ${uniswapV2Factory.address}`)
-  const uniAllPairsLength = await uniswapV2Factory.allPairsLength()
-  console.log(`Uniswap Factory number of pairs: ${uniAllPairsLength}`)
-
   deployerETHBalance = await ethers.provider.getBalance(deployerWallet.address)
   console.log(`deployer's ETH balance before deployments: ${deployerETHBalance}`)
 
   // Deploy core logic contracts
   const liquityCore = await mdh.deployLiquityCoreMainnet(configParams.externalAddrs.TELLOR_MASTER, deploymentState)
   await mdh.logContractObjects(liquityCore)
-
-  // Check Uniswap Pair ZUSD-ETH pair before pair creation
-  let ZUSDWETHPairAddr = await uniswapV2Factory.getPair(liquityCore.zusdToken.address, configParams.externalAddrs.WETH_ERC20)
-  let WETHZUSDPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, liquityCore.zusdToken.address)
-  assert.equal(ZUSDWETHPairAddr, WETHZUSDPairAddr)
-
-
-  if (ZUSDWETHPairAddr == th.ZERO_ADDRESS) {
-    // Deploy Unipool for ZUSD-WETH
-    await mdh.sendAndWaitForTransaction(uniswapV2Factory.createPair(
-      configParams.externalAddrs.WETH_ERC20,
-      liquityCore.zusdToken.address,
-      { gasPrice }
-    ))
-
-    // Check Uniswap Pair ZUSD-WETH pair after pair creation (forwards and backwards should have same address)
-    ZUSDWETHPairAddr = await uniswapV2Factory.getPair(liquityCore.zusdToken.address, configParams.externalAddrs.WETH_ERC20)
-    assert.notEqual(ZUSDWETHPairAddr, th.ZERO_ADDRESS)
-    WETHZUSDPairAddr = await uniswapV2Factory.getPair(configParams.externalAddrs.WETH_ERC20, liquityCore.zusdToken.address)
-    console.log(`ZUSD-WETH pair contract address after Uniswap pair creation: ${ZUSDWETHPairAddr}`)
-    assert.equal(WETHZUSDPairAddr, ZUSDWETHPairAddr)
-  }
-
-  // Deploy Unipool
-  const unipool = await mdh.deployUnipoolMainnet(deploymentState)
 
   // Deploy ZERO Contracts
   const ZEROContracts = await mdh.deployZEROContractsMainnet(
@@ -82,14 +46,9 @@ async function mainnetDeploy(configParams) {
   // Deploy a read-only multi-trove getter
   const multiTroveGetter = await mdh.deployMultiTroveGetterMainnet(liquityCore, deploymentState)
 
-  // Connect Unipool to ZEROToken and the ZUSD-WETH pair address, with a 6 week duration
-  const LPRewardsDuration = timeVals.SECONDS_IN_SIX_WEEKS
-  await mdh.connectUnipoolMainnet(unipool, ZEROContracts, ZUSDWETHPairAddr, LPRewardsDuration)
-
-  // Log ZERO and Unipool addresses
+  // Log ZERO addresses
   await mdh.logContractObjects(ZEROContracts)
-  console.log(`Unipool address: ${unipool.address}`)
-  
+
   // let latestBlock = await ethers.provider.getBlockNumber()
   let deploymentStartTime = await ZEROContracts.zeroToken.getDeploymentStartTime()
 
@@ -146,23 +105,6 @@ async function mainnetDeploy(configParams) {
   // await mdh.sendAndWaitForTransaction(liquityCore.borrowerOperations.addColl(th.ZERO_ADDRESS, th.ZERO_ADDRESS, {value: dec(2, 'ether'), gasPrice, gasLimit: 1000000}))
   // console.log(`deployer trove coll after addingColl: ${await liquityCore.troveManager.getTroveColl(deployerWallet.address)}`)
   
-  // Check chainlink proxy price ---
-
-  const chainlinkProxy = new ethers.Contract(
-    configParams.externalAddrs.CHAINLINK_ETHUSD_PROXY,
-    ChainlinkAggregatorV3Interface,
-    deployerWallet
-  )
-
-  // Get latest price
-  let chainlinkPrice = await chainlinkProxy.latestAnswer()
-  console.log(`current Chainlink price: ${chainlinkPrice}`)
-
-  // Check Tellor price directly (through our TellorCaller)
-  let tellorPriceResponse = await liquityCore.tellorCaller.getTellorCurrentValue(1) // id == 1: the ETH-USD request ID
-  console.log(`current Tellor price: ${tellorPriceResponse[1]}`)
-  console.log(`current Tellor timestamp: ${tellorPriceResponse[2]}`)
-
   // // --- Lockup Contracts ---
   console.log("LOCKUP CONTRACT CHECKS")
   // Check lockup contracts exist for each beneficiary with correct unlock time
@@ -290,13 +232,6 @@ async function mainnetDeploy(configParams) {
   // // Check deployer has ZUSD
   // let deployerZUSDBal = await liquityCore.zusdToken.balanceOf(deployerWallet.address)
   // th.logBN("deployer's ZUSD balance", deployerZUSDBal)
-
-  // // Check Uniswap pool has ZUSD and WETH tokens
-  const ZUSDETHPair = await new ethers.Contract(
-    ZUSDWETHPairAddr,
-    UniswapV2Pair.abi,
-    deployerWallet
-  )
 
   // const token0Addr = await ZUSDETHPair.token0()
   // const token1Addr = await ZUSDETHPair.token1()
@@ -528,11 +463,6 @@ async function mainnetDeploy(configParams) {
 
   // // --- System stats  ---
 
-  // Uniswap ZUSD-ETH pool size
-  reserves = await ZUSDETHPair.getReserves()
-  th.logBN("ZUSD-ETH Pair's current ZUSD reserves", reserves[0])
-  th.logBN("ZUSD-ETH Pair's current ETH reserves", reserves[1])
-
   // Number of troves
   const numTroves = await liquityCore.troveManager.getTroveOwnersCount()
   console.log(`number of troves: ${numTroves} `)
@@ -564,10 +494,6 @@ async function mainnetDeploy(configParams) {
   // total ZERO Staked in ZEROStaking
   const totalZEROStaked = await ZEROContracts.zeroStaking.totalZEROStaked()
   th.logBN("Total ZERO staked", totalZEROStaked)
-
-  // total LP tokens staked in Unipool
-  const totalLPTokensStaked = await unipool.totalSupply()
-  th.logBN("Total LP (ZUSD-ETH) tokens staked in unipool", totalLPTokensStaked)
 
   // --- State variables ---
 
@@ -611,8 +537,6 @@ async function mainnetDeploy(configParams) {
   const totalZEROIssued = await ZEROContracts.communityIssuance.totalZEROIssued()
   th.logBN("Total ZERO issued to depositors / front ends", totalZEROIssued)
 
-
-  // TODO: Uniswap *ZERO-ETH* pool size (check it's deployed?)
 
 
 

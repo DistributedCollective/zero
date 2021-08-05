@@ -48,8 +48,6 @@ contract ZEROTokenStorage is Initializable {
     address public sovStakersIssuanceAddress;
     address public zeroStakingAddress;
 
-    uint internal lpRewardsEntitlement;
-
     ILockupContractFactory public lockupContractFactory;
 
 }
