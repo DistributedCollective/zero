@@ -12,8 +12,8 @@ import { LoadingOverlay } from "../LoadingOverlay";
 
 import { useStakingView } from "./context/StakingViewContext";
 
-const select = ({ lqtyBalance, totalStakedZERO }: LiquityStoreState) => ({
-  lqtyBalance,
+const select = ({ zeroBalance, totalStakedZERO }: LiquityStoreState) => ({
+  zeroBalance,
   totalStakedZERO
 });
 
@@ -31,13 +31,13 @@ export const StakingEditor: React.FC<StakingEditorProps> = ({
   editedZERO,
   dispatch
 }) => {
-  const { lqtyBalance, totalStakedZERO } = useLiquitySelector(select);
+  const { zeroBalance, totalStakedZERO } = useLiquitySelector(select);
   const { changePending } = useStakingView();
   const editingState = useState<string>();
 
   const edited = !editedZERO.eq(originalStake.stakedZERO);
 
-  const maxAmount = originalStake.stakedZERO.add(lqtyBalance);
+  const maxAmount = originalStake.stakedZERO.add(zeroBalance);
   const maxedOut = editedZERO.eq(maxAmount);
 
   const totalStakedZEROAfterChange = totalStakedZERO.sub(originalStake.stakedZERO).add(editedZERO);
@@ -65,7 +65,7 @@ export const StakingEditor: React.FC<StakingEditorProps> = ({
       <Box sx={{ p: [2, 3] }}>
         <EditableRow
           label="Stake"
-          inputId="stake-lqty"
+          inputId="stake-zero"
           amount={editedZERO.prettify()}
           maxAmount={maxAmount.toString()}
           maxedOut={maxedOut}

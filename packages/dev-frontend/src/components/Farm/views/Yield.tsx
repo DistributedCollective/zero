@@ -23,10 +23,10 @@ export const Yield: React.FC = () => {
   } = useLiquity();
 
   const { remainingLiquidityMiningZEROReward, totalStakedUniTokens } = useLiquitySelector(selector);
-  const [lqtyPrice, setZeroPrice] = useState<Decimal | undefined>(undefined);
+  const [zeroPrice, setZeroPrice] = useState<Decimal | undefined>(undefined);
   const [uniLpPrice, setUniLpPrice] = useState<Decimal | undefined>(undefined);
   const hasZeroValue = remainingLiquidityMiningZEROReward.isZero || totalStakedUniTokens.isZero;
-  const lqtyTokenAddress = addresses["lqtyToken"];
+  const zeroTokenAddress = addresses["zeroToken"];
   const uniTokenAddress = addresses["uniToken"];
   const secondsRemaining = remainingLiquidityMiningZEROReward.div(liquidityMiningZERORewardRate);
   const daysRemaining = secondsRemaining.div(60 * 60 * 24);
@@ -34,18 +34,18 @@ export const Yield: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { lqtyPriceUSD, uniLpPriceUSD } = await fetchPrices(lqtyTokenAddress, uniTokenAddress);
-        setZeroPrice(lqtyPriceUSD);
+        const { zeroPriceUSD, uniLpPriceUSD } = await fetchPrices(zeroTokenAddress, uniTokenAddress);
+        setZeroPrice(zeroPriceUSD);
         setUniLpPrice(uniLpPriceUSD);
       } catch (error) {
         console.error(error);
       }
     })();
-  }, [lqtyTokenAddress, uniTokenAddress]);
+  }, [zeroTokenAddress, uniTokenAddress]);
 
-  if (hasZeroValue || lqtyPrice === undefined || uniLpPrice === undefined) return null;
+  if (hasZeroValue || zeroPrice === undefined || uniLpPrice === undefined) return null;
 
-  const remainingZeroInUSD = remainingLiquidityMiningZEROReward.mul(lqtyPrice);
+  const remainingZeroInUSD = remainingLiquidityMiningZEROReward.mul(zeroPrice);
   const totalStakedUniLpInUSD = totalStakedUniTokens.mul(uniLpPrice);
   const yieldPercentage = remainingZeroInUSD.div(totalStakedUniLpInUSD).mul(100);
 

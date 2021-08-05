@@ -12,16 +12,16 @@ import { Icon } from "../Icon";
 import { useStakingView } from "./context/StakingViewContext";
 import { StakingGainsAction } from "./StakingGainsAction";
 
-const select = ({ lqtyStake, totalStakedZERO }: LiquityStoreState) => ({
-  lqtyStake,
+const select = ({ zeroStake, totalStakedZERO }: LiquityStoreState) => ({
+  zeroStake,
   totalStakedZERO
 });
 
 export const ReadOnlyStake: React.FC = () => {
   const { changePending, dispatch } = useStakingView();
-  const { lqtyStake, totalStakedZERO } = useLiquitySelector(select);
+  const { zeroStake, totalStakedZERO } = useLiquitySelector(select);
 
-  const poolShare = lqtyStake.stakedZERO.mulDiv(100, totalStakedZERO);
+  const poolShare = zeroStake.stakedZERO.mulDiv(100, totalStakedZERO);
 
   return (
     <Card>
@@ -30,8 +30,8 @@ export const ReadOnlyStake: React.FC = () => {
       <Box sx={{ p: [2, 3] }}>
         <DisabledEditableRow
           label="Stake"
-          inputId="stake-lqty"
-          amount={lqtyStake.stakedZERO.prettify()}
+          inputId="stake-zero"
+          amount={zeroStake.stakedZERO.prettify()}
           unit={GT}
         />
 
@@ -45,16 +45,16 @@ export const ReadOnlyStake: React.FC = () => {
         <StaticRow
           label="Redemption gain"
           inputId="stake-gain-eth"
-          amount={lqtyStake.collateralGain.prettify(4)}
-          color={lqtyStake.collateralGain.nonZero && "success"}
+          amount={zeroStake.collateralGain.prettify(4)}
+          color={zeroStake.collateralGain.nonZero && "success"}
           unit="ETH"
         />
 
         <StaticRow
           label="Issuance gain"
           inputId="stake-gain-zusd"
-          amount={lqtyStake.zusdGain.prettify()}
-          color={lqtyStake.zusdGain.nonZero && "success"}
+          amount={zeroStake.zusdGain.prettify()}
+          color={zeroStake.zusdGain.nonZero && "success"}
           unit={COIN}
         />
 

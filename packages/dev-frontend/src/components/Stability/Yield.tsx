@@ -20,28 +20,28 @@ export const Yield: React.FC = () => {
   } = useLiquity();
   const { zusdInStabilityPool, remainingStabilityPoolZEROReward } = useLiquitySelector(selector);
 
-  const [lqtyPrice, setZeroPrice] = useState<Decimal | undefined>(undefined);
+  const [zeroPrice, setZeroPrice] = useState<Decimal | undefined>(undefined);
   const hasZeroValue = remainingStabilityPoolZEROReward.isZero || zusdInStabilityPool.isZero;
-  const lqtyTokenAddress = addresses["lqtyToken"];
+  const zeroTokenAddress = addresses["zeroToken"];
 
   useEffect(() => {
     (async () => {
       try {
-        const { lqtyPriceUSD } = await fetchZeroPrice(lqtyTokenAddress);
-        setZeroPrice(lqtyPriceUSD);
+        const { zeroPriceUSD } = await fetchZeroPrice(zeroTokenAddress);
+        setZeroPrice(zeroPriceUSD);
       } catch (error) {
         console.error(error);
       }
     })();
-  }, [lqtyTokenAddress]);
+  }, [zeroTokenAddress]);
 
-  if (hasZeroValue || lqtyPrice === undefined) return null;
+  if (hasZeroValue || zeroPrice === undefined) return null;
 
   const yearlyHalvingSchedule = 0.5; // 50% see ZERO distribution schedule for more info
   const remainingZeroOneYear = remainingStabilityPoolZEROReward.mul(yearlyHalvingSchedule);
-  const remainingZeroOneYearInUSD = remainingZeroOneYear.mul(lqtyPrice);
+  const remainingZeroOneYearInUSD = remainingZeroOneYear.mul(zeroPrice);
   const aprPercentage = remainingZeroOneYearInUSD.div(zusdInStabilityPool).mul(100);
-  const remainingZeroInUSD = remainingStabilityPoolZEROReward.mul(lqtyPrice);
+  const remainingZeroInUSD = remainingStabilityPoolZEROReward.mul(zeroPrice);
 
   if (aprPercentage.isZero) return null;
 

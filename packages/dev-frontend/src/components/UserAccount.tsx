@@ -10,15 +10,15 @@ import { shortenAddress } from "../utils/shortenAddress";
 
 import { Icon } from "./Icon";
 
-const select = ({ accountBalance, zusdBalance, lqtyBalance }: LiquityStoreState) => ({
+const select = ({ accountBalance, zusdBalance, zeroBalance }: LiquityStoreState) => ({
   accountBalance,
   zusdBalance,
-  lqtyBalance
+  zeroBalance
 });
 
 export const UserAccount: React.FC = () => {
   const { account } = useLiquity();
-  const { accountBalance, zusdBalance, lqtyBalance } = useLiquitySelector(select);
+  const { accountBalance, zusdBalance, zeroBalance } = useLiquitySelector(select);
 
   return (
     <Box sx={{ display: ["none", "flex"] }}>
@@ -38,7 +38,7 @@ export const UserAccount: React.FC = () => {
         {([
           ["ETH", accountBalance],
           [COIN, zusdBalance],
-          [GT, lqtyBalance]
+          [GT, zeroBalance]
         ] as const).map(([currency, balance], i) => (
           <Flex key={i} sx={{ ml: 3, flexDirection: "column" }}>
             <Heading sx={{ fontSize: 1 }}>{currency}</Heading>

@@ -19,9 +19,9 @@ import { StakingManagerAction } from "./StakingManagerAction";
 import { ActionDescription, Amount } from "../ActionDescription";
 import { ErrorDescription } from "../ErrorDescription";
 
-const init = ({ lqtyStake }: LiquityStoreState) => ({
-  originalStake: lqtyStake,
-  editedZERO: lqtyStake.stakedZERO
+const init = ({ zeroStake }: LiquityStoreState) => ({
+  originalStake: zeroStake,
+  editedZERO: zeroStake.stakedZERO
 });
 
 type StakeManagerState = ReturnType<typeof init>;
@@ -45,7 +45,7 @@ const reduce = (state: StakeManagerState, action: StakeManagerAction): StakeMana
 
     case "updateStore": {
       const {
-        stateChange: { lqtyStake: updatedStake }
+        stateChange: { zeroStake: updatedStake }
       } = action;
 
       if (updatedStake) {
@@ -60,7 +60,7 @@ const reduce = (state: StakeManagerState, action: StakeManagerAction): StakeMana
   return state;
 };
 
-const selectZEROBalance = ({ lqtyBalance }: LiquityStoreState) => lqtyBalance;
+const selectZEROBalance = ({ zeroBalance }: LiquityStoreState) => zeroBalance;
 
 type StakingManagerActionDescriptionProps = {
   originalStake: ZEROStake;
@@ -119,18 +119,18 @@ const StakingManagerActionDescription: React.FC<StakingManagerActionDescriptionP
 export const StakingManager: React.FC = () => {
   const { dispatch: dispatchStakingViewAction } = useStakingView();
   const [{ originalStake, editedZERO }, dispatch] = useLiquityReducer(reduce, init);
-  const lqtyBalance = useLiquitySelector(selectZEROBalance);
+  const zeroBalance = useLiquitySelector(selectZEROBalance);
 
   const change = originalStake.whatChanged(editedZERO);
   const [validChange, description] = !change
     ? [undefined, undefined]
-    : change.stakeZERO?.gt(lqtyBalance)
+    : change.stakeZERO?.gt(zeroBalance)
     ? [
         undefined,
         <ErrorDescription>
           The amount you're trying to stake exceeds your balance by{" "}
           <Amount>
-            {change.stakeZERO.sub(lqtyBalance).prettify()} {GT}
+            {change.stakeZERO.sub(zeroBalance).prettify()} {GT}
           </Amount>
           .
         </ErrorDescription>
