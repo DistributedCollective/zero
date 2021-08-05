@@ -61,7 +61,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         }
       ],
@@ -93,7 +93,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_zusdTokenAddress",
           "type": "address"
         }
       ],
@@ -650,7 +650,7 @@
     },
     {
       "inputs": [],
-      "name": "lqtyStaking",
+      "name": "zeroStaking",
       "outputs": [
         {
           "internalType": "contract ILQTYStaking",
@@ -663,7 +663,7 @@
     },
     {
       "inputs": [],
-      "name": "lqtyStakingAddress",
+      "name": "zeroStakingAddress",
       "outputs": [
         {
           "internalType": "address",
@@ -676,7 +676,7 @@
     },
     {
       "inputs": [],
-      "name": "lusdToken",
+      "name": "zusdToken",
       "outputs": [
         {
           "internalType": "contract ILUSDToken",
@@ -831,12 +831,12 @@
         },
         {
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_zusdTokenAddress",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         }
       ],

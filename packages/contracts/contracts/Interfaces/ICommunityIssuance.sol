@@ -6,19 +6,19 @@ interface ICommunityIssuance {
     
     // --- Events ---
     
-    event LQTYTokenAddressSet(address _lqtyTokenAddress);
+    event ZEROTokenAddressSet(address _zeroTokenAddress);
     event CommunityPotAddressSet(address _communityPotAddress);
-    event TotalLQTYIssuedUpdated(uint _totalLQTYIssued);
+    event TotalZEROIssuedUpdated(uint _totalZEROIssued);
 
     // --- Functions ---
 
     function initialize
     (
-        address _lqtyTokenAddress, 
+        address _zeroTokenAddress, 
         address _communityPotAddress
     ) external;
 
-    function issueLQTY() external returns (uint);
+    function issueZERO() external returns (uint);
 
-    function sendLQTY(address _account, uint _LQTYamount) external;
+    function sendZERO(address _account, uint _ZEROamount) external;
 }

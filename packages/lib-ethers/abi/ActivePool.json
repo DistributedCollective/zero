@@ -31,11 +31,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_LUSDDebt",
+        "name": "_ZUSDDebt",
         "type": "uint256"
       }
     ],
-    "name": "ActivePoolLUSDDebtUpdated",
+    "name": "ActivePoolZUSDDebtUpdated",
     "type": "event"
   },
   {
@@ -100,19 +100,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_newBalance",
-        "type": "uint256"
-      }
-    ],
-    "name": "LUSDBalanceUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -155,6 +142,19 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "ZUSDBalanceUpdated",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "NAME",
     "outputs": [
@@ -188,7 +188,7 @@
         "type": "uint256"
       }
     ],
-    "name": "decreaseLUSDDebt",
+    "name": "decreaseZUSDDebt",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -221,12 +221,12 @@
   },
   {
     "inputs": [],
-    "name": "getLUSDDebt",
+    "name": "getOwner",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -234,12 +234,12 @@
   },
   {
     "inputs": [],
-    "name": "getOwner",
+    "name": "getZUSDDebt",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -253,7 +253,7 @@
         "type": "uint256"
       }
     ],
-    "name": "increaseLUSDDebt",
+    "name": "increaseZUSDDebt",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

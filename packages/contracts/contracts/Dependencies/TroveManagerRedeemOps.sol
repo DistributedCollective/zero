@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 import "./TroveManagerBase.sol";
 
 contract TroveManagerRedeemOps is TroveManagerBase {
-    /* Send _LUSDamount LUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
+    /* Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
      * request.  Applies pending rewards to a Trove before reducing its debt and coll.
      *
      * Note that if _amount is very large, this function can run out of gas, specially if traversed troves are small. This can be easily avoided by
@@ -23,11 +23,11 @@ contract TroveManagerRedeemOps is TroveManagerBase {
      *
      * If another transaction modifies the list between calling getRedemptionHints() and passing the hints to redeemCollateral(), it
      * is very likely that the last (partially) redeemed Trove would end up with a different ICR than what the hint is for. In this case the
-     * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining LUSD amount, which they can attempt
+     * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining ZUSD amount, which they can attempt
      * to redeem later.
      */
     function redeemCollateral(
-        uint256 _LUSDamount,
+        uint256 _ZUSDamount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
@@ -38,8 +38,8 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         ContractsCache memory contractsCache = ContractsCache(
             activePool,
             defaultPool,
-            _lusdToken,
-            _lqtyStaking,
+            _zusdToken,
+            _zeroStaking,
             sortedTroves,
             collSurplusPool,
             gasPoolAddress
@@ -50,14 +50,14 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         _requireAfterBootstrapPeriod();
         totals.price = priceFeed.fetchPrice();
         _requireTCRoverMCR(totals.price);
-        _requireAmountGreaterThanZero(_LUSDamount);
-        _requireLUSDBalanceCoversRedemption(contractsCache.lusdToken, msg.sender, _LUSDamount);
+        _requireAmountGreaterThanZero(_ZUSDamount);
+        _requireZUSDBalanceCoversRedemption(contractsCache.zusdToken, msg.sender, _ZUSDamount);
 
-        totals.totalLUSDSupplyAtStart = getEntireSystemDebt();
-        // Confirm redeemer's balance is less than total LUSD supply
-        assert(contractsCache.lusdToken.balanceOf(msg.sender) <= totals.totalLUSDSupplyAtStart);
+        totals.totalZUSDSupplyAtStart = getEntireSystemDebt();
+        // Confirm redeemer's balance is less than total ZUSD supply
+        assert(contractsCache.zusdToken.balanceOf(msg.sender) <= totals.totalZUSDSupplyAtStart);
 
-        totals.remainingLUSD = _LUSDamount;
+        totals.remainingZUSD = _ZUSDamount;
         address currentBorrower;
 
         if (
@@ -79,11 +79,11 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             }
         }
 
-        // Loop through the Troves starting from the one with lowest collateral ratio until _amount of LUSD is exchanged for collateral
+        // Loop through the Troves starting from the one with lowest collateral ratio until _amount of ZUSD is exchanged for collateral
         if (_maxIterations == 0) {
             _maxIterations = uint256(-1);
         }
-        while (currentBorrower != address(0) && totals.remainingLUSD > 0 && _maxIterations > 0) {
+        while (currentBorrower != address(0) && totals.remainingZUSD > 0 && _maxIterations > 0) {
             _maxIterations--;
             // Save the address of the Trove preceding the current one, before potentially modifying the list
             address nextUserToCheck = contractsCache.sortedTroves.getPrev(currentBorrower);
@@ -97,7 +97,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             SingleRedemptionValues memory singleRedemption = _redeemCollateralFromTrove(
                 contractsCache,
                 currentBorrower,
-                totals.remainingLUSD,
+                totals.remainingZUSD,
                 totals.price,
                 _upperPartialRedemptionHint,
                 _lowerPartialRedemptionHint,
@@ -106,20 +106,20 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
             if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
 
-            totals.totalLUSDToRedeem = totals.totalLUSDToRedeem.add(singleRedemption.LUSDLot);
+            totals.totalZUSDToRedeem = totals.totalZUSDToRedeem.add(singleRedemption.ZUSDLot);
             totals.totalETHDrawn = totals.totalETHDrawn.add(singleRedemption.ETHLot);
 
-            totals.remainingLUSD = totals.remainingLUSD.sub(singleRedemption.LUSDLot);
+            totals.remainingZUSD = totals.remainingZUSD.sub(singleRedemption.ZUSDLot);
             currentBorrower = nextUserToCheck;
         }
         require(totals.totalETHDrawn > 0, "TroveManager: Unable to redeem any amount");
 
         // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
-        // Use the saved total LUSD supply value, from before it was reduced by the redemption.
+        // Use the saved total ZUSD supply value, from before it was reduced by the redemption.
         _updateBaseRateFromRedemption(
             totals.totalETHDrawn,
             totals.price,
-            totals.totalLUSDSupplyAtStart
+            totals.totalZUSDSupplyAtStart
         );
 
         // Calculate the ETH fee
@@ -127,18 +127,18 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
         _requireUserAcceptsFee(totals.ETHFee, totals.totalETHDrawn, _maxFeePercentage);
 
-        // Send the ETH fee to the LQTY staking contract
-        contractsCache.activePool.sendETH(address(contractsCache.lqtyStaking), totals.ETHFee);
-        contractsCache.lqtyStaking.increaseF_ETH(totals.ETHFee);
+        // Send the ETH fee to the ZERO staking contract
+        contractsCache.activePool.sendETH(address(contractsCache.zeroStaking), totals.ETHFee);
+        contractsCache.zeroStaking.increaseF_ETH(totals.ETHFee);
 
         totals.ETHToSendToRedeemer = totals.totalETHDrawn.sub(totals.ETHFee);
 
-        emit Redemption(_LUSDamount, totals.totalLUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
+        emit Redemption(_ZUSDamount, totals.totalZUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
 
-        // Burn the total LUSD that is cancelled with debt, and send the redeemed ETH to msg.sender
-        contractsCache.lusdToken.burn(msg.sender, totals.totalLUSDToRedeem);
-        // Update Active Pool LUSD, and send ETH to account
-        contractsCache.activePool.decreaseLUSDDebt(totals.totalLUSDToRedeem);
+        // Burn the total ZUSD that is cancelled with debt, and send the redeemed ETH to msg.sender
+        contractsCache.zusdToken.burn(msg.sender, totals.totalZUSDToRedeem);
+        // Update Active Pool ZUSD, and send ETH to account
+        contractsCache.activePool.decreaseZUSDDebt(totals.totalZUSDToRedeem);
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
 
@@ -159,34 +159,34 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         return nextTrove == address(0) || _getCurrentICR(nextTrove, _price) < liquityBaseParams.MCR();
     }
 
-    // Redeem as much collateral as possible from _borrower's Trove in exchange for LUSD up to _maxLUSDamount
+    // Redeem as much collateral as possible from _borrower's Trove in exchange for ZUSD up to _maxZUSDamount
     function _redeemCollateralFromTrove(
         ContractsCache memory _contractsCache,
         address _borrower,
-        uint256 _maxLUSDamount,
+        uint256 _maxZUSDamount,
         uint256 _price,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
         uint256 _partialRedemptionHintNICR
     ) internal returns (SingleRedemptionValues memory singleRedemption) {
         // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
-        singleRedemption.LUSDLot = LiquityMath._min(
-            _maxLUSDamount,
-            Troves[_borrower].debt.sub(LUSD_GAS_COMPENSATION)
+        singleRedemption.ZUSDLot = LiquityMath._min(
+            _maxZUSDamount,
+            Troves[_borrower].debt.sub(ZUSD_GAS_COMPENSATION)
         );
 
         // Get the ETHLot of equivalent value in USD
-        singleRedemption.ETHLot = singleRedemption.LUSDLot.mul(DECIMAL_PRECISION).div(_price);
+        singleRedemption.ETHLot = singleRedemption.ZUSDLot.mul(DECIMAL_PRECISION).div(_price);
 
-        // Decrease the debt and collateral of the current Trove according to the LUSD lot and corresponding ETH to send
-        uint256 newDebt = (Troves[_borrower].debt).sub(singleRedemption.LUSDLot);
+        // Decrease the debt and collateral of the current Trove according to the ZUSD lot and corresponding ETH to send
+        uint256 newDebt = (Troves[_borrower].debt).sub(singleRedemption.ZUSDLot);
         uint256 newColl = (Troves[_borrower].coll).sub(singleRedemption.ETHLot);
 
-        if (newDebt == LUSD_GAS_COMPENSATION) {
+        if (newDebt == ZUSD_GAS_COMPENSATION) {
             // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
             _removeStake(_borrower);
             _closeTrove(_borrower, Status.closedByRedemption);
-            _redeemCloseTrove(_contractsCache, _borrower, LUSD_GAS_COMPENSATION, newColl);
+            _redeemCloseTrove(_contractsCache, _borrower, ZUSD_GAS_COMPENSATION, newColl);
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.redeemCollateral);
         } else {
             uint256 newNICR = LiquityMath._computeNominalCR(newColl, newDebt);
@@ -227,22 +227,22 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
     /*
      * This function has two impacts on the baseRate state variable:
-     * 1) decays the baseRate based on time passed since last redemption or LUSD borrowing operation.
+     * 1) decays the baseRate based on time passed since last redemption or ZUSD borrowing operation.
      * then,
      * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
      */
     function _updateBaseRateFromRedemption(
         uint256 _ETHDrawn,
         uint256 _price,
-        uint256 _totalLUSDSupply
+        uint256 _totalZUSDSupply
     ) internal returns (uint256) {
         uint256 decayedBaseRate = _calcDecayedBaseRate();
 
-        /* Convert the drawn ETH back to LUSD at face value rate (1 LUSD:1 USD), in order to get
+        /* Convert the drawn ETH back to ZUSD at face value rate (1 ZUSD:1 USD), in order to get
          * the fraction of total supply that was redeemed at face value. */
-        uint256 redeemedLUSDFraction = _ETHDrawn.mul(_price).div(_totalLUSDSupply);
+        uint256 redeemedZUSDFraction = _ETHDrawn.mul(_price).div(_totalZUSDSupply);
 
-        uint256 newBaseRate = decayedBaseRate.add(redeemedLUSDFraction.div(BETA));
+        uint256 newBaseRate = decayedBaseRate.add(redeemedZUSDFraction.div(BETA));
         newBaseRate = LiquityMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
         //assert(newBaseRate <= DECIMAL_PRECISION); // This is already enforced in the line above
         assert(newBaseRate > 0); // Base rate is always non-zero after redemption
@@ -258,20 +258,20 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
     /*
      * Called when a full redemption occurs, and closes the trove.
-     * The redeemer swaps (debt - liquidation reserve) LUSD for (debt - liquidation reserve) worth of ETH, so the LUSD liquidation reserve left corresponds to the remaining debt.
-     * In order to close the trove, the LUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
+     * The redeemer swaps (debt - liquidation reserve) ZUSD for (debt - liquidation reserve) worth of ETH, so the ZUSD liquidation reserve left corresponds to the remaining debt.
+     * In order to close the trove, the ZUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
      * The debt recorded on the trove's struct is zero'd elswhere, in _closeTrove.
      * Any surplus ETH left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
      */
     function _redeemCloseTrove(
         ContractsCache memory _contractsCache,
         address _borrower,
-        uint256 _LUSD,
+        uint256 _ZUSD,
         uint256 _ETH
     ) internal {
-        _contractsCache.lusdToken.burn(gasPoolAddress, _LUSD);
-        // Update Active Pool LUSD, and send ETH to account
-        _contractsCache.activePool.decreaseLUSDDebt(_LUSD);
+        _contractsCache.zusdToken.burn(gasPoolAddress, _ZUSD);
+        // Update Active Pool ZUSD, and send ETH to account
+        _contractsCache.activePool.decreaseZUSDDebt(_ZUSD);
 
         // send ETH from Active Pool to CollSurplus Pool
         _contractsCache.collSurplusPool.accountSurplus(_borrower, _ETH);

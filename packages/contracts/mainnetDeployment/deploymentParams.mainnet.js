@@ -11,8 +11,8 @@ const externalAddrs  = {
 }
 
 const liquityAddrs = {
-  GENERAL_SAFE:"0xF06016D822943C42e3Cb7FC3a6A3B1889C1045f8", // to be passed to LQTYToken as the bounties/hackathons address
-  LQTY_SAFE:"0xb8a9faDA75c6d891fB77a7988Ff9BaD9e485Ca1C", // to be passed to LQTYToken as the LQTY multisig address
+  GENERAL_SAFE:"0xF06016D822943C42e3Cb7FC3a6A3B1889C1045f8", // to be passed to ZEROToken as the bounties/hackathons address
+  ZERO_SAFE:"0xb8a9faDA75c6d891fB77a7988Ff9BaD9e485Ca1C", // to be passed to ZEROToken as the ZERO multisig address
   DEPLOYER: "0xa850535D3628CD4dFEB528dC85cfA93051Ff2984" // Mainnet REAL deployment address
 }
 

@@ -74,8 +74,8 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
   /** Time period (in seconds) after `deploymentDate` during which redemptions are disabled. */
   readonly bootstrapPeriod: number;
 
-  /** Total amount of LQTY allocated for rewarding stability depositors. */
-  readonly totalStabilityPoolLQTYReward: Decimal;
+  /** Total amount of ZERO allocated for rewarding stability depositors. */
+  readonly totalStabilityPoolZEROReward: Decimal;
 
   /** A mapping of Liquity contracts' names to their addresses. */
   readonly addresses: Record<string, string>;
@@ -104,7 +104,7 @@ const connectionFrom = (
   _multicall: _Multicall | undefined,
   {
     deploymentDate,
-    totalStabilityPoolLQTYReward,
+    totalStabilityPoolZEROReward,
     ...deployment
   }: _LiquityDeploymentJSON,
   optionalParams?: EthersLiquityConnectionOptionalParams
@@ -123,7 +123,7 @@ const connectionFrom = (
     _contracts,
     _multicall,
     deploymentDate: new Date(deploymentDate),
-    totalStabilityPoolLQTYReward: Decimal.from(totalStabilityPoolLQTYReward),
+    totalStabilityPoolZEROReward: Decimal.from(totalStabilityPoolZEROReward),
     ...deployment,
     ...optionalParams
   });
@@ -248,7 +248,7 @@ const validStoreOptions = ["blockPolled"];
  */
 export interface EthersLiquityConnectionOptionalParams {
   /**
-   * Address whose Trove, Stability Deposit, LQTY Stake and balances will be read by default.
+   * Address whose Trove, Stability Deposit, ZERO Stake and balances will be read by default.
    *
    * @remarks
    * For example {@link EthersLiquity.getTrove | getTrove(address?)} will return the Trove owned by
@@ -260,11 +260,11 @@ export interface EthersLiquityConnectionOptionalParams {
   readonly userAddress?: string;
 
   /**
-   * Address that will receive LQTY rewards from newly created Stability Deposits by default.
+   * Address that will receive ZERO rewards from newly created Stability Deposits by default.
    *
    * @remarks
    * For example
-   * {@link EthersLiquity.depositLUSDInStabilityPool | depositLUSDInStabilityPool(amount, frontendTag?)}
+   * {@link EthersLiquity.depositZUSDInStabilityPool | depositZUSDInStabilityPool(amount, frontendTag?)}
    * will tag newly made Stability Deposits with this address when its `frontendTag` parameter is
    * omitted.
    */

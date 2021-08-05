@@ -42,8 +42,8 @@ contract('StabilityPool', async accounts => {
     assert.equal(recordedETHBalance, 0)
   })
 
-  it('getTotalLUSDDeposits(): gets the recorded LUSD balance', async () => {
-    const recordedETHBalance = await stabilityPool.getTotalLUSDDeposits()
+  it('getTotalZUSDDeposits(): gets the recorded ZUSD balance', async () => {
+    const recordedETHBalance = await stabilityPool.getTotalZUSDDeposits()
     assert.equal(recordedETHBalance, 0)
   })
 })
@@ -65,39 +65,39 @@ contract('ActivePool', async accounts => {
     assert.equal(recordedETHBalance, 0)
   })
 
-  it('getLUSDDebt(): gets the recorded LUSD balance', async () => {
-    const recordedETHBalance = await activePool.getLUSDDebt()
+  it('getZUSDDebt(): gets the recorded ZUSD balance', async () => {
+    const recordedETHBalance = await activePool.getZUSDDebt()
     assert.equal(recordedETHBalance, 0)
   })
  
-  it('increaseLUSD(): increases the recorded LUSD balance by the correct amount', async () => {
-    const recordedLUSD_balanceBefore = await activePool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceBefore, 0)
+  it('increaseZUSD(): increases the recorded ZUSD balance by the correct amount', async () => {
+    const recordedZUSD_balanceBefore = await activePool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceBefore, 0)
 
-    // await activePool.increaseLUSDDebt(100, { from: mockBorrowerOperationsAddress })
-    const increaseLUSDDebtData = th.getTransactionData('increaseLUSDDebt(uint256)', ['0x64'])
-    const tx = await mockBorrowerOperations.forward(activePool.address, increaseLUSDDebtData)
+    // await activePool.increaseZUSDDebt(100, { from: mockBorrowerOperationsAddress })
+    const increaseZUSDDebtData = th.getTransactionData('increaseZUSDDebt(uint256)', ['0x64'])
+    const tx = await mockBorrowerOperations.forward(activePool.address, increaseZUSDDebtData)
     assert.isTrue(tx.receipt.status)
-    const recordedLUSD_balanceAfter = await activePool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceAfter, 100)
+    const recordedZUSD_balanceAfter = await activePool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceAfter, 100)
   })
   // Decrease
-  it('decreaseLUSD(): decreases the recorded LUSD balance by the correct amount', async () => {
+  it('decreaseZUSD(): decreases the recorded ZUSD balance by the correct amount', async () => {
     // start the pool on 100 wei
-    //await activePool.increaseLUSDDebt(100, { from: mockBorrowerOperationsAddress })
-    const increaseLUSDDebtData = th.getTransactionData('increaseLUSDDebt(uint256)', ['0x64'])
-    const tx1 = await mockBorrowerOperations.forward(activePool.address, increaseLUSDDebtData)
+    //await activePool.increaseZUSDDebt(100, { from: mockBorrowerOperationsAddress })
+    const increaseZUSDDebtData = th.getTransactionData('increaseZUSDDebt(uint256)', ['0x64'])
+    const tx1 = await mockBorrowerOperations.forward(activePool.address, increaseZUSDDebtData)
     assert.isTrue(tx1.receipt.status)
 
-    const recordedLUSD_balanceBefore = await activePool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceBefore, 100)
+    const recordedZUSD_balanceBefore = await activePool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceBefore, 100)
 
-    //await activePool.decreaseLUSDDebt(100, { from: mockBorrowerOperationsAddress })
-    const decreaseLUSDDebtData = th.getTransactionData('decreaseLUSDDebt(uint256)', ['0x64'])
-    const tx2 = await mockBorrowerOperations.forward(activePool.address, decreaseLUSDDebtData)
+    //await activePool.decreaseZUSDDebt(100, { from: mockBorrowerOperationsAddress })
+    const decreaseZUSDDebtData = th.getTransactionData('decreaseZUSDDebt(uint256)', ['0x64'])
+    const tx2 = await mockBorrowerOperations.forward(activePool.address, decreaseZUSDDebtData)
     assert.isTrue(tx2.receipt.status)
-    const recordedLUSD_balanceAfter = await activePool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceAfter, 0)
+    const recordedZUSD_balanceAfter = await activePool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceAfter, 0)
   })
 
   // send raw ether
@@ -143,46 +143,46 @@ contract('DefaultPool', async accounts => {
     await defaultPool.setAddresses(mockTroveManager.address, mockActivePool.address)
   })
 
-  it('getETH(): gets the recorded LUSD balance', async () => {
+  it('getETH(): gets the recorded ZUSD balance', async () => {
     const recordedETHBalance = await defaultPool.getETH()
     assert.equal(recordedETHBalance, 0)
   })
 
-  it('getLUSDDebt(): gets the recorded LUSD balance', async () => {
-    const recordedETHBalance = await defaultPool.getLUSDDebt()
+  it('getZUSDDebt(): gets the recorded ZUSD balance', async () => {
+    const recordedETHBalance = await defaultPool.getZUSDDebt()
     assert.equal(recordedETHBalance, 0)
   })
  
-  it('increaseLUSD(): increases the recorded LUSD balance by the correct amount', async () => {
-    const recordedLUSD_balanceBefore = await defaultPool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceBefore, 0)
+  it('increaseZUSD(): increases the recorded ZUSD balance by the correct amount', async () => {
+    const recordedZUSD_balanceBefore = await defaultPool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceBefore, 0)
 
-    // await defaultPool.increaseLUSDDebt(100, { from: mockTroveManagerAddress })
-    const increaseLUSDDebtData = th.getTransactionData('increaseLUSDDebt(uint256)', ['0x64'])
-    const tx = await mockTroveManager.forward(defaultPool.address, increaseLUSDDebtData)
+    // await defaultPool.increaseZUSDDebt(100, { from: mockTroveManagerAddress })
+    const increaseZUSDDebtData = th.getTransactionData('increaseZUSDDebt(uint256)', ['0x64'])
+    const tx = await mockTroveManager.forward(defaultPool.address, increaseZUSDDebtData)
     assert.isTrue(tx.receipt.status)
 
-    const recordedLUSD_balanceAfter = await defaultPool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceAfter, 100)
+    const recordedZUSD_balanceAfter = await defaultPool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceAfter, 100)
   })
   
-  it('decreaseLUSD(): decreases the recorded LUSD balance by the correct amount', async () => {
+  it('decreaseZUSD(): decreases the recorded ZUSD balance by the correct amount', async () => {
     // start the pool on 100 wei
-    //await defaultPool.increaseLUSDDebt(100, { from: mockTroveManagerAddress })
-    const increaseLUSDDebtData = th.getTransactionData('increaseLUSDDebt(uint256)', ['0x64'])
-    const tx1 = await mockTroveManager.forward(defaultPool.address, increaseLUSDDebtData)
+    //await defaultPool.increaseZUSDDebt(100, { from: mockTroveManagerAddress })
+    const increaseZUSDDebtData = th.getTransactionData('increaseZUSDDebt(uint256)', ['0x64'])
+    const tx1 = await mockTroveManager.forward(defaultPool.address, increaseZUSDDebtData)
     assert.isTrue(tx1.receipt.status)
 
-    const recordedLUSD_balanceBefore = await defaultPool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceBefore, 100)
+    const recordedZUSD_balanceBefore = await defaultPool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceBefore, 100)
 
-    // await defaultPool.decreaseLUSDDebt(100, { from: mockTroveManagerAddress })
-    const decreaseLUSDDebtData = th.getTransactionData('decreaseLUSDDebt(uint256)', ['0x64'])
-    const tx2 = await mockTroveManager.forward(defaultPool.address, decreaseLUSDDebtData)
+    // await defaultPool.decreaseZUSDDebt(100, { from: mockTroveManagerAddress })
+    const decreaseZUSDDebtData = th.getTransactionData('decreaseZUSDDebt(uint256)', ['0x64'])
+    const tx2 = await mockTroveManager.forward(defaultPool.address, decreaseZUSDDebtData)
     assert.isTrue(tx2.receipt.status)
 
-    const recordedLUSD_balanceAfter = await defaultPool.getLUSDDebt()
-    assert.equal(recordedLUSD_balanceAfter, 0)
+    const recordedZUSD_balanceAfter = await defaultPool.getZUSDDebt()
+    assert.equal(recordedZUSD_balanceAfter, 0)
   })
 
   // send raw ether

@@ -19,17 +19,17 @@ export interface LiquityStoreBaseState
 |  [accountBalance](./lib-base.liquitystorebasestate.accountbalance.md) | [Decimal](./lib-base.decimal.md) | User's native currency balance (e.g. Ether). |
 |  [collateralSurplusBalance](./lib-base.liquitystorebasestate.collateralsurplusbalance.md) | [Decimal](./lib-base.decimal.md) | Amount of leftover collateral available for withdrawal to the user. |
 |  [frontend](./lib-base.liquitystorebasestate.frontend.md) | [FrontendStatus](./lib-base.frontendstatus.md) | Status of currently used frontend. |
-|  [lqtyBalance](./lib-base.liquitystorebasestate.lqtybalance.md) | [Decimal](./lib-base.decimal.md) | User's LQTY token balance. |
-|  [lqtyStake](./lib-base.liquitystorebasestate.lqtystake.md) | [LQTYStake](./lib-base.lqtystake.md) | User's LQTY stake. |
-|  [lusdBalance](./lib-base.liquitystorebasestate.lusdbalance.md) | [Decimal](./lib-base.decimal.md) | User's LUSD token balance. |
-|  [lusdInStabilityPool](./lib-base.liquitystorebasestate.lusdinstabilitypool.md) | [Decimal](./lib-base.decimal.md) | Total amount of LUSD currently deposited in the Stability Pool. |
 |  [numberOfTroves](./lib-base.liquitystorebasestate.numberoftroves.md) | number | Number of Troves that are currently open. |
 |  [ownFrontend](./lib-base.liquitystorebasestate.ownfrontend.md) | [FrontendStatus](./lib-base.frontendstatus.md) | Status of user's own frontend. |
 |  [price](./lib-base.liquitystorebasestate.price.md) | [Decimal](./lib-base.decimal.md) | Current price of the native currency (e.g. Ether) in USD. |
-|  [remainingStabilityPoolLQTYReward](./lib-base.liquitystorebasestate.remainingstabilitypoollqtyreward.md) | [Decimal](./lib-base.decimal.md) | Remaining LQTY that will be collectively rewarded to stability depositors. |
+|  [remainingStabilityPoolZEROReward](./lib-base.liquitystorebasestate.remainingstabilitypoolzeroreward.md) | [Decimal](./lib-base.decimal.md) | Remaining ZERO that will be collectively rewarded to stability depositors. |
 |  [stabilityDeposit](./lib-base.liquitystorebasestate.stabilitydeposit.md) | [StabilityDeposit](./lib-base.stabilitydeposit.md) | User's stability deposit. |
 |  [total](./lib-base.liquitystorebasestate.total.md) | [Trove](./lib-base.trove.md) | Total collateral and debt in the Liquity system. |
 |  [totalRedistributed](./lib-base.liquitystorebasestate.totalredistributed.md) | [Trove](./lib-base.trove.md) | Total collateral and debt per stake that has been liquidated through redistribution. |
-|  [totalStakedLQTY](./lib-base.liquitystorebasestate.totalstakedlqty.md) | [Decimal](./lib-base.decimal.md) | Total amount of LQTY currently staked. |
+|  [totalStakedZERO](./lib-base.liquitystorebasestate.totalstakedzero.md) | [Decimal](./lib-base.decimal.md) | Total amount of ZERO currently staked. |
 |  [troveBeforeRedistribution](./lib-base.liquitystorebasestate.trovebeforeredistribution.md) | [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md) | User's Trove in its state after the last direct modification. |
+|  [zeroBalance](./lib-base.liquitystorebasestate.zerobalance.md) | [Decimal](./lib-base.decimal.md) | User's ZERO token balance. |
+|  [zeroStake](./lib-base.liquitystorebasestate.zerostake.md) | [ZEROStake](./lib-base.zerostake.md) | User's ZERO stake. |
+|  [zusdBalance](./lib-base.liquitystorebasestate.zusdbalance.md) | [Decimal](./lib-base.decimal.md) | User's ZUSD token balance. |
+|  [zusdInStabilityPool](./lib-base.liquitystorebasestate.zusdinstabilitypool.md) | [Decimal](./lib-base.decimal.md) | Total amount of ZUSD currently deposited in the Stability Pool. |
 

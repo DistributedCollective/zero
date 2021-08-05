@@ -9,7 +9,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         }
       ],
@@ -88,7 +88,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         }
       ],

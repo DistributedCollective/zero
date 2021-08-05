@@ -100,7 +100,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_LUSDLoss",
+        "name": "_ZUSDLoss",
         "type": "uint256"
       }
     ],
@@ -258,57 +258,6 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_depositor",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_LQTY",
-        "type": "uint256"
-      }
-    ],
-    "name": "LQTYPaidToDepositor",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_frontEnd",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_LQTY",
-        "type": "uint256"
-      }
-    ],
-    "name": "LQTYPaidToFrontEnd",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_newLUSDTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LUSDTokenAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
         "name": "previousOwner",
         "type": "address"
       },
@@ -422,7 +371,7 @@
         "type": "uint256"
       }
     ],
-    "name": "StabilityPoolLUSDBalanceUpdated",
+    "name": "StabilityPoolZUSDBalanceUpdated",
     "type": "event"
   },
   {
@@ -458,21 +407,59 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "DECIMAL_PRECISION",
-    "outputs": [
+    "anonymous": false,
+    "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_depositor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
-        "name": "",
+        "name": "_ZERO",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
+    "name": "ZEROPaidToDepositor",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_frontEnd",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_ZERO",
+        "type": "uint256"
+      }
+    ],
+    "name": "ZEROPaidToFrontEnd",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newZUSDTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ZUSDTokenAddressChanged",
+    "type": "event"
   },
   {
     "inputs": [],
-    "name": "LUSD_GAS_COMPENSATION",
+    "name": "DECIMAL_PRECISION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -525,6 +512,19 @@
   {
     "inputs": [],
     "name": "SCALE_FACTOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ZUSD_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -846,7 +846,7 @@
         "type": "address"
       }
     ],
-    "name": "getCompoundedLUSDDeposit",
+    "name": "getCompoundedZUSDDeposit",
     "outputs": [
       {
         "internalType": "uint256",
@@ -884,7 +884,7 @@
         "type": "address"
       }
     ],
-    "name": "getDepositorLQTYGain",
+    "name": "getDepositorZEROGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -942,7 +942,7 @@
         "type": "address"
       }
     ],
-    "name": "getFrontEndLQTYGain",
+    "name": "getFrontEndZEROGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -968,7 +968,7 @@
   },
   {
     "inputs": [],
-    "name": "getTotalLUSDDeposits",
+    "name": "getTotalZUSDDeposits",
     "outputs": [
       {
         "internalType": "uint256",
@@ -994,7 +994,7 @@
   },
   {
     "inputs": [],
-    "name": "lastLQTYError",
+    "name": "lastZEROError",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1007,7 +1007,7 @@
   },
   {
     "inputs": [],
-    "name": "lastLUSDLossError_Offset",
+    "name": "lastZUSDLossError_Offset",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1024,19 +1024,6 @@
     "outputs": [
       {
         "internalType": "contract ILiquityBaseParams",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lusdToken",
-    "outputs": [
-      {
-        "internalType": "contract ILUSDToken",
         "name": "",
         "type": "address"
       }
@@ -1130,7 +1117,7 @@
       },
       {
         "internalType": "address",
-        "name": "_lusdTokenAddress",
+        "name": "_zusdTokenAddress",
         "type": "address"
       },
       {
@@ -1222,6 +1209,19 @@
     "name": "withdrawFromSP",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "zusdToken",
+    "outputs": [
+      {
+        "internalType": "contract IZUSDToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

@@ -23,18 +23,18 @@ Implemented by [EthersLiquity](./lib-ethers.ethersliquity.md)<!-- -->.
 |  [getCollateralSurplusBalance(address)](./lib-base.readableliquity.getcollateralsurplusbalance.md) | Get the amount of leftover collateral available for withdrawal by an address. |
 |  [getFees()](./lib-base.readableliquity.getfees.md) | Get a calculator for current fees. |
 |  [getFrontendStatus(address)](./lib-base.readableliquity.getfrontendstatus.md) | Check whether an address is registered as a Liquity frontend, and what its kickback rate is. |
-|  [getLQTYBalance(address)](./lib-base.readableliquity.getlqtybalance.md) | Get the amount of LQTY held by an address. |
-|  [getLQTYStake(address)](./lib-base.readableliquity.getlqtystake.md) | Get the current state of an LQTY Stake. |
-|  [getLUSDBalance(address)](./lib-base.readableliquity.getlusdbalance.md) | Get the amount of LUSD held by an address. |
-|  [getLUSDInStabilityPool()](./lib-base.readableliquity.getlusdinstabilitypool.md) | Get the total amount of LUSD currently deposited in the Stability Pool. |
 |  [getNumberOfTroves()](./lib-base.readableliquity.getnumberoftroves.md) | Get number of Troves that are currently open. |
 |  [getPrice()](./lib-base.readableliquity.getprice.md) | Get the current price of the native currency (e.g. Ether) in USD. |
-|  [getRemainingStabilityPoolLQTYReward()](./lib-base.readableliquity.getremainingstabilitypoollqtyreward.md) | Get the remaining LQTY that will be collectively rewarded to stability depositors. |
+|  [getRemainingStabilityPoolZEROReward()](./lib-base.readableliquity.getremainingstabilitypoolzeroreward.md) | Get the remaining ZERO that will be collectively rewarded to stability depositors. |
 |  [getStabilityDeposit(address)](./lib-base.readableliquity.getstabilitydeposit.md) | Get the current state of a Stability Deposit. |
 |  [getTotal()](./lib-base.readableliquity.gettotal.md) | Get the total amount of collateral and debt in the Liquity system. |
 |  [getTotalRedistributed()](./lib-base.readableliquity.gettotalredistributed.md) | Get the total collateral and debt per stake that has been liquidated through redistribution. |
-|  [getTotalStakedLQTY()](./lib-base.readableliquity.gettotalstakedlqty.md) | Get the total amount of LQTY currently staked. |
+|  [getTotalStakedZERO()](./lib-base.readableliquity.gettotalstakedzero.md) | Get the total amount of ZERO currently staked. |
 |  [getTrove(address)](./lib-base.readableliquity.gettrove.md) | Get the current state of a Trove. |
 |  [getTroveBeforeRedistribution(address)](./lib-base.readableliquity.gettrovebeforeredistribution.md) | Get a Trove in its state after the last direct modification. |
 |  [getTroves(params)](./lib-base.readableliquity.gettroves_1.md) | Get a slice from the list of Troves. |
+|  [getZEROBalance(address)](./lib-base.readableliquity.getzerobalance.md) | Get the amount of ZERO held by an address. |
+|  [getZEROStake(address)](./lib-base.readableliquity.getzerostake.md) | Get the current state of an ZERO Stake. |
+|  [getZUSDBalance(address)](./lib-base.readableliquity.getzusdbalance.md) | Get the amount of ZUSD held by an address. |
+|  [getZUSDInStabilityPool()](./lib-base.readableliquity.getzusdinstabilitypool.md) | Get the total amount of ZUSD currently deposited in the Stability Pool. |
 

@@ -59,7 +59,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         },
         {

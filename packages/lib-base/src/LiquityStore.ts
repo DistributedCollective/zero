@@ -4,7 +4,7 @@ import { Decimal } from "./Decimal";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
 import { Fees } from "./Fees";
-import { LQTYStake } from "./LQTYStake";
+import { ZEROStake } from "./ZEROStake";
 import { FrontendStatus } from "./ReadableLiquity";
 
 /**
@@ -25,11 +25,11 @@ export interface LiquityStoreBaseState {
   /** User's native currency balance (e.g. Ether). */
   accountBalance: Decimal;
 
-  /** User's LUSD token balance. */
-  lusdBalance: Decimal;
+  /** User's ZUSD token balance. */
+  zusdBalance: Decimal;
 
-  /** User's LQTY token balance. */
-  lqtyBalance: Decimal;
+  /** User's ZERO token balance. */
+  zeroBalance: Decimal;
 
   /**
    * Amount of leftover collateral available for withdrawal to the user.
@@ -43,8 +43,8 @@ export interface LiquityStoreBaseState {
   /** Current price of the native currency (e.g. Ether) in USD. */
   price: Decimal;
 
-  /** Total amount of LUSD currently deposited in the Stability Pool. */
-  lusdInStabilityPool: Decimal;
+  /** Total amount of ZUSD currently deposited in the Stability Pool. */
+  zusdInStabilityPool: Decimal;
 
   /** Total collateral and debt in the Liquity system. */
   total: Trove;
@@ -69,17 +69,17 @@ export interface LiquityStoreBaseState {
   /** User's stability deposit. */
   stabilityDeposit: StabilityDeposit;
 
-  /** Remaining LQTY that will be collectively rewarded to stability depositors. */
-  remainingStabilityPoolLQTYReward: Decimal;
+  /** Remaining ZERO that will be collectively rewarded to stability depositors. */
+  remainingStabilityPoolZEROReward: Decimal;
 
   /** @internal */
   _feesInNormalMode: Fees;
 
-  /** User's LQTY stake. */
-  lqtyStake: LQTYStake;
+  /** User's ZERO stake. */
+  zeroStake: ZEROStake;
 
-  /** Total amount of LQTY currently staked. */
-  totalStakedLQTY: Decimal;
+  /** Total amount of ZERO currently staked. */
+  totalStakedZERO: Decimal;
 
   /** @internal */
   _riskiestTroveBeforeRedistribution: TroveWithPendingRedistribution;
@@ -112,7 +112,7 @@ export interface LiquityStoreDerivedState {
    * Current redemption rate.
    *
    * @remarks
-   * Note that the actual rate paid by a redemption transaction will depend on the amount of LUSD
+   * Note that the actual rate paid by a redemption transaction will depend on the amount of ZUSD
    * being redeemed.
    *
    * Use {@link Fees.redemptionRate} to calculate a precise redemption rate.
@@ -334,18 +334,18 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate.accountBalance
       ),
 
-      lusdBalance: this._updateIfChanged(
+      zusdBalance: this._updateIfChanged(
         eq,
-        "lusdBalance",
-        baseState.lusdBalance,
-        baseStateUpdate.lusdBalance
+        "zusdBalance",
+        baseState.zusdBalance,
+        baseStateUpdate.zusdBalance
       ),
 
-      lqtyBalance: this._updateIfChanged(
+      zeroBalance: this._updateIfChanged(
         eq,
-        "lqtyBalance",
-        baseState.lqtyBalance,
-        baseStateUpdate.lqtyBalance
+        "zeroBalance",
+        baseState.zeroBalance,
+        baseStateUpdate.zeroBalance
       ),
 
       collateralSurplusBalance: this._updateIfChanged(
@@ -357,11 +357,11 @@ export abstract class LiquityStore<T = unknown> {
 
       price: this._updateIfChanged(eq, "price", baseState.price, baseStateUpdate.price),
 
-      lusdInStabilityPool: this._updateIfChanged(
+      zusdInStabilityPool: this._updateIfChanged(
         eq,
-        "lusdInStabilityPool",
-        baseState.lusdInStabilityPool,
-        baseStateUpdate.lusdInStabilityPool
+        "zusdInStabilityPool",
+        baseState.zusdInStabilityPool,
+        baseStateUpdate.zusdInStabilityPool
       ),
 
       total: this._updateIfChanged(equals, "total", baseState.total, baseStateUpdate.total),
@@ -387,10 +387,10 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate.stabilityDeposit
       ),
 
-      remainingStabilityPoolLQTYReward: this._silentlyUpdateIfChanged(
+      remainingStabilityPoolZEROReward: this._silentlyUpdateIfChanged(
         eq,
-        baseState.remainingStabilityPoolLQTYReward,
-        baseStateUpdate.remainingStabilityPoolLQTYReward
+        baseState.remainingStabilityPoolZEROReward,
+        baseStateUpdate.remainingStabilityPoolZEROReward
       ),
 
       _feesInNormalMode: this._silentlyUpdateIfChanged(
@@ -399,18 +399,18 @@ export abstract class LiquityStore<T = unknown> {
         baseStateUpdate._feesInNormalMode
       ),
 
-      lqtyStake: this._updateIfChanged(
+      zeroStake: this._updateIfChanged(
         equals,
-        "lqtyStake",
-        baseState.lqtyStake,
-        baseStateUpdate.lqtyStake
+        "zeroStake",
+        baseState.zeroStake,
+        baseStateUpdate.zeroStake
       ),
 
-      totalStakedLQTY: this._updateIfChanged(
+      totalStakedZERO: this._updateIfChanged(
         eq,
-        "totalStakedLQTY",
-        baseState.totalStakedLQTY,
-        baseStateUpdate.totalStakedLQTY
+        "totalStakedZERO",
+        baseState.totalStakedZERO,
+        baseStateUpdate.totalStakedZERO
       ),
 
       _riskiestTroveBeforeRedistribution: this._silentlyUpdateIfChanged(

@@ -466,7 +466,7 @@
     },
     {
       "inputs": [],
-      "name": "lusdToken",
+      "name": "zusdToken",
       "outputs": [
         {
           "internalType": "contract LUSDToken",

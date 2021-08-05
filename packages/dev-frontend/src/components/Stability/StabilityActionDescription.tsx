@@ -15,15 +15,15 @@ export const StabilityActionDescription: React.FC<StabilityActionDescriptionProp
   change
 }) => {
   const collateralGain = originalDeposit.collateralGain.nonZero?.prettify(4).concat(" ETH");
-  const lqtyReward = originalDeposit.lqtyReward.nonZero?.prettify().concat(" ", GT);
+  const zeroReward = originalDeposit.zeroReward.nonZero?.prettify().concat(" ", GT);
 
   return (
     <ActionDescription>
-      {change.depositLUSD ? (
+      {change.depositZUSD ? (
         <>
           You are depositing{" "}
           <Amount>
-            {change.depositLUSD.prettify()} {COIN}
+            {change.depositZUSD.prettify()} {COIN}
           </Amount>{" "}
           in the Stability Pool
         </>
@@ -31,21 +31,21 @@ export const StabilityActionDescription: React.FC<StabilityActionDescriptionProp
         <>
           You are withdrawing{" "}
           <Amount>
-            {change.withdrawLUSD.prettify()} {COIN}
+            {change.withdrawZUSD.prettify()} {COIN}
           </Amount>{" "}
           to your wallet
         </>
       )}
-      {(collateralGain || lqtyReward) && (
+      {(collateralGain || zeroReward) && (
         <>
           {" "}
           and claiming at least{" "}
-          {collateralGain && lqtyReward ? (
+          {collateralGain && zeroReward ? (
             <>
-              <Amount>{collateralGain}</Amount> and <Amount>{lqtyReward}</Amount>
+              <Amount>{collateralGain}</Amount> and <Amount>{zeroReward}</Amount>
             </>
           ) : (
-            <Amount>{collateralGain ?? lqtyReward}</Amount>
+            <Amount>{collateralGain ?? zeroReward}</Amount>
           )}
         </>
       )}

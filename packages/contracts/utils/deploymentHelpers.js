@@ -3,7 +3,7 @@ const LiquityBaseParams = artifacts.require("./LiquityBaseParams.sol")
 const TroveManagerRedeemOps = artifacts.require("./Dependencies/TroveManagerRedeemOps.sol")
 const TroveManager = artifacts.require("./TroveManager.sol")
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol")
-const LUSDToken = artifacts.require("./LUSDToken.sol")
+const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
 const StabilityPool = artifacts.require("./StabilityPool.sol")
@@ -13,14 +13,14 @@ const FunctionCaller = artifacts.require("./TestContracts/FunctionCaller.sol")
 const BorrowerOperations = artifacts.require("./BorrowerOperations.sol")
 const HintHelpers = artifacts.require("./HintHelpers.sol")
 
-const LQTYStaking = artifacts.require("./LQTYStaking.sol")
-const LQTYToken = artifacts.require("./LQTYToken.sol")
+const ZEROStaking = artifacts.require("./ZEROStaking.sol")
+const ZEROToken = artifacts.require("./ZEROToken.sol")
 const LockupContractFactory = artifacts.require("./LockupContractFactory.sol")
 const CommunityIssuance = artifacts.require("./CommunityIssuance.sol")
 
 const Unipool =  artifacts.require("./Unipool.sol")
 
-const LQTYTokenTester = artifacts.require("./LQTYTokenTester.sol")
+const ZEROTokenTester = artifacts.require("./ZEROTokenTester.sol")
 const CommunityIssuanceTester = artifacts.require("./CommunityIssuanceTester.sol")
 const SovStakersIssuance = artifacts.require("./SovStakersIssuance.sol")
 const MockFeeSharingProxy = artifacts.require("./MockFeeSharingProxy.sol")
@@ -30,7 +30,7 @@ const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
 const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const LUSDTokenTester = artifacts.require("./LUSDTokenTester.sol")
+const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
 
 // Proxy scripts
 const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript')
@@ -38,7 +38,7 @@ const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript')
 const TroveManagerScript = artifacts.require('TroveManagerScript')
 const StabilityPoolScript = artifacts.require('StabilityPoolScript')
 const TokenScript = artifacts.require('TokenScript')
-const LQTYStakingScript = artifacts.require('LQTYStakingScript')
+const ZEROStakingScript = artifacts.require('ZEROStakingScript')
 const {
   buildUserProxies,
   BorrowerOperationsProxy,
@@ -47,16 +47,16 @@ const {
   StabilityPoolProxy,
   SortedTrovesProxy,
   TokenProxy,
-  LQTYStakingProxy
+  ZEROStakingProxy
 } = require('../utils/proxyHelpers.js')
 
 /* "Liquity core" consists of all contracts in the core Liquity system.
 
-LQTY contracts consist of only those contracts related to the LQTY Token:
+ZERO contracts consist of only those contracts related to the ZERO Token:
 
--the LQTY token
+-the ZERO token
 -the Lockup factory and lockup contracts
--the LQTYStaking contract
+-the ZEROStaking contract
 -the CommunityIssuance contract 
 */
 
@@ -77,15 +77,15 @@ class DeploymentHelper {
     }
   }
 
-  static async deployLQTYContracts(multisigAddress) {
+  static async deployZEROContracts(multisigAddress) {
     const cmdLineArgs = process.argv
     const frameworkPath = cmdLineArgs[1]
     // console.log(`Framework used:  ${frameworkPath}`)
 
     if (frameworkPath.includes("hardhat")) {
-      return this.deployLQTYContractsHardhat(multisigAddress)
+      return this.deployZEROContractsHardhat(multisigAddress)
     } else if (frameworkPath.includes("truffle")) {
-      return this.deployLQTYContractsTruffle(multisigAddress)
+      return this.deployZEROContractsTruffle(multisigAddress)
     }
   }
 
@@ -103,14 +103,14 @@ class DeploymentHelper {
     const functionCaller = await FunctionCaller.new()
     const borrowerOperations = await BorrowerOperations.new()
     const hintHelpers = await HintHelpers.new()
-    const lusdToken = await LUSDToken.new()
-    await lusdToken.initialize(
+    const zusdToken = await ZUSDToken.new()
+    await zusdToken.initialize(
       troveManager.address,
       stabilityPool.address,
       borrowerOperations.address
     )
     await liquityBaseParams.initialize()
-    LUSDToken.setAsDeployed(lusdToken)
+    ZUSDToken.setAsDeployed(zusdToken)
     DefaultPool.setAsDeployed(defaultPool)
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
     SortedTroves.setAsDeployed(sortedTroves)
@@ -127,7 +127,7 @@ class DeploymentHelper {
 
     const coreContracts = {
       priceFeedTestnet,
-      lusdToken,
+      zusdToken,
       sortedTroves,
       liquityBaseParams,
       troveManagerRedeemOps,
@@ -164,7 +164,7 @@ class DeploymentHelper {
     testerContracts.troveManager = await TroveManagerTester.new()
     testerContracts.functionCaller = await FunctionCaller.new()
     testerContracts.hintHelpers = await HintHelpers.new()
-    testerContracts.lusdToken =  await LUSDTokenTester.new(
+    testerContracts.zusdToken =  await ZUSDTokenTester.new(
       testerContracts.troveManager.address,
       testerContracts.stabilityPool.address,
       testerContracts.borrowerOperations.address
@@ -173,71 +173,71 @@ class DeploymentHelper {
     return testerContracts
   }
 
-  static async deployLQTYContractsHardhat(multisigAddress) {
-    const lqtyStaking = await LQTYStaking.new()
+  static async deployZEROContractsHardhat(multisigAddress) {
+    const zeroStaking = await ZEROStaking.new()
     const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuance.new()
     const sovStakersIssuance = await SovStakersIssuance.new()
     const mockFeeSharingProxy = await MockFeeSharingProxy.new()
 
-    LQTYStaking.setAsDeployed(lqtyStaking)
+    ZEROStaking.setAsDeployed(zeroStaking)
     LockupContractFactory.setAsDeployed(lockupContractFactory)
     CommunityIssuance.setAsDeployed(communityIssuance)
 
-    // Deploy LQTY Token, passing Community Issuance and Factory addresses to the constructor 
-    const lqtyToken = await LQTYToken.new()
-    await lqtyToken.initialize(
+    // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor 
+    const zeroToken = await ZEROToken.new()
+    await zeroToken.initialize(
       communityIssuance.address, 
       sovStakersIssuance.address,
-      lqtyStaking.address,
+      zeroStaking.address,
       lockupContractFactory.address, 
       multisigAddress
     )
-    LQTYToken.setAsDeployed(lqtyToken)
+    ZEROToken.setAsDeployed(zeroToken)
 
-    const LQTYContracts = {
-      lqtyStaking,
+    const ZEROContracts = {
+      zeroStaking,
       lockupContractFactory,
       communityIssuance,
       sovStakersIssuance,
       mockFeeSharingProxy,
-      lqtyToken
+      zeroToken
     }
-    return LQTYContracts
+    return ZEROContracts
   }
 
-  static async deployLQTYTesterContractsHardhat(multisigAddress) {
-    const lqtyStaking = await LQTYStaking.new()
+  static async deployZEROTesterContractsHardhat(multisigAddress) {
+    const zeroStaking = await ZEROStaking.new()
     const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuanceTester.new()
     const sovStakersIssuance = await SovStakersIssuance.new()
     const mockFeeSharingProxy = await MockFeeSharingProxy.new()
 
-    LQTYStaking.setAsDeployed(lqtyStaking)
+    ZEROStaking.setAsDeployed(zeroStaking)
     LockupContractFactory.setAsDeployed(lockupContractFactory)
     CommunityIssuanceTester.setAsDeployed(communityIssuance)
     CommunityIssuanceTester.setAsDeployed(sovStakersIssuance)
     MockFeeSharingProxy.setAsDeployed(mockFeeSharingProxy)
 
-    // Deploy LQTY Token, passing Community Issuance and Factory addresses to the constructor 
-    const lqtyToken = await LQTYTokenTester.new(
+    // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor 
+    const zeroToken = await ZEROTokenTester.new(
       communityIssuance.address, 
       sovStakersIssuance.address,
-      lqtyStaking.address,
+      zeroStaking.address,
       lockupContractFactory.address,
       multisigAddress
     )
-    LQTYTokenTester.setAsDeployed(lqtyToken)
+    ZEROTokenTester.setAsDeployed(zeroToken)
 
-    const LQTYContracts = {
-      lqtyStaking,
+    const ZEROContracts = {
+      zeroStaking,
       lockupContractFactory,
       communityIssuance,
       sovStakersIssuance,
       mockFeeSharingProxy,
-      lqtyToken
+      zeroToken
     }
-    return LQTYContracts
+    return ZEROContracts
   }
 
   static async deployLiquityCoreTruffle() {
@@ -254,8 +254,8 @@ class DeploymentHelper {
     const functionCaller = await FunctionCaller.new()
     const borrowerOperations = await BorrowerOperations.new()
     const hintHelpers = await HintHelpers.new()
-    const lusdToken = await LUSDToken.new()
-    await lusdToken.initialize(
+    const zusdToken = await ZUSDToken.new()
+    await zusdToken.initialize(
       troveManager.address,
       stabilityPool.address,
       borrowerOperations.address
@@ -263,7 +263,7 @@ class DeploymentHelper {
     await liquityBaseParams.initialize()
     const coreContracts = {
       priceFeedTestnet,
-      lusdToken,
+      zusdToken,
       sortedTroves,
       liquityBaseParams,
       troveManagerRedeemOps,
@@ -280,35 +280,35 @@ class DeploymentHelper {
     return coreContracts
   }
 
-  static async deployLQTYContractsTruffle(multisigAddress) {
-    const lqtyStaking = await lqtyStaking.new()
+  static async deployZEROContractsTruffle(multisigAddress) {
+    const zeroStaking = await zeroStaking.new()
     const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuance.new()
     const sovStakersIssuance = await SovStakersIssuance.new()
 
-    /* Deploy LQTY Token, passing Community Issuance,  LQTYStaking, and Factory addresses 
+    /* Deploy ZERO Token, passing Community Issuance,  ZEROStaking, and Factory addresses 
     to the constructor  */
-    const lqtyToken = await LQTYToken.new()
-    await lqtyToken.initialize(
+    const zeroToken = await ZEROToken.new()
+    await zeroToken.initialize(
       communityIssuance.address, 
       sovStakersIssuance.address,
-      lqtyStaking.address,
+      zeroStaking.address,
       lockupContractFactory.address,
       multisigAddress
     )
 
-    const LQTYContracts = {
-      lqtyStaking,
+    const ZEROContracts = {
+      zeroStaking,
       lockupContractFactory,
       communityIssuance,
-      lqtyToken
+      zeroToken
     }
-    return LQTYContracts
+    return ZEROContracts
   }
 
-  static async deployLUSDToken(contracts) {
-    contracts.lusdToken = await LUSDToken.new()
-    await contracts.lusdToken.initialize(
+  static async deployZUSDToken(contracts) {
+    contracts.zusdToken = await ZUSDToken.new()
+    await contracts.zusdToken.initialize(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
@@ -316,8 +316,8 @@ class DeploymentHelper {
     return contracts
   }
 
-  static async deployLUSDTokenTester(contracts) {
-    contracts.lusdToken = await LUSDTokenTester.new(
+  static async deployZUSDTokenTester(contracts) {
+    contracts.zusdToken = await ZUSDTokenTester.new(
       contracts.troveManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
@@ -325,17 +325,17 @@ class DeploymentHelper {
     return contracts
   }
 
-  static async deployProxyScripts(contracts, LQTYContracts, owner, users) {
+  static async deployProxyScripts(contracts, ZEROContracts, owner, users) {
     const proxies = await buildUserProxies(users)
 
     const borrowerWrappersScript = await BorrowerWrappersScript.new(
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
-      LQTYContracts.lqtyStaking.address,
+      ZEROContracts.zeroStaking.address,
       contracts.stabilityPool.address,
       contracts.priceFeedTestnet.address,
-      contracts.lusdToken.address,
-      LQTYContracts.lqtyToken.address,
+      contracts.zusdToken.address,
+      ZEROContracts.zeroToken.address,
     )
     contracts.borrowerWrappers = new BorrowerWrappersProxy(owner, proxies, borrowerWrappersScript.address)
 
@@ -350,18 +350,18 @@ class DeploymentHelper {
 
     contracts.sortedTroves = new SortedTrovesProxy(owner, proxies, contracts.sortedTroves)
 
-    const lusdTokenScript = await TokenScript.new(contracts.lusdToken.address)
-    contracts.lusdToken = new TokenProxy(owner, proxies, lusdTokenScript.address, contracts.lusdToken)
+    const zusdTokenScript = await TokenScript.new(contracts.zusdToken.address)
+    contracts.zusdToken = new TokenProxy(owner, proxies, zusdTokenScript.address, contracts.zusdToken)
 
-    const lqtyTokenScript = await TokenScript.new(LQTYContracts.lqtyToken.address)
-    LQTYContracts.lqtyToken = new TokenProxy(owner, proxies, lqtyTokenScript.address, LQTYContracts.lqtyToken)
+    const zeroTokenScript = await TokenScript.new(ZEROContracts.zeroToken.address)
+    ZEROContracts.zeroToken = new TokenProxy(owner, proxies, zeroTokenScript.address, ZEROContracts.zeroToken)
 
-    const lqtyStakingScript = await LQTYStakingScript.new(LQTYContracts.lqtyStaking.address)
-    LQTYContracts.lqtyStaking = new LQTYStakingProxy(owner, proxies, lqtyStakingScript.address, LQTYContracts.lqtyStaking)
+    const zeroStakingScript = await ZEROStakingScript.new(ZEROContracts.zeroStaking.address)
+    ZEROContracts.zeroStaking = new ZEROStakingProxy(owner, proxies, zeroStakingScript.address, ZEROContracts.zeroStaking)
   }
 
   // Connect contracts to their dependencies
-  static async connectCoreContracts(contracts, LQTYContracts) {
+  static async connectCoreContracts(contracts, ZEROContracts) {
 
     // set TroveManager addr in SortedTroves
     await contracts.sortedTroves.setParams(
@@ -385,10 +385,10 @@ class DeploymentHelper {
       contracts.gasPool.address,
       contracts.collSurplusPool.address,
       contracts.priceFeedTestnet.address,
-      contracts.lusdToken.address,
+      contracts.zusdToken.address,
       contracts.sortedTroves.address,
-      LQTYContracts.lqtyToken.address,
-      LQTYContracts.lqtyStaking.address
+      ZEROContracts.zeroToken.address,
+      ZEROContracts.zeroStaking.address
     )
 
     // set contracts in BorrowerOperations 
@@ -402,8 +402,8 @@ class DeploymentHelper {
       contracts.collSurplusPool.address,
       contracts.priceFeedTestnet.address,
       contracts.sortedTroves.address,
-      contracts.lusdToken.address,
-      LQTYContracts.lqtyStaking.address
+      contracts.zusdToken.address,
+      ZEROContracts.zeroStaking.address
     )
 
     // set contracts in the Pools
@@ -412,10 +412,10 @@ class DeploymentHelper {
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
       contracts.activePool.address,
-      contracts.lusdToken.address,
+      contracts.zusdToken.address,
       contracts.sortedTroves.address,
       contracts.priceFeedTestnet.address,
-      LQTYContracts.communityIssuance.address
+      ZEROContracts.communityIssuance.address
     )
 
     await contracts.activePool.setAddresses(
@@ -444,33 +444,33 @@ class DeploymentHelper {
     )
   }
 
-  static async connectLQTYContracts(LQTYContracts) {
-    // Set LQTYToken address in LCF
-    await LQTYContracts.lockupContractFactory.setLQTYTokenAddress(LQTYContracts.lqtyToken.address)
+  static async connectZEROContracts(ZEROContracts) {
+    // Set ZEROToken address in LCF
+    await ZEROContracts.lockupContractFactory.setZEROTokenAddress(ZEROContracts.zeroToken.address)
   }
 
-  static async connectLQTYContractsToCore(LQTYContracts, coreContracts) {
-    await LQTYContracts.lqtyStaking.setAddresses(
-      LQTYContracts.lqtyToken.address,
-      coreContracts.lusdToken.address,
+  static async connectZEROContractsToCore(ZEROContracts, coreContracts) {
+    await ZEROContracts.zeroStaking.setAddresses(
+      ZEROContracts.zeroToken.address,
+      coreContracts.zusdToken.address,
       coreContracts.troveManager.address, 
       coreContracts.borrowerOperations.address,
       coreContracts.activePool.address
     )
   
-    await LQTYContracts.communityIssuance.initialize(
-      LQTYContracts.lqtyToken.address,
+    await ZEROContracts.communityIssuance.initialize(
+      ZEROContracts.zeroToken.address,
       coreContracts.stabilityPool.address
     )
 
-    await LQTYContracts.sovStakersIssuance.initialize(
-      LQTYContracts.lqtyToken.address,
-      LQTYContracts.mockFeeSharingProxy.address
+    await ZEROContracts.sovStakersIssuance.initialize(
+      ZEROContracts.zeroToken.address,
+      ZEROContracts.mockFeeSharingProxy.address
     )
   }
 
-  static async connectUnipool(uniPool, LQTYContracts, uniswapPairAddr, duration) {
-    await uniPool.setParams(LQTYContracts.lqtyToken.address, uniswapPairAddr, duration)
+  static async connectUnipool(uniPool, ZEROContracts, uniswapPairAddr, duration) {
+    await uniPool.setParams(ZEROContracts.zeroToken.address, uniswapPairAddr, duration)
   }
 }
 module.exports = DeploymentHelper

@@ -1,6 +1,6 @@
 import {
   Decimal,
-  LUSD_MINIMUM_DEBT,
+  ZUSD_MINIMUM_DEBT,
   Trove,
   TroveAdjustmentParams,
   TroveChange,
@@ -26,33 +26,33 @@ type TroveAdjustmentDescriptionParams = {
 
 const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ params }) => (
   <ActionDescription>
-    {params.depositCollateral && params.borrowLUSD ? (
+    {params.depositCollateral && params.borrowZUSD ? (
       <>
         You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount> and receive{" "}
         <Amount>
-          {params.borrowLUSD.prettify()} {COIN}
+          {params.borrowZUSD.prettify()} {COIN}
         </Amount>
       </>
-    ) : params.repayLUSD && params.withdrawCollateral ? (
+    ) : params.repayZUSD && params.withdrawCollateral ? (
       <>
         You will pay{" "}
         <Amount>
-          {params.repayLUSD.prettify()} {COIN}
+          {params.repayZUSD.prettify()} {COIN}
         </Amount>{" "}
         and receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount>
       </>
-    ) : params.depositCollateral && params.repayLUSD ? (
+    ) : params.depositCollateral && params.repayZUSD ? (
       <>
         You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount> and pay{" "}
         <Amount>
-          {params.repayLUSD.prettify()} {COIN}
+          {params.repayZUSD.prettify()} {COIN}
         </Amount>
       </>
-    ) : params.borrowLUSD && params.withdrawCollateral ? (
+    ) : params.borrowZUSD && params.withdrawCollateral ? (
       <>
         You will receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount> and{" "}
         <Amount>
-          {params.borrowLUSD.prettify()} {COIN}
+          {params.borrowZUSD.prettify()} {COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
@@ -63,18 +63,18 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
       <>
         You will receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount>
       </>
-    ) : params.borrowLUSD ? (
+    ) : params.borrowZUSD ? (
       <>
         You will receive{" "}
         <Amount>
-          {params.borrowLUSD.prettify()} {COIN}
+          {params.borrowZUSD.prettify()} {COIN}
         </Amount>
       </>
     ) : (
       <>
         You will pay{" "}
         <Amount>
-          {params.repayLUSD.prettify()} {COIN}
+          {params.repayZUSD.prettify()} {COIN}
         </Amount>
       </>
     )}
@@ -86,9 +86,9 @@ export const selectForTroveChangeValidation = ({
   price,
   total,
   accountBalance,
-  lusdBalance,
+  zusdBalance,
   numberOfTroves
-}: LiquityStoreState) => ({ price, total, accountBalance, lusdBalance, numberOfTroves });
+}: LiquityStoreState) => ({ price, total, accountBalance, zusdBalance, numberOfTroves });
 
 type TroveChangeValidationSelectedState = ReturnType<typeof selectForTroveChangeValidation>;
 
@@ -139,7 +139,7 @@ export const validateTroveChange = (
       <ErrorDescription>
         Total debt must be at least{" "}
         <Amount>
-          {LUSD_MINIMUM_DEBT.toString()} {COIN}
+          {ZUSD_MINIMUM_DEBT.toString()} {COIN}
         </Amount>
         .
       </ErrorDescription>
@@ -170,12 +170,12 @@ const validateTroveCreation = (
     price
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
-  if (resultingTrove.debt.lt(LUSD_MINIMUM_DEBT)) {
+  if (resultingTrove.debt.lt(ZUSD_MINIMUM_DEBT)) {
     return (
       <ErrorDescription>
         Total debt must be at least{" "}
         <Amount>
-          {LUSD_MINIMUM_DEBT.toString()} {COIN}
+          {ZUSD_MINIMUM_DEBT.toString()} {COIN}
         </Amount>
         .
       </ErrorDescription>
@@ -223,7 +223,7 @@ const validateTroveCreation = (
 };
 
 const validateTroveAdjustment = (
-  { depositCollateral, withdrawCollateral, borrowLUSD, repayLUSD }: TroveAdjustmentParams<Decimal>,
+  { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD }: TroveAdjustmentParams<Decimal>,
   {
     originalTrove,
     resultingTrove,
@@ -231,7 +231,7 @@ const validateTroveAdjustment = (
     wouldTriggerRecoveryMode,
     price,
     accountBalance,
-    lusdBalance
+    zusdBalance
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
   if (recoveryMode) {
@@ -243,7 +243,7 @@ const validateTroveAdjustment = (
       );
     }
 
-    if (borrowLUSD) {
+    if (borrowZUSD) {
       if (resultingTrove.collateralRatioIsBelowCritical(price)) {
         return (
           <ErrorDescription>
@@ -280,25 +280,25 @@ const validateTroveAdjustment = (
     }
   }
 
-  if (repayLUSD) {
-    if (resultingTrove.debt.lt(LUSD_MINIMUM_DEBT)) {
+  if (repayZUSD) {
+    if (resultingTrove.debt.lt(ZUSD_MINIMUM_DEBT)) {
       return (
         <ErrorDescription>
           Total debt must be at least{" "}
           <Amount>
-            {LUSD_MINIMUM_DEBT.toString()} {COIN}
+            {ZUSD_MINIMUM_DEBT.toString()} {COIN}
           </Amount>
           .
         </ErrorDescription>
       );
     }
 
-    if (repayLUSD.gt(lusdBalance)) {
+    if (repayZUSD.gt(zusdBalance)) {
       return (
         <ErrorDescription>
           The amount you're trying to repay exceeds your balance by{" "}
           <Amount>
-            {repayLUSD.sub(lusdBalance).prettify()} {COIN}
+            {repayZUSD.sub(zusdBalance).prettify()} {COIN}
           </Amount>
           .
         </ErrorDescription>
@@ -319,12 +319,12 @@ const validateTroveAdjustment = (
 };
 
 const validateTroveClosure = (
-  { repayLUSD }: TroveClosureParams<Decimal>,
+  { repayZUSD }: TroveClosureParams<Decimal>,
   {
     recoveryMode,
     wouldTriggerRecoveryMode,
     numberOfTroves,
-    lusdBalance
+    zusdBalance
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
   if (numberOfTroves === 1) {
@@ -343,12 +343,12 @@ const validateTroveClosure = (
     );
   }
 
-  if (repayLUSD?.gt(lusdBalance)) {
+  if (repayZUSD?.gt(zusdBalance)) {
     return (
       <ErrorDescription>
         You need{" "}
         <Amount>
-          {repayLUSD.sub(lusdBalance).prettify()} {COIN}
+          {repayZUSD.sub(zusdBalance).prettify()} {COIN}
         </Amount>{" "}
         more to close your Trove.
       </ErrorDescription>

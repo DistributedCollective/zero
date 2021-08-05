@@ -12,27 +12,27 @@ import { DisabledEditableRow, StaticRow } from "../Trove/Editor";
 import { ClaimAndMove } from "./actions/ClaimAndMove";
 import { ClaimRewards } from "./actions/ClaimRewards";
 import { useStabilityView } from "./context/StabilityViewContext";
-import { RemainingLQTY } from "./RemainingLQTY";
+import { RemainingZERO } from "./RemainingZERO";
 import { Yield } from "./Yield";
 import { InfoIcon } from "../InfoIcon";
 
-const selector = ({ stabilityDeposit, trove, lusdInStabilityPool }: LiquityStoreState) => ({
+const selector = ({ stabilityDeposit, trove, zusdInStabilityPool }: LiquityStoreState) => ({
   stabilityDeposit,
   trove,
-  lusdInStabilityPool
+  zusdInStabilityPool
 });
 
 export const ActiveDeposit: React.FC = () => {
   const { dispatchEvent } = useStabilityView();
-  const { stabilityDeposit, trove, lusdInStabilityPool } = useLiquitySelector(selector);
+  const { stabilityDeposit, trove, zusdInStabilityPool } = useLiquitySelector(selector);
 
-  const poolShare = stabilityDeposit.currentLUSD.mulDiv(100, lusdInStabilityPool);
+  const poolShare = stabilityDeposit.currentZUSD.mulDiv(100, zusdInStabilityPool);
 
   const handleAdjustDeposit = useCallback(() => {
     dispatchEvent("ADJUST_DEPOSIT_PRESSED");
   }, [dispatchEvent]);
 
-  const hasReward = !stabilityDeposit.lqtyReward.isZero;
+  const hasReward = !stabilityDeposit.zeroReward.isZero;
   const hasGain = !stabilityDeposit.collateralGain.isZero;
   const hasTrove = !trove.isEmpty;
 
@@ -54,7 +54,7 @@ export const ActiveDeposit: React.FC = () => {
         Stability Pool
         {!isWaitingForTransaction && (
           <Flex sx={{ justifyContent: "flex-end" }}>
-            <RemainingLQTY />
+            <RemainingZERO />
           </Flex>
         )}
       </Heading>
@@ -62,8 +62,8 @@ export const ActiveDeposit: React.FC = () => {
         <Box>
           <DisabledEditableRow
             label="Deposit"
-            inputId="deposit-lusd"
-            amount={stabilityDeposit.currentLUSD.prettify()}
+            inputId="deposit-zusd"
+            amount={stabilityDeposit.currentZUSD.prettify()}
             unit={COIN}
           />
 
@@ -86,14 +86,14 @@ export const ActiveDeposit: React.FC = () => {
             <StaticRow
               label="Reward"
               inputId="deposit-reward"
-              amount={stabilityDeposit.lqtyReward.prettify()}
-              color={stabilityDeposit.lqtyReward.nonZero && "success"}
+              amount={stabilityDeposit.zeroReward.prettify()}
+              color={stabilityDeposit.zeroReward.nonZero && "success"}
               unit={GT}
               infoIcon={
                 <InfoIcon
                   tooltip={
                     <Card variant="tooltip" sx={{ width: "240px" }}>
-                      Although the LQTY rewards accrue every minute, the value on the UI only updates
+                      Although the ZERO rewards accrue every minute, the value on the UI only updates
                       when a user transacts with the Stability Pool. Therefore you may receive more
                       rewards than is displayed when you claim or adjust your deposit.
                     </Card>
@@ -113,11 +113,11 @@ export const ActiveDeposit: React.FC = () => {
             &nbsp;Adjust
           </Button>
 
-          <ClaimRewards disabled={!hasGain && !hasReward}>Claim ETH and LQTY</ClaimRewards>
+          <ClaimRewards disabled={!hasGain && !hasReward}>Claim ETH and ZERO</ClaimRewards>
         </Flex>
 
         {hasTrove && (
-          <ClaimAndMove disabled={!hasGain}>Claim LQTY and move ETH to Trove</ClaimAndMove>
+          <ClaimAndMove disabled={!hasGain}>Claim ZERO and move ETH to Trove</ClaimAndMove>
         )}
       </Box>
 

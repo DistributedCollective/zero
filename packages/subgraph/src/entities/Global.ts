@@ -1,6 +1,6 @@
 import { Value, BigInt } from "@graphprotocol/graph-ts";
 
-import { Global, LqtyStakeChange } from "../../generated/schema";
+import { Global, ZeroStakeChange } from "../../generated/schema";
 
 import { BIGINT_ZERO, DECIMAL_ZERO, decimalize } from "../utils/bignumbers";
 
@@ -26,9 +26,9 @@ export function getGlobal(): Global {
     newGlobal.totalNumberOfTroves = 0;
     newGlobal.rawTotalRedistributedCollateral = BIGINT_ZERO;
     newGlobal.rawTotalRedistributedDebt = BIGINT_ZERO;
-    newGlobal.totalNumberOfLQTYStakes = 0;
-    newGlobal.numberOfActiveLQTYStakes = 0;
-    newGlobal.totalLQTYTokensStaked = DECIMAL_ZERO;
+    newGlobal.totalNumberOfZEROStakes = 0;
+    newGlobal.numberOfActiveZEROStakes = 0;
+    newGlobal.totalZEROTokensStaked = DECIMAL_ZERO;
     newGlobal.totalBorrowingFeesPaid = DECIMAL_ZERO;
     newGlobal.totalRedemptionFeesPaid = DECIMAL_ZERO;
 
@@ -72,11 +72,11 @@ export function getRedemptionSequenceNumber(): i32 {
   return increaseCounter("redemptionCount");
 }
 
-export function updateTotalRedistributed(L_ETH: BigInt, L_LUSDDebt: BigInt): void {
+export function updateTotalRedistributed(L_ETH: BigInt, L_ZUSDDebt: BigInt): void {
   let global = getGlobal();
 
   global.rawTotalRedistributedCollateral = L_ETH;
-  global.rawTotalRedistributedDebt = L_LUSDDebt;
+  global.rawTotalRedistributedDebt = L_ZUSDDebt;
   global.save();
 }
 
@@ -136,27 +136,27 @@ export function decreaseNumberOfTrovesClosedByOwner(): void {
   global.save();
 }
 
-export function handleLQTYStakeChange(
-  stakeChange: LqtyStakeChange,
+export function handleZEROStakeChange(
+  stakeChange: ZeroStakeChange,
   isUserFirstStake: boolean
 ): void {
   let global = getGlobal();
 
   if (stakeChange.stakeOperation == "stakeCreated") {
     if (isUserFirstStake) {
-      global.totalNumberOfLQTYStakes++;
+      global.totalNumberOfZEROStakes++;
     }
-    global.numberOfActiveLQTYStakes++;
+    global.numberOfActiveZEROStakes++;
   } else if (stakeChange.stakeOperation == "stakeRemoved") {
-    global.numberOfActiveLQTYStakes--;
+    global.numberOfActiveZEROStakes--;
   }
 
-  global.totalLQTYTokensStaked = global.totalLQTYTokensStaked.plus(stakeChange.amountChange);
+  global.totalZEROTokensStaked = global.totalZEROTokensStaked.plus(stakeChange.amountChange);
   global.save();
 }
 
-export function increaseTotalBorrowingFeesPaid(_LUSDFee: BigInt): void {
+export function increaseTotalBorrowingFeesPaid(_ZUSDFee: BigInt): void {
   let global = getGlobal();
-  global.totalBorrowingFeesPaid = global.totalBorrowingFeesPaid.plus(decimalize(_LUSDFee));
+  global.totalBorrowingFeesPaid = global.totalBorrowingFeesPaid.plus(decimalize(_ZUSDFee));
   global.save();
 }

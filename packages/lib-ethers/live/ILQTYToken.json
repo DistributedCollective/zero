@@ -47,7 +47,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         }
       ],

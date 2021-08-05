@@ -78,8 +78,8 @@ dataSources:
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
-        - event: LUSDBorrowingFeePaid(indexed address,uint256)
-          handler: handleLUSDBorrowingFeePaid
+        - event: ZUSDBorrowingFeePaid(indexed address,uint256)
+          handler: handleZUSDBorrowingFeePaid
   - name: PriceFeed
     kind: ethereum/contract
     network: mainnet
@@ -160,15 +160,15 @@ dataSources:
       eventHandlers:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollSurplusBalanceUpdated
-  - name: LQTYStaking
+  - name: ZEROStaking
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: LQTYStaking
-      address: "${addresses.lqtyStaking}"
+      abi: ZEROStaking
+      address: "${addresses.zeroStaking}"
       startBlock: ${startBlock}
     mapping:
-      file: ./src/mappings/LqtyStake.ts
+      file: ./src/mappings/ZeroStake.ts
       language: wasm/assemblyscript
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -176,19 +176,19 @@ dataSources:
         - Global
         - User
         - Transaction
-        - LqtyStake
-        - LqtyStakeChange
+        - ZeroStake
+        - ZeroStakeChange
       abis:
-        - name: LQTYStaking
-          file: ../lib-ethers/abi/LQTYStaking.json
+        - name: ZEROStaking
+          file: ../lib-ethers/abi/ZEROStaking.json
       eventHandlers:
         - event: StakeChanged(indexed address,uint256)
           handler: handleStakeChanged
         - event: StakingGainsWithdrawn(indexed address,uint256,uint256)
           handler: handleStakeGainsWithdrawn
 ${[
-  ["LUSDToken", addresses.lusdToken],
-  ["LQTYToken", addresses.lqtyToken]
+  ["ZUSDToken", addresses.zusdToken],
+  ["ZEROToken", addresses.zeroToken]
 ].map(
   ([name, address]) => yaml`
   - name: ${name}

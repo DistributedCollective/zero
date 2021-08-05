@@ -7,7 +7,7 @@ import {
   LiquityStoreBaseState,
   TroveWithPendingRedistribution,
   StabilityDeposit,
-  LQTYStake,
+  ZEROStake,
   LiquityStore
 } from "@liquity/lib-base";
 
@@ -113,10 +113,10 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       numberOfTroves: this._readable.getNumberOfTroves({ blockTag }),
       totalRedistributed: this._readable.getTotalRedistributed({ blockTag }),
       total: this._readable.getTotal({ blockTag }),
-      lusdInStabilityPool: this._readable.getLUSDInStabilityPool({ blockTag }),
-      totalStakedLQTY: this._readable.getTotalStakedLQTY({ blockTag }),
+      zusdInStabilityPool: this._readable.getZUSDInStabilityPool({ blockTag }),
+      totalStakedZERO: this._readable.getTotalStakedZERO({ blockTag }),
       _riskiestTroveBeforeRedistribution: this._getRiskiestTroveBeforeRedistribution({ blockTag }),
-      remainingStabilityPoolLQTYReward: this._readable.getRemainingStabilityPoolLQTYReward({
+      remainingStabilityPoolZEROReward: this._readable.getRemainingStabilityPoolZEROReward({
         blockTag
       }),
 
@@ -127,8 +127,8 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       ...(userAddress
         ? {
             accountBalance: this._provider.getBalance(userAddress, blockTag).then(decimalify),
-            lusdBalance: this._readable.getLUSDBalance(userAddress, { blockTag }),
-            lqtyBalance: this._readable.getLQTYBalance(userAddress, { blockTag }),
+            zusdBalance: this._readable.getZUSDBalance(userAddress, { blockTag }),
+            zeroBalance: this._readable.getZEROBalance(userAddress, { blockTag }),
             collateralSurplusBalance: this._readable.getCollateralSurplusBalance(userAddress, {
               blockTag
             }),
@@ -136,17 +136,17 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
               blockTag
             }),
             stabilityDeposit: this._readable.getStabilityDeposit(userAddress, { blockTag }),
-            lqtyStake: this._readable.getLQTYStake(userAddress, { blockTag }),
+            zeroStake: this._readable.getZEROStake(userAddress, { blockTag }),
             ownFrontend: this._readable.getFrontendStatus(userAddress, { blockTag })
           }
         : {
             accountBalance: Decimal.ZERO,
-            lusdBalance: Decimal.ZERO,
-            lqtyBalance: Decimal.ZERO,
+            zusdBalance: Decimal.ZERO,
+            zeroBalance: Decimal.ZERO,
             uniTokenBalance: Decimal.ZERO,
             uniTokenAllowance: Decimal.ZERO,
             liquidityMiningStake: Decimal.ZERO,
-            liquidityMiningLQTYReward: Decimal.ZERO,
+            liquidityMiningZEROReward: Decimal.ZERO,
             collateralSurplusBalance: Decimal.ZERO,
             troveBeforeRedistribution: new TroveWithPendingRedistribution(
               AddressZero,
@@ -159,7 +159,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
               Decimal.ZERO,
               AddressZero
             ),
-            lqtyStake: new LQTYStake(),
+            zeroStake: new ZEROStake(),
             ownFrontend: { status: "unregistered" as const }
           })
     });

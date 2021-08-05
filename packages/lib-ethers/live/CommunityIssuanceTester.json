@@ -9,7 +9,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         }
       ],
@@ -180,7 +180,7 @@
     },
     {
       "inputs": [],
-      "name": "lqtyToken",
+      "name": "zeroToken",
       "outputs": [
         {
           "internalType": "contract ILQTYToken",
@@ -239,7 +239,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_lqtyTokenAddress",
+          "name": "_zeroTokenAddress",
           "type": "address"
         },
         {

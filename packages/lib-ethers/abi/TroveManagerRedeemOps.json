@@ -24,7 +24,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_L_LUSDDebt",
+        "name": "_L_ZUSDDebt",
         "type": "uint256"
       }
     ],
@@ -68,7 +68,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_LUSDGasCompensation",
+        "name": "_ZUSDGasCompensation",
         "type": "uint256"
       }
     ],
@@ -100,13 +100,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_attemptedLUSDAmount",
+        "name": "_attemptedZUSDAmount",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_actualLUSDAmount",
+        "name": "_actualZUSDAmount",
         "type": "uint256"
       },
       {
@@ -219,7 +219,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_L_LUSDDebt",
+        "name": "_L_ZUSDDebt",
         "type": "uint256"
       }
     ],
@@ -304,19 +304,6 @@
   },
   {
     "inputs": [],
-    "name": "LUSD_GAS_COMPENSATION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "L_ETH",
     "outputs": [
       {
@@ -330,7 +317,7 @@
   },
   {
     "inputs": [],
-    "name": "L_LUSDDebt",
+    "name": "L_ZUSDDebt",
     "outputs": [
       {
         "internalType": "uint256",
@@ -453,6 +440,19 @@
   },
   {
     "inputs": [],
+    "name": "ZUSD_GAS_COMPENSATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "_100pct",
     "outputs": [
       {
@@ -515,7 +515,7 @@
         "type": "address"
       }
     ],
-    "name": "_getPendingLUSDDebtReward",
+    "name": "_getPendingZUSDDebtReward",
     "outputs": [
       {
         "internalType": "uint256",
@@ -560,49 +560,49 @@
   },
   {
     "inputs": [],
-    "name": "_lqtyStaking",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYStaking",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "_lqtyToken",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "_lusdToken",
-    "outputs": [
-      {
-        "internalType": "contract ILUSDToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "_stabilityPool",
     "outputs": [
       {
         "internalType": "contract IStabilityPool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_zeroStaking",
+    "outputs": [
+      {
+        "internalType": "contract IZEROStaking",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_zeroToken",
+    "outputs": [
+      {
+        "internalType": "contract IZEROToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_zusdToken",
+    "outputs": [
+      {
+        "internalType": "contract IZUSDToken",
         "name": "",
         "type": "address"
       }
@@ -729,7 +729,7 @@
   },
   {
     "inputs": [],
-    "name": "lastLUSDDebtError_Redistribution",
+    "name": "lastZUSDDebtError_Redistribution",
     "outputs": [
       {
         "internalType": "uint256",
@@ -770,7 +770,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LUSDamount",
+        "name": "_ZUSDamount",
         "type": "uint256"
       },
       {
@@ -826,7 +826,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "LUSDDebt",
+        "name": "ZUSDDebt",
         "type": "uint256"
       }
     ],

@@ -103,12 +103,12 @@ class BorrowerOperationsProxy extends Proxy {
     return this.forwardFunction(params, 'withdrawColl(uint256,address,address)')
   }
 
-  async withdrawLUSD(...params) {
-    return this.forwardFunction(params, 'withdrawLUSD(uint256,uint256,address,address)')
+  async withdrawZUSD(...params) {
+    return this.forwardFunction(params, 'withdrawZUSD(uint256,uint256,address,address)')
   }
 
-  async repayLUSD(...params) {
-    return this.forwardFunction(params, 'repayLUSD(uint256,address,address)')
+  async repayZUSD(...params) {
+    return this.forwardFunction(params, 'repayZUSD(uint256,address,address)')
   }
 
   async closeTrove(...params) {
@@ -135,8 +135,8 @@ class BorrowerOperationsProxy extends Proxy {
     return this.proxyFunction('getCompositeDebt', params)
   }
 
-  async LUSD_GAS_COMPENSATION(...params) {
-    return this.proxyFunction('LUSD_GAS_COMPENSATION', params)
+  async ZUSD_GAS_COMPENSATION(...params) {
+    return this.proxyFunction('ZUSD_GAS_COMPENSATION', params)
   }
 
   async MIN_NET_DEBT(...params) {
@@ -199,8 +199,8 @@ class TroveManagerProxy extends Proxy {
     return this.proxyFunction('getPendingETHReward', params)
   }
 
-  async getPendingLUSDDebtReward(...params) {
-    return this.proxyFunction('getPendingLUSDDebtReward', params)
+  async getPendingZUSDDebtReward(...params) {
+    return this.proxyFunction('getPendingZUSDDebtReward', params)
   }
 
   async liquidate(user) {
@@ -231,8 +231,8 @@ class TroveManagerProxy extends Proxy {
     return this.proxyFunction('L_ETH', [])
   }
 
-  async L_LUSDDebt() {
-    return this.proxyFunction('L_LUSDDebt', [])
+  async L_ZUSDDebt() {
+    return this.proxyFunction('L_ZUSDDebt', [])
   }
 
   async rewardSnapshots(user) {
@@ -285,8 +285,8 @@ class StabilityPoolProxy extends Proxy {
     return this.forwardFunction(params, 'provideToSP(uint256,address)')
   }
 
-  async getCompoundedLUSDDeposit(user) {
-    return this.proxyFunctionWithUser('getCompoundedLUSDDeposit', user)
+  async getCompoundedZUSDDeposit(user) {
+    return this.proxyFunctionWithUser('getCompoundedZUSDDeposit', user)
   }
 
   async deposits(user) {
@@ -381,7 +381,7 @@ class TokenProxy extends Proxy {
   }
 }
 
-class LQTYStakingProxy extends Proxy {
+class ZEROStakingProxy extends Proxy {
   constructor(owner, proxies, tokenScriptAddress, token) {
     super(owner, proxies, tokenScriptAddress, token)
   }
@@ -394,8 +394,8 @@ class LQTYStakingProxy extends Proxy {
     return this.proxyFunctionWithUser('stakes', user)
   }
 
-  async F_LUSD(user) {
-    return this.proxyFunctionWithUser('F_LUSD', user)
+  async F_ZUSD(user) {
+    return this.proxyFunctionWithUser('F_ZUSD', user)
   }
 }
 
@@ -407,5 +407,5 @@ module.exports = {
   StabilityPoolProxy,
   SortedTrovesProxy,
   TokenProxy,
-  LQTYStakingProxy
+  ZEROStakingProxy
 }

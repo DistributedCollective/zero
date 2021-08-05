@@ -11,7 +11,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   const multisig = accounts[999];
   
   let contracts
-  let lusdToken
+  let zusdToken
   let sortedTroves
   let troveManager
   let activePool
@@ -19,18 +19,18 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   let defaultPool
   let borrowerOperations
 
-  let lqtyStaking
+  let zeroStaking
   let communityIssuance
-  let lqtyToken 
+  let zeroToken 
   let lockupContractFactory
 
   before(async () => {
     contracts = await deploymentHelper.deployLiquityCore()
     contracts.borrowerOperations = await BorrowerOperationsTester.new()
-    contracts = await deploymentHelper.deployLUSDToken(contracts)
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
+    contracts = await deploymentHelper.deployZUSDToken(contracts)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
 
-    lusdToken = contracts.lusdToken
+    zusdToken = contracts.zusdToken
     sortedTroves = contracts.sortedTroves
     troveManager = contracts.troveManager
     activePool = contracts.activePool
@@ -38,10 +38,10 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     defaultPool = contracts.defaultPool
     borrowerOperations = contracts.borrowerOperations
 
-    lqtyStaking = LQTYContracts.lqtyStaking
-    communityIssuance = LQTYContracts.communityIssuance
-    lqtyToken = LQTYContracts.lqtyToken
-    lockupContractFactory = LQTYContracts.lockupContractFactory
+    zeroStaking = ZEROContracts.zeroStaking
+    communityIssuance = ZEROContracts.communityIssuance
+    zeroToken = ZEROContracts.zeroToken
+    lockupContractFactory = ZEROContracts.lockupContractFactory
   })
 
   const testZeroAddress = async (contract, params, method = 'setAddresses', skip = 0) => {
@@ -130,7 +130,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   describe('CommunityIssuance', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      const params = [lqtyToken.address, stabilityPool.address]
+      const params = [zeroToken.address, stabilityPool.address]
       await th.assertRevert(communityIssuance.initialize(...params, { from: alice }))
 
       // Attempt to use zero address
@@ -148,29 +148,29 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     })
   })
 
-  describe('LQTYStaking', async accounts => {
+  describe('ZEROStaking', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      await testSetAddresses(lqtyStaking, 5)
+      await testSetAddresses(zeroStaking, 5)
     })
   })
 
   describe('LockupContractFactory', async accounts => {
-    it("setLQTYAddress(): reverts when called by non-owner, with wrong address, or twice", async () => {
-      await th.assertRevert(lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, { from: alice }))
+    it("setZEROAddress(): reverts when called by non-owner, with wrong address, or twice", async () => {
+      await th.assertRevert(lockupContractFactory.setZEROTokenAddress(zeroToken.address, { from: alice }))
 
-      const params = [lqtyToken.address]
+      const params = [zeroToken.address]
 
       // Attempt to use zero address
-      await testZeroAddress(lockupContractFactory, params, 'setLQTYTokenAddress')
+      await testZeroAddress(lockupContractFactory, params, 'setZEROTokenAddress')
       // Attempt to use non contract
-      await testNonContractAddress(lockupContractFactory, params, 'setLQTYTokenAddress')
+      await testNonContractAddress(lockupContractFactory, params, 'setZEROTokenAddress')
 
       // Owner can successfully set any address
-      const txOwner = await lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, { from: owner })
+      const txOwner = await lockupContractFactory.setZEROTokenAddress(zeroToken.address, { from: owner })
       assert.isTrue(txOwner.receipt.status)
 
       // Owner can set any address more than once
-      const secondTxOwner = await lockupContractFactory.setLQTYTokenAddress(...params, { from: owner })
+      const secondTxOwner = await lockupContractFactory.setZEROTokenAddress(...params, { from: owner })
       assert.isTrue(secondTxOwner.receipt.status)
     })
   })

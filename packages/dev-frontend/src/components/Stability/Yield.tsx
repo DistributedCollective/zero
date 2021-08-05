@@ -5,11 +5,11 @@ import { useLiquitySelector } from "@liquity/lib-react";
 import { InfoIcon } from "../InfoIcon";
 import { useLiquity } from "../../hooks/LiquityContext";
 import { Badge } from "../Badge";
-import { fetchLqtyPrice } from "./context/fetchLqtyPrice";
+import { fetchZeroPrice } from "./context/fetchZeroPrice";
 
-const selector = ({ lusdInStabilityPool, remainingStabilityPoolLQTYReward }: LiquityStoreState) => ({
-  lusdInStabilityPool,
-  remainingStabilityPoolLQTYReward
+const selector = ({ zusdInStabilityPool, remainingStabilityPoolZEROReward }: LiquityStoreState) => ({
+  zusdInStabilityPool,
+  remainingStabilityPoolZEROReward
 });
 
 export const Yield: React.FC = () => {
@@ -18,51 +18,51 @@ export const Yield: React.FC = () => {
       connection: { addresses }
     }
   } = useLiquity();
-  const { lusdInStabilityPool, remainingStabilityPoolLQTYReward } = useLiquitySelector(selector);
+  const { zusdInStabilityPool, remainingStabilityPoolZEROReward } = useLiquitySelector(selector);
 
-  const [lqtyPrice, setLqtyPrice] = useState<Decimal | undefined>(undefined);
-  const hasZeroValue = remainingStabilityPoolLQTYReward.isZero || lusdInStabilityPool.isZero;
-  const lqtyTokenAddress = addresses["lqtyToken"];
+  const [zeroPrice, setZeroPrice] = useState<Decimal | undefined>(undefined);
+  const hasZeroValue = remainingStabilityPoolZEROReward.isZero || zusdInStabilityPool.isZero;
+  const zeroTokenAddress = addresses["zeroToken"];
 
   useEffect(() => {
     (async () => {
       try {
-        const { lqtyPriceUSD } = await fetchLqtyPrice(lqtyTokenAddress);
-        setLqtyPrice(lqtyPriceUSD);
+        const { zeroPriceUSD } = await fetchZeroPrice(zeroTokenAddress);
+        setZeroPrice(zeroPriceUSD);
       } catch (error) {
         console.error(error);
       }
     })();
-  }, [lqtyTokenAddress]);
+  }, [zeroTokenAddress]);
 
-  if (hasZeroValue || lqtyPrice === undefined) return null;
+  if (hasZeroValue || zeroPrice === undefined) return null;
 
-  const yearlyHalvingSchedule = 0.5; // 50% see LQTY distribution schedule for more info
-  const remainingLqtyOneYear = remainingStabilityPoolLQTYReward.mul(yearlyHalvingSchedule);
-  const remainingLqtyOneYearInUSD = remainingLqtyOneYear.mul(lqtyPrice);
-  const aprPercentage = remainingLqtyOneYearInUSD.div(lusdInStabilityPool).mul(100);
-  const remainingLqtyInUSD = remainingStabilityPoolLQTYReward.mul(lqtyPrice);
+  const yearlyHalvingSchedule = 0.5; // 50% see ZERO distribution schedule for more info
+  const remainingZeroOneYear = remainingStabilityPoolZEROReward.mul(yearlyHalvingSchedule);
+  const remainingZeroOneYearInUSD = remainingZeroOneYear.mul(zeroPrice);
+  const aprPercentage = remainingZeroOneYearInUSD.div(zusdInStabilityPool).mul(100);
+  const remainingZeroInUSD = remainingStabilityPoolZEROReward.mul(zeroPrice);
 
   if (aprPercentage.isZero) return null;
 
   return (
     <Badge>
-      <Text>LQTY APR {aprPercentage.toString(2)}%</Text>
+      <Text>ZERO APR {aprPercentage.toString(2)}%</Text>
       <InfoIcon
         tooltip={
           <Card variant="tooltip" sx={{ width: ["220px", "518px"] }}>
             <Paragraph>
-              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the LQTY return on the LUSD
+              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the ZERO return on the ZUSD
               deposited to the Stability Pool over the next year, not including your ETH gains from
               liquidations.
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace", mt: 2 }}>
-              (($LQTY_REWARDS * YEARLY_DISTRIBUTION%) / DEPOSITED_LUSD) * 100 ={" "}
+              (($ZERO_REWARDS * YEARLY_DISTRIBUTION%) / DEPOSITED_ZUSD) * 100 ={" "}
               <Text sx={{ fontWeight: "bold" }}> APR</Text>
             </Paragraph>
             <Paragraph sx={{ fontSize: "12px", fontFamily: "monospace" }}>
               ($
-              {remainingLqtyInUSD.shorten()} * 50% / ${lusdInStabilityPool.shorten()}) * 100 =
+              {remainingZeroInUSD.shorten()} * 50% / ${zusdInStabilityPool.shorten()}) * 100 =
               <Text sx={{ fontWeight: "bold" }}> {aprPercentage.toString(2)}%</Text>
             </Paragraph>
           </Card>

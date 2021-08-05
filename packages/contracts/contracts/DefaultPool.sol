@@ -9,17 +9,17 @@ import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
 
 /*
- * The Default Pool holds the ETH and LUSD debt (but not LUSD tokens) from liquidations that have been redistributed
+ * The Default Pool holds the ETH and ZUSD debt (but not ZUSD tokens) from liquidations that have been redistributed
  * to active troves but not yet "applied", i.e. not yet recorded on a recipient active trove's struct.
  *
- * When a trove makes an operation that applies its pending ETH and LUSD debt, its pending ETH and LUSD debt is moved
+ * When a trove makes an operation that applies its pending ETH and ZUSD debt, its pending ETH and ZUSD debt is moved
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     using SafeMath for uint256;
     
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolLUSDDebtUpdated(uint _LUSDDebt);
+    event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
     event DefaultPoolETHBalanceUpdated(uint _ETH);
 
     // --- Dependency setters ---
@@ -54,8 +54,8 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         return ETH;
     }
 
-    function getLUSDDebt() external view override returns (uint) {
-        return LUSDDebt;
+    function getZUSDDebt() external view override returns (uint) {
+        return ZUSDDebt;
     }
 
     // --- Pool functionality ---
@@ -71,16 +71,16 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         require(success, "DefaultPool: sending ETH failed");
     }
 
-    function increaseLUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
-        LUSDDebt = LUSDDebt.add(_amount);
-        emit DefaultPoolLUSDDebtUpdated(LUSDDebt);
+        ZUSDDebt = ZUSDDebt.add(_amount);
+        emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
-    function decreaseLUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint _amount) external override {
         _requireCallerIsTroveManager();
-        LUSDDebt = LUSDDebt.sub(_amount);
-        emit DefaultPoolLUSDDebtUpdated(LUSDDebt);
+        ZUSDDebt = ZUSDDebt.sub(_amount);
+        emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     // --- 'require' functions ---

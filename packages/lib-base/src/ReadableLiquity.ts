@@ -2,7 +2,7 @@ import { Decimal } from "./Decimal";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Fees } from "./Fees";
-import { LQTYStake } from "./LQTYStake";
+import { ZEROStake } from "./ZEROStake";
 
 /**
  * Represents whether an address has been registered as a Liquity frontend.
@@ -102,28 +102,28 @@ export interface ReadableLiquity {
   getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
 
   /**
-   * Get the remaining LQTY that will be collectively rewarded to stability depositors.
+   * Get the remaining ZERO that will be collectively rewarded to stability depositors.
    */
-  getRemainingStabilityPoolLQTYReward(): Promise<Decimal>;
+  getRemainingStabilityPoolZEROReward(): Promise<Decimal>;
 
   /**
-   * Get the total amount of LUSD currently deposited in the Stability Pool.
+   * Get the total amount of ZUSD currently deposited in the Stability Pool.
    */
-  getLUSDInStabilityPool(): Promise<Decimal>;
+  getZUSDInStabilityPool(): Promise<Decimal>;
 
   /**
-   * Get the amount of LUSD held by an address.
+   * Get the amount of ZUSD held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
-  getLUSDBalance(address?: string): Promise<Decimal>;
+  getZUSDBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the amount of LQTY held by an address.
+   * Get the amount of ZERO held by an address.
    *
    * @param address - Address whose balance should be retrieved.
    */
-  getLQTYBalance(address?: string): Promise<Decimal>;
+  getZEROBalance(address?: string): Promise<Decimal>;
 
   /**
    * Get the amount of leftover collateral available for withdrawal by an address.
@@ -155,16 +155,16 @@ export interface ReadableLiquity {
   getFees(): Promise<Fees>;
 
   /**
-   * Get the current state of an LQTY Stake.
+   * Get the current state of an ZERO Stake.
    *
-   * @param address - Address that owns the LQTY Stake.
+   * @param address - Address that owns the ZERO Stake.
    */
-  getLQTYStake(address?: string): Promise<LQTYStake>;
+  getZEROStake(address?: string): Promise<ZEROStake>;
 
   /**
-   * Get the total amount of LQTY currently staked.
+   * Get the total amount of ZERO currently staked.
    */
-  getTotalStakedLQTY(): Promise<Decimal>;
+  getTotalStakedZERO(): Promise<Decimal>;
 
   /**
    * Check whether an address is registered as a Liquity frontend, and what its kickback rate is.

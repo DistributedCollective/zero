@@ -2,26 +2,26 @@
 const SortedTroves = artifacts.require("./SortedTroves.sol")
 const TroveManager = artifacts.require("./TroveManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
-const LUSDToken = artifacts.require("./LUSDToken.sol")
+const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
 const StabilityPool = artifacts.require("./StabilityPool.sol")
 const FunctionCaller = artifacts.require("./FunctionCaller.sol")
 const BorrowerOperations = artifacts.require("./BorrowerOperations.sol")
 
-const LQTYStaking = artifacts.require("./LQTY/LQTYStaking.sol")
-const LQTYToken = artifacts.require("./LQTY/LQTYToken.sol")
-const LockupContractFactory = artifacts.require("./LQTY/LockupContractFactory.sol")
-const CommunityIssuance = artifacts.require("./LQTY/CommunityIssuance.sol")
+const ZEROStaking = artifacts.require("./ZERO/ZEROStaking.sol")
+const ZEROToken = artifacts.require("./ZERO/ZEROToken.sol")
+const LockupContractFactory = artifacts.require("./ZERO/LockupContractFactory.sol")
+const CommunityIssuance = artifacts.require("./ZERO/CommunityIssuance.sol")
 const HintHelpers = artifacts.require("./HintHelpers.sol")
 
-const CommunityIssuanceTester = artifacts.require("./LQTY/CommunityIssuanceTester.sol")
+const CommunityIssuanceTester = artifacts.require("./ZERO/CommunityIssuanceTester.sol")
 const ActivePoolTester = artifacts.require("./ActivePoolTester.sol")
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
 const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const LUSDTokenTester = artifacts.require("./LUSDTokenTester.sol")
+const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
 
 const { TestHelper: th } = require("../utils/testHelpers.js")
 
@@ -31,7 +31,7 @@ const ARBITRARY_ADDRESS = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"   // plac
 const coreContractABIs = [
   BorrowerOperations,
   PriceFeed,
-  LUSDToken,
+  ZUSDToken,
   SortedTroves,
   TroveManager,
   ActivePool,
@@ -41,9 +41,9 @@ const coreContractABIs = [
   HintHelpers,
 ]
 
-const LQTYContractABIs = [
-  LQTYStaking,
-  LQTYToken,
+const ZEROContractABIs = [
+  ZEROStaking,
+  ZEROToken,
   LockupContractFactory,
   CommunityIssuance
 ]
@@ -55,7 +55,7 @@ const TesterContractABIs  = [
   LiquityMathTester,
   BorrowerOperationsTester,
   TroveManagerTester,
-  LUSDTokenTester,
+  ZUSDTokenTester,
 ]
 
 const getGasFromContractDeployment = async (contractObject, name) => {
@@ -109,19 +109,19 @@ const logContractBytecodeLengths = (contractABIs) => {
 // Run script: log deployment gas costs and bytecode lengths for all contracts
 async function main() {
   const coreContracts = await dh.deployLiquityCoreHardhat()
-  const LQTYContracts = await dh.deployLQTYContractsHardhat(ARBITRARY_ADDRESS, ARBITRARY_ADDRESS)
+  const ZEROContracts = await dh.deployZEROContractsHardhat(ARBITRARY_ADDRESS, ARBITRARY_ADDRESS)
   const testerContracts = await dh.deployTesterContractsHardhat()
 
-  await dh.connectCoreContracts(coreContracts, LQTYContracts)
-  await dh.connectLQTYContracts(LQTYContracts)
-  await dh.connectLQTYContractsToCore(LQTYContracts, coreContracts)
+  await dh.connectCoreContracts(coreContracts, ZEROContracts)
+  await dh.connectZEROContracts(ZEROContracts)
+  await dh.connectZEROContractsToCore(ZEROContracts, coreContracts)
 
 
   console.log(`\n`)
-  console.log(`LQTY CONTRACTS`)
-  await logContractDeploymentCosts(LQTYContracts)
+  console.log(`ZERO CONTRACTS`)
+  await logContractDeploymentCosts(ZEROContracts)
   console.log(`\n`)
-  logContractBytecodeLengths(LQTYContractABIs)
+  logContractBytecodeLengths(ZEROContractABIs)
   console.log(`\n`)
 
   console.log(`CORE CONTRACTS`)

@@ -61,7 +61,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         }
       ],
@@ -93,7 +93,7 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_zusdTokenAddress",
           "type": "address"
         }
       ],
@@ -415,12 +415,12 @@
         },
         {
           "internalType": "address",
-          "name": "_lusdTokenAddress",
+          "name": "_zusdTokenAddress",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_lqtyStakingAddress",
+          "name": "_zeroStakingAddress",
           "type": "address"
         }
       ],

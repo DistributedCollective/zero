@@ -338,11 +338,11 @@ contract('Fee arithmetic tests', async accounts => {
     mathTester = await LiquityMathTester.new()
     LiquityMathTester.setAsDeployed(mathTester)
     contracts = await deploymentHelper.deployLiquityCore()
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(multisig)
+    const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
   
-    await deploymentHelper.connectLQTYContracts(LQTYContracts)
-    await deploymentHelper.connectCoreContracts(contracts, LQTYContracts)
-    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts)
+    await deploymentHelper.connectZEROContracts(ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
   })
 
   let revertToSnapshot;
