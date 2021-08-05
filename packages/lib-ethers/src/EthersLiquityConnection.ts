@@ -10,6 +10,7 @@ import kovan from "../deployments/kovan.json";
 import rinkeby from "../deployments/rinkeby.json";
 import ropsten from "../deployments/ropsten.json";
 import mainnet from "../deployments/mainnet.json";
+import rsktestnet from "../deployments/rsktestnet.json";
 
 import { EthersProvider, EthersSigner } from "./types";
 
@@ -32,6 +33,7 @@ const deployments: {
   [rinkeby.chainId]: rinkeby,
   [goerli.chainId]: goerli,
   [kovan.chainId]: kovan,
+  [rsktestnet.chainId]: rsktestnet,
 
   ...(dev !== null ? { [dev.chainId]: dev } : {})
 };

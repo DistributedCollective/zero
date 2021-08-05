@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
 import { Wallet } from "@ethersproject/wallet";
@@ -6,11 +7,17 @@ import { Contract } from "ethers";
 import {
   _connectToContracts, _LiquityContractAddresses,
   _LiquityContracts,
-  _LiquityDeploymentJSON
+  _LiquityDeploymentJSON,
+  _priceFeedIsTestnet as checkPriceFeedIsTestnet
 } from "../src/contracts";
 import { PriceFeed } from "../types";
 
 let silent = true;
+
+export type OracleAddresses = {
+  mocOracleAddress: string;
+  rskOracleAddress: string;
+} | undefined;
 
 export const log = (...args: unknown[]): void => {
   if (!silent) {
@@ -455,12 +462,14 @@ const transferOwnership = async (
 export const deployAndSetupContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
-  _priceFeedIsTestnet = true,
+  externalPriceFeeds: OracleAddresses = undefined,
+
   _isDev = true,
   governanceAddress?: string,
   sovCommunityPotAddress?: string,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
+
   if (!deployer.provider) {
     throw new Error("Signer must have a provider.");
   }
@@ -470,6 +479,8 @@ export const deployAndSetupContracts = async (
 
   log("Deploying contracts...");
   log();
+
+  const _priceFeedIsTestnet = externalPriceFeeds === undefined;
 
   const deployment: _LiquityDeploymentJSON = {
     chainId: await deployer.getChainId(),
@@ -489,6 +500,18 @@ export const deployAndSetupContracts = async (
 
   log("Connecting contracts...");
   await connectContracts(contracts, deployer, sovCommunityPotAddress, overrides);
+
+  if (externalPriceFeeds !== undefined) {
+    assert(!checkPriceFeedIsTestnet(contracts.priceFeed));
+
+    console.log("Deploying external price feeds");
+    const mocMedianizerAddress = await deployContract(deployer, getContractFactory, "MoCMedianizer", externalPriceFeeds.mocOracleAddress, {...overrides});
+    const rskPriceFeedAddress = await deployContract(deployer, getContractFactory, "RskOracle", externalPriceFeeds.rskOracleAddress, {...overrides});
+
+    console.log(`Hooking up PriceFeed with oracles: MocMedianizer => ${mocMedianizerAddress}, RskPriceFeed => ${rskPriceFeedAddress}`);
+    const tx = await contracts.priceFeed.setAddresses(mocMedianizerAddress, rskPriceFeedAddress, {...overrides});
+    await tx.wait();
+  }
 
   log("Transferring Ownership...");
   await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);

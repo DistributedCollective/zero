@@ -11,5 +11,5 @@ spawnSync("docker", [
   ...["--name", "regtest-node-rsk"],
   ...["-p", "4444:4444/tcp"],
   ...["-p", "30305:30305/tcp"],
-  "docker.atixlabs.com/rsk/regtest:fdaf299a72b429d3066860fbc53bbb6e89e0490b"
+  "atixlabs/rsk-regtest:fdaf299a72b429d3066860fbc53bbb6e89e0490b"
 ]);

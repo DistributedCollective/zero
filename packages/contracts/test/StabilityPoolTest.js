@@ -223,7 +223,7 @@ contract('StabilityPool', async accounts => {
       // --- TEST ---
 
       // Alice makes deposit #1: 150 LUSD
-      await openTrove({ extraLUSDAmount: toBN(dec(250, 18)), ICR: toBN(dec(3, 18)), extraParams: { from: alice } })
+      await openTrove({ extraLUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(3, 18)), extraParams: { from: alice } })
       await stabilityPool.provideToSP(dec(150, 18), frontEnd_1, { from: alice })
 
       const alice_Snapshot_0 = await stabilityPool.depositSnapshots(alice)
@@ -263,7 +263,7 @@ contract('StabilityPool', async accounts => {
 
       // Bob withdraws LUSD and deposits to StabilityPool
       await openTrove({ extraLUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await stabilityPool.provideToSP(dec(427, 18), frontEnd_1, { from: alice })
+      await stabilityPool.provideToSP(dec(250, 18), frontEnd_1, { from: alice })
 
       // Defaulter 3 Trove is closed
       await troveManager.liquidate(defaulter_3, { from: owner })
@@ -371,7 +371,7 @@ contract('StabilityPool', async accounts => {
       await stabilityPool.provideToSP(dec(3000, 18), frontEnd_1, { from: carol })
 
       // D opens a trove
-      await openTrove({ extraLUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
+      await openTrove({ extraLUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
 
       // Would-be defaulters open troves
       await openTrove({ extraLUSDAmount: 0, ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
@@ -683,7 +683,7 @@ contract('StabilityPool', async accounts => {
       await openTrove({ extraLUSDAmount: toBN(dec(1000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraLUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
       await openTrove({ extraLUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraLUSDAmount: toBN(dec(3000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openTrove({ extraLUSDAmount: toBN(dec(4000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
 
       // Check A, B, C D have no front end tags
       const A_tagBefore = await getFrontEndTag(stabilityPool, A)
@@ -2953,7 +2953,7 @@ contract('StabilityPool', async accounts => {
     it("withdrawETHGainToTrove(): reverts when user has no active deposit", async () => {
       await openTrove({ extraLUSDAmount: toBN(dec(100000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
 
-      await openTrove({ extraLUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      await openTrove({ extraLUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(3, 18)), extraParams: { from: alice } })
       await openTrove({ extraLUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
 
       await stabilityPool.provideToSP(dec(10000, 18), frontEnd_1, { from: alice })
