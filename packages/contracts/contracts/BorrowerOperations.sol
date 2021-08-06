@@ -192,28 +192,28 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
     }
 
-    // Send ETH as collateral to a trove
+    /// Send ETH as collateral to a trove
     function addColl(address _upperHint, address _lowerHint) external payable override {
         _adjustTrove(msg.sender, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    // Send ETH as collateral to a trove. Called by only the Stability Pool.
+    /// Send ETH as collateral to a trove. Called by only the Stability Pool.
     function moveETHGainToTrove(address _borrower, address _upperHint, address _lowerHint) external payable override {
         _requireCallerIsStabilityPool();
         _adjustTrove(_borrower, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    // Withdraw ETH collateral from a trove
+    /// Withdraw ETH collateral from a trove
     function withdrawColl(uint _collWithdrawal, address _upperHint, address _lowerHint) external override {
         _adjustTrove(msg.sender, _collWithdrawal, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    // Withdraw ZUSD tokens from a trove: mint new ZUSD tokens to the owner, and increase the trove's debt accordingly
+    /// Withdraw ZUSD tokens from a trove: mint new ZUSD tokens to the owner, and increase the trove's debt accordingly
     function withdrawZUSD(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint) external override {
         _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
-    // Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly
+    /// Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly
     function repayZUSD(uint _ZUSDAmount, address _upperHint, address _lowerHint) external override {
         _adjustTrove(msg.sender, 0, _ZUSDAmount, false, _upperHint, _lowerHint, 0);
     }
@@ -222,7 +222,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _adjustTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
-    /*
+    /**
     * _adjustTrove(): Alongside a debt change, this function can perform either a collateral top-up or a collateral withdrawal. 
     *
     * It therefore expects either a positive msg.value, or a positive _collWithdrawal argument.
@@ -378,7 +378,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         }
     }
 
-    // Update trove's coll and debt based on whether they increase or decrease
+    /// Update trove's coll and debt based on whether they increase or decrease
     function _updateTroveFromAdjustment
     (
         ITroveManager _troveManager,
@@ -425,19 +425,19 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         }
     }
 
-    // Send ETH to Active Pool and increase its recorded ETH balance
+    /// Send ETH to Active Pool and increase its recorded ETH balance
     function _activePoolAddColl(IActivePool _activePool, uint _amount) internal {
         (bool success, ) = address(_activePool).call{value: _amount}("");
         require(success, "BorrowerOps: Sending ETH to ActivePool failed");
     }
 
-    // Issue the specified amount of ZUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a ZUSDFee)
+    /// Issue the specified amount of ZUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a ZUSDFee)
     function _withdrawZUSD(IActivePool _activePool, IZUSDToken _zusdToken, address _account, uint _ZUSDAmount, uint _netDebtIncrease) internal {
         _activePool.increaseZUSDDebt(_netDebtIncrease);
         _zusdToken.mint(_account, _ZUSDAmount);
     }
 
-    // Burn the specified amount of ZUSD from _account and decreases the total active debt
+    /// Burn the specified amount of ZUSD from _account and decreases the total active debt
     function _repayZUSD(IActivePool _activePool, IZUSDToken _zusdToken, address _account, uint _ZUSD) internal {
         _activePool.decreaseZUSDDebt(_ZUSD);
         _zusdToken.burn(_account, _ZUSD);
@@ -559,7 +559,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
 
     // --- ICR and TCR getters ---
 
-    // Compute the new collateral ratio, considering the change in coll and debt. Assumes 0 pending rewards.
+    /// Compute the new collateral ratio, considering the change in coll and debt. Assumes 0 pending rewards.
     function _getNewNominalICRFromTroveChange
     (
         uint _coll,
@@ -579,7 +579,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         return newNICR;
     }
 
-    // Compute the new collateral ratio, considering the change in coll and debt. Assumes 0 pending rewards.
+    /// Compute the new collateral ratio, considering the change in coll and debt. Assumes 0 pending rewards.
     function _getNewICRFromTroveChange
     (
         uint _coll,

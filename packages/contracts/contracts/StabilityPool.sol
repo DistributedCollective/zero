@@ -15,7 +15,7 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./StabilityPoolStorage.sol";
 
-/*
+/**
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
  *
  * When a trove is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
@@ -239,7 +239,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- External Depositor Functions ---
 
-    /*  provideToSP():
+    /**  provideToSP():
     *
     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
     * - Tags the deposit with the provided front end tag param, if it's a new deposit
@@ -284,7 +284,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         _sendETHGainToDepositor(depositorETHGain);
      }
 
-    /*  withdrawFromSP():
+    /**  withdrawFromSP():
     *
     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
     * - Removes the deposit's front end tag if it is a full withdrawal
@@ -331,7 +331,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         _sendETHGainToDepositor(depositorETHGain);
     }
 
-    /* withdrawETHGainToTrove:
+    /** withdrawETHGainToTrove:
     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
     * - Sends all depositor's ZERO gain to  depositor
     * - Sends all tagged front end's ZERO gain to the tagged front end
@@ -425,7 +425,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- Liquidation functions ---
 
-    /*
+    /**
     * Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
     * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
     * Only called by liquidation functions in the TroveManager.
@@ -488,7 +488,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return (ETHGainPerUnitStaked, ZUSDLossPerUnitStaked);
     }
 
-    // Update the Stability Pool reward sum S and product P
+    /// Update the Stability Pool reward sum S and product P
     function _updateRewardSumAndProduct(uint _ETHGainPerUnitStaked, uint _ZUSDLossPerUnitStaked) internal {
         uint currentP = P;
         uint newP;
@@ -560,7 +560,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- Reward calculator functions for depositor and front end ---
 
-    /* Calculates the ETH gain earned by the deposit since its last snapshots were taken.
+    /** Calculates the ETH gain earned by the deposit since its last snapshots were taken.
     * Given by the formula:  E = d0 * (S - S(0))/P(0)
     * where S(0) and P(0) are the depositor's snapshots of the sum S and product P, respectively.
     * d0 is the last recorded deposit value.
@@ -595,7 +595,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return ETHGain;
     }
 
-    /*
+    /**
     * Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
     * Given by the formula:  ZERO = d0 * (G - G(0))/P(0)
     * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
@@ -621,7 +621,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return ZEROGain;
     }
 
-    /*
+    /**
     * Return the ZERO gain earned by the front end. Given by the formula:  E = D0 * (G - G(0))/P(0)
     * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
     *
@@ -661,7 +661,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- Compounded deposit and compounded front end stake ---
 
-    /*
+    /**
     * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)
     * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
     */
@@ -675,7 +675,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return compoundedDeposit;
     }
 
-    /*
+    /**
     * Return the front end's compounded stake. Given by the formula:  D = D0 * P/P(0)
     * where P(0) is the depositor's snapshot of the product P, taken at the last time
     * when one of the front end's tagged deposits updated their deposit.
@@ -739,7 +739,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- Sender functions for ZUSD deposit, ETH gains and ZERO gains ---
 
-    // Transfer the ZUSD tokens from the user to the Stability Pool's address, and update its recorded ZUSD
+    /// Transfer the ZUSD tokens from the user to the Stability Pool's address, and update its recorded ZUSD
     function _sendZUSDtoStabilityPool(address _address, uint _amount) internal {
         zusdToken.sendToPool(_address, address(this), _amount);
         uint newTotalZUSDDeposits = totalZUSDDeposits.add(_amount);
@@ -758,7 +758,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         require(success, "StabilityPool: sending ETH failed");
     }
 
-    // Send ZUSD to user and decrease ZUSD in Pool
+    /// Send ZUSD to user and decrease ZUSD in Pool
     function _sendZUSDToDepositor(address _depositor, uint ZUSDWithdrawal) internal {
         if (ZUSDWithdrawal == 0) {return;}
 
@@ -768,7 +768,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- External Front End functions ---
 
-    // Front end makes a one-time selection of kickback rate upon registering
+    /// Front end makes a one-time selection of kickback rate upon registering
     function registerFrontEnd(uint _kickbackRate) external override {
         _requireFrontEndNotRegistered(msg.sender);
         _requireUserHasNoDeposit(msg.sender);

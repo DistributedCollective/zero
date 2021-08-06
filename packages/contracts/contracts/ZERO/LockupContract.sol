@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IZEROToken.sol";
 
-/*
+/**
 * The lockup contract architecture utilizes a single LockupContract, with an unlockTime. The unlockTime is passed as an argument 
 * to the LockupContract's constructor. The contract's balance can be withdrawn by the beneficiary when block.timestamp > unlockTime. 
 * At construction, the contract checks that unlockTime is at least one year later than the Liquity system's deployment time. 

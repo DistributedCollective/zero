@@ -70,10 +70,18 @@ interface IStabilityPool {
 
     // --- Functions ---
 
-    /*
-     * Called only once on init, to set addresses of other Liquity contracts
-     * Callable only by owner, renounces ownership at the end
-     */
+    /**
+     * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
+     * @dev initializer function, checks addresses are contracts
+     * @param _liquityBaseParamsAddress LiquidityBaseParams contract address
+     * @param _borrowerOperationsAddress BorrowerOperations contract address
+     * @param _troveManagerAddress TroveManager contract address
+     * @param _activePoolAddress ActivePool contract address
+     * @param _zusdTokenAddress ZUSDToken contract address
+     * @param _sortedTrovesAddress SortedTroves contract address
+     * @param _priceFeedAddress PriceFeed contract address
+     * @param _communityIssuanceAddress CommunityIssuanceAddress
+    */
     function setAddresses(
         address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
@@ -85,112 +93,126 @@ interface IStabilityPool {
         address _communityIssuanceAddress
     ) external;
 
-    /*
-     * Initial checks:
-     * - Frontend is registered or zero address
-     * - Sender is not a registered frontend
-     * - _amount is not zero
-     * ---
-     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-     * - Tags the deposit with the provided front end tag param, if it's a new deposit
-     * - Sends depositor's accumulated gains (ZERO, ETH) to depositor
-     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
-     * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
+    /**
+     * @notice Initial checks:
+     *  - Frontend is registered or zero address
+     *  - Sender is not a registered frontend
+     *  - _amount is not zero
+     *  ---
+     *  - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     *  - Tags the deposit with the provided front end tag param, if it's a new deposit
+     *  - Sends depositor's accumulated gains (ZERO, ETH) to depositor
+     *  - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     *  - Increases deposit and tagged front end's stake, and takes new snapshots for each.
+     * @param _amount amount to provide
+     * @param _frontEndTag frontend address to receive accumulated ZERO gains
      */
     function provideToSP(uint _amount, address _frontEndTag) external;
 
-    /*
-     * Initial checks:
-     * - _amount is zero or there are no under collateralized troves left in the system
-     * - User has a non zero deposit
-     * ---
-     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-     * - Removes the deposit's front end tag if it is a full withdrawal
-     * - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
-     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
-     * - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
-     *
-     * If _amount > userDeposit, the user withdraws all of their compounded deposit.
+    /**
+     * @notice Initial checks:
+     *    - _amount is zero or there are no under collateralized troves left in the system
+     *    - User has a non zero deposit
+     *    ---
+     *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     *    - Removes the deposit's front end tag if it is a full withdrawal
+     *    - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
+     *    - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     *    - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
+     * 
+     *    If _amount > userDeposit, the user withdraws all of their compounded deposit.
+     * @param _amount amount to withdraw
      */
     function withdrawFromSP(uint _amount) external;
 
-    /*
-     * Initial checks:
-     * - User has a non zero deposit
-     * - User has an open trove
-     * - User has some ETH gain
-     * ---
-     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-     * - Sends all depositor's ZERO gain to  depositor
-     * - Sends all tagged front end's ZERO gain to the tagged front end
-     * - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
-     * - Leaves their compounded deposit in the Stability Pool
-     * - Updates snapshots for deposit and tagged front end stake
+    /**
+     * @notice Initial checks:
+     *    - User has a non zero deposit
+     *    - User has an open trove
+     *    - User has some ETH gain
+     *    ---
+     *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     *    - Sends all depositor's ZERO gain to  depositor
+     *    - Sends all tagged front end's ZERO gain to the tagged front end
+     *    - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
+     *    - Leaves their compounded deposit in the Stability Pool
+     *    - Updates snapshots for deposit and tagged front end stake
+     * @param _upperHint upper trove id hint
+     * @param _lowerHint lower trove id hint
      */
     function withdrawETHGainToTrove(address _upperHint, address _lowerHint) external;
 
-    /*
-     * Initial checks:
-     * - Frontend (sender) not already registered
-     * - User (sender) has no deposit
-     * - _kickbackRate is in the range [0, 100%]
-     * ---
-     * Front end makes a one-time selection of kickback rate upon registering
+    /**
+     * @notice Initial checks:
+     *    - Frontend (sender) not already registered
+     *    - User (sender) has no deposit
+     *    - _kickbackRate is in the range [0, 100%]
+     *    ---
+     *    Front end makes a one-time selection of kickback rate upon registering
+     * @param _kickbackRate kickback rate selected by frontend
      */
     function registerFrontEnd(uint _kickbackRate) external;
 
-    /*
-     * Initial checks:
-     * - Caller is TroveManager
-     * ---
-     * Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
-     * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
-     * Only called by liquidation functions in the TroveManager.
+    /**
+     * @notice Initial checks:
+     *    - Caller is TroveManager
+     *    ---
+     *    Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
+     *    and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
+     *    Only called by liquidation functions in the TroveManager.
+     * @param _debt debt to cancel
+     * @param _coll collateral to transfer
      */
     function offset(uint _debt, uint _coll) external;
 
-    /*
-     * Returns the total amount of ETH held by the pool, accounted in an internal variable instead of `balance`,
+    /**
+     * @return the total amount of ETH held by the pool, accounted in an internal variable instead of `balance`,
      * to exclude edge cases like ETH received from a self-destruct.
      */
     function getETH() external view returns (uint);
 
-    /*
-     * Returns ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+    /**
+     * @return ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
      */
     function getTotalZUSDDeposits() external view returns (uint);
 
-    /*
-     * Calculates the ETH gain earned by the deposit since its last snapshots were taken.
+    /**
+     * @notice Calculates the ETH gain earned by the deposit since its last snapshots were taken.
+     * @param _depositor address to calculate ETH gain
+     * @return ETH gain from given depositor
      */
     function getDepositorETHGain(address _depositor) external view returns (uint);
 
-    /*
-     * Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
-     * If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
-     * Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
-     * which they made their deposit.
+    /**
+     * @notice Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
+     *    If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
+     *    Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
+     *    which they made their deposit.
+     * @param _depositor address to calculate ETH gain
+     * @return ZERO gain from given depositor
      */
     function getDepositorZEROGain(address _depositor) external view returns (uint);
 
-    /*
-     * Return the ZERO gain earned by the front end.
+    /**
+     * @param _frontEnd front end address
+     * @return the ZERO gain earned by the front end.
      */
     function getFrontEndZEROGain(address _frontEnd) external view returns (uint);
 
-    /*
-     * Return the user's compounded deposit.
+    /**
+     * @param _depositor depositor address
+     * @return the user's compounded deposit.
      */
     function getCompoundedZUSDDeposit(address _depositor) external view returns (uint);
 
-    /*
-     * Return the front end's compounded stake.
-     *
-     * The front end's compounded stake is equal to the sum of its depositors' compounded deposits.
+    /**
+     * @notice The front end's compounded stake is equal to the sum of its depositors' compounded deposits.
+     * @param _frontEnd front end address
+     * @return the front end's compounded stake.
      */
     function getCompoundedFrontEndStake(address _frontEnd) external view returns (uint);
 
-    /*
+    /**
      * Fallback function
      * Only callable by Active Pool, it just accounts for ETH received
      * receive() external payable;

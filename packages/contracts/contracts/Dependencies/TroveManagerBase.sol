@@ -16,21 +16,21 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
 
-    // During bootsrap period redemptions are not allowed
+    /// During bootsrap period redemptions are not allowed
     uint256 public constant BOOTSTRAP_PERIOD = 14 days;
 
-    /*
-     * BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
-     * Corresponds to (1 / ALPHA) in the white paper.
+    /**
+      BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
+      Corresponds to (1 / ALPHA) in the white paper.
      */
     uint256 public constant BETA = 2;
 
-    /*
-     * --- Variable container structs for liquidations ---
-     *
-     * These structs are used to hold, return and assign variables inside the liquidation functions,
-     * in order to avoid the error: "CompilerError: Stack too deep".
-     **/
+    /**
+      --- Variable container structs for liquidations ---
+     
+      These structs are used to hold, return and assign variables inside the liquidation functions,
+      in order to avoid the error: "CompilerError: Stack too deep".
+     */
 
     struct LocalVariables_OuterLiquidationFunction {
         uint256 price;
@@ -150,7 +150,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         redeemCollateral
     }
 
-    // Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
+    /// Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
     function _getCurrentICR(address _borrower, uint256 _price) public view returns (uint256) {
         (uint256 currentETH, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
@@ -168,7 +168,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         return (currentETH, currentZUSDDebt);
     }
 
-    // Get the borrower's pending accumulated ETH reward, earned by their stake
+    /// Get the borrower's pending accumulated ETH reward, earned by their stake
     function _getPendingETHReward(address _borrower) public view returns (uint256) {
         uint256 snapshotETH = rewardSnapshots[_borrower].ETH;
         uint256 rewardPerUnitStaked = L_ETH.sub(snapshotETH);
@@ -184,7 +184,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         return pendingETHReward;
     }
 
-    // Get the borrower's pending accumulated ZUSD reward, earned by their stake
+    /// Get the borrower's pending accumulated ZUSD reward, earned by their stake
     function _getPendingZUSDDebtReward(address _borrower) public view returns (uint256) {
         uint256 snapshotZUSDDebt = rewardSnapshots[_borrower].ZUSDDebt;
         uint256 rewardPerUnitStaked = L_ZUSDDebt.sub(snapshotZUSDDebt);
@@ -200,7 +200,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         return pendingZUSDDebtReward;
     }
 
-    // Add the borrowers's coll and debt rewards earned from redistributions, to their Trove
+    /// Add the borrowers's coll and debt rewards earned from redistributions, to their Trove
     function _applyPendingRewards(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
@@ -256,7 +256,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         emit TroveSnapshotsUpdated(L_ETH, L_ZUSDDebt);
     }
 
-    // Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
+    /// Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
     function _movePendingTroveRewardsToActivePool(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
@@ -268,7 +268,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         _defaultPool.sendETHToActivePool(_ETH);
     }
 
-    // Remove borrower's stake from the totalStakes sum, and set their stake to 0
+    /// Remove borrower's stake from the totalStakes sum, and set their stake to 0
     function _removeStake(address _borrower) internal {
         uint256 stake = Troves[_borrower].stake;
         totalStakes = totalStakes.sub(stake);
@@ -292,7 +292,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         sortedTroves.remove(_borrower);
     }
 
-    // Update borrower's stake based on their latest collateral value
+    /// Update borrower's stake based on their latest collateral value
     function _updateStakeAndTotalStakes(address _borrower) internal returns (uint256) {
         uint256 newStake = _computeNewStake(Troves[_borrower].coll);
         uint256 oldStake = Troves[_borrower].stake;
@@ -369,9 +369,9 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
             );
     }
 
-    /*
-     * Remove a Trove owner from the TroveOwners array, not preserving array order. Removing owner 'B' does the following:
-     * [A B C D E] => [A E C D], and updates E's Trove struct to point to its new array index.
+    /**
+      Remove a Trove owner from the TroveOwners array, not preserving array order. Removing owner 'B' does the following:
+      [A B C D E] => [A E C D], and updates E's Trove struct to point to its new array index.
      */
     function _removeTroveOwner(address _borrower, uint256 TroveOwnersArrayLength) internal {
         Status troveStatus = Troves[_borrower].status;

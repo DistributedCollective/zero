@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 
 contract CheckContract {
     /**
-     * Check that the account is an already deployed non-destroyed contract.
+     * @dev Check that the account is an already deployed non-destroyed contract.
      * See: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol#L12
      */
     function checkContract(address _account) internal view {

@@ -103,8 +103,8 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         }
     }
 
-    // Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & ETH gains. 
-    // If requested amount > stake, send their entire stake.
+    /// Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & ETH gains. 
+    /// If requested amount > stake, send their entire stake.
     function unstake(uint _ZEROamount) external override {
         uint currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);

@@ -2,6 +2,12 @@
 pragma solidity 0.6.11;
 
 import "./Dependencies/Ownable.sol";
+
+/**
+ * @title Active Pool Storage
+ * @dev Stores Active Pool required addresses and internal ETH and ZUSD debt states
+ * Extends Ownable
+ */
 contract ActivePoolStorage is Ownable {
     string public constant NAME = "ActivePool";
 

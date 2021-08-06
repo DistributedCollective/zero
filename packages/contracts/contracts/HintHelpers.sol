@@ -41,7 +41,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
 
     // --- Functions ---
 
-    /* getRedemptionHints() - Helper function for finding the right hints to pass to redeemCollateral().
+    /** getRedemptionHints() - Helper function for finding the right hints to pass to redeemCollateral().
      *
      * It simulates a redemption of `_ZUSDamount` to figure out where the redemption sequence will start and what state the final Trove
      * of the sequence will end up in.
@@ -116,7 +116,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
         truncatedZUSDamount = _ZUSDamount.sub(remainingZUSD);
     }
 
-    /* getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 
+    /** getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 
     sortedTroves list from the correct insert position of the Trove to be inserted. 
     
     Note: The output address is worst-case O(n) positions away from the correct insert position, however, the function 

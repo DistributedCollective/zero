@@ -7,7 +7,7 @@ import "./TroveManager.sol";
 import "./SortedTroves.sol";
 import "./MultiTroveGetterStorage.sol";
 
-/*  Helper contract for grabbing Trove data for the front end. Not part of the core Liquity system. */
+/**  Helper contract for grabbing Trove data for the front end. Not part of the core Liquity system. */
 contract MultiTroveGetter is MultiTroveGetterStorage {
     struct CombinedTroveData {
         address owner;
