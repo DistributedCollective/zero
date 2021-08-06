@@ -71,7 +71,10 @@ interface IBorrowerOperations {
     /// @param _lowerHint lower trove id hint
     function addColl(address _upperHint, address _lowerHint) external payable;
 
-    
+    /// @notice send ETH as collateral to a trove. Called by only the Stability Pool.
+    /// @param _user user trove address
+    /// @param _upperHint upper trove id hint
+    /// @param _lowerHint lower trove id hint
     function moveETHGainToTrove(address _user, address _upperHint, address _lowerHint) external payable;
     
     /**
