@@ -74,9 +74,9 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
 
-      // Check community issuance starts with 32 million ZERO
+      // Check community issuance starts with 30 million ZERO
       communityZEROSupply = toBN(await zeroToken.balanceOf(communityIssuanceTester.address))
-      assert.isAtMost(getDifference(communityZEROSupply, '35000000000000000000000000'), 1000)
+      assert.isAtMost(getDifference(communityZEROSupply, '30000000000000000000000000'), 1000)
 
       /* Monthly ZERO issuance
   

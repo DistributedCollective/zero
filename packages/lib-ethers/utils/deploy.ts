@@ -207,9 +207,10 @@ const connectContracts = async (
       zeroToken.initialize(
         communityIssuance.address,
         sovStakersIssuance.address,
+        gasPool.address, // TODO: liquidity mining contract address, should be a valid contract
         zeroStaking.address,
         lockupContractFactory.address,
-        Wallet.createRandom().address, // _multisigAddress (TODO: parameterize this)
+        Wallet.createRandom().address, // TODO: _multisigAddress (parameterize this)
         {
           ...overrides,
           nonce

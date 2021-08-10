@@ -60,12 +60,14 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     function initialize (
         address _communityIssuanceAddress, 
         address _sovStakersIssuanceAddress,
+        address _liquidityMiningAddress,
         address _zeroStakingAddress,
         address _lockupFactoryAddress,
         address _multisigAddress
     ) initializer public {
         checkContract(_communityIssuanceAddress);
         checkContract(_sovStakersIssuanceAddress);
+        checkContract(_liquidityMiningAddress);
         checkContract(_lockupFactoryAddress);
 
         multisigAddress = _multisigAddress;
@@ -73,6 +75,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         
         communityIssuanceAddress = _communityIssuanceAddress;
         sovStakersIssuanceAddress = _sovStakersIssuanceAddress;
+        liquidityMiningAddress = _liquidityMiningAddress;
         zeroStakingAddress = _zeroStakingAddress;
         lockupContractFactory = ILockupContractFactory(_lockupFactoryAddress);
 
@@ -89,14 +92,18 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         uint sovStakersEntitlement = _1_MILLION.mul(45); // Allocate 45 million to the algorithmic issuance schedule
         _mint(_sovStakersIssuanceAddress, sovStakersEntitlement);
 
-        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(35); // Allocate 35 million to the algorithmic issuance schedule
+        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(30); // Allocate 30 million to the algorithmic issuance schedule
         _mint(_communityIssuanceAddress, depositorsAndFrontEndsEntitlement);
 
-        // Allocate the remainder to the ZERO Multisig: (100 - 45 - 35) million = 20 million
+        uint liquidityMiningEntitlement = _1_MILLION.mul(5);
+        _mint(_liquidityMiningAddress, liquidityMiningEntitlement);
+
+        // Allocate the remainder to the ZERO Multisig: (100 - 45 - 35 - 5) million = 20 million
         // This amount will be distributed to founders 
         uint multisigEntitlement = _1_MILLION.mul(100)
             .sub(sovStakersEntitlement)
-            .sub(depositorsAndFrontEndsEntitlement);
+            .sub(depositorsAndFrontEndsEntitlement)
+            .sub(liquidityMiningEntitlement);
 
         _mint(_multisigAddress, multisigEntitlement);
 

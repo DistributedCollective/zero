@@ -431,7 +431,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
 
    // Error tolerance: 1e-3, i.e. 1/1000th of a token
 
-  it("Total ZERO tokens issued is 46.15 after a minute", async () => {
+  it("Total ZERO tokens issued is 39.56 after a minute", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -442,8 +442,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    // 35,000,000 * (1 – 0.5 ^ 0.00000190258) where 1 minute is 0.00000190258 years 
-    const expectedTotalZEROIssued = '46156848261800000000'
+    // 30,000,000 * (1 – 0.5 ^ 0.00000190258) where 1 minute is 0.00000190258 years 
+    const expectedTotalZEROIssued = '39563012795800000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(
@@ -456,7 +456,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 2,769.31 after an hour", async () => {
+  it("Total ZERO tokens issued is 2,373.69 after an hour", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -468,7 +468,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '2769314074500000000000';
+    const expectedTotalZEROIssued = '2373697801938210000000';
+    
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(
@@ -481,7 +482,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 66,403.10 after a day", async () => {
+  it("Total ZERO tokens issued is 56,916.94 after a day", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -493,20 +494,20 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '66403097015100000000000'
+    const expectedTotalZEROIssued = '56916940452158250000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
+    console.log(
+      `time since deployment: ${duration}, 
+       totalZEROIssued: ${totalZEROIssued},  
+       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
+       abs. error: ${absError}`
+    )
 
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 462,184.407313 after a week", async () => {
+  it("Total ZERO tokens issued is 396,158.063411 after a week", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -518,20 +519,20 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '462184407313000000000000'
+    const expectedTotalZEROIssued = '396158063411293080000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
+    console.log(
+      `time since deployment: ${duration}, 
+       totalZEROIssued: ${totalZEROIssued},  
+       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
+       abs. error: ${absError}`
+    )
 
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 1,938,248.83304 after a month", async () => {
+  it("Total ZERO tokens issued is 1,661,356.14260 after a month", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -544,20 +545,20 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
     // 35,000,000 * (1 – 0.5 ^ (30 / 365)) where 1 month is 30 days
-    const expectedTotalZEROIssued = '1938248833040000000000000'
+    const expectedTotalZEROIssued = '1661356142607978180000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
+    console.log(
+      `time since deployment: ${duration}, 
+       totalZEROIssued: ${totalZEROIssued},  
+       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
+       abs. error: ${absError}`
+    )
 
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 5,498,678.52622 after 3 months", async () => {
+  it("Total ZERO tokens issued is 4,713,153.02247 after 3 months", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -569,20 +570,20 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
     // 35,000,000 * (1 – 0.5 ^ (90 / 365)) where 1 month is 30 days
-    const expectedTotalZEROIssued = '5498678526220000000000000'
+    const expectedTotalZEROIssued = '4713153022478071950000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
+    console.log(
+      `time since deployment: ${duration}, 
+       totalZEROIssued: ${totalZEROIssued},  
+       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
+       abs. error: ${absError}`
+    )
 
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 10,133,486.6086 after 6 months", async () => {
+  it("Total ZERO tokens issued is 8,685,845.6645 after 6 months", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -593,19 +594,19 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '10133486608600000000000000'
+    const expectedTotalZEROIssued = '8685845664513004410000000'
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
+    console.log(
+      `time since deployment: ${duration}, 
+       totalZEROIssued: ${totalZEROIssued},  
+       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
+       abs. error: ${absError}`
+    )
 
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 17,500,000 after a year", async () => {
+  it("Total ZERO tokens issued is 15,000,000 after a year", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -616,7 +617,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '17500000000000000000000000'
+    const expectedTotalZEROIssued = '15000000000000000000000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(
@@ -629,11 +630,35 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 26,250,000 after 2 years", async () => {
+  it("Total ZERO tokens issued is 22,500,000 after 2 years", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 2)
+    // Fast forward time
+    await th.fastForwardTime(duration, web3.currentProvider)
+
+    // Issue ZERO
+    await communityIssuanceTester.unprotectedIssueZERO()
+    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
+    const expectedTotalZEROIssued = '22500000000000000000000000'
+
+    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
+    // console.log(
+    //   `time since deployment: ${duration}, 
+    //    totalZEROIssued: ${totalZEROIssued},  
+    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
+    //    abs. error: ${absError}`
+    // )
+
+    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
+  })
+
+  it("Total ZERO tokens issued is 26,250,000 after 3 years", async () => {
+    const initialIssuance = await communityIssuanceTester.totalZEROIssued()
+    assert.equal(initialIssuance, 0)
+
+    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 3)
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider)
 
@@ -653,31 +678,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 30,625,000 after 3 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued()
-    assert.equal(initialIssuance, 0)
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 3)
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider)
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO()
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '30625000000000000000000000'
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
-  })
-
-  it("Total ZERO tokens issued is 32,812,500 after 4 years", async () => {
+  it("Total ZERO tokens issued is 28,125,000 after 4 years", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -688,7 +689,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '32812500000000000000000000'
+    const expectedTotalZEROIssued = '28125000000000000000000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(
@@ -701,7 +702,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 34,965,820.3125 after 10 years", async () => {
+  it("Total ZERO tokens issued is 29,970,703.125 after 10 years", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -712,7 +713,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '34965820312500000000000000'
+    const expectedTotalZEROIssued = '29970703125000000000000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(
@@ -725,7 +726,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 34,999,966.6214 after 20 years", async () => {
+  it("Total ZERO tokens issued is 29,999,971.3898 after 20 years", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -736,7 +737,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '34999966621400000000000000'
+    const expectedTotalZEROIssued = '29999971389800000000000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(
@@ -749,7 +750,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000)
   })
 
-  it("Total ZERO tokens issued is 34,999,999.9674 after 30 years", async () => {
+  it("Total ZERO tokens issued is 29,999,999.9721 after 30 years", async () => {
     const initialIssuance = await communityIssuanceTester.totalZEROIssued()
     assert.equal(initialIssuance, 0)
 
@@ -760,7 +761,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Issue ZERO
     await communityIssuanceTester.unprotectedIssueZERO()
     const totalZEROIssued = await communityIssuanceTester.totalZEROIssued()
-    const expectedTotalZEROIssued = '34999999967400000000000000'
+    const expectedTotalZEROIssued = '29999999972100000000000000'
 
     const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued)
     // console.log(

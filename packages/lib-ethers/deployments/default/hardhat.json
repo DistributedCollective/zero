@@ -1,9 +1,9 @@
 {
   "chainId": 31337,
-  "version": "694545029a14a58291c6a47abedc5773cd92d16e",
-  "deploymentDate": 1626984166000,
+  "version": "91c5b7d7e80d9a3a647679f64f0aea4d7992df75",
+  "deploymentDate": 1628627841000,
   "bootstrapPeriod": 1209600,
-  "totalStabilityPoolZEROReward": "35000000",
+  "totalStabilityPoolZEROReward": "30000000",
   "governanceAddress": "0x31c57298578f7508B5982062cfEc5ec8BD346247",
   "sovCommunityPotAddress": "0x3B22f0466d98bE3040d2c51dE89b0479FDD48910",
   "_priceFeedIsTestnet": true,

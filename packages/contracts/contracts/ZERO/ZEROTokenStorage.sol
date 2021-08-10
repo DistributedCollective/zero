@@ -46,6 +46,7 @@ contract ZEROTokenStorage is Initializable {
 
     address public communityIssuanceAddress;
     address public sovStakersIssuanceAddress;
+    address public liquidityMiningAddress;
     address public zeroStakingAddress;
 
     ILockupContractFactory public lockupContractFactory;
