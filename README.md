@@ -4,7 +4,7 @@
 
 
 Liquity is a decentralized protocol that allows Ether holders to obtain maximum liquidity against
-their collateral without paying interest. After locking up ETH as collateral in a smart contract and
+their collateral without paying interest. After locking up rBTC as collateral in a smart contract and
 creating an individual position called a "trove", the user can get instant liquidity by minting ZUSD,
 a USD-pegged stablecoin. Each trove is required to be collateralized at a minimum of 110%. Any
 owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption
@@ -91,10 +91,10 @@ Visit [liquity.org](https://www.liquity.org) to find out more and join the discu
   - [Gas compensation helper functions](#gas-compensation-helper-functions)
 - [The Stability Pool](#the-stability-pool)
   - [Mixed liquidations: offset and redistribution](#mixed-liquidations-offset-and-redistribution)
-  - [Stability Pool deposit losses and ETH gains - implementation](#stability-pool-deposit-losses-and-eth-gains---implementation)
+  - [Stability Pool deposit losses and rBTC gains - implementation](#stability-pool-deposit-losses-and-eth-gains---implementation)
   - [Stability Pool example](#stability-pool-example)
   - [Stability Pool implementation](#stability-pool-implementation)
-  - [How deposits and ETH gains are tracked](#how-deposits-and-eth-gains-are-tracked)
+  - [How deposits and rBTC gains are tracked](#how-deposits-and-eth-gains-are-tracked)
 - [ZERO Issuance to Stability Providers](#zero-issuance-to-stability-providers)
   - [ZERO Issuance schedule](#zero-issuance-schedule)
   - [ZERO Issuance implementation](#zero-issuance-implementation)
@@ -145,15 +145,15 @@ The stablecoin tokens are economically geared towards maintaining value of 1 ZUS
 
 1. The system is designed to always be over-collateralized - the dollar value of the locked Ether exceeds the dollar value of the issued stablecoins
 
-2. The stablecoins are fully redeemable - users can always swap $x worth of ZUSD for $x worth of ETH (minus fees), directly with the system.
+2. The stablecoins are fully redeemable - users can always swap $x worth of ZUSD for $x worth of rBTC (minus fees), directly with the system.
 
 3. The system algorithmically controls the generation of ZUSD through a variable issuance fee.
 
-After opening a Trove with some Ether, users may issue ("borrow") tokens such that the collateralization ratio of their Trove remains above 110%. A user with $1000 worth of ETH in a Trove can issue up to 909.09 ZUSD.
+After opening a Trove with some Ether, users may issue ("borrow") tokens such that the collateralization ratio of their Trove remains above 110%. A user with $1000 worth of rBTC in a Trove can issue up to 909.09 ZUSD.
 
 The tokens are freely exchangeable - anyone with an Ethereum address can send or receive ZUSD tokens, whether they have an open Trove or not. The tokens are burned upon repayment of a Trove's debt.
 
-The Liquity system regularly updates the ETH:USD price via a decentralized data feed. When a Trove falls below a minimum collateralization ratio (MCR) of 110%, it is considered under-collateralized, and is vulnerable to liquidation.
+The Liquity system regularly updates the rBTC:USD price via a decentralized data feed. When a Trove falls below a minimum collateralization ratio (MCR) of 110%, it is considered under-collateralized, and is vulnerable to liquidation.
 
 ## Liquidation and the Stability Pool
 
@@ -187,32 +187,32 @@ Here is the liquidation logic for a single Trove in Normal Mode and Recovery Mod
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                      | Liquidation behavior                                                                                                                                                                                                                                                                                                |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR < MCR & SP.ZUSD >= trove.debt | ZUSD in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's ETH collateral is shared between depositors.                                                                                                                                                                       |
-| ICR < MCR & SP.ZUSD < trove.debt | The total StabilityPool ZUSD is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus ETH gas compensation) is redistributed to active Troves |
-| ICR < MCR & SP.ZUSD = 0          | Redistribute all debt and collateral (minus ETH gas compensation) to active Troves.                                                                                                                                                                                                                                 |
+| ICR < MCR & SP.ZUSD >= trove.debt | ZUSD in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's rBTC collateral is shared between depositors.                                                                                                                                                                       |
+| ICR < MCR & SP.ZUSD < trove.debt | The total StabilityPool ZUSD is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus rBTC gas compensation) is redistributed to active Troves |
+| ICR < MCR & SP.ZUSD = 0          | Redistribute all debt and collateral (minus rBTC gas compensation) to active Troves.                                                                                                                                                                                                                                 |
 | ICR  >= MCR                      | Do nothing.                                                                                                                                                                                                                                                                                                         |
 #### Liquidations in Recovery Mode: TCR < 150%
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                                | Liquidation behavior                                                                                                                                                                                                                                                                                                                                                                                         |
 |------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR <=100%                               | Redistribute all debt and collateral (minus ETH gas compensation) to active Troves.                                                                                                                                                                                                                                                                                                                          |
-| 100% < ICR < MCR & SP.ZUSD > trove.debt  | ZUSD in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's ETH collateral (minus ETH gas compensation) is shared between depsitors.                                                                                                                                                                                                                                    |
-| 100% < ICR < MCR & SP.ZUSD < trove.debt  | The total StabilityPool ZUSD is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus ETH gas compensation) is redistributed to active troves                                                                                          |
-| MCR <= ICR < TCR & SP.ZUSD >= trove.debt  |  The Pool ZUSD is offset with an equal amount of debt from the Trove. A fraction of ETH collateral with dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to other active Troves. Since it's ICR was > 1.1, the Trove has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The Trove is closed. |
+| ICR <=100%                               | Redistribute all debt and collateral (minus rBTC gas compensation) to active Troves.                                                                                                                                                                                                                                                                                                                          |
+| 100% < ICR < MCR & SP.ZUSD > trove.debt  | ZUSD in the StabilityPool equal to the Trove's debt is offset with the Trove's debt. The Trove's rBTC collateral (minus rBTC gas compensation) is shared between depsitors.                                                                                                                                                                                                                                    |
+| 100% < ICR < MCR & SP.ZUSD < trove.debt  | The total StabilityPool ZUSD is offset with an equal amount of debt from the Trove.  A fraction of the Trove's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus rBTC gas compensation) is redistributed to active troves                                                                                          |
+| MCR <= ICR < TCR & SP.ZUSD >= trove.debt  |  The Pool ZUSD is offset with an equal amount of debt from the Trove. A fraction of rBTC collateral with dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to other active Troves. Since it's ICR was > 1.1, the Trove has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The Trove is closed. |
 | MCR <= ICR < TCR & SP.ZUSD  < trove.debt | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ICR >= TCR                               | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ## Gains From Liquidations
 
-Stability Pool depositors gain Ether over time, as liquidated debt is cancelled with their deposit. When they withdraw all or part of their deposited tokens, or top up their deposit, the system sends them their accumulated ETH gains.
+Stability Pool depositors gain Ether over time, as liquidated debt is cancelled with their deposit. When they withdraw all or part of their deposited tokens, or top up their deposit, the system sends them their accumulated rBTC gains.
 
 Similarly, a Trove's accumulated gains from liquidations are automatically applied to the Trove when the owner performs any operation - e.g. adding/withdrawing collateral, or issuing/repaying ZUSD.
 
 ## ZUSD Token Redemption
 
-Any ZUSD holder (whether or not they have an active Trove) may redeem their ZUSD directly with the system. Their ZUSD is exchanged for ETH, at face value: redeeming x ZUSD tokens returns \$x worth of ETH (minus a [redemption fee](#redemption-fee)).
+Any ZUSD holder (whether or not they have an active Trove) may redeem their ZUSD directly with the system. Their ZUSD is exchanged for rBTC, at face value: redeeming x ZUSD tokens returns \$x worth of rBTC (minus a [redemption fee](#redemption-fee)).
 
-When ZUSD is redeemed for ETH, the system cancels the ZUSD with debt from Troves, and the ETH is drawn from their collateral.
+When ZUSD is redeemed for rBTC, the system cancels the ZUSD with debt from Troves, and the rBTC is drawn from their collateral.
 
 In order to fulfill the redemption request, Troves are redeemed from in ascending order of their collateralization ratio.
 
@@ -232,7 +232,7 @@ The partially redeemed Trove is re-inserted into the sorted list of Troves, and 
 
 A Trove is defined as “fully redeemed from” when the redemption has caused (debt-200) of its debt to absorb (debt-200) ZUSD. Then, its 200 ZUSD Liquidation Reserve is cancelled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zero’d.
 
-Before closing, we must handle the Trove’s **collateral surplus**: that is, the excess ETH collateral remaining after redemption, due to its initial over-collateralization.
+Before closing, we must handle the Trove’s **collateral surplus**: that is, the excess rBTC collateral remaining after redemption, due to its initial over-collateralization.
 
 This collateral surplus is sent to the `CollSurplusPool`, and the borrower can reclaim it later. The Trove is then fully closed.
 
@@ -286,7 +286,7 @@ Liquity also issues ZERO to Stability Providers, in a continous time-based manne
 
 The ZERO contracts consist of:
 
-`ZEROStaking.sol` - the staking contract, containing stake and unstake functionality for ZERO holders. This contract receives ETH fees from redemptions, and ZUSD fees from new debt issuance.
+`ZEROStaking.sol` - the staking contract, containing stake and unstake functionality for ZERO holders. This contract receives rBTC fees from redemptions, and ZUSD fees from new debt issuance.
 
 `CommunityIssuance.sol` - This contract handles the issuance of ZERO tokens to Stability Providers as a function of time. It is controlled by the `StabilityPool`. Upon system launch, the `CommunityIssuance` automatically receives 32 million ZERO - the “community issuance” supply. The contract steadily issues these ZERO tokens to the Stability Providers over time.
 
@@ -314,7 +314,7 @@ A `LockupContractFactory` is used to deploy `LockupContracts` in the first year.
 1. Liquity admin deploys `LockupContractFactory`
 2. Liquity admin deploys `CommunityIssuance`
 3. Liquity admin deploys `ZEROStaking` 
-4. Liquity admin creates a Pool in Uniswap for ZUSD/ETH and deploys `Unipool` (LP rewards contract), which knows the address of the Pool
+4. Liquity admin creates a Pool in Uniswap for ZUSD/rBTC and deploys `Unipool` (LP rewards contract), which knows the address of the Pool
 5. Liquity admin deploys `ZEROToken`, which upon deployment:
 - Stores the `CommunityIssuance` and `LockupContractFactory` addresses
 - Mints ZERO tokens to `CommunityIssuance`, the Liquity admin address, the `Unipool` LP rewards address, and the bug bounty address
@@ -361,19 +361,19 @@ The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `Sta
 
 ### Core Smart Contracts
 
-`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their Trove: Trove creation, ETH top-up / withdrawal, stablecoin issuance and repayment. It also sends issuance fees to the `ZEROStaking` contract. BorrowerOperations functions call in to TroveManager, telling it to update Trove state, where necessary. BorrowerOperations functions also call in to the various Pools, telling them to move Ether/Tokens between Pools or between Pool <> user, where necessary.
+`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their Trove: Trove creation, rBTC top-up / withdrawal, stablecoin issuance and repayment. It also sends issuance fees to the `ZEROStaking` contract. BorrowerOperations functions call in to TroveManager, telling it to update Trove state, where necessary. BorrowerOperations functions also call in to the various Pools, telling them to move Ether/Tokens between Pools or between Pool <> user, where necessary.
 
 `TroveManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `ZEROStaking` contract. Also contains the state of each Trove - i.e. a record of the Trove’s collateral and debt. TroveManager does not hold value (i.e. Ether / other tokens). TroveManager functions call in to the various Pools to tell them to move Ether/tokens between Pools, where necessary.
 
 `LiquityBase.sol` - Both TroveManager and BorrowerOperations inherit from the parent contract LiquityBase, which contains global constants and some common functions.
 
-`StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits, and withdrawing compounded deposits and accumulated ETH and ZERO gains. Holds the ZUSD Stability Pool deposits, and the ETH gains for depositors, from liquidations.
+`StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits, and withdrawing compounded deposits and accumulated rBTC and ZERO gains. Holds the ZUSD Stability Pool deposits, and the rBTC gains for depositors, from liquidations.
 
 `ZUSDToken.sol` - the stablecoin token contract, which implements the ERC20 fungible token standard in conjunction with EIP-2612 and a mechanism that blocks (accidental) transfers to addresses like the StabilityPool and address(0) that are not supposed to receive funds through direct transfers. The contract mints, burns and transfers ZUSD tokens.
 
 `SortedTroves.sol` - a doubly linked list that stores addresses of Trove owners, sorted by their individual collateralization ratio (ICR). It inserts and re-inserts Troves at the correct position, based on their ICR.
 
-`PriceFeed.sol` - Contains functionality for obtaining the current ETH:USD price, which the system uses for calculating collateralization ratios.
+`PriceFeed.sol` - Contains functionality for obtaining the current rBTC:USD price, which the system uses for calculating collateralization ratios.
 
 `HintHelpers.sol` - Helper contract, containing the read-only functionality for calculation of accurate hints to be supplied to borrower operations and redemptions.
 
@@ -385,7 +385,7 @@ Along with `StabilityPool.sol`, these contracts hold Ether and/or tokens for the
 
 `DefaultPool.sol` - holds the total Ether balance and records the total stablecoin debt of the liquidated Troves that are pending redistribution to active Troves. If a Trove has pending ether/debt “rewards” in the DefaultPool, then they will be applied to the Trove when it next undergoes a borrower operation, a redemption, or a liquidation.
 
-`CollSurplusPool.sol` - holds the ETH surplus from Troves that have been fully redeemed from as well as from Troves with an ICR > MCR that were liquidated in Recovery Mode. Sends the surplus back to the owning borrower, when told to do so by `BorrowerOperations.sol`.
+`CollSurplusPool.sol` - holds the rBTC surplus from Troves that have been fully redeemed from as well as from Troves with an ICR > MCR that were liquidated in Recovery Mode. Sends the surplus back to the owning borrower, when told to do so by `BorrowerOperations.sol`.
 
 `GasPool.sol` - holds the total ZUSD liquidation reserves. ZUSD is moved into the `GasPool` when a Trove is opened, and moved out when a Trove is liquidated or closed.
 
@@ -395,58 +395,25 @@ Along with `StabilityPool.sol`, these contracts hold Ether and/or tokens for the
 
 ### PriceFeed and Oracle
 
-Liquity functions that require the most current ETH:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the Chainlink ETH:USD reference contract as its primary and Tellor's ETH:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
+Liquity functions that require the most current rBTC:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the MoC Medianizer rBTC:USD reference contract as its primary and RSK's rBTC:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
 
-The fallback logic distinguishes 3 different failure modes for Chainlink and 2 failure modes for Tellor:
-
-- `Frozen` (for both oracles): last price update more than 4 hours ago
-- `Broken` (for both oracles): response call reverted, invalid timeStamp that is either 0 or in the future, or reported price is non-positive (Chainlink) or zero (Tellor). Chainlink is considered broken if either the response for the latest round _or_ the response for the round before the latest fails one of these conditions.
-- `PriceChangeAboveMax` (Chainlink only): higher than 50% deviation between two consecutive price updates
-
-There is also a return condition `bothOraclesLiveAndUnbrokenAndSimilarPrice` which is a function returning true if both oracles are live and not broken, and the percentual difference between the two reported prices is below 5%.
-
-The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Liquity functions which require a current ETH:USD price.  `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
+The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Liquity functions which require a current rBTC:USD price.  `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
 
 ### PriceFeed Logic
 
-The PriceFeed contract fetches the current price and previous price from Chainlink and changes its state (called `Status`) based on certain conditions.
-
-**Initial PriceFeed state:** `chainlinkWorking`. The initial system state that is maintained as long as Chainlink is working properly, i.e. neither broken nor frozen nor exceeding the maximum price change threshold between two consecutive rounds. PriceFeed then obeys the logic found in this table:
-
-  https://docs.google.com/spreadsheets/d/18fdtTUoqgmsK3Mb6LBO-6na0oK-Y9LWBqnPCJRp5Hsg/edit?usp=sharing
-
+The PriceFeed contract uses the main price feed and fallback to the backup one in case of an error. If both fail return the last good price seen.
 
 ### Testnet PriceFeed and PriceFeed tests
 
 The `PriceFeedTestnet.sol` is a mock PriceFeed for testnet and general back end testing purposes, with no oracle connection. It contains a manual price setter, `setPrice()`, and a getter, `getPrice()`, which returns the latest stored price.
 
-The mainnet PriceFeed is tested in `test/PriceFeedTest.js`, using a mock Chainlink aggregator and a mock TellorMaster contract.
+The mainnet PriceFeed is tested in `test/PriceFeedTest.js`, using `ExternalPriceFeedTester` contract as mocks for primary and secondary price feeds.
 
 ### PriceFeed limitations and known issues
 
-The purpose of the PriceFeed is to be at least as good as an immutable PriceFeed that relies purely on Chainlink, while also having some resilience in case of Chainlink failure / timeout, and chance of recovery.
+The purpose of the PriceFeed is to be at least as good as an immutable PriceFeed that relies purely on MoC Medianizer, while also having some resilience in case of MoC Medianizer failure / timeout, and chance of recovery.
 
-The PriceFeed logic consists of automatic on-chain decision-making for obtaining fallback price data from Tellor, and if possible, for returning to Chainlink if/when it recovers.
-
-The PriceFeed logic is complex, and although we would prefer simplicity, it does allow the system a chance of switching to an accurate price source in case of a Chainlink failure or timeout, and also the possibility of returning to an honest Chainlink price after it has failed and recovered.
-
-We believe the benefit of the fallback logic is worth the complexity, given that our system is entirely immutable - if we had no fallback logic and Chainlink were to be hacked or permanently fail, Liquity would become permanently unusable anyway.
-
-
-
-**Chainlink Decimals**: the `PriceFeed` checks for and uses the latest `decimals` value reported by the Chainlink aggregator in order to calculate the Chainlink price at 18-digit precision, as needed by Liquity.  `PriceFeed` does not assume a value for decimals and can handle the case where Chainlink change their decimal value. 
-
-However, the check `chainlinkIsBroken` uses both the current response from the latest round and the response previous round. Since `decimals` is not attached to round data, Liquity has no way of knowing whether decimals has changed between the current round and the previous round, so we assume it is the same. Liquity assumes the current return value of decimals() applies to both current round `i` and previous round `i-1`. 
-
-This means that a decimal change that coincides with a Liquity price fetch could cause Liquity to assert that the Chainlink price has deviated too much, and fall back to Tellor. There is nothing we can do about this. We hope/expect Chainlink to never change their `decimals()` return value (currently 8), and if a hack/technical error causes Chainlink's decimals to change, Liquity may fall back to Tellor.
-
-To summarize the Chainlink decimals issue: 
-- Liquity can handle the case where Chainlink decimals changes across _two consecutive rounds `i` and `i-1` which are not used in the same Liquity price fetch_
-- If Liquity fetches the price at round `i`, it will not know if Chainlink decimals changed across round `i-1` to round `i`, and the consequent price scaling distortion may cause Liquity to fall back to Tellor
-- Liquity will always calculate the correct current price at 18-digit precision assuming the current return value of `decimals()` is correct (i.e. is the value used by the nodes).
-
-**Tellor Decimals**: Tellor uses 6 decimal precision for their ETHUSD price as determined by a social consensus of Tellor miners/data providers, and shown on Tellor's price feed page. Their decimals value is not offered in their on-chain contracts.  We rely on the continued social consensus around 6 decimals for their ETHUSD price feed. Tellor have informed us that if there was demand for an ETHUSD price at different precision, they would simply create a new `requestId`, and make no attempt to alter the social consensus around the precision of the current ETHUSD `requestId` (1) used by Liquity.
-
+The PriceFeed logic consists of automatic on-chain decision-making for obtaining fallback price data from RSK Oracle, and if possible, for returning to MoC Medianizer if/when it recovers.
 
 ### Keeping a sorted list of Troves ordered by ICR
 
@@ -460,7 +427,7 @@ Nodes map to active Troves in the system - the ID property is the address of a t
 
 ICRs are computed dynamically at runtime, and not stored on the node. This is because ICRs of active Troves change dynamically, when:
 
-- The ETH:USD price varies, altering the USD of the collateral of every Trove
+- The rBTC:USD price varies, altering the USD of the collateral of every Trove
 - A liquidation that redistributes collateral and debt to active Troves occurs
 
 The list relies on the fact that a collateral and debt redistribution due to a liquidation preserves the ordering of all active Troves (though it does decrease the ICR of each active Trove above the MCR).
@@ -469,13 +436,13 @@ The fact that ordering is maintained as redistributions occur, is not immediatel
 
 A node inserted based on current ICR will maintain the correct position, relative to its peers, as liquidation gains accumulate, as long as its raw collateral and debt have not changed.
 
-Nodes also remain sorted as the ETH:USD price varies, since price fluctuations change the collateral value of each Trove by the same proportion.
+Nodes also remain sorted as the rBTC:USD price varies, since price fluctuations change the collateral value of each Trove by the same proportion.
 
 Thus, nodes need only be re-inserted to the sorted list upon a Trove operation - when the owner adds or removes collateral or debt to their position.
 
 ### Flow of Ether in Liquity
 
-![Flow of Ether](images/ETH_flows.svg)
+![Flow of Ether](images/rBTC_flows.svg)
 
 Ether in the system lives in three Pools: the ActivePool, the DefaultPool and the StabilityPool. When an operation is made, Ether is transferred in one of three ways:
 
@@ -485,23 +452,23 @@ Ether in the system lives in three Pools: the ActivePool, the DefaultPool and th
 
 Ether is recorded on an _individual_ level, but stored in _aggregate_ in a Pool. An active Trove with collateral and debt has a struct in the TroveManager that stores its ether collateral value in a uint, but its actual Ether is in the balance of the ActivePool contract.
 
-Likewise, the StabilityPool holds the total accumulated ETH gains from liquidations for all depositors.
+Likewise, the StabilityPool holds the total accumulated rBTC gains from liquidations for all depositors.
 
 **Borrower Operations**
 
-| Function                     | ETH quantity                        | Path                                       |
+| Function                     | rBTC quantity                        | Path                                       |
 |------------------------------|-------------------------------------|--------------------------------------------|
 | openTrove                    | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
 | addColl                      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
 | withdrawColl                 | _collWithdrawal parameter           | ActivePool->msg.sender                     |
-| adjustTrove: adding ETH      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
-| adjustTrove: withdrawing ETH | _collWithdrawal parameter           | ActivePool->msg.sender                     |
+| adjustTrove: adding rBTC      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
+| adjustTrove: withdrawing rBTC | _collWithdrawal parameter           | ActivePool->msg.sender                     |
 | closeTrove                   | All remaining                       | ActivePool->msg.sender                     |
 | claimCollateral              | CollSurplusPool.balance[msg.sender] | CollSurplusPool->msg.sender                |
 
 **Trove Manager**
 
-| Function                                | ETH quantity                           | Path                          |
+| Function                                | rBTC quantity                           | Path                          |
 |-----------------------------------------|----------------------------------------|-------------------------------|
 | liquidate (offset)                      | collateral to be offset                | ActivePool->StabilityPool     |
 | liquidate (redistribution)              | collateral to be redistributed         | ActivePool->DefaultPool       |
@@ -515,18 +482,18 @@ Likewise, the StabilityPool holds the total accumulated ETH gains from liquidati
 
 **Stability Pool**
 
-| Function               | ETH quantity                     | Path                                              |
+| Function               | rBTC quantity                     | Path                                              |
 |------------------------|----------------------------------|---------------------------------------------------|
-| provideToSP            | depositor's accumulated ETH gain | StabilityPool -> msg.sender                       |
-| withdrawFromSP         | depositor's accumulated ETH gain | StabilityPool -> msg.sender                       |
-| withdrawETHGainToTrove | depositor's accumulated ETH gain | StabilityPool -> BorrowerOperations -> ActivePool |
+| provideToSP            | depositor's accumulated rBTC gain | StabilityPool -> msg.sender                       |
+| withdrawFromSP         | depositor's accumulated rBTC gain | StabilityPool -> msg.sender                       |
+| withdrawrBTCGainToTrove | depositor's accumulated rBTC gain | StabilityPool -> BorrowerOperations -> ActivePool |
 
 **ZERO Staking**
 
-| Function    | ETH quantity                                   | Path                     |
+| Function    | rBTC quantity                                   | Path                     |
 |-------------|------------------------------------------------|--------------------------|
-| stake       | staker's accumulated ETH gain from system fees | ZEROStaking ->msg.sender |
-| unstake     | staker's accumulated ETH gain from system fees | ZEROStaking ->msg.sender |
+| stake       | staker's accumulated rBTC gain from system fees | ZEROStaking ->msg.sender |
+| unstake     | staker's accumulated rBTC gain from system fees | ZEROStaking ->msg.sender |
 
 ### Flow of ZUSD tokens in Liquity
 
@@ -591,7 +558,7 @@ Stability Providers and Frontend Operators receive ZERO gains according to their
 |                        | front end ZERO gain | ZERO._transfer(stabilityPoolAddress, _frontEnd, frontEndZEROGain);   |
 | withdrawFromSP         | depositor ZERO gain | ZERO._transfer(stabilityPoolAddress, msg.sender, depositorZEROGain); |
 |                        | front end ZERO gain | ZERO._transfer(stabilityPoolAddress, _frontEnd, frontEndZEROGain);   |
-| withdrawETHGainToTrove | depositor ZERO gain | ZERO._transfer(stabilityPoolAddress, msg.sender, depositorZEROGain); |
+| withdrawrBTCGainToTrove | depositor ZERO gain | ZERO._transfer(stabilityPoolAddress, msg.sender, depositorZEROGain); |
 |                        | front end ZERO gain | ZERO._transfer(stabilityPoolAddress, _frontEnd, frontEndZEROGain);   |
 
 **ZERO Staking Contract**
@@ -610,7 +577,7 @@ Anyone may call the public liquidation functions, and attempt to liquidate one o
 
 ZUSD token holders may also redeem their tokens, and swap an amount of tokens 1-for-1 in value (minus fees) with Ether.
 
-ZERO token holders may stake their ZERO, to earn a share of the system fee revenue, in ETH and ZUSD.
+ZERO token holders may stake their ZERO, to earn a share of the system fee revenue, in rBTC and ZUSD.
 
 ## Contract Ownership and Function Permissions
 
@@ -691,7 +658,7 @@ yarn stop-dev-chain
 
 ### Integer representations of decimals
 
-Several ratios and the ETH:USD price are integer representations of decimals, to 18 digits of precision. For example:
+Several ratios and the rBTC:USD price are integer representations of decimals, to 18 digits of precision. For example:
 
 | **uint representation of decimal** | **Number**    |
 | ---------------------------------- | ------------- |
@@ -727,7 +694,7 @@ All data structures with the ‘public’ visibility specifier are ‘gettable�
 
 `closeTrove()`: allows a borrower to repay all debt, withdraw all their collateral, and close their Trove. Requires the borrower have a ZUSD balance sufficient to repay their trove's debt, excluding gas compensation - i.e. `(debt - 50)` ZUSD.
 
-`claimCollateral(address _user)`: when a borrower’s Trove has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%, this function allows the borrower to claim their ETH collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation).
+`claimCollateral(address _user)`: when a borrower’s Trove has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%, this function allows the borrower to claim their rBTC collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation).
 
 ### TroveManager Functions - `TroveManager.sol`
 
@@ -737,19 +704,19 @@ All data structures with the ‘public’ visibility specifier are ‘gettable�
 
 `batchLiquidateTroves(address[] calldata _troveArray)`: callable by anyone, accepts a custom list of Troves addresses as an argument. Steps through the provided list and attempts to liquidate every Trove, until it reaches the end or it runs out of gas. A Trove is liquidated only if it meets the conditions for liquidation. For a batch of 10 Troves, the gas costs per liquidated Trove are roughly between 75K-83K, for a batch of 50 Troves between 54K-69K.
 
-`redeemCollateral(uint _ZUSDAmount, address _firstRedemptionHint, address _upperPartialRedemptionHint, address _lowerPartialRedemptionHint, uint _partialRedemptionHintNICR, uint _maxIterations, uint _maxFeePercentage)`: redeems `_ZUSDamount` of stablecoins for ether from the system. Decreases the caller’s ZUSD balance, and sends them the corresponding amount of ETH. Executes successfully if the caller has sufficient ZUSD to redeem. The number of Troves redeemed from is capped by `_maxIterations`. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when another redemption transaction is processed first, driving up the redemption fee.
+`redeemCollateral(uint _ZUSDAmount, address _firstRedemptionHint, address _upperPartialRedemptionHint, address _lowerPartialRedemptionHint, uint _partialRedemptionHintNICR, uint _maxIterations, uint _maxFeePercentage)`: redeems `_ZUSDamount` of stablecoins for ether from the system. Decreases the caller’s ZUSD balance, and sends them the corresponding amount of rBTC. Executes successfully if the caller has sufficient ZUSD to redeem. The number of Troves redeemed from is capped by `_maxIterations`. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when another redemption transaction is processed first, driving up the redemption fee.
 
 `getCurrentICR(address _user, uint _price)`: computes the user’s individual collateralization ratio (ICR) based on their total collateral and total ZUSD debt. Returns 2^256 -1 if they have 0 debt.
 
 `getTroveOwnersCount()`: get the number of active Troves in the system.
 
-`getPendingETHReward(address _borrower)`: get the pending ETH reward from liquidation redistribution events, for the given Trove.
+`getPendingrBTCReward(address _borrower)`: get the pending rBTC reward from liquidation redistribution events, for the given Trove.
 
 `getPendingZUSDDebtReward(address _borrower)`: get the pending Trove debt "reward" (i.e. the amount of extra debt assigned to the Trove) from liquidation redistribution events.
 
-`getEntireDebtAndColl(address _borrower)`: returns a Trove’s entire debt and collateral, which respectively include any pending debt rewards and ETH rewards from prior redistributions.
+`getEntireDebtAndColl(address _borrower)`: returns a Trove’s entire debt and collateral, which respectively include any pending debt rewards and rBTC rewards from prior redistributions.
 
-`getEntireSystemColl()`:  Returns the systemic entire collateral allocated to Troves, i.e. the sum of the ETH in the Active Pool and the Default Pool.
+`getEntireSystemColl()`:  Returns the systemic entire collateral allocated to Troves, i.e. the sum of the rBTC in the Active Pool and the Default Pool.
 
 `getEntireSystemDebt()` Returns the systemic entire debt assigned to Troves, i.e. the sum of the ZUSDDebt in the Active Pool and the Default Pool.
 
@@ -771,15 +738,15 @@ The number of Troves to consider for redemption can be capped by passing a non-z
 
 ### Stability Pool Functions - `StabilityPool.sol`
 
-`provideToSP(uint _amount, address _frontEndTag)`: allows stablecoin holders to deposit `_amount` of ZUSD to the Stability Pool. It sends `_amount` of ZUSD from their address to the Pool, and tops up their ZUSD deposit by `_amount` and their tagged front end’s stake by `_amount`. If the depositor already has a non-zero deposit, it sends their accumulated ETH and ZERO gains to their address, and pays out their front end’s ZERO gain to their front end.
+`provideToSP(uint _amount, address _frontEndTag)`: allows stablecoin holders to deposit `_amount` of ZUSD to the Stability Pool. It sends `_amount` of ZUSD from their address to the Pool, and tops up their ZUSD deposit by `_amount` and their tagged front end’s stake by `_amount`. If the depositor already has a non-zero deposit, it sends their accumulated rBTC and ZERO gains to their address, and pays out their front end’s ZERO gain to their front end.
 
-`withdrawFromSP(uint _amount)`: allows a stablecoin holder to withdraw `_amount` of ZUSD from the Stability Pool, up to the value of their remaining Stability deposit. It decreases their ZUSD balance by `_amount` and decreases their front end’s stake by `_amount`. It sends the depositor’s accumulated ETH and ZERO gains to their address, and pays out their front end’s ZERO gain to their front end. If the user makes a partial withdrawal, their deposit remainder will earn further gains. To prevent potential loss evasion by depositors, withdrawals from the Stability Pool are suspended when there are liquidable Troves with ICR < 110% in the system.
+`withdrawFromSP(uint _amount)`: allows a stablecoin holder to withdraw `_amount` of ZUSD from the Stability Pool, up to the value of their remaining Stability deposit. It decreases their ZUSD balance by `_amount` and decreases their front end’s stake by `_amount`. It sends the depositor’s accumulated rBTC and ZERO gains to their address, and pays out their front end’s ZERO gain to their front end. If the user makes a partial withdrawal, their deposit remainder will earn further gains. To prevent potential loss evasion by depositors, withdrawals from the Stability Pool are suspended when there are liquidable Troves with ICR < 110% in the system.
 
-`withdrawETHGainToTrove(address _hint)`: sends the user's entire accumulated ETH gain to the user's active Trove, and updates their Stability deposit with its accumulated loss from debt absorptions. Sends the depositor's ZERO gain to the depositor, and sends the tagged front end's ZERO gain to the front end.
+`withdrawrBTCGainToTrove(address _hint)`: sends the user's entire accumulated rBTC gain to the user's active Trove, and updates their Stability deposit with its accumulated loss from debt absorptions. Sends the depositor's ZERO gain to the depositor, and sends the tagged front end's ZERO gain to the front end.
 
 `registerFrontEnd(uint _kickbackRate)`: Registers an address as a front end and sets their chosen kickback rate in range `[0,1]`.
 
-`getDepositorETHGain(address _depositor)`: returns the accumulated ETH gain for a given Stability Pool depositor
+`getDepositorrBTCGain(address _depositor)`: returns the accumulated rBTC gain for a given Stability Pool depositor
 
 `getDepositorZEROGain(address _depositor)`: returns the accumulated ZERO gain for a given Stability Pool depositor
 
@@ -791,9 +758,9 @@ The number of Troves to consider for redemption can be capped by passing a non-z
 
 ### ZERO Staking Functions  `ZEROStaking.sol`
 
- `stake(uint _ZEROamount)`: sends `_ZEROAmount` from the caller to the staking contract, and increases their stake. If the caller already has a non-zero stake, it pays out their accumulated ETH and ZUSD gains from staking.
+ `stake(uint _ZEROamount)`: sends `_ZEROAmount` from the caller to the staking contract, and increases their stake. If the caller already has a non-zero stake, it pays out their accumulated rBTC and ZUSD gains from staking.
 
- `unstake(uint _ZEROamount)`: reduces the caller’s stake by `_ZEROamount`, up to a maximum of their entire stake. It pays out their accumulated ETH and ZUSD gains from staking.
+ `unstake(uint _ZEROamount)`: reduces the caller’s stake by `_ZEROamount`, up to a maximum of their entire stake. It pays out their accumulated rBTC and ZUSD gains from staking.
 
 ### Lockup Contract Factory `LockupContractFactory.sol`
 
@@ -819,7 +786,7 @@ https://eips.ethereum.org/EIPS/eip-2612
 
 ## Supplying Hints to Trove operations
 
-Troves in Liquity are recorded in a sorted doubly linked list, sorted by their NICR, from high to low. NICR stands for the nominal collateral ratio that is simply the amount of collateral (in ETH) multiplied by 100e18 and divided by the amount of debt (in ZUSD), without taking the ETH:USD price into account. Given that all Troves are equally affected by Ether price changes, they do not need to be sorted by their real ICR.
+Troves in Liquity are recorded in a sorted doubly linked list, sorted by their NICR, from high to low. NICR stands for the nominal collateral ratio that is simply the amount of collateral (in rBTC) multiplied by 100e18 and divided by the amount of debt (in ZUSD), without taking the rBTC:USD price into account. Given that all Troves are equally affected by Ether price changes, they do not need to be sorted by their real ICR.
 
 All Trove operations that change the collateralization ratio need to either insert or reinsert the Trove to the `SortedTroves` list. To reduce the computational complexity (and gas cost) of the insertion to the linked list, two ‘hints’ may be provided.
 
@@ -860,7 +827,7 @@ Hints allow cheaper Trove operations for the user, at the expense of a slightly 
   const toBN = web3.utils.toBN
 
   const ZUSDAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 ZUSD
-  const ETHColl = toBN(toWei('5')) // borrower wants to lock 5 ETH collateral
+  const rBTCColl = toBN(toWei('5')) // borrower wants to lock 5 rBTC collateral
 
   // Call deployed TroveManager contract to read the liquidation reserve and latest borrowing fee
   const liquidationReserve = await troveManager.ZUSD_GAS_COMPENSATION()
@@ -871,7 +838,7 @@ Hints allow cheaper Trove operations for the user, at the expense of a slightly 
 
   // Get the nominal NICR of the new trove
   const _1e20 = toBN(toWei('100'))
-  let NICR = ETHColl.mul(_1e20).div(expectedDebt)
+  let NICR = rBTCColl.mul(_1e20).div(expectedDebt)
 
   // Get an approximate address hint from the deployed HintHelper contract. Use (15 * number of troves) trials 
   // to get an approx. hint that is close to the right position.
@@ -884,12 +851,12 @@ Hints allow cheaper Trove operations for the user, at the expense of a slightly 
 
   // Finally, call openTrove with the exact upperHint and lowerHint
   const maxFee = '5'.concat('0'.repeat(16)) // Slippage protection: 5%
-  await borrowerOperations.openTrove(maxFee, ZUSDAmount, upperHint, lowerHint, { value: ETHColl })
+  await borrowerOperations.openTrove(maxFee, ZUSDAmount, upperHint, lowerHint, { value: rBTCColl })
 ```
 
 #### Adjusting a Trove
 ```
-  const collIncrease = toBN(toWei('1'))  // borrower wants to add 1 ETH
+  const collIncrease = toBN(toWei('1'))  // borrower wants to add 1 rBTC
   const ZUSDRepayment = toBN(toWei('230')) // borrower wants to repay 230 ZUSD
 
   // Get trove's current debt and coll
@@ -921,7 +888,7 @@ Hints allow cheaper Trove operations for the user, at the expense of a slightly 
 - `_upperPartialRedemptionHint` hints at the `prevId` neighbor of the last redeemed Trove upon reinsertion, if it's partially redeemed,
 - `_partialRedemptionHintNICR` ensures that the transaction won't run out of gas if neither `_lowerPartialRedemptionHint` nor `_upperPartialRedemptionHint` are  valid anymore.
 
-`redeemCollateral` will only redeem from Troves that have an ICR >= MCR. In other words, if there are Troves at the bottom of the SortedTroves list that are below the minimum collateralization ratio (which can happen after an ETH:USD price drop), they will be skipped. To make this more gas-efficient, the position of the first redeemable Trove should be passed as `_firstRedemptionHint`.
+`redeemCollateral` will only redeem from Troves that have an ICR >= MCR. In other words, if there are Troves at the bottom of the SortedTroves list that are below the minimum collateralization ratio (which can happen after an rBTC:USD price drop), they will be skipped. To make this more gas-efficient, the position of the first redeemable Trove should be passed as `_firstRedemptionHint`.
 
 #### First redemption hint
 
@@ -979,13 +946,13 @@ However, gas costs in Ethereum are substantial. If the gas costs of our public l
 
 The protocol thus directly compensates liquidators for their gas costs, to incentivize prompt liquidations in both normal and extreme periods of high gas prices. Liquidators should be confident that they will at least break even by making liquidation transactions.
 
-Gas compensation is paid in a mix of ZUSD and ETH. While the ETH is taken from the liquidated Trove, the ZUSD is provided by the borrower. When a borrower first issues debt, some ZUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws ETH from the trove(s) it liquidates, and sends the both the reserved ZUSD and the compensation in ETH to the caller, and liquidates the remainder.
+Gas compensation is paid in a mix of ZUSD and rBTC. While the rBTC is taken from the liquidated Trove, the ZUSD is provided by the borrower. When a borrower first issues debt, some ZUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws rBTC from the trove(s) it liquidates, and sends the both the reserved ZUSD and the compensation in rBTC to the caller, and liquidates the remainder.
 
-When a liquidation transaction liquidates multiple Troves, each Trove contributes ZUSD and ETH towards the total compensation for the transaction.
+When a liquidation transaction liquidates multiple Troves, each Trove contributes ZUSD and rBTC towards the total compensation for the transaction.
 
 Gas compensation per liquidated Trove is given by the formula:
 
-Gas compensation = `50 ZUSD + 0.5% of trove’s collateral (ETH)`
+Gas compensation = `50 ZUSD + 0.5% of trove’s collateral (rBTC)`
 
 The intentions behind this formula are:
 - To ensure that smaller Troves are liquidated promptly in normal times, at least
@@ -997,7 +964,7 @@ When a borrower opens a Trove, an additional 50 ZUSD debt is issued, and 50 ZUSD
 
 When a borrower closes their active Trove, this gas compensation is refunded: 50 ZUSD is burned from the gas pool's balance, and the corresponding 50 ZUSD debt on the Trove is cancelled.
 
-The purpose of the 50 ZUSD Liquidation Reserve is to provide a minimum level of gas compensation, regardless of the Trove's collateral size or the current ETH price.
+The purpose of the 50 ZUSD Liquidation Reserve is to provide a minimum level of gas compensation, regardless of the Trove's collateral size or the current rBTC price.
 
 ### Liquidation
 
@@ -1007,13 +974,13 @@ When a Trove is liquidated, 0.5% of its collateral is sent to the liquidator, al
 
 When a Trove is redeemed from, the redemption is made only against (debt - 50), not the entire debt.
 
-But if the redemption causes an amount (debt - 50) to be cancelled, the Trove is then closed: the 50 ZUSD Liquidation Reserve is cancelled with its remaining 50 debt. That is, the gas compensation is burned from the gas pool, and the 50 debt is zero’d. The ETH collateral surplus from the Trove remains in the system, to be later claimed by its owner.
+But if the redemption causes an amount (debt - 50) to be cancelled, the Trove is then closed: the 50 ZUSD Liquidation Reserve is cancelled with its remaining 50 debt. That is, the gas compensation is burned from the gas pool, and the 50 debt is zero’d. The rBTC collateral surplus from the Trove remains in the system, to be later claimed by its owner.
 
 ### Gas compensation helper functions
 
 Gas compensation functions are found in the parent _LiquityBase.sol_ contract:
 
-`_getCollGasCompensation(uint _entireColl)` returns the amount of ETH to be drawn from a trove's collateral and sent as gas compensation. 
+`_getCollGasCompensation(uint _entireColl)` returns the amount of rBTC to be drawn from a trove's collateral and sent as gas compensation. 
 
 `_getCompositeDebt(uint _debt)` returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation.
 
@@ -1021,45 +988,45 @@ Gas compensation functions are found in the parent _LiquityBase.sol_ contract:
 
 Any ZUSD holder may deposit ZUSD to the Stability Pool. It is designed to absorb debt from liquidations, and reward depositors with the liquidated collateral, shared between depositors in proportion to their deposit size.
 
-Since liquidations are expected to occur at an ICR of just below 110%, and even in most extreme cases, still above 100%, a depositor can expect to receive a net gain from most liquidations. When that holds, the dollar value of the ETH gain from a liquidation exceeds the dollar value of the ZUSD loss (assuming the price of ZUSD is $1).  
+Since liquidations are expected to occur at an ICR of just below 110%, and even in most extreme cases, still above 100%, a depositor can expect to receive a net gain from most liquidations. When that holds, the dollar value of the rBTC gain from a liquidation exceeds the dollar value of the ZUSD loss (assuming the price of ZUSD is $1).  
 
-We define the **collateral surplus** in a liquidation as `$(ETH) - debt`, where `$(...)` represents the dollar value.
+We define the **collateral surplus** in a liquidation as `$(rBTC) - debt`, where `$(...)` represents the dollar value.
 
 At an ZUSD price of $1, Troves with `ICR > 100%` have a positive collateral surplus.
 
-After one or more liquidations, a deposit will have absorbed ZUSD losses, and received ETH gains. The remaining reduced deposit is the **compounded deposit**.
+After one or more liquidations, a deposit will have absorbed ZUSD losses, and received rBTC gains. The remaining reduced deposit is the **compounded deposit**.
 
 Stability Providers expect a positive ROI on their initial deposit. That is:
 
-`$(ETH Gain + compounded deposit) > $(initial deposit)`
+`$(rBTC Gain + compounded deposit) > $(initial deposit)`
 
 ### Mixed liquidations: offset and redistribution
 
-When a liquidation hits the Stability Pool, it is known as an **offset**: the debt of the Trove is offset against the ZUSD in the Pool. When **x** ZUSD debt is offset, the debt is cancelled, and **x** ZUSD in the Pool is burned. When the ZUSD Stability Pool is greater than the debt of the Trove, all the Trove's debt is cancelled, and all its ETH is shared between depositors. This is a **pure offset**.
+When a liquidation hits the Stability Pool, it is known as an **offset**: the debt of the Trove is offset against the ZUSD in the Pool. When **x** ZUSD debt is offset, the debt is cancelled, and **x** ZUSD in the Pool is burned. When the ZUSD Stability Pool is greater than the debt of the Trove, all the Trove's debt is cancelled, and all its rBTC is shared between depositors. This is a **pure offset**.
 
-It can happen that the ZUSD in the Stability Pool is less than the debt of a Trove. In this case, the the whole Stability Pool will be used to offset a fraction of the Trove’s debt, and an equal fraction of the Trove’s ETH collateral will be assigned to Stability Providers. The remainder of the Trove’s debt and ETH gets redistributed to active Troves. This is a **mixed offset and redistribution**.
+It can happen that the ZUSD in the Stability Pool is less than the debt of a Trove. In this case, the the whole Stability Pool will be used to offset a fraction of the Trove’s debt, and an equal fraction of the Trove’s rBTC collateral will be assigned to Stability Providers. The remainder of the Trove’s debt and rBTC gets redistributed to active Troves. This is a **mixed offset and redistribution**.
 
-Because the ETH collateral fraction matches the offset debt fraction, the effective ICR of the collateral and debt that is offset, is equal to the ICR of the Trove. So, for depositors, the ROI per liquidation depends only on the ICR of the liquidated Trove.
+Because the rBTC collateral fraction matches the offset debt fraction, the effective ICR of the collateral and debt that is offset, is equal to the ICR of the Trove. So, for depositors, the ROI per liquidation depends only on the ICR of the liquidated Trove.
 
-### Stability Pool deposit losses and ETH gains - implementation
+### Stability Pool deposit losses and rBTC gains - implementation
 
-Deposit functionality is handled by `StabilityPool.sol` (`provideToSP`, `withdrawFromSP`, etc).  StabilityPool also handles the liquidation calculation, and holds the ZUSD and ETH balances.
+Deposit functionality is handled by `StabilityPool.sol` (`provideToSP`, `withdrawFromSP`, etc).  StabilityPool also handles the liquidation calculation, and holds the ZUSD and rBTC balances.
 
 When a liquidation is offset with the Stability Pool, debt from the liquidation is cancelled with an equal amount of ZUSD in the pool, which is burned. 
 
 Individual deposits absorb the debt from the liquidated Trove in proportion to their deposit as a share of total deposits.
  
-Similarly the liquidated Trove’s ETH is assigned to depositors in the same proportion.
+Similarly the liquidated Trove’s rBTC is assigned to depositors in the same proportion.
 
 For example: a liquidation that empties 30% of the Stability Pool will reduce each deposit by 30%, no matter the size of the deposit.
 
 ### Stability Pool example
 
-Here’s an example of the Stability Pool absorbing liquidations. The Stability Pool contains 3 depositors, A, B and C, and the ETH:USD price is 100.
+Here’s an example of the Stability Pool absorbing liquidations. The Stability Pool contains 3 depositors, A, B and C, and the rBTC:USD price is 100.
 
 There are two Troves to be liquidated, T1 and T2:
 
-|   | Trove | Collateral (ETH) | Debt (ZUSD) | ICR         | $(ETH) ($) | Collateral surplus ($) |
+|   | Trove | Collateral (rBTC) | Debt (ZUSD) | ICR         | $(rBTC) ($) | Collateral surplus ($) |
 |---|-------|------------------|-------------|-------------|------------|------------------------|
 |   | T1    | 1.6              | 150         | 1.066666667 | 160        | 10                     |
 |   | T2    | 2.45             | 225         | 1.088888889 | 245        | 20                     |
@@ -1073,18 +1040,18 @@ Here are the deposits, before any liquidations occur:
 | C         | 300     | 0.5    |
 | Total     | 600     | 1      |
 
-Now, the first liquidation T1 is absorbed by the Pool: 150 debt is cancelled with 150 Pool ZUSD, and its 1.6 ETH is split between depositors. We see the gains earned by A, B, C, are in proportion to their share of the total ZUSD in the Stability Pool:
+Now, the first liquidation T1 is absorbed by the Pool: 150 debt is cancelled with 150 Pool ZUSD, and its 1.6 rBTC is split between depositors. We see the gains earned by A, B, C, are in proportion to their share of the total ZUSD in the Stability Pool:
 
-| Deposit | Debt absorbed from T1 | Deposit after | Total ETH gained | $(deposit + ETH gain) ($) | Current ROI   |
+| Deposit | Debt absorbed from T1 | Deposit after | Total rBTC gained | $(deposit + rBTC gain) ($) | Current ROI   |
 |---------|-----------------------|---------------|------------------|---------------------------|---------------|
 | A       | 25                    | 75            | 0.2666666667     | 101.6666667               | 0.01666666667 |
 | B       | 50                    | 150           | 0.5333333333     | 203.3333333               | 0.01666666667 |
 | C       | 75                    | 225           | 0.8              | 305                       | 0.01666666667 |
 | Total   | 150                   | 450           | 1.6              | 610                       | 0.01666666667 |
 
-And now the second liquidation, T2, occurs: 225 debt is cancelled with 225 Pool ZUSD, and 2.45 ETH is split between depositors. The accumulated ETH gain includes all ETH gain from T1 and T2.
+And now the second liquidation, T2, occurs: 225 debt is cancelled with 225 Pool ZUSD, and 2.45 rBTC is split between depositors. The accumulated rBTC gain includes all rBTC gain from T1 and T2.
 
-| Depositor | Debt absorbed from T2 | Deposit after | Accumulated ETH | $(deposit + ETH gain) ($) | Current ROI |
+| Depositor | Debt absorbed from T2 | Deposit after | Accumulated rBTC | $(deposit + rBTC gain) ($) | Current ROI |
 |-----------|-----------------------|---------------|-----------------|---------------------------|-------------|
 | A         | 37.5                  | 37.5          | 0.675           | 105                       | 0.05        |
 | B         | 75                    | 75            | 1.35            | 210                       | 0.05        |
@@ -1096,32 +1063,32 @@ It’s clear that:
 - Each depositor gets the same ROI from a given liquidation
 - Depositors return increases over time, as the deposits absorb liquidations with a positive collateral surplus
 
-Eventually, a deposit can be fully “used up” in absorbing debt, and reduced to 0. This happens whenever a liquidation occurs that empties the Stability Pool. A deposit stops earning ETH gains when it has been reduced to 0.
+Eventually, a deposit can be fully “used up” in absorbing debt, and reduced to 0. This happens whenever a liquidation occurs that empties the Stability Pool. A deposit stops earning rBTC gains when it has been reduced to 0.
 
 
 ### Stability Pool implementation
 
-A depositor obtains their compounded deposits and corresponding ETH gain in a “pull-based” manner. The system calculates the depositor’s compounded deposit and accumulated ETH gain when the depositor makes an operation that changes their ETH deposit.
+A depositor obtains their compounded deposits and corresponding rBTC gain in a “pull-based” manner. The system calculates the depositor’s compounded deposit and accumulated rBTC gain when the depositor makes an operation that changes their rBTC deposit.
 
-Depositors deposit ZUSD via `provideToSP`, and withdraw with `withdrawFromSP`. Their accumulated ETH gain is paid out every time they make a deposit operation - so ETH payout is triggered by both deposit withdrawals and top-ups.
+Depositors deposit ZUSD via `provideToSP`, and withdraw with `withdrawFromSP`. Their accumulated rBTC gain is paid out every time they make a deposit operation - so rBTC payout is triggered by both deposit withdrawals and top-ups.
 
-### How deposits and ETH gains are tracked
+### How deposits and rBTC gains are tracked
 
-We use a highly scalable method of tracking deposits and ETH gains that has O(1) complexity. 
+We use a highly scalable method of tracking deposits and rBTC gains that has O(1) complexity. 
 
-When a liquidation occurs, rather than updating each depositor’s deposit and ETH gain, we simply update two intermediate variables: a product `P`, and a sum `S`.
+When a liquidation occurs, rather than updating each depositor’s deposit and rBTC gain, we simply update two intermediate variables: a product `P`, and a sum `S`.
 
-A mathematical manipulation allows us to factor out the initial deposit, and accurately track all depositors’ compounded deposits and accumulated ETH gains over time, as liquidations occur, using just these two variables. When depositors join the Pool, they get a snapshot of `P` and `S`.
+A mathematical manipulation allows us to factor out the initial deposit, and accurately track all depositors’ compounded deposits and accumulated rBTC gains over time, as liquidations occur, using just these two variables. When depositors join the Pool, they get a snapshot of `P` and `S`.
 
-The formula for a depositor’s accumulated ETH gain is derived here:
+The formula for a depositor’s accumulated rBTC gain is derived here:
 
 [Scalable reward distribution for compounding, decreasing stake](https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf)
 
-Each liquidation updates `P` and `S`. After a series of liquidations, a compounded deposit and corresponding ETH gain can be calculated using the initial deposit, the depositor’s snapshots, and the current values of `P` and `S`.
+Each liquidation updates `P` and `S`. After a series of liquidations, a compounded deposit and corresponding rBTC gain can be calculated using the initial deposit, the depositor’s snapshots, and the current values of `P` and `S`.
 
-Any time a depositor updates their deposit (withdrawal, top-up) their ETH gain is paid out, and they receive new snapshots of `P` and `S`.
+Any time a depositor updates their deposit (withdrawal, top-up) their rBTC gain is paid out, and they receive new snapshots of `P` and `S`.
 
-This is similar in spirit to the simpler [Scalable Reward Distribution on the Ethereum Network by Bogdan Batog et al](http://batog.info/papers/scalable-reward-distribution.pdf), however, the mathematics is more involved as we handle a compounding, decreasing stake, and a corresponding ETH reward.
+This is similar in spirit to the simpler [Scalable Reward Distribution on the Ethereum Network by Bogdan Batog et al](http://batog.info/papers/scalable-reward-distribution.pdf), however, the mathematics is more involved as we handle a compounding, decreasing stake, and a corresponding rBTC reward.
 
 ## ZERO Issuance to Stability Providers
 
@@ -1164,7 +1131,7 @@ In a ZERO reward event, the ZERO to be issued is calculated based on time passed
 
 The ZERO produced in this issuance event is shared between depositors, in proportion to their deposit sizes.
 
-To efficiently and accurately track ZERO gains for depositors and front ends as deposits decrease over time from liquidations, we re-use the [algorithm for rewards from a compounding, decreasing stake](https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf). It is the same algorithm used for the ETH gain from liquidations.
+To efficiently and accurately track ZERO gains for depositors and front ends as deposits decrease over time from liquidations, we re-use the [algorithm for rewards from a compounding, decreasing stake](https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf). It is the same algorithm used for the rBTC gain from liquidations.
 
 The same product `P` is used, and a sum `G` is used to track ZERO rewards, and each deposit gets a new snapshot of `P` and `G` when it is updated.
 
@@ -1183,7 +1150,7 @@ Also, whenever one of the front end’s depositors tops or withdraws their depos
 When a deposit is changed (top-up, withdrawal):
 
 - A ZERO reward event occurs, and `G` is updated
-- Its ETH and ZERO gains are paid out
+- Its rBTC and ZERO gains are paid out
 - Its tagged front end’s ZERO gains are paid out to that front end
 - The deposit is updated, with new snapshots of `P`, `S` and `G`
 - The front end’s stake updated, with new snapshots of `P` and `G`
@@ -1193,7 +1160,7 @@ When a liquidation occurs:
 
 ## ZERO issuance to liquity providers
 
-On deployment a new Uniswap pool will be created for the pair ZUSD/ETH and a Staking rewards contract will be deployed. The contract is based on [Unipool by Synthetix](https://github.com/Synthetixio/Unipool/blob/master/contracts/Unipool.sol). More information about their liquidity rewards program can be found in the [original SIP 31](https://sips.synthetix.io/sips/sip-31) and in [their blog](https://blog.synthetix.io/new-uniswap-seth-lp-reward-system/).
+On deployment a new Uniswap pool will be created for the pair ZUSD/rBTC and a Staking rewards contract will be deployed. The contract is based on [Unipool by Synthetix](https://github.com/Synthetixio/Unipool/blob/master/contracts/Unipool.sol). More information about their liquidity rewards program can be found in the [original SIP 31](https://sips.synthetix.io/sips/sip-31) and in [their blog](https://blog.synthetix.io/new-uniswap-seth-lp-reward-system/).
 
 Essentially the way it works is:
 - Liqudity providers add funds to the Uniswap pool, and get UNIv2 tokens in exchange
@@ -1214,13 +1181,13 @@ A ZERO holder may stake their ZERO, and earn a share of all system fees, proport
 
 Liquity generates revenue in two ways: redemptions, and issuance of new ZUSD tokens.
 
-Redemptions fees are paid in ETH. Issuance fees (when a user opens a Trove, or issues more ZUSD from their existing Trove) are paid in ZUSD.
+Redemptions fees are paid in rBTC. Issuance fees (when a user opens a Trove, or issues more ZUSD from their existing Trove) are paid in ZUSD.
 
 ### Redemption Fee
 
-The redemption fee is taken as a cut of the total ETH drawn from the system in a redemption. It is based on the current redemption rate.
+The redemption fee is taken as a cut of the total rBTC drawn from the system in a redemption. It is based on the current redemption rate.
 
-In the `TroveManager`, `redeemCollateral` calculates the ETH fee and transfers it to the staking contract, `ZEROStaking.sol`
+In the `TroveManager`, `redeemCollateral` calculates the rBTC fee and transfers it to the staking contract, `ZEROStaking.sol`
 
 ### Issuance fee
 
@@ -1237,7 +1204,7 @@ The current fee schedule:
 Upon each redemption:
 - `baseRate` is decayed based on time passed since the last fee event
 - `baseRate` is incremented by an amount proportional to the fraction of the total ZUSD supply that was redeemed
-- The redemption rate is given by `min{REDEMPTION_FEE_FLOOR + baseRate * ETHdrawn, DECIMAL_PRECISION}`
+- The redemption rate is given by `min{REDEMPTION_FEE_FLOOR + baseRate * rBTCdrawn, DECIMAL_PRECISION}`
 
 Upon each debt issuance:
 - `baseRate` is decayed based on time passed since the last fee event
@@ -1265,7 +1232,7 @@ The decay parameter is tuned such that the fee changes by a factor of 0.99 per h
 
 ZERO holders may `stake` and `unstake` their ZERO in the `ZEROStaking.sol` contract. 
 
-When a fee event occurs, the fee in ZUSD or ETH is sent to the staking contract, and a reward-per-unit-staked sum (`F_ETH`, or `F_ZUSD`) is incremented. A ZERO stake earns a share of the fee equal to its share of the total ZERO staked, at the instant the fee occurred.
+When a fee event occurs, the fee in ZUSD or rBTC is sent to the staking contract, and a reward-per-unit-staked sum (`F_rBTC`, or `F_ZUSD`) is incremented. A ZERO stake earns a share of the fee equal to its share of the total ZERO staked, at the instant the fee occurred.
 
 This staking formula and implementation follows the basic [“Batog” pull-based reward distribution](http://batog.info/papers/scalable-reward-distribution.pdf).
 
@@ -1325,13 +1292,13 @@ PDFs of these can be found in https://github.com/liquity/dev/blob/main/papers
 
 _**Trove:**_ a collateralized debt position, bound to a single Ethereum address. Also referred to as a “CDP” in similar protocols.
 
-_**ZUSD**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any Ethereum address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 ZUSD is always exchangeable for $1 USD worth of ETH.
+_**ZUSD**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any Ethereum address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 ZUSD is always exchangeable for $1 USD worth of rBTC.
 
 _**Active Trove:**_ an Ethereum address owns an “active Trove” if there is a node in the `SortedTroves` list with ID equal to the address, and non-zero collateral is recorded on the Trove struct for that address.
 
 _**Closed Trove:**_ a Trove that was once active, but now has zero debt and zero collateral recorded on its struct, and there is no node in the `SortedTroves` list with ID equal to the owning address.
 
-_**Active collateral:**_ the amount of ETH collateral recorded on a Trove’s struct
+_**Active collateral:**_ the amount of rBTC collateral recorded on a Trove’s struct
 
 _**Active debt:**_ the amount of ZUSD debt recorded on a Trove’s struct
 
@@ -1339,15 +1306,15 @@ _**Entire collateral:**_ the sum of a Trove’s active collateral plus its pendi
 
 _**Entire debt:**_ the sum of a Trove’s active debt plus its pending debt rewards accumulated from distributions
 
-_**Individual collateralization ratio (ICR):**_ a Trove's ICR is the ratio of the dollar value of its entire collateral at the current ETH:USD price, to its entire debt
+_**Individual collateralization ratio (ICR):**_ a Trove's ICR is the ratio of the dollar value of its entire collateral at the current rBTC:USD price, to its entire debt
 
-_**Nominal collateralization ratio (nominal ICR, NICR):**_ a Trove's nominal ICR is its entire collateral (in ETH) multiplied by 100e18 and divided by its entire debt.
+_**Nominal collateralization ratio (nominal ICR, NICR):**_ a Trove's nominal ICR is its entire collateral (in rBTC) multiplied by 100e18 and divided by its entire debt.
 
-_**Total active collateral:**_ the sum of active collateral over all Troves. Equal to the ETH in the ActivePool.
+_**Total active collateral:**_ the sum of active collateral over all Troves. Equal to the rBTC in the ActivePool.
 
 _**Total active debt:**_ the sum of active debt over all Troves. Equal to the ZUSD in the ActivePool.
 
-_**Total defaulted collateral:**_ the total ETH collateral in the DefaultPool
+_**Total defaulted collateral:**_ the total rBTC collateral in the DefaultPool
 
 _**Total defaulted debt:**_ the total ZUSD debt in the DefaultPool
 
@@ -1355,37 +1322,37 @@ _**Entire system collateral:**_ the sum of the collateral in the ActivePool and 
 
 _**Entire system debt:**_ the sum of the debt in the ActivePool and DefaultPool
 
-_**Total collateralization ratio (TCR):**_ the ratio of the dollar value of the entire system collateral at the current ETH:USD price, to the entire system debt
+_**Total collateralization ratio (TCR):**_ the ratio of the dollar value of the entire system collateral at the current rBTC:USD price, to the entire system debt
 
 _**Critical collateralization ratio (CCR):**_ 150%. When the TCR is below the CCR, the system enters Recovery Mode.
 
-_**Borrower:**_ an externally owned account or contract that locks collateral in a Trove and issues ZUSD tokens to their own address. They “borrow” ZUSD tokens against their ETH collateral.
+_**Borrower:**_ an externally owned account or contract that locks collateral in a Trove and issues ZUSD tokens to their own address. They “borrow” ZUSD tokens against their rBTC collateral.
 
 _**Depositor:**_ an externally owned account or contract that has assigned ZUSD tokens to the Stability Pool, in order to earn returns from liquidations, and receive ZERO token issuance.
 
-_**Redemption:**_ the act of swapping ZUSD tokens with the system, in return for an equivalent value of ETH. Any account with a ZUSD token balance may redeem them, whether or not they are a borrower.
+_**Redemption:**_ the act of swapping ZUSD tokens with the system, in return for an equivalent value of rBTC. Any account with a ZUSD token balance may redeem them, whether or not they are a borrower.
 
-When ZUSD is redeemed for ETH, the ETH is always withdrawn from the lowest collateral Troves, in ascending order of their collateralization ratio. A redeemer can not selectively target Troves with which to swap ZUSD for ETH.
+When ZUSD is redeemed for rBTC, the rBTC is always withdrawn from the lowest collateral Troves, in ascending order of their collateralization ratio. A redeemer can not selectively target Troves with which to swap ZUSD for rBTC.
 
 _**Repayment:**_ when a borrower sends ZUSD tokens to their own Trove, reducing their debt, and increasing their collateralization ratio.
 
-_**Retrieval:**_ when a borrower with an active Trove withdraws some or all of their ETH collateral from their own trove, either reducing their collateralization ratio, or closing their Trove (if they have zero debt and withdraw all their ETH)
+_**Retrieval:**_ when a borrower with an active Trove withdraws some or all of their rBTC collateral from their own trove, either reducing their collateralization ratio, or closing their Trove (if they have zero debt and withdraw all their rBTC)
 
-_**Liquidation:**_ the act of force-closing an undercollateralized Trove and redistributing its collateral and debt. When the Stability Pool is sufficiently large, the liquidated debt is offset with the Stability Pool, and the ETH distributed to depositors. If the liquidated debt can not be offset with the Pool, the system redistributes the liquidated collateral and debt directly to the active Troves with >110% collateralization ratio.
+_**Liquidation:**_ the act of force-closing an undercollateralized Trove and redistributing its collateral and debt. When the Stability Pool is sufficiently large, the liquidated debt is offset with the Stability Pool, and the rBTC distributed to depositors. If the liquidated debt can not be offset with the Pool, the system redistributes the liquidated collateral and debt directly to the active Troves with >110% collateralization ratio.
 
 Liquidation functionality is permissionless and publically available - anyone may liquidate an undercollateralized Trove, or batch liquidate Troves in ascending order of collateralization ratio.
 
-_**Collateral Surplus**_: The difference between the dollar value of a Trove's ETH collateral, and the dollar value of its ZUSD debt. In a full liquidation, this is the net gain earned by the recipients of the liquidation.
+_**Collateral Surplus**_: The difference between the dollar value of a Trove's rBTC collateral, and the dollar value of its ZUSD debt. In a full liquidation, this is the net gain earned by the recipients of the liquidation.
 
 _**Offset:**_ cancellation of liquidated debt with ZUSD in the Stability Pool, and assignment of liquidated collateral to Stability Pool depositors, in proportion to their deposit.
 
 _**Redistribution:**_ assignment of liquidated debt and collateral directly to active Troves, in proportion to their collateral.
 
-_**Pure offset:**_  when a Trove's debt is entirely cancelled with ZUSD in the Stability Pool, and all of it's liquidated ETH collateral is assigned to Stability Providers.
+_**Pure offset:**_  when a Trove's debt is entirely cancelled with ZUSD in the Stability Pool, and all of it's liquidated rBTC collateral is assigned to Stability Providers.
 
 _**Mixed offset and redistribution:**_  When the Stability Pool ZUSD only covers a fraction of the liquidated Trove's debt.  This fraction of debt is cancelled with ZUSD in the Stability Pool, and an equal fraction of the Trove's collateral is assigned to depositors. The remaining collateral & debt is redistributed directly to active Troves.
 
-_**Gas compensation:**_ A refund, in ZUSD and ETH, automatically paid to the caller of a liquidation function, intended to at least cover the gas cost of the transaction. Designed to ensure that liquidators are not dissuaded by potentially high gas costs.
+_**Gas compensation:**_ A refund, in ZUSD and rBTC, automatically paid to the caller of a liquidation function, intended to at least cover the gas cost of the transaction. Designed to ensure that liquidators are not dissuaded by potentially high gas costs.
 
 ## Development
 
@@ -1507,7 +1474,7 @@ This will automatically start the local blockchain, so you need to make sure tha
 yarn start-demo
 ```
 
-This spawns a modified version of dev-frontend that ignores MetaMask, and directly uses the local blockchain node. Every time the page is reloaded (at http://localhost:3000), a new random account is created with a balance of 100 ETH. Additionally, transactions are automatically signed, so you no longer need to accept wallet confirmations. This lets you play around with Liquity more freely.
+This spawns a modified version of dev-frontend that ignores MetaMask, and directly uses the local blockchain node. Every time the page is reloaded (at http://localhost:3000), a new random account is created with a balance of 100 rBTC. Additionally, transactions are automatically signed, so you no longer need to accept wallet confirmations. This lets you play around with Liquity more freely.
 
 When you no longer need the demo mode, press Ctrl+C in the terminal then run:
 
@@ -1644,12 +1611,12 @@ Please read this Disclaimer carefully before accessing, interacting with, or usi
 
 While Liquity AG developed the Liquity Protocol Software, the Liquity Protocol Software runs in a fully decentralized and autonomous manner on the Ethereum network. Liquity AG is not involved in the operation of the Liquity Protocol Software nor has it any control over transactions made using its smart contracts. Further, Liquity AG does neither enter into any relationship with users of the Liquity Protocol Software and/or frontend operators, nor does it operate an own frontend. Any and all functionalities of the Liquity Protocol Software, including the ZUSD and the ZERO, are of purely technical nature and there is no claim towards any private individual or legal entity in this regard.
 
-LIQUITY AG IS NOT LIABLE TO ANY USER FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, IN CONNECTION WITH THE USE OR INABILITY TO USE THE LIQUITY PROTOCOL SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF ETH, ZUSD OR ZERO, NON-ALLOCATION OF TECHNICAL FEES TO ZERO HOLDERS, LOSS OF DATA, BUSINESS INTERRUPTION, DATA BEING RENDERED INACCURATE OR OTHER LOSSES SUSTAINED BY A USER OR THIRD PARTIES AS A RESULT OF THE LIQUITY PROTOCOL SOFTWARE AND/OR ANY ACTIVITY OF A FRONTEND OPERATOR OR A FAILURE OF THE LIQUITY PROTOCOL SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE).
+LIQUITY AG IS NOT LIABLE TO ANY USER FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, IN CONNECTION WITH THE USE OR INABILITY TO USE THE LIQUITY PROTOCOL SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF rBTC, ZUSD OR ZERO, NON-ALLOCATION OF TECHNICAL FEES TO ZERO HOLDERS, LOSS OF DATA, BUSINESS INTERRUPTION, DATA BEING RENDERED INACCURATE OR OTHER LOSSES SUSTAINED BY A USER OR THIRD PARTIES AS A RESULT OF THE LIQUITY PROTOCOL SOFTWARE AND/OR ANY ACTIVITY OF A FRONTEND OPERATOR OR A FAILURE OF THE LIQUITY PROTOCOL SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE).
 
 The Liquity Protocol Software has been developed and published under the GNU GPL v3 open-source license, which forms an integral part of this disclaimer. 
 
-THE LIQUITY PROTOCOL SOFTWARE HAS BEEN PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE LIQUITY PROTOCOL SOFTWARE IS HIGHLY EXPERIMENTAL AND ANY REAL ETH AND/OR ZUSD AND/OR ZERO SENT, STAKED OR DEPOSITED TO THE LIQUITY PROTOCOL SOFTWARE ARE AT RISK OF BEING LOST INDEFINITELY, WITHOUT ANY KIND OF CONSIDERATION.
+THE LIQUITY PROTOCOL SOFTWARE HAS BEEN PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE LIQUITY PROTOCOL SOFTWARE IS HIGHLY EXPERIMENTAL AND ANY REAL rBTC AND/OR ZUSD AND/OR ZERO SENT, STAKED OR DEPOSITED TO THE LIQUITY PROTOCOL SOFTWARE ARE AT RISK OF BEING LOST INDEFINITELY, WITHOUT ANY KIND OF CONSIDERATION.
 
 There are no official frontend operators, and the use of any frontend is made by users at their own risk. To assess the trustworthiness of a frontend operator lies in the sole responsibility of the users and must be made carefully.
 
-User is solely responsible for complying with applicable law when interacting (in particular, when using ETH, ZUSD, ZERO or other Token) with the Liquity Protocol Software whatsoever. 
+User is solely responsible for complying with applicable law when interacting (in particular, when using rBTC, ZUSD, ZERO or other Token) with the Liquity Protocol Software whatsoever. 
