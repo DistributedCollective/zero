@@ -31,11 +31,13 @@ import "./ZEROTokenStorage.sol";
 *
 * 5) 45 million tokens are minted at deployment to SOV holders
 
-* 6) 35 million tokens are minted at deployment to the CommunityIssuance contract
+* 6) 30 million tokens are minted at deployment to the CommunityIssuance contract
 *
-* 7) 20 million tokens are minted at deployment to the Liquity multisig
+* 7) 5 million tokens are minted at deployment to the LiquidityMining contract
 *
-* 8) Until one year from deployment:
+* 8) 20 million tokens are minted at deployment to the Liquity multisig
+*
+* 9) Until one year from deployment:
 * -Liquity multisig may only transfer() tokens to LockupContracts that have been deployed via & registered in the 
 *  LockupContractFactory 
 * -approve(), increaseAllowance(), decreaseAllowance() revert when called by the multisig
@@ -98,7 +100,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         uint liquidityMiningEntitlement = _1_MILLION.mul(5);
         _mint(_liquidityMiningAddress, liquidityMiningEntitlement);
 
-        // Allocate the remainder to the ZERO Multisig: (100 - 45 - 35 - 5) million = 20 million
+        // Allocate the remainder to the ZERO Multisig: (100 - 45 - 30 - 5) million = 20 million
         // This amount will be distributed to founders 
         uint multisigEntitlement = _1_MILLION.mul(100)
             .sub(sovStakersEntitlement)
