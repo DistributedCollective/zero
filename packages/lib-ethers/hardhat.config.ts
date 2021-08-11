@@ -61,7 +61,7 @@ const infuraNetwork = (name: string): { [name: string]: NetworkUserConfig } => (
 });
 
 const governanceAddresses = {
-  mainnet: "0x0000000000000000000000000000000000000001",
+  mainnet: "0x967c84b731679E36A344002b8E3CE50620A7F69f",
   rsktestnet: "0x0000000000000000000000000000000000000002",
   dev: "0x0000000000000000000000000000000000000003"
 };
