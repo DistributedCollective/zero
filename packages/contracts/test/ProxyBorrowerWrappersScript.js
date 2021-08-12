@@ -318,8 +318,9 @@ contract('BorrowerWrappers', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Alice has staked 150 ZUSD and the whale 2350 therefore she gets 6% of the ZERO gains
-    // ie. 0.06 * 918,265.545302 = 55,095.9327181
-    const expectedZEROGain_A = toBN('55095932718100000000000')
+    // 30,000,000 * (1–0.5^ (SECONDS_IN_A_WEEK * 2 / SECONDS_IN_A_YEAR) )
+    // ie. 0.06 * 787,084.753044 = 47,225.0851826
+    const expectedZEROGain_A = toBN('47225085182600000000000')
 
     await priceFeed.setPrice(price.mul(toBN(2)));
 
@@ -352,7 +353,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(zeroBalanceAfter, zeroBalanceBefore)
 
     // ZERO staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e10)
+    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
@@ -515,7 +516,7 @@ contract('BorrowerWrappers', async accounts => {
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
 
-    const expectedZEROGain_A = toBN('918265545302000000000000')
+    const expectedZEROGain_A = toBN('787084753044000000000000')
 
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
     // Alice claims staking rewards and puts them back in the system through the proxy
@@ -551,7 +552,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(zeroBalanceBefore, zeroBalanceAfter)
 
     // ZERO staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
+    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e14)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
@@ -677,7 +678,7 @@ contract('BorrowerWrappers', async accounts => {
     const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
     const expectedTotalZUSD = expectedZUSDGain_A.add(netDebtChange)
 
-    const expectedZEROGain_A = toBN('918265545302000000000000')
+    const expectedZEROGain_A = toBN('787084753044000000000000')
 
     // Alice claims staking rewards and puts them back in the system through the proxy
     await borrowerWrappers.claimStakingGainsAndRecycle(th._100pct, alice, alice, { from: alice })
@@ -712,7 +713,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(zeroBalanceBefore, zeroBalanceAfter)
 
     // ZERO staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
+    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e14)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)

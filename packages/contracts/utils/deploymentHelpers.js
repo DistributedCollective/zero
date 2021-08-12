@@ -30,6 +30,9 @@ const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.s
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
 
+// FIXME: this one should be removed after liquidity mining is correctly deployed
+const NonPayable = artifacts.require("./NonPayable.sol")
+
 // Proxy scripts
 const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript')
 const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript')
@@ -187,6 +190,8 @@ class DeploymentHelper {
     await zeroToken.initialize(
       communityIssuance.address, 
       sovStakersIssuance.address,
+      // FIXME: replace with liquidity mining contract address
+      (await NonPayable.new()).address,
       zeroStaking.address,
       lockupContractFactory.address, 
       multisigAddress
@@ -221,6 +226,8 @@ class DeploymentHelper {
     const zeroToken = await ZEROTokenTester.new(
       communityIssuance.address, 
       sovStakersIssuance.address,
+      // FIXME: replace with liquidity mining contract address
+      (await NonPayable.new()).address,
       zeroStaking.address,
       lockupContractFactory.address,
       multisigAddress
@@ -283,6 +290,8 @@ class DeploymentHelper {
     const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuance.new()
     const sovStakersIssuance = await SovStakersIssuance.new()
+    // FIXME: replace with liquidity mining contract address
+    const liquidityMining = await NonPayable.new();
 
     /* Deploy ZERO Token, passing Community Issuance,  ZEROStaking, and Factory addresses 
     to the constructor  */
@@ -290,6 +299,7 @@ class DeploymentHelper {
     await zeroToken.initialize(
       communityIssuance.address, 
       sovStakersIssuance.address,
+      liquidityMining.address,
       zeroStaking.address,
       lockupContractFactory.address,
       multisigAddress

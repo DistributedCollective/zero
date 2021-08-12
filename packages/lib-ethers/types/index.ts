@@ -467,6 +467,7 @@ interface ZEROTokenCalls {
   decimals(_overrides?: CallOverrides): Promise<number>;
   domainSeparator(_overrides?: CallOverrides): Promise<string>;
   getDeploymentStartTime(_overrides?: CallOverrides): Promise<BigNumber>;
+  liquidityMiningAddress(_overrides?: CallOverrides): Promise<string>;
   lockupContractFactory(_overrides?: CallOverrides): Promise<string>;
   multisigAddress(_overrides?: CallOverrides): Promise<string>;
   name(_overrides?: CallOverrides): Promise<string>;
@@ -483,7 +484,7 @@ interface ZEROTokenTransactions {
   approve(spender: string, amount: BigNumberish, _overrides?: Overrides): Promise<boolean>;
   decreaseAllowance(spender: string, subtractedValue: BigNumberish, _overrides?: Overrides): Promise<boolean>;
   increaseAllowance(spender: string, addedValue: BigNumberish, _overrides?: Overrides): Promise<boolean>;
-  initialize(_communityIssuanceAddress: string, _sovStakersIssuanceAddress: string, _zeroStakingAddress: string, _lockupFactoryAddress: string, _multisigAddress: string, _overrides?: Overrides): Promise<void>;
+  initialize(_communityIssuanceAddress: string, _sovStakersIssuanceAddress: string, _liquidityMiningAddress: string, _zeroStakingAddress: string, _lockupFactoryAddress: string, _multisigAddress: string, _overrides?: Overrides): Promise<void>;
   permit(owner: string, spender: string, amount: BigNumberish, deadline: BigNumberish, v: BigNumberish, r: BytesLike, s: BytesLike, _overrides?: Overrides): Promise<void>;
   sendToZEROStaking(_sender: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   transfer(recipient: string, amount: BigNumberish, _overrides?: Overrides): Promise<boolean>;

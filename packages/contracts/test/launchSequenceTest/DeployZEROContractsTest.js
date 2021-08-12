@@ -80,12 +80,21 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
       assert.equal(multisigZEROEntitlement, _20Million)
     })
 
-    it("Mints the correct ZERO amount to the CommunityIssuance contract address: 35 million", async () => {
+    it("Mints the correct ZERO amount to the CommunityIssuance contract address: 30 million", async () => {
       const communityZEROEntitlement = await zeroToken.balanceOf(communityIssuance.address)
-      // 32 million as 18-digit decimal
-      const _35Million = dec(35, 24)
+      // 30 million as 18-digit decimal
+      const _30Million = dec(30, 24)
 
-      assert.equal(communityZEROEntitlement, _35Million)
+      assert.equal(communityZEROEntitlement, _30Million)
+    })
+
+    // FIXME: remove skip after adding LiquidityMining contract
+    it.skip("Mints the correct ZERO amount to the LiquidityMining contract address: 5 million", async () => {
+      const liquidityMiningZEROEntitlement = await zeroToken.balanceOf(liquidityMining.address)
+      // 5 million as 18-digit decimal
+      const _5Million = dec(5, 24)
+
+      assert.equal(liquidityMiningZEROEntitlement, _5Million)
     })
 
     it("Mints the correct ZERO amount to the SOVStakersIssuance contract address: 45 million", async () => {

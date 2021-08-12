@@ -9,6 +9,7 @@ contract ZEROTokenTester is ZEROToken {
     (
         address _communityIssuanceAddress, 
         address _sovStakersIssuanceAddress,
+        address _liquidityMiningAddress,
         address _zeroStakingAddress,
         address _lockupFactoryAddress,
         address _multisigAddress
@@ -18,6 +19,7 @@ contract ZEROTokenTester is ZEROToken {
         initialize(
             _communityIssuanceAddress, 
             _sovStakersIssuanceAddress,
+            _liquidityMiningAddress,
             _zeroStakingAddress,
             _lockupFactoryAddress,
             _multisigAddress

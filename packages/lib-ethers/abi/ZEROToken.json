@@ -282,6 +282,11 @@
       },
       {
         "internalType": "address",
+        "name": "_liquidityMiningAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_zeroStakingAddress",
         "type": "address"
       },
@@ -299,6 +304,19 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidityMiningAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
