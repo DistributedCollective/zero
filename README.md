@@ -1,6 +1,6 @@
 # Zero: Decentralized Borrowing Protocol
 
-![Tests](https://github.com/DistributedCollective/zero/main/workflows/CI/badge.svg)
+![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
 
 Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows Bitcoin holders to obtain maximum liquidity against
 their collateral without paying interest. After locking up rBTC as collateral in a smart contract and
