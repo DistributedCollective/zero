@@ -5,10 +5,6 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { Decimal } from "@liquity/lib-base";
 
 import devOrNull from "../deployments/dev.json";
-import goerli from "../deployments/goerli.json";
-import kovan from "../deployments/kovan.json";
-import rinkeby from "../deployments/rinkeby.json";
-import ropsten from "../deployments/ropsten.json";
 import mainnet from "../deployments/mainnet.json";
 import rsktestnet from "../deployments/rsktestnet.json";
 
@@ -29,10 +25,6 @@ const deployments: {
   [chainId: number]: _LiquityDeploymentJSON | undefined;
 } = {
   [mainnet.chainId]: mainnet,
-  [ropsten.chainId]: ropsten,
-  [rinkeby.chainId]: rinkeby,
-  [goerli.chainId]: goerli,
-  [kovan.chainId]: kovan,
   [rsktestnet.chainId]: rsktestnet,
 
   ...(dev !== null ? { [dev.chainId]: dev } : {})

@@ -51,15 +51,6 @@ const generateRandomAccounts = (numberOfAccounts: number) => {
 const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey;
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
 
-const infuraApiKey = "ad9cef41c9c844a7b54d10be24d416e5";
-
-const infuraNetwork = (name: string): { [name: string]: NetworkUserConfig } => ({
-  [name]: {
-    url: `https://${name}.infura.io/v3/${infuraApiKey}`,
-    accounts: [deployerAccount]
-  }
-});
-
 const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
   rsktestnet: "0x0000000000000000000000000000000000000002",
@@ -124,12 +115,19 @@ const config: HardhatUserConfig = {
       url: "https://public-node.testnet.rsk.co",
       accounts: [deployerAccount]
     },
-
-    ...infuraNetwork("ropsten"),
-    ...infuraNetwork("rinkeby"),
-    ...infuraNetwork("goerli"),
-    ...infuraNetwork("kovan"),
-    ...infuraNetwork("mainnet")
+    rsksovryntestnet: {
+			url: "https://testnet.sovryn.app/rpc",
+			accounts: { mnemonic: "brownie", count: 10 },
+			chainId: 31,
+			gasMultiplier: 1.25,
+			//timeout: 20000, // increase if needed; 20000 is the default value
+			//allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
+		},
+		rsksovrynmainnet: {
+			url: "https://mainnet.sovryn.app/rpc",
+			chainId: 30,
+			//timeout: 20000, // increase if needed; 20000 is the default value
+		}
   },
 
   paths: {
