@@ -115,6 +115,19 @@ const config: HardhatUserConfig = {
       url: "https://public-node.testnet.rsk.co",
       accounts: [deployerAccount]
     },
+    rsksovryntestnet: {
+			url: "https://testnet.sovryn.app/rpc",
+			accounts: { mnemonic: "brownie", count: 10 },
+			chainId: 31,
+			gasMultiplier: 1.25,
+			//timeout: 20000, // increase if needed; 20000 is the default value
+			//allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
+		},
+		rsksovrynmainnet: {
+			url: "https://mainnet.sovryn.app/rpc",
+			chainId: 30,
+			//timeout: 20000, // increase if needed; 20000 is the default value
+		}
   },
 
   paths: {
