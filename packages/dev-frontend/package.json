@@ -10,7 +10,7 @@
     "@fortawesome/free-solid-svg-icons": "5.15.2",
     "@fortawesome/react-fontawesome": "0.1.14",
     "@popperjs/core": "2.9.1",
-    "@testing-library/dom": "7.30.0",
+    "@testing-library/dom": "8.7.1",
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.5",
     "@testing-library/user-event": "12.8.3",
