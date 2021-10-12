@@ -51,4 +51,7 @@ contract ZEROTokenStorage is Initializable {
 
     ILockupContractFactory public lockupContractFactory;
 
+    address public marketMakerAddress;
+    address public presaleAddress;
+
 }

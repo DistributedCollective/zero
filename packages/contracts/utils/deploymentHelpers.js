@@ -194,7 +194,11 @@ class DeploymentHelper {
       (await NonPayable.new()).address,
       zeroStaking.address,
       lockupContractFactory.address, 
-      multisigAddress
+      multisigAddress,
+      // FIXME: replace with market maker contract address
+      (await NonPayable.new()).address,
+      // FIXME: replace with presale contract address
+      (await NonPayable.new()).address,
     )
     ZEROToken.setAsDeployed(zeroToken)
 
@@ -230,7 +234,11 @@ class DeploymentHelper {
       (await NonPayable.new()).address,
       zeroStaking.address,
       lockupContractFactory.address,
-      multisigAddress
+      multisigAddress,
+      // FIXME: replace with market maker contract address
+      (await NonPayable.new()).address,
+      // FIXME: replace with presale contract address
+      (await NonPayable.new()).address,
     )
     ZEROTokenTester.setAsDeployed(zeroToken)
 
