@@ -35,6 +35,7 @@ import { _LiquityDeploymentJSON } from "../src/contracts";
 import { _connectToDeployment } from "../src/EthersLiquityConnection";
 import { EthersLiquity } from "../src/EthersLiquity";
 import { ReadableEthersLiquity } from "../src/ReadableEthersLiquity";
+import mockBalanceRedirectPresaleAbi from "../abi/MockBalanceRedirectPresale.json";
 
 const provider = ethers.provider;
 
@@ -397,6 +398,10 @@ describe("EthersLiquity", () => {
       const otherLiquity = await connectToDeployment(deployment, otherUsers[0], frontendTag);
       await otherLiquity.openTrove({ depositCollateral: 20, borrowZUSD: ZUSD_MINIMUM_DEBT });
 
+      if(deployment.presaleAddress) {
+        const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
+        await presale.connect(deployer).closePresale();
+      }
       await otherLiquity.depositZUSDInStabilityPool(ZUSD_MINIMUM_DEBT);
 
       const deposit = await otherLiquity.getStabilityDeposit();
@@ -427,9 +432,20 @@ describe("EthersLiquity", () => {
 
     const smallStabilityDeposit = Decimal.from(10);
 
+    it("should fail if Zero presale is open", async () => {
+      await expect(liquity.depositZUSDInStabilityPool(smallStabilityDeposit)).to.eventually.be.rejected;
+
+    });
+
     it("should make a small stability deposit", async () => {
       const { newTrove } = await liquity.openTrove(Trove.recreate(initialTroveOfDepositor));
       expect(newTrove).to.deep.equal(initialTroveOfDepositor);
+
+
+      if(deployment.presaleAddress) {
+        const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
+        await presale.connect(deployer).closePresale();
+      }
 
       const details = await liquity.depositZUSDInStabilityPool(smallStabilityDeposit);
 
@@ -571,7 +587,11 @@ describe("EthersLiquity", () => {
           user,
           ...otherUsersSubset
         ]);
-
+        
+        if(deployment.presaleAddress) {
+          const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
+          await presale.connect(deployer).closePresale();
+        }
         await sendToEach(otherUsersSubset, 21.1);
 
         let price = Decimal.from(200);
@@ -1016,6 +1036,11 @@ describe("EthersLiquity", () => {
 
     it("should include enough gas for issuing ZERO", async function () {
       this.timeout("1m");
+
+      if(deployment.presaleAddress) {
+        const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
+        await presale.connect(deployer).closePresale();
+      }
 
       await liquity.openTrove({ depositCollateral: 40, borrowZUSD: 4000 });
       await liquity.depositZUSDInStabilityPool(19);

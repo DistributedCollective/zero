@@ -84,7 +84,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         zeroStakingAddress = _zeroStakingAddress;
         lockupContractFactory = ILockupContractFactory(_lockupFactoryAddress);
         marketMakerAddress = _marketMakerAddress;
-        presaleAddress = _presaleAddress;
+        presale = IBalanceRedirectPresale(_presaleAddress);
 
         bytes32 hashedName = keccak256(bytes(_NAME));
         bytes32 hashedVersion = keccak256(bytes(_VERSION));
@@ -125,7 +125,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     /// @param account The address that will be assigned the new tokens
     /// @param amount The quantity of tokens generated
     function mint (address account, uint amount) external {
-        require(msg.sender == marketMakerAddress || msg.sender == presaleAddress, 'Invalid caller');
+        require(msg.sender == marketMakerAddress || msg.sender == address(presale), 'Invalid caller');
         _mint(account,amount);
     }
 
@@ -256,6 +256,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     function _transfer(address sender, address recipient, uint256 amount) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
+        require(presale.isClosed(), "Presale is not over yet");
 
         _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
         _balances[recipient] = _balances[recipient].add(amount);

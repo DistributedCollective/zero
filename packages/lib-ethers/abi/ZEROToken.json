@@ -494,10 +494,10 @@
   },
   {
     "inputs": [],
-    "name": "presaleAddress",
+    "name": "presale",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IBalanceRedirectPresale",
         "name": "",
         "type": "address"
       }

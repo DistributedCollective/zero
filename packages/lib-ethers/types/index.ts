@@ -474,7 +474,7 @@ interface ZEROTokenCalls {
   name(_overrides?: CallOverrides): Promise<string>;
   nonces(owner: string, _overrides?: CallOverrides): Promise<BigNumber>;
   permitTypeHash(_overrides?: CallOverrides): Promise<string>;
-  presaleAddress(_overrides?: CallOverrides): Promise<string>;
+  presale(_overrides?: CallOverrides): Promise<string>;
   sovStakersIssuanceAddress(_overrides?: CallOverrides): Promise<string>;
   symbol(_overrides?: CallOverrides): Promise<string>;
   totalSupply(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -1044,4 +1044,19 @@ export interface SovStakersIssuance
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "TotalZEROIssuedUpdated"): _TypedLogDescription<{ _totalZEROIssued: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZEROTokenAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
+}
+
+interface MockBalanceRedirectPresaleCalls {
+  isClosed(_overrides?: CallOverrides): Promise<boolean>;
+}
+
+interface MockBalanceRedirectPresaleTransactions {
+  closePresale(_overrides?: Overrides): Promise<void>;
+}
+
+export interface MockBalanceRedirectPresale
+  extends _TypedLiquityContract<MockBalanceRedirectPresaleCalls, MockBalanceRedirectPresaleTransactions> {
+  readonly address: string;
+  readonly filters: {
+  };
 }

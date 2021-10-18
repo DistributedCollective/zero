@@ -78,7 +78,7 @@ const marketMakerAddresses = {
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
   rsktestnet: "0x0000000000000000000000000000000000000002",
-  dev: "0x0000000000000000000000000000000000000003"
+  dev: ""
 };
 
 const oracleAddresses : Record<string, OracleAddresses> = {

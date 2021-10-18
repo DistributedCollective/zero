@@ -182,8 +182,8 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   sovCommunityPotAddress: string,
-  liquidityMiningAddress?: string,
-  presaleAddress?: string,
+  liquidityMiningAddress: string,
+  presaleAddress: string,
   marketMakerAddress?: string,
   overrides?: Overrides
 ) => {
@@ -214,8 +214,8 @@ const connectContracts = async (
         zeroStaking.address,
         lockupContractFactory.address,
         Wallet.createRandom().address, // TODO: _multisigAddress (parameterize this)
-        presaleAddress?presaleAddress:gasPool.address,
         marketMakerAddress?marketMakerAddress:gasPool.address,
+        presaleAddress,
         {
           ...overrides,
           nonce
@@ -485,6 +485,9 @@ export const deployAndSetupContracts = async (
 
   governanceAddress ??= await deployer.getAddress();
   sovCommunityPotAddress ??= await deployContract(deployer, getContractFactory, "MockFeeSharingProxy", { ...overrides });
+  //TODO replace with mocked liquidity mining 
+  liquidityMiningAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
+  presaleAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
 
   log("Deploying contracts...");
   log();

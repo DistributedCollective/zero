@@ -3,6 +3,7 @@
 pragma solidity 0.6.11;
 
 import "../Interfaces/ILockupContractFactory.sol";
+import "../Interfaces/IBalanceRedirectPresale.sol";
 import "../Dependencies/Initializable.sol";
 
 contract ZEROTokenStorage is Initializable {
@@ -52,6 +53,6 @@ contract ZEROTokenStorage is Initializable {
     ILockupContractFactory public lockupContractFactory;
 
     address public marketMakerAddress;
-    address public presaleAddress;
+    IBalanceRedirectPresale public presale;
 
 }
