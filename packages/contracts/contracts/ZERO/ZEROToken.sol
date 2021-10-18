@@ -6,7 +6,6 @@ import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/ILockupContractFactory.sol";
-import "../Dependencies/console.sol";
 import "./ZEROTokenStorage.sol";
 
 /**
@@ -65,12 +64,16 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         address _liquidityMiningAddress,
         address _zeroStakingAddress,
         address _lockupFactoryAddress,
-        address _multisigAddress
+        address _multisigAddress,
+        address _marketMakerAddress,
+        address _presaleAddress
     ) initializer public {
         checkContract(_communityIssuanceAddress);
         checkContract(_sovStakersIssuanceAddress);
         checkContract(_liquidityMiningAddress);
         checkContract(_lockupFactoryAddress);
+        checkContract(_marketMakerAddress);
+        checkContract(_presaleAddress);
 
         multisigAddress = _multisigAddress;
         deploymentStartTime  = block.timestamp;
@@ -80,6 +83,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         liquidityMiningAddress = _liquidityMiningAddress;
         zeroStakingAddress = _zeroStakingAddress;
         lockupContractFactory = ILockupContractFactory(_lockupFactoryAddress);
+        marketMakerAddress = _marketMakerAddress;
+        presale = IBalanceRedirectPresale(_presaleAddress);
 
         bytes32 hashedName = keccak256(bytes(_NAME));
         bytes32 hashedVersion = keccak256(bytes(_VERSION));
@@ -115,6 +120,22 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     }
 
     // --- External functions ---
+
+    /// @notice Generates `amount` tokens that are assigned to `account`
+    /// @param account The address that will be assigned the new tokens
+    /// @param amount The quantity of tokens generated
+    function mint (address account, uint amount) external {
+        require(msg.sender == marketMakerAddress || msg.sender == address(presale), 'Invalid caller');
+        _mint(account,amount);
+    }
+
+    /// @notice Burns `amount` tokens from `account`
+    /// @param account The address that will lose the tokens
+    /// @param amount The quantity of tokens to burn
+    function burn (address account, uint amount) external {
+        require(msg.sender == marketMakerAddress , 'Invalid caller');
+        _burn(account, amount);
+    }
 
     function totalSupply() external view override returns (uint256) {
         return _totalSupply;
@@ -235,9 +256,11 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     function _transfer(address sender, address recipient, uint256 amount) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
+        require(presale.isClosed(), "Presale is not over yet");
 
         _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
         _balances[recipient] = _balances[recipient].add(amount);
+
         emit Transfer(sender, recipient, amount);
     }
 
@@ -247,6 +270,15 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
         emit Transfer(address(0), account, amount);
+    }
+
+    function _burn(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: mint to the zero address");
+        require(amount <= _balances[account], "balance too low");
+
+        _totalSupply = _totalSupply.sub(amount);
+        _balances[account] = _balances[account].sub(amount);
+        emit Transfer(account, address(0), amount);
     }
 
     function _approve(address owner, address spender, uint256 amount) internal {

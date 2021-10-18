@@ -1,3 +1,4 @@
+const { artifacts } = require('hardhat')
 const SortedTroves = artifacts.require("./SortedTroves.sol")
 const LiquityBaseParams = artifacts.require("./LiquityBaseParams.sol")
 const TroveManagerRedeemOps = artifacts.require("./Dependencies/TroveManagerRedeemOps.sol")
@@ -30,6 +31,8 @@ const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.s
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
 
+const MockBalanceRedirectPresale = artifacts.require("./MockBalanceRedirectPresale.sol")
+
 // FIXME: this one should be removed after liquidity mining is correctly deployed
 const NonPayable = artifacts.require("./NonPayable.sol")
 
@@ -40,6 +43,7 @@ const TroveManagerScript = artifacts.require('TroveManagerScript')
 const StabilityPoolScript = artifacts.require('StabilityPoolScript')
 const TokenScript = artifacts.require('TokenScript')
 const ZEROStakingScript = artifacts.require('ZEROStakingScript')
+
 const {
   buildUserProxies,
   BorrowerOperationsProxy,
@@ -180,10 +184,14 @@ class DeploymentHelper {
     const communityIssuance = await CommunityIssuance.new()
     const sovStakersIssuance = await SovStakersIssuance.new()
     const mockFeeSharingProxy = await MockFeeSharingProxy.new()
+    const mockBalanceRedirectPresale = await MockBalanceRedirectPresale.new()
 
     ZEROStaking.setAsDeployed(zeroStaking)
     LockupContractFactory.setAsDeployed(lockupContractFactory)
     CommunityIssuance.setAsDeployed(communityIssuance)
+    MockBalanceRedirectPresale.setAsDeployed(mockBalanceRedirectPresale)
+
+    await mockBalanceRedirectPresale.closePresale()
 
     // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor 
     const zeroToken = await ZEROToken.new()
@@ -194,7 +202,10 @@ class DeploymentHelper {
       (await NonPayable.new()).address,
       zeroStaking.address,
       lockupContractFactory.address, 
-      multisigAddress
+      multisigAddress,
+      // FIXME: replace with market maker contract address
+      (await NonPayable.new()).address,
+      mockBalanceRedirectPresale.address,
     )
     ZEROToken.setAsDeployed(zeroToken)
 
@@ -215,12 +226,16 @@ class DeploymentHelper {
     const communityIssuance = await CommunityIssuanceTester.new()
     const sovStakersIssuance = await SovStakersIssuance.new()
     const mockFeeSharingProxy = await MockFeeSharingProxy.new()
+    const mockBalanceRedirectPresale = await MockBalanceRedirectPresale.new()
 
     ZEROStaking.setAsDeployed(zeroStaking)
     LockupContractFactory.setAsDeployed(lockupContractFactory)
     CommunityIssuanceTester.setAsDeployed(communityIssuance)
     CommunityIssuanceTester.setAsDeployed(sovStakersIssuance)
     MockFeeSharingProxy.setAsDeployed(mockFeeSharingProxy)
+    MockBalanceRedirectPresale.setAsDeployed(mockBalanceRedirectPresale)
+
+    await mockBalanceRedirectPresale.closePresale()
 
     // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor 
     const zeroToken = await ZEROTokenTester.new(
@@ -230,7 +245,10 @@ class DeploymentHelper {
       (await NonPayable.new()).address,
       zeroStaking.address,
       lockupContractFactory.address,
-      multisigAddress
+      multisigAddress,
+      // FIXME: replace with market maker contract address
+      (await NonPayable.new()).address,
+      mockBalanceRedirectPresale.address,
     )
     ZEROTokenTester.setAsDeployed(zeroToken)
 
@@ -240,7 +258,8 @@ class DeploymentHelper {
       communityIssuance,
       sovStakersIssuance,
       mockFeeSharingProxy,
-      zeroToken
+      zeroToken,
+      mockBalanceRedirectPresale
     }
     return ZEROContracts
   }

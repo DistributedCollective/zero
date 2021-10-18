@@ -227,6 +227,9 @@ export interface _LiquityDeploymentJSON {
   readonly totalStabilityPoolZEROReward: string;
   readonly governanceAddress: string;
   readonly sovCommunityPotAddress: string;
+  readonly liquidityMiningAddress?: string;
+  readonly presaleAddress?: string;
+  readonly marketMakerAddress?: string;
   readonly _priceFeedIsTestnet: boolean;
   readonly _isDev: boolean;
 }

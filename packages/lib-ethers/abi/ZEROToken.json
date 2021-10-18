@@ -169,6 +169,24 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "burn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "communityIssuanceAddress",
     "outputs": [
@@ -299,6 +317,16 @@
         "internalType": "address",
         "name": "_multisigAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_marketMakerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_presaleAddress",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -330,6 +358,37 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "marketMakerAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -428,6 +487,19 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "presale",
+    "outputs": [
+      {
+        "internalType": "contract IBalanceRedirectPresale",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

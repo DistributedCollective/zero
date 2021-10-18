@@ -182,6 +182,9 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   sovCommunityPotAddress: string,
+  liquidityMiningAddress: string,
+  presaleAddress: string,
+  marketMakerAddress?: string,
   overrides?: Overrides
 ) => {
   if (!deployer.provider) {
@@ -207,10 +210,12 @@ const connectContracts = async (
       zeroToken.initialize(
         communityIssuance.address,
         sovStakersIssuance.address,
-        gasPool.address, // TODO: liquidity mining contract address, should be a valid contract
+        liquidityMiningAddress?liquidityMiningAddress:gasPool.address,
         zeroStaking.address,
         lockupContractFactory.address,
         Wallet.createRandom().address, // TODO: _multisigAddress (parameterize this)
+        marketMakerAddress?marketMakerAddress:gasPool.address,
+        presaleAddress,
         {
           ...overrides,
           nonce
@@ -468,6 +473,9 @@ export const deployAndSetupContracts = async (
   _isDev = true,
   governanceAddress?: string,
   sovCommunityPotAddress?: string,
+  liquidityMiningAddress?: string,
+  presaleAddress?: string,
+  marketMakerAddress?: string,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
 
@@ -477,6 +485,9 @@ export const deployAndSetupContracts = async (
 
   governanceAddress ??= await deployer.getAddress();
   sovCommunityPotAddress ??= await deployContract(deployer, getContractFactory, "MockFeeSharingProxy", { ...overrides });
+  //TODO replace with mocked liquidity mining 
+  liquidityMiningAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
+  presaleAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
 
   log("Deploying contracts...");
   log();
@@ -491,6 +502,9 @@ export const deployAndSetupContracts = async (
     totalStabilityPoolZEROReward: "0",
     governanceAddress,
     sovCommunityPotAddress, 
+    liquidityMiningAddress,
+    presaleAddress,
+    marketMakerAddress,
     _priceFeedIsTestnet,
     _isDev,
 
@@ -500,7 +514,7 @@ export const deployAndSetupContracts = async (
   const contracts = _connectToContracts(deployer, deployment);
 
   log("Connecting contracts...");
-  await connectContracts(contracts, deployer, sovCommunityPotAddress, overrides);
+  await connectContracts(contracts, deployer, sovCommunityPotAddress, liquidityMiningAddress, presaleAddress, marketMakerAddress, overrides);
 
   if (externalPriceFeeds !== undefined) {
     assert(!checkPriceFeedIsTestnet(contracts.priceFeed));

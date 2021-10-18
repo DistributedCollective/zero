@@ -60,6 +60,8 @@ contract('During the initial lockup period', async accounts => {
   let oneYearFromSystemDeployment
   let twoYearsFromSystemDeployment
 
+  let mockBalanceRedirectPresale
+
   beforeEach(async () => {
     // Deploy all contracts from the first account
     coreContracts = await deploymentHelper.deployLiquityCore()
@@ -69,6 +71,7 @@ contract('During the initial lockup period', async accounts => {
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
     lockupContractFactory = ZEROContracts.lockupContractFactory
+    mockBalanceRedirectPresale = ZEROContracts.mockBalanceRedirectPresale
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
@@ -110,6 +113,46 @@ contract('During the initial lockup period', async accounts => {
     // Fast forward time 364 days, so that still less than 1 year since launch has passed
     await th.fastForwardTime(SECONDS_IN_364_DAYS, web3.currentProvider)
   })
+
+  describe('ZERO transfer during presale', async accounts => {
+    it("should fail transfer if presale is not over yet", async () => {
+      // Start D with some ZERO
+      await zeroToken.unprotectedMint(D, dec(1, 24))
+      // H deploy lockup contracts with A as beneficiaries
+      const deployedLCtx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, { from: H })
+       // Grab contract addresses from deployment tx events
+      const LCAddress_A = await th.getLCAddressFromDeploymentTx(deployedLCtx_A)
+
+      await mockBalanceRedirectPresale.openPresale()
+
+      const ZEROtransferTxPromise = zeroToken.transfer(LCAddress_A, dec(1, 24), { from: D })
+      await assertRevert(ZEROtransferTxPromise, "Presale is not over yet")
+    });
+
+    it("should fail transferFrom if presale is not over yet", async () => {
+      // Fund A
+      await zeroToken.unprotectedMint(A, dec(1, 18))
+
+      // A approve F
+      await zeroToken.approve(F, dec(1, 18), { from: A })
+
+      await mockBalanceRedirectPresale.openPresale()
+      
+      const ZEROtransferFromTx = zeroToken.transferFrom(A, F, dec(1, 18), { from: F })
+      await assertRevert(ZEROtransferFromTx, "Presale is not over yet")
+    });
+
+    it("should fail staking if presale is not over yet", async () => {
+      // Fund F
+      await zeroToken.unprotectedMint(F, dec(1, 18))
+
+      await mockBalanceRedirectPresale.openPresale()
+
+      const ZEROStakingTx = zeroStaking.stake(dec(1, 18), { from: F })
+      await assertRevert(ZEROStakingTx, "Presale is not over yet")
+    })
+
+  });
 
   describe('ZERO transfer during first year after ZERO deployment', async accounts => {
     // --- Liquity AG transfer restriction, 1st year ---

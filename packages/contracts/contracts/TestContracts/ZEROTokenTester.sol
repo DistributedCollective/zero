@@ -12,7 +12,9 @@ contract ZEROTokenTester is ZEROToken {
         address _liquidityMiningAddress,
         address _zeroStakingAddress,
         address _lockupFactoryAddress,
-        address _multisigAddress
+        address _multisigAddress,
+        address _marketMakerAddress,
+        address _presaleAddress
     ) 
         public 
     {
@@ -22,7 +24,9 @@ contract ZEROTokenTester is ZEROToken {
             _liquidityMiningAddress,
             _zeroStakingAddress,
             _lockupFactoryAddress,
-            _multisigAddress
+            _multisigAddress,
+            _marketMakerAddress,
+            _presaleAddress
         );
     } 
 

@@ -63,6 +63,24 @@ const sovCommunityPotAddresses = {
   dev: ""
 };
 
+const liquidityMiningAddresses = {
+  mainnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0x0000000000000000000000000000000000000002",
+  dev: "0x0000000000000000000000000000000000000003"
+};
+
+const marketMakerAddresses = {
+  mainnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0x0000000000000000000000000000000000000002",
+  dev: "0x0000000000000000000000000000000000000003"
+};
+
+const presaleAddresses = {
+  mainnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0x0000000000000000000000000000000000000002",
+  dev: ""
+};
+
 const oracleAddresses : Record<string, OracleAddresses> = {
   mainnet: {
     mocOracleAddress: "",
@@ -85,6 +103,15 @@ const hasSovCommunityPot = (network: string): network is keyof typeof sovCommuni
 
 const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
   network in governanceAddresses;
+
+const hasLiquidityMining = (network: string): network is keyof typeof liquidityMiningAddresses =>
+  network in liquidityMiningAddresses;
+
+const hasPresale = (network: string): network is keyof typeof presaleAddresses =>
+  network in presaleAddresses;
+
+const hasMarketMaker = (network: string): network is keyof typeof marketMakerAddresses =>
+  network in marketMakerAddresses;
 
 const config: HardhatUserConfig = {
   networks: {
@@ -143,6 +170,9 @@ declare module "hardhat/types/runtime" {
       governanceAddress?: string,
       sovCommunityPotAddress?: string,
       externalPriceFeeds?: OracleAddresses,
+      liquidityMiningAddress?: string,
+      presaleAddress?: string,
+      marketMakerAddress?: string,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -166,6 +196,9 @@ extendEnvironment(env => {
     governanceAddress,
     sovCommunityPotAddress,
     externalPriceFeeds,
+    liquidityMiningAddress,
+    presaleAddress,
+    marketMakerAddress,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
@@ -175,6 +208,9 @@ extendEnvironment(env => {
       env.network.name === "dev",
       governanceAddress,
       sovCommunityPotAddress,
+      liquidityMiningAddress,
+      presaleAddress,
+      marketMakerAddress,
       overrides
     );
 
@@ -188,6 +224,9 @@ type DeployParams = {
   useRealPriceFeed?: boolean;
   governanceAddress?: string;
   sovCommunityPotAddress?: string;
+  liquidityMiningAddress?: string;
+  presaleAddress?: string;
+  marketMakerAddress?: string;
 };
 
 const defaultChannel = process.env.CHANNEL || "default";
@@ -220,7 +259,10 @@ task("deploy", "Deploys the contracts to the network")
         gasPrice,
         useRealPriceFeed,
         governanceAddress,
-        sovCommunityPotAddress
+        sovCommunityPotAddress,
+        liquidityMiningAddress,
+        presaleAddress,
+        marketMakerAddress,
       }: DeployParams,
       env
     ) => {
@@ -240,12 +282,24 @@ task("deploy", "Deploys the contracts to the network")
       sovCommunityPotAddress ??= hasSovCommunityPot(env.network.name)
         ? sovCommunityPotAddresses[env.network.name]
         : undefined;
+      liquidityMiningAddress ??= hasLiquidityMining(env.network.name)
+        ? liquidityMiningAddresses[env.network.name]
+        : undefined;
+      presaleAddress ??= hasPresale(env.network.name)
+        ? presaleAddresses[env.network.name]
+        : undefined;
+      marketMakerAddress ??= hasMarketMaker(env.network.name)
+        ? marketMakerAddresses[env.network.name]
+        : undefined;
 
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
         sovCommunityPotAddress,
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
+        liquidityMiningAddress,
+        presaleAddress,
+        marketMakerAddress,
         overrides
       );
 
