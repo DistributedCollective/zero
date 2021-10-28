@@ -151,7 +151,7 @@ contract('ZERO Token', async accounts => {
   it('totalSupply(): gets the total supply', async () => {
     const total = (await zeroTokenTester.totalSupply()).toString()
    
-    assert.equal(total, dec(100, 24))
+    assert.equal(total, 0)
   })
 
   it("name(): returns the token's name", async () => {
@@ -266,8 +266,7 @@ contract('ZERO Token', async accounts => {
 
     await assertRevert(zeroTokenTester.transfer(zeroTokenTester.address, 1, { from: A }))
     await assertRevert(zeroTokenTester.transfer(ZERO_ADDRESS, 1, { from: A }))
-    await assertRevert(zeroTokenTester.transfer(communityIssuance.address, 1, { from: A }))
-    await assertRevert(zeroTokenTester.transfer(zeroStaking.address, 1, { from: A }))
+
   })
 
   it('transfer(): transfer to or from the zero-address reverts', async () => {

@@ -32,6 +32,8 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     communityIssuance = ZEROContracts.communityIssuance
     sovStakersIssuance = ZEROContracts.sovStakersIssuance
     lockupContractFactory = ZEROContracts.lockupContractFactory
+    marketMaker = ZEROContracts.marketMaker
+    presale = ZEROContracts.presale
 
     //ZERO Staking and CommunityIssuance have not yet had their setters called, so are not yet
     // connected to the rest of the system
@@ -55,54 +57,17 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
   })
 
   describe('ZEROToken deployment', async accounts => {
-    it("Stores the multisig's address", async () => {
-      const storedMultisigAddress = await zeroToken.multisigAddress()
 
-      assert.equal(multisig, storedMultisigAddress)
+    it("Stores the market maker address", async () => {
+      const storedMarketMakerAddress = await zeroToken.marketMakerAddress()
+
+      assert.equal(marketMaker.address, storedMarketMakerAddress)
     })
 
-    it("Stores the CommunityIssuance address", async () => {
-      const storedCIAddress = await zeroToken.communityIssuanceAddress()
+    it("Stores the presale address", async () => {
+      const storedPresaleAddress = await zeroToken.presale()
 
-      assert.equal(communityIssuance.address, storedCIAddress)
-    })
-
-    it("Stores the LockupContractFactory address", async () => {
-      const storedLCFAddress = await zeroToken.lockupContractFactory()
-
-      assert.equal(lockupContractFactory.address, storedLCFAddress)
-    })
-
-    it("Mints the correct ZERO amount to the multisig's address: (20 million)", async () => {
-      const multisigZEROEntitlement = await zeroToken.balanceOf(multisig)
-
-      const _20Million = dec(20, 24)
-      assert.equal(multisigZEROEntitlement, _20Million)
-    })
-
-    it("Mints the correct ZERO amount to the CommunityIssuance contract address: 30 million", async () => {
-      const communityZEROEntitlement = await zeroToken.balanceOf(communityIssuance.address)
-      // 30 million as 18-digit decimal
-      const _30Million = dec(30, 24)
-
-      assert.equal(communityZEROEntitlement, _30Million)
-    })
-
-    // FIXME: remove skip after adding LiquidityMining contract
-    it.skip("Mints the correct ZERO amount to the LiquidityMining contract address: 5 million", async () => {
-      const liquidityMiningZEROEntitlement = await zeroToken.balanceOf(liquidityMining.address)
-      // 5 million as 18-digit decimal
-      const _5Million = dec(5, 24)
-
-      assert.equal(liquidityMiningZEROEntitlement, _5Million)
-    })
-
-    it("Mints the correct ZERO amount to the SOVStakersIssuance contract address: 45 million", async () => {
-      const sovStakersZEROEntitlement = await zeroToken.balanceOf(sovStakersIssuance.address)
-      // 50 million as 18-digit decimal
-      const _45Million = dec(45, 24)
-
-      assert.equal(sovStakersZEROEntitlement, _45Million)
+      assert.equal(presale.address, storedPresaleAddress)
     })
   })
 

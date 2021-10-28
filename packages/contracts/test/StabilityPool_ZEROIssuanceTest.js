@@ -70,6 +70,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       zeroToken = ZEROContracts.zeroToken
       communityIssuanceTester = ZEROContracts.communityIssuance
 
+      await zeroToken.unprotectedMint(communityIssuanceTester.address,toBN(dec(30,24)))
+
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)

@@ -8,6 +8,7 @@ const StabilityPool = artifacts.require("./StabilityPool.sol")
 const th = testHelpers.TestHelper
 const timeValues = testHelpers.TimeValues
 const dec = th.dec
+const toBN = th.toBN
 
 
 const logZEROBalanceAndError = (ZEROBalance_A, expectedZEROBalance_A) => {
@@ -56,6 +57,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
 
     zeroToken = ZEROContracts.zeroToken
     communityIssuanceTester = ZEROContracts.communityIssuance
+
+    await zeroToken.unprotectedMint(communityIssuanceTester.address,toBN(dec(30,24)))
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)

@@ -61,7 +61,7 @@ contract('TroveManager', async accounts => {
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     )
-    const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
+    const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
 
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken
@@ -78,6 +78,9 @@ contract('TroveManager', async accounts => {
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
     lockupContractFactory = ZEROContracts.lockupContractFactory
+
+    await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
+    await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
 
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContracts(ZEROContracts)

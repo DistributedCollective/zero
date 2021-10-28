@@ -50,6 +50,8 @@ contract('SOV Stakers - ZERO Rewards', async accounts => {
       sovStakersIssuance = ZEROContracts.sovStakersIssuance
       sovFeeSharingProxyAddress = ZEROContracts.mockFeeSharingProxy.address
 
+      await zeroToken.unprotectedMint(sovStakersIssuance.address,toBN(dec(45,24)))
+
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)

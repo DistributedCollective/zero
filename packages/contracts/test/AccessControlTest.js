@@ -59,6 +59,11 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     communityIssuance = ZEROContracts.communityIssuance
     lockupContractFactory = ZEROContracts.lockupContractFactory
 
+    await deploymentHelper.deployZEROTesterContractsHardhat(ZEROContracts)
+
+    await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
+    await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
+    
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)

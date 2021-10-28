@@ -64,7 +64,7 @@ contract('StabilityPool', async accounts => {
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
       )
-      const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
+      const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
 
       priceFeed = contracts.priceFeedTestnet
       zusdToken = contracts.zusdToken
@@ -78,6 +78,8 @@ contract('StabilityPool', async accounts => {
 
       zeroToken = ZEROContracts.zeroToken
       communityIssuance = ZEROContracts.communityIssuance
+
+      await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)

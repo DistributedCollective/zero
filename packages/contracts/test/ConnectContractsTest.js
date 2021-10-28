@@ -300,28 +300,12 @@ contract('Deployment script - Sets correct contract addresses dependencies after
 
   // ---  ZEROToken ---
 
-  // Sets CI in ZEROToken
-  it('Sets the correct CommunityIssuance address in ZEROToken', async () => {
-    const communityIssuanceAddress = communityIssuance.address
-
-    const recordedcommunityIssuanceAddress = await zeroToken.communityIssuanceAddress()
-    assert.equal(communityIssuanceAddress, recordedcommunityIssuanceAddress)
-  })
-
   // Sets ZEROStaking in ZEROToken
   it('Sets the correct ZEROStaking address in ZEROToken', async () => {
     const zeroStakingAddress = zeroStaking.address
 
     const recordedZEROStakingAddress =  await zeroToken.zeroStakingAddress()
     assert.equal(zeroStakingAddress, recordedZEROStakingAddress)
-  })
-
-  // Sets LCF in ZEROToken
-  it('Sets the correct LockupContractFactory address in ZEROToken', async () => {
-    const LCFAddress = lockupContractFactory.address
-
-    const recordedLCFAddress =  await zeroToken.lockupContractFactory()
-    assert.equal(LCFAddress, recordedLCFAddress)
   })
 
   // --- LCF  ---

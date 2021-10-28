@@ -34,7 +34,15 @@ contract('Deploying and funding One Year Lockup Contracts', async accounts => {
 
   beforeEach(async () => {
     // Deploy all contracts from the first account
-    ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
+    ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
+
+    await ZEROContracts.zeroToken.unprotectedMint(A, ZEROEntitlement_A)
+    await ZEROContracts.zeroToken.unprotectedMint(B, ZEROEntitlement_B)
+    await ZEROContracts.zeroToken.unprotectedMint(C, ZEROEntitlement_C)
+    await ZEROContracts.zeroToken.unprotectedMint(D, ZEROEntitlement_D)
+    await ZEROContracts.zeroToken.unprotectedMint(E, ZEROEntitlement_E)
+    await ZEROContracts.zeroToken.unprotectedMint(multisig, toBN(dec(20, 24)))
+
     await deploymentHelper.connectZEROContracts(ZEROContracts)
 
     zeroStaking = ZEROContracts.zeroStaking

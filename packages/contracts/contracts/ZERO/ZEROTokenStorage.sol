@@ -42,6 +42,9 @@ contract ZEROTokenStorage is Initializable {
     // uint for use with SafeMath
     uint internal constant _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
 
+    uint internal deploymentStartTime;
+
+    address public zeroStakingAddress;
     address public marketMakerAddress;
     IBalanceRedirectPresale public presale;
 

@@ -52,12 +52,16 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     // --- Functions ---
 
     function initialize (
+        address _zeroStakingAddress,
         address _marketMakerAddress,
         address _presaleAddress
     ) initializer public {
         checkContract(_marketMakerAddress);
         checkContract(_presaleAddress);
 
+        deploymentStartTime  = block.timestamp;
+
+        zeroStakingAddress = _zeroStakingAddress;
         marketMakerAddress = _marketMakerAddress;
         presale = IBalanceRedirectPresale(_presaleAddress);
 
@@ -97,6 +101,10 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         return _balances[account];
     }
 
+    function getDeploymentStartTime() external view override returns (uint256) {
+        return deploymentStartTime;
+    }
+
     function transfer(address recipient, uint256 amount) external override returns (bool) {
         _requireValidRecipient(recipient);
 
@@ -130,6 +138,11 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
         return true;
+    }
+
+    function sendToZEROStaking(address _sender, uint256 _amount) external override {
+        _requireCallerIsZEROStaking();
+        _transfer(_sender, zeroStakingAddress, _amount);
     }
 
     // --- EIP 2612 functionality ---
@@ -227,6 +240,10 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
             _recipient != address(this),
             "ZERO: Cannot transfer tokens directly to the ZERO token contract or the zero address"
         );
+    }
+
+    function _requireCallerIsZEROStaking() internal view {
+         require(msg.sender == zeroStakingAddress, "ZEROToken: caller must be the ZEROStaking contract");
     }
 
     // --- Optional functions ---
