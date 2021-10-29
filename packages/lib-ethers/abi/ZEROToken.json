@@ -28,45 +28,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_communityIssuanceAddress",
-        "type": "address"
-      }
-    ],
-    "name": "CommunityIssuanceAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_lockupContractFactoryAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LockupContractFactoryAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_sovStakersIssuanceAddress",
-        "type": "address"
-      }
-    ],
-    "name": "SovStakersAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "from",
@@ -188,19 +149,6 @@
   },
   {
     "inputs": [],
-    "name": "communityIssuanceAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "decimals",
     "outputs": [
       {
@@ -290,32 +238,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_communityIssuanceAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_sovStakersIssuanceAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_liquidityMiningAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_zeroStakingAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lockupFactoryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_multisigAddress",
         "type": "address"
       },
       {
@@ -332,32 +255,6 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liquidityMiningAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lockupContractFactory",
-    "outputs": [
-      {
-        "internalType": "contract ILockupContractFactory",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -389,19 +286,6 @@
     "name": "mint",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "multisigAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -521,19 +405,6 @@
     "name": "sendToZEROStaking",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "sovStakersIssuanceAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {

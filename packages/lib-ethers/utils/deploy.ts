@@ -208,12 +208,7 @@ const connectContracts = async (
 
     nonce =>
       zeroToken.initialize(
-        communityIssuance.address,
-        sovStakersIssuance.address,
-        liquidityMiningAddress?liquidityMiningAddress:gasPool.address,
         zeroStaking.address,
-        lockupContractFactory.address,
-        Wallet.createRandom().address, // TODO: _multisigAddress (parameterize this)
         marketMakerAddress?marketMakerAddress:gasPool.address,
         presaleAddress,
         {

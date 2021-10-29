@@ -155,11 +155,14 @@ const config: HardhatUserConfig = {
 			chainId: 30,
 			//timeout: 20000, // increase if needed; 20000 is the default value
 		}
+    
   },
-
   paths: {
     artifacts,
     cache
+  },
+  mocha: {
+    timeout: 60000
   }
 };
 
