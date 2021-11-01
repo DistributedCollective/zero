@@ -77,7 +77,6 @@ contract('TroveManager', async accounts => {
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
     await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
     await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))

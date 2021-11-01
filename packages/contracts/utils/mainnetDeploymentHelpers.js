@@ -132,21 +132,18 @@ class MainnetDeploymentHelper {
     return coreContracts
   }
 
+  // FIXME: This needs to be changes
   async deployZEROContractsMainnet(bountyAddress, lpRewardsAddress, multisigAddress, deploymentState) {
     const zeroStakingFactory = await this.getFactory("ZEROStaking")
-    const lockupContractFactory_Factory = await this.getFactory("LockupContractFactory")
     const communityIssuanceFactory = await this.getFactory("CommunityIssuance")
     const zeroTokenFactory = await this.getFactory("ZEROToken")
 
     const zeroStaking = await this.loadOrDeploy(zeroStakingFactory, 'zeroStaking', deploymentState)
-    const lockupContractFactory = await this.loadOrDeploy(lockupContractFactory_Factory, 'lockupContractFactory', deploymentState)
     const communityIssuance = await this.loadOrDeploy(communityIssuanceFactory, 'communityIssuance', deploymentState)
 
     // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor
     const zeroTokenParams = [
-      communityIssuance.address,
       zeroStaking.address,
-      lockupContractFactory.address,
       bountyAddress,
       lpRewardsAddress,
       multisigAddress
@@ -162,14 +159,12 @@ class MainnetDeploymentHelper {
       console.log('No Etherscan Url defined, skipping verification')
     } else {
       await this.verifyContract('zeroStaking', deploymentState)
-      await this.verifyContract('lockupContractFactory', deploymentState)
       await this.verifyContract('communityIssuance', deploymentState)
       await this.verifyContract('zeroToken', deploymentState, zeroTokenParams)
     }
 
     const ZEROContracts = {
       zeroStaking,
-      lockupContractFactory,
       communityIssuance,
       zeroToken
     }

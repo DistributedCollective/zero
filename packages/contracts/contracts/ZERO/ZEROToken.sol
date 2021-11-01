@@ -23,27 +23,6 @@ import "./ZEROTokenStorage.sol";
 *
 * 2) sendToZEROStaking(): callable only by Liquity core contracts, which move ZERO tokens from user -> ZEROStaking contract.
 *
-* 3) Supply hard-capped at 100 million
-*
-* 4) CommunityIssuance and LockupContractFactory addresses are set at deployment
-*
-* 5) 45 million tokens are minted at deployment to SOV holders
-
-* 6) 30 million tokens are minted at deployment to the CommunityIssuance contract
-*
-* 7) 5 million tokens are minted at deployment to the LiquidityMining contract
-*
-* 8) 20 million tokens are minted at deployment to the Liquity multisig
-*
-* 9) Until one year from deployment:
-* -Liquity multisig may only transfer() tokens to LockupContracts that have been deployed via & registered in the 
-*  LockupContractFactory 
-* -approve(), increaseAllowance(), decreaseAllowance() revert when called by the multisig
-* -transferFrom() reverts when the multisig is the sender
-* -sendToZEROStaking() reverts when the multisig is the sender, blocking the multisig from staking its ZERO.
-* 
-* After one year has passed since deployment of the ZEROToken, the restrictions on multisig operations are lifted
-* and the multisig has the same rights as any other address.
 */
 
 contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {

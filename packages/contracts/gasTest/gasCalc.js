@@ -63,7 +63,6 @@ contract('Gas cost tests', async accounts => {
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)

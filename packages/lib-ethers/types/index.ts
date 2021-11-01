@@ -325,34 +325,6 @@ export interface IERC20
   extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
 }
 
-interface LockupContractFactoryCalls {
-  NAME(_overrides?: CallOverrides): Promise<string>;
-  SECONDS_IN_ONE_YEAR(_overrides?: CallOverrides): Promise<BigNumber>;
-  getOwner(_overrides?: CallOverrides): Promise<string>;
-  isRegisteredLockup(_contractAddress: string, _overrides?: CallOverrides): Promise<boolean>;
-  lockupContractToDeployer(arg0: string, _overrides?: CallOverrides): Promise<string>;
-  zeroTokenAddress(_overrides?: CallOverrides): Promise<string>;
-}
-
-interface LockupContractFactoryTransactions {
-  deployLockupContract(_beneficiary: string, _unlockTime: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
-  setZEROTokenAddress(_zeroTokenAddress: string, _overrides?: Overrides): Promise<void>;
-}
-
-export interface LockupContractFactory
-  extends _TypedLiquityContract<LockupContractFactoryCalls, LockupContractFactoryTransactions> {
-  readonly address: string;
-  readonly filters: {
-    LockupContractDeployedThroughFactory(_lockupContractAddress?: null, _beneficiary?: null, _unlockTime?: null, _deployer?: null): EventFilter;
-    OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    ZEROTokenAddressSet(_zeroTokenAddress?: null): EventFilter;
-  };
-  extractEvents(logs: Log[], name: "LockupContractDeployedThroughFactory"): _TypedLogDescription<{ _lockupContractAddress: string; _beneficiary: string; _unlockTime: BigNumber; _deployer: string }>[];
-  extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "ZEROTokenAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
-}
-
 interface ZUSDTokenCalls {
   allowance(owner: string, spender: string, _overrides?: CallOverrides): Promise<BigNumber>;
   balanceOf(account: string, _overrides?: CallOverrides): Promise<BigNumber>;

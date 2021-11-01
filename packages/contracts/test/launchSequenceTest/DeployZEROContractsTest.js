@@ -30,8 +30,6 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    sovStakersIssuance = ZEROContracts.sovStakersIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
     marketMaker = ZEROContracts.marketMaker
     presale = ZEROContracts.presale
 
@@ -118,13 +116,6 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
       const zeroTokenAddress = zeroToken.address
 
       const recordedZEROTokenAddress = await zeroStaking.zeroToken()
-      assert.equal(zeroTokenAddress, recordedZEROTokenAddress)
-    })
-
-    it('sets the correct ZEROToken address in LockupContractFactory', async () => {
-      const zeroTokenAddress = zeroToken.address
-
-      const recordedZEROTokenAddress = await lockupContractFactory.zeroTokenAddress()
       assert.equal(zeroTokenAddress, recordedZEROTokenAddress)
     })
 

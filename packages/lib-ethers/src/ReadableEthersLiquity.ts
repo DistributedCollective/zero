@@ -287,7 +287,8 @@ export class ReadableEthersLiquity implements ReadableLiquity {
   async getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { communityIssuance } = _getContracts(this.connection);
 
-    const issuanceCap = this.connection.totalStabilityPoolZEROReward;
+    // FIXME: This should read the value instead of the one that was assigned after deployment
+    const issuanceCap =  Decimal.from(0) // this.connection.totalStabilityPoolZEROReward;
     const totalZEROIssued = decimalify(await communityIssuance.totalZEROIssued({ ...overrides }));
 
     // totalZEROIssued approaches but never reaches issuanceCap

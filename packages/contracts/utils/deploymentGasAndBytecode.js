@@ -11,7 +11,6 @@ const BorrowerOperations = artifacts.require("./BorrowerOperations.sol")
 
 const ZEROStaking = artifacts.require("./ZERO/ZEROStaking.sol")
 const ZEROToken = artifacts.require("./ZERO/ZEROToken.sol")
-const LockupContractFactory = artifacts.require("./ZERO/LockupContractFactory.sol")
 const CommunityIssuance = artifacts.require("./ZERO/CommunityIssuance.sol")
 const HintHelpers = artifacts.require("./HintHelpers.sol")
 
@@ -44,7 +43,6 @@ const coreContractABIs = [
 const ZEROContractABIs = [
   ZEROStaking,
   ZEROToken,
-  LockupContractFactory,
   CommunityIssuance
 ]
 

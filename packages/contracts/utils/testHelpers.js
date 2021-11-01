@@ -1,6 +1,5 @@
 
 const BN = require('bn.js')
-const LockupContract = artifacts.require(("./LockupContract.sol"))
 const Destructible = artifacts.require("./TestContracts/Destructible.sol")
 
 const MoneyValues = {
@@ -1076,18 +1075,6 @@ class TestHelper {
   static getLCAddressFromDeploymentTx(deployedLCTx) {
     return deployedLCTx.logs[0].args[0]
   }
-
-  static async getLCFromDeploymentTx(deployedLCTx) {
-    const deployedLCAddress = this.getLCAddressFromDeploymentTx(deployedLCTx)  // grab addr of deployed contract from event
-    const LC = await this.getLCFromAddress(deployedLCAddress)
-    return LC
-  }
-
-  static async getLCFromAddress(LCAddress) {
-    const LC = await LockupContract.at(LCAddress)
-    return LC
-  }
-
 
   static async registerFrontEnds(frontEnds, stabilityPool) {
     for (const frontEnd of frontEnds) {

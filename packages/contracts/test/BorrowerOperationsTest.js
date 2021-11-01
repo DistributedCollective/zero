@@ -100,7 +100,6 @@ contract('BorrowerOperations', async accounts => {
       zeroStaking = ZEROContracts.zeroStaking
       zeroToken = ZEROContracts.zeroToken
       communityIssuance = ZEROContracts.communityIssuance
-      lockupContractFactory = ZEROContracts.lockupContractFactory
 
       ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION()
       MIN_NET_DEBT = await borrowerOperations.MIN_NET_DEBT()

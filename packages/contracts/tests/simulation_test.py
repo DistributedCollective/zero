@@ -130,7 +130,6 @@ def contracts():
     # ZERO
     contracts.zeroStaking = ZEROStaking.deploy({ 'from': accounts[0] })
     contracts.communityIssuance = CommunityIssuance.deploy({ 'from': accounts[0] })
-    contracts.lockupContractFactory = LockupContractFactory.deploy({ 'from': accounts[0] })
     contracts.zeroToken = ZEROToken.deploy(
         contracts.communityIssuance.address,
         contracts.zeroStaking.address,
