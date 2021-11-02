@@ -2,6 +2,8 @@
 
 pragma solidity 0.6.11;
 
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
 import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
 import "../Dependencies/BaseMath.sol";
@@ -12,7 +14,7 @@ import "../Dependencies/SafeMath.sol";
 import "./CommunityIssuanceStorage.sol";
 
 
-abstract contract CommunityIssuanceBase is CommunityIssuanceStorage, ICommunityIssuance, CheckContract, BaseMath {
+abstract contract CommunityIssuanceBase is ReentrancyGuard, CommunityIssuanceStorage, ICommunityIssuance, CheckContract, BaseMath {
     using SafeMath for uint;
 
     // --- Events ---
@@ -35,15 +37,8 @@ abstract contract CommunityIssuanceBase is CommunityIssuanceStorage, ICommunityI
         checkContract(_zeroTokenAddress);
         checkContract(_communityPotAddress);
 
-        deploymentTime = block.timestamp;
         zeroToken = IZEROToken(_zeroTokenAddress);
         communityPotAddress = _communityPotAddress;
-
-        //FIX: this force to mint Zero tokens before this contract initialization
-        // When ZEROToken deployed, it should have transferred CommunityIssuance's ZERO entitlement
-        ZEROSupplyCap = zeroToken.balanceOf(address(this));
-        //FIX: Throw invalid opcode in tests
-        //assert(ZEROSupplyCap > 0);
 
         emit ZEROTokenAddressSet(_zeroTokenAddress);
         emit CommunityPotAddressSet(_communityPotAddress);
@@ -84,6 +79,21 @@ abstract contract CommunityIssuanceBase is CommunityIssuanceStorage, ICommunityI
 
         bool success = zeroToken.transfer(_account, _ZEROamount);
         require(success, "Failed to send ZERO");
+    }
+
+    /// @notice This function allows depositing tokens into the community pot for the community to use.
+    ///         and configures the deploymentTime if it's the first time this function is called.
+    /// @param _account The account that is depositing the ZERO.
+    /// @param _ZEROamount The amount of ZERO to deposit into the community pot.
+    /// @dev   Even if ZeroToken is a trusted ERC20 token contract, it is still important to ensure that
+    ///        non reentrancy is possible (maybe due to an upgrade)
+    function receiveZero(address _account, uint _ZEROamount) external override nonReentrant {
+        if (zeroToken.transferFrom(_account, address(this), _ZEROamount)) {
+            ZEROSupplyCap += _ZEROamount;
+        }
+        if(deploymentTime == 0) {
+            deploymentTime = block.timestamp;
+        }
     }
 
     // --- 'require' functions ---
