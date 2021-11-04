@@ -442,37 +442,6 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     })
   })
 
-  describe('LockupContract', async accounts => {
-    it("withdrawZERO(): reverts when caller is not beneficiary", async () => {
-      // deploy new LC with Carol as beneficiary
-      const unlockTime = (await zeroToken.getDeploymentStartTime()).add(toBN(timeValues.SECONDS_IN_ONE_YEAR))
-      const deployedLCtx = await lockupContractFactory.deployLockupContract(
-        carol, 
-        unlockTime,
-        { from: owner })
-
-      const LC = await th.getLCFromDeploymentTx(deployedLCtx)
-
-      // ZERO Multisig funds the LC
-      await zeroToken.transfer(LC.address, dec(100, 18), { from: multisig })
-
-      // Fast-forward one year, so that beneficiary can withdraw
-      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
-
-      // Bob attempts to withdraw ZERO
-      try {
-        const txBob = await LC.withdrawZERO({ from: bob })
-        
-      } catch (err) {
-        assert.include(err.message, "revert")
-      }
-
-      // Confirm beneficiary, Carol, can withdraw
-      const txCarol = await LC.withdrawZERO({ from: carol })
-      assert.isTrue(txCarol.receipt.status)
-    })
-  })
-
   describe('ZEROStaking', async accounts => {
     it("increaseF_ZUSD(): reverts when caller is not TroveManager", async () => {
       try {

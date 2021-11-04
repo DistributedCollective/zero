@@ -22,7 +22,6 @@ import communityIssuanceAbi from "../abi/CommunityIssuance.json";
 import defaultPoolAbi from "../abi/DefaultPool.json";
 import zeroTokenAbi from "../abi/ZEROToken.json";
 import hintHelpersAbi from "../abi/HintHelpers.json";
-import lockupContractFactoryAbi from "../abi/LockupContractFactory.json";
 import zeroStakingAbi from "../abi/ZEROStaking.json";
 import multiTroveGetterAbi from "../abi/MultiTroveGetter.json";
 import priceFeedAbi from "../abi/PriceFeed.json";
@@ -31,7 +30,6 @@ import sortedTrovesAbi from "../abi/SortedTroves.json";
 import stabilityPoolAbi from "../abi/StabilityPool.json";
 import gasPoolAbi from "../abi/GasPool.json";
 import liquityBaseParamsAbi from "../abi/LiquityBaseParams.json";
-import sovStakersIssuanceAbi from "../abi/SovStakersIssuance.json";
 
 import {
   ActivePool,
@@ -44,7 +42,6 @@ import {
   DefaultPool,
   ZEROToken,
   HintHelpers,
-  LockupContractFactory,
   ZEROStaking,
   MultiTroveGetter,
   PriceFeed,
@@ -53,7 +50,6 @@ import {
   StabilityPool,
   GasPool,
   LiquityBaseParams,
-  SovStakersIssuance
 } from "../types";
 
 import { EthersProvider, EthersSigner } from "./types";
@@ -163,7 +159,6 @@ export interface _LiquityContracts {
   defaultPool: DefaultPool;
   zeroToken: ZEROToken;
   hintHelpers: HintHelpers;
-  lockupContractFactory: LockupContractFactory;
   zeroStaking: ZEROStaking;
   multiTroveGetter: MultiTroveGetter;
   priceFeed: PriceFeed | PriceFeedTestnet;
@@ -171,7 +166,6 @@ export interface _LiquityContracts {
   stabilityPool: StabilityPool;
   gasPool: GasPool;
   liquityBaseParams: LiquityBaseParams;
-  sovStakersIssuance: SovStakersIssuance;
 }
 
 /** @internal */
@@ -196,7 +190,6 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   defaultPool: defaultPoolAbi,
   zeroToken: zeroTokenAbi,
   hintHelpers: hintHelpersAbi,
-  lockupContractFactory: lockupContractFactoryAbi,
   zeroStaking: zeroStakingAbi,
   multiTroveGetter: multiTroveGetterAbi,
   priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
@@ -205,7 +198,6 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,
   liquityBaseParams: liquityBaseParamsAbi,
-  sovStakersIssuance: sovStakersIssuanceAbi
 });
 
 const mapLiquityContracts = <T, U>(
@@ -224,10 +216,7 @@ export interface _LiquityDeploymentJSON {
   readonly deploymentDate: number;
   readonly startBlock: number;
   readonly bootstrapPeriod: number;
-  readonly totalStabilityPoolZEROReward: string;
   readonly governanceAddress: string;
-  readonly sovCommunityPotAddress: string;
-  readonly liquidityMiningAddress?: string;
   readonly presaleAddress?: string;
   readonly marketMakerAddress?: string;
   readonly _priceFeedIsTestnet: boolean;

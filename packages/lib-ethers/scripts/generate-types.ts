@@ -11,7 +11,6 @@ import DefaultPool from "../../contracts/artifacts/contracts/DefaultPool.sol/Def
 import GasPool from "../../contracts/artifacts/contracts/GasPool.sol/GasPool.json";
 import HintHelpers from "../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json";
 import IERC20 from "../../contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json";
-import LockupContractFactory from "../../contracts/artifacts/contracts/ZERO/LockupContractFactory.sol/LockupContractFactory.json";
 import ZUSDToken from "../../contracts/artifacts/contracts/ZUSDToken.sol/ZUSDToken.json";
 import ZEROStaking from "../../contracts/artifacts/contracts/ZERO/ZEROStaking.sol/ZEROStaking.json";
 import ZEROToken from "../../contracts/artifacts/contracts/ZERO/ZEROToken.sol/ZEROToken.json";
@@ -24,7 +23,6 @@ import TroveManager from "../../contracts/artifacts/contracts/TroveManager.sol/T
 import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
 import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
 import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
-import SovStakersIssuance from "../../contracts/artifacts/contracts/ZERO/SovStakersIssuance.sol/SovStakersIssuance.json";
 import MockBalanceRedirectPresale from "../../contracts/artifacts/contracts/TestContracts/MockBalanceRedirectPresale.sol/MockBalanceRedirectPresale.json";
 
 const getTupleType = (components: ParamType[], flexible: boolean) => {
@@ -154,7 +152,6 @@ const contractArtifacts = [
   GasPool,
   HintHelpers,
   IERC20,
-  LockupContractFactory,
   ZUSDToken,
   ZEROStaking,
   ZEROToken,
@@ -167,7 +164,6 @@ const contractArtifacts = [
   TroveManagerRedeemOps,
   UpgradeableProxy,
   LiquityBaseParams,
-  SovStakersIssuance,
   MockBalanceRedirectPresale
 ];
 

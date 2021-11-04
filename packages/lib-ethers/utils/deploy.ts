@@ -117,12 +117,6 @@ const deployContracts = async (
       ...overrides
     }),
     hintHelpers: await deployContractWithProxy(deployer, getContractFactory, "HintHelpers", { ...overrides }),
-    lockupContractFactory: await deployContractWithProxy(
-      deployer,
-      getContractFactory,
-      "LockupContractFactory",
-      { ...overrides }
-    ),
     zeroStaking: await deployContractWithProxy(deployer, getContractFactory, "ZEROStaking", { ...overrides }),
     priceFeed: priceFeedIsTestnet ? 
       await deployContract(deployer, getContractFactory, "PriceFeedTestnet", { ...overrides }) :
@@ -137,9 +131,6 @@ const deployContracts = async (
     liquityBaseParams: await deployContractWithProxy(deployer, getContractFactory, "LiquityBaseParams", {
       ...overrides
     }),
-    sovStakersIssuance: await deployContractWithProxy(deployer, getContractFactory, "SovStakersIssuance", {
-      ...overrides
-    })
   };
 
   return {
@@ -170,7 +161,6 @@ const connectContracts = async (
     defaultPool,
     zeroToken,
     hintHelpers,
-    lockupContractFactory,
     zeroStaking,
     multiTroveGetter,
     priceFeed,
@@ -178,7 +168,6 @@ const connectContracts = async (
     stabilityPool,
     gasPool,
     liquityBaseParams,
-    sovStakersIssuance
   }: _LiquityContracts,
   deployer: Signer,
   sovCommunityPotAddress: string,
@@ -310,19 +299,7 @@ const connectContracts = async (
       ),
 
     nonce =>
-      lockupContractFactory.setZEROTokenAddress(zeroToken.address, {
-        ...overrides,
-        nonce
-      }),
-
-    nonce =>
       communityIssuance.initialize(zeroToken.address, stabilityPool.address, {
-        ...overrides,
-        nonce
-      }),
-
-    nonce =>
-      sovStakersIssuance.initialize(zeroToken.address, sovCommunityPotAddress, {
         ...overrides,
         nonce
       }),
@@ -354,7 +331,6 @@ const transferOwnership = async (
     communityIssuance,
     defaultPool,
     hintHelpers,
-    lockupContractFactory,
     zeroStaking,
     multiTroveGetter,
     priceFeed,
@@ -406,11 +382,6 @@ const transferOwnership = async (
     }),
     nonce =>
     hintHelpers.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
-    nonce =>
-    lockupContractFactory.setOwner(governanceAddress, {
       ...overrides,
       nonce
     }),
@@ -494,10 +465,7 @@ export const deployAndSetupContracts = async (
     version: "unknown",
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
-    totalStabilityPoolZEROReward: "0",
     governanceAddress,
-    sovCommunityPotAddress, 
-    liquidityMiningAddress,
     presaleAddress,
     marketMakerAddress,
     _priceFeedIsTestnet,
@@ -528,14 +496,10 @@ export const deployAndSetupContracts = async (
 
   const zeroTokenDeploymentTime = await contracts.zeroToken.getDeploymentStartTime();
   const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();
-  const totalStabilityPoolZEROReward = await contracts.communityIssuance.ZEROSupplyCap();
 
   return {
     ...deployment,
     deploymentDate: zeroTokenDeploymentTime.toNumber() * 1000,
     bootstrapPeriod: bootstrapPeriod.toNumber(),
-    totalStabilityPoolZEROReward: `${Decimal.fromBigNumberString(
-      totalStabilityPoolZEROReward.toHexString()
-    )}`,
   };
 };

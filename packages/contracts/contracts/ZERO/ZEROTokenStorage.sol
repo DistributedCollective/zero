@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.11;
 
-import "../Interfaces/ILockupContractFactory.sol";
 import "../Interfaces/IBalanceRedirectPresale.sol";
 import "../Dependencies/Initializable.sol";
 

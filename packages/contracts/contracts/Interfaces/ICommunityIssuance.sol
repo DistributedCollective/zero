@@ -32,4 +32,12 @@ interface ICommunityIssuance {
     /// @param _account account to receive the tokens
     /// @param _ZEROamount amount of tokens to transfer
     function sendZERO(address _account, uint _ZEROamount) external;
+
+    /// @notice This function allows depositing tokens into the community pot for the community to use.
+    ///         and configures the deploymentTime if it's the first time this function is called.
+    /// @param _account The account that is depositing the ZERO.
+    /// @param _ZEROamount The amount of ZERO to deposit into the community pot.
+    /// @dev   Even if ZeroToken is a trusted ERC20 token contract, it is still important to ensure that
+    ///        non reentrancy is possible (maybe due to an upgrade)
+    function receiveZero(address _account, uint _ZEROamount) external;
 }

@@ -42,7 +42,6 @@ contract('Gas costs for math functions', async accounts => {
     gtStaking = ZEROContracts.gtStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
