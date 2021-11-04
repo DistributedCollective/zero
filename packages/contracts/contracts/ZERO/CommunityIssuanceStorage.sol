@@ -38,6 +38,9 @@ contract CommunityIssuanceStorage is Ownable {
 
     address public communityPotAddress;
 
+    // Address that will send the Zero tokens to distribute funds
+    address public fundingWalletAddress;
+
     uint public totalZEROIssued;
     uint public deploymentTime;
 
