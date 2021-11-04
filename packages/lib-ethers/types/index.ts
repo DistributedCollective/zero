@@ -174,14 +174,16 @@ interface CommunityIssuanceCalls {
   ZEROSupplyCap(_overrides?: CallOverrides): Promise<BigNumber>;
   communityPotAddress(_overrides?: CallOverrides): Promise<string>;
   deploymentTime(_overrides?: CallOverrides): Promise<BigNumber>;
+  fundingWalletAddress(_overrides?: CallOverrides): Promise<string>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
   totalZEROIssued(_overrides?: CallOverrides): Promise<BigNumber>;
   zeroToken(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface CommunityIssuanceTransactions {
-  initialize(_zeroTokenAddress: string, _communityPotAddress: string, _overrides?: Overrides): Promise<void>;
+  initialize(_zeroTokenAddress: string, _communityPotAddress: string, _fundingWalletAddress: string, _overrides?: Overrides): Promise<void>;
   issueZERO(_overrides?: Overrides): Promise<BigNumber>;
+  receiveZero(_account: string, _ZEROamount: BigNumberish, _overrides?: Overrides): Promise<void>;
   sendZERO(_account: string, _ZEROamount: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
@@ -191,13 +193,15 @@ export interface CommunityIssuance
   readonly address: string;
   readonly filters: {
     CommunityPotAddressSet(_communityPotAddress?: null): EventFilter;
+    FundingWalletAddressSet(_zeroTokenAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    TotalZEROIssuedUpdated(_totalZEROIssued?: null): EventFilter;
+    TotalZEROIssuedUpdated(_fundingWalletAddress?: null): EventFilter;
     ZEROTokenAddressSet(_zeroTokenAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "CommunityPotAddressSet"): _TypedLogDescription<{ _communityPotAddress: string }>[];
+  extractEvents(logs: Log[], name: "FundingWalletAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "TotalZEROIssuedUpdated"): _TypedLogDescription<{ _totalZEROIssued: BigNumber }>[];
+  extractEvents(logs: Log[], name: "TotalZEROIssuedUpdated"): _TypedLogDescription<{ _fundingWalletAddress: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZEROTokenAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
 }
 
@@ -969,42 +973,6 @@ export interface LiquityBaseParams
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
   };
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-}
-
-interface SovStakersIssuanceCalls {
-  DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
-  ISSUANCE_FACTOR(_overrides?: CallOverrides): Promise<BigNumber>;
-  NAME(_overrides?: CallOverrides): Promise<string>;
-  SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
-  ZEROSupplyCap(_overrides?: CallOverrides): Promise<BigNumber>;
-  communityPotAddress(_overrides?: CallOverrides): Promise<string>;
-  deploymentTime(_overrides?: CallOverrides): Promise<BigNumber>;
-  getOwner(_overrides?: CallOverrides): Promise<string>;
-  totalZEROIssued(_overrides?: CallOverrides): Promise<BigNumber>;
-  zeroToken(_overrides?: CallOverrides): Promise<string>;
-}
-
-interface SovStakersIssuanceTransactions {
-  initialize(_zeroTokenAddress: string, _communityPotAddress: string, _overrides?: Overrides): Promise<void>;
-  issueZERO(_overrides?: Overrides): Promise<BigNumber>;
-  sendZERO(_account: string, _ZEROamount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
-  transferToFeeSharingProxy(_overrides?: Overrides): Promise<void>;
-}
-
-export interface SovStakersIssuance
-  extends _TypedLiquityContract<SovStakersIssuanceCalls, SovStakersIssuanceTransactions> {
-  readonly address: string;
-  readonly filters: {
-    CommunityPotAddressSet(_communityPotAddress?: null): EventFilter;
-    OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    TotalZEROIssuedUpdated(_totalZEROIssued?: null): EventFilter;
-    ZEROTokenAddressSet(_zeroTokenAddress?: null): EventFilter;
-  };
-  extractEvents(logs: Log[], name: "CommunityPotAddressSet"): _TypedLogDescription<{ _communityPotAddress: string }>[];
-  extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "TotalZEROIssuedUpdated"): _TypedLogDescription<{ _totalZEROIssued: BigNumber }>[];
-  extractEvents(logs: Log[], name: "ZEROTokenAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
 }
 
 interface MockBalanceRedirectPresaleCalls {

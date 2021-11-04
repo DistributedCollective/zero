@@ -76,14 +76,18 @@ contract('TroveManager', async accounts => {
 
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
-    communityIssuance = ZEROContracts.communityIssuance
-
-    await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
-    await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
+    communityIssuance = ZEROContracts.communityIssuance 
 
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
+
+    await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
+    await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
+    await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
+    await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
+
+    
   })
 
   let revertToSnapshot;

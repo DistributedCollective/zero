@@ -21,7 +21,8 @@ interface ICommunityIssuance {
     function initialize
     (
         address _zeroTokenAddress, 
-        address _communityPotAddress
+        address _communityPotAddress,
+        address _fundingWalletAddress
     ) external;
 
     /// @notice issues ZERO tokens corresponding to time in issuance curve

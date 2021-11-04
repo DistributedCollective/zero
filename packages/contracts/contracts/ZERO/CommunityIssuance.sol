@@ -11,7 +11,7 @@ import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
 import "./CommunityIssuanceStorage.sol";
 
-abstract contract CommunityIssuance is
+contract CommunityIssuance is
     CommunityIssuanceStorage,
     ICommunityIssuance,
     CheckContract,

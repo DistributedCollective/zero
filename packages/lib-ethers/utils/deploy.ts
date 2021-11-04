@@ -170,8 +170,7 @@ const connectContracts = async (
     liquityBaseParams,
   }: _LiquityContracts,
   deployer: Signer,
-  sovCommunityPotAddress: string,
-  liquidityMiningAddress: string,
+  governanceAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
   overrides?: Overrides
@@ -299,7 +298,7 @@ const connectContracts = async (
       ),
 
     nonce =>
-      communityIssuance.initialize(zeroToken.address, stabilityPool.address, {
+      communityIssuance.initialize(zeroToken.address, stabilityPool.address, governanceAddress, {
         ...overrides,
         nonce
       }),
@@ -438,8 +437,6 @@ export const deployAndSetupContracts = async (
 
   _isDev = true,
   governanceAddress?: string,
-  sovCommunityPotAddress?: string,
-  liquidityMiningAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
   overrides?: Overrides
@@ -450,9 +447,6 @@ export const deployAndSetupContracts = async (
   }
 
   governanceAddress ??= await deployer.getAddress();
-  sovCommunityPotAddress ??= await deployContract(deployer, getContractFactory, "MockFeeSharingProxy", { ...overrides });
-  //TODO replace with mocked liquidity mining 
-  liquidityMiningAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
   presaleAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
 
   log("Deploying contracts...");
@@ -477,7 +471,7 @@ export const deployAndSetupContracts = async (
   const contracts = _connectToContracts(deployer, deployment);
 
   log("Connecting contracts...");
-  await connectContracts(contracts, deployer, sovCommunityPotAddress, liquidityMiningAddress, presaleAddress, marketMakerAddress, overrides);
+  await connectContracts(contracts, deployer, governanceAddress, presaleAddress, marketMakerAddress, overrides);
 
   if (externalPriceFeeds !== undefined) {
     assert(!checkPriceFeedIsTestnet(contracts.priceFeed));

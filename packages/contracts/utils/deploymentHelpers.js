@@ -452,7 +452,7 @@ class DeploymentHelper {
     // FIXME
   }
 
-  static async connectZEROContractsToCore(ZEROContracts, coreContracts) {
+  static async connectZEROContractsToCore(ZEROContracts, coreContracts, walletAddress) {
     await ZEROContracts.zeroStaking.setAddresses(
       ZEROContracts.zeroToken.address,
       coreContracts.zusdToken.address,
@@ -463,7 +463,8 @@ class DeploymentHelper {
   
     await ZEROContracts.communityIssuance.initialize(
       ZEROContracts.zeroToken.address,
-      coreContracts.stabilityPool.address
+      coreContracts.stabilityPool.address,
+      walletAddress
     )
     
   }

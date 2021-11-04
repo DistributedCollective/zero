@@ -25,7 +25,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     const coreContracts = await deploymentHelper.deployLiquityCore()
     ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, multisig)
 
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
@@ -97,6 +97,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
         const tx = await newCI.initialize(
           zeroToken.address,
           coreContracts.stabilityPool.address,
+          multisig,
           { from: liquityAG }
         );
       
@@ -111,7 +112,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     it('sets the correct ZEROToken address in ZEROStaking', async () => {
       // Deploy core contracts and set the ZEROToken address in the CI and ZEROStaking
       const coreContracts = await deploymentHelper.deployLiquityCore()
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, multisig)
 
       const zeroTokenAddress = zeroToken.address
 
@@ -122,7 +123,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     it('sets the correct ZEROToken address in CommunityIssuance', async () => {
       // Deploy core contracts and set the ZEROToken address in the CI and ZEROStaking
       const coreContracts = await deploymentHelper.deployLiquityCore()
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, multisig)
 
       const zeroTokenAddress = zeroToken.address
 

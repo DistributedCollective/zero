@@ -75,12 +75,11 @@ contract('BorrowerOperations', async accounts => {
       contracts = await deploymentHelper.deployZUSDTokenTester(contracts)
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
 
-      await ZEROContracts.zeroToken.unprotectedMint(ZEROContracts.communityIssuance.address,toBN(dec(30,24)))
       await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       if (withProxy) {
         const users = [alice, bob, carol, dennis, whale, A, B, C, D, E]

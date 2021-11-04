@@ -128,13 +128,13 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   describe('CommunityIssuance', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      const params = [zeroToken.address, stabilityPool.address]
+      const params = [zeroToken.address, stabilityPool.address, owner]
       await th.assertRevert(communityIssuance.initialize(...params, { from: alice }))
 
       // Attempt to use zero address
-      await testZeroAddress(communityIssuance, params, "initialize")
+      await testZeroAddress(communityIssuance, params, "initialize",3)
       // Attempt to use non contract
-      await testNonContractAddress(communityIssuance, params, "initialize")
+      await testNonContractAddress(communityIssuance, params, "initialize", 3)
 
       // Owner can successfully set any address
       const txOwner = await communityIssuance.initialize(...params, { from: owner })

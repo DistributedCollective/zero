@@ -57,26 +57,19 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
     await deploymentHelper.deployZEROTesterContractsHardhat(ZEROContracts)
 
-    await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
     await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
     
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner)
 
     for (account of accounts.slice(0, 10)) {
       await th.openTrove(coreContracts, { extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
     }
 
-    const expectedCISupplyCap = '30000000000000000000000000' // 30mil
-
-    // Check CI has been properly funded
-    const bal = await zeroToken.balanceOf(communityIssuance.address)
-    assert.equal(bal, expectedCISupplyCap)
   })
 
   describe('BorrowerOperations', async accounts => { 

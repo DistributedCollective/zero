@@ -79,11 +79,13 @@ contract('StabilityPool', async accounts => {
       zeroToken = ZEROContracts.zeroToken
       communityIssuance = ZEROContracts.communityIssuance
 
-      await zeroToken.unprotectedMint(communityIssuance.address,toBN(dec(30,24)))
-
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
+
+      await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
+      await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
+      await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
       // Register 3 front ends
       await th.registerFrontEnds(frontEnds, stabilityPool)

@@ -226,7 +226,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
     })
 
     // mixed deposits/liquidations

@@ -67,11 +67,13 @@ contract('BorrowerWrappers', async accounts => {
     contracts = await deploymentHelper.deployZUSDToken(contracts)
     const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
 
-    await ZEROContracts.zeroToken.unprotectedMint(ZEROContracts.communityIssuance.address,toBN(dec(30,24)))
-
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
+
+    await ZEROContracts.zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
+    await ZEROContracts.zeroToken.approve(ZEROContracts.communityIssuance.address, toBN(dec(30,24)))
+    await ZEROContracts.communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
     troveManagerOriginal = contracts.troveManager
     zeroTokenOriginal = ZEROContracts.zeroToken

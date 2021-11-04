@@ -39,7 +39,7 @@ contract('TroveManager', async accounts => {
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })
 
   // --- Check accumulation from repeatedly applying rewards ---

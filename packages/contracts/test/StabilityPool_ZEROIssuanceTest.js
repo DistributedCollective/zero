@@ -70,11 +70,13 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       zeroToken = ZEROContracts.zeroToken
       communityIssuanceTester = ZEROContracts.communityIssuance
 
-      await zeroToken.unprotectedMint(communityIssuanceTester.address,toBN(dec(30,24)))
-
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
+
+      await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
+      await zeroToken.approve(communityIssuanceTester.address, toBN(dec(30,24)))
+      await communityIssuanceTester.receiveZero(owner, toBN(dec(30,24)))
 
       // Check community issuance starts with 30 million ZERO
       communityZEROSupply = toBN(await zeroToken.balanceOf(communityIssuanceTester.address))
