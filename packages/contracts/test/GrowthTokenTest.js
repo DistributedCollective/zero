@@ -23,6 +23,8 @@ const timeValues = testHelpers.TimeValues
 const ZERO_ADDRESS = th.ZERO_ADDRESS
 const assertRevert = th.assertRevert
 
+const MockApprovalReceiver = artifacts.require("MockApprovalReceiver")
+
 contract('ZERO Token', async accounts => {
   const [owner, A, B, C, D] = accounts
 
@@ -41,6 +43,7 @@ contract('ZERO Token', async accounts => {
   let zeroTokenTester
   let zeroStaking
   let communityIssuance
+  let approvalReceiver
 
   let tokenName
   let tokenVersion
@@ -115,6 +118,7 @@ contract('ZERO Token', async accounts => {
     zeroStaking = ZEROContracts.zeroStaking
     zeroTokenTester = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
+    approvalReceiver = await MockApprovalReceiver.new();
 
     tokenName = await zeroTokenTester.name()
     tokenVersion = await zeroTokenTester.version()
@@ -332,6 +336,17 @@ contract('ZERO Token', async accounts => {
     assert.equal(A_BalanceAfter, dec(113, 18))
     const zeroStakingBalanceAfter = await zeroTokenTester.balanceOf(zeroStaking.address)
     assert.equal(zeroStakingBalanceAfter, dec(37, 18))
+  })
+
+  it("should approve for transfer and call the receiver", async () => {
+    const tx = await zeroTokenTester.approveAndCall(approvalReceiver.address, dec(150, 18), '0x1234');
+    expect(await th.getEventArgByName(tx, "Approval", "owner")).eq(owner);
+    expect(await th.getEventArgByName(tx, "Approval", "spender")).eq(approvalReceiver.address);
+    expect((await th.getEventArgByName(tx, "Approval", "value")).toString()).eq(dec(150, 18));
+    expect(await approvalReceiver.sender(), 'sender').eq(owner);
+    expect((await approvalReceiver.amount()).toString(), 'amount').eq(dec(150, 18));
+    expect(await approvalReceiver.token(), 'token').eq(zeroTokenTester.address);
+    expect(await approvalReceiver.data(), 'data').eq('0x1234');
   })
 
   // EIP2612 tests
