@@ -74,7 +74,7 @@ contract('ZUSDToken', async accounts => {
 
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       zusdTokenOriginal = contracts.zusdToken
       if (withProxy) {

@@ -57,21 +57,19 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
+    await deploymentHelper.deployZEROTesterContractsHardhat(ZEROContracts)
+
+    await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
+    
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner)
 
     for (account of accounts.slice(0, 10)) {
       await th.openTrove(coreContracts, { extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
     }
 
-    const expectedCISupplyCap = '30000000000000000000000000' // 30mil
-
-    // Check CI has been properly funded
-    const bal = await zeroToken.balanceOf(communityIssuance.address)
-    assert.equal(bal, expectedCISupplyCap)
   })
 
   describe('BorrowerOperations', async accounts => { 
@@ -434,37 +432,6 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
         assert.include(err.message, "revert")
         // assert.include(err.message, "Caller is neither BO nor TroveM")
       }
-    })
-  })
-
-  describe('LockupContract', async accounts => {
-    it("withdrawZERO(): reverts when caller is not beneficiary", async () => {
-      // deploy new LC with Carol as beneficiary
-      const unlockTime = (await zeroToken.getDeploymentStartTime()).add(toBN(timeValues.SECONDS_IN_ONE_YEAR))
-      const deployedLCtx = await lockupContractFactory.deployLockupContract(
-        carol, 
-        unlockTime,
-        { from: owner })
-
-      const LC = await th.getLCFromDeploymentTx(deployedLCtx)
-
-      // ZERO Multisig funds the LC
-      await zeroToken.transfer(LC.address, dec(100, 18), { from: multisig })
-
-      // Fast-forward one year, so that beneficiary can withdraw
-      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
-
-      // Bob attempts to withdraw ZERO
-      try {
-        const txBob = await LC.withdrawZERO({ from: bob })
-        
-      } catch (err) {
-        assert.include(err.message, "revert")
-      }
-
-      // Confirm beneficiary, Carol, can withdraw
-      const txCarol = await LC.withdrawZERO({ from: carol })
-      assert.isTrue(txCarol.receipt.status)
     })
   })
 

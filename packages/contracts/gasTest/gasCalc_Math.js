@@ -42,11 +42,10 @@ contract('Gas costs for math functions', async accounts => {
     gtStaking = ZEROContracts.gtStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })
 
   // performs n runs of exponentiation on a random base

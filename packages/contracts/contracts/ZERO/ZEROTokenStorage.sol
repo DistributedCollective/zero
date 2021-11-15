@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.11;
 
-import "../Interfaces/ILockupContractFactory.sol";
 import "../Interfaces/IBalanceRedirectPresale.sol";
 import "../Dependencies/Initializable.sol";
 
@@ -43,15 +42,8 @@ contract ZEROTokenStorage is Initializable {
     uint internal constant _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
 
     uint internal deploymentStartTime;
-    address public multisigAddress;
 
-    address public communityIssuanceAddress;
-    address public sovStakersIssuanceAddress;
-    address public liquidityMiningAddress;
     address public zeroStakingAddress;
-
-    ILockupContractFactory public lockupContractFactory;
-
     address public marketMakerAddress;
     IBalanceRedirectPresale public presale;
 

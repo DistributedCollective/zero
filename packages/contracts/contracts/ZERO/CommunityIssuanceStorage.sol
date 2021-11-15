@@ -32,11 +32,14 @@ contract CommunityIssuanceStorage is Ownable {
     * The community ZERO supply cap is the starting balance of the Community Issuance contract.
     * It should be minted to this contract by ZEROToken, when the token is deployed.
     */
-    uint public ZEROSupplyCap;
+    uint public ZEROSupplyCap = 0;
 
     IZEROToken public zeroToken;
 
     address public communityPotAddress;
+
+    // Address that will send the Zero tokens to distribute funds
+    address public fundingWalletAddress;
 
     uint public totalZEROIssued;
     uint public deploymentTime;

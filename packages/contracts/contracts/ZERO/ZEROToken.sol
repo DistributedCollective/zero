@@ -5,7 +5,6 @@ pragma solidity 0.6.11;
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IZEROToken.sol";
-import "../Interfaces/ILockupContractFactory.sol";
 import "./ZEROTokenStorage.sol";
 
 /**
@@ -24,65 +23,24 @@ import "./ZEROTokenStorage.sol";
 *
 * 2) sendToZEROStaking(): callable only by Liquity core contracts, which move ZERO tokens from user -> ZEROStaking contract.
 *
-* 3) Supply hard-capped at 100 million
-*
-* 4) CommunityIssuance and LockupContractFactory addresses are set at deployment
-*
-* 5) 45 million tokens are minted at deployment to SOV holders
-
-* 6) 30 million tokens are minted at deployment to the CommunityIssuance contract
-*
-* 7) 5 million tokens are minted at deployment to the LiquidityMining contract
-*
-* 8) 20 million tokens are minted at deployment to the Liquity multisig
-*
-* 9) Until one year from deployment:
-* -Liquity multisig may only transfer() tokens to LockupContracts that have been deployed via & registered in the 
-*  LockupContractFactory 
-* -approve(), increaseAllowance(), decreaseAllowance() revert when called by the multisig
-* -transferFrom() reverts when the multisig is the sender
-* -sendToZEROStaking() reverts when the multisig is the sender, blocking the multisig from staking its ZERO.
-* 
-* After one year has passed since deployment of the ZEROToken, the restrictions on multisig operations are lifted
-* and the multisig has the same rights as any other address.
 */
 
 contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     using SafeMath for uint256;
 
-    // --- Events ---
-
-    event CommunityIssuanceAddressSet(address _communityIssuanceAddress);
-    event SovStakersAddressSet(address _sovStakersIssuanceAddress);
-    event LockupContractFactoryAddressSet(address _lockupContractFactoryAddress);
-
     // --- Functions ---
 
     function initialize (
-        address _communityIssuanceAddress, 
-        address _sovStakersIssuanceAddress,
-        address _liquidityMiningAddress,
         address _zeroStakingAddress,
-        address _lockupFactoryAddress,
-        address _multisigAddress,
         address _marketMakerAddress,
         address _presaleAddress
     ) initializer public {
-        checkContract(_communityIssuanceAddress);
-        checkContract(_sovStakersIssuanceAddress);
-        checkContract(_liquidityMiningAddress);
-        checkContract(_lockupFactoryAddress);
         checkContract(_marketMakerAddress);
         checkContract(_presaleAddress);
 
-        multisigAddress = _multisigAddress;
         deploymentStartTime  = block.timestamp;
-        
-        communityIssuanceAddress = _communityIssuanceAddress;
-        sovStakersIssuanceAddress = _sovStakersIssuanceAddress;
-        liquidityMiningAddress = _liquidityMiningAddress;
+
         zeroStakingAddress = _zeroStakingAddress;
-        lockupContractFactory = ILockupContractFactory(_lockupFactoryAddress);
         marketMakerAddress = _marketMakerAddress;
         presale = IBalanceRedirectPresale(_presaleAddress);
 
@@ -94,29 +52,6 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         _CACHED_CHAIN_ID = _chainID();
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
         
-        // --- Initial ZERO allocations ---
-     
-        uint sovStakersEntitlement = _1_MILLION.mul(45); // Allocate 45 million to the algorithmic issuance schedule
-        _mint(_sovStakersIssuanceAddress, sovStakersEntitlement);
-
-        uint depositorsAndFrontEndsEntitlement = _1_MILLION.mul(30); // Allocate 30 million to the algorithmic issuance schedule
-        _mint(_communityIssuanceAddress, depositorsAndFrontEndsEntitlement);
-
-        uint liquidityMiningEntitlement = _1_MILLION.mul(5);
-        _mint(_liquidityMiningAddress, liquidityMiningEntitlement);
-
-        // Allocate the remainder to the ZERO Multisig: (100 - 45 - 30 - 5) million = 20 million
-        // This amount will be distributed to founders 
-        uint multisigEntitlement = _1_MILLION.mul(100)
-            .sub(sovStakersEntitlement)
-            .sub(depositorsAndFrontEndsEntitlement)
-            .sub(liquidityMiningEntitlement);
-
-        _mint(_multisigAddress, multisigEntitlement);
-
-        emit CommunityIssuanceAddressSet(_communityIssuanceAddress);
-        emit SovStakersAddressSet(_sovStakersIssuanceAddress);
-        emit LockupContractFactoryAddressSet(_lockupFactoryAddress);
     }
 
     // --- External functions ---
@@ -149,13 +84,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         return deploymentStartTime;
     }
 
-
     function transfer(address recipient, uint256 amount) external override returns (bool) {
-        // Restrict the multisig's transfers in first year
-        if (_callerIsMultisig() && _isFirstYear()) {
-            _requireRecipientIsRegisteredLC(recipient);
-        }
-
         _requireValidRecipient(recipient);
 
         // Otherwise, standard transfer functionality
@@ -168,15 +97,11 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     }
 
     function approve(address spender, uint256 amount) external override returns (bool) {
-        if (_isFirstYear()) { _requireCallerIsNotMultisig(); }
-
         _approve(msg.sender, spender, amount);
         return true;
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
-        if (_isFirstYear()) { _requireSenderIsNotMultisig(sender); }
-        
         _requireValidRecipient(recipient);
 
         _transfer(sender, recipient, amount);
@@ -185,22 +110,17 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     }
 
     function increaseAllowance(address spender, uint256 addedValue) external override returns (bool) {
-        if (_isFirstYear()) { _requireCallerIsNotMultisig(); }
-        
         _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
-        if (_isFirstYear()) { _requireCallerIsNotMultisig(); }
-        
         _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
         return true;
     }
 
     function sendToZEROStaking(address _sender, uint256 _amount) external override {
         _requireCallerIsZEROStaking();
-        if (_isFirstYear()) { _requireSenderIsNotMultisig(_sender); }  // Prevent the multisig from staking ZERO
         _transfer(_sender, zeroStakingAddress, _amount);
     }
 
@@ -291,14 +211,6 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     
     // --- Helper functions ---
 
-    function _callerIsMultisig() internal view returns (bool) {
-        return (msg.sender == multisigAddress);
-    }
-
-    function _isFirstYear() internal view returns (bool) {
-        return (block.timestamp.sub(deploymentStartTime) < ONE_YEAR_IN_SECONDS);
-    }
-
     // --- 'require' functions ---
     
     function _requireValidRecipient(address _recipient) internal view {
@@ -307,25 +219,6 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
             _recipient != address(this),
             "ZERO: Cannot transfer tokens directly to the ZERO token contract or the zero address"
         );
-        require(
-            _recipient != communityIssuanceAddress &&
-            _recipient != sovStakersIssuanceAddress &&
-            _recipient != zeroStakingAddress,
-            "ZERO: Cannot transfer tokens directly to the community issuance, sov stakers or staking contract"
-        );
-    }
-
-    function _requireRecipientIsRegisteredLC(address _recipient) internal view {
-        require(lockupContractFactory.isRegisteredLockup(_recipient), 
-        "ZEROToken: recipient must be a LockupContract registered in the Factory");
-    }
-
-    function _requireSenderIsNotMultisig(address _sender) internal view {
-        require(_sender != multisigAddress, "ZEROToken: sender must not be the multisig");
-    }
-
-    function _requireCallerIsNotMultisig() internal view {
-        require(!_callerIsMultisig(), "ZEROToken: caller must not be the multisig");
     }
 
     function _requireCallerIsZEROStaking() internal view {

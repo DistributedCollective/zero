@@ -24,7 +24,6 @@ const dev = devOrNull as _LiquityDeploymentJSON | null;
 const deployments: {
   [chainId: number]: _LiquityDeploymentJSON | undefined;
 } = {
-  [mainnet.chainId]: mainnet,
   [rsktestnet.chainId]: rsktestnet,
 
   ...(dev !== null ? { [dev.chainId]: dev } : {})
@@ -66,9 +65,6 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
   /** Time period (in seconds) after `deploymentDate` during which redemptions are disabled. */
   readonly bootstrapPeriod: number;
 
-  /** Total amount of ZERO allocated for rewarding stability depositors. */
-  readonly totalStabilityPoolZEROReward: Decimal;
-
   /** A mapping of Liquity contracts' names to their addresses. */
   readonly addresses: Record<string, string>;
 
@@ -96,7 +92,6 @@ const connectionFrom = (
   _multicall: _Multicall | undefined,
   {
     deploymentDate,
-    totalStabilityPoolZEROReward,
     ...deployment
   }: _LiquityDeploymentJSON,
   optionalParams?: EthersLiquityConnectionOptionalParams
@@ -115,7 +110,6 @@ const connectionFrom = (
     _contracts,
     _multicall,
     deploymentDate: new Date(deploymentDate),
-    totalStabilityPoolZEROReward: Decimal.from(totalStabilityPoolZEROReward),
     ...deployment,
     ...optionalParams
   });

@@ -17,7 +17,6 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   let zeroStaking
   let zeroToken
   let communityIssuance
-  let lockupContractFactory
 
   before(async () => {
     const coreContracts = await deploymentHelper.deployLiquityCore()
@@ -36,11 +35,10 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
-    lockupContractFactory = ZEROContracts.lockupContractFactory
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner)
   })
 
   it('Sets the correct PriceFeed address in TroveManager', async () => {
@@ -300,38 +298,12 @@ contract('Deployment script - Sets correct contract addresses dependencies after
 
   // ---  ZEROToken ---
 
-  // Sets CI in ZEROToken
-  it('Sets the correct CommunityIssuance address in ZEROToken', async () => {
-    const communityIssuanceAddress = communityIssuance.address
-
-    const recordedcommunityIssuanceAddress = await zeroToken.communityIssuanceAddress()
-    assert.equal(communityIssuanceAddress, recordedcommunityIssuanceAddress)
-  })
-
   // Sets ZEROStaking in ZEROToken
   it('Sets the correct ZEROStaking address in ZEROToken', async () => {
     const zeroStakingAddress = zeroStaking.address
 
     const recordedZEROStakingAddress =  await zeroToken.zeroStakingAddress()
     assert.equal(zeroStakingAddress, recordedZEROStakingAddress)
-  })
-
-  // Sets LCF in ZEROToken
-  it('Sets the correct LockupContractFactory address in ZEROToken', async () => {
-    const LCFAddress = lockupContractFactory.address
-
-    const recordedLCFAddress =  await zeroToken.lockupContractFactory()
-    assert.equal(LCFAddress, recordedLCFAddress)
-  })
-
-  // --- LCF  ---
-
-  // Sets ZEROToken in LockupContractFactory
-  it('Sets the correct ZEROToken address in LockupContractFactory', async () => {
-    const zeroTokenAddress = zeroToken.address
-
-    const recordedZEROTokenAddress = await lockupContractFactory.zeroTokenAddress()
-    assert.equal(zeroTokenAddress, recordedZEROTokenAddress)
   })
 
   // --- CI ---

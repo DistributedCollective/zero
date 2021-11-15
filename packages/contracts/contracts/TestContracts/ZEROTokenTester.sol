@@ -7,24 +7,14 @@ import "../ZERO/ZEROToken.sol";
 contract ZEROTokenTester is ZEROToken {
     constructor
     (
-        address _communityIssuanceAddress, 
-        address _sovStakersIssuanceAddress,
-        address _liquidityMiningAddress,
         address _zeroStakingAddress,
-        address _lockupFactoryAddress,
-        address _multisigAddress,
         address _marketMakerAddress,
         address _presaleAddress
     ) 
         public 
     {
         initialize(
-            _communityIssuanceAddress, 
-            _sovStakersIssuanceAddress,
-            _liquidityMiningAddress,
             _zeroStakingAddress,
-            _lockupFactoryAddress,
-            _multisigAddress,
             _marketMakerAddress,
             _presaleAddress
         );
@@ -38,8 +28,7 @@ contract ZEROTokenTester is ZEROToken {
 
     function unprotectedSendToZEROStaking(address _sender, uint256 _amount) external {
         // No check for the caller here
-        
-        if (_isFirstYear()) {_requireSenderIsNotMultisig(_sender);}
+ 
         _transfer(_sender, zeroStakingAddress, _amount);
     }
 

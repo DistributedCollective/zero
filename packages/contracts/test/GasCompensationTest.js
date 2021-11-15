@@ -67,7 +67,7 @@ contract('Gas compensation tests', async accounts => {
   
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts) 
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })
 
   let revertToSnapshot;

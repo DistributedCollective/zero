@@ -16,12 +16,10 @@ const HintHelpers = artifacts.require("./HintHelpers.sol")
 
 const ZEROStaking = artifacts.require("./ZEROStaking.sol")
 const ZEROToken = artifacts.require("./ZEROToken.sol")
-const LockupContractFactory = artifacts.require("./LockupContractFactory.sol")
 const CommunityIssuance = artifacts.require("./CommunityIssuance.sol")
 
 const ZEROTokenTester = artifacts.require("./ZEROTokenTester.sol")
 const CommunityIssuanceTester = artifacts.require("./CommunityIssuanceTester.sol")
-const SovStakersIssuance = artifacts.require("./SovStakersIssuance.sol")
 const MockFeeSharingProxy = artifacts.require("./MockFeeSharingProxy.sol")
 const StabilityPoolTester = artifacts.require("./StabilityPoolTester.sol")
 const ActivePoolTester = artifacts.require("./ActivePoolTester.sol")
@@ -60,7 +58,6 @@ const {
 ZERO contracts consist of only those contracts related to the ZERO Token:
 
 -the ZERO token
--the Lockup factory and lockup contracts
 -the ZEROStaking contract
 -the CommunityIssuance contract 
 */
@@ -180,86 +177,68 @@ class DeploymentHelper {
 
   static async deployZEROContractsHardhat(multisigAddress) {
     const zeroStaking = await ZEROStaking.new()
-    const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuance.new()
-    const sovStakersIssuance = await SovStakersIssuance.new()
     const mockFeeSharingProxy = await MockFeeSharingProxy.new()
-    const mockBalanceRedirectPresale = await MockBalanceRedirectPresale.new()
+    const presale = await MockBalanceRedirectPresale.new()
+    // FIXME: replace with market maker contract address
+    const marketMaker = await NonPayable.new()
 
     ZEROStaking.setAsDeployed(zeroStaking)
-    LockupContractFactory.setAsDeployed(lockupContractFactory)
     CommunityIssuance.setAsDeployed(communityIssuance)
-    MockBalanceRedirectPresale.setAsDeployed(mockBalanceRedirectPresale)
+    MockBalanceRedirectPresale.setAsDeployed(presale)
 
-    await mockBalanceRedirectPresale.closePresale()
+    await presale.closePresale()
 
-    // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor 
+    // Deploy ZERO Token, passing market maker and presale addresses to the constructor 
     const zeroToken = await ZEROToken.new()
     await zeroToken.initialize(
-      communityIssuance.address, 
-      sovStakersIssuance.address,
-      // FIXME: replace with liquidity mining contract address
-      (await NonPayable.new()).address,
       zeroStaking.address,
-      lockupContractFactory.address, 
-      multisigAddress,
-      // FIXME: replace with market maker contract address
-      (await NonPayable.new()).address,
-      mockBalanceRedirectPresale.address,
+      marketMaker.address,
+      presale.address,
     )
     ZEROToken.setAsDeployed(zeroToken)
 
     const ZEROContracts = {
       zeroStaking,
-      lockupContractFactory,
       communityIssuance,
-      sovStakersIssuance,
       mockFeeSharingProxy,
-      zeroToken
+      zeroToken,
+      marketMaker,
+      presale
     }
     return ZEROContracts
   }
 
   static async deployZEROTesterContractsHardhat(multisigAddress) {
     const zeroStaking = await ZEROStaking.new()
-    const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuanceTester.new()
-    const sovStakersIssuance = await SovStakersIssuance.new()
     const mockFeeSharingProxy = await MockFeeSharingProxy.new()
-    const mockBalanceRedirectPresale = await MockBalanceRedirectPresale.new()
+    const presale = await MockBalanceRedirectPresale.new()
+    // FIXME: replace with market maker contract address
+    const marketMaker = await NonPayable.new()
 
     ZEROStaking.setAsDeployed(zeroStaking)
-    LockupContractFactory.setAsDeployed(lockupContractFactory)
     CommunityIssuanceTester.setAsDeployed(communityIssuance)
-    CommunityIssuanceTester.setAsDeployed(sovStakersIssuance)
     MockFeeSharingProxy.setAsDeployed(mockFeeSharingProxy)
-    MockBalanceRedirectPresale.setAsDeployed(mockBalanceRedirectPresale)
+    MockBalanceRedirectPresale.setAsDeployed(presale)
 
-    await mockBalanceRedirectPresale.closePresale()
+    await presale.closePresale()
 
-    // Deploy ZERO Token, passing Community Issuance and Factory addresses to the constructor 
+    // Deploy ZERO Token, passing marketMaker and presale addresses to the constructor 
     const zeroToken = await ZEROTokenTester.new(
-      communityIssuance.address, 
-      sovStakersIssuance.address,
-      // FIXME: replace with liquidity mining contract address
-      (await NonPayable.new()).address,
       zeroStaking.address,
-      lockupContractFactory.address,
-      multisigAddress,
-      // FIXME: replace with market maker contract address
-      (await NonPayable.new()).address,
-      mockBalanceRedirectPresale.address,
+      marketMaker.address,
+      presale.address,
     )
     ZEROTokenTester.setAsDeployed(zeroToken)
 
     const ZEROContracts = {
       zeroStaking,
-      lockupContractFactory,
       communityIssuance,
-      sovStakersIssuance,
       mockFeeSharingProxy,
       zeroToken,
-      mockBalanceRedirectPresale
+      marketMaker,
+      presale
     }
     return ZEROContracts
   }
@@ -306,29 +285,26 @@ class DeploymentHelper {
 
   static async deployZEROContractsTruffle(multisigAddress) {
     const zeroStaking = await zeroStaking.new()
-    const lockupContractFactory = await LockupContractFactory.new()
     const communityIssuance = await CommunityIssuance.new()
-    const sovStakersIssuance = await SovStakersIssuance.new()
-    // FIXME: replace with liquidity mining contract address
-    const liquidityMining = await NonPayable.new();
+    const presale = await MockBalanceRedirectPresale.new()
+    // FIXME: replace with market maker contract address
+    const marketMaker = await NonPayable.new()
 
-    /* Deploy ZERO Token, passing Community Issuance,  ZEROStaking, and Factory addresses 
+    /* Deploy ZERO Token, passing market maker and presale addresses 
     to the constructor  */
     const zeroToken = await ZEROToken.new()
     await zeroToken.initialize(
-      communityIssuance.address, 
-      sovStakersIssuance.address,
-      liquidityMining.address,
       zeroStaking.address,
-      lockupContractFactory.address,
-      multisigAddress
+      marketMakeraddress,
+      presale.address,
     )
 
     const ZEROContracts = {
       zeroStaking,
-      lockupContractFactory,
       communityIssuance,
-      zeroToken
+      zeroToken,
+      marketMaker,
+      presale
     }
     return ZEROContracts
   }
@@ -473,10 +449,10 @@ class DeploymentHelper {
 
   static async connectZEROContracts(ZEROContracts) {
     // Set ZEROToken address in LCF
-    await ZEROContracts.lockupContractFactory.setZEROTokenAddress(ZEROContracts.zeroToken.address)
+    // FIXME
   }
 
-  static async connectZEROContractsToCore(ZEROContracts, coreContracts) {
+  static async connectZEROContractsToCore(ZEROContracts, coreContracts, walletAddress) {
     await ZEROContracts.zeroStaking.setAddresses(
       ZEROContracts.zeroToken.address,
       coreContracts.zusdToken.address,
@@ -487,13 +463,10 @@ class DeploymentHelper {
   
     await ZEROContracts.communityIssuance.initialize(
       ZEROContracts.zeroToken.address,
-      coreContracts.stabilityPool.address
+      coreContracts.stabilityPool.address,
+      walletAddress
     )
-
-    await ZEROContracts.sovStakersIssuance.initialize(
-      ZEROContracts.zeroToken.address,
-      ZEROContracts.mockFeeSharingProxy.address
-    )
+    
   }
 
 }

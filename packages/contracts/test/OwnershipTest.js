@@ -22,7 +22,6 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   let zeroStaking
   let communityIssuance
   let zeroToken 
-  let lockupContractFactory
 
   before(async () => {
     contracts = await deploymentHelper.deployLiquityCore()
@@ -41,7 +40,6 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     zeroStaking = ZEROContracts.zeroStaking
     communityIssuance = ZEROContracts.communityIssuance
     zeroToken = ZEROContracts.zeroToken
-    lockupContractFactory = ZEROContracts.lockupContractFactory
   })
 
   const testZeroAddress = async (contract, params, method = 'setAddresses', skip = 0) => {
@@ -130,13 +128,13 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   describe('CommunityIssuance', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      const params = [zeroToken.address, stabilityPool.address]
+      const params = [zeroToken.address, stabilityPool.address, owner]
       await th.assertRevert(communityIssuance.initialize(...params, { from: alice }))
 
       // Attempt to use zero address
-      await testZeroAddress(communityIssuance, params, "initialize")
+      await testZeroAddress(communityIssuance, params, "initialize",3)
       // Attempt to use non contract
-      await testNonContractAddress(communityIssuance, params, "initialize")
+      await testNonContractAddress(communityIssuance, params, "initialize", 3)
 
       // Owner can successfully set any address
       const txOwner = await communityIssuance.initialize(...params, { from: owner })
@@ -151,27 +149,6 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   describe('ZEROStaking', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
       await testSetAddresses(zeroStaking, 5)
-    })
-  })
-
-  describe('LockupContractFactory', async accounts => {
-    it("setZEROAddress(): reverts when called by non-owner, with wrong address, or twice", async () => {
-      await th.assertRevert(lockupContractFactory.setZEROTokenAddress(zeroToken.address, { from: alice }))
-
-      const params = [zeroToken.address]
-
-      // Attempt to use zero address
-      await testZeroAddress(lockupContractFactory, params, 'setZEROTokenAddress')
-      // Attempt to use non contract
-      await testNonContractAddress(lockupContractFactory, params, 'setZEROTokenAddress')
-
-      // Owner can successfully set any address
-      const txOwner = await lockupContractFactory.setZEROTokenAddress(zeroToken.address, { from: owner })
-      assert.isTrue(txOwner.receipt.status)
-
-      // Owner can set any address more than once
-      const secondTxOwner = await lockupContractFactory.setZEROTokenAddress(...params, { from: owner })
-      assert.isTrue(secondTxOwner.receipt.status)
     })
   })
 })

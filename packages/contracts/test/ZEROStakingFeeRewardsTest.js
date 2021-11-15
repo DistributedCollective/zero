@@ -52,9 +52,11 @@ contract('ZEROStaking revenue share tests', async accounts => {
     contracts = await deploymentHelper.deployZUSDTokenTester(contracts)
     const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
     
+    await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
+
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts)
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
     nonPayable = await NonPayable.new() 
     priceFeed = contracts.priceFeedTestnet

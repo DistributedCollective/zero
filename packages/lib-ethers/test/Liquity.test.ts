@@ -1035,7 +1035,7 @@ describe("EthersLiquity", () => {
     });
 
     it("should include enough gas for issuing ZERO", async function () {
-      this.timeout("1m");
+      this.timeout("2m");
 
       if(deployment.presaleAddress) {
         const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
