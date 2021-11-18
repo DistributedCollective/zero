@@ -12,7 +12,7 @@ const ZUSDToken = artifacts.require("ZUSDToken")
 
 contract('HintHelpers', async accounts => {
  
-  const [owner] = accounts;
+  const [owner, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
 
@@ -88,7 +88,7 @@ contract('HintHelpers', async accounts => {
     hintHelpers = contracts.hintHelpers
     priceFeed = contracts.priceFeedTestnet
   
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 

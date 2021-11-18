@@ -15,7 +15,7 @@ contract('Gas compensation tests', async accounts => {
   const [
     owner, liquidator,
     alice, bob, carol, dennis, erin, flyn, graham, harriet, ida,
-    defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale] = accounts;
+    defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale, sovFeeCollector] = accounts;
 
     const multisig = accounts[999];
 
@@ -66,7 +66,7 @@ contract('Gas compensation tests', async accounts => {
     borrowerOperations = contracts.borrowerOperations
   
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts) 
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector) 
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })
 

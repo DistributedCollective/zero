@@ -17,6 +17,7 @@ contract('Fee arithmetic tests', async accounts => {
   let troveManagerTester
   let mathTester
 
+  const [sovFeeCollector] = accounts;
   const multisig = accounts[999];
 
   // see: https://docs.google.com/spreadsheets/d/1RbD8VGzq7xFgeK1GOkz_9bbKVIx-xkOz0VsVelnUFdc/edit#gid=0
@@ -341,7 +342,7 @@ contract('Fee arithmetic tests', async accounts => {
     const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
   
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, multisig)
   })
 

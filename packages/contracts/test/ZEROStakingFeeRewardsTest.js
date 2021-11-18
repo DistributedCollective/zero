@@ -9,6 +9,7 @@ const TroveManagerTester = artifacts.require("TroveManagerTester")
 const NonPayable = artifacts.require("./NonPayable.sol")
 
 const th = testHelpers.TestHelper
+const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 const dec = th.dec
 const assertRevert = th.assertRevert
@@ -29,7 +30,7 @@ contract('ZEROStaking revenue share tests', async accounts => {
 
   const multisig = accounts[999];
   
-  const [owner, A, B, C, D, E, F, G, whale] = accounts;
+  const [owner, A, B, C, D, E, F, G, whale, sovFeeCollector] = accounts;
 
   let priceFeed
   let zusdToken
@@ -55,7 +56,7 @@ contract('ZEROStaking revenue share tests', async accounts => {
     await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
     nonPayable = await NonPayable.new() 
@@ -135,7 +136,10 @@ contract('ZEROStaking revenue share tests', async accounts => {
     const F_ETH_After = await zeroStaking.F_ETH()
 
     // Expect fee per unit staked = fee/100, since there is 100 ZUSD totalStaked
-    const expected_F_ETH_After = emittedETHFee.div(toBN('100')) 
+    // 20% sent to SovFeeCollector address
+    const ethFeeToSovCollector = emittedETHFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking = emittedETHFee.sub(ethFeeToSovCollector)
+    const expected_F_ETH_After = ethFeeToZeroStalking.div(toBN('100')) 
 
     assert.isTrue(expected_F_ETH_After.eq(F_ETH_After))
   })
@@ -216,7 +220,10 @@ contract('ZEROStaking revenue share tests', async accounts => {
     const F_ZUSD_After = await zeroStaking.F_ZUSD()
 
     // Expect fee per unit staked = fee/100, since there is 100 ZUSD totalStaked
-    const expected_F_ZUSD_After = emittedZUSDFee.div(toBN('100')) 
+    // 20% sent to SovFeeCollector address
+    const zusdFeeToSovCollector = emittedZUSDFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking = emittedZUSDFee.sub(zusdFeeToSovCollector)
+    const expected_F_ZUSD_After = zusdFeeToZeroStalking.div(toBN('100')) 
 
     assert.isTrue(expected_F_ZUSD_After.eq(F_ZUSD_After))
   })
@@ -314,8 +321,19 @@ contract('ZEROStaking revenue share tests', async accounts => {
     const emittedZUSDFee_2 = toBN(th.getZUSDFeeFromZUSDBorrowingEvent(borrowingTx_2))
     assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
 
-    const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2)
-    const expectedTotalZUSDGain = emittedZUSDFee_1.add(emittedZUSDFee_2)
+    // 20% sent to SovFeeCollector address
+    const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
+    const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const rethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+    const expectedTotalETHGain = ethFeeToZeroStalking_1.add(rethFeeToZeroStalking_2)
+
+    // 20% sent to SovFeeCollector address
+    const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
+    const zusdFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToSovCollector_2)
+    const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
     const A_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(A))
@@ -387,8 +405,20 @@ contract('ZEROStaking revenue share tests', async accounts => {
     const emittedZUSDFee_2 = toBN(th.getZUSDFeeFromZUSDBorrowingEvent(borrowingTx_2))
     assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
 
-    const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2)
-    const expectedTotalZUSDGain = emittedZUSDFee_1.add(emittedZUSDFee_2)
+
+    // 20% sent to SovFeeCollector address
+    const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
+    const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+    const expectedTotalETHGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
+
+    // 20% sent to SovFeeCollector address
+    const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
+    const zusdDFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToSovCollector_2)
+    const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
     const A_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(A))
@@ -445,7 +475,12 @@ contract('ZEROStaking revenue share tests', async accounts => {
      const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
      assert.isTrue(emittedETHFee_2.gt(toBN('0')))
 
-    const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2)
+    // 20% sent to SovFeeCollector address
+    const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
+    const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+    const expectedTotalETHGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
 
     const A_ETHGain = await zeroStaking.getPendingETHGain(A)
 
@@ -505,7 +540,12 @@ contract('ZEROStaking revenue share tests', async accounts => {
     const emittedZUSDFee_2 = toBN(th.getZUSDFeeFromZUSDBorrowingEvent(borrowingTx_2))
     assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
 
-    const expectedTotalZUSDGain = emittedZUSDFee_1.add(emittedZUSDFee_2)
+    // 20% sent to SovFeeCollector address
+    const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
+    const zusdDFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToSovCollector_2)
+    const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
     const A_ZUSDGain = await zeroStaking.getPendingZUSDGain(A)
 
     assert.isAtMost(th.getDifference(expectedTotalZUSDGain, A_ZUSDGain), 1000)
@@ -597,34 +637,50 @@ contract('ZEROStaking revenue share tests', async accounts => {
     */
 
     // Expected ETH gains
-    const expectedETHGain_A = toBN('100').mul(emittedETHFee_1).div( toBN('600'))
-                            .add(toBN('100').mul(emittedETHFee_2).div( toBN('600')))
-                            .add(toBN('100').mul(emittedETHFee_3).div( toBN('650')))
 
-    const expectedETHGain_B = toBN('200').mul(emittedETHFee_1).div( toBN('600'))
-                            .add(toBN('200').mul(emittedETHFee_2).div( toBN('600')))
-                            .add(toBN('200').mul(emittedETHFee_3).div( toBN('650')))
+    // 20% sent to SovFeeCollector address
+    const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
+    const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+    const ethFeeToSovCollector_3 = emittedETHFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const ethFeeToZeroStalking_3 = emittedETHFee_3.sub(ethFeeToSovCollector_3)
+    const expectedETHGain_A = toBN('100').mul(ethFeeToZeroStalking_1).div( toBN('600'))
+                            .add(toBN('100').mul(ethFeeToZeroStalking_2).div( toBN('600')))
+                            .add(toBN('100').mul(ethFeeToZeroStalking_3).div( toBN('650')))
 
-    const expectedETHGain_C = toBN('300').mul(emittedETHFee_1).div( toBN('600'))
-                            .add(toBN('300').mul(emittedETHFee_2).div( toBN('600')))
-                            .add(toBN('300').mul(emittedETHFee_3).div( toBN('650')))
+    const expectedETHGain_B = toBN('200').mul(ethFeeToZeroStalking_1).div( toBN('600'))
+                            .add(toBN('200').mul(ethFeeToZeroStalking_2).div( toBN('600')))
+                            .add(toBN('200').mul(ethFeeToZeroStalking_3).div( toBN('650')))
 
-    const expectedETHGain_D = toBN('50').mul(emittedETHFee_3).div( toBN('650'))
+    const expectedETHGain_C = toBN('300').mul(ethFeeToZeroStalking_1).div( toBN('600'))
+                            .add(toBN('300').mul(ethFeeToZeroStalking_2).div( toBN('600')))
+                            .add(toBN('300').mul(ethFeeToZeroStalking_3).div( toBN('650')))
+
+    const expectedETHGain_D = toBN('50').mul(ethFeeToZeroStalking_3).div( toBN('650'))
 
     // Expected ZUSD gains:
-    const expectedZUSDGain_A = toBN('100').mul(emittedZUSDFee_1).div( toBN('600'))
-                            .add(toBN('100').mul(emittedZUSDFee_2).div( toBN('600')))
-                            .add(toBN('100').mul(emittedZUSDFee_3).div( toBN('650')))
 
-    const expectedZUSDGain_B = toBN('200').mul(emittedZUSDFee_1).div( toBN('600'))
-                            .add(toBN('200').mul(emittedZUSDFee_2).div( toBN('600')))
-                            .add(toBN('200').mul(emittedZUSDFee_3).div( toBN('650')))
+    // 20% sent to SovFeeCollector address
+    const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
+    const zusdFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToSovCollector_2)
+    const zusdFeeToSovCollector_3 = emittedZUSDFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+    const zusdFeeToZeroStalking_3 = emittedZUSDFee_3.sub(zusdFeeToSovCollector_3)
+    const expectedZUSDGain_A = toBN('100').mul(zusdFeeToZeroStalking_1).div( toBN('600'))
+                            .add(toBN('100').mul(zusdFeeToZeroStalking_2).div( toBN('600')))
+                            .add(toBN('100').mul(zusdFeeToZeroStalking_3).div( toBN('650')))
 
-    const expectedZUSDGain_C = toBN('300').mul(emittedZUSDFee_1).div( toBN('600'))
-                            .add(toBN('300').mul(emittedZUSDFee_2).div( toBN('600')))
-                            .add(toBN('300').mul(emittedZUSDFee_3).div( toBN('650')))
+    const expectedZUSDGain_B = toBN('200').mul(zusdFeeToZeroStalking_1).div( toBN('600'))
+                            .add(toBN('200').mul(zusdFeeToZeroStalking_2).div( toBN('600')))
+                            .add(toBN('200').mul(zusdFeeToZeroStalking_3).div( toBN('650')))
+
+    const expectedZUSDGain_C = toBN('300').mul(zusdFeeToZeroStalking_1).div( toBN('600'))
+                            .add(toBN('300').mul(zusdFeeToZeroStalking_2).div( toBN('600')))
+                            .add(toBN('300').mul(zusdFeeToZeroStalking_3).div( toBN('650')))
     
-    const expectedZUSDGain_D = toBN('50').mul(emittedZUSDFee_3).div( toBN('650'))
+    const expectedZUSDGain_D = toBN('50').mul(zusdFeeToZeroStalking_3).div( toBN('650'))
 
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))

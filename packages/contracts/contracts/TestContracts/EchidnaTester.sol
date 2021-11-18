@@ -70,6 +70,7 @@ contract EchidnaTester {
         sortedTroves = new SortedTroves();
 
         troveManager.setAddresses(
+            address(uint256(keccak256(abi.encodePacked(now)))),
             address(troveManagerRedeemOps),
             address(liquityBaseParams), address(borrowerOperations), 
             address(activePool), address(defaultPool), 
@@ -78,6 +79,7 @@ contract EchidnaTester {
             address(sortedTroves), address(0), address(0));
        
         borrowerOperations.setAddresses(
+            address(uint256(keccak256(abi.encodePacked(now)))),
             address(liquityBaseParams), address(troveManager), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),

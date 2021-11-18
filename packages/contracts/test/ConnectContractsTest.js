@@ -1,7 +1,7 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 
 contract('Deployment script - Sets correct contract addresses dependencies after deployment', async accounts => {
-  const [owner] = accounts;
+  const [owner, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
   
@@ -37,7 +37,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     communityIssuance = ZEROContracts.communityIssuance
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner)
   })
 

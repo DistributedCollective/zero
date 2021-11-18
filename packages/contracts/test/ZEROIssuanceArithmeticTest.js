@@ -42,7 +42,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
   let zeroToken
   let stabilityPool
 
-  const [owner, alice, frontEnd_1] = accounts;
+  const [owner, alice, frontEnd_1, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
 
@@ -59,7 +59,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     communityIssuanceTester = ZEROContracts.communityIssuance
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
     await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))

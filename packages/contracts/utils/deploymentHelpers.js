@@ -364,7 +364,7 @@ class DeploymentHelper {
   }
 
   // Connect contracts to their dependencies
-  static async connectCoreContracts(contracts, ZEROContracts) {
+  static async connectCoreContracts(contracts, ZEROContracts, sovFeeCollectorAddress) {
 
     // set TroveManager addr in SortedTroves
     await contracts.sortedTroves.setParams(
@@ -379,6 +379,7 @@ class DeploymentHelper {
 
     // set contracts in the Trove Manager
     await contracts.troveManager.setAddresses(
+      sovFeeCollectorAddress,
       contracts.troveManagerRedeemOps.address,
       contracts.liquityBaseParams.address,
       contracts.borrowerOperations.address,
@@ -396,6 +397,7 @@ class DeploymentHelper {
 
     // set contracts in BorrowerOperations 
     await contracts.borrowerOperations.setAddresses(
+      sovFeeCollectorAddress,
       contracts.liquityBaseParams.address,
       contracts.troveManager.address,
       contracts.activePool.address,

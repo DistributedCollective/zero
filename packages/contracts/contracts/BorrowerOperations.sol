@@ -58,6 +58,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         adjustTrove
     }
     
+    event SOVFeeCollectorAddressChanged(address _sovFeeCollector);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolAddressChanged(address _activePoolAddress);
     event DefaultPoolAddressChanged(address _defaultPoolAddress);
@@ -76,6 +77,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     // --- Dependency setters ---
 
     function setAddresses(
+        address _sovFeeCollector,
         address _liquityBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
@@ -95,6 +97,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         // This makes impossible to open a trove with zero withdrawn ZUSD
         assert(MIN_NET_DEBT > 0);
 
+        require(_sovFeeCollector != address(0), "invalid address");
         checkContract(_liquityBaseParamsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
@@ -107,6 +110,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         checkContract(_zusdTokenAddress);
         checkContract(_zeroStakingAddress);
 
+        sovFeeCollector = _sovFeeCollector;
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
@@ -120,6 +124,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         zeroStakingAddress = _zeroStakingAddress;
         zeroStaking = IZEROStaking(_zeroStakingAddress);
 
+        emit SOVFeeCollectorAddressChanged(_sovFeeCollector);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
@@ -348,10 +353,15 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint ZUSDFee = _troveManager.getBorrowingFee(_ZUSDAmount);
 
         _requireUserAcceptsFee(ZUSDFee, _ZUSDAmount, _maxFeePercentage);
-        
+
+        // Send fee to the SOVFeeCollector address
+        uint256 feeToSovCollector = ZUSDFee.mul(liquityBaseParams.FEE_TO_SOV_COLLECTOR()).div(DECIMAL_PRECISION);
+       _zusdToken.mint(sovFeeCollector, feeToSovCollector);
+
         // Send fee to ZERO staking contract
-        zeroStaking.increaseF_ZUSD(ZUSDFee);
-        _zusdToken.mint(zeroStakingAddress, ZUSDFee);
+        uint256 feeToZeroStaking = ZUSDFee.sub(feeToSovCollector);
+        zeroStaking.increaseF_ZUSD(feeToZeroStaking);
+        _zusdToken.mint(zeroStakingAddress, feeToZeroStaking);
 
         return ZUSDFee;
     }

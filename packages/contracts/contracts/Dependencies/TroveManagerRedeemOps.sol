@@ -127,9 +127,14 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
         _requireUserAcceptsFee(totals.ETHFee, totals.totalETHDrawn, _maxFeePercentage);
 
+        // Send the ETH fee to the SOVFeeCollector address
+        uint256 feeToSovCollector = totals.ETHFee.mul(liquityBaseParams.FEE_TO_SOV_COLLECTOR()).div(DECIMAL_PRECISION);
+        contractsCache.activePool.sendETH(sovFeeCollector, feeToSovCollector);
+
         // Send the ETH fee to the ZERO staking contract
-        contractsCache.activePool.sendETH(address(contractsCache.zeroStaking), totals.ETHFee);
-        contractsCache.zeroStaking.increaseF_ETH(totals.ETHFee);
+        uint256 feeToZeroStaking = totals.ETHFee.sub(feeToSovCollector);
+        contractsCache.activePool.sendETH(address(contractsCache.zeroStaking), feeToZeroStaking);
+        contractsCache.zeroStaking.increaseF_ETH(feeToZeroStaking);
 
         totals.ETHToSendToRedeemer = totals.totalETHDrawn.sub(totals.ETHFee);
 

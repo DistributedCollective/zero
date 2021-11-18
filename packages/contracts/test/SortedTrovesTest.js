@@ -42,7 +42,7 @@ contract('SortedTroves', async accounts => {
     owner,
     alice, bob, carol, dennis, erin, flyn, graham, harriet, ida,
     defaulter_1, defaulter_2, defaulter_3, defaulter_4,
-    A, B, C, D, E, F, G, H, I, J, whale] = accounts;
+    A, B, C, D, E, F, G, H, I, J, whale, sovFeeCollector] = accounts;
 
   let priceFeed
   let sortedTroves
@@ -76,7 +76,7 @@ contract('SortedTroves', async accounts => {
       zusdToken = contracts.zusdToken
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
     })
 

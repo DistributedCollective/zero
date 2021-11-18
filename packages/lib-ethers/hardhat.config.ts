@@ -53,19 +53,25 @@ const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eef
 
 const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x0000000000000000000000000000000000000002",
+  rsktestnet: "0xB0D1D7fad89CfC28394b0B1AB51d24c432170f5A",
+  dev: "0x0000000000000000000000000000000000000003"
+};
+
+const sovFeeCollectorAddresses = {
+  mainnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0xB0D1D7fad89CfC28394b0B1AB51d24c432170f5A",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x0000000000000000000000000000000000000002",
+  rsktestnet: "0xEF660F708AAe1041A1c871f4e3Ffb5e166437383",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x0000000000000000000000000000000000000002",
+  rsktestnet: "0xeEBAeE881CcDed8c4e90caeeac86408a93c9bfF9",
   dev: ""
 };
 
@@ -89,6 +95,9 @@ const hasOracles = (network: string): boolean => network in oracleAddresses;
 const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
   network in governanceAddresses;
 
+const hasSovFeeCollector = (network: string): network is keyof typeof sovFeeCollectorAddresses =>
+  network in sovFeeCollectorAddresses;
+
 const hasPresale = (network: string): network is keyof typeof presaleAddresses =>
   network in presaleAddresses;
 
@@ -100,8 +109,8 @@ const config: HardhatUserConfig = {
     hardhat: {
       accounts: accounts.slice(0, numAccounts),
 
-      gas: 12e6, // tx gas limit
-      blockGasLimit: 12e6,
+      gas: 13e6, // tx gas limit
+      blockGasLimit: 13e6,
 
       // Let Ethers throw instead of Buidler EVM
       // This is closer to what will happen in production
@@ -153,6 +162,7 @@ declare module "hardhat/types/runtime" {
     deployLiquity: (
       deployer: Signer,
       governanceAddress?: string,
+      sovFeeCollectorAddress?: string,
       externalPriceFeeds?: OracleAddresses,
       presaleAddress?: string,
       marketMakerAddress?: string,
@@ -177,6 +187,7 @@ extendEnvironment(env => {
   env.deployLiquity = async (
     deployer,
     governanceAddress,
+    sovFeeCollectorAddress,
     externalPriceFeeds,
     presaleAddress,
     marketMakerAddress,
@@ -188,6 +199,7 @@ extendEnvironment(env => {
       externalPriceFeeds,
       env.network.name === "dev",
       governanceAddress,
+      sovFeeCollectorAddress,
       presaleAddress,
       marketMakerAddress,
       overrides
@@ -202,6 +214,7 @@ type DeployParams = {
   gasPrice?: number;
   useRealPriceFeed?: boolean;
   governanceAddress?: string;
+  sovFeeCollectorAddress?: string;
   presaleAddress?: string;
   marketMakerAddress?: string;
 };
@@ -236,6 +249,7 @@ task("deploy", "Deploys the contracts to the network")
         gasPrice,
         useRealPriceFeed,
         governanceAddress,
+        sovFeeCollectorAddress,
         presaleAddress,
         marketMakerAddress,
       }: DeployParams,
@@ -254,6 +268,9 @@ task("deploy", "Deploys the contracts to the network")
       governanceAddress ??= hasGovernance(env.network.name)
         ? governanceAddresses[env.network.name]
         : undefined;
+      sovFeeCollectorAddress ??= hasSovFeeCollector(env.network.name)
+        ? sovFeeCollectorAddresses[env.network.name]
+        : undefined;
       presaleAddress ??= hasPresale(env.network.name)
         ? presaleAddresses[env.network.name]
         : undefined;
@@ -264,6 +281,7 @@ task("deploy", "Deploys the contracts to the network")
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
+        sovFeeCollectorAddress,
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
         presaleAddress,
         marketMakerAddress,

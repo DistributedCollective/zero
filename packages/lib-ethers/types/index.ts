@@ -75,6 +75,7 @@ interface BorrowerOperationsCalls {
   liquityBaseParams(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
   sortedTroves(_overrides?: CallOverrides): Promise<string>;
+  sovFeeCollector(_overrides?: CallOverrides): Promise<string>;
   troveManager(_overrides?: CallOverrides): Promise<string>;
   zeroStaking(_overrides?: CallOverrides): Promise<string>;
   zeroStakingAddress(_overrides?: CallOverrides): Promise<string>;
@@ -89,7 +90,7 @@ interface BorrowerOperationsTransactions {
   moveETHGainToTrove(_borrower: string, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
   openTrove(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
   repayZUSD(_ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
-  setAddresses(_liquityBaseParamsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _sortedTrovesAddress: string, _zusdTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_sovFeeCollector: string, _liquityBaseParamsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _sortedTrovesAddress: string, _zusdTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   withdrawColl(_collWithdrawal: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawZUSD(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
@@ -105,6 +106,7 @@ export interface BorrowerOperations
     GasPoolAddressChanged(_gasPoolAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
+    SOVFeeCollectorAddressChanged(_sovFeeCollector?: null): EventFilter;
     SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
     StabilityPoolAddressChanged(_stabilityPoolAddress?: null): EventFilter;
     TroveCreated(_borrower?: string | null, arrayIndex?: null): EventFilter;
@@ -120,6 +122,7 @@ export interface BorrowerOperations
   extractEvents(logs: Log[], name: "GasPoolAddressChanged"): _TypedLogDescription<{ _gasPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
+  extractEvents(logs: Log[], name: "SOVFeeCollectorAddressChanged"): _TypedLogDescription<{ _sovFeeCollector: string }>[];
   extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedTrovesAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "TroveCreated"): _TypedLogDescription<{ _borrower: string; arrayIndex: BigNumber }>[];
@@ -760,6 +763,7 @@ interface TroveManagerCalls {
   priceFeed(_overrides?: CallOverrides): Promise<string>;
   rewardSnapshots(arg0: string, _overrides?: CallOverrides): Promise<{ ETH: BigNumber; ZUSDDebt: BigNumber }>;
   sortedTroves(_overrides?: CallOverrides): Promise<string>;
+  sovFeeCollector(_overrides?: CallOverrides): Promise<string>;
   totalCollateralSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakes(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakesSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -780,7 +784,7 @@ interface TroveManagerTransactions {
   liquidateTroves(_n: BigNumberish, _overrides?: Overrides): Promise<void>;
   redeemCollateral(_ZUSDamount: BigNumberish, _firstRedemptionHint: string, _upperPartialRedemptionHint: string, _lowerPartialRedemptionHint: string, _partialRedemptionHintNICR: BigNumberish, _maxIterations: BigNumberish, _maxFeePercentage: BigNumberish, _overrides?: Overrides): Promise<void>;
   removeStake(_borrower: string, _overrides?: Overrides): Promise<void>;
-  setAddresses(_troveManagerRedeemOps: string, _liquityBaseParamsAddress: string, _borrowerOperationsAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _zeroTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_sovFeeCollector: string, _troveManagerRedeemOps: string, _liquityBaseParamsAddress: string, _borrowerOperationsAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _zeroTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   setTroveStatus(_borrower: string, _num: BigNumberish, _overrides?: Overrides): Promise<void>;
   updateStakeAndTotalStakes(_borrower: string, _overrides?: Overrides): Promise<BigNumber>;
@@ -804,6 +808,7 @@ export interface TroveManager
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     Redemption(_attemptedZUSDAmount?: null, _actualZUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
+    SOVFeeCollectorAddressChanged(_sovFeeCollector?: null): EventFilter;
     SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
     StabilityPoolAddressChanged(_stabilityPoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
@@ -830,6 +835,7 @@ export interface TroveManager
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedZUSDAmount: BigNumber; _actualZUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "SOVFeeCollectorAddressChanged"): _TypedLogDescription<{ _sovFeeCollector: string }>[];
   extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedTrovesAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
@@ -881,6 +887,7 @@ interface TroveManagerRedeemOpsCalls {
   priceFeed(_overrides?: CallOverrides): Promise<string>;
   rewardSnapshots(arg0: string, _overrides?: CallOverrides): Promise<{ ETH: BigNumber; ZUSDDebt: BigNumber }>;
   sortedTroves(_overrides?: CallOverrides): Promise<string>;
+  sovFeeCollector(_overrides?: CallOverrides): Promise<string>;
   totalCollateralSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakes(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakesSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -948,6 +955,7 @@ interface LiquityBaseParamsCalls {
   BORROWING_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
   CCR(_overrides?: CallOverrides): Promise<BigNumber>;
   DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
+  FEE_TO_SOV_COLLECTOR(_overrides?: CallOverrides): Promise<BigNumber>;
   MAX_BORROWING_FEE(_overrides?: CallOverrides): Promise<BigNumber>;
   MCR(_overrides?: CallOverrides): Promise<BigNumber>;
   PERCENT_DIVISOR(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -959,6 +967,7 @@ interface LiquityBaseParamsTransactions {
   initialize(_overrides?: Overrides): Promise<void>;
   setBorrowingFeeFloor(BORROWING_FEE_FLOOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setCCR(CCR_: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setFeeToSOVCollector(FEE_TO_SOV_COLLECTOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setMCR(MCR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setMaxBorrowingFee(MAX_BORROWING_FEE_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;

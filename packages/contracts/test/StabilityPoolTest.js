@@ -26,6 +26,7 @@ contract('StabilityPool', async accounts => {
     alice, bob, carol, dennis, erin, flyn,
     A, B, C, D, E, F,
     frontEnd_1, frontEnd_2, frontEnd_3,
+    sovFeeCollector,
   ] = accounts;
 
   const multisig = accounts[999];
@@ -80,7 +81,7 @@ contract('StabilityPool', async accounts => {
       communityIssuance = ZEROContracts.communityIssuance
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))

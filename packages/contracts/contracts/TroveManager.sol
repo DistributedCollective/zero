@@ -17,6 +17,7 @@ import "./TroveManagerStorage.sol";
 
 contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
+    event SOVFeeCollectorAddressChanged(address _sovFeeCollector);
     event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
     event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
@@ -34,6 +35,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     // --- Dependency setter ---
     function setAddresses(
+        address _sovFeeCollector,
         address _troveManagerRedeemOps,
         address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
@@ -49,6 +51,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         address _zeroStakingAddress
     ) external override onlyOwner {
 
+        require(_sovFeeCollector != address(0), "invalid address");
         checkContract(_troveManagerRedeemOps);
         checkContract(_liquityBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
@@ -63,6 +66,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         checkContract(_zeroTokenAddress);
         checkContract(_zeroStakingAddress);
 
+        sovFeeCollector = _sovFeeCollector;
         troveManagerRedeemOps = _troveManagerRedeemOps;
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         borrowerOperationsAddress = _borrowerOperationsAddress;
@@ -75,8 +79,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         _zusdToken = IZUSDToken(_zusdTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         _zeroToken = IZEROToken(_zeroTokenAddress);
-        _zeroStaking = IZEROStaking(_zeroStakingAddress);
+        _zeroStaking = IZEROStaking(_zeroStakingAddress);        
 
+        emit SOVFeeCollectorAddressChanged(_sovFeeCollector);
         emit TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps);
         emit LiquityBaseParamsAddressChanges(_borrowerOperationsAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);

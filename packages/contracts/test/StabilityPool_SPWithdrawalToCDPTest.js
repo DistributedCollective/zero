@@ -30,7 +30,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     C,
     D,
     E,
-    F
+    F,
+    sovFeeCollector
   ] = accounts;
 
   const multisig = accounts[999];
@@ -74,7 +75,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       borrowerOperations = contracts.borrowerOperations
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
     })
 

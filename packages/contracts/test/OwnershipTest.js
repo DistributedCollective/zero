@@ -75,13 +75,47 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   describe('TroveManager', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      await testSetAddresses(troveManager, 13)
+      const dumbContract = await GasPool.new()
+      const params = Array(14).fill(dumbContract.address)
+
+      // Attempt call from alice
+      await th.assertRevert(troveManager.setAddresses(...params, { from: alice }))
+
+      // Attempt to use zero address
+      await testZeroAddress(troveManager, params, "setAddresses")
+      // Attempt to use non contract
+      await testNonContractAddress(troveManager, params, "setAddresses", 1)
+
+      // Owner can successfully set any address
+      const txOwner = await troveManager.setAddresses(...params, { from: owner })
+      assert.isTrue(txOwner.receipt.status)
+
+      // Owner can set any address more than once
+      const secondTxOwner = await troveManager.setAddresses(...params, { from: owner })
+      assert.isTrue(secondTxOwner.receipt.status)
     })
   })
 
   describe('BorrowerOperations', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      await testSetAddresses(borrowerOperations, 11)
+      const dumbContract = await GasPool.new()
+      const params = Array(12).fill(dumbContract.address)
+
+      // Attempt call from alice
+      await th.assertRevert(borrowerOperations.setAddresses(...params, { from: alice }))
+
+      // Attempt to use zero address
+      await testZeroAddress(borrowerOperations, params, "setAddresses")
+      // Attempt to use non contract
+      await testNonContractAddress(borrowerOperations, params, "setAddresses", 1)
+
+      // Owner can successfully set any address
+      const txOwner = await borrowerOperations.setAddresses(...params, { from: owner })
+      assert.isTrue(txOwner.receipt.status)
+
+      // Owner can set any address more than once
+      const secondTxOwner = await borrowerOperations.setAddresses(...params, { from: owner })
+      assert.isTrue(secondTxOwner.receipt.status)
     })
   })
 

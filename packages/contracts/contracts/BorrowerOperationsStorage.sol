@@ -32,4 +32,6 @@ contract BorrowerOperationsStorage is Ownable {
     // A doubly linked list of Troves, sorted by their collateral ratios
     ISortedTroves public sortedTroves;
 
+    address public sovFeeCollector;
+
 }

@@ -22,7 +22,7 @@ const timeValues = testHelpers.TimeValues
 contract('TroveManager', async accounts => {
 
   const ZERO_ADDRESS = th.ZERO_ADDRESS
-  const [owner, A, B, C, D, E, F] = accounts.slice(0, 7);
+  const [owner, A, B, C, D, E, F, sovFeeCollector] = accounts.slice(0, 8);
 
   const multisig = accounts[999];
 
@@ -74,7 +74,7 @@ contract('TroveManager', async accounts => {
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
 
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })

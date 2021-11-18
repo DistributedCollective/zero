@@ -16,7 +16,7 @@ test/launchSequenceTest/DuringLockupPeriodTest.js */
 
 contract('Access Control: Liquity functions with the caller restricted to Liquity contract(s)', async accounts => {
 
-  const [owner, alice, bob, carol] = accounts;
+  const [owner, alice, bob, carol, sovFeeCollector] = accounts;
   const multisig = accounts[999];
 
   let coreContracts
@@ -35,7 +35,6 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
   let zeroStaking
   let zeroToken
   let communityIssuance
-  let lockupContractFactory
 
   before(async () => {
     coreContracts = await deploymentHelper.deployLiquityCore()
@@ -63,7 +62,7 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
     
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner)
 
     for (account of accounts.slice(0, 10)) {

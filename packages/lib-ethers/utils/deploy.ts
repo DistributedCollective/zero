@@ -171,6 +171,7 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
+  sovFeeCollectorAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
   overrides?: Overrides
@@ -213,6 +214,7 @@ const connectContracts = async (
 
     nonce =>
       troveManager.setAddresses(
+        sovFeeCollectorAddress,
         troveManagerRedeemOps.address,
         liquityBaseParams.address,
         borrowerOperations.address,
@@ -231,6 +233,7 @@ const connectContracts = async (
 
     nonce =>
       borrowerOperations.setAddresses(
+        sovFeeCollectorAddress,
         liquityBaseParams.address,
         troveManager.address,
         activePool.address,
@@ -437,6 +440,7 @@ export const deployAndSetupContracts = async (
 
   _isDev = true,
   governanceAddress?: string,
+  sovFeeCollectorAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
   overrides?: Overrides
@@ -447,6 +451,7 @@ export const deployAndSetupContracts = async (
   }
 
   governanceAddress ??= await deployer.getAddress();
+  sovFeeCollectorAddress ??= await deployer.getAddress();
   presaleAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
 
   log("Deploying contracts...");
@@ -460,6 +465,7 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     governanceAddress,
+    sovFeeCollectorAddress,
     presaleAddress,
     marketMakerAddress,
     _priceFeedIsTestnet,
@@ -471,7 +477,7 @@ export const deployAndSetupContracts = async (
   const contracts = _connectToContracts(deployer, deployment);
 
   log("Connecting contracts...");
-  await connectContracts(contracts, deployer, governanceAddress, presaleAddress, marketMakerAddress, overrides);
+  await connectContracts(contracts, deployer, governanceAddress, sovFeeCollectorAddress, presaleAddress, marketMakerAddress, overrides);
 
   if (externalPriceFeeds !== undefined) {
     assert(!checkPriceFeedIsTestnet(contracts.priceFeed));

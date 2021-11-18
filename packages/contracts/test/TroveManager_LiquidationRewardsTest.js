@@ -17,7 +17,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     owner,
     alice, bob, carol, dennis, erin, freddy, greta, harry, ida,
     A, B, C, D, E,
-    whale, defaulter_1, defaulter_2, defaulter_3, defaulter_4] = accounts;
+    whale, defaulter_1, defaulter_2, defaulter_3, defaulter_4, sovFeeCollector] = accounts;
 
     const multisig = accounts[999];
 
@@ -61,7 +61,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     borrowerOperations = contracts.borrowerOperations
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })
 

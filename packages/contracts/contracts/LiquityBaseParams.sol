@@ -30,6 +30,9 @@ contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMa
 
     uint override public MAX_BORROWING_FEE;
 
+    //pct of fees sent to feeSOVCollector address
+    uint override public FEE_TO_SOV_COLLECTOR;
+
     function initialize() public initializer {
         MCR = 1100000000000000000; // 110%
         CCR = 1500000000000000000; // 150%
@@ -37,6 +40,7 @@ contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMa
         BORROWING_FEE_FLOOR = DECIMAL_PRECISION / 1000 * 5; // 0.5%
         REDEMPTION_FEE_FLOOR = DECIMAL_PRECISION / 1000 * 5; // 0.5%
         MAX_BORROWING_FEE = DECIMAL_PRECISION / 100 * 5; // 5%
+        FEE_TO_SOV_COLLECTOR = DECIMAL_PRECISION / 100 * 20; // 20%
     }
 
     function setMCR(uint MCR_) public onlyOwner {
@@ -61,5 +65,9 @@ contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMa
     
     function setMaxBorrowingFee(uint MAX_BORROWING_FEE_) public onlyOwner {
         MAX_BORROWING_FEE = MAX_BORROWING_FEE_;
+    }
+
+    function setFeeToSOVCollector(uint FEE_TO_SOV_COLLECTOR_) public onlyOwner {
+        FEE_TO_SOV_COLLECTOR = FEE_TO_SOV_COLLECTOR_;
     }
 }

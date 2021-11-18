@@ -29,7 +29,7 @@ contract('TroveManager', async accounts => {
     owner,
     alice, bob, carol, dennis, erin, flyn, graham, harriet, ida,
     defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale,
-    A, B, C, D, E] = accounts;
+    A, B, C, D, E, sovFeeCollector] = accounts;
 
     const multisig = accounts[999];
 
@@ -78,7 +78,7 @@ contract('TroveManager', async accounts => {
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance 
 
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 

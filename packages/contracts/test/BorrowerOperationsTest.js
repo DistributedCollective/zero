@@ -32,7 +32,7 @@ contract('BorrowerOperations', async accounts => {
     owner, alice, bob, carol, dennis, whale,
     A, B, C, D, E, F, G, H,
     // defaulter_1, defaulter_2,
-    frontEnd_1, frontEnd_2, frontEnd_3] = accounts;
+    frontEnd_1, frontEnd_2, frontEnd_3, sovFeeCollector] = accounts;
 
     const multisig = accounts[999];
 
@@ -78,7 +78,7 @@ contract('BorrowerOperations', async accounts => {
       await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       if (withProxy) {

@@ -33,6 +33,8 @@ contract TroveManagerStorage is Ownable, BaseMath {
 
     IZEROStaking public _zeroStaking;
 
+    address public sovFeeCollector;
+
     // A doubly linked list of Troves, sorted by their sorted by their collateral ratios
     ISortedTroves public sortedTroves;
 

@@ -15,7 +15,7 @@ const ZUSDToken = artifacts.require("ZUSDToken")
 contract('CollSurplusPool', async accounts => {
   const [
     owner,
-    A, B, C, D, E] = accounts;
+    A, B, C, D, E, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
 
@@ -43,7 +43,7 @@ contract('CollSurplusPool', async accounts => {
     collSurplusPool = contracts.collSurplusPool
     borrowerOperations = contracts.borrowerOperations
 
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })
