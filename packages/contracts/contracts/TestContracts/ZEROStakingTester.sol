@@ -6,7 +6,7 @@ import "../ZERO/ZEROStaking.sol";
 
 
 contract ZEROStakingTester is ZEROStaking {
-    function requireCallerIsTroveManager() external view {
-        _requireCallerIsTroveManager();
+    function requireCallerIsFeeDistributor() external view {
+        _requireCallerIsFeeDistributor();
     }
 }

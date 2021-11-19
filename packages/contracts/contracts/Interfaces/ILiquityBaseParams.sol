@@ -22,6 +22,4 @@ interface ILiquityBaseParams {
 
     function MAX_BORROWING_FEE() external view returns (uint);
 
-    function FEE_TO_SOV_COLLECTOR() external view returns (uint);
-
 }

@@ -20,8 +20,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     event ZEROTokenAddressSet(address _zeroTokenAddress);
     event ZUSDTokenAddressSet(address _zusdTokenAddress);
-    event TroveManagerAddressSet(address _troveManager);
-    event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
+    event FeeDistributorAddressSet(address _feeDistributorAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
@@ -38,8 +37,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     (
         address _zeroTokenAddress,
         address _zusdTokenAddress,
-        address _troveManagerAddress, 
-        address _borrowerOperationsAddress,
+        address _feeDistributorAddress, 
         address _activePoolAddress
     ) 
         external 
@@ -48,20 +46,17 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     {
         checkContract(_zeroTokenAddress);
         checkContract(_zusdTokenAddress);
-        checkContract(_troveManagerAddress);
-        checkContract(_borrowerOperationsAddress);
+        checkContract(_feeDistributorAddress);
         checkContract(_activePoolAddress);
 
         zeroToken = IZEROToken(_zeroTokenAddress);
         zusdToken = IZUSDToken(_zusdTokenAddress);
-        troveManagerAddress = _troveManagerAddress;
-        borrowerOperationsAddress = _borrowerOperationsAddress;
+        feeDistributorAddress = _feeDistributorAddress;
         activePoolAddress = _activePoolAddress;
 
         emit ZEROTokenAddressSet(_zeroTokenAddress);
         emit ZEROTokenAddressSet(_zusdTokenAddress);
-        emit TroveManagerAddressSet(_troveManagerAddress);
-        emit BorrowerOperationsAddressSet(_borrowerOperationsAddress);
+        emit FeeDistributorAddressSet(_feeDistributorAddress);
         emit ActivePoolAddressSet(_activePoolAddress);
 
         
@@ -141,7 +136,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     // --- Reward-per-unit-staked increase functions. Called by Liquity core contracts ---
 
     function increaseF_ETH(uint _ETHFee) external override {
-        _requireCallerIsTroveManager();
+        _requireCallerIsFeeDistributor();
         uint ETHFeePerZEROStaked;
      
         if (totalZEROStaked > 0) {ETHFeePerZEROStaked = _ETHFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
@@ -151,7 +146,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     }
 
     function increaseF_ZUSD(uint _ZUSDFee) external override {
-        _requireCallerIsBorrowerOperations();
+        _requireCallerIsFeeDistributor();
         uint ZUSDFeePerZEROStaked;
         
         if (totalZEROStaked > 0) {ZUSDFeePerZEROStaked = _ZUSDFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
@@ -198,12 +193,8 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     // --- 'require' functions ---
 
-    function _requireCallerIsTroveManager() internal view {
-        require(msg.sender == troveManagerAddress, "ZEROStaking: caller is not TroveM");
-    }
-
-    function _requireCallerIsBorrowerOperations() internal view {
-        require(msg.sender == borrowerOperationsAddress, "ZEROStaking: caller is not BorrowerOps");
+    function _requireCallerIsFeeDistributor() internal view {
+        require(msg.sender == feeDistributorAddress, "ZEROStaking: caller is not FeeDistributor");
     }
 
      function _requireCallerIsActivePool() internal view {

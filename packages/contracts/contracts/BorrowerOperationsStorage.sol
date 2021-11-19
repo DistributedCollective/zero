@@ -9,6 +9,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROStaking.sol";
+import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/Ownable.sol";
 
 contract BorrowerOperationsStorage is Ownable {
@@ -32,6 +33,6 @@ contract BorrowerOperationsStorage is Ownable {
     // A doubly linked list of Troves, sorted by their collateral ratios
     ISortedTroves public sortedTroves;
 
-    address public sovFeeCollector;
+    IFeeDistributor public feeDistributor;
 
 }

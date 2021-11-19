@@ -9,6 +9,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROToken.sol";
 import "./Interfaces/IZEROStaking.sol";
+import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -17,7 +18,7 @@ import "./TroveManagerStorage.sol";
 
 contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
-    event SOVFeeCollectorAddressChanged(address _sovFeeCollector);
+    event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
     event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
@@ -35,7 +36,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     // --- Dependency setter ---
     function setAddresses(
-        address _sovFeeCollector,
+        address _feeDistributorAddress,
         address _troveManagerRedeemOps,
         address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
@@ -51,7 +52,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         address _zeroStakingAddress
     ) external override onlyOwner {
 
-        require(_sovFeeCollector != address(0), "invalid address");
+        checkContract(_feeDistributorAddress);
         checkContract(_troveManagerRedeemOps);
         checkContract(_liquityBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
@@ -66,7 +67,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         checkContract(_zeroTokenAddress);
         checkContract(_zeroStakingAddress);
 
-        sovFeeCollector = _sovFeeCollector;
+        feeDistributor = IFeeDistributor(_feeDistributorAddress);
         troveManagerRedeemOps = _troveManagerRedeemOps;
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         borrowerOperationsAddress = _borrowerOperationsAddress;
@@ -81,7 +82,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         _zeroToken = IZEROToken(_zeroTokenAddress);
         _zeroStaking = IZEROStaking(_zeroStakingAddress);        
 
-        emit SOVFeeCollectorAddressChanged(_sovFeeCollector);
+        emit FeeDistributorAddressChanged(_feeDistributorAddress);
         emit TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps);
         emit LiquityBaseParamsAddressChanges(_borrowerOperationsAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
