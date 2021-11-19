@@ -36,6 +36,7 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
   let zeroToken
   let communityIssuance
 
+
   before(async () => {
     coreContracts = await deploymentHelper.deployLiquityCore()
     coreContracts.troveManager = await TroveManagerTester.new()
@@ -52,7 +53,7 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     defaultPool = coreContracts.defaultPool
     functionCaller = coreContracts.functionCaller
     borrowerOperations = coreContracts.borrowerOperations
-
+ 
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance
@@ -62,7 +63,7 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
     await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
     
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts, sovFeeCollector)
+    await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner)
 
     for (account of accounts.slice(0, 10)) {

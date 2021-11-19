@@ -58,9 +58,15 @@ const governanceAddresses = {
 };
 
 const sovFeeCollectorAddresses = {
-  mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0xB0D1D7fad89CfC28394b0B1AB51d24c432170f5A",
-  dev: "0x0000000000000000000000000000000000000003"
+  mainnet: "",
+  rsktestnet: "",
+  dev: ""
+};
+
+const wrbtcAddresses = {
+  mainnet: "",
+  rsktestnet: "",
+  dev: ""
 };
 
 const marketMakerAddresses = {
@@ -97,6 +103,9 @@ const hasGovernance = (network: string): network is keyof typeof governanceAddre
 
 const hasSovFeeCollector = (network: string): network is keyof typeof sovFeeCollectorAddresses =>
   network in sovFeeCollectorAddresses;
+
+const hasWrbtc = (network: string): network is keyof typeof wrbtcAddresses =>
+  network in wrbtcAddresses;
 
 const hasPresale = (network: string): network is keyof typeof presaleAddresses =>
   network in presaleAddresses;
@@ -163,6 +172,7 @@ declare module "hardhat/types/runtime" {
       deployer: Signer,
       governanceAddress?: string,
       sovFeeCollectorAddress?: string,
+      wrbtcAddress?: string,
       externalPriceFeeds?: OracleAddresses,
       presaleAddress?: string,
       marketMakerAddress?: string,
@@ -188,6 +198,7 @@ extendEnvironment(env => {
     deployer,
     governanceAddress,
     sovFeeCollectorAddress,
+    wrbtcAddress,
     externalPriceFeeds,
     presaleAddress,
     marketMakerAddress,
@@ -200,6 +211,7 @@ extendEnvironment(env => {
       env.network.name === "dev",
       governanceAddress,
       sovFeeCollectorAddress,
+      wrbtcAddress,
       presaleAddress,
       marketMakerAddress,
       overrides
@@ -215,6 +227,7 @@ type DeployParams = {
   useRealPriceFeed?: boolean;
   governanceAddress?: string;
   sovFeeCollectorAddress?: string;
+  wrbtcAddress?: string;
   presaleAddress?: string;
   marketMakerAddress?: string;
 };
@@ -250,6 +263,7 @@ task("deploy", "Deploys the contracts to the network")
         useRealPriceFeed,
         governanceAddress,
         sovFeeCollectorAddress,
+        wrbtcAddress,
         presaleAddress,
         marketMakerAddress,
       }: DeployParams,
@@ -271,6 +285,9 @@ task("deploy", "Deploys the contracts to the network")
       sovFeeCollectorAddress ??= hasSovFeeCollector(env.network.name)
         ? sovFeeCollectorAddresses[env.network.name]
         : undefined;
+        wrbtcAddress ??= hasWrbtc(env.network.name)
+        ? wrbtcAddresses[env.network.name]
+        : undefined;
       presaleAddress ??= hasPresale(env.network.name)
         ? presaleAddresses[env.network.name]
         : undefined;
@@ -282,6 +299,7 @@ task("deploy", "Deploys the contracts to the network")
         deployer,
         governanceAddress,
         sovFeeCollectorAddress,
+        wrbtcAddress,
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
         presaleAddress,
         marketMakerAddress,

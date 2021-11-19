@@ -210,6 +210,6 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     }
 
     receive() external payable {
-        _requireCallerIsActivePool();
+        _requireCallerIsFeeDistributor();
     }
 }

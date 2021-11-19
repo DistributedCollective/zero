@@ -81,7 +81,7 @@ contract('StabilityPool', async accounts => {
       communityIssuance = ZEROContracts.communityIssuance
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))

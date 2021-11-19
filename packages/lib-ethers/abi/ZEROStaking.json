@@ -18,19 +18,6 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_borrowerOperationsAddress",
-        "type": "address"
-      }
-    ],
-    "name": "BorrowerOperationsAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
         "name": "_account",
         "type": "address"
       },
@@ -68,6 +55,32 @@
       }
     ],
     "name": "F_ZUSDUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_feeDistributorAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FeeDistributorAddressAddressSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_feeDistributorAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FeeDistributorAddressSet",
     "type": "event"
   },
   {
@@ -177,19 +190,6 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_troveManager",
-        "type": "address"
-      }
-    ],
-    "name": "TroveManagerAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
         "name": "_zeroTokenAddress",
         "type": "address"
       }
@@ -277,7 +277,7 @@
   },
   {
     "inputs": [],
-    "name": "borrowerOperationsAddress",
+    "name": "feeDistributorAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -379,12 +379,7 @@
       },
       {
         "internalType": "address",
-        "name": "_troveManagerAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_borrowerOperationsAddress",
+        "name": "_feeDistributorAddress",
         "type": "address"
       },
       {
@@ -475,19 +470,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "troveManagerAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

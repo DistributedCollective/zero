@@ -31,7 +31,7 @@ contract('BorrowerWrappers', async accounts => {
   const [
     owner, alice, bob, carol, dennis, whale,
     A, B, C, D, E,
-    defaulter_1, defaulter_2, sovFeeCollector,
+    defaulter_1, defaulter_2,
     // frontEnd_1, frontEnd_2, frontEnd_3
   ] = accounts;
 
@@ -51,6 +51,8 @@ contract('BorrowerWrappers', async accounts => {
   let zeroTokenOriginal
   let zeroToken
   let zeroStaking
+  let wrbtcToken
+  let sovFeeCollector
 
   let contracts
 
@@ -68,7 +70,7 @@ contract('BorrowerWrappers', async accounts => {
     const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
     await ZEROContracts.zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
@@ -93,6 +95,8 @@ contract('BorrowerWrappers', async accounts => {
     borrowerWrappers = contracts.borrowerWrappers
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
+    wrbtcToken = contracts.wrbtcTokenTester
+    sovFeeCollector = ZEROContracts.mockFeeSharingProxy.address
 
     ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION()
   })
@@ -506,9 +510,9 @@ contract('BorrowerWrappers', async accounts => {
 
     // whale redeems 100 ZUSD
     const redeemedAmount = toBN(dec(100, 18))
-    const sovFeeCollectorBalanceBefore = toBN(await web3.eth.getBalance(sovFeeCollector))
+    const sovFeeCollectorBalanceBefore = await wrbtcToken.balanceOf(sovFeeCollector)
     await th.redeemCollateral(whale, contracts, redeemedAmount)
-    const sovFeeCollectorBalanceAfter = toBN(await web3.eth.getBalance(sovFeeCollector))
+    const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
  
     // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
@@ -698,9 +702,9 @@ contract('BorrowerWrappers', async accounts => {
 
     // whale redeems 100 ZUSD
     const redeemedAmount = toBN(dec(100, 18))
-    const sovFeeCollectorBalanceBefore = toBN(await web3.eth.getBalance(sovFeeCollector))
+    const sovFeeCollectorBalanceBefore = await wrbtcToken.balanceOf(sovFeeCollector)
     await th.redeemCollateral(whale, contracts, redeemedAmount)
-    const sovFeeCollectorBalanceAfter = toBN(await web3.eth.getBalance(sovFeeCollector))
+    const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
 
     // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)

@@ -78,7 +78,7 @@ contract('TroveManager', async accounts => {
     zeroToken = ZEROContracts.zeroToken
     communityIssuance = ZEROContracts.communityIssuance 
 
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 

@@ -78,7 +78,7 @@ contract('BorrowerOperations', async accounts => {
       await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       if (withProxy) {

@@ -342,7 +342,7 @@ contract('Fee arithmetic tests', async accounts => {
     const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
   
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, multisig)
   })
 

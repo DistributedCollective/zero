@@ -18,6 +18,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   let stabilityPool
   let defaultPool
   let borrowerOperations
+  let feeDistributor
 
   let zeroStaking
   let communityIssuance
@@ -36,6 +37,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     stabilityPool = contracts.stabilityPool
     defaultPool = contracts.defaultPool
     borrowerOperations = contracts.borrowerOperations
+    feeDistributor = contracts.feeDistributor
 
     zeroStaking = ZEROContracts.zeroStaking
     communityIssuance = ZEROContracts.communityIssuance
@@ -75,49 +77,22 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   describe('TroveManager', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      const dumbContract = await GasPool.new()
-      const params = Array(14).fill(dumbContract.address)
-
-      // Attempt call from alice
-      await th.assertRevert(troveManager.setAddresses(...params, { from: alice }))
-
-      // Attempt to use zero address
-      await testZeroAddress(troveManager, params, "setAddresses")
-      // Attempt to use non contract
-      await testNonContractAddress(troveManager, params, "setAddresses", 1)
-
-      // Owner can successfully set any address
-      const txOwner = await troveManager.setAddresses(...params, { from: owner })
-      assert.isTrue(txOwner.receipt.status)
-
-      // Owner can set any address more than once
-      const secondTxOwner = await troveManager.setAddresses(...params, { from: owner })
-      assert.isTrue(secondTxOwner.receipt.status)
+      await testSetAddresses(troveManager, 14)
     })
   })
 
   describe('BorrowerOperations', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      const dumbContract = await GasPool.new()
-      const params = Array(12).fill(dumbContract.address)
-
-      // Attempt call from alice
-      await th.assertRevert(borrowerOperations.setAddresses(...params, { from: alice }))
-
-      // Attempt to use zero address
-      await testZeroAddress(borrowerOperations, params, "setAddresses")
-      // Attempt to use non contract
-      await testNonContractAddress(borrowerOperations, params, "setAddresses", 1)
-
-      // Owner can successfully set any address
-      const txOwner = await borrowerOperations.setAddresses(...params, { from: owner })
-      assert.isTrue(txOwner.receipt.status)
-
-      // Owner can set any address more than once
-      const secondTxOwner = await borrowerOperations.setAddresses(...params, { from: owner })
-      assert.isTrue(secondTxOwner.receipt.status)
+      await testSetAddresses(borrowerOperations, 12)
     })
   })
+
+  describe('FeeDistributor', async accounts => {
+    it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
+      await testSetAddresses(feeDistributor, 7)
+    })
+  })
+
 
   describe('DefaultPool', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
@@ -182,7 +157,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
   describe('ZEROStaking', async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      await testSetAddresses(zeroStaking, 5)
+      await testSetAddresses(zeroStaking, 4)
     })
   })
 })

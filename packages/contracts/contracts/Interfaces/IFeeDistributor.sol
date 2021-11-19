@@ -13,6 +13,8 @@ interface IFeeDistributor {
     event TroveManagerAddressChanged(address _troveManagerAddress);
     event WrbtcAddressChanged(address _wrbtcAddress);
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
+    event ActivePoolAddressSet(address _activePoolAddress);
+
 
     event ZUSDDistributed(uint256 _zusdDistributedAmount);
     event RBTCistributed(uint256 _rbtcDistributedAmount);
@@ -28,6 +30,7 @@ interface IFeeDistributor {
      * @param _troveManagerAddress TroveManager contract address
      * @param _wrbtcAddress wrbtc ERC20 contract address
      * @param _zusdTokenAddress ZUSDToken contract address
+     * @param _activePoolAddress ActivePool contract address
      */
     function setAddresses(
         address _sovFeeCollectorAddress,
@@ -35,7 +38,8 @@ interface IFeeDistributor {
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _wrbtcAddress,
-        address _zusdTokenAddress
+        address _zusdTokenAddress,
+        address _activePoolAddress
     ) external;
 
     function distributeFees() external;

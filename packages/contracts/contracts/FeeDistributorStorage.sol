@@ -27,6 +27,8 @@ contract FeeDistributorStorage is Ownable {
 
     IZUSDToken public zusdToken;
 
+    address public activePoolAddress;
+
     //pct of fees sent to feeSOVCollector address
     uint public FEE_TO_SOV_COLLECTOR;
 }

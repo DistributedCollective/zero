@@ -72,7 +72,7 @@ contract('ZUSDToken', async accounts => {
 
       const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
 
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 

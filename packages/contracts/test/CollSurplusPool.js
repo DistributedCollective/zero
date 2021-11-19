@@ -43,7 +43,7 @@ contract('CollSurplusPool', async accounts => {
     collSurplusPool = contracts.collSurplusPool
     borrowerOperations = contracts.borrowerOperations
 
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
   })

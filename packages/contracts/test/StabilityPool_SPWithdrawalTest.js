@@ -72,7 +72,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       borrowerOperations = contracts.borrowerOperations
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
     })
 

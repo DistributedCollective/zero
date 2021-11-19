@@ -56,7 +56,7 @@ contract('ZEROStaking revenue share tests', async accounts => {
     await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
 
     await deploymentHelper.connectZEROContracts(ZEROContracts)
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector)
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
     nonPayable = await NonPayable.new() 
@@ -790,6 +790,6 @@ contract('ZEROStaking revenue share tests', async accounts => {
 
   it('Test requireCallerIsTroveManager', async () => {
     const zeroStakingTester = await ZEROStakingTester.new()
-    await assertRevert(zeroStakingTester.requireCallerIsTroveManager(), 'ZEROStaking: caller is not TroveM')
+    await assertRevert(zeroStakingTester.requireCallerIsFeeDistributor(), 'ZEROStaking: caller is not FeeDistributor')
   })
 })
