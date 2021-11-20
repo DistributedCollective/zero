@@ -201,7 +201,7 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,
   liquityBaseParams: liquityBaseParamsAbi,
-  feeDistributor: feeDistributorAbi
+  feeDistributor: feeDistributorAbi,
 });
 
 const mapLiquityContracts = <T, U>(

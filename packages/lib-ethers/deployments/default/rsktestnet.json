@@ -25,7 +25,8 @@
     "liquityBaseParams": "0x1e513f4C31F608d7E620A9d57Fc6eBFa03A2a800",
     "zusdToken": "0x547fC96dcc594bF027fe0D014fe67E969EE37135",
     "zeroToken": "0xe2D10337488D1a0117532B0C46B043064f27c406",
-    "multiTroveGetter": "0xcFc174e3Da230E7F32A8a4876B5b5F2Cc03b9ca7"
+    "multiTroveGetter": "0xcFc174e3Da230E7F32A8a4876B5b5F2Cc03b9ca7",
+    "feeDistributor":""
   },
   "startBlock": 2331156
 }

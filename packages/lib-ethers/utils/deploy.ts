@@ -356,7 +356,7 @@ const transferOwnership = async (
     sortedTroves,
     stabilityPool,
     liquityBaseParams,
-    feeDistributor
+    feeDistributor,
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
