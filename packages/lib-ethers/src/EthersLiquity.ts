@@ -214,6 +214,11 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable.getZUSDBalance(address, overrides);
   }
 
+  /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getNUEBalance} */
+  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+    return this._readable.getNUEBalance(address, overrides);
+  }
+
   /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getZEROBalance} */
   getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZEROBalance(address, overrides);
@@ -276,6 +281,20 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     overrides?: EthersTransactionOverrides
   ): Promise<TroveCreationDetails> {
     return this.send.openTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  /**
+ * {@inheritDoc @liquity/lib-base#TransactableLiquity.openTrove}
+ *
+ * @throws
+ * Throws {@link EthersTransactionFailedError} in case of transaction failure.
+ */
+  openNueTrove(
+    params: TroveCreationParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<TroveCreationDetails> {
+    return this.send.openNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**

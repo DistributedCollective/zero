@@ -49,6 +49,15 @@ export class SendableEthersLiquity
     return this._populate.openTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
+  /** {@inheritDoc @liquity/lib-base#SendableLiquity.openNueTrove} */
+  openNueTrove(
+    params: TroveCreationParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<TroveCreationDetails>> {
+    return this._populate.openNueTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  }
+
   /** {@inheritDoc @liquity/lib-base#SendableLiquity.closeTrove} */
   closeTrove(
     overrides?: EthersTransactionOverrides

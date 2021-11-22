@@ -365,6 +365,44 @@
         "type": "address"
       }
     ],
+    "name": "adjustNueTrove",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxFeePercentage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collWithdrawal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_ZUSDChange",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isDebtIncrease",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
+      }
+    ],
     "name": "adjustTrove",
     "outputs": [],
     "stateMutability": "payable",
@@ -373,6 +411,13 @@
   {
     "inputs": [],
     "name": "claimCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeNueTrove",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -469,6 +514,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "masset",
+    "outputs": [
+      {
+        "internalType": "contract IMasset",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -487,6 +545,34 @@
       }
     ],
     "name": "moveETHGainToTrove",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxFeePercentage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_ZUSDAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
+      }
+    ],
+    "name": "openNueTrove",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -614,6 +700,19 @@
       }
     ],
     "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_massetAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setMassetAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

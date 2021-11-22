@@ -27,7 +27,7 @@ export const RedemptionPage: React.FC = () => {
                 emerge.
               </Paragraph>
               <Paragraph sx={{ mt: 2 }}>
-                Most of the time you will get a better rate for converting ZUSD to ETH on{" "}
+                Most of the time you will get a better rate for converting ZUSD to rBTC on{" "}
                 <Link href={uniLink(addresses["zusdToken"])} target="_blank">
                   Uniswap <Icon name="external-link-alt" size="xs" />
                 </Link>{" "}

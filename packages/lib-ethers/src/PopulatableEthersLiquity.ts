@@ -120,7 +120,7 @@ function* generateTrials(totalNumberOfTrials: number) {
  */
 export class SentEthersLiquityTransaction<T = unknown>
   implements
-    SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
+  SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
   /** Ethers' representation of a sent transaction. */
   readonly rawSentTransaction: EthersTransactionResponse;
 
@@ -142,8 +142,8 @@ export class SentEthersLiquityTransaction<T = unknown>
     return rawReceipt
       ? rawReceipt.status
         ? _successfulReceipt(rawReceipt, this._parse(rawReceipt), () =>
-            logsToString(rawReceipt, _getContracts(this._connection))
-          )
+          logsToString(rawReceipt, _getContracts(this._connection))
+        )
         : _failedReceipt(rawReceipt)
       : _pendingReceipt;
   }
@@ -176,7 +176,7 @@ export class SentEthersLiquityTransaction<T = unknown>
  */
 export class PopulatedEthersLiquityTransaction<T = unknown>
   implements
-    PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
+  PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
   /** Unsigned transaction object populated by Ethers. */
   readonly rawPopulatedTransaction: EthersPopulatedTransaction;
 
@@ -212,11 +212,11 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
 export class PopulatedEthersRedemption
   extends PopulatedEthersLiquityTransaction<RedemptionDetails>
   implements
-    PopulatedRedemption<
-      EthersPopulatedTransaction,
-      EthersTransactionResponse,
-      EthersTransactionReceipt
-    > {
+  PopulatedRedemption<
+  EthersPopulatedTransaction,
+  EthersTransactionResponse,
+  EthersTransactionReceipt
+  > {
   /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.attemptedZUSDAmount} */
   readonly attemptedZUSDAmount: Decimal;
 
@@ -270,7 +270,7 @@ export class PopulatedEthersRedemption
     if (!this._increaseAmountByMinimumNetDebt) {
       throw new Error(
         "PopulatedEthersRedemption: increaseAmountByMinimumNetDebt() can " +
-          "only be called when amount is truncated"
+        "only be called when amount is truncated"
       );
     }
 
@@ -292,11 +292,11 @@ export interface _TroveChangeWithFees<T> {
  */
 export class PopulatableEthersLiquity
   implements
-    PopulatableLiquity<
-      EthersTransactionReceipt,
-      EthersTransactionResponse,
-      EthersPopulatedTransaction
-    > {
+  PopulatableLiquity<
+  EthersTransactionReceipt,
+  EthersTransactionResponse,
+  EthersPopulatedTransaction
+  > {
   private readonly _readable: ReadableEthersLiquity;
 
   constructor(readable: ReadableEthersLiquity) {
@@ -575,8 +575,8 @@ export class PopulatableEthersLiquity
       partialRedemptionUpperHint,
       partialRedemptionLowerHint
     ] = partialRedemptionHintNICR.isZero()
-      ? [AddressZero, AddressZero]
-      : await this._findHintsForNominalCollateralRatio(decimalify(partialRedemptionHintNICR));
+        ? [AddressZero, AddressZero]
+        : await this._findHintsForNominalCollateralRatio(decimalify(partialRedemptionHintNICR));
 
     return [
       decimalify(truncatedZUSDamount),
@@ -610,6 +610,38 @@ export class PopulatableEthersLiquity
     return this._wrapTroveChangeWithFees(
       normalized,
       await borrowerOperations.estimateAndPopulate.openTrove(
+        { value: depositCollateral.hex, ...overrides },
+        compose(addGasForPotentialLastFeeOperationTimeUpdate, addGasForPotentialListTraversal),
+        maxBorrowingRate.hex,
+        borrowZUSD.hex,
+        ...(await this._findHints(newTrove))
+      )
+    );
+  }
+
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.openNueTrove} */
+  async openNueTrove(
+    params: TroveCreationParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersLiquityTransaction<TroveCreationDetails>> {
+    const { borrowerOperations } = _getContracts(this._readable.connection);
+
+    const normalized = _normalizeTroveCreation(params);
+    const { depositCollateral, borrowZUSD } = normalized;
+
+    const fees = await this._readable.getFees();
+    const borrowingRate = fees.borrowingRate();
+    const newTrove = Trove.create(normalized, borrowingRate);
+
+    maxBorrowingRate =
+      maxBorrowingRate !== undefined
+        ? Decimal.from(maxBorrowingRate)
+        : borrowingRate.add(defaultBorrowingRateSlippageTolerance);
+
+    return this._wrapTroveChangeWithFees(
+      normalized,
+      await borrowerOperations.estimateAndPopulate.openNueTrove(
         { value: depositCollateral.hex, ...overrides },
         compose(addGasForPotentialLastFeeOperationTimeUpdate, addGasForPotentialListTraversal),
         maxBorrowingRate.hex,
@@ -943,10 +975,10 @@ export class PopulatableEthersLiquity
 
         truncatedAmount.lt(attemptedZUSDAmount)
           ? newMaxRedemptionRate =>
-              populateRedemption(
-                truncatedAmount.add(ZUSD_MINIMUM_NET_DEBT),
-                newMaxRedemptionRate ?? maxRedemptionRate
-              )
+            populateRedemption(
+              truncatedAmount.add(ZUSD_MINIMUM_NET_DEBT),
+              newMaxRedemptionRate ?? maxRedemptionRate
+            )
           : undefined
       );
     };

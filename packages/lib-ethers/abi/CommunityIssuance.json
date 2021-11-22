@@ -16,6 +16,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_zeroTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FundingWalletAddressSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -37,7 +50,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_totalZEROIssued",
+        "name": "_fundingWalletAddress",
         "type": "uint256"
       }
     ],
@@ -150,6 +163,19 @@
   },
   {
     "inputs": [],
+    "name": "fundingWalletAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getOwner",
     "outputs": [
       {
@@ -172,6 +198,11 @@
         "internalType": "address",
         "name": "_communityPotAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_fundingWalletAddress",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -189,6 +220,24 @@
         "type": "uint256"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_ZEROamount",
+        "type": "uint256"
+      }
+    ],
+    "name": "receiveZero",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

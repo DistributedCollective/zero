@@ -9,15 +9,16 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, Overrides } from "@ethersproject/contracts";
 
 import { task, HardhatUserConfig, types, extendEnvironment } from "hardhat/config";
-import { HardhatRuntimeEnvironment, NetworkUserConfig } from "hardhat/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import "@nomiclabs/hardhat-ethers";
 
 import { Decimal } from "@liquity/lib-base";
 
 import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/deploy";
-import { _LiquityDeploymentJSON } from "./src/contracts";
+import {  _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
+import { BorrowerOperations } from "./types";
 
 dotenv.config();
 
@@ -164,6 +165,14 @@ declare module "hardhat/types/runtime" {
 const getLiveArtifact = (name: string): { abi: JsonFragment[]; bytecode: string } =>
   require(`./live/${name}.json`);
 
+const getDeploymentData = (network: string, channel: string): _LiquityDeploymentJSON => {
+  const addresses = fs.readFileSync(
+    path.join("deployments", channel, `${network}.json`)
+  );
+
+  return JSON.parse(String(addresses))
+}
+
 const getContractFactory: (
   env: HardhatRuntimeEnvironment
 ) => (name: string, signer: Signer) => Promise<ContractFactory> = useLiveVersion
@@ -197,6 +206,43 @@ extendEnvironment(env => {
   };
 });
 
+type SetAddressParams = {
+  address: string;
+  nuetokenaddress: string;
+  channel: string;
+}
+
+const defaultChannel = process.env.CHANNEL || "default";
+
+task("setMassetAddress", "Sets address of masset contract in order to support NUE troves")
+  .addParam("address", "address of deployed MassetProxy contract")
+  .addParam("nuetokenaddress", "address of NUE token")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async (
+    {
+      address,
+      channel,
+      nuetokenaddress,
+    }: SetAddressParams,
+    hre
+  ) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel)
+    const { borrowerOperations: borrowerOperationsAddress } = deployment.addresses
+
+    const borrowerOperations = await hre.ethers.getContractAt("BorrowerOperations", borrowerOperationsAddress, deployer) as unknown as  BorrowerOperations
+
+    const tx = await borrowerOperations.setMassetAddress(address) 
+    await tx.wait()
+
+    deployment.addresses.nueToken = nuetokenaddress
+
+    fs.writeFileSync(
+      path.join("deployments", channel, `${hre.network.name}.json`),
+      JSON.stringify(deployment, undefined, 2)
+    );
+  })
+
 type DeployParams = {
   channel: string;
   gasPrice?: number;
@@ -206,7 +252,6 @@ type DeployParams = {
   marketMakerAddress?: string;
 };
 
-const defaultChannel = process.env.CHANNEL || "default";
 
 task("deploy", "Deploys the contracts to the network")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)

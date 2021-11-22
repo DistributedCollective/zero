@@ -310,6 +310,18 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return zusdToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
+  /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getNUEBalance} */
+  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+    address ??= _requireAddress(this.connection);
+    const { nueToken } = _getContracts(this.connection);
+
+    if (!nueToken) {
+      throw "nue token address not set"
+    }
+
+    return nueToken.balanceOf(address, { ...overrides }).then(decimalify);
+  }
+
   /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getZEROBalance} */
   getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
@@ -563,6 +575,12 @@ class BlockPolledLiquityStoreBasedCache
   getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Decimal | undefined {
     if (this._userHit(address, overrides)) {
       return this._store.state.zusdBalance;
+    }
+  }
+
+  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Decimal | undefined {
+    if (this._userHit(address, overrides)) {
+      return this._store.state.nueBalance;
     }
   }
 

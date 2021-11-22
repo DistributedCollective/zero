@@ -30,6 +30,5 @@ Exposed through [ReadableEthersLiquity.connection](./lib-ethers.readableethersli
 |  [provider](./lib-ethers.ethersliquityconnection.provider.md) | [EthersProvider](./lib-ethers.ethersprovider.md) | Ethers <code>Provider</code> used for connecting to the network. |
 |  [signer?](./lib-ethers.ethersliquityconnection.signer.md) | [EthersSigner](./lib-ethers.etherssigner.md) | <i>(Optional)</i> Ethers <code>Signer</code> used for sending transactions. |
 |  [startBlock](./lib-ethers.ethersliquityconnection.startblock.md) | number | Number of block in which the first Liquity contract was deployed. |
-|  [totalStabilityPoolZEROReward](./lib-ethers.ethersliquityconnection.totalstabilitypoolzeroreward.md) | [Decimal](./lib-base.decimal.md) | Total amount of ZERO allocated for rewarding stability depositors. |
 |  [version](./lib-ethers.ethersliquityconnection.version.md) | string | Version of the Liquity contracts (Git commit hash). |
 

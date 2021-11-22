@@ -16,6 +16,7 @@ import {
   selectForTroveChangeValidation,
   validateTroveChange
 } from "./validation/validateTroveChange";
+import { useNueTokenSelection } from "../../hooks/useNueTokenSelection";
 
 const init = ({ trove }: LiquityStoreState) => ({
   original: trove,
@@ -158,6 +159,7 @@ type TroveManagerProps = {
 export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) => {
   const [{ original, edited, changePending }, dispatch] = useLiquityReducer(reduce, init);
   const { fees, validationContext } = useLiquitySelector(select);
+  const { borrowedToken, handleSetNueToken, useNueToken } = useNueTokenSelection();
 
   useEffect(() => {
     if (collateral !== undefined) {
@@ -212,12 +214,15 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
       fee={feeFrom(original, edited, borrowingRate)}
       borrowingRate={borrowingRate}
       changePending={changePending}
+      borrowedToken={borrowedToken}
+      useNueToken={useNueToken}
+      handleSetNueToken={handleSetNueToken}
       dispatch={dispatch}
     >
       {description ??
         (openingNewTrove ? (
           <ActionDescription>
-            Start by entering the amount of ETH you'd like to deposit as collateral.
+            Start by entering the amount of rBTC you'd like to deposit as collateral.
           </ActionDescription>
         ) : (
           <ActionDescription>
@@ -234,6 +239,7 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
           <TroveAction
             transactionId={`${transactionIdPrefix}${validChange.type}`}
             change={validChange}
+            useNueToken={useNueToken}
             maxBorrowingRate={maxBorrowingRate}
           >
             Confirm

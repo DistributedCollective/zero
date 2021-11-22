@@ -6,6 +6,8 @@ const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.s
 const NonPayable = artifacts.require('NonPayable.sol')
 const TroveManagerTester = artifacts.require("TroveManagerTester")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester")
+const MassetTester = artifacts.require("MassetTester")
+const NueToken = artifacts.require("NueToken")
 
 const th = testHelpers.TestHelper
 
@@ -34,7 +36,7 @@ contract('BorrowerOperations', async accounts => {
     // defaulter_1, defaulter_2,
     frontEnd_1, frontEnd_2, frontEnd_3] = accounts;
 
-    const multisig = accounts[999];
+  const multisig = accounts[999];
 
   // const frontEnds = [frontEnd_1, frontEnd_2, frontEnd_3]
 
@@ -48,6 +50,8 @@ contract('BorrowerOperations', async accounts => {
   let borrowerOperations
   let zeroStaking
   let zeroToken
+  let masset
+  let nueToken
 
   let contracts
 
@@ -55,6 +59,7 @@ contract('BorrowerOperations', async accounts => {
   const getNetBorrowingAmount = async (debtWithFee) => th.getNetBorrowingAmount(contracts, debtWithFee)
   const getActualDebtFromComposite = async (compositeDebt) => th.getActualDebtFromComposite(compositeDebt, contracts)
   const openTrove = async (params) => th.openTrove(contracts, params)
+  const openNueTrove = async (params) => th.openNueTrove(contracts, params)
   const getTroveEntireColl = async (trove) => th.getTroveEntireColl(contracts, trove)
   const getTroveEntireDebt = async (trove) => th.getTroveEntireDebt(contracts, trove)
   const getTroveStake = async (trove) => th.getTroveStake(contracts, trove)
@@ -71,11 +76,12 @@ contract('BorrowerOperations', async accounts => {
     before(async () => {
       contracts = await deploymentHelper.deployLiquityCore()
       contracts.borrowerOperations = await BorrowerOperationsTester.new()
+      contracts.masset = await MassetTester.new()
       contracts.troveManager = await TroveManagerTester.new()
       contracts = await deploymentHelper.deployZUSDTokenTester(contracts)
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
 
-      await ZEROContracts.zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
+      await ZEROContracts.zeroToken.unprotectedMint(multisig, toBN(dec(20, 24)))
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
@@ -94,6 +100,7 @@ contract('BorrowerOperations', async accounts => {
       stabilityPool = contracts.stabilityPool
       defaultPool = contracts.defaultPool
       borrowerOperations = contracts.borrowerOperations
+      masset = contracts.masset
       hintHelpers = contracts.hintHelpers
 
       zeroStaking = ZEROContracts.zeroStaking
@@ -103,18 +110,22 @@ contract('BorrowerOperations', async accounts => {
       ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION()
       MIN_NET_DEBT = await borrowerOperations.MIN_NET_DEBT()
       BORROWING_FEE_FLOOR = await borrowerOperations.BORROWING_FEE_FLOOR()
+      const nueTokenAddress = await masset.token()
+      nueToken = await NueToken.at(nueTokenAddress)
+
+      await borrowerOperations.setMassetAddress(masset.address)
     })
 
     let revertToSnapshot;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
       let snapshot = await timeMachine.takeSnapshot();
       revertToSnapshot = () => timeMachine.revertToSnapshot(snapshot['result'])
     });
 
-    afterEach(async() => {
+    afterEach(async () => {
       await revertToSnapshot();
-    }); 
+    });
 
     it("addColl(): reverts when top-up would leave trove with ICR < MCR", async () => {
       // alice creates a Trove and adds first collateral
@@ -130,8 +141,8 @@ contract('BorrowerOperations', async accounts => {
 
       const collTopUp = 1  // 1 wei top up
 
-      await assertRevert(borrowerOperations.addColl(alice, alice, { from: alice, value: collTopUp }), 
-      "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
+      await assertRevert(borrowerOperations.addColl(alice, alice, { from: alice, value: collTopUp }),
+        "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
     })
 
     it("addColl(): Increases the activePool ETH and raw ether balance by correct amount", async () => {
@@ -397,8 +408,8 @@ contract('BorrowerOperations', async accounts => {
 
       const collWithdrawal = 1  // 1 wei withdrawal
 
-     await assertRevert(borrowerOperations.withdrawColl(1, alice, alice, { from: alice }), 
-      "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
+      await assertRevert(borrowerOperations.withdrawColl(1, alice, alice, { from: alice }),
+        "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
     })
 
     // reverts when calling address does not have active trove  
@@ -708,8 +719,8 @@ contract('BorrowerOperations', async accounts => {
 
       const ZUSDwithdrawal = 1  // withdraw 1 wei ZUSD
 
-     await assertRevert(borrowerOperations.withdrawZUSD(th._100pct, ZUSDwithdrawal, alice, alice, { from: alice }), 
-      "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
+      await assertRevert(borrowerOperations.withdrawZUSD(th._100pct, ZUSDwithdrawal, alice, alice, { from: alice }),
+        "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
     })
 
     it("withdrawZUSD(): decays a non-zero base rate", async () => {
@@ -1353,8 +1364,8 @@ contract('BorrowerOperations', async accounts => {
 
       const ZUSDRepayment = 1  // 1 wei repayment
 
-     await assertRevert(borrowerOperations.repayZUSD(ZUSDRepayment, alice, alice, { from: alice }), 
-      "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
+      await assertRevert(borrowerOperations.repayZUSD(ZUSDRepayment, alice, alice, { from: alice }),
+        "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
     })
 
     it("repayZUSD(): Succeeds when it would leave trove with net debt >= minimum net debt", async () => {
@@ -1494,7 +1505,7 @@ contract('BorrowerOperations', async accounts => {
       const bobBalAfter = await zusdToken.balanceOf(B)
 
       assert.isTrue(bobBalAfter.eq(toBN(dec(5, 18))))
-      
+
       // Bob tries to repay 6 ZUSD
       const repayZUSDPromise_B = borrowerOperations.repayZUSD(toBN(dec(6, 18)), B, B, { from: B })
 
@@ -1518,8 +1529,8 @@ contract('BorrowerOperations', async accounts => {
       const ZUSDRepayment = 1  // 1 wei repayment
       const collTopUp = 1
 
-     await assertRevert(borrowerOperations.adjustTrove(th._100pct, 0, ZUSDRepayment, false, alice, alice, { from: alice, value: collTopUp }), 
-      "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
+      await assertRevert(borrowerOperations.adjustTrove(th._100pct, 0, ZUSDRepayment, false, alice, alice, { from: alice, value: collTopUp }),
+        "BorrowerOps: An operation that would result in ICR < MCR is not permitted")
     })
 
     it("adjustTrove(): reverts if max fee < 0.5% in Normal mode", async () => {
@@ -1780,7 +1791,7 @@ contract('BorrowerOperations', async accounts => {
         assert.isTrue(emittedFee.gt(toBN('0')))
 
         const D_newDebt = (await troveManager.Troves(D))[0]
-    
+
         // Check debt on Trove struct equals initila debt plus drawn debt plus emitted fee
         assert.isTrue(D_newDebt.eq(D_debtBefore.add(withdrawal_D).add(emittedFee)))
       })
@@ -2283,6 +2294,25 @@ contract('BorrowerOperations', async accounts => {
       assert.isTrue(activePoolCollAfter.eq(activePoolCollAfter))
     })
 
+    it("adjustNueTrove(): With 0 debt change, doesnt change borrower's debt or ActivePool debt", async () => {
+      await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+
+      const aliceDebtBefore = await getTroveEntireDebt(alice)
+      const activePoolDebtBefore = await activePool.getZUSDDebt()
+
+      assert.isTrue(aliceDebtBefore.gt(toBN('0')))
+      assert.isTrue(aliceDebtBefore.eq(activePoolDebtBefore))
+
+      // Alice adjusts trove. Coll change, no debt change
+      await borrowerOperations.adjustNueTrove(th._100pct, 0, 0, false, alice, alice, { from: alice, value: dec(1, 16) })
+
+      const aliceDebtAfter = await getTroveEntireDebt(alice)
+      const activePoolDebtAfter = await activePool.getZUSDDebt()
+
+      assert.isTrue(aliceDebtAfter.eq(aliceDebtBefore))
+      assert.isTrue(activePoolDebtAfter.eq(activePoolDebtBefore))
+    })
+
     it("adjustTrove(): With 0 debt change, doesnt change borrower's debt or ActivePool debt", async () => {
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
 
@@ -2300,6 +2330,32 @@ contract('BorrowerOperations', async accounts => {
 
       assert.isTrue(aliceDebtAfter.eq(aliceDebtBefore))
       assert.isTrue(activePoolDebtAfter.eq(activePoolDebtBefore))
+    })
+
+    it("adjustNueTrove(): updates borrower's debt and coll with an increase in both", async () => {
+      await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 16)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+
+      await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 16)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+
+      const debtBefore = await getTroveEntireDebt(alice)
+      const collBefore = await getTroveEntireColl(alice)
+      assert.isTrue(debtBefore.gt(toBN('0')))
+      assert.isTrue(collBefore.gt(toBN('0')))
+
+      const nueBalance_Before = await nueToken.balanceOf(alice)
+
+      // Alice adjusts trove. Coll and debt increase(+1 ETH, +50ZUSD)
+      const increaseAmount = await getNetBorrowingAmount(dec(50, 16))
+      await borrowerOperations.adjustNueTrove(th._100pct, 0, increaseAmount, true, alice, alice, { from: alice, value: dec(1, 16) })
+
+      const debtAfter = await getTroveEntireDebt(alice)
+      const collAfter = await getTroveEntireColl(alice)
+      const nueBalance_After = await nueToken.balanceOf(alice)
+
+      th.assertIsApproximatelyEqual(debtAfter, debtBefore.add(toBN(dec(50, 16))), 10000)
+      th.assertIsApproximatelyEqual(collAfter, collBefore.add(toBN(dec(1, 16))), 10000)
+
+      assert.isTrue(nueBalance_After.eq(nueBalance_Before.add(increaseAmount)))
     })
 
     it("adjustTrove(): updates borrower's debt and coll with an increase in both", async () => {
@@ -2320,6 +2376,32 @@ contract('BorrowerOperations', async accounts => {
 
       th.assertIsApproximatelyEqual(debtAfter, debtBefore.add(toBN(dec(50, 16))), 10000)
       th.assertIsApproximatelyEqual(collAfter, collBefore.add(toBN(dec(1, 16))), 10000)
+    })
+
+    it("adjustNueTrove(): updates borrower's debt and coll with a decrease in both", async () => {
+      await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+
+      await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
+
+      const debtBefore = await getTroveEntireDebt(alice)
+      const collBefore = await getTroveEntireColl(alice)
+      assert.isTrue(debtBefore.gt(toBN('0')))
+      assert.isTrue(collBefore.gt(toBN('0')))
+
+      const nueBalance_Before = await nueToken.balanceOf(alice)
+
+      const decreaseAmount = toBN(dec(50, 16))
+      // Alice adjusts trove coll and debt decrease (-0.5 ETH, -50ZUSD)
+      await borrowerOperations.adjustNueTrove(th._100pct, dec(500, 'finney'), decreaseAmount, false, alice, alice, { from: alice })
+
+      const debtAfter = await getTroveEntireDebt(alice)
+      const collAfter = await getTroveEntireColl(alice)
+      const nueBalance_After = await nueToken.balanceOf(alice)
+
+      assert.isTrue(debtAfter.eq(debtBefore.sub(toBN(dec(50, 16)))))
+      assert.isTrue(collAfter.eq(collBefore.sub(toBN(dec(5, 17)))))
+
+      assert.isTrue(nueBalance_After.eq(nueBalance_Before.sub(decreaseAmount)))
     })
 
     it("adjustTrove(): updates borrower's debt and coll with a decrease in both", async () => {
@@ -2518,7 +2600,7 @@ contract('BorrowerOperations', async accounts => {
       await borrowerOperations.adjustTrove(th._100pct, 0, await getNetBorrowingAmount(dec(100, 16)), true, alice, alice, { from: alice, value: dec(1, 16) })
 
       const activePool_ZUSDDebt_After = await activePool.getZUSDDebt()
-    
+
       th.assertIsApproximatelyEqual(activePool_ZUSDDebt_After, activePool_ZUSDDebt_Before.add(toBN(dec(100, 16))))
     })
 
@@ -2559,7 +2641,7 @@ contract('BorrowerOperations', async accounts => {
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: alice } })
 
       await assertRevert(borrowerOperations.adjustTrove(th._100pct, 0, 0, false, alice, alice, { from: alice }),
-                         'BorrowerOps: There must be either a collateral change or a debt change')
+        'BorrowerOps: There must be either a collateral change or a debt change')
     })
 
     it("adjustTrove(): Reverts if requested coll withdrawal is greater than trove's collateral", async () => {
@@ -2610,16 +2692,16 @@ contract('BorrowerOperations', async accounts => {
     // --- closeTrove() ---
 
     it("closeTrove(): reverts when it would lower the TCR below CCR", async () => {
-      await openTrove({ ICR: toBN(dec(300, 16)), extraParams:{ from: alice } })
-      await openTrove({ ICR: toBN(dec(120, 16)), extraZUSDAmount: toBN(dec(300, 18)), extraParams:{ from: bob } })
+      await openTrove({ ICR: toBN(dec(300, 16)), extraParams: { from: alice } })
+      await openTrove({ ICR: toBN(dec(120, 16)), extraZUSDAmount: toBN(dec(300, 18)), extraParams: { from: bob } })
 
       const price = await priceFeed.getPrice()
-      
+
       // to compensate borrowing fees
       await zusdToken.transfer(alice, dec(300, 18), { from: bob })
 
       assert.isFalse(await troveManager.checkRecoveryMode(price))
-    
+
       await assertRevert(
         borrowerOperations.closeTrove({ from: alice }),
         "BorrowerOps: An operation that would result in TCR < CCR is not permitted"
@@ -2700,6 +2782,35 @@ contract('BorrowerOperations', async accounts => {
 
       const aliceCollAfter = await getTroveEntireColl(alice)
       assert.equal(aliceCollAfter, '0')
+    })
+
+    it("closeNueTrove(): reduces a Trove's debt to zero", async () => {
+      const { zusdAmount } = await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: dennis } })
+
+      await openNueTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+
+      const aliceDebtBefore = await getTroveEntireColl(alice)
+      const dennisNUE = await nueToken.balanceOf(dennis)
+      assert.isTrue(aliceDebtBefore.gt(toBN('0')))
+      assert.isTrue(dennisNUE.gt(toBN('0')))
+
+      const expectedDebt = zusdAmount
+      .add(await troveManager.getBorrowingFee(zusdAmount))
+      .add(ZUSD_GAS_COMPENSATION)
+
+      // To compensate borrowing fees
+      await nueToken.transfer(alice, dennisNUE.div(toBN(2)), { from: dennis })
+
+      const nueBalance_Before = await nueToken.balanceOf(alice)
+
+      // Alice attempts to close trove
+      await borrowerOperations.closeNueTrove({ from: alice })
+      
+      const aliceCollAfter = await getTroveEntireColl(alice)
+      assert.equal(aliceCollAfter, '0')
+
+      const nueBalance_After = await nueToken.balanceOf(alice)
+      assert.isTrue(nueBalance_After.eq(nueBalance_Before.sub(expectedDebt)))
     })
 
     it("closeTrove(): reduces a Trove's debt to zero", async () => {
@@ -3120,6 +3231,17 @@ contract('BorrowerOperations', async accounts => {
       assert.isTrue(await sortedTroves.contains(A))
 
       const txC = await borrowerOperations.openTrove(th._100pct, await getNetBorrowingAmount(MIN_NET_DEBT.add(toBN(dec(47789898, 22)))), A, A, { from: C, value: dec(100, 30) })
+      assert.isTrue(txC.receipt.status)
+      assert.isTrue(await sortedTroves.contains(C))
+    })
+
+    it("openNueTrove(): Opens a trove with net debt >= minimum net debt", async () => {
+      // Add 1 wei to correct for rounding error in helper function
+      const txA = await borrowerOperations.openNueTrove(th._100pct, await getNetBorrowingAmount(MIN_NET_DEBT.add(toBN(1))), A, A, { from: A, value: dec(100, 30) })
+      assert.isTrue(txA.receipt.status)
+      assert.isTrue(await sortedTroves.contains(A))
+
+      const txC = await borrowerOperations.openNueTrove(th._100pct, await getNetBorrowingAmount(MIN_NET_DEBT.add(toBN(dec(47789898, 22)))), A, A, { from: C, value: dec(100, 30) })
       assert.isTrue(txC.receipt.status)
       assert.isTrue(await sortedTroves.contains(C))
     })
@@ -3729,6 +3851,46 @@ contract('BorrowerOperations', async accounts => {
       assert.equal(status_After, 1)
     })
 
+    it("openNueTrove(): creates a new Trove and assigns the correct collateral and debt amount in NUE", async () => {
+      const debt_Before = await getTroveEntireDebt(alice)
+      const coll_Before = await getTroveEntireColl(alice)
+      const status_Before = await troveManager.getTroveStatus(alice)
+      const nueBalance_Before = await nueToken.balanceOf(alice)
+
+      // check coll and debt before
+      assert.equal(debt_Before, 0)
+      assert.equal(coll_Before, 0)
+
+      // check non-existent status
+      assert.equal(status_Before, 0)
+
+      const ZUSDRequest = MIN_NET_DEBT
+      borrowerOperations.openNueTrove(th._100pct, MIN_NET_DEBT, carol, carol, { from: alice, value: dec(100, 'ether') })
+
+      // Get the expected debt based on the ZUSD request (adding fee and liq. reserve on top)
+      const expectedDebt = ZUSDRequest
+        .add(await troveManager.getBorrowingFee(ZUSDRequest))
+        .add(ZUSD_GAS_COMPENSATION)
+
+      const debt_After = await getTroveEntireDebt(alice)
+      const coll_After = await getTroveEntireColl(alice)
+      const status_After = await troveManager.getTroveStatus(alice)
+
+      // check coll and debt after
+      assert.isTrue(coll_After.gt('0'))
+      assert.isTrue(debt_After.gt('0'))
+
+      assert.isTrue(debt_After.eq(expectedDebt))
+
+      // check active status
+      assert.equal(status_After, 1)
+
+      const nueBalance_After = await nueToken.balanceOf(alice)
+      const expectedNueBalance = nueBalance_Before.add(ZUSDRequest)
+
+      assert.isTrue(nueBalance_After.eq(expectedNueBalance))
+    })
+
     it("openTrove(): adds Trove owner to TroveOwners array", async () => {
       const TroveOwnersCount_Before = (await troveManager.getTroveOwnersCount()).toString();
       assert.equal(TroveOwnersCount_Before, '0')
@@ -4304,7 +4466,7 @@ contract('BorrowerOperations', async accounts => {
         await borrowerOperations.openTrove(th._100pct, dec(100000, 18), alice, alice, { from: alice, value: dec(1000, 18) })
 
         // Alice sends ZUSD to NonPayable so its ZUSD balance covers its debt
-        await zusdToken.transfer(nonPayable.address, dec(10000, 18), {from: alice})
+        await zusdToken.transfer(nonPayable.address, dec(10000, 18), { from: alice })
 
         // open trove from NonPayable proxy contract
         const _100pctHex = '0xde0b6b3a7640000'

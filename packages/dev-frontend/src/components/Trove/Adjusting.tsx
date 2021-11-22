@@ -13,7 +13,6 @@ import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 import { TroveAction } from "./TroveAction";
 import { useTroveView } from "./context/TroveViewContext";
-import { COIN } from "../../strings";
 import { Icon } from "../Icon";
 import { InfoIcon } from "../InfoIcon";
 import { LoadingOverlay } from "../LoadingOverlay";
@@ -23,6 +22,8 @@ import {
   selectForTroveChangeValidation,
   validateTroveChange
 } from "./validation/validateTroveChange";
+import { useNueTokenSelection } from "../../hooks/useNueTokenSelection";
+import { NueCheckbox } from "./NueCheckbox";
 
 const selector = (state: LiquityStoreState) => {
   const { trove, fees, price, accountBalance } = state;
@@ -85,6 +86,7 @@ export const Adjusting: React.FC = () => {
   const previousTrove = useRef<Trove>(trove);
   const [collateral, setCollateral] = useState<Decimal>(trove.collateral);
   const [netDebt, setNetDebt] = useState<Decimal>(trove.netDebt);
+  const { borrowedToken, handleSetNueToken, useNueToken } = useNueTokenSelection();
 
   const transactionState = useMyTransactionState(TRANSACTION_ID);
   const borrowingRate = fees.borrowingRate();
@@ -170,16 +172,18 @@ export const Adjusting: React.FC = () => {
           maxAmount={maxCollateral.toString()}
           maxedOut={collateralMaxedOut}
           editingState={editingState}
-          unit="ETH"
+          unit="rBTC"
           editedAmount={collateral.toString(4)}
           setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
         />
+
+        <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
 
         <EditableRow
           label="Net debt"
           inputId="trove-net-debt-amount"
           amount={netDebt.prettify()}
-          unit={COIN}
+          unit={borrowedToken}
           editingState={editingState}
           editedAmount={netDebt.toString(2)}
           setEditedAmount={(amount: string) => setNetDebt(Decimal.from(amount))}
@@ -189,7 +193,7 @@ export const Adjusting: React.FC = () => {
           label="Liquidation Reserve"
           inputId="trove-liquidation-reserve"
           amount={`${ZUSD_LIQUIDATION_RESERVE}`}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={
@@ -208,7 +212,7 @@ export const Adjusting: React.FC = () => {
           inputId="trove-borrowing-fee"
           amount={fee.prettify(2)}
           pendingAmount={feePct.toString(2)}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={
@@ -225,7 +229,7 @@ export const Adjusting: React.FC = () => {
           label="Total debt"
           inputId="trove-total-debt"
           amount={totalDebt.prettify(2)}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={
@@ -261,6 +265,7 @@ export const Adjusting: React.FC = () => {
             <TroveAction
               transactionId={TRANSACTION_ID}
               change={troveChange}
+              useNueToken={useNueToken}
               maxBorrowingRate={maxBorrowingRate}
             >
               Confirm

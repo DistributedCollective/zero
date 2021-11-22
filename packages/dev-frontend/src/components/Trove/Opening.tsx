@@ -13,7 +13,6 @@ import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 import { TroveAction } from "./TroveAction";
 import { useTroveView } from "./context/TroveViewContext";
-import { COIN } from "../../strings";
 import { Icon } from "../Icon";
 import { InfoIcon } from "../InfoIcon";
 import { LoadingOverlay } from "../LoadingOverlay";
@@ -23,6 +22,8 @@ import {
   selectForTroveChangeValidation,
   validateTroveChange
 } from "./validation/validateTroveChange";
+import { NueCheckbox } from "./NueCheckbox";
+import { useNueTokenSelection } from "../../hooks/useNueTokenSelection";
 
 const selector = (state: LiquityStoreState) => {
   const { fees, price, accountBalance } = state;
@@ -43,6 +44,7 @@ export const Opening: React.FC = () => {
   const { fees, price, accountBalance, validationContext } = useLiquitySelector(selector);
   const borrowingRate = fees.borrowingRate();
   const editingState = useState<string>();
+  const { borrowedToken, handleSetNueToken, useNueToken } = useNueTokenSelection();
 
   const [collateral, setCollateral] = useState<Decimal>(Decimal.ZERO);
   const [borrowAmount, setBorrowAmount] = useState<Decimal>(Decimal.ZERO);
@@ -106,16 +108,17 @@ export const Opening: React.FC = () => {
           maxAmount={maxCollateral.toString()}
           maxedOut={collateralMaxedOut}
           editingState={editingState}
-          unit="ETH"
+          unit="rBTC"
           editedAmount={collateral.toString(4)}
           setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
         />
+        <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
 
         <EditableRow
           label="Borrow"
           inputId="trove-borrow-amount"
           amount={borrowAmount.prettify()}
-          unit={COIN}
+          unit={borrowedToken}
           editingState={editingState}
           editedAmount={borrowAmount.toString(2)}
           setEditedAmount={(amount: string) => setBorrowAmount(Decimal.from(amount))}
@@ -125,7 +128,7 @@ export const Opening: React.FC = () => {
           label="Liquidation Reserve"
           inputId="trove-liquidation-reserve"
           amount={`${ZUSD_LIQUIDATION_RESERVE}`}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={
@@ -144,7 +147,7 @@ export const Opening: React.FC = () => {
           inputId="trove-borrowing-fee"
           amount={fee.prettify(2)}
           pendingAmount={feePct.toString(2)}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={
@@ -161,16 +164,16 @@ export const Opening: React.FC = () => {
           label="Total debt"
           inputId="trove-total-debt"
           amount={totalDebt.prettify(2)}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "240px" }}>
-                  The total amount of ZUSD your Trove will hold.{" "}
+                  The total amount of {borrowedToken} your Trove will hold.{" "}
                   {isDirty && (
                     <>
                       You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
-                      ZUSD to reclaim your collateral ({ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD
+                      {borrowedToken} to reclaim your collateral ({ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD
                       Liquidation Reserve excluded).
                     </>
                   )}
@@ -184,7 +187,7 @@ export const Opening: React.FC = () => {
 
         {description ?? (
           <ActionDescription>
-            Start by entering the amount of ETH you'd like to deposit as collateral.
+            Start by entering the amount of rBTC you'd like to deposit as collateral.
           </ActionDescription>
         )}
 
@@ -197,6 +200,7 @@ export const Opening: React.FC = () => {
             <TroveAction
               transactionId={TRANSACTION_ID}
               change={troveChange}
+              useNueToken={useNueToken}
               maxBorrowingRate={maxBorrowingRate}
             >
               Confirm

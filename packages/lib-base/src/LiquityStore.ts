@@ -28,6 +28,9 @@ export interface LiquityStoreBaseState {
   /** User's ZUSD token balance. */
   zusdBalance: Decimal;
 
+  /** User's NUE token balance. */
+  nueBalance: Decimal;
+
   /** User's ZERO token balance. */
   zeroBalance: Decimal;
 
@@ -339,6 +342,13 @@ export abstract class LiquityStore<T = unknown> {
         "zusdBalance",
         baseState.zusdBalance,
         baseStateUpdate.zusdBalance
+      ),
+
+      nueBalance: this._updateIfChanged(
+        eq,
+        "nueBalance",
+        baseState.nueBalance,
+        baseStateUpdate.nueBalance
       ),
 
       zeroBalance: this._updateIfChanged(
