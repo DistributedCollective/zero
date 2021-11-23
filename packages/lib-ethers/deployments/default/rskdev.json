@@ -1,7 +1,7 @@
 {
   "chainId": 33,
-  "version": "e7cba3bf5e8c2aee09e865f1af7f8f6086b3ab07",
-  "deploymentDate": 1637589300000,
+  "version": "ed3cee82662aa3518f8113819f15b088667132ae",
+  "deploymentDate": 1637664593000,
   "bootstrapPeriod": 1209600,
   "governanceAddress": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
   "presaleAddress": "0x77045E71a7A2c50903d88e564cD72fab11e82051",
@@ -21,11 +21,11 @@
     "sortedTroves": "0xEB71c55A85016d201718b7B08701b495548fe6aD",
     "stabilityPool": "0x9f84F92d952f90027618089F6F2a3481f1a3fa0F",
     "gasPool": "0xDA7Ce79725418F4F6E13Bf5F520C89Cec5f6A974",
-    "liquityBaseParams": "0x9957A338858bc941dA9D0ED2ACBCa4F16116B836",
-    "zusdToken": "0x24307fAF57D235783582F1912Ef6A384ab456568",
-    "zeroToken": "0x13cF0a53b6102b518e8b547d5E50b38C1b089E08",
-    "multiTroveGetter": "0x0Aa058aD63E36bC2f98806f2D638353AE89C3634",
-    "nueToken": "0x7c8A2881B341EF0d938b410A38c7b0dD51f0a8A8"
+    "liquityBaseParams": "0x320c72614222bD0C615e52eac5B23900cEf2b889",
+    "zusdToken": "0xd6681FD2d471c044BDdDc9DF00D1Af195Bd58bfa",
+    "zeroToken": "0xc3e75147D582fFc126590C537cEe894180aAcDDC",
+    "multiTroveGetter": "0xb2e09ab18a1792025D8505B5722E527d5e90c8e7",
+    "nueToken": "0x76597BD2D29C993D19Dd5d282AcB09D6e785F275"
   },
   "startBlock": 13
 }

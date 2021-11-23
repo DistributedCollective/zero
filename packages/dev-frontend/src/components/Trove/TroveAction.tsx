@@ -35,14 +35,14 @@ export const TroveAction: React.FC<TroveActionProps> = ({
 
       case 'closure': {
         action = useNueToken
-          ? liquity.send.closeTrove.bind(liquity.send)
+          ? liquity.send.closeNueTrove.bind(liquity.send)
           : liquity.send.closeTrove.bind(liquity.send)
         break;
       }
 
       case 'adjustment': {
         action = useNueToken
-          ? liquity.send.adjustTrove.bind(liquity.send, change.params, maxBorrowingRate)
+          ? liquity.send.adjustNueTrove.bind(liquity.send, change.params, maxBorrowingRate)
           : liquity.send.adjustTrove.bind(liquity.send, change.params, maxBorrowingRate)
         break;
       }

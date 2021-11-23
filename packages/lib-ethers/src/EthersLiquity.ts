@@ -308,6 +308,16 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
+   * {@inheritDoc @liquity/lib-base#TransactableLiquity.closeNueTrove}
+   *
+   * @throws
+   * Throws {@link EthersTransactionFailedError} in case of transaction failure.
+   */
+   closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
+    return this.send.closeNueTrove(overrides).then(waitForSuccess);
+  }
+
+  /**
    * {@inheritDoc @liquity/lib-base#TransactableLiquity.adjustTrove}
    *
    * @throws
@@ -319,6 +329,20 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     overrides?: EthersTransactionOverrides
   ): Promise<TroveAdjustmentDetails> {
     return this.send.adjustTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  /**
+   * {@inheritDoc @liquity/lib-base#TransactableLiquity.adjustNueTrove}
+   *
+   * @throws
+   * Throws {@link EthersTransactionFailedError} in case of transaction failure.
+   */
+   adjustNueTrove(
+    params: TroveAdjustmentParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<TroveAdjustmentDetails> {
+    return this.send.adjustNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**

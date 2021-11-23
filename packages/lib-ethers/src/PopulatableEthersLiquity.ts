@@ -658,7 +658,18 @@ export class PopulatableEthersLiquity
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapTroveClosure(
-      await borrowerOperations.estimateAndPopulate.closeTrove({ ...overrides }, id)
+      await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, id)
+    );
+  }
+
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.closeNueTrove} */
+  async closeNueTrove(
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
+    const { borrowerOperations } = _getContracts(this._readable.connection);
+
+    return this._wrapTroveClosure(
+      await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, id)
     );
   }
 
@@ -723,6 +734,48 @@ export class PopulatableEthersLiquity
     return this._wrapTroveChangeWithFees(
       normalized,
       await borrowerOperations.estimateAndPopulate.adjustTrove(
+        { value: depositCollateral?.hex, ...overrides },
+        compose(
+          borrowZUSD ? addGasForPotentialLastFeeOperationTimeUpdate : id,
+          addGasForPotentialListTraversal
+        ),
+        maxBorrowingRate.hex,
+        (withdrawCollateral ?? Decimal.ZERO).hex,
+        (borrowZUSD ?? repayZUSD ?? Decimal.ZERO).hex,
+        !!borrowZUSD,
+        ...(await this._findHints(finalTrove))
+      )
+    );
+  }
+
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.adjustNueTrove} */
+  async adjustNueTrove(
+    params: TroveAdjustmentParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+    const address = _requireAddress(this._readable.connection, overrides);
+    const { borrowerOperations } = _getContracts(this._readable.connection);
+
+    const normalized = _normalizeTroveAdjustment(params);
+    const { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD } = normalized;
+
+    const [trove, fees] = await Promise.all([
+      this._readable.getTrove(address),
+      borrowZUSD && this._readable.getFees()
+    ]);
+
+    const borrowingRate = fees?.borrowingRate();
+    const finalTrove = trove.adjust(normalized, borrowingRate);
+
+    maxBorrowingRate =
+      maxBorrowingRate !== undefined
+        ? Decimal.from(maxBorrowingRate)
+        : borrowingRate?.add(defaultBorrowingRateSlippageTolerance) ?? Decimal.ZERO;
+
+    return this._wrapTroveChangeWithFees(
+      normalized,
+      await borrowerOperations.estimateAndPopulate.adjustNueTrove(
         { value: depositCollateral?.hex, ...overrides },
         compose(
           borrowZUSD ? addGasForPotentialLastFeeOperationTimeUpdate : id,

@@ -288,11 +288,15 @@ export class ObservableEthersLiquity implements ObservableLiquity {
 export class PopulatableEthersLiquity implements PopulatableLiquity<EthersTransactionReceipt, EthersTransactionResponse, EthersPopulatedTransaction> {
     constructor(readable: ReadableEthersLiquity);
     // (undocumented)
+    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    // (undocumented)
     adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
     borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    // (undocumented)
+    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>>;
     // (undocumented)
     closeTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>>;
     // (undocumented)
@@ -438,11 +442,15 @@ export const _redeemMaxIterations = 70;
 export class SendableEthersLiquity implements SendableLiquity<EthersTransactionReceipt, EthersTransactionResponse> {
     constructor(populatable: PopulatableEthersLiquity);
     // (undocumented)
+    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    // (undocumented)
     adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
     borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    // (undocumented)
+    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveClosureDetails>>;
     // (undocumented)
     closeTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveClosureDetails>>;
     // (undocumented)
