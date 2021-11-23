@@ -147,6 +147,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
 
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, msg.sender, msg.value, address(this));
         zusdToken.approve(address(masset), _ZUSDAmount);
+        zusdToken.transfer(address(masset), _ZUSDAmount);
         masset.onTokensMinted(_ZUSDAmount, address(zusdToken), abi.encode(msg.sender));
     }
 
@@ -246,6 +247,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _adjustSenderTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage, msg.sender, msg.value, address(this));
         if (_isDebtIncrease  && _ZUSDChange > 0) {
             zusdToken.approve(address(masset), _ZUSDChange);
+            zusdToken.transfer(address(masset), _ZUSDChange);
             masset.onTokensMinted(_ZUSDChange, address(zusdToken), abi.encode(msg.sender));
         }
     }
@@ -342,7 +344,8 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         require(address(masset) != address(0), "Masset address not set");
 
         uint debt = troveManager.getTroveDebt(msg.sender);
-        masset.redeemByBridge(address(zusdToken), debt, msg.sender);
+
+        masset.redeemByBridge(address(zusdToken), debt.sub(ZUSD_GAS_COMPENSATION), msg.sender);
         _closeTrove(msg.sender);
     }
 

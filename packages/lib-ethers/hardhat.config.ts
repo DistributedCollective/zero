@@ -232,8 +232,14 @@ task("setMassetAddress", "Sets address of masset contract in order to support NU
 
     const borrowerOperations = await hre.ethers.getContractAt("BorrowerOperations", borrowerOperationsAddress, deployer) as unknown as  BorrowerOperations
 
+    const currentMassetAddress = await borrowerOperations.masset()
+    console.log("Current masset address: ", currentMassetAddress)
+
     const tx = await borrowerOperations.setMassetAddress(address) 
     await tx.wait()
+
+    const newMassetAddress = await borrowerOperations.masset()
+    console.log("New masset address: ", newMassetAddress)
 
     deployment.addresses.nueToken = nuetokenaddress
 

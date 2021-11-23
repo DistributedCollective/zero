@@ -29,9 +29,11 @@ The constructor for this class is marked as internal. Third-party code should no
 
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
+|  [adjustNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.ethersliquity.adjustnuetrove.md) |  |  |
 |  [adjustTrove(params, maxBorrowingRate, overrides)](./lib-ethers.ethersliquity.adjusttrove.md) |  | Adjust existing Trove by changing its collateral, debt, or both. |
 |  [borrowZUSD(amount, maxBorrowingRate, overrides)](./lib-ethers.ethersliquity.borrowzusd.md) |  | Adjust existing Trove by borrowing more ZUSD. |
 |  [claimCollateralSurplus(overrides)](./lib-ethers.ethersliquity.claimcollateralsurplus.md) |  | Claim leftover collateral after a liquidation or redemption. |
+|  [closeNueTrove(overrides)](./lib-ethers.ethersliquity.closenuetrove.md) |  |  |
 |  [closeTrove(overrides)](./lib-ethers.ethersliquity.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
 |  [connect(signerOrProvider, optionalParams)](./lib-ethers.ethersliquity.connect_1.md) | <code>static</code> | Connect to the Liquity protocol and create an <code>EthersLiquity</code> object. |
 |  [depositCollateral(amount, overrides)](./lib-ethers.ethersliquity.depositcollateral.md) |  | Adjust existing Trove by depositing more collateral. |
