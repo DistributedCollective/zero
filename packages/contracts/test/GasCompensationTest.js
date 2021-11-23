@@ -15,7 +15,7 @@ contract('Gas compensation tests', async accounts => {
   const [
     owner, liquidator,
     alice, bob, carol, dennis, erin, flyn, graham, harriet, ida,
-    defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale] = accounts;
+    defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale, sovFeeCollector] = accounts;
 
     const multisig = accounts[999];
 

@@ -8,6 +8,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROToken.sol";
 import "./Interfaces/IZEROStaking.sol";
+import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/BaseMath.sol";
 import "./Dependencies/console.sol";
@@ -32,6 +33,8 @@ contract TroveManagerStorage is Ownable, BaseMath {
     IZEROToken public _zeroToken;
 
     IZEROStaking public _zeroStaking;
+
+    IFeeDistributor public feeDistributor;
 
     // A doubly linked list of Troves, sorted by their sorted by their collateral ratios
     ISortedTroves public sortedTroves;

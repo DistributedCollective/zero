@@ -15,7 +15,7 @@ const ZUSDToken = artifacts.require("ZUSDToken")
 contract('CollSurplusPool', async accounts => {
   const [
     owner,
-    A, B, C, D, E] = accounts;
+    A, B, C, D, E, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
 

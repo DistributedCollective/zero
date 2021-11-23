@@ -664,6 +664,19 @@
   },
   {
     "inputs": [],
+    "name": "feeDistributor",
+    "outputs": [
+      {
+        "internalType": "contract IFeeDistributor",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getEntireSystemColl",
     "outputs": [
       {

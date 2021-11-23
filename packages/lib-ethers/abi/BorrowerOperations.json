@@ -44,6 +44,19 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "_feeDistributorAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FeeDistributorAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "_gasPoolAddress",
         "type": "address"
       }
@@ -398,6 +411,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "feeDistributor",
+    "outputs": [
+      {
+        "internalType": "contract IFeeDistributor",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -557,6 +583,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_feeDistributorAddress",
+        "type": "address"
+      },
       {
         "internalType": "address",
         "name": "_liquityBaseParamsAddress",

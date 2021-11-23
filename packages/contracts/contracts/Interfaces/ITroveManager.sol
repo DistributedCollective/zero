@@ -14,6 +14,7 @@ interface ITroveManager is ILiquityBase {
     
     // --- Events ---
     
+    event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
     event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
@@ -44,6 +45,7 @@ interface ITroveManager is ILiquityBase {
     /**
      * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
+     * @param _feeDistributorAddress feeDistributor contract address
      * @param _troveManagerRedeemOps TroveManagerRedeemOps contract address
      * @param _liquityBaseParamsAddress LiquityBaseParams contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
@@ -59,6 +61,7 @@ interface ITroveManager is ILiquityBase {
      * @param _zeroStakingAddress ZEROStaking contract address
      */
     function setAddresses(
+        address _feeDistributorAddress,
         address _troveManagerRedeemOps,
         address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,

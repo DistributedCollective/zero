@@ -106,6 +106,7 @@ const deployContracts = async (
     troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
       ...overrides
     }),
+
     troveManagerRedeemOps: await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides }),
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
@@ -129,6 +130,9 @@ const deployContracts = async (
     }),
     gasPool: gasPool.address,
     liquityBaseParams: await deployContractWithProxy(deployer, getContractFactory, "LiquityBaseParams", {
+      ...overrides
+    }),
+    feeDistributor: await deployContractWithProxy(deployer, getContractFactory, "FeeDistributor", {
       ...overrides
     }),
   };
@@ -168,9 +172,12 @@ const connectContracts = async (
     stabilityPool,
     gasPool,
     liquityBaseParams,
+    feeDistributor,
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
+  sovFeeCollectorAddress: string,
+  wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
   overrides?: Overrides
@@ -213,6 +220,7 @@ const connectContracts = async (
 
     nonce =>
       troveManager.setAddresses(
+        feeDistributor.address,
         troveManagerRedeemOps.address,
         liquityBaseParams.address,
         borrowerOperations.address,
@@ -231,6 +239,7 @@ const connectContracts = async (
 
     nonce =>
       borrowerOperations.setAddresses(
+        feeDistributor.address,
         liquityBaseParams.address,
         troveManager.address,
         activePool.address,
@@ -291,8 +300,7 @@ const connectContracts = async (
       zeroStaking.setAddresses(
         zeroToken.address,
         zusdToken.address,
-        troveManager.address,
-        borrowerOperations.address,
+        feeDistributor.address,
         activePool.address,
         { ...overrides, nonce }
       ),
@@ -308,6 +316,18 @@ const connectContracts = async (
         ...overrides,
         nonce
       }),
+
+      nonce => 
+      feeDistributor.setAddresses(
+        sovFeeCollectorAddress,
+        zeroStaking.address,
+        borrowerOperations.address,
+        troveManager.address,
+        wrbtcAddress,
+        zusdToken.address,
+        activePool.address,
+        { ...overrides, nonce }
+      ),
     
   ];
 
@@ -335,7 +355,8 @@ const transferOwnership = async (
     priceFeed,
     sortedTroves,
     stabilityPool,
-    liquityBaseParams
+    liquityBaseParams,
+    feeDistributor,
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
@@ -356,6 +377,11 @@ const transferOwnership = async (
     }),
     nonce =>
     borrowerOperations.setOwner(governanceAddress, {
+      ...overrides,
+      nonce
+    }),
+    nonce =>
+    feeDistributor.setOwner(governanceAddress, {
       ...overrides,
       nonce
     }),
@@ -437,6 +463,8 @@ export const deployAndSetupContracts = async (
 
   _isDev = true,
   governanceAddress?: string,
+  sovFeeCollectorAddress?: string,
+  wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
   overrides?: Overrides
@@ -447,7 +475,10 @@ export const deployAndSetupContracts = async (
   }
 
   governanceAddress ??= await deployer.getAddress();
+  sovFeeCollectorAddress ??= await deployContract(deployer, getContractFactory, "MockFeeSharingProxy", { ...overrides });
+  wrbtcAddress ??=  await deployContract(deployer, getContractFactory, "WRBTCTokenTester", { ...overrides });
   presaleAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
+  marketMakerAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
 
   log("Deploying contracts...");
   log();
@@ -460,6 +491,8 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     governanceAddress,
+    sovFeeCollectorAddress,
+    wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
     _priceFeedIsTestnet,
@@ -471,7 +504,7 @@ export const deployAndSetupContracts = async (
   const contracts = _connectToContracts(deployer, deployment);
 
   log("Connecting contracts...");
-  await connectContracts(contracts, deployer, governanceAddress, presaleAddress, marketMakerAddress, overrides);
+  await connectContracts(contracts, deployer, governanceAddress, sovFeeCollectorAddress,wrbtcAddress, presaleAddress, marketMakerAddress, overrides);
 
   if (externalPriceFeeds !== undefined) {
     assert(!checkPriceFeedIsTestnet(contracts.priceFeed));

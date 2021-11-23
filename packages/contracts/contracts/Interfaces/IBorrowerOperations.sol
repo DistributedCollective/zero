@@ -7,6 +7,7 @@ interface IBorrowerOperations {
 
     // --- Events ---
 
+    event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolAddressChanged(address _activePoolAddress);
     event DefaultPoolAddressChanged(address _defaultPoolAddress);
@@ -27,6 +28,7 @@ interface IBorrowerOperations {
     /**
      * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
+     * @param _feeDistributorAddress feeDistributor contract address
      * @param _liquityBaseParamsAddress LiquidityBaseParams contract address
      * @param _troveManagerAddress TroveManager contract address
      * @param _activePoolAddress ActivePool contract address
@@ -40,6 +42,7 @@ interface IBorrowerOperations {
      * @param _zeroStakingAddress ZEROStaking contract address
      */
     function setAddresses(
+        address _feeDistributorAddress,
         address _liquityBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,

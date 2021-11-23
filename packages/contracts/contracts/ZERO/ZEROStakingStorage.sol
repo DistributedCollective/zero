@@ -27,8 +27,7 @@ contract ZEROStakingStorage is Ownable {
     IZEROToken public zeroToken;
     IZUSDToken public zusdToken;
 
-    address public troveManagerAddress;
-    address public borrowerOperationsAddress;
+    address public feeDistributorAddress;
     address public activePoolAddress;
 
 }

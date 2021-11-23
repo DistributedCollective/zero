@@ -8,8 +8,7 @@ interface IZEROStaking {
     
     event ZEROTokenAddressSet(address _zeroTokenAddress);
     event ZUSDTokenAddressSet(address _zusdTokenAddress);
-    event TroveManagerAddressSet(address _troveManager);
-    event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
+    event FeeDistributorAddressAddressSet(address _feeDistributorAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
@@ -27,16 +26,14 @@ interface IZEROStaking {
      * @dev initializer function, checks addresses are contracts
      * @param _zeroTokenAddress ZEROToken contract address
      * @param _zusdTokenAddress ZUSDToken contract address
-     * @param _troveManagerAddress TroveManager contract address
-     * @param _borrowerOperationsAddress BorrowerOperations contract address
+     * @param _feeDistributorAddress FeeDistributorAddress contract address
      * @param _activePoolAddress ActivePool contract address
      */
     function setAddresses
     (
         address _zeroTokenAddress,
         address _zusdTokenAddress,
-        address _troveManagerAddress, 
-        address _borrowerOperationsAddress,
+        address _feeDistributorAddress, 
         address _activePoolAddress
     )  external;
 
