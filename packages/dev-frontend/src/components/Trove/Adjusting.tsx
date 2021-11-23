@@ -146,6 +146,7 @@ export const Adjusting: React.FC = () => {
     trove,
     updatedTrove,
     borrowingRate,
+    useNueToken,
     validationContext
   );
 

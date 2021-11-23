@@ -177,6 +177,7 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
     original,
     edited,
     borrowingRate,
+    useNueToken,
     validationContext
   );
 

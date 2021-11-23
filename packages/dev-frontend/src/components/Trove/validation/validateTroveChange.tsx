@@ -12,7 +12,7 @@ import {
   TroveCreationParams
 } from "@liquity/lib-base";
 
-import { COIN } from "../../../strings";
+import { COIN, COIN2 } from "../../../strings";
 
 import { ActionDescription, Amount } from "../../ActionDescription";
 import { ErrorDescription } from "../../ErrorDescription";
@@ -22,22 +22,23 @@ const ccrPercent = new Percent(CRITICAL_COLLATERAL_RATIO).toString(0);
 
 type TroveAdjustmentDescriptionParams = {
   params: TroveAdjustmentParams<Decimal>;
+  useNueBalance: Boolean
 };
 
-const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ params }) => (
+const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ params, useNueBalance }) => (
   <ActionDescription>
     {params.depositCollateral && params.borrowZUSD ? (
       <>
         You will deposit <Amount>{params.depositCollateral.prettify()} rBTC</Amount> and receive{" "}
         <Amount>
-          {params.borrowZUSD.prettify()} {COIN}
+          {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.repayZUSD && params.withdrawCollateral ? (
       <>
         You will pay{" "}
         <Amount>
-          {params.repayZUSD.prettify()} {COIN}
+          {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>{" "}
         and receive <Amount>{params.withdrawCollateral.prettify()} rBTC</Amount>
       </>
@@ -45,14 +46,14 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
       <>
         You will deposit <Amount>{params.depositCollateral.prettify()} rBTC</Amount> and pay{" "}
         <Amount>
-          {params.repayZUSD.prettify()} {COIN}
+          {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.borrowZUSD && params.withdrawCollateral ? (
       <>
         You will receive <Amount>{params.withdrawCollateral.prettify()} rBTC</Amount> and{" "}
         <Amount>
-          {params.borrowZUSD.prettify()} {COIN}
+          {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
@@ -67,14 +68,14 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
       <>
         You will receive{" "}
         <Amount>
-          {params.borrowZUSD.prettify()} {COIN}
+          {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : (
       <>
         You will pay{" "}
         <Amount>
-          {params.repayZUSD.prettify()} {COIN}
+          {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     )}
@@ -87,8 +88,9 @@ export const selectForTroveChangeValidation = ({
   total,
   accountBalance,
   zusdBalance,
+  nueBalance,
   numberOfTroves
-}: LiquityStoreState) => ({ price, total, accountBalance, zusdBalance, numberOfTroves });
+}: LiquityStoreState) => ({ price, total, accountBalance, zusdBalance, nueBalance, numberOfTroves });
 
 type TroveChangeValidationSelectedState = ReturnType<typeof selectForTroveChangeValidation>;
 
@@ -103,6 +105,7 @@ export const validateTroveChange = (
   originalTrove: Trove,
   adjustedTrove: Trove,
   borrowingRate: Decimal,
+  useNueBalance: Boolean,
   selectedState: TroveChangeValidationSelectedState
 ): [
   validChange: Exclude<TroveChange<Decimal>, { type: "invalidCreation" }> | undefined,
@@ -150,14 +153,14 @@ export const validateTroveChange = (
     change.type === "creation"
       ? validateTroveCreation(change.params, context)
       : change.type === "closure"
-      ? validateTroveClosure(change.params, context)
-      : validateTroveAdjustment(change.params, context);
+      ? validateTroveClosure(useNueBalance, change.params, context)
+      : validateTroveAdjustment(useNueBalance, change.params, context);
 
   if (errorDescription) {
     return [undefined, errorDescription];
   }
 
-  return [change, <TroveChangeDescription params={change.params} />];
+  return [change, <TroveChangeDescription params={change.params} useNueBalance={useNueBalance} />];
 };
 
 const validateTroveCreation = (
@@ -223,6 +226,7 @@ const validateTroveCreation = (
 };
 
 const validateTroveAdjustment = (
+  useNueBalance : Boolean,
   { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD }: TroveAdjustmentParams<Decimal>,
   {
     originalTrove,
@@ -231,7 +235,8 @@ const validateTroveAdjustment = (
     wouldTriggerRecoveryMode,
     price,
     accountBalance,
-    zusdBalance
+    zusdBalance,
+    nueBalance
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
   if (recoveryMode) {
@@ -286,19 +291,20 @@ const validateTroveAdjustment = (
         <ErrorDescription>
           Total debt must be at least{" "}
           <Amount>
-            {ZUSD_MINIMUM_DEBT.toString()} {COIN}
+            {ZUSD_MINIMUM_DEBT.toString()} {useNueBalance ? COIN2 : COIN}
           </Amount>
           .
         </ErrorDescription>
       );
     }
 
-    if (repayZUSD.gt(zusdBalance)) {
+    const repayBalance = useNueBalance ? nueBalance : zusdBalance;
+    if (repayZUSD?.gt(repayBalance)) {
       return (
         <ErrorDescription>
           The amount you're trying to repay exceeds your balance by{" "}
           <Amount>
-            {repayZUSD.sub(zusdBalance).prettify()} {COIN}
+            {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2: COIN}
           </Amount>
           .
         </ErrorDescription>
@@ -319,11 +325,13 @@ const validateTroveAdjustment = (
 };
 
 const validateTroveClosure = (
+  useNueBalance: Boolean,
   { repayZUSD }: TroveClosureParams<Decimal>,
   {
     recoveryMode,
     wouldTriggerRecoveryMode,
     numberOfTroves,
+    nueBalance,
     zusdBalance
   }: TroveChangeValidationContext
 ): JSX.Element | null => {
@@ -343,12 +351,13 @@ const validateTroveClosure = (
     );
   }
 
-  if (repayZUSD?.gt(zusdBalance)) {
+  const repayBalance = useNueBalance ? nueBalance : zusdBalance
+  if (repayZUSD?.gt(repayBalance)) {
     return (
       <ErrorDescription>
         You need{" "}
         <Amount>
-          {repayZUSD.sub(zusdBalance).prettify()} {COIN}
+          {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>{" "}
         more to close your Trove.
       </ErrorDescription>

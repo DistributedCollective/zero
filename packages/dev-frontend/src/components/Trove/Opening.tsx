@@ -66,6 +66,7 @@ export const Opening: React.FC = () => {
     EMPTY_TROVE,
     trove,
     borrowingRate,
+    useNueToken,
     validationContext
   );
 
