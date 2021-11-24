@@ -30,7 +30,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     C,
     D,
     E,
-    F
+    F,
+    sovFeeCollector
   ] = accounts;
 
   const multisig = accounts[999];

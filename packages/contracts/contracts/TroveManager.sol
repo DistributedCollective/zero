@@ -9,6 +9,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROToken.sol";
 import "./Interfaces/IZEROStaking.sol";
+import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -17,6 +18,7 @@ import "./TroveManagerStorage.sol";
 
 contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
+    event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
     event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
@@ -34,6 +36,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     // --- Dependency setter ---
     function setAddresses(
+        address _feeDistributorAddress,
         address _troveManagerRedeemOps,
         address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
@@ -49,6 +52,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         address _zeroStakingAddress
     ) external override onlyOwner {
 
+        checkContract(_feeDistributorAddress);
         checkContract(_troveManagerRedeemOps);
         checkContract(_liquityBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
@@ -63,6 +67,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         checkContract(_zeroTokenAddress);
         checkContract(_zeroStakingAddress);
 
+        feeDistributor = IFeeDistributor(_feeDistributorAddress);
         troveManagerRedeemOps = _troveManagerRedeemOps;
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         borrowerOperationsAddress = _borrowerOperationsAddress;
@@ -75,8 +80,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         _zusdToken = IZUSDToken(_zusdTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         _zeroToken = IZEROToken(_zeroTokenAddress);
-        _zeroStaking = IZEROStaking(_zeroStakingAddress);
+        _zeroStaking = IZEROStaking(_zeroStakingAddress);        
 
+        emit FeeDistributorAddressChanged(_feeDistributorAddress);
         emit TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps);
         emit LiquityBaseParamsAddressChanges(_borrowerOperationsAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);

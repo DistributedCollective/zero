@@ -24,6 +24,7 @@ import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/Upgradab
 import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
 import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
 import MockBalanceRedirectPresale from "../../contracts/artifacts/contracts/TestContracts/MockBalanceRedirectPresale.sol/MockBalanceRedirectPresale.json";
+import FeeDistributor from "../../contracts/artifacts/contracts/FeeDistributor.sol/FeeDistributor.json";
 
 const getTupleType = (components: ParamType[], flexible: boolean) => {
   if (components.every(component => component.name)) {
@@ -164,7 +165,8 @@ const contractArtifacts = [
   TroveManagerRedeemOps,
   UpgradeableProxy,
   LiquityBaseParams,
-  MockBalanceRedirectPresale
+  MockBalanceRedirectPresale,
+  FeeDistributor
 ];
 
 const contracts = contractArtifacts.map(({ contractName, abi }) => ({

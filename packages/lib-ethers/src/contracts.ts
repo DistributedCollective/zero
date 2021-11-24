@@ -31,6 +31,7 @@ import sortedTrovesAbi from "../abi/SortedTroves.json";
 import stabilityPoolAbi from "../abi/StabilityPool.json";
 import gasPoolAbi from "../abi/GasPool.json";
 import liquityBaseParamsAbi from "../abi/LiquityBaseParams.json";
+import feeDistributorAbi from "../abi/FeeDistributor.json";
 
 import {
   ActivePool,
@@ -52,6 +53,7 @@ import {
   GasPool,
   LiquityBaseParams,
   IERC20,
+  FeeDistributor
 } from "../types";
 
 import { EthersProvider, EthersSigner } from "./types";
@@ -169,6 +171,7 @@ export interface _LiquityContracts {
   stabilityPool: StabilityPool;
   gasPool: GasPool;
   liquityBaseParams: LiquityBaseParams;
+  feeDistributor: FeeDistributor;
 }
 
 /** @internal */
@@ -201,6 +204,7 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,
   liquityBaseParams: liquityBaseParamsAbi,
+  feeDistributor: feeDistributorAbi,
 });
 
 const mapLiquityContracts = <T, U>(
@@ -220,6 +224,8 @@ export interface _LiquityDeploymentJSON {
   readonly startBlock: number;
   readonly bootstrapPeriod: number;
   readonly governanceAddress: string;
+  readonly sovFeeCollectorAddress?: string;
+  readonly wrbtcAddress?: string;
   readonly presaleAddress?: string;
   readonly marketMakerAddress?: string;
   readonly _priceFeedIsTestnet: boolean;

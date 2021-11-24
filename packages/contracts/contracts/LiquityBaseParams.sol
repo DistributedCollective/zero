@@ -62,4 +62,5 @@ contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMa
     function setMaxBorrowingFee(uint MAX_BORROWING_FEE_) public onlyOwner {
         MAX_BORROWING_FEE = MAX_BORROWING_FEE_;
     }
+
 }

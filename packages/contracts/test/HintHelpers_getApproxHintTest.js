@@ -12,7 +12,7 @@ const ZUSDToken = artifacts.require("ZUSDToken")
 
 contract('HintHelpers', async accounts => {
  
-  const [owner] = accounts;
+  const [owner, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
 

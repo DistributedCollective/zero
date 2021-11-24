@@ -8,6 +8,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROStaking.sol";
+import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -60,6 +61,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         adjustTrove
     }
     
+    event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolAddressChanged(address _activePoolAddress);
     event DefaultPoolAddressChanged(address _defaultPoolAddress);
@@ -78,6 +80,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     // --- Dependency setters ---
 
     function setAddresses(
+        address _feeDistributorAddress,
         address _liquityBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
@@ -97,6 +100,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         // This makes impossible to open a trove with zero withdrawn ZUSD
         assert(MIN_NET_DEBT > 0);
 
+        checkContract(_feeDistributorAddress);
         checkContract(_liquityBaseParamsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
@@ -109,6 +113,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         checkContract(_zusdTokenAddress);
         checkContract(_zeroStakingAddress);
 
+        feeDistributor = IFeeDistributor (_feeDistributorAddress);
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
@@ -122,6 +127,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         zeroStakingAddress = _zeroStakingAddress;
         zeroStaking = IZEROStaking(_zeroStakingAddress);
 
+        emit FeeDistributorAddressChanged(_feeDistributorAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
@@ -396,10 +402,8 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint ZUSDFee = _troveManager.getBorrowingFee(_ZUSDAmount);
 
         _requireUserAcceptsFee(ZUSDFee, _ZUSDAmount, _maxFeePercentage);
-        
-        // Send fee to ZERO staking contract
-        zeroStaking.increaseF_ZUSD(ZUSDFee);
-        _zusdToken.mint(zeroStakingAddress, ZUSDFee);
+        _zusdToken.mint(address(feeDistributor), ZUSDFee);
+        feeDistributor.distributeFees();
 
         return ZUSDFee;
     }

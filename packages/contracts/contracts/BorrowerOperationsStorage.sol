@@ -9,6 +9,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROStaking.sol";
+import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/Ownable.sol";
 
 interface IMasset {
@@ -47,4 +48,6 @@ contract BorrowerOperationsStorage is Ownable {
     ISortedTroves public sortedTroves;
 
     IMasset public masset;
+    IFeeDistributor public feeDistributor;
+
 }

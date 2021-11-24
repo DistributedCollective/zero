@@ -26,6 +26,7 @@ contract('StabilityPool', async accounts => {
     alice, bob, carol, dennis, erin, flyn,
     A, B, C, D, E, F,
     frontEnd_1, frontEnd_2, frontEnd_3,
+    sovFeeCollector,
   ] = accounts;
 
   const multisig = accounts[999];

@@ -31,7 +31,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     owner,
     alice, bob, carol, dennis, erin, freddy, greta, harry, ida,
     whale, defaulter_1, defaulter_2, defaulter_3, defaulter_4,
-    A, B, C, D, E, F, G, H, I] = accounts;
+    A, B, C, D, E, F, G, H, I, sovFeeCollector] = accounts;
 
     const multisig = accounts[999];
 

@@ -1,7 +1,7 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 
 contract('Deployment script - Sets correct contract addresses dependencies after deployment', async accounts => {
-  const [owner] = accounts;
+  const [owner, sovFeeCollector] = accounts;
 
   const multisig = accounts[999];
   
@@ -17,6 +17,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   let zeroStaking
   let zeroToken
   let communityIssuance
+  let feeDistributor
 
   before(async () => {
     const coreContracts = await deploymentHelper.deployLiquityCore()
@@ -31,6 +32,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     defaultPool = coreContracts.defaultPool
     functionCaller = coreContracts.functionCaller
     borrowerOperations = coreContracts.borrowerOperations
+    feeDistributor = coreContracts.feeDistributor
 
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
@@ -280,21 +282,56 @@ contract('Deployment script - Sets correct contract addresses dependencies after
     assert.equal(zusdTokenAddress, recordedZUSDTokenAddress)
   })
 
-  // Sets TroveManager in ZEROStaking
-  it('Sets the correct ActivePool address in ZEROStaking', async () => {
+  // Sets FeeDistributor in ZEROStaking
+  it('Sets the correct feeDistributor address in ZEROStaking', async () => {
+    const feeDistributorAddress = feeDistributor.address
+
+    const recordedFeeDistributorAddress = await zeroStaking.feeDistributorAddress()
+    assert.equal(feeDistributorAddress, recordedFeeDistributorAddress)
+  })
+
+  // --- FeeDistributor ---
+
+   // Sets ZEROStaking in feeDistributor
+   it('Sets the correct ZEROStaking address in feeDistributor', async () => {
+    const zeroStakingAddress = zeroStaking.address
+
+    const recordedZeroStakingAddress = await feeDistributor.zeroStaking()
+    assert.equal(zeroStakingAddress, recordedZeroStakingAddress)
+  })
+
+  // Sets BorrowerOperations in feeDistributor
+  it('Sets the correct BorrowerOperations address in feeDistributor', async () => {
+    const borrowerOperationsAddress = borrowerOperations.address
+
+    const recordedBorrowerOperationsAddress = await feeDistributor.borrowerOperations()
+    assert.equal(borrowerOperationsAddress, recordedBorrowerOperationsAddress)
+  })
+
+  // Sets TroveManager in feeDistributor
+  it('Sets the correct TroveManager address in feeDistributor', async () => {
     const troveManagerAddress = troveManager.address
 
-    const recordedTroveManagerAddress = await zeroStaking.troveManagerAddress()
+    const recordedTroveManagerAddress = await feeDistributor.troveManager()
     assert.equal(troveManagerAddress, recordedTroveManagerAddress)
   })
 
-  // Sets BorrowerOperations in ZEROStaking
-  it('Sets the correct BorrowerOperations address in ZEROStaking', async () => {
-    const borrowerOperationsAddress = borrowerOperations.address
+  // Sets ActivePool in feeDistributor
+  it('Sets the correct ActivePool address in feeDistributor', async () => {
+    const activePoolAddress = activePool.address
 
-    const recordedBorrowerOperationsAddress = await zeroStaking.borrowerOperationsAddress()
-    assert.equal(borrowerOperationsAddress, recordedBorrowerOperationsAddress)
+    const recordedActivePoolAddress = await feeDistributor.activePoolAddress()
+    assert.equal(activePoolAddress, recordedActivePoolAddress)
   })
+
+  // Sets ZUSDToken in feeDistributor
+  it('Sets the correct ZUSDToken address in feeDistributor', async () => {
+    const zusdTokenAddress = zusdToken.address
+
+    const recordedZUSDTokenAddress = await feeDistributor.zusdToken()
+    assert.equal(zusdTokenAddress, recordedZUSDTokenAddress)
+  })
+
 
   // ---  ZEROToken ---
 
