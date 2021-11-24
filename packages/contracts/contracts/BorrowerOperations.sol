@@ -342,7 +342,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     }
 
     function closeTrove() external override {
-        _closeTrove(msg.sender);
+        _closeTrove();
     }
 
     function closeNueTrove() external {
@@ -351,39 +351,39 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint debt = troveManager.getTroveDebt(msg.sender);
 
         masset.redeemByBridge(address(zusdToken), debt.sub(ZUSD_GAS_COMPENSATION), msg.sender);
-        _closeTrove(msg.sender);
+        _closeTrove();
     }
 
-    function _closeTrove(address _sender) internal {
+    function _closeTrove() internal {
         ITroveManager troveManagerCached = troveManager;
         IActivePool activePoolCached = activePool;
         IZUSDToken zusdTokenCached = zusdToken;
 
-        _requireTroveisActive(troveManagerCached, _sender);
+        _requireTroveisActive(troveManagerCached, msg.sender);
         uint price = priceFeed.fetchPrice();
         _requireNotInRecoveryMode(price);
 
-        troveManagerCached.applyPendingRewards(_sender);
+        troveManagerCached.applyPendingRewards(msg.sender);
 
-        uint coll = troveManagerCached.getTroveColl(_sender);
-        uint debt = troveManagerCached.getTroveDebt(_sender);
+        uint coll = troveManagerCached.getTroveColl(msg.sender);
+        uint debt = troveManagerCached.getTroveDebt(msg.sender);
 
-        _requireSufficientZUSDBalance(zusdTokenCached, _sender, debt.sub(ZUSD_GAS_COMPENSATION));
+        _requireSufficientZUSDBalance(zusdTokenCached, msg.sender, debt.sub(ZUSD_GAS_COMPENSATION));
 
         uint newTCR = _getNewTCRFromTroveChange(coll, false, debt, false, price);
         _requireNewTCRisAboveCCR(newTCR);
 
-        troveManagerCached.removeStake(_sender);
-        troveManagerCached.closeTrove(_sender);
+        troveManagerCached.removeStake(msg.sender);
+        troveManagerCached.closeTrove(msg.sender);
 
-        emit TroveUpdated(_sender, 0, 0, 0, BorrowerOperation.closeTrove);
+        emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
 
         // Burn the repaid ZUSD from the user's balance and the gas compensation from the Gas Pool
-        _repayZUSD(activePoolCached, zusdTokenCached, _sender, debt.sub(ZUSD_GAS_COMPENSATION));
+        _repayZUSD(activePoolCached, zusdTokenCached, msg.sender, debt.sub(ZUSD_GAS_COMPENSATION));
         _repayZUSD(activePoolCached, zusdTokenCached, gasPoolAddress, ZUSD_GAS_COMPENSATION);
 
         // Send the collateral back to the user
-        activePoolCached.sendETH(_sender, coll);
+        activePoolCached.sendETH(msg.sender, coll);
     }
 
     /**

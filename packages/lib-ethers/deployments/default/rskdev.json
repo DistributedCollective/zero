@@ -1,7 +1,7 @@
 {
   "chainId": 33,
-  "version": "c12d992fe8581541f641887ae67a70e0e13d7395",
-  "deploymentDate": 1637714403000,
+  "version": "85ae75b4b6a765b7bb45b438036f9aef1758e8e9",
+  "deploymentDate": 1637757544000,
   "bootstrapPeriod": 1209600,
   "governanceAddress": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
   "sovFeeCollectorAddress": "0x77045E71a7A2c50903d88e564cD72fab11e82051",
@@ -31,5 +31,5 @@
     "multiTroveGetter": "0x91FbADa78ba89F9D316192cf67b7efec8Be56711",
     "nueToken": "0x4977f70457fFeF89025B49dFc0DFAD60982bAC7c"
   },
-  "startBlock": 28
+  "startBlock": 26
 }
