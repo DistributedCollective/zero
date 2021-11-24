@@ -252,7 +252,6 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         }
         _adjustSenderTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage, msg.sender, msg.value, address(this));
         if (_isDebtIncrease  && _ZUSDChange > 0) {
-            zusdToken.approve(address(masset), _ZUSDChange);
             zusdToken.transfer(address(masset), _ZUSDChange);
             masset.onTokensMinted(_ZUSDChange, address(zusdToken), abi.encode(msg.sender));
         }

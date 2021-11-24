@@ -2796,7 +2796,6 @@ contract('BorrowerOperations', async accounts => {
 
       const expectedDebt = zusdAmount
       .add(await troveManager.getBorrowingFee(zusdAmount))
-      .add(ZUSD_GAS_COMPENSATION)
 
       // To compensate borrowing fees
       await nueToken.transfer(alice, dennisNUE.div(toBN(2)), { from: dennis })

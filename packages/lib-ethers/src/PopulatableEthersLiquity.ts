@@ -658,7 +658,7 @@ export class PopulatableEthersLiquity
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapTroveClosure(
-      await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, id)
+      await borrowerOperations.estimateAndPopulate.closeTrove({ ...overrides }, id)
     );
   }
 

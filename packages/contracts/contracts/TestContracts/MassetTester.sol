@@ -30,7 +30,6 @@ contract MassetTester is IMasset {
         bytes calldata _userData
     ) external override {
         token.mint(abi.decode(_userData, (address)), _orderAmount);
-        ERC20(_tokenAddress).transferFrom(msg.sender, address(this), _orderAmount);
     }
 
     function redeemByBridge(
