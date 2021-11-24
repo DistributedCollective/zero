@@ -7,7 +7,7 @@ pragma solidity 0.6.11;
 interface IFeeSharingProxy {
 	function withdrawFees(address _token) external;
 
-	function transferTokens(address _token, uint256 _amount) external;
+	function transferTokens(address _token, uint96 _amount) external;
 
 	function withdraw(
 		address _loanPoolToken,
