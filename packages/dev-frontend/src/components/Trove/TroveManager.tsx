@@ -223,7 +223,7 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
       {description ??
         (openingNewTrove ? (
           <ActionDescription>
-            Start by entering the amount of rBTC you'd like to deposit as collateral.
+            Start by entering the amount of RBTC you'd like to deposit as collateral.
           </ActionDescription>
         ) : (
           <ActionDescription>

@@ -37,7 +37,7 @@ export const UserAccount: React.FC = () => {
         <Icon name="wallet" size="lg" />
 
         {([
-          ["rBTC", accountBalance],
+          ["RBTC", accountBalance],
           [COIN, zusdBalance],
           [COIN2, nueBalance],
           [GT, zeroBalance]

@@ -29,7 +29,7 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
   <ActionDescription>
     {params.depositCollateral && params.borrowZUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} rBTC</Amount> and receive{" "}
+        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount> and receive{" "}
         <Amount>
           {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
@@ -40,29 +40,29 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
         <Amount>
           {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>{" "}
-        and receive <Amount>{params.withdrawCollateral.prettify()} rBTC</Amount>
+        and receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.depositCollateral && params.repayZUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} rBTC</Amount> and pay{" "}
+        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount> and pay{" "}
         <Amount>
           {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.borrowZUSD && params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} rBTC</Amount> and{" "}
+        You will receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount> and{" "}
         <Amount>
           {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} rBTC</Amount>
+        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} rBTC</Amount>
+        You will receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.borrowZUSD ? (
       <>
@@ -217,7 +217,7 @@ const validateTroveCreation = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} rBTC</Amount>.
+        <Amount>{depositCollateral.sub(accountBalance).prettify()} RBTC</Amount>.
       </ErrorDescription>
     );
   }
@@ -316,7 +316,7 @@ const validateTroveAdjustment = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} rBTC</Amount>.
+        <Amount>{depositCollateral.sub(accountBalance).prettify()} RBTC</Amount>.
       </ErrorDescription>
     );
   }

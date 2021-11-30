@@ -62,7 +62,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
           label="Collateral"
           inputId="trove-collateral"
           amount={edited.collateral.prettify(4)}
-          unit="rBTC"
+          unit="RBTC"
         />
 
         <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />

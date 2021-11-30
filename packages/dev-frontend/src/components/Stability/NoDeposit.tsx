@@ -22,7 +22,7 @@ export const NoDeposit: React.FC = props => {
       </Heading>
       <Box sx={{ p: [2, 3] }}>
         <InfoMessage title="You have no ZUSD in the Stability Pool.">
-          You can earn rBTC and ZERO rewards by depositing ZUSD.
+          You can earn RBTC and ZERO rewards by depositing ZUSD.
         </InfoMessage>
 
         <Flex variant="layout.actions">
