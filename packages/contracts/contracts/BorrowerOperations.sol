@@ -148,11 +148,10 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, msg.sender, msg.value, msg.sender);
     }
 
-    function openNueTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable {
+    function openNueTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable override {
         require(address(masset) != address(0), "Masset address not set");
 
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, msg.sender, msg.value, address(this));
-        zusdToken.approve(address(masset), _ZUSDAmount);
         zusdToken.transfer(address(masset), _ZUSDAmount);
         masset.onTokensMinted(_ZUSDAmount, address(zusdToken), abi.encode(msg.sender));
     }
@@ -244,7 +243,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _adjustTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
     }
     // in case of _isDebtIncrease = false masset contract must have an approval of NUE tokens
-    function adjustNueTrove(uint _maxFeePercentage, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint) external payable {
+    function adjustNueTrove(uint _maxFeePercentage, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint) external payable override {
         require(address(masset) != address(0), "Masset address not set");
 
         if (!_isDebtIncrease && _ZUSDChange > 0) {
@@ -345,7 +344,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _closeTrove();
     }
 
-    function closeNueTrove() external {
+    function closeNueTrove() external override {
         require(address(masset) != address(0), "Masset address not set");
 
         uint debt = troveManager.getTroveDebt(msg.sender);
