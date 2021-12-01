@@ -86,7 +86,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
     <Card {...{ variant }}>
       {showBalances && <Balances />}
 
-      <Heading>Liquity statistics</Heading>
+      <Heading>Zero statistics</Heading>
 
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
         Protocol
@@ -111,7 +111,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       <Statistic name="Troves" tooltip="The total number of active Troves in the system.">
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
-      <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Liquity Protocol.">
+      <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Zero Protocol.">
         {total.debt.shorten()}
       </Statistic>
       {zusdInStabilityPoolPct && (
