@@ -207,7 +207,6 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
     readonly provider: EthersProvider;
     readonly signer?: EthersSigner;
     readonly startBlock: number;
-    readonly totalStabilityPoolZEROReward: Decimal;
     readonly version: string;
 }
 
