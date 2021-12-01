@@ -189,8 +189,8 @@ const validateTroveCreation = (
     if (!resultingTrove.isOpenableInRecoveryMode(price)) {
       return (
         <ErrorDescription>
-          You're not allowed to open a Trove with less than <Amount>{ccrPercent}</Amount> Collateral
-          Ratio during recovery mode. Please increase your Trove's Collateral Ratio.
+          You're not allowed to open a Line of Credit with less than <Amount>{ccrPercent}</Amount> Collateral
+          Ratio during recovery mode. Please increase your Line of Credit's Collateral Ratio.
         </ErrorDescription>
       );
     }
@@ -206,8 +206,8 @@ const validateTroveCreation = (
     if (wouldTriggerRecoveryMode) {
       return (
         <ErrorDescription>
-          You're not allowed to open a Trove that would cause the Total Collateral Ratio to fall
-          below <Amount>{ccrPercent}</Amount>. Please increase your Trove's Collateral Ratio.
+          You're not allowed to open a Line of Credit that would cause the Total Collateral Ratio to fall
+          below <Amount>{ccrPercent}</Amount>. Please increase your Line of Credit's Collateral Ratio.
         </ErrorDescription>
       );
     }
@@ -279,7 +279,7 @@ const validateTroveAdjustment = (
       return (
         <ErrorDescription>
           The adjustment you're trying to make would cause the Total Collateral Ratio to fall below{" "}
-          <Amount>{ccrPercent}</Amount>. Please increase your Trove's Collateral Ratio.
+          <Amount>{ccrPercent}</Amount>. Please increase your Line of Credit's Collateral Ratio.
         </ErrorDescription>
       );
     }
@@ -338,7 +338,7 @@ const validateTroveClosure = (
   if (numberOfTroves === 1) {
     return (
       <ErrorDescription>
-        You're not allowed to close your Trove when there are no other Troves in the system.
+        You're not allowed to close your Line of Credit when there are no other Lines of Credit in the system.
       </ErrorDescription>
     );
   }
@@ -346,7 +346,7 @@ const validateTroveClosure = (
   if (recoveryMode) {
     return (
       <ErrorDescription>
-        You're not allowed to close your Trove during recovery mode.
+        You're not allowed to close your Line of Credit during recovery mode.
       </ErrorDescription>
     );
   }
@@ -359,7 +359,7 @@ const validateTroveClosure = (
         <Amount>
           {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>{" "}
-        more to close your Trove.
+        more to close your Line of Credit.
       </ErrorDescription>
     );
   }
@@ -367,7 +367,7 @@ const validateTroveClosure = (
   if (wouldTriggerRecoveryMode) {
     return (
       <ErrorDescription>
-        You're not allowed to close a Trove if it would cause the Total Collateralization Ratio to
+        You're not allowed to close a Line of Credit if it would cause the Total Collateralization Ratio to
         fall below <Amount>{ccrPercent}</Amount>. Please wait until the Total Collateral Ratio
         increases.
       </ErrorDescription>

@@ -28,7 +28,7 @@ export const LiquidationManager: React.FC = () => {
             onChange={e => setNumberOfTrovesToLiquidate(e.target.value)}
           />
 
-          <Label>Troves</Label>
+          <Label>Lines of Credit</Label>
 
           <Flex sx={{ ml: 2, alignItems: "center" }}>
             <Transaction

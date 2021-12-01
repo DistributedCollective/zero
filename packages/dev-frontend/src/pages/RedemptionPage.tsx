@@ -35,7 +35,7 @@ export const RedemptionPage: React.FC = () => {
               </Paragraph>
               <Paragraph sx={{ mt: 2 }}>
                 <strong>Note</strong>: Redemption is not for repaying your loan. To repay your loan,
-                adjust your Trove on the <Link href="#/">Dashboard</Link>.
+                adjust your Line of Credit on the <Link href="#/">Dashboard</Link>.
               </Paragraph>
             </InfoMessage>
           </Box>

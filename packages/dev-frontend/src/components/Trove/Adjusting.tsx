@@ -157,7 +157,7 @@ export const Adjusting: React.FC = () => {
   return (
     <Card>
       <Heading>
-        Trove
+        Line of Credit
         {isDirty && !isTransactionPending && (
           <Button variant="titleIcon" sx={{ ":enabled:hover": { color: "danger" } }} onClick={reset}>
             <Icon name="history" size="lg" />
@@ -199,8 +199,8 @@ export const Adjusting: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "200px" }}>
-                  An amount set aside to cover the liquidator’s gas costs if your Trove needs to be
-                  liquidated. The amount increases your debt and is refunded if you close your Trove
+                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs to be
+                  liquidated. The amount increases your debt and is refunded if you close your Line of Credit
                   by fully paying off its net debt.
                 </Card>
               }
@@ -235,7 +235,7 @@ export const Adjusting: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "240px" }}>
-                  The total amount of ZUSD your Trove will hold.{" "}
+                  The total amount of ZUSD your Line of Credit will hold.{" "}
                   {isDirty && (
                     <>
                       You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
@@ -253,7 +253,7 @@ export const Adjusting: React.FC = () => {
 
         {description ?? (
           <ActionDescription>
-            Adjust your Trove by modifying its collateral, debt, or both.
+            Adjust your Line of Credit by modifying its collateral, debt, or both.
           </ActionDescription>
         )}
 
