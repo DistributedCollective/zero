@@ -34,7 +34,7 @@ export const PriceManager: React.FC = () => {
         <Flex sx={{ alignItems: "stretch" }}>
           <Label>RBTC</Label>
 
-          <Label variant="unit">$</Label>
+          <Label variant="unit" color="primary" backgroundColor="background">$</Label>
 
           <Input
             type={canSetPrice ? "number" : "text"}
