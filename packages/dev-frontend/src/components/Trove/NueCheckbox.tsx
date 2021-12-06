@@ -9,6 +9,6 @@ export const NueCheckbox: React.FC<NueCheckboxProps> = ({
 }) => (
   <Label sx={{ display: "flex" }}>
     <Checkbox checked={checked} onChange={onChange} />
-    Use Nue token
+    Use NUE
   </Label>
 )
