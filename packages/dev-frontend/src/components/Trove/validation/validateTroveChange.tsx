@@ -28,7 +28,7 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
   <ActionDescription>
     {params.depositCollateral && params.borrowZUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount> and receive{" "}
+        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount> and receive{" "}
         <Amount>
           {params.borrowZUSD.prettify()} {COIN}
         </Amount>
@@ -39,29 +39,29 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ pa
         <Amount>
           {params.repayZUSD.prettify()} {COIN}
         </Amount>{" "}
-        and receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount>
+        and receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.depositCollateral && params.repayZUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount> and pay{" "}
+        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount> and pay{" "}
         <Amount>
           {params.repayZUSD.prettify()} {COIN}
         </Amount>
       </>
     ) : params.borrowZUSD && params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount> and{" "}
+        You will receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount> and{" "}
         <Amount>
           {params.borrowZUSD.prettify()} {COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} ETH</Amount>
+        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} ETH</Amount>
+        You will receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.borrowZUSD ? (
       <>
@@ -186,8 +186,8 @@ const validateTroveCreation = (
     if (!resultingTrove.isOpenableInRecoveryMode(price)) {
       return (
         <ErrorDescription>
-          You're not allowed to open a Trove with less than <Amount>{ccrPercent}</Amount> Collateral
-          Ratio during recovery mode. Please increase your Trove's Collateral Ratio.
+          You're not allowed to open a Line of Credit with less than <Amount>{ccrPercent}</Amount> Collateral
+          Ratio during recovery mode. Please increase your Line of Credit's Collateral Ratio.
         </ErrorDescription>
       );
     }
@@ -203,8 +203,8 @@ const validateTroveCreation = (
     if (wouldTriggerRecoveryMode) {
       return (
         <ErrorDescription>
-          You're not allowed to open a Trove that would cause the Total Collateral Ratio to fall
-          below <Amount>{ccrPercent}</Amount>. Please increase your Trove's Collateral Ratio.
+          You're not allowed to open a Line of Credit that would cause the Total Collateral Ratio to fall
+          below <Amount>{ccrPercent}</Amount>. Please increase your Line of Credit's Collateral Ratio.
         </ErrorDescription>
       );
     }
@@ -214,7 +214,7 @@ const validateTroveCreation = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} ETH</Amount>.
+        <Amount>{depositCollateral.sub(accountBalance).prettify()} RBTC</Amount>.
       </ErrorDescription>
     );
   }
@@ -274,7 +274,7 @@ const validateTroveAdjustment = (
       return (
         <ErrorDescription>
           The adjustment you're trying to make would cause the Total Collateral Ratio to fall below{" "}
-          <Amount>{ccrPercent}</Amount>. Please increase your Trove's Collateral Ratio.
+          <Amount>{ccrPercent}</Amount>. Please increase your Line of Credit's Collateral Ratio.
         </ErrorDescription>
       );
     }
@@ -310,7 +310,7 @@ const validateTroveAdjustment = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} ETH</Amount>.
+        <Amount>{depositCollateral.sub(accountBalance).prettify()} RBTC</Amount>.
       </ErrorDescription>
     );
   }
@@ -330,7 +330,7 @@ const validateTroveClosure = (
   if (numberOfTroves === 1) {
     return (
       <ErrorDescription>
-        You're not allowed to close your Trove when there are no other Troves in the system.
+        You're not allowed to close your Line of Credit when there are no other Lines of Credit in the system.
       </ErrorDescription>
     );
   }
@@ -338,7 +338,7 @@ const validateTroveClosure = (
   if (recoveryMode) {
     return (
       <ErrorDescription>
-        You're not allowed to close your Trove during recovery mode.
+        You're not allowed to close your Line of Credit during recovery mode.
       </ErrorDescription>
     );
   }
@@ -350,7 +350,7 @@ const validateTroveClosure = (
         <Amount>
           {repayZUSD.sub(zusdBalance).prettify()} {COIN}
         </Amount>{" "}
-        more to close your Trove.
+        more to close your Line of Credit.
       </ErrorDescription>
     );
   }
@@ -358,7 +358,7 @@ const validateTroveClosure = (
   if (wouldTriggerRecoveryMode) {
     return (
       <ErrorDescription>
-        You're not allowed to close a Trove if it would cause the Total Collateralization Ratio to
+        You're not allowed to close a Line of Credit if it would cause the Total Collateralization Ratio to
         fall below <Amount>{ccrPercent}</Amount>. Please wait until the Total Collateral Ratio
         increases.
       </ErrorDescription>
