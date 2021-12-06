@@ -16,7 +16,10 @@ export const ErrorDescription: React.FC = ({ children }) => (
       borderRadius: "8px",
       borderColor: "danger",
       boxShadow: 2,
-      bg: "rgba(220, 44, 16, 0.05)"
+      bg: "rgba(220, 44, 16, 0.05)",
+      '& svg': {
+        color: "danger"
+      }
     }}
   >
     <Flex sx={{ alignItems: "center" }}>

@@ -189,7 +189,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
               activate(connectionState.connector);
             }}
           >
-            <Text>To use Liquity, you need to connect your Ethereum account.</Text>
+            <Text>To use Zero, you need to connect your RSK account.</Text>
           </RetryDialog>
         </Modal>
       )}

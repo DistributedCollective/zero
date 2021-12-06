@@ -1,30 +1,30 @@
 import { Theme, ThemeUIStyleObject } from "theme-ui";
 
 const baseColors = {
-  blue: "#1542cd",
-  purple: "#745ddf",
-  cyan: "#2eb6ea",
-  green: "#28c081",
-  yellow: "#fd9d28",
+  blue: "#4fbfd4",
+  yellow: "rgb(254, 192, 4)",
   red: "#dc2c10",
-  lightRed: "#ff755f"
+  lightRed: "#ff755f",
+  orange: "rgb(254, 192, 4)",
+  black: 'black'
 };
 
 const colors = {
-  primary: baseColors.blue,
-  secondary: baseColors.purple,
-  accent: baseColors.cyan,
-
-  success: baseColors.green,
+  primary: baseColors.orange,
+  secondary: baseColors.blue,
+  accent: baseColors.orange,
+  success: baseColors.blue,
   warning: baseColors.yellow,
   danger: baseColors.red,
   dangerHover: baseColors.lightRed,
   info: baseColors.blue,
   invalid: "pink",
-
-  text: "#293147",
-  background: "white",
-  muted: "#eaebed"
+  text: "#E8E8E8",
+  background: "#181C1F",
+  cardBackground: baseColors.black,
+  muted: "#eaebed",
+  bonded: "#5C5C5C",
+  highlight: "#5C5C5C"
 };
 
 const buttonBase: ThemeUIStyleObject = {
@@ -41,8 +41,9 @@ const button: ThemeUIStyleObject = {
   px: "32px",
   py: "12px",
 
-  color: "white",
-  border: 1,
+  color: "black",
+  border: 2,
+  borderColor: "white",
 
   fontWeight: "bold",
 
@@ -57,8 +58,7 @@ const buttonOutline = (color: string, hoverColor: string): ThemeUIStyleObject =>
   background: "none",
 
   ":enabled:hover": {
-    color: "background",
-    bg: hoverColor,
+    color: hoverColor,
     borderColor: hoverColor
   }
 });
@@ -86,17 +86,16 @@ const cardGapY = [3, 3, 4];
 const card: ThemeUIStyleObject = {
   position: "relative",
   mt: cardGapY,
-  border: 1,
-  boxShadow: [1, null, 2]
+  boxShadow: [1, null, 2],
+  borderRadius: 13
 };
 
 const infoCard: ThemeUIStyleObject = {
   ...card,
 
   padding: 3,
-
   borderColor: "rgba(122,199,240,0.4)",
-  background: "linear-gradient(200deg, #d4d9fc, #cae9f9)",
+  background: `linear-gradient(200deg, #26899b, #030c0d)`,
 
   h2: {
     mb: 2,
@@ -141,7 +140,7 @@ const modalOverlay: ThemeUIStyleObject = {
 };
 
 const headerGradient: ThemeUIStyleObject = {
-  background: `linear-gradient(90deg, ${colors.background}, ${colors.muted})`
+  background: colors.cardBackground
 };
 
 const theme: Theme = {
@@ -201,7 +200,7 @@ const theme: Theme = {
 
       ":enabled:hover": {
         bg: "secondary",
-        borderColor: "secondary"
+        borderColor: "muted",
       }
     },
 
@@ -212,7 +211,7 @@ const theme: Theme = {
 
     cancel: {
       ...button,
-      ...buttonOutline("text", "text"),
+      ...buttonOutline("text", "secondary"),
 
       opacity: 0.8
     },
@@ -253,22 +252,21 @@ const theme: Theme = {
       ...card,
 
       padding: 0,
-
-      borderColor: "muted",
-      bg: "background",
+      bg: colors.cardBackground,
 
       "> h2": {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
 
+        borderRadius: 13,
         height: "56px",
 
         pl: 3,
         py: 2,
         pr: 2,
 
-        bg: "muted",
+        bg: colors.cardBackground,
 
         fontSize: cardHeadingFontSize
       }

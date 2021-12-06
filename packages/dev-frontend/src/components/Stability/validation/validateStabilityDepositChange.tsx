@@ -71,7 +71,7 @@ export const validateStabilityDepositChange = (
       undefined,
       <ErrorDescription>
         You're not allowed to withdraw ZUSD from your Stability Deposit when there are
-        undercollateralized Troves. Please liquidate those Troves or try again later.
+        undercollateralized Credit Lines. Please liquidate those Credit Lines or try again later.
       </ErrorDescription>
     ];
   }
