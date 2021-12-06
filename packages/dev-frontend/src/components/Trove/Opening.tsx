@@ -134,8 +134,8 @@ export const Opening: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "200px" }}>
-                  An amount set aside to cover the liquidator’s gas costs if your Credit Line needs to be
-                  liquidated. The amount increases your debt and is refunded if you close your Credit Line
+                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs to be
+                  liquidated. The amount increases your debt and is refunded if you close your Line of Credit
                   by fully paying off its net debt.
                 </Card>
               }
@@ -170,7 +170,7 @@ export const Opening: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "240px" }}>
-                  The total amount of {borrowedToken} your Credit Line will hold.{" "}
+                  The total amount of {borrowedToken} your Line of Credit will hold.{" "}
                   {isDirty && (
                     <>
                       You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
