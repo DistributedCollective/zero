@@ -78,7 +78,7 @@ export const RedemptionManager: React.FC = () => {
     : [
         true,
         <ActionDescription>
-          You will receive <Amount>{ethAmount.sub(ethFee).prettify(4)} ETH</Amount> in exchange for{" "}
+          You will receive <Amount>{ethAmount.sub(ethFee).prettify(4)} RBTC</Amount> in exchange for{" "}
           <Amount>
             {zusdAmount.prettify()} {COIN}
           </Amount>
@@ -124,7 +124,7 @@ export const RedemptionManager: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ minWidth: "240px" }}>
-                  The Redemption Fee is charged as a percentage of the redeemed Ether. The Redemption
+                  The Redemption Fee is charged as a percentage of the redeemed RBTC. The Redemption
                   Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
                 </Card>
               }
