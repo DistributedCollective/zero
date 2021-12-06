@@ -108,7 +108,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
           &nbsp;(${Decimal.from(total.collateral.mul(price)).shorten()})
         </Text>
       </Statistic>
-      <Statistic name="Credit Lines" tooltip="The total number of active Credit Lines in the system.">
+      <Statistic name="Credit Lines" tooltip="The total number of active Lines of Credit in the system.">
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
       <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Zero Protocol.">
@@ -132,7 +132,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
       <Statistic
         name="Total Collateral Ratio"
-        tooltip="The ratio of the Dollar value of the entire system collateral at the current RBTC:USD price, to the entire system debt."
+        tooltip="The ratio of the USD value of the entire system collateral at the current RBTC:USD price, to the entire system debt."
       >
         {totalCollateralRatioPct.prettify()}
       </Statistic>
