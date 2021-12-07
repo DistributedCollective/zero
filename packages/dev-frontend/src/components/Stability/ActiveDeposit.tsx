@@ -117,7 +117,7 @@ export const ActiveDeposit: React.FC = () => {
         </Flex>
 
         {hasTrove && (
-          <ClaimAndMove disabled={!hasGain}>Claim ZERO and move RBTC to Trove</ClaimAndMove>
+          <ClaimAndMove disabled={!hasGain}>Claim ZERO and move RBTC to Line of Credit</ClaimAndMove>
         )}
       </Box>
 
