@@ -47,7 +47,7 @@ export const ReadOnlyStake: React.FC = () => {
           inputId="stake-gain-eth"
           amount={zeroStake.collateralGain.prettify(4)}
           color={zeroStake.collateralGain.nonZero && "success"}
-          unit="ETH"
+          unit="RBTC"
         />
 
         <StaticRow

@@ -19,7 +19,7 @@ export const NoTrove: React.FC = props => {
         </InfoMessage>
 
         <Flex variant="layout.actions">
-          <Button onClick={handleOpenTrove}>Open Credit Line</Button>
+          <Button onClick={handleOpenTrove}>Open Line of Credit</Button>
         </Flex>
       </Box>
     </Card>

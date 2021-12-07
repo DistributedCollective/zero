@@ -73,7 +73,7 @@ const StakingManagerActionDescription: React.FC<StakingManagerActionDescriptionP
 }) => {
   const stakeZERO = change.stakeZERO?.prettify().concat(" ", GT);
   const unstakeZERO = change.unstakeZERO?.prettify().concat(" ", GT);
-  const collateralGain = originalStake.collateralGain.nonZero?.prettify(4).concat(" ETH");
+  const collateralGain = originalStake.collateralGain.nonZero?.prettify(4).concat(" RBTC");
   const zusdGain = originalStake.zusdGain.nonZero?.prettify().concat(" ", COIN);
 
   if (originalStake.isEmpty && stakeZERO) {

@@ -227,7 +227,7 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
           </ActionDescription>
         ) : (
           <ActionDescription>
-            Adjust your Credit Line by modifying its collateral, debt, or both.
+            Adjust your Line of Credit by modifying its collateral, debt, or both.
           </ActionDescription>
         ))}
 

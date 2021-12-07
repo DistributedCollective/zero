@@ -46,7 +46,7 @@ export const ReadOnlyTrove: React.FC = () => {
 
         <Flex variant="layout.actions">
           <Button variant="outline" onClick={handleCloseTrove}>
-            Close Credit Line
+            Close Line of Credit
           </Button>
           <Button onClick={handleAdjustTrove}>
             <Icon name="pen" size="sm" />

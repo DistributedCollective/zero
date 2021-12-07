@@ -22,15 +22,15 @@ export const LiquidatedTrove: React.FC = () => {
     <Card>
       <Heading>Line of Credit</Heading>
       <Box sx={{ p: [2, 3] }}>
-        <InfoMessage title="Your Credit Line has been liquidated.">
+        <InfoMessage title="Your Line of Credit has been liquidated.">
           {hasSurplusCollateral
-            ? "Please reclaim your remaining collateral before opening a new Line."
-            : "You can borrow ZUSD by opening a new Credit Line."}
+            ? "Please reclaim your remaining collateral before opening a new Line of Credit."
+            : "You can borrow ZUSD by opening a new Line of Credit."}
         </InfoMessage>
 
         <Flex variant="layout.actions">
           {hasSurplusCollateral && <CollateralSurplusAction />}
-          {!hasSurplusCollateral && <Button onClick={handleOpenTrove}>Open Credit Line</Button>}
+          {!hasSurplusCollateral && <Button onClick={handleOpenTrove}>Open Line of Credit</Button>}
         </Flex>
       </Box>
     </Card>

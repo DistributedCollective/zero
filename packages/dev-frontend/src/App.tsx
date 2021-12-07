@@ -57,12 +57,12 @@ const UnsupportedMainnetFallback: React.FC = () => (
     </Heading>
 
     <Paragraph sx={{ mb: 3 }}>
-      Please change your network to Ropsten, Rinkeby, Kovan or Görli.
+      Please change your network to RSK Testnet.
     </Paragraph>
 
     <Paragraph>
-      If you'd like to use the Liquity Protocol on mainnet, please pick a frontend{" "}
-      <Link href="https://www.liquity.org/frontend">
+      If you'd like to use Zero on mainnet, please go{" "}
+      <Link href="https://live.sovryn.app/zero">
         here <Icon name="external-link-alt" size="xs" />
       </Link>
       .
@@ -89,10 +89,10 @@ const App = () => {
       }}
     >
       <Heading sx={{ mb: 3 }}>
-        <Icon name="exclamation-triangle" /> Liquity is not yet deployed to{" "}
-        {chainId === 1 ? "mainnet" : "this network"}.
+        <Icon name="exclamation-triangle" /> Zero is not yet deployed to{" "}
+        {chainId === 30 ? "mainnet" : "this network"}.
       </Heading>
-      Please switch to Ropsten, Rinkeby, Kovan or Görli.
+      Please switch to RSK Testnet.
     </Flex>
   );
 
