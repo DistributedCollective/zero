@@ -49,11 +49,27 @@ export class SendableEthersLiquity
     return this._populate.openTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
+  /** {@inheritDoc @liquity/lib-base#SendableLiquity.openNueTrove} */
+  openNueTrove(
+    params: TroveCreationParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<TroveCreationDetails>> {
+    return this._populate.openNueTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  }
+
   /** {@inheritDoc @liquity/lib-base#SendableLiquity.closeTrove} */
   closeTrove(
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersLiquityTransaction<TroveClosureDetails>> {
     return this._populate.closeTrove(overrides).then(sendTransaction);
+  }
+
+  /** {@inheritDoc @liquity/lib-base#SendableLiquity.closeNueTrove} */
+  closeNueTrove(
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<TroveClosureDetails>> {
+    return this._populate.closeNueTrove(overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @liquity/lib-base#SendableLiquity.adjustTrove} */
@@ -63,6 +79,15 @@ export class SendableEthersLiquity
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>> {
     return this._populate.adjustTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  }
+  
+  /** {@inheritDoc @liquity/lib-base#SendableLiquity.adjustNueTrove} */
+  adjustNueTrove(
+    params: TroveAdjustmentParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>> {
+    return this._populate.adjustNueTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @liquity/lib-base#SendableLiquity.depositCollateral} */

@@ -90,7 +90,7 @@ const deployContracts = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
   overrides?: Overrides
-): Promise<{addresses: _LiquityContractAddresses, startBlock: number}> => {
+): Promise<{addresses: Omit<_LiquityContractAddresses, 'nueToken'>, startBlock: number}> => {
 
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, "GasPool", {
     ...overrides
@@ -499,7 +499,7 @@ export const deployAndSetupContracts = async (
     _isDev,
 
     ...await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides)
-  };
+  } as _LiquityDeploymentJSON;
 
   const contracts = _connectToContracts(deployer, deployment);
 

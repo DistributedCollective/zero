@@ -21,7 +21,7 @@ export const ConnectionConfirmationDialog: React.FC<ConnectionConfirmationDialog
     waitReason={
       <>
         <Text sx={{ fontWeight: "bold" }}>Waiting for connection confirmation...</Text>
-        <Text>This won’t cost you any Ether</Text>
+        <Text>This won’t cost you any RBTC</Text>
       </>
     }
     cancelLabel="Cancel connection"

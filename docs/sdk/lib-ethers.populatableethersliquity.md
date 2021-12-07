@@ -23,14 +23,17 @@ export declare class PopulatableEthersLiquity implements PopulatableLiquity<Ethe
 
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
+|  [adjustNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.adjustnuetrove.md) |  |  |
 |  [adjustTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.adjusttrove.md) |  | Adjust existing Trove by changing its collateral, debt, or both. |
 |  [borrowZUSD(amount, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.borrowzusd.md) |  | Adjust existing Trove by borrowing more ZUSD. |
 |  [claimCollateralSurplus(overrides)](./lib-ethers.populatableethersliquity.claimcollateralsurplus.md) |  | Claim leftover collateral after a liquidation or redemption. |
+|  [closeNueTrove(overrides)](./lib-ethers.populatableethersliquity.closenuetrove.md) |  |  |
 |  [closeTrove(overrides)](./lib-ethers.populatableethersliquity.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
 |  [depositCollateral(amount, overrides)](./lib-ethers.populatableethersliquity.depositcollateral.md) |  | Adjust existing Trove by depositing more collateral. |
 |  [depositZUSDInStabilityPool(amount, frontendTag, overrides)](./lib-ethers.populatableethersliquity.depositzusdinstabilitypool.md) |  | Make a new Stability Deposit, or top up existing one. |
 |  [liquidate(address, overrides)](./lib-ethers.populatableethersliquity.liquidate.md) |  | Liquidate one or more undercollateralized Troves. |
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides)](./lib-ethers.populatableethersliquity.liquidateupto.md) |  | Liquidate the least collateralized Troves up to a maximum number. |
+|  [openNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.opennuetrove.md) |  |  |
 |  [openTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.opentrove.md) |  | Open a new Trove by depositing collateral and borrowing ZUSD. |
 |  [redeemZUSD(amount, maxRedemptionRate, overrides)](./lib-ethers.populatableethersliquity.redeemzusd.md) |  | Redeem ZUSD to native currency (e.g. Ether) at face value. |
 |  [registerFrontend(kickbackRate, overrides)](./lib-ethers.populatableethersliquity.registerfrontend.md) |  | Register current wallet address as a Liquity frontend. |

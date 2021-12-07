@@ -244,7 +244,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
         sx={{
           ...editableStyle,
           fontWeight: "medium",
-          bg: invalid ? "invalid" : "background"
+          bg: invalid ? "danger" : "background"
         }}
       />
     </Row>

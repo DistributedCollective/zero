@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Box, Button, Container, Flex } from "theme-ui";
+import { Box, Button, Container, Flex, NavLink } from "theme-ui";
 import { Icon } from "./Icon";
 import { LiquityLogo } from "./LiquityLogo";
 import { Link } from "./Link";
@@ -38,8 +38,8 @@ export const SideNav: React.FC = () => {
         <LiquityLogo height={logoHeight} p={2} />
         <Box as="nav" sx={{ m: 3, mt: 1, p: 0 }} onClick={() => setIsVisible(false)}>
           <Link to="/">Dashboard</Link>
-          <Link to="/farm">Farm</Link>
-          <Link to="/risky-troves">Risky Troves</Link>
+          <NavLink href="https://live.sovryn.app/swap" target="_blank">Trade</NavLink>
+          <Link to="/liquidation">Liquidation</Link>
           <Link to="/redemption">Redemption</Link>
         </Box>
       </Flex>

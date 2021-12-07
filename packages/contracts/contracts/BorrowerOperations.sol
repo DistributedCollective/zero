@@ -34,6 +34,8 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint newDebt;
         uint newColl;
         uint stake;
+        uint newNICR;
+        bool isRecoveryMode;
     }
 
     struct LocalVariables_openTrove {
@@ -136,13 +138,26 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit ZUSDTokenAddressChanged(_zusdTokenAddress);
         emit ZEROStakingAddressChanged(_zeroStakingAddress);
+    }
 
-        
+    function setMassetAddress(address _massetAddress) onlyOwner external {
+        masset = IMasset(_massetAddress);
+    }
+
+    function openTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable override {
+        _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, msg.sender, msg.value, msg.sender);
+    }
+
+    function openNueTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable override {
+        require(address(masset) != address(0), "Masset address not set");
+
+        _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, msg.sender, msg.value, address(this));
+        zusdToken.transfer(address(masset), _ZUSDAmount);
+        masset.onTokensMinted(_ZUSDAmount, address(zusdToken), abi.encode(msg.sender));
     }
 
     // --- Borrower Trove Operations ---
-
-    function openTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable override {
+    function _openTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint, address _sender, uint256 value, address _tokensRecipient) internal {
         ContractsCache memory contractsCache = ContractsCache(troveManager, activePool, zusdToken);
         LocalVariables_openTrove memory vars;
 
@@ -150,7 +165,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         bool isRecoveryMode = _checkRecoveryMode(vars.price);
 
         _requireValidMaxFeePercentage(_maxFeePercentage, isRecoveryMode);
-        _requireTroveisNotActive(contractsCache.troveManager, msg.sender);
+        _requireTroveisNotActive(contractsCache.troveManager, _sender);
 
         vars.ZUSDFee;
         vars.netDebt = _ZUSDAmount;
@@ -165,37 +180,37 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         vars.compositeDebt = _getCompositeDebt(vars.netDebt);
         assert(vars.compositeDebt > 0);
         
-        vars.ICR = LiquityMath._computeCR(msg.value, vars.compositeDebt, vars.price);
-        vars.NICR = LiquityMath._computeNominalCR(msg.value, vars.compositeDebt);
+        vars.ICR = LiquityMath._computeCR(value, vars.compositeDebt, vars.price);
+        vars.NICR = LiquityMath._computeNominalCR(value, vars.compositeDebt);
 
         if (isRecoveryMode) {
             _requireICRisAboveCCR(vars.ICR);
         } else {
             _requireICRisAboveMCR(vars.ICR);
-            uint newTCR = _getNewTCRFromTroveChange(msg.value, true, vars.compositeDebt, true, vars.price);  // bools: coll increase, debt increase
+            uint newTCR = _getNewTCRFromTroveChange(value, true, vars.compositeDebt, true, vars.price);  // bools: coll increase, debt increase
             _requireNewTCRisAboveCCR(newTCR); 
         }
 
         // Set the trove struct's properties
-        contractsCache.troveManager.setTroveStatus(msg.sender, 1);
-        contractsCache.troveManager.increaseTroveColl(msg.sender, msg.value);
-        contractsCache.troveManager.increaseTroveDebt(msg.sender, vars.compositeDebt);
+        contractsCache.troveManager.setTroveStatus(_sender, 1);
+        contractsCache.troveManager.increaseTroveColl(_sender, value);
+        contractsCache.troveManager.increaseTroveDebt(_sender, vars.compositeDebt);
 
-        contractsCache.troveManager.updateTroveRewardSnapshots(msg.sender);
-        vars.stake = contractsCache.troveManager.updateStakeAndTotalStakes(msg.sender);
+        contractsCache.troveManager.updateTroveRewardSnapshots(_sender);
+        vars.stake = contractsCache.troveManager.updateStakeAndTotalStakes(_sender);
 
-        sortedTroves.insert(msg.sender, vars.NICR, _upperHint, _lowerHint);
-        vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
-        emit TroveCreated(msg.sender, vars.arrayIndex);
+        sortedTroves.insert(_sender, vars.NICR, _upperHint, _lowerHint);
+        vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(_sender);
+        emit TroveCreated(_sender, vars.arrayIndex);
 
         // Move the ether to the Active Pool, and mint the ZUSDAmount to the borrower
-        _activePoolAddColl(contractsCache.activePool, msg.value);
-        _withdrawZUSD(contractsCache.activePool, contractsCache.zusdToken, msg.sender, _ZUSDAmount, vars.netDebt);
+        _activePoolAddColl(contractsCache.activePool, value);
+        _withdrawZUSD(contractsCache.activePool, contractsCache.zusdToken, _tokensRecipient, _ZUSDAmount, vars.netDebt);
         // Move the ZUSD gas compensation to the Gas Pool
         _withdrawZUSD(contractsCache.activePool, contractsCache.zusdToken, gasPoolAddress, ZUSD_GAS_COMPENSATION, ZUSD_GAS_COMPENSATION);
 
-        emit TroveUpdated(msg.sender, vars.compositeDebt, msg.value, vars.stake, BorrowerOperation.openTrove);
-        emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
+        emit TroveUpdated(_sender, vars.compositeDebt, value, vars.stake, BorrowerOperation.openTrove);
+        emit ZUSDBorrowingFeePaid(_sender, vars.ZUSDFee);
     }
 
     /// Send ETH as collateral to a trove
@@ -227,6 +242,23 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     function adjustTrove(uint _maxFeePercentage, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint) external payable override {
         _adjustTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
     }
+    // in case of _isDebtIncrease = false masset contract must have an approval of NUE tokens
+    function adjustNueTrove(uint _maxFeePercentage, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint) external payable override {
+        require(address(masset) != address(0), "Masset address not set");
+
+        if (!_isDebtIncrease && _ZUSDChange > 0) {
+            masset.redeemByBridge(address(zusdToken), _ZUSDChange, msg.sender);
+        }
+        _adjustSenderTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage, msg.sender, msg.value, address(this));
+        if (_isDebtIncrease  && _ZUSDChange > 0) {
+            zusdToken.transfer(address(masset), _ZUSDChange);
+            masset.onTokensMinted(_ZUSDChange, address(zusdToken), abi.encode(msg.sender));
+        }
+    }
+
+    function _adjustTrove(address _borrower, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage) internal {
+        _adjustSenderTrove(_borrower, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage, msg.sender, msg.value, msg.sender);
+    }
 
     /**
     * _adjustTrove(): Alongside a debt change, this function can perform either a collateral top-up or a collateral withdrawal. 
@@ -235,15 +267,15 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     *
     * If both are positive, it will revert.
     */
-    function _adjustTrove(address _borrower, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage) internal {
+    function _adjustSenderTrove(address _borrower, uint _collWithdrawal, uint _ZUSDChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage, address _sender, uint256 _value, address _tokensRecipient) internal {
         ContractsCache memory contractsCache = ContractsCache(troveManager, activePool, zusdToken);
         LocalVariables_adjustTrove memory vars;
 
         vars.price = priceFeed.fetchPrice();
-        bool isRecoveryMode = _checkRecoveryMode(vars.price);
+        vars.isRecoveryMode = _checkRecoveryMode(vars.price);
 
         if (_isDebtIncrease) {
-            _requireValidMaxFeePercentage(_maxFeePercentage, isRecoveryMode);
+            _requireValidMaxFeePercentage(_maxFeePercentage, vars.isRecoveryMode);
             _requireNonZeroDebtChange(_ZUSDChange);
         }
         _requireSingularCollChange(_collWithdrawal);
@@ -251,17 +283,17 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _requireTroveisActive(contractsCache.troveManager, _borrower);
 
         // Confirm the operation is either a borrower adjusting their own trove, or a pure ETH transfer from the Stability Pool to a trove
-        assert(msg.sender == _borrower || (msg.sender == stabilityPoolAddress && msg.value > 0 && _ZUSDChange == 0));
+        assert(_sender == _borrower || (_sender == stabilityPoolAddress && _value > 0 && _ZUSDChange == 0));
 
         contractsCache.troveManager.applyPendingRewards(_borrower);
 
         // Get the collChange based on whether or not ETH was sent in the transaction
-        (vars.collChange, vars.isCollIncrease) = _getCollChange(msg.value, _collWithdrawal);
+        (vars.collChange, vars.isCollIncrease) = _getCollChange(_value, _collWithdrawal);
 
         vars.netDebtChange = _ZUSDChange;
 
         // If the adjustment incorporates a debt increase and system is in Normal Mode, then trigger a borrowing fee
-        if (_isDebtIncrease && !isRecoveryMode) { 
+        if (_isDebtIncrease && !vars.isRecoveryMode) { 
             vars.ZUSDFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.zusdToken, _ZUSDChange, _maxFeePercentage);
             vars.netDebtChange = vars.netDebtChange.add(vars.ZUSDFee); // The raw debt change includes the fee
         }
@@ -275,7 +307,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         assert(_collWithdrawal <= vars.coll); 
 
         // Check the adjustment satisfies all conditions for the current system mode
-        _requireValidAdjustmentInCurrentMode(isRecoveryMode, _collWithdrawal, _isDebtIncrease, vars);
+        _requireValidAdjustmentInCurrentMode(vars.isRecoveryMode, _collWithdrawal, _isDebtIncrease, vars);
             
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough ZUSD
         if (!_isDebtIncrease && _ZUSDChange > 0) {
@@ -288,26 +320,40 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         vars.stake = contractsCache.troveManager.updateStakeAndTotalStakes(_borrower);
 
         // Re-insert trove in to the sorted list
-        uint newNICR = _getNewNominalICRFromTroveChange(vars.coll, vars.debt, vars.collChange, vars.isCollIncrease, vars.netDebtChange, _isDebtIncrease);
-        sortedTroves.reInsert(_borrower, newNICR, _upperHint, _lowerHint);
+        vars.newNICR = _getNewNominalICRFromTroveChange(vars.coll, vars.debt, vars.collChange, vars.isCollIncrease, vars.netDebtChange, _isDebtIncrease);
+        sortedTroves.reInsert(_borrower, vars.newNICR, _upperHint, _lowerHint);
 
         emit TroveUpdated(_borrower, vars.newDebt, vars.newColl, vars.stake, BorrowerOperation.adjustTrove);
-        emit ZUSDBorrowingFeePaid(msg.sender,  vars.ZUSDFee);
+        emit ZUSDBorrowingFeePaid(_sender,  vars.ZUSDFee);
 
         // Use the unmodified _ZUSDChange here, as we don't send the fee to the user
         _moveTokensAndETHfromAdjustment(
             contractsCache.activePool,
             contractsCache.zusdToken,
-            msg.sender,
+            _sender,
             vars.collChange,
             vars.isCollIncrease,
             _ZUSDChange,
             _isDebtIncrease,
-            vars.netDebtChange
+            vars.netDebtChange,
+            _tokensRecipient
         );
     }
 
     function closeTrove() external override {
+        _closeTrove();
+    }
+
+    function closeNueTrove() external override {
+        require(address(masset) != address(0), "Masset address not set");
+
+        uint debt = troveManager.getTroveDebt(msg.sender);
+
+        masset.redeemByBridge(address(zusdToken), debt.sub(ZUSD_GAS_COMPENSATION), msg.sender);
+        _closeTrove();
+    }
+
+    function _closeTrove() internal {
         ITroveManager troveManagerCached = troveManager;
         IActivePool activePoolCached = activePool;
         IZUSDToken zusdTokenCached = zusdToken;
@@ -412,12 +458,13 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         bool _isCollIncrease,
         uint _ZUSDChange,
         bool _isDebtIncrease,
-        uint _netDebtChange
+        uint _netDebtChange,
+        address _tokensRecipient
     )
         internal
     {
         if (_isDebtIncrease) {
-            _withdrawZUSD(_activePool, _zusdToken, _borrower, _ZUSDChange, _netDebtChange);
+            _withdrawZUSD(_activePool, _zusdToken, _tokensRecipient, _ZUSDChange, _netDebtChange);
         } else {
             _repayZUSD(_activePool, _zusdToken, _borrower, _ZUSDChange);
         }

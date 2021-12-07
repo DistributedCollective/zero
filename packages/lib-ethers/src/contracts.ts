@@ -17,6 +17,7 @@ import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
 import troveManagerAbi from "../abi/TroveManager.json";
 import troveManagerRedeemOpsAbi from "../abi/TroveManagerRedeemOps.json";
 import zusdTokenAbi from "../abi/ZUSDToken.json";
+import nueTokenAbi from "../abi/IERC20.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
 import communityIssuanceAbi from "../abi/CommunityIssuance.json";
 import defaultPoolAbi from "../abi/DefaultPool.json";
@@ -51,6 +52,7 @@ import {
   StabilityPool,
   GasPool,
   LiquityBaseParams,
+  IERC20,
   FeeDistributor
 } from "../types";
 
@@ -156,6 +158,7 @@ export interface _LiquityContracts {
   troveManager: TroveManager;
   troveManagerRedeemOps: TroveManagerRedeemOps;
   zusdToken: ZUSDToken;
+  nueToken?: IERC20;
   collSurplusPool: CollSurplusPool;
   communityIssuance: CommunityIssuance;
   defaultPool: DefaultPool;
@@ -180,7 +183,6 @@ type LiquityContractsKey = keyof _LiquityContracts;
 
 /** @internal */
 export type _LiquityContractAddresses = Record<LiquityContractsKey, string>;
-
 type LiquityContractAbis = Record<LiquityContractsKey, JsonFragment[]>;
 
 const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
@@ -189,6 +191,7 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   troveManager: troveManagerAbi,
   troveManagerRedeemOps: troveManagerRedeemOpsAbi,
   zusdToken: zusdTokenAbi,
+  nueToken: nueTokenAbi,
   communityIssuance: communityIssuanceAbi,
   defaultPool: defaultPoolAbi,
   zeroToken: zeroTokenAbi,

@@ -287,12 +287,14 @@ export class ReadableEthersLiquity implements ReadableLiquity {
   async getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { communityIssuance } = _getContracts(this.connection);
 
-    // FIXME: This should read the value instead of the one that was assigned after deployment
-    const issuanceCap =  Decimal.from(0) // this.connection.totalStabilityPoolZEROReward;
+    const issuanceCap = decimalify(await communityIssuance.ZEROSupplyCap());
     const totalZEROIssued = decimalify(await communityIssuance.totalZEROIssued({ ...overrides }));
 
-    // totalZEROIssued approaches but never reaches issuanceCap
-    return issuanceCap.sub(totalZEROIssued);
+    const remaining = issuanceCap.gt(totalZEROIssued)
+      ? issuanceCap.sub(totalZEROIssued)
+      : Decimal.from(0);
+
+    return remaining;
   }
 
   /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getZUSDInStabilityPool} */
@@ -308,6 +310,18 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     const { zusdToken } = _getContracts(this.connection);
 
     return zusdToken.balanceOf(address, { ...overrides }).then(decimalify);
+  }
+
+  /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getNUEBalance} */
+  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+    address ??= _requireAddress(this.connection);
+    const { nueToken } = _getContracts(this.connection);
+
+    if (!nueToken) {
+      throw "nue token address not set"
+    }
+
+    return nueToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
   /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getZEROBalance} */
@@ -563,6 +577,12 @@ class BlockPolledLiquityStoreBasedCache
   getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Decimal | undefined {
     if (this._userHit(address, overrides)) {
       return this._store.state.zusdBalance;
+    }
+  }
+
+  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Decimal | undefined {
+    if (this._userHit(address, overrides)) {
+      return this._store.state.nueBalance;
     }
   }
 

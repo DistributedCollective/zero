@@ -214,6 +214,11 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable.getZUSDBalance(address, overrides);
   }
 
+  /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getNUEBalance} */
+  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
+    return this._readable.getNUEBalance(address, overrides);
+  }
+
   /** {@inheritDoc @liquity/lib-base#ReadableLiquity.getZEROBalance} */
   getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZEROBalance(address, overrides);
@@ -279,6 +284,20 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
+ * {@inheritDoc @liquity/lib-base#TransactableLiquity.openTrove}
+ *
+ * @throws
+ * Throws {@link EthersTransactionFailedError} in case of transaction failure.
+ */
+  openNueTrove(
+    params: TroveCreationParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<TroveCreationDetails> {
+    return this.send.openNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  /**
    * {@inheritDoc @liquity/lib-base#TransactableLiquity.closeTrove}
    *
    * @throws
@@ -286,6 +305,16 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    */
   closeTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
     return this.send.closeTrove(overrides).then(waitForSuccess);
+  }
+
+  /**
+   * {@inheritDoc @liquity/lib-base#TransactableLiquity.closeNueTrove}
+   *
+   * @throws
+   * Throws {@link EthersTransactionFailedError} in case of transaction failure.
+   */
+   closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
+    return this.send.closeNueTrove(overrides).then(waitForSuccess);
   }
 
   /**
@@ -300,6 +329,20 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     overrides?: EthersTransactionOverrides
   ): Promise<TroveAdjustmentDetails> {
     return this.send.adjustTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  /**
+   * {@inheritDoc @liquity/lib-base#TransactableLiquity.adjustNueTrove}
+   *
+   * @throws
+   * Throws {@link EthersTransactionFailedError} in case of transaction failure.
+   */
+   adjustNueTrove(
+    params: TroveAdjustmentParams<Decimalish>,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<TroveAdjustmentDetails> {
+    return this.send.adjustNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**

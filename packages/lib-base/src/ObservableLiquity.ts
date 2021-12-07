@@ -29,4 +29,5 @@ export interface ObservableLiquity {
   ): () => void;
 
   watchZUSDBalance(onZUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
+  watchNUEBalance(onNUEBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
 }

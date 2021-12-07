@@ -12,14 +12,16 @@ import {
 } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
 
-import { COIN } from "../../strings";
-
 import { StaticRow } from "./Editor";
 import { LoadingOverlay } from "../LoadingOverlay";
 import { CollateralRatio } from "./CollateralRatio";
 import { InfoIcon } from "../InfoIcon";
+import { NueCheckbox } from "./NueCheckbox";
 
 type TroveEditorProps = {
+  borrowedToken: string;
+  useNueToken: boolean;
+  handleSetNueToken: () => void;
   original: Trove;
   edited: Trove;
   fee: Decimal;
@@ -37,6 +39,9 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
   original,
   edited,
   fee,
+  useNueToken,
+  handleSetNueToken,
+  borrowedToken,
   borrowingRate,
   changePending
 }) => {
@@ -50,31 +55,33 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
 
   return (
     <Card>
-      <Heading>Trove</Heading>
+      <Heading>Line of Credit</Heading>
 
       <Box sx={{ p: [2, 3] }}>
         <StaticRow
           label="Collateral"
           inputId="trove-collateral"
           amount={edited.collateral.prettify(4)}
-          unit="ETH"
+          unit="RBTC"
         />
 
-        <StaticRow label="Debt" inputId="trove-debt" amount={edited.debt.prettify()} unit={COIN} />
+        <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
+
+        <StaticRow label="Debt" inputId="trove-debt" amount={edited.debt.prettify()} unit={borrowedToken} />
 
         {original.isEmpty && (
           <StaticRow
             label="Liquidation Reserve"
             inputId="trove-liquidation-reserve"
             amount={`${ZUSD_LIQUIDATION_RESERVE}`}
-            unit={COIN}
+            unit={borrowedToken}
             infoIcon={
               <InfoIcon
                 tooltip={
                   <Card variant="tooltip" sx={{ width: "200px" }}>
-                    An amount set aside to cover the liquidator’s gas costs if your Trove needs to be
-                    liquidated. The amount increases your debt and is refunded if you close your
-                    Trove by fully paying off its net debt.
+                    An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs 
+                    to be liquidated. The amount increases your debt and is refunded if you close your
+                    Line of Credit by fully paying off its net debt.
                   </Card>
                 }
               />
@@ -87,7 +94,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
           inputId="trove-borrowing-fee"
           amount={fee.toString(2)}
           pendingAmount={feePct.toString(2)}
-          unit={COIN}
+          unit={borrowedToken}
           infoIcon={
             <InfoIcon
               tooltip={

@@ -9,7 +9,7 @@ const accounts = require("./hardhatAccountsList2k.js");
 const accountsList = accounts.accountsList
 
 const fs = require('fs')
-const getSecret = (secretKey, defaultValue='') => {
+const getSecret = (secretKey, defaultValue = '') => {
     const SECRETS_FILE = "./secrets.js"
     let secret = defaultValue
     if (fs.existsSync(SECRETS_FILE)) {
@@ -67,7 +67,7 @@ module.exports = {
         hardhat: {
             accounts: accountsList,
             gas: 10000000,  // tx gas limit
-            blockGasLimit: 12500000, 
+            blockGasLimit: 12500000,
             gasPrice: 20000000000,
             allowUnlimitedContractSize: true
         },
@@ -83,6 +83,11 @@ module.exports = {
             url: alchemyUrlRinkeby(),
             gas: 10000000,  // tx gas limit
             accounts: [getSecret('RINKEBY_DEPLOYER_PRIVATEKEY', '0x60ddfe7f579ab6867cbe7a2dc03853dc141d7a4ab6dbefc0dae2d2b1bd4e487f')]
+        },
+        rskdev: {
+            url: "http://localhost:4444",
+            // regtest default prefunded account
+            from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
         },
     },
     etherscan: {

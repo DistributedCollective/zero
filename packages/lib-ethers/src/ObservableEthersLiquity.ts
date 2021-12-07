@@ -206,4 +206,29 @@ export class ObservableEthersLiquity implements ObservableLiquity {
     return () =>
       zusdTransferFilters.forEach(filter => zusdToken.removeListener(filter, zusdTransferListener));
   }
+
+  watchNUEBalance(onNUEBalanceChanged: (balance: Decimal) => void, address?: string): () => void {
+    address ??= _requireAddress(this._readable.connection);
+
+    const { nueToken } = _getContracts(this._readable.connection);
+
+    if (!nueToken) {
+      throw "nue token address not set"
+    }
+
+    const { Transfer } = nueToken.filters;
+    const transferNUEFromUser = Transfer(address);
+    const transferNUEToUser = Transfer(null, address);
+
+    const nueTransferFilters = [transferNUEFromUser, transferNUEToUser];
+
+    const zusdTransferListener = debounce((blockTag: number) => {
+      this._readable.getNUEBalance(address, { blockTag }).then(onNUEBalanceChanged);
+    });
+
+    nueTransferFilters.forEach(filter => nueToken.on(filter, zusdTransferListener));
+
+    return () =>
+      nueTransferFilters.forEach(filter => nueToken.removeListener(filter, zusdTransferListener));
+  }
 }

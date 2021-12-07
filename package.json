@@ -60,6 +60,7 @@
     "release:lib-base": "yarn workspace @liquity/lib-base semantic-release",
     "release:lib-ethers": "yarn workspace @liquity/lib-ethers semantic-release",
     "save-live-version": "yarn workspace @liquity/lib-ethers save-live-version",
+    "set-masset": "yarn workspace @liquity/lib-ethers hardhat setMassetAddress",
     "start-dev-chain": "run-s start-dev-chain:*",
     "start-dev-chain:rsk": "node dev-chain/start.js",
     "start-dev-chain:prepare-providers": "yarn prepare:providers",

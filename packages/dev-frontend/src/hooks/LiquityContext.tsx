@@ -53,7 +53,9 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
           frontendTag: config.frontendTag,
           useStore: "blockPolled"
         });
-      } catch {}
+      } catch (e) {
+        console.log(e)
+      }
     }
   }, [config, provider, account, chainId]);
 

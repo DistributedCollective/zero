@@ -7,6 +7,7 @@ import { Decimal } from "@liquity/lib-base";
 import devOrNull from "../deployments/dev.json";
 import mainnet from "../deployments/mainnet.json";
 import rsktestnet from "../deployments/rsktestnet.json";
+import rskdev from "../deployments/rskdev.json";
 
 import { EthersProvider, EthersSigner } from "./types";
 
@@ -21,10 +22,9 @@ import { _connectToMulticall, _Multicall } from "./_Multicall";
 
 const dev = devOrNull as _LiquityDeploymentJSON | null;
 
-const deployments: {
-  [chainId: number]: _LiquityDeploymentJSON | undefined;
-} = {
+const deployments = {
   [rsktestnet.chainId]: rsktestnet,
+  ...(rskdev ? { [rskdev.chainId]: rskdev } : {}),
 
   ...(dev !== null ? { [dev.chainId]: dev } : {})
 };
@@ -296,7 +296,7 @@ export function _connectByChainId(
   optionalParams?: EthersLiquityConnectionOptionalParams
 ): EthersLiquityConnection {
   const deployment: _LiquityDeploymentJSON =
-    deployments[chainId] ?? panic(new UnsupportedNetworkError(chainId));
+    (deployments[chainId]) as _LiquityDeploymentJSON ?? panic(new UnsupportedNetworkError(chainId));
 
   return connectionFrom(
     provider,

@@ -13,7 +13,7 @@ export const RiskyTrovesPage: React.FC = () => (
           <InfoMessage title="Bot functionality">
             <Paragraph>Liquidation is expected to be carried out by bots.</Paragraph>
             <Paragraph>
-              Early on you may be able to manually liquidate Troves, but as the system matures this
+              Early on you may be able to manually liquidate Lines of Credit, but as the system matures this
               will become less likely.
             </Paragraph>
           </InfoMessage>

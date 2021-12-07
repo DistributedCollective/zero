@@ -9,15 +9,16 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, Overrides } from "@ethersproject/contracts";
 
 import { task, HardhatUserConfig, types, extendEnvironment } from "hardhat/config";
-import { HardhatRuntimeEnvironment, NetworkUserConfig } from "hardhat/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import "@nomiclabs/hardhat-ethers";
 
 import { Decimal } from "@liquity/lib-base";
 
 import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/deploy";
-import { _LiquityDeploymentJSON } from "./src/contracts";
+import {  _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
+import { BorrowerOperations } from "./types";
 
 dotenv.config();
 
@@ -53,31 +54,31 @@ const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eef
 
 const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0xB0D1D7fad89CfC28394b0B1AB51d24c432170f5A",
+  rsktestnet: "0x4D1A9fD1E1e67E83Ffe72Bdd769088d689993E4B",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const sovFeeCollectorAddresses = {
   mainnet: "",
-  rsktestnet: "",
+  rsktestnet: "0x85B19DD6E3c6cCC54D40c1bAEC15058962B8245b",
   dev: ""
 };
 
 const wrbtcAddresses = {
   mainnet: "",
-  rsktestnet: "",
+  rsktestnet: "0x69FE5cEC81D5eF92600c1A0dB1F11986AB3758Ab",
   dev: ""
 };
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0xEF660F708AAe1041A1c871f4e3Ffb5e166437383",
+  rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0xeEBAeE881CcDed8c4e90caeeac86408a93c9bfF9",
+  rsktestnet: "0xC4C82fE6d6D531cf7bE8DaC7F9F0Ba63FED4c8d0",
   dev: ""
 };
 
@@ -184,6 +185,14 @@ declare module "hardhat/types/runtime" {
 const getLiveArtifact = (name: string): { abi: JsonFragment[]; bytecode: string } =>
   require(`./live/${name}.json`);
 
+const getDeploymentData = (network: string, channel: string): _LiquityDeploymentJSON => {
+  const addresses = fs.readFileSync(
+    path.join("deployments", channel, `${network}.json`)
+  );
+
+  return JSON.parse(String(addresses))
+}
+
 const getContractFactory: (
   env: HardhatRuntimeEnvironment
 ) => (name: string, signer: Signer) => Promise<ContractFactory> = useLiveVersion
@@ -221,6 +230,49 @@ extendEnvironment(env => {
   };
 });
 
+type SetAddressParams = {
+  address: string;
+  nuetokenaddress: string;
+  channel: string;
+}
+
+const defaultChannel = process.env.CHANNEL || "default";
+
+task("setMassetAddress", "Sets address of masset contract in order to support NUE troves")
+  .addParam("address", "address of deployed MassetProxy contract")
+  .addParam("nuetokenaddress", "address of NUE token")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async (
+    {
+      address,
+      channel,
+      nuetokenaddress,
+    }: SetAddressParams,
+    hre
+  ) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel)
+    const { borrowerOperations: borrowerOperationsAddress } = deployment.addresses
+
+    const borrowerOperations = await hre.ethers.getContractAt("BorrowerOperations", borrowerOperationsAddress, deployer) as unknown as  BorrowerOperations
+
+    const currentMassetAddress = await borrowerOperations.masset()
+    console.log("Current masset address: ", currentMassetAddress)
+
+    const tx = await borrowerOperations.setMassetAddress(address) 
+    await tx.wait()
+
+    const newMassetAddress = await borrowerOperations.masset()
+    console.log("New masset address: ", newMassetAddress)
+
+    deployment.addresses.nueToken = nuetokenaddress
+
+    fs.writeFileSync(
+      path.join("deployments", channel, `${hre.network.name}.json`),
+      JSON.stringify(deployment, undefined, 2)
+    );
+  })
+
 type DeployParams = {
   channel: string;
   gasPrice?: number;
@@ -232,7 +284,6 @@ type DeployParams = {
   marketMakerAddress?: string;
 };
 
-const defaultChannel = process.env.CHANNEL || "default";
 
 task("deploy", "Deploys the contracts to the network")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
