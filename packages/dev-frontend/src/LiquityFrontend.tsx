@@ -62,10 +62,7 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
                   <Route path="/" exact>
                     <PageSwitcher />
                   </Route>
-                  <Route path="/farm">
-              
-                  </Route>
-                  <Route path="/risky-troves">
+                  <Route path="/liquidation">
                     <RiskyTrovesPage />
                   </Route>
                   <Route path="/redemption">
