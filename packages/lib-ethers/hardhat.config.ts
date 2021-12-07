@@ -18,7 +18,7 @@ import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/dep
 import {  _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
-import { BorrowerOperations } from "./types";
+import { BorrowerOperations, CommunityIssuance, ZEROToken } from "./types";
 
 dotenv.config();
 
@@ -273,6 +273,41 @@ task("setMassetAddress", "Sets address of masset contract in order to support NU
     );
   })
 
+type FundCommunityIssuance = {
+  channel: string;
+  amount: string;
+}
+
+task("fundCommunityIssuance", "Sends funds to the community issuance contract so users can get rewards")
+  .addParam("amount", "Amount to send", undefined, types.string)
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel, amount }: FundCommunityIssuance, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel)
+    const { zeroToken: zeroTokenAddress, communityIssuance: communityIssuanceAddress } = deployment.addresses
+
+    const zeroToken = await hre.ethers.getContractAt("ZEROToken", zeroTokenAddress, deployer) as unknown as  ZEROToken
+    const communityIssuance = await hre.ethers.getContractAt("CommunityIssuance", communityIssuanceAddress, deployer) as unknown as  CommunityIssuance
+
+    const fundingWalletAddress = await communityIssuance.fundingWalletAddress()
+    console.log(`Funding wallet address is ${fundingWalletAddress} and sender is ${deployer.address}`)
+
+    const senderZeroBalance = await zeroToken.balanceOf(deployer.address)
+    console.log(`Sender zero balance: ${senderZeroBalance}`)
+
+    const communityIssuanceBalanceBefore = await zeroToken.balanceOf(communityIssuanceAddress)
+    console.log(`Community issuance balance before: ${communityIssuanceBalanceBefore}`)
+
+    console.log("Setting allowance")
+    const allowance = await zeroToken.allowance(deployer.address, communityIssuanceAddress);
+    console.log(`Current allowance: ${allowance}`)
+    await (await zeroToken.increaseAllowance(communityIssuanceAddress, amount)).wait()
+    console.log("Transferring zero")
+    await (await communityIssuance.receiveZero(deployer.address, amount)).wait()
+    const communityIssuanceBalanceAfter = await zeroToken.balanceOf(communityIssuanceAddress)
+    console.log(`Community issuance balance after: ${communityIssuanceBalanceAfter}`)
+  });
+
 type DeployParams = {
   channel: string;
   gasPrice?: number;
@@ -283,7 +318,6 @@ type DeployParams = {
   presaleAddress?: string;
   marketMakerAddress?: string;
 };
-
 
 task("deploy", "Deploys the contracts to the network")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
