@@ -206,8 +206,8 @@ const theme: Theme = {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
 
   fonts: {
-    body: 'Montserrat", "sans-serif',
-    heading: 'Montserrat", "sans-serif',
+    body: '"Montserrat", "sans-serif"',
+    heading: '"Montserrat", "sans-serif"',
     monospace: "Menlo, monospace"
   },
 
