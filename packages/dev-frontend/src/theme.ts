@@ -1,30 +1,86 @@
 import { Theme, ThemeUIStyleObject } from "theme-ui";
 
 const baseColors = {
-  blue: "#4fbfd4",
-  yellow: "rgb(254, 192, 4)",
-  red: "#dc2c10",
-  lightRed: "#ff755f",
-  orange: "rgb(254, 192, 4)",
-  black: 'black'
+  transparent: "transparent",
+  current: "currentColor",
+
+  primary: "#fec004",
+  "primary-75": "#fec004C0",
+  "primary-50": "#fec00480",
+  "primary-25": "#fec00440",
+  "primary-10": "#fec0041a",
+
+  secondary: "#2274a5",
+  "secondary-75": "#2274a5C0",
+  "secondary-50": "#2274a580",
+  "secondary-25": "#2274a540",
+  "secondary-10": "#2274a51a",
+
+  black: "#000000",
+  "gray-1": "#161616",
+  "gray-2": "#1f1f1f",
+  "gray-3": "#2c2c2c",
+  "gray-4": "#343434",
+  "gray-5": "#484848",
+  "gray-6": "#5c5c5c",
+  "gray-7": "#8e8e8e",
+  "gray-8": "#a2a2a2",
+  "gray-9": "#c4c4c4",
+  "sov-white": "#e8e8e8",
+  white: "#ffffff",
+
+  "trade-long": "#17C3B2",
+  "trade-long-75": "#17C3B2C0",
+  "trade-long-50": "#17C3B280",
+  "trade-long-25": "#17C3B240",
+  "trade-long-10": "#17C3B21a",
+  "trade-short": "#D74E09",
+  "trade-short-75": "#D74E09C0",
+  "trade-short-50": "#D74E0980",
+  "trade-short-25": "#D74E0940",
+  "trade-short-10": "#D74E091a",
+
+  success: "#27A522",
+  "success-75": "#27A522C0",
+  "success-50": "#27A52280",
+  "success-25": "#27A52240",
+  "success-10": "#27A5221a",
+  warning: "#A52222",
+  "warning-75": "#A52222C0",
+  "warning-50": "#A5222280",
+  "warning-25": "#A5222240",
+  "warning-10": "#A522221a",
+
+  "yellow-1": "#F5E884",
+  "yellow-2": "#DEB258",
+  "blue-1": "#8EDBDB",
+  "blue-2": "#628CB5",
+  "orange-1": "#F7B199",
+  "orange-2": "#DB6E4D",
+  "green-1": "#95CA8F",
+  "green-2": "#5AA897",
+  "purple-1": "#8F91C3",
+  "purple-2": "#7E64A7",
+  "pink-1": "#C38FBB",
+  "pink-2": "#A264A7"
 };
 
 const colors = {
-  primary: baseColors.orange,
-  secondary: baseColors.blue,
-  accent: baseColors.orange,
-  success: baseColors.blue,
-  warning: baseColors.yellow,
-  danger: baseColors.red,
-  dangerHover: baseColors.lightRed,
-  info: baseColors.blue,
-  invalid: "pink",
-  text: "#E8E8E8",
-  background: "#181C1F",
+  primary: baseColors.primary,
+  secondary: baseColors.secondary,
+  accent: baseColors.primary,
+  success: baseColors["blue-1"],
+  warning: baseColors.primary,
+  danger: baseColors.warning,
+  dangerHover: baseColors["orange-2"],
+  info: baseColors["blue-1"],
+  invalid: baseColors["pink-1"],
+  text: baseColors["sov-white"],
+  background: baseColors["gray-1"],
   cardBackground: baseColors.black,
-  muted: "#eaebed",
-  bonded: "#5C5C5C",
-  highlight: "#5C5C5C"
+  muted: baseColors["sov-white"],
+  bonded: baseColors["gray-6"],
+  highlight: baseColors["gray-6"]
 };
 
 const buttonBase: ThemeUIStyleObject = {
@@ -38,14 +94,15 @@ const buttonBase: ThemeUIStyleObject = {
 const button: ThemeUIStyleObject = {
   ...buttonBase,
 
-  px: "32px",
-  py: "12px",
+  px: "2rem",
+  py: "0.375rem",
 
-  color: "black",
+  color: colors.primary,
   border: 2,
-  borderColor: "white",
+  borderColor: colors.primary,
+  backgroundColor: "transparent",
 
-  fontWeight: "bold",
+  borderRadius: "8px",
 
   ":disabled": {
     opacity: 0.5
@@ -149,33 +206,60 @@ const theme: Theme = {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
 
   fonts: {
-    body: [
-      "system-ui",
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Segoe UI"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "sans-serif"
-    ].join(", "),
-    heading: "inherit",
+    body: 'Montserrat", "sans-serif',
+    heading: 'Montserrat", "sans-serif',
     monospace: "Menlo, monospace"
   },
 
-  fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
+  fontSizes: [
+    "0.625rem",
+    "0.75rem",
+    "0.875rem",
+    "1rem",
+    "1.125rem",
+    "1.25rem",
+    "1.5rem",
+    "1.75rem",
+    "2.5rem",
+    "3.25rem"
+  ], // [10px, 12px, 14px, 16px, 18px, 20px, 24px, 28px, 40px, 52px]
 
   fontWeights: {
     body: 400,
     heading: 600,
 
-    light: 200,
+    light: 300,
+    normal: 400,
     medium: 500,
-    bold: 600
+    semibold: 600,
+    bold: 700
   },
 
   lineHeights: {
     body: 1.5,
-    heading: 1.25
+    heading: 1.25,
+
+    "leading-4": "1rem",
+    "leading-3": "0.75rem",
+    "leading-5": "1.25rem",
+    "leading-6": "1.5rem",
+    "leading-7": "1.75rem",
+    "leading-8": "2rem",
+    "leading-9": "2.25rem",
+    "leading-10": "2.5rem",
+    "leading-none": 1,
+    "leading-tight": 1.25,
+    "leading-snug": 1.375,
+    "leading-normal": 1.5,
+    "leading-relaxed": 1.625,
+    "leading-loose": 2
+  },
+
+  letterSpacings: {
+    "tracking-normal": 0,
+    "tracking-wide": "0.025em",
+    "tracking-wider": "0.05em",
+    "tracking-widest": "0.1em"
   },
 
   colors,
@@ -186,7 +270,7 @@ const theme: Theme = {
 
   text: {
     address: {
-      fontFamily: "monospace",
+      fontFamily: "Montserrat",
       fontSize: 1
     }
   },
@@ -195,12 +279,8 @@ const theme: Theme = {
     primary: {
       ...button,
 
-      bg: "primary",
-      borderColor: "primary",
-
       ":enabled:hover": {
-        bg: "secondary",
-        borderColor: "muted",
+        opacity: 0.75
       }
     },
 
@@ -211,9 +291,13 @@ const theme: Theme = {
 
     cancel: {
       ...button,
-      ...buttonOutline("text", "secondary"),
 
-      opacity: 0.8
+      color: "#ededed",
+      borderColor: "#ededed",
+
+      ":enabled:hover": {
+        opacity: 0.75
+      }
     },
 
     danger: {
