@@ -2,17 +2,17 @@ import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
 import { Box, Heading, Image, Paragraph, Button, Input } from "theme-ui";
-import { WaitListSuccess } from "../components/WaitListSuccess";
+import { WaitlistSuccess } from "../components/WaitlistSuccess";
 import { validateEmail } from "../utils/helpers";
 
 export const WaitListSignup: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [email, setEmail] = useState("");
 
-  const emailIsValid = useMemo(() => validateEmail(email), [email]);
+  const isValidEmail = useMemo(() => validateEmail(email), [email]);
 
-  const signup = useCallback(() => {
-    if (!emailIsValid) {
+  const onSignupClick = useCallback(() => {
+    if (!isValidEmail) {
       return;
     }
 
@@ -22,7 +22,7 @@ export const WaitListSignup: React.FC = () => {
     //     console.log("User: " + JSON.stringify(user));
     //   });
     // }
-  }, [emailIsValid]);
+  }, [isValidEmail]);
 
   return (
     <Box
@@ -33,7 +33,7 @@ export const WaitListSignup: React.FC = () => {
         alignItems: "center",
         color: "white",
         height: "100%",
-        width: "377px",
+        width: "384px",
         maxWidth: "100vw",
         px: 2,
         margin: "auto",
@@ -81,12 +81,12 @@ export const WaitListSignup: React.FC = () => {
             bg: "primary",
             color: "cardBackground"
           }}
-          onClick={signup}
-          disabled={!emailIsValid}
+          onClick={onSignupClick}
+          disabled={!isValidEmail}
         >
           Sign Up
         </Button>
-        {email && !emailIsValid && (
+        {email && !isValidEmail && (
           <Paragraph
             sx={{
               fontSize: 2,
@@ -139,7 +139,7 @@ export const WaitListSignup: React.FC = () => {
           Connect Wallet
         </Button>
       </Box>
-      {success && <WaitListSuccess onClose={() => setSuccess(false)} />}
+      <WaitlistSuccess open={success} onClose={() => setSuccess(false)} />
     </Box>
   );
 };
