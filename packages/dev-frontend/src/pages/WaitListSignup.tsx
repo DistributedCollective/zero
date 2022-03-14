@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
 import { Box, Heading, Image, Paragraph, Button, Input } from "theme-ui";
-import { WaitlistSuccess } from "../components/WaitlistSuccess";
+import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { validateEmail } from "../utils/helpers";
 
 export const WaitListSignup: React.FC = () => {
