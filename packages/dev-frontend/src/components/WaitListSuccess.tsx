@@ -4,10 +4,10 @@ import { CSSTransition } from "react-transition-group";
 
 type WaitlistSuccessProps = {
   onClose: () => void;
-  open: boolean;
+  isOpen: boolean;
 };
 
-export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose, open }) => {
+export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose, isOpen }) => {
   const nodeRef = useRef(null);
 
   return (
@@ -15,7 +15,7 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose, open 
       unmountOnExit
       classNames="dialog"
       nodeRef={nodeRef}
-      in={open}
+      in={isOpen}
       timeout={{ enter: 500, exit: 300 }}
     >
       <Box

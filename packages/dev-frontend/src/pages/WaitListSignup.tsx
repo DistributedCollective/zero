@@ -18,7 +18,7 @@ export const WaitListSignup: React.FC = () => {
 
     setSuccess(true);
     // if (window?.prefinery) {
-    //   window.prefinery("addUser", email, function (user: any) {
+    //   window?.prefiner.prefinery("addUser", 'email', function (user: any) {
     //     console.log("User: " + JSON.stringify(user));
     //   });
     // }
@@ -139,7 +139,7 @@ export const WaitListSignup: React.FC = () => {
           Connect Wallet
         </Button>
       </Box>
-      <WaitlistSuccess open={success} onClose={() => setSuccess(false)} />
+      <WaitlistSuccess isOpen={success} onClose={() => setSuccess(false)} />
     </Box>
   );
 };
