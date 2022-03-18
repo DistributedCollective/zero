@@ -1,1 +1,5 @@
-export const shortenAddress = (address: string) => address.substr(0, 6) + "..." + address.substr(-4);
+export const shortenAddress = (text: string, startLength: number = 6, endLength: number = 4) => {
+  const start = text.substr(0, startLength);
+  const end = text.substr(-endLength);
+  return `${start}...${end}`;
+};
