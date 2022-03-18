@@ -23,10 +23,11 @@ const baseColors = {
   "gray-4": "#343434",
   "gray-5": "#484848",
   "gray-6": "#5c5c5c",
-  "gray-7": "#8e8e8e",
+  "gray-7": "#909090",
   "gray-8": "#a2a2a2",
   "gray-9": "#c4c4c4",
   "sov-white": "#e8e8e8",
+  "sov-white2": "#EAEAEA",
   white: "#ffffff",
 
   "trade-long": "#17C3B2",
@@ -80,7 +81,9 @@ const colors = {
   cardBackground: baseColors.black,
   muted: baseColors["sov-white"],
   bonded: baseColors["gray-6"],
-  highlight: baseColors["gray-6"]
+  highlight: baseColors["gray-6"],
+  darkGray: baseColors["gray-8"],
+  darkGray2: baseColors["gray-7"]
 };
 
 const zeroCardColors = {
@@ -209,13 +212,13 @@ const headerGradient: ThemeUIStyleObject = {
 };
 
 const theme: Theme = {
-  breakpoints: ["48em", "52em", "64em"],
+  breakpoints: ["576px", "768px", "992px", "1200px", "1536px", "1854px"],
 
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
 
   fonts: {
-    body: 'Montserrat", "sans-serif',
-    heading: 'Montserrat", "sans-serif',
+    body: '"Montserrat", "sans-serif"',
+    heading: '"Montserrat", "sans-serif"',
     monospace: "Menlo, monospace"
   },
 
@@ -426,18 +429,18 @@ const theme: Theme = {
     header: {
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "stretch",
+      alignItems: "center",
 
       position: ["fixed", "relative"],
       width: "100vw",
       top: 0,
       zIndex: 1,
 
-      px: [2, "12px", "12px", 5],
-      py: [2, "12px", "12px"],
+      px: ["10px", "20px", "20px", "30px"],
+      py: "12px",
 
-      ...headerGradient,
-      boxShadow: [1, "none"]
+      background: baseColors["sov-white2"],
+      color: baseColors.black
     },
 
     footer: {
@@ -453,12 +456,9 @@ const theme: Theme = {
     },
 
     main: {
-      width: "100%",
-      maxWidth: "1250px",
-      mx: "auto",
-      mt: ["40px", 0],
-      mb: ["40px", "40px"],
-      px: cardGapX
+      width: "100vw",
+      maxWidth: "1248px",
+      mx: "auto"
     },
 
     columns: {
@@ -574,8 +574,7 @@ const theme: Theme = {
       fontSize: 2,
       textTransform: "uppercase",
       letterSpacing: "2px",
-      width: ["100%", "auto"],
-      mt: [3, "auto"]
+      width: ["100%", "auto"]
     }
   }
 };
