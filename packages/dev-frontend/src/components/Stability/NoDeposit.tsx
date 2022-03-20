@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Card, Heading, Box, Flex, Button } from "theme-ui";
+import { Card, Heading, Box, Flex, Button, Text } from "theme-ui";
 import { InfoMessage } from "../InfoMessage";
 import { useStabilityView } from "./context/StabilityViewContext";
 import { RemainingZERO } from "./RemainingZERO";
@@ -14,18 +14,11 @@ export const NoDeposit: React.FC = props => {
 
   return (
     <Card>
-      <Heading>
-        Stability Pool
-        <Flex sx={{ justifyContent: "flex-end" }}>
-          <RemainingZERO />
-        </Flex>
-      </Heading>
+      <Heading>Stability Pool</Heading>
+      <Heading as="h3" sx={{fontWeight:"light"}}> You can earn RBTC by depositing ZUSD.</Heading>
       <Box sx={{ p: [2, 3] }}>
-        <InfoMessage title="You have no ZUSD in the Stability Pool.">
-          You can earn RBTC and ZERO rewards by depositing ZUSD.
-        </InfoMessage>
-
         <Flex variant="layout.actions">
+          <Text>You have no ZUSD in the Stability Pool. </Text>
           <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>
             <Yield />
           </Flex>
