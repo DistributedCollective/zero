@@ -16,7 +16,7 @@ export const NoDeposit: React.FC = props => {
     <Card>
       <Heading>Stability Pool</Heading>
       <Heading as="h3" sx={{fontWeight:"light"}}> You can earn RBTC by depositing ZUSD.</Heading>
-      <Box sx={{ p: [2, 3] }}>
+      <Box sx={{paddingTop:"72px", paddingLeft: "31px", paddingRight:"41px"}}>
         <Flex variant="layout.actions">
           <Text>You have no ZUSD in the Stability Pool. </Text>
           <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>

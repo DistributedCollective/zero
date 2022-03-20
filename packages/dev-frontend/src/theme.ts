@@ -370,7 +370,7 @@ const theme: Theme = {
         width: "764 px",
 
         pl: 3,
-        py: 2,
+        pb: 2,
         pr: 2,
 
         bg: zeroCardColors.heading,
