@@ -88,15 +88,9 @@ const colors = {
 
 const zeroCardColors = {
   heading: "#2D2D2D",
-<<<<<<< HEAD
   subheading: "rgba(237, 237, 237, 0.75)",
   content: "#222222"
 };
-=======
-  content: "#222222",
-  text: "rgba(237, 237, 237, 0.75)"
-}
->>>>>>> ee41cab4... restyle card Header, Subheader and content
 
 const buttonBase: ThemeUIStyleObject = {
   display: "flex",
@@ -354,29 +348,17 @@ const theme: Theme = {
 
       padding: 0,
       bg: zeroCardColors.content,
-<<<<<<< HEAD
 
       ".subheading": {
         fontSize: cardSubHeadingFontSize,
         color: zeroCardColors.subheading
       },
-=======
-
-      "> h2": {
-        display: "flex",
-        alignItems: "center",
-
-        borderRadius: "10px 10px 0px 0px",
-        height: "53px",
-        width: "764 px",
->>>>>>> ee41cab4... restyle card Header, Subheader and content
 
       ".heading": {
         color: "text",
         fontSize: cardHeadingFontSize
       },
 
-<<<<<<< HEAD
       "> .heading-wrapper": {
         display: "flex",
         borderRadius: "10px 10px 0px 0px",
@@ -385,26 +367,6 @@ const theme: Theme = {
         py: 3,
 
         bg: zeroCardColors.heading
-=======
-        bg: zeroCardColors.heading,
-
-        fontSize: cardHeadingFontSize
-      },
-
-      "> h3": {
-        display: "flex",
-        alignItems: "center",
-
-        width: "764 px",
-
-        pl: 3,
-        py: 2,
-        pr: 2,
-
-        bg: zeroCardColors.heading,
-        color: zeroCardColors.text,
-        fontSize: cardSubHeadingFontSize
->>>>>>> ee41cab4... restyle card Header, Subheader and content
       }
     },
 
@@ -494,12 +456,18 @@ const theme: Theme = {
     },
 
     main: {
+<<<<<<< HEAD
       width: "100%",
       maxWidth: "1250px",
       mx: "auto",
       mt: ["40px", 0],
       mb: ["40px", "40px"],
       px: cardGapX
+=======
+      width: "100vw",
+      maxWidth: "1248px",
+      mx: "auto"
+>>>>>>> feat/restyle
     },
 
     columns: {
