@@ -86,8 +86,8 @@ const colors = {
 const zeroCardColors = {
   heading: "#2D2D2D",
   subheading: "rgba(237, 237, 237, 0.75)",
-  content: "#222222",
-}
+  content: "#222222"
+};
 
 const buttonBase: ThemeUIStyleObject = {
   display: "flex",
@@ -345,10 +345,10 @@ const theme: Theme = {
 
       padding: 0,
       bg: zeroCardColors.content,
-     
+
       ".subheading": {
         fontSize: cardSubHeadingFontSize,
-        color: zeroCardColors.subheading,
+        color: zeroCardColors.subheading
       },
 
       ".heading": {
@@ -363,7 +363,7 @@ const theme: Theme = {
         px: 3,
         py: 3,
 
-        bg: zeroCardColors.heading,
+        bg: zeroCardColors.heading
       }
     },
 

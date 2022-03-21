@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Heading, Box, Flex, Button, Text } from "theme-ui";
+import { Heading, Flex, Button, Text } from "theme-ui";
 import { useTroveView } from "./context/TroveViewContext";
 import { Card } from "../Card";
 

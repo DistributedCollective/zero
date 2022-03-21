@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Heading,Flex, Button, Text } from "theme-ui";
+import { Heading, Flex, Button, Text } from "theme-ui";
 import { useStabilityView } from "./context/StabilityViewContext";
 import { Yield } from "./Yield";
 import { Card } from "../Card";
