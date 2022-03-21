@@ -1,28 +1,59 @@
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
-import { Box, Heading, Image, Paragraph, Button, Input } from "theme-ui";
+import { Box, Heading, Image, Paragraph, Button, Input, Spinner } from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { validateEmail } from "../utils/helpers";
+import { registerEmail } from "../utils/whitelist";
 
 export const WaitListSignup: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
 
   const isValidEmail = useMemo(() => validateEmail(email), [email]);
 
-  const onSignupClick = useCallback(() => {
-    if (!isValidEmail) {
-      return;
-    }
+  const resetStatus = useCallback(() => {
+    if (!errorMessage && !success) return;
+    setErrorMessage("");
+    setSuccess(false);
+  }, [errorMessage, success]);
 
-    setSuccess(true);
-    // if (window?.prefinery) {
-    //   window?.prefiner.prefinery("addUser", 'email', function (user: any) {
-    //     console.log("User: " + JSON.stringify(user));
-    //   });
-    // }
-  }, [isValidEmail]);
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(e.target.value);
+      resetStatus();
+    },
+    [resetStatus]
+  );
+
+  const onSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      resetStatus();
+      if (!isValidEmail) {
+        return;
+      }
+      try {
+        setIsLoading(true);
+        await registerEmail(email);
+
+        setEmail("");
+        setErrorMessage("");
+        setSuccess(true);
+        setIsLoading(false);
+      } catch (error: any) {
+        if (error?.response?.data?.message) {
+          setErrorMessage(error?.response?.data?.message);
+        } else {
+          setErrorMessage("An error has occurred");
+        }
+        setIsLoading(false);
+      }
+    },
+    [email, isValidEmail, resetStatus]
+  );
 
   return (
     <Box
@@ -59,48 +90,55 @@ export const WaitListSignup: React.FC = () => {
         Sign up and get notified when it's your turn to access the Zero private beta.
       </Paragraph>
       <Box sx={{ position: "relative", mb: 70 }}>
-        <Input
-          sx={{
-            borderRadius: 8,
-            outline: "none",
-            color: "cardBackground",
-            borderColor: "#ededed",
-            bg: "#C4C4C4",
-            width: 285
-          }}
-          placeholder="satoshin@gmx.com"
-          variant="primary"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <Button
-          sx={{
-            width: 285,
-            height: "40px",
-            mt: 20,
-            bg: "primary",
-            color: "cardBackground"
-          }}
-          onClick={onSignupClick}
-          disabled={!isValidEmail}
-        >
-          Sign Up
-        </Button>
-        {email && !isValidEmail && (
-          <Paragraph
+        <form onSubmit={onSubmit}>
+          <Input
             sx={{
-              fontSize: 2,
-              fontWeight: 500,
-              position: "absolute",
-              bottom: -30,
-              color: "danger",
-              width: "100%",
-              textAlign: "center"
+              borderRadius: 8,
+              outline: "none",
+              color: "cardBackground",
+              borderColor: "#ededed",
+              bg: "#C4C4C4",
+              width: 285
             }}
+            placeholder="satoshin@gmx.com"
+            variant="primary"
+            value={email}
+            onChange={handleEmailChange}
+          />
+          <Button
+            sx={{
+              width: 285,
+              height: "40px",
+              mt: 20,
+              bg: "primary",
+              color: "cardBackground",
+              display: "flex",
+              alignItems: "center"
+            }}
+            disabled={!isValidEmail || isLoading}
           >
-            Please enter a valid email address.
-          </Paragraph>
-        )}
+            Sign Up
+            {isLoading && <Spinner sx={{ ml: 1 }} color={"cardBackground"} size={24} />}
+          </Button>
+          {((email && !isValidEmail) || errorMessage) && (
+            <Paragraph
+              sx={{
+                fontSize: 2,
+                fontWeight: 500,
+                position: "absolute",
+                bottom: -30,
+                color: "danger",
+                width: "385px",
+                margin: "auto",
+                left: -50,
+                right: 0,
+                textAlign: "center"
+              }}
+            >
+              {errorMessage ? errorMessage : "Please enter a valid email address."}
+            </Paragraph>
+          )}
+        </form>
       </Box>
 
       <Box
