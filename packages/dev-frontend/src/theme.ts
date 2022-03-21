@@ -85,8 +85,8 @@ const colors = {
 
 const zeroCardColors = {
   heading: "#2D2D2D",
+  subheading: "rgba(237, 237, 237, 0.75)",
   content: "#222222",
-  text: "rgba(237, 237, 237, 0.75)"
 }
 
 const buttonBase: ThemeUIStyleObject = {
@@ -345,37 +345,25 @@ const theme: Theme = {
 
       padding: 0,
       bg: zeroCardColors.content,
+     
+      ".subheading": {
+        fontSize: cardSubHeadingFontSize,
+        color: zeroCardColors.subheading,
+      },
 
-      "> h2": {
-        display: "flex",
-        alignItems: "center",
-
-        borderRadius: "10px 10px 0px 0px",
-        height: "53px",
-        width: "764 px",
-
-        pl: 3,
-        py: 2,
-        pr: 2,
-
-        bg: zeroCardColors.heading,
-
+      ".heading": {
+        color: "text",
         fontSize: cardHeadingFontSize
       },
 
-      "> h3": {
+      "> .heading-wrapper": {
         display: "flex",
-        alignItems: "center",
-
-        width: "764 px",
-
-        pl: 3,
-        pb: 2,
-        pr: 2,
+        borderRadius: "10px 10px 0px 0px",
+        flexDirection: "column",
+        px: 3,
+        py: 3,
 
         bg: zeroCardColors.heading,
-        color: zeroCardColors.text,
-        fontSize: cardSubHeadingFontSize
       }
     },
 

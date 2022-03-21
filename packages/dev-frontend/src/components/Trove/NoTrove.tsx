@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
-import { Card, Heading, Box, Flex, Button, Text } from "theme-ui";
-import { InfoMessage } from "../InfoMessage";
+import { Heading, Box, Flex, Button, Text } from "theme-ui";
 import { useTroveView } from "./context/TroveViewContext";
+import { Card } from "../Card";
 
 export const NoTrove: React.FC = props => {
   const { dispatchEvent } = useTroveView();
@@ -11,16 +11,20 @@ export const NoTrove: React.FC = props => {
   }, [dispatchEvent]);
 
   return (
-    <Card>
-      <Heading>Line of Credit</Heading>
-      <Heading as="h3" sx={{fontWeight:"light"}}>You can borrow ZUSD by opening a Line of Credit.</Heading>
-      <Box sx={{paddingTop:"72px", paddingLeft: "31px", paddingRight:"41px"}}>
-
-        <Flex variant="layout.actions">
-          <Text sx={{fontStyle: "italic"}}>You haven't borrowed any ZUSD yet. </Text>
-          <Button onClick={handleOpenTrove}>Open Line of Credit</Button>
-        </Flex>
-      </Box>
+    <Card
+      heading={
+        <>
+          <Heading className="heading">Line of Credit</Heading>
+          <Heading as="h3" className="subheading" sx={{ fontWeight: "light" }}>
+            You can borrow ZUSD by opening a Line of Credit.
+          </Heading>
+        </>
+      }
+    >
+      <Flex variant="layout.actions">
+        <Text sx={{ fontStyle: "italic" }}>You haven't borrowed any ZUSD yet. </Text>
+        <Button onClick={handleOpenTrove}>Open Line of Credit</Button>
+      </Flex>
     </Card>
   );
 };
