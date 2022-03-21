@@ -1,7 +1,10 @@
 import React, { useCallback } from "react";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Heading, Flex, Button, Text } from "theme-ui";
 =======
+=======
+>>>>>>> ee41cab4... restyle card Header, Subheader and content
 import { Card, Heading, Box, Flex, Button, Text } from "theme-ui";
 import { InfoMessage } from "../InfoMessage";
 >>>>>>> ee41cab4... restyle card Header, Subheader and content
@@ -17,6 +20,7 @@ export const NoDeposit: React.FC = props => {
   }, [dispatchEvent]);
 
   return (
+<<<<<<< HEAD
 <<<<<<< HEAD
     <Card
       heading={
@@ -36,6 +40,8 @@ export const NoDeposit: React.FC = props => {
         <Button onClick={handleOpenTrove}>Deposit</Button>
       </Flex>
 =======
+=======
+>>>>>>> ee41cab4... restyle card Header, Subheader and content
     <Card>
       <Heading>Stability Pool</Heading>
       <Heading as="h3" sx={{fontWeight:"light"}}> You can earn RBTC by depositing ZUSD.</Heading>

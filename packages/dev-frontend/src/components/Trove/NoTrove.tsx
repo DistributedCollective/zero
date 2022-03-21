@@ -1,7 +1,10 @@
 import React, { useCallback } from "react";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Heading, Flex, Button, Text } from "theme-ui";
 =======
+=======
+>>>>>>> ee41cab4... restyle card Header, Subheader and content
 import { Card, Heading, Box, Flex, Button, Text } from "theme-ui";
 import { InfoMessage } from "../InfoMessage";
 >>>>>>> ee41cab4... restyle card Header, Subheader and content
