@@ -456,18 +456,9 @@ const theme: Theme = {
     },
 
     main: {
-<<<<<<< HEAD
-      width: "100%",
-      maxWidth: "1250px",
-      mx: "auto",
-      mt: ["40px", 0],
-      mb: ["40px", "40px"],
-      px: cardGapX
-=======
       width: "100vw",
       maxWidth: "1248px",
       mx: "auto"
->>>>>>> feat/restyle
     },
 
     columns: {
