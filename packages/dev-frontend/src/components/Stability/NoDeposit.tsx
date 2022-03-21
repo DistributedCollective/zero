@@ -1,8 +1,6 @@
 import React, { useCallback } from "react";
 import { Card, Heading, Box, Flex, Button, Text } from "theme-ui";
-import { InfoMessage } from "../InfoMessage";
 import { useStabilityView } from "./context/StabilityViewContext";
-import { RemainingZERO } from "./RemainingZERO";
 import { Yield } from "./Yield";
 
 export const NoDeposit: React.FC = props => {
@@ -18,7 +16,7 @@ export const NoDeposit: React.FC = props => {
       <Heading as="h3" sx={{fontWeight:"light"}}> You can earn RBTC by depositing ZUSD.</Heading>
       <Box sx={{paddingTop:"72px", paddingLeft: "31px", paddingRight:"41px"}}>
         <Flex variant="layout.actions">
-          <Text>You have no ZUSD in the Stability Pool. </Text>
+          <Text sx={{fontStyle: "italic"}}>You have no ZUSD in the Stability Pool. </Text>
           <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>
             <Yield />
           </Flex>

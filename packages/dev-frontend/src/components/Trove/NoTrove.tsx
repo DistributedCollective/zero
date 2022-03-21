@@ -17,7 +17,7 @@ export const NoTrove: React.FC = props => {
       <Box sx={{paddingTop:"72px", paddingLeft: "31px", paddingRight:"41px"}}>
 
         <Flex variant="layout.actions">
-          <Text >You haven't borrowed any ZUSD yet. </Text>
+          <Text sx={{fontStyle: "italic"}}>You haven't borrowed any ZUSD yet. </Text>
           <Button onClick={handleOpenTrove}>Open Line of Credit</Button>
         </Flex>
       </Box>
