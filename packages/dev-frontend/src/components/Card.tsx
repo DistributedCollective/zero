@@ -5,7 +5,6 @@ interface CardProps {
   heading?: ReactNode;
   children: ReactNode;
 }
-//TODO: make props interface: heading,children
 
 export const Card: React.FC<CardProps> = ({ heading, children }) => {
   return (
