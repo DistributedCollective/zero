@@ -86,16 +86,9 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
   const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
 
   return (
-    <Card
-      {...{ variant }}
-      heading={
-        <>
-          <Heading className="heading">Zero statistics</Heading>
-        </>
-      }
-    >
+    <Card {...{ variant }}>
       {showBalances && <Balances />}
-
+      <Heading className="heading">Zero statistics</Heading>
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
         Protocol
       </Heading>

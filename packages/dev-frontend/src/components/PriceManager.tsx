@@ -28,13 +28,8 @@ export const PriceManager: React.FC = () => {
   }, [price]);
 
   return (
-    <Card
-      heading={
-        <>
-          <Heading className="heading">Price feed</Heading>
-        </>
-      }
-    >
+    <Card>
+      <Heading className="heading">Price feed</Heading>
       <Flex sx={{ alignItems: "stretch" }}>
         <Label>RBTC</Label>
 
