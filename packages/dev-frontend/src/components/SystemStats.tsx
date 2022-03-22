@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Heading, Link, Box, Text } from "theme-ui";
+import { Heading, Link, Box, Text } from "theme-ui";
+import { Card } from "./Card";
 import { AddressZero } from "@ethersproject/constants";
 import { Decimal, Percent, LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
@@ -29,7 +30,9 @@ const Balances: React.FC = () => {
 
 const GitHubCommit: React.FC<{ children?: string }> = ({ children }) =>
   children?.match(/[0-9a-f]{40}/) ? (
-    <Link href={`https://github.com/DistributedCollective/zero/commit/${children}`}>{children.substr(0, 7)}</Link>
+    <Link href={`https://github.com/DistributedCollective/zero/commit/${children}`}>
+      {children.substr(0, 7)}
+    </Link>
   ) : (
     <>unknown</>
   );
@@ -83,10 +86,15 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
   const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
 
   return (
-    <Card {...{ variant }}>
+    <Card
+      {...{ variant }}
+      heading={
+        <>
+          <Heading className="heading">Zero statistics</Heading>
+        </>
+      }
+    >
       {showBalances && <Balances />}
-
-      <Heading>Zero statistics</Heading>
 
       <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
         Protocol
@@ -108,7 +116,10 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
           &nbsp;(${Decimal.from(total.collateral.mul(price)).shorten()})
         </Text>
       </Statistic>
-      <Statistic name="Credit Lines" tooltip="The total number of active Lines of Credit in the system.">
+      <Statistic
+        name="Credit Lines"
+        tooltip="The total number of active Lines of Credit in the system."
+      >
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
       <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Zero Protocol.">

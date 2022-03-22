@@ -15,7 +15,7 @@ export const NoTrove: React.FC = props => {
       heading={
         <>
           <Heading className="heading">Line of Credit</Heading>
-          <Heading as="h3" className="subheading" sx={{ fontWeight: "light" }}>
+          <Heading as="h3" className="subheading">
             You can borrow ZUSD by opening a Line of Credit.
           </Heading>
         </>

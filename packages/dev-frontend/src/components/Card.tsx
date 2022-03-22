@@ -10,7 +10,7 @@ export const Card: React.FC<CardProps> = ({ heading, children }) => {
   return (
     <ThemeUICard>
       {heading && <div className="heading-wrapper">{heading}</div>}
-      <Box sx={{ paddingTop: "72px", paddingLeft: "31px", paddingRight: "41px" }}>{children}</Box>
+      <Box sx={{ px: "40px", py: "20px" }}>{children}</Box>
     </ThemeUICard>
   );
 };

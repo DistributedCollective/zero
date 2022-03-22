@@ -16,7 +16,7 @@ export const NoDeposit: React.FC = props => {
       heading={
         <>
           <Heading className="heading">Stability Pool</Heading>
-          <Heading as="h3" className="subheading" sx={{ fontWeight: "light" }}>
+          <Heading as="h3" className="subheading">
             You can earn RBTC by depositing ZUSD.
           </Heading>
         </>

@@ -88,7 +88,6 @@ const colors = {
 
 const zeroCardColors = {
   heading: "#2D2D2D",
-  subheading: "rgba(237, 237, 237, 0.75)",
   content: "#222222"
 };
 
@@ -144,9 +143,6 @@ const iconButton: ThemeUIStyleObject = {
   }
 };
 
-const cardHeadingFontSize = 18.7167;
-const cardSubHeadingFontSize = 16;
-
 const cardGapX = [0, 3, 4];
 const cardGapY = [3, 3, 4];
 
@@ -167,7 +163,7 @@ const infoCard: ThemeUIStyleObject = {
 
   h2: {
     mb: 2,
-    fontSize: cardHeadingFontSize
+    fontSize: 18.7167
   }
 };
 
@@ -350,14 +346,16 @@ const theme: Theme = {
       bg: zeroCardColors.content,
 
       ".subheading": {
-        fontSize: cardSubHeadingFontSize,
-        color: zeroCardColors.subheading
+        fontSize: 16,
+        fontWeight: "light",
+        color: "text",
+        opacity: 0.75
       },
 
       ".heading": {
         color: "text",
-        fontSize: cardHeadingFontSize,
-        py:2
+        fontSize: 18.7167,
+        py: 2
       },
 
       "> .heading-wrapper": {
@@ -479,8 +477,7 @@ const theme: Theme = {
 
     actions: {
       justifyContent: "space-between",
-      mt: 2,
-
+      mt: 50,
       button: {
         ml: 2
       }
