@@ -31,7 +31,7 @@ export const PriceManager: React.FC = () => {
       <Heading className="heading">Price feed</Heading>
       <Flex sx={{ mt: 24 }}>
         <Label>RBTC</Label>
-        <Box sx={{width: "330px", position: "relative", display: "flex", alignItems: "center" }}>
+        <Box sx={{ width: "330px", position: "relative", display: "flex", alignItems: "center" }}>
           <Label
             variant="unit"
             color="white"
