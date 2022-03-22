@@ -356,7 +356,8 @@ const theme: Theme = {
 
       ".heading": {
         color: "text",
-        fontSize: cardHeadingFontSize
+        fontSize: cardHeadingFontSize,
+        py:2
       },
 
       "> .heading-wrapper": {
