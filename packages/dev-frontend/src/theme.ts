@@ -86,6 +86,11 @@ const colors = {
   darkGray2: baseColors["gray-7"]
 };
 
+const zeroCardColors = {
+  heading: "#2D2D2D",
+  content: "#222222"
+};
+
 const buttonBase: ThemeUIStyleObject = {
   display: "flex",
   alignItems: "center",
@@ -101,7 +106,7 @@ const button: ThemeUIStyleObject = {
   py: "0.375rem",
 
   color: colors.primary,
-  border: 2,
+  border: 1,
   borderColor: colors.primary,
   backgroundColor: "transparent",
 
@@ -138,8 +143,6 @@ const iconButton: ThemeUIStyleObject = {
   }
 };
 
-const cardHeadingFontSize = 18.7167;
-
 const cardGapX = [0, 3, 4];
 const cardGapY = [3, 3, 4];
 
@@ -147,19 +150,17 @@ const card: ThemeUIStyleObject = {
   position: "relative",
   mt: cardGapY,
   boxShadow: [1, null, 2],
-  borderRadius: 13
+  borderRadius: 10
 };
 
 const infoCard: ThemeUIStyleObject = {
   ...card,
 
   padding: 3,
-  borderColor: "rgba(122,199,240,0.4)",
-  background: `linear-gradient(200deg, #26899b, #030c0d)`,
 
   h2: {
     mb: 2,
-    fontSize: cardHeadingFontSize
+    fontSize: 18.7167
   }
 };
 
@@ -339,23 +340,29 @@ const theme: Theme = {
       ...card,
 
       padding: 0,
-      bg: colors.cardBackground,
+      bg: zeroCardColors.content,
 
-      "> h2": {
+      ".subheading": {
+        fontSize: 16,
+        fontWeight: "light",
+        color: "text",
+        opacity: 0.75,
+        mt: 2
+      },
+
+      ".heading": {
+        color: "text",
+        fontSize: 18.7167
+      },
+
+      "> .heading-wrapper": {
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+        borderRadius: "10px 10px 0px 0px",
+        flexDirection: "column",
+        px: 3,
+        py: 3,
 
-        borderRadius: 13,
-        height: "56px",
-
-        pl: 3,
-        py: 2,
-        pr: 2,
-
-        bg: colors.cardBackground,
-
-        fontSize: cardHeadingFontSize
+        bg: zeroCardColors.heading
       }
     },
 
@@ -466,9 +473,8 @@ const theme: Theme = {
     },
 
     actions: {
-      justifyContent: "flex-end",
-      mt: 2,
-
+      justifyContent: "space-between",
+      mt: 50,
       button: {
         ml: 2
       }

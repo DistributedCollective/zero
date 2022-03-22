@@ -1,9 +1,8 @@
 import React, { useCallback } from "react";
-import { Card, Heading, Box, Flex, Button } from "theme-ui";
-import { InfoMessage } from "../InfoMessage";
+import { Heading, Flex, Button, Text } from "theme-ui";
 import { useStabilityView } from "./context/StabilityViewContext";
-import { RemainingZERO } from "./RemainingZERO";
 import { Yield } from "./Yield";
+import { Card } from "../Card";
 
 export const NoDeposit: React.FC = props => {
   const { dispatchEvent } = useStabilityView();
@@ -13,25 +12,23 @@ export const NoDeposit: React.FC = props => {
   }, [dispatchEvent]);
 
   return (
-    <Card>
-      <Heading>
-        Stability Pool
-        <Flex sx={{ justifyContent: "flex-end" }}>
-          <RemainingZERO />
+    <Card
+      heading={
+        <>
+          <Heading className="heading">Stability Pool</Heading>
+          <Heading as="h3" className="subheading">
+            You can earn RBTC by depositing ZUSD.
+          </Heading>
+        </>
+      }
+    >
+      <Flex sx={{ px: 20 }} variant="layout.actions">
+        <Text sx={{ fontStyle: "italic" }}>You have no ZUSD in the Stability Pool. </Text>
+        <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>
+          <Yield />
         </Flex>
-      </Heading>
-      <Box sx={{ p: [2, 3] }}>
-        <InfoMessage title="You have no ZUSD in the Stability Pool.">
-          You can earn RBTC and ZERO rewards by depositing ZUSD.
-        </InfoMessage>
-
-        <Flex variant="layout.actions">
-          <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>
-            <Yield />
-          </Flex>
-          <Button onClick={handleOpenTrove}>Deposit</Button>
-        </Flex>
-      </Box>
+        <Button onClick={handleOpenTrove}>Deposit</Button>
+      </Flex>
     </Card>
   );
 };
