@@ -66,6 +66,11 @@ const baseColors = {
   "pink-2": "#A264A7"
 };
 
+const zeroCardColors = {
+  heading: "#2D2D2D",
+  content: "#222222"
+};
+
 const colors = {
   primary: baseColors.primary,
   secondary: baseColors.secondary,
@@ -83,13 +88,11 @@ const colors = {
   bonded: baseColors["gray-6"],
   highlight: baseColors["gray-6"],
   darkGray: baseColors["gray-8"],
-  darkGray2: baseColors["gray-7"]
+  darkGray2: baseColors["gray-7"],
+  zeroCardHeading: zeroCardColors.heading,
+  zeroCardContent: zeroCardColors.content
 };
 
-const zeroCardColors = {
-  heading: "#2D2D2D",
-  content: "#222222"
-};
 
 const buttonBase: ThemeUIStyleObject = {
   display: "flex",
@@ -175,16 +178,16 @@ const formBase: ThemeUIStyleObject = {
 const formCell: ThemeUIStyleObject = {
   ...formBase,
 
-  bg: "background",
-  border: 1,
+  bg: zeroCardColors.heading,
+  border: 0,
+  outline: 0,
   borderColor: "muted",
-  borderRadius: 0,
+  borderRadius: 10,
   boxShadow: [1, 2]
 };
 
 const overlay: ThemeUIStyleObject = {
   position: "absolute",
-
   left: 0,
   top: 0,
   width: "100%",
@@ -465,11 +468,11 @@ const theme: Theme = {
 
     left: {
       pr: cardGapX,
-      width: ["100%", "58%"]
+      width: ["100%", "64%"]
     },
 
     right: {
-      width: ["100%", "42%"]
+      width: ["100%", "36%"]
     },
 
     actions: {
