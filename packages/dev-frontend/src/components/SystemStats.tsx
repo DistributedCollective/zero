@@ -1,5 +1,5 @@
 import React from "react";
-import { Heading, Link, Box, Text } from "theme-ui";
+import { Heading, Link, Box, Text, Flex } from "theme-ui";
 import { Card } from "./Card";
 import { AddressZero } from "@ethersproject/constants";
 import { Decimal, Percent, LiquityStoreState } from "@liquity/lib-base";
@@ -89,7 +89,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
     <Card {...{ variant }}>
       {showBalances && <Balances />}
       <Heading className="heading">Zero statistics</Heading>
-      <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
+      <Heading as="h2" sx={{ my: 2, fontWeight: "body", fontSize: 16 }}>
         Protocol
       </Heading>
 
@@ -148,23 +148,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
       {}
 
-      <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
-        Frontend
-      </Heading>
-      {kickbackRatePct && (
-        <Statistic
-          name="Kickback Rate"
-          tooltip="A rate between 0 and 100% set by the Frontend Operator that determines the fraction of ZERO that will be paid out as a kickback to the Stability Providers using the frontend."
-        >
-          {kickbackRatePct}%
-        </Statistic>
-      )}
-
-      <Box sx={{ mt: 3, opacity: 0.66 }}>
-        <Box sx={{ fontSize: 0 }}>
-          Contracts version: <GitHubCommit>{contractsVersion}</GitHubCommit>
-        </Box>
-        <Box sx={{ fontSize: 0 }}>Deployed: {deploymentDate.toLocaleString()}</Box>
+      <Box sx={{ mt: 3, opacity: 0.3 }}>
         <Box sx={{ fontSize: 0 }}>
           Frontend version:{" "}
           {process.env.NODE_ENV === "development" ? (
@@ -173,6 +157,12 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
             <GitHubCommit>{process.env.REACT_APP_VERSION}</GitHubCommit>
           )}
         </Box>
+        <Flex sx={{ flexDirection: "row" }}>
+          <Box sx={{ fontSize: 0 }}>
+            Contracts version: <GitHubCommit>{contractsVersion}</GitHubCommit>
+          </Box>
+          <Box sx={{ fontSize: 0, mx: 2 }}>Deployed: {deploymentDate.toLocaleString()}</Box>
+        </Flex>
       </Box>
     </Card>
   );
