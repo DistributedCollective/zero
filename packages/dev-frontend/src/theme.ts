@@ -150,16 +150,13 @@ const card: ThemeUIStyleObject = {
   position: "relative",
   mt: cardGapY,
   boxShadow: [1, null, 2],
-  borderRadius: 10,
-  height: "225px"
+  borderRadius: 10
 };
 
 const infoCard: ThemeUIStyleObject = {
   ...card,
 
   padding: 3,
-  borderColor: "rgba(122,199,240,0.4)",
-  background: `linear-gradient(200deg, #26899b, #030c0d)`,
 
   h2: {
     mb: 2,
@@ -349,13 +346,13 @@ const theme: Theme = {
         fontSize: 16,
         fontWeight: "light",
         color: "text",
-        opacity: 0.75
+        opacity: 0.75,
+        mt: 2
       },
 
       ".heading": {
         color: "text",
-        fontSize: 18.7167,
-        py: 2
+        fontSize: 18.7167
       },
 
       "> .heading-wrapper": {

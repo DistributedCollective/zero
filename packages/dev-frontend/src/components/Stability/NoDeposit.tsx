@@ -22,7 +22,7 @@ export const NoDeposit: React.FC = props => {
         </>
       }
     >
-      <Flex variant="layout.actions">
+      <Flex sx={{ px: 20 }} variant="layout.actions">
         <Text sx={{ fontStyle: "italic" }}>You have no ZUSD in the Stability Pool. </Text>
         <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>
           <Yield />
