@@ -148,7 +148,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
       {}
 
-      <Box sx={{ mt: 3, opacity: 0.3 }}>
+      <Box sx={{ mt: 4, opacity: 0.3 }}>
         <Box sx={{ fontSize: 0 }}>
           Frontend version:{" "}
           {process.env.NODE_ENV === "development" ? (
