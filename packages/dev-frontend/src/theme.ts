@@ -93,7 +93,6 @@ const colors = {
   zeroCardContent: zeroCardColors.content
 };
 
-
 const buttonBase: ThemeUIStyleObject = {
   display: "flex",
   alignItems: "center",
@@ -557,10 +556,9 @@ const theme: Theme = {
     },
 
     a: {
-      color: "primary",
-      ":hover": { color: "accent" },
-      textDecoration: "none",
-      fontWeight: "bold"
+      color: "text",
+      ":hover": { fontWeight: "bold", cursor: "pointer" },
+      textDecoration: "none"
     }
   },
 
