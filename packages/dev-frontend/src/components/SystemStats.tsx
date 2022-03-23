@@ -1,7 +1,6 @@
 import React from "react";
 import { Heading, Link, Box, Text, Flex } from "theme-ui";
 import { Card } from "./Card";
-import { AddressZero } from "@ethersproject/constants";
 import { Decimal, Percent, LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
 
@@ -65,7 +64,7 @@ const select = ({
 export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", showBalances }) => {
   const {
     liquity: {
-      connection: { version: contractsVersion, deploymentDate, frontendTag }
+      connection: { version: contractsVersion, deploymentDate }
     }
   } = useLiquity();
 
@@ -75,15 +74,14 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
     zusdInStabilityPool,
     total,
     borrowingRate,
-    totalStakedZERO,
-    kickbackRate
+    totalStakedZERO
   } = useLiquitySelector(select);
 
   const zusdInStabilityPoolPct =
     total.debt.nonZero && new Percent(zusdInStabilityPool.div(total.debt));
   const totalCollateralRatioPct = new Percent(total.collateralRatio(price));
   const borrowingFeePct = new Percent(borrowingRate);
-  const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
+  // const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
 
   return (
     <Card {...{ variant }}>
@@ -111,7 +109,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
       <Statistic
         name="Credit Lines"
-        tooltip="The total number of active Lines of Credit in the system."
+        tooltip="The total number of active Lin es of Credit in the system."
       >
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
