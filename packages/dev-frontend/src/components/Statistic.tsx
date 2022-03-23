@@ -14,7 +14,6 @@ export const Statistic: React.FC<StatisticProps> = ({ name, tooltip, children })
         borderBottom: 1,
         borderColor: "rgba(232, 232, 232, 0.2)",
         color: "text",
-        opacity: 0.75,
         fontSize: 12
       }}
     >
@@ -27,10 +26,19 @@ export const Statistic: React.FC<StatisticProps> = ({ name, tooltip, children })
           py: 1
         }}
       >
-        <Flex>{name}</Flex>
+        <Flex
+          sx={{
+            opacity: 0.75,
+            mr: tooltip ? 1 : 0
+          }}
+        >
+          {name}
+        </Flex>
         {tooltip && <InfoIcon size="xs" tooltip={<Card variant="tooltip">{tooltip}</Card>} />}
       </Flex>
-      <Flex sx={{ justifyContent: "flex-end", alignItems: "center" }}>{children}</Flex>
+      <Flex sx={{ justifyContent: "flex-end", alignItems: "center", opacity: 0.75 }}>
+        {children}
+      </Flex>
     </Flex>
   );
 };
