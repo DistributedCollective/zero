@@ -3,7 +3,9 @@
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
 
 Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows Bitcoin holders to obtain maximum liquidity against their collateral without paying interest. After locking up rBTC as collateral in a smart contract and creating an individual position called a "line of credit (trove)," the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each line of credit is required to be collateralized at a minimum of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of USD 1.
+
 An unprecedented liquidation mechanism based on incentivized stability deposits and a redistribution cycle from riskier to safer lines of credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
+
 The protocol has built-in incentives that encourage both early adoption and the operation of multiple front ends, enhancing decentralization.
 
 ## More information
