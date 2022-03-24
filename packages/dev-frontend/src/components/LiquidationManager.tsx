@@ -1,3 +1,4 @@
+import { text } from "@fortawesome/fontawesome-svg-core";
 import React, { useState } from "react";
 import { Card, Box, Heading, Flex, Button, Label, Input } from "theme-ui";
 
@@ -14,11 +15,9 @@ export const LiquidationManager: React.FC = () => {
 
   return (
     <Card>
-      <Heading>Liquidate</Heading>
-
       <Box sx={{ p: [2, 3] }}>
-        <Flex sx={{ alignItems: "stretch" }}>
-          <Label>Up to</Label>
+        <Flex sx={{ alignItems: "center" }}>
+          <Label sx={{pr:"18px"}}>Liquidate up to</Label>
 
           <Input
             type="number"
@@ -26,9 +25,10 @@ export const LiquidationManager: React.FC = () => {
             step="1"
             value={numberOfTrovesToLiquidate}
             onChange={e => setNumberOfTrovesToLiquidate(e.target.value)}
+            sx={{border:"solid",borderColor:"rgba(255, 255, 255, 0.3)", width:"70px",color:"text", textAlign:"center"}}
           />
 
-          <Label>Lines of Credit</Label>
+          <Label sx={{pl:"18px"}} >Lines of Credit</Label>
 
           <Flex sx={{ ml: 2, alignItems: "center" }}>
             <Transaction
@@ -42,7 +42,7 @@ export const LiquidationManager: React.FC = () => {
                 return liquity.liquidateUpTo(parseInt(numberOfTrovesToLiquidate, 10), overrides);
               }}
             >
-              <Button variant="dangerIcon">
+              <Button variant="dangerIcon" sx={{pl:"23px", pr:"66px"}}>
                 <Icon name="trash" size="lg" />
               </Button>
             </Transaction>

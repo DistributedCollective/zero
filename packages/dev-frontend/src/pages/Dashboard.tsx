@@ -7,12 +7,12 @@ import { PriceManager } from "../components/PriceManager";
 
 export const Dashboard: React.FC = () => (
   <Container variant="columns">
-    <Container variant="left">
+    <Container variant="leftDashboard">
       <Trove />
       <Stability />
     </Container>
 
-    <Container variant="right">
+    <Container variant="rightDashboard">
       <SystemStats />
       <PriceManager />
     </Container>
