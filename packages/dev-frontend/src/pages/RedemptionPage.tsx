@@ -9,7 +9,7 @@ import { Icon } from "../components/Icon";
 export const RedemptionPage: React.FC = () => {
   return (
     <Container variant="columns">
-      <Container variant="left">
+      <Container variant="leftRedemption">
         <Card>
           <Box sx={{ p: [2, 3] }}>
             <InfoMessage title="Bot functionality">
@@ -34,7 +34,7 @@ export const RedemptionPage: React.FC = () => {
         <Redemption />
       </Container>
 
-      <Container variant="right">
+      <Container variant="rightRedemption">
         <SystemStats />
       </Container>
     </Container>
