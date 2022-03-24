@@ -2,20 +2,9 @@
 
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
 
-Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows Bitcoin holders to obtain maximum liquidity against
-their collateral without paying interest. After locking up rBTC as collateral in a smart contract and
-creating an individual position called a "line of credit (trove)", the user can get instant liquidity by minting ZUSD,
-a USD-pegged stablecoin. Each line of credit  is required to be collateralized at a minimum of 110%. Any
-owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption
-mechanism along with algorithmically adjusted fees guarantee a minimum stablecoin value of USD 1.
-
-An unprecedented liquidation mechanism based on incentivized stability deposits and a redistribution
-cycle from riskier to safer lines of credit provides stability at a much lower collateral ratio than current
-systems. Stability is maintained via economically-driven user interactions and arbitrage, rather
-than by active governance or monetary interventions.
-
-The protocol has built-in incentives that encourage both early adoption and the operation of
-multiple front ends, enhancing decentralization.
+Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows Bitcoin holders to obtain maximum liquidity against their collateral without paying interest. After locking up rBTC as collateral in a smart contract and creating an individual position called a "line of credit (trove)," the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each line of credit is required to be collateralized at a minimum of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of USD 1.
+An unprecedented liquidation mechanism based on incentivized stability deposits and a redistribution cycle from riskier to safer lines of credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
+The protocol has built-in incentives that encourage both early adoption and the operation of multiple front ends, enhancing decentralization.
 
 ## More information
 
@@ -144,21 +133,22 @@ Visit [Sovryn website](https://www.sovryn.app/) to find out more and join the di
 
 ## Zero Overview
 
-Zero is a collateralized debt platform. Users can lock up BTC (rBTC), and issue stablecoin tokens (ZUSD) to their own RSK address, and subsequently transfer those tokens to any other RSK address. The individual collateralized debt positions are called Lines of Credit (Troves).
+Zero is a collateralized debt platform. Users can lock up BTC (rBTC), issue stablecoin tokens (ZUSD) to their own RSK address, and subsequently transfer those tokens to any other RSK address. The individual collateralized debt positions are called Lines of Credit (Troves).
 
-The stablecoin tokens are economically geared towards maintaining value of 1 ZUSD = \$1 USD, due to the following properties:
+The stablecoin tokens are economically geared towards maintaining a value of 1 ZUSD = \$1 USD, due to the following properties:
 
-1. The system is designed to always be over-collateralized - the dollar value of the locked rBTC exceeds the dollar value of the issued stablecoins
+1. The system is always designed to be over-collateralized - the dollar value of the locked rBTC exceeds the dollar value of the issued stablecoins
 
-2. The stablecoins are fully redeemable - users can always swap $x worth of ZUSD for $x worth of rBTC (minus fees), directly with the system.
+2. The stablecoins are fully redeemable - users can always swap $x worth of ZUSD for $x worth of rBTC (minus fees) directly with the system.
 
 3. The system algorithmically controls the generation of ZUSD through a variable issuance fee.
 
 After opening a line of credit with some rBTC, users may issue ("borrow") tokens such that the collateralization ratio of their line of credit remains above 110%. A user with $1000 worth of rBTC in a line of credit can issue up to 909.09 ZUSD.
 
-The tokens are freely exchangeable - anyone with an rBTC address can send or receive ZUSD tokens, whether they have an open line of credit or not. The tokens are burned upon repayment of a line of credit 's debt.
+The tokens are freely exchangeable - anyone with an rBTC address can send or receive ZUSD tokens, whether they have an open line of credit or not. The tokens are burned upon repayment of a line of credit's debt.
 
-The Zero system regularly updates the rBTC:USD price via a decentralized data feed. When a line of credit  falls below a minimum collateralization ratio (MCR) of 110%, it is considered under-collateralized, and is vulnerable to liquidation.
+The Zero system regularly updates the rBTC:USD price via a decentralized data feed. When a line of credit falls below a minimum collateralization ratio (MCR) of 110%, it is considered under-collateralized and is vulnerable to liquidation.
+
 
 ## Liquidation and the Stability Pool
 
@@ -168,15 +158,16 @@ Zero utilizes a two-step liquidation mechanism in the following order of priorit
 
 2. Redistribute under-collateralized lines of credit to other borrowers if the Stability Pool is emptied
 
-Zero primarily uses the ZUSD tokens in its Stability Pool to absorb the under-collateralized debt, i.e. to repay the liquidated borrower's liability.
+Zero primarily uses the ZUSD tokens in its Stability Pool to absorb the under-collateralized debt, i.e., to repay the liquidated borrower's liability.
 
-Any user may deposit ZUSD tokens to the Stability Pool. This allows them to earn the collateral from the liquidated line of credit . When a liquidation occurs, the liquidated debt is cancelled with the same amount of ZUSD in the Pool (which is burned as a result), and the liquidated rBTC is proportionally distributed to depositors.
+Any user may deposit ZUSD tokens to the Stability Pool. This allows them to earn the collateral from the liquidated line of credit. When a liquidation occurs, the liquidated debt is canceled with the same amount of ZUSD in the Pool (which is burned as a result). The liquidated rBTC is then proportionally distributed to depositors.
 
-Stability Pool depositors can expect to earn net gains from liquidations, as in most cases, the value of the liquidated rBTC will be greater than the value of the cancelled debt (since a liquidated line of credit will likely have an ICR just slightly below 110%).
+Stability Pool depositors can expect to earn net gains from liquidations. In most cases, the value of the liquidated rBTC will be greater than the value of the canceled debt (since a liquidated line of credit will likely have an ICR just slightly below 110%).
 
-If the liquidated debt is higher than the amount of ZUSD in the Stability Pool, the system tries to cancel as much debt as possible with the tokens in the Stability Pool, and then redistributes the remaining liquidated collateral and debt across all active line of credit s.
+Suppose the liquidated debt is higher than the amount of ZUSD in the Stability Pool. In that case, the system tries to cancel as much debt as possible with the tokens from the Stability Pool. Then, the system redistributes the remaining liquidated collateral and debt across all active lines of credit s.
 
-Anyone may call the public `liquidateTroves()` function, which will check for under-collateralized line of credit s, and liquidate them. Alternatively they can call `batchLiquidateTroves()` with a custom list of line of credit  addresses to attempt to liquidate.
+Anyone may call the public `liquidateTroves()` function, which will check for under-collateralized lines of credits and liquidate them. Alternatively, they can call `batchLiquidateTroves()` with a custom list of line of credit addresses to attempt to liquidate.
+
 
 ### Liquidation gas costs
 
@@ -192,68 +183,72 @@ Here is the liquidation logic for a single line of credit  in Normal Mode and Re
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                      | Liquidation behavior                                                                                                                                                                                                                                                                                                |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR < MCR & SP.ZUSD >= line of credit .debt | ZUSD in the StabilityPool equal to the line of credit 's debt is offset with the line of credit 's debt. The line of credit 's rBTC collateral is shared between depositors.                                                                                                                                                                       |
-| ICR < MCR & SP.ZUSD < line of credit .debt | The total StabilityPool ZUSD is offset with an equal amount of debt from the line of credit .  A fraction of the line of credit 's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus rBTC gas compensation) is redistributed to active lines of credit |
-| ICR < MCR & SP.ZUSD = 0          | Redistribute all debt and collateral (minus rBTC gas compensation) to active line of credit s.                                                                                                                                                                                                                                 |
+| ICR < MCR & SP.ZUSD >= line of credit .debt | ZUSD in the StabilityPool equal to the line of credit's debt is offset with the line of credit's debt. The line of credit's rBTC collateral is shared between depositors.                                                                                                                                                                       |
+| ICR < MCR & SP.ZUSD < line of credit .debt | The total StabilityPool ZUSD is offset with an equal amount of debt from the line of credit. A fraction of the line of credit's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus rBTC gas compensation) is redistributed to active lines of credit |
+| ICR < MCR & SP.ZUSD = 0          | Redistribute all debt and collateral (minus rBTC gas compensation) to activate the line of credit.
+                                                                                                                                                                                                                             |
 | ICR  >= MCR                      | Do nothing.                                                                                                                                                                                                                                                                                                         |
 #### Liquidations in Recovery Mode: TCR < 150%
 
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                                | Liquidation behavior                                                                                                                                                                                                                                                                                                                                                                                         |
 |------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR <=100%                               | Redistribute all debt and collateral (minus rBTC gas compensation) to active line of credit s.                                                                                                                                                                                                                                                                                                                          |
-| 100% < ICR < MCR & SP.ZUSD > line of credit .debt  | ZUSD in the StabilityPool equal to the line of credit 's debt is offset with the line of credit 's debt. The line of credit 's rBTC collateral (minus rBTC gas compensation) is shared between depsitors.                                                                                                                                                                                                                                    |
-| 100% < ICR < MCR & SP.ZUSD < line of credit .debt  | The total StabilityPool ZUSD is offset with an equal amount of debt from the line of credit .  A fraction of the line of credit 's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus rBTC gas compensation) is redistributed to active lines of credit                                                                                          |
-| MCR <= ICR < TCR & SP.ZUSD >= line of credit .debt  |  The Pool ZUSD is offset with an equal amount of debt from the line of credit . A fraction of rBTC collateral with dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to other active line of credit s. Since it's ICR was > 1.1, the line of credit  has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The line of credit  is closed. |
-| MCR <= ICR < TCR & SP.ZUSD  < line of credit .debt | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ICR <=100%                               | Redistribute all debt and collateral (minus rBTC gas compensation) to active the line of credit.                                                                                                                                                                                                                                                                                                                          |
+| 100% < ICR < MCR & SP.ZUSD > line of credit .debt  | ZUSD in the StabilityPool equal to the line of credit's debt is offset with the line of credit's debt. The line of credit's rBTC collateral (minus rBTC gas compensation) is shared between depositors.                                                                                                                                                                                                                                    |
+| 100% < ICR < MCR & SP.ZUSD < line of credit .debt  | The total StabilityPool ZUSD is offset with an equal amount of debt from the line of credit. A fraction of the line of credit's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus rBTC gas compensation) is redistributed to active lines of credit                                                                                          |
+| MCR <= ICR < TCR & SP.ZUSD >= line of credit .debt  |  The Pool ZUSD is offset with an equal amount of debt from the line of credit. A fraction of rBTC collateral with a dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to another active line of credit s. Since its ICR was > 1.1, the line of credit has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The line of credit is closed. |
+| MCR <= ICR < TCR & SP.ZUSD  < line of credit .debt | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ICR >= TCR                               | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ## Gains From Liquidations
 
-Stability Pool depositors gain rBTC over time, as liquidated debt is cancelled with their deposit. When they withdraw all or part of their deposited tokens, or top up their deposit, the system sends them their accumulated rBTC gains.
+Stability Pool depositors gain rBTC over time, as liquidated debt is canceled with their deposit. When they withdraw all or part of their deposited tokens or top up their deposit, the system sends them their accumulated rBTC gains.
 
-Similarly, a line of credit 's accumulated gains from liquidations are automatically applied to the line of credit  when the owner performs any operation - e.g. adding/withdrawing collateral, or issuing/repaying ZUSD.
+Similarly, a line of credit's accumulated gains from liquidations are automatically applied to the line of credit when the owner performs any operation - e.g., adding/withdrawing collateral or issuing/repaying ZUSD.
+
 
 ## ZUSD Token Redemption
 
 Any ZUSD holder (whether or not they have an active line of credit) may redeem their ZUSD directly with the system. Their ZUSD is exchanged for rBTC, at face value: redeeming x ZUSD tokens returns \$x worth of rBTC (minus a [redemption fee](#redemption-fee)).
 
-When ZUSD is redeemed for rBTC, the system cancels the ZUSD with debt from line of credit s, and the rBTC is drawn from their collateral.
+When ZUSD is redeemed for rBTC, the system cancels the ZUSD with debt from the line of credit, and the rBTC is drawn from their collateral.
 
-In order to fulfill the redemption request, lines of credit are redeemed from in ascending order of their collateralization ratio.
+To fulfill the redemption request, lines of credit are redeemed in ascending order of their collateralization ratio.
 
-A redemption sequence of `n` steps will **fully** redeem from up to `n-1` line of credit s, and, and **partially** redeems from up to 1 line of credit , which is always the last line of credit  in the redemption sequence.
+A redemption sequence of `n` steps will **fully** redeem from up to `n-1` line of credit, and **partially** redeems from up to 1 line of credit, which is always the last line of credit in the redemption sequence.
 
-Redemptions are blocked when TCR < 110% (there is no need to restrict ICR < TCR). At that TCR redemptions would likely be unprofitable, as ZUSD is probably trading above $1 if the system has crashed that badly, but it could be a way for an attacker with a lot of ZUSD to lower the TCR even further.
+Redemptions are blocked when TCR < 110% (there is no need to restrict ICR < TCR). At that point, TCR redemptions would likely be unprofitable, as ZUSD is probably trading above $1 if the system has crashed that badly, but it could be a way for an attacker with a lot of ZUSD to lower the TCR even further.
 
-Note that redemptions are disabled during the first 14 days of operation since deployment of the Zero protocol to protect the monetary system in its infancy.
+Note that redemptions are disabled during the first 14 days of operation since the deployment of the Zero protocol to protect the monetary system in its infancy.
+
 
 ### Partial redemption
 
-Most redemption transactions will include a partial redemption, since the amount redeemed is unlikely to perfectly match the total debt of a series of line of credit s.
+Most redemption transactions will include a partial redemption since the amount redeemed is unlikely to perfectly match the total debt of a series of lines of credit.
 
-The partially redeemed line of credit  is re-inserted into the sorted list of line of credit s, and remains active, with reduced collateral and debt.
+The partially redeemed line of credit is re-inserted into the sorted list of lines of credit and remains active, with reduced collateral and debt.
 
 ### Full redemption
 
-A line of credit  is defined as “fully redeemed from” when the redemption has caused (debt-200) of its debt to absorb (debt-200) ZUSD. Then, its 200 ZUSD Liquidation Reserve is cancelled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zero’d.
+A line of credit is defined as "fully redeemed from" when the redemption has caused (debt-200) of its debt to absorb (debt-200) ZUSD. Then, its 200 ZUSD Liquidation Reserve is canceled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zeroed.
 
-Before closing, we must handle the line of credit ’s **collateral surplus**: that is, the excess rBTC collateral remaining after redemption, due to its initial over-collateralization.
+Before closing, we must handle the line of credit **collateral surplus**: that is, the excess rBTC collateral remaining after redemption due to its initial over-collateralization.
 
-This collateral surplus is sent to the `CollSurplusPool`, and the borrower can reclaim it later. The line of credit  is then fully closed.
+This collateral surplus is sent to the `CollSurplusPool`, and the borrower can reclaim it later. The line of credit is then fully closed.
 
 ### Redemptions create a price floor
 
-Economically, the redemption mechanism creates a hard price floor for ZUSD, ensuring that the market price stays at or near to $1 USD. 
+Economically, the redemption mechanism creates a hard price floor for ZUSD, ensuring that the market price stays at or near $1 USD. 
 
 ## Recovery Mode
 
-Recovery Mode kicks in when the total collateralization ratio (TCR) of the system falls below 150%.
+Recovery Mode kicks in when the system's total collateralization ratio (TCR) falls below 150%.
 
-During Recovery Mode, liquidation conditions are relaxed, and the system blocks borrower transactions that would further decrease the TCR. New ZUSD may only be issued by adjusting existing lines of credit in a way that improves their ICR, or by opening a new line of credit  with an ICR of >=150%. In general, if an existing line of credit 's adjustment reduces its ICR, the transaction is only executed if the resulting TCR is above 150%
+During Recovery Mode, liquidation conditions are relaxed, and the system blocks borrower transactions that would further decrease the TCR. New ZUSD may only be issued by adjusting existing lines of credit to improve their ICR or by opening a new line of credit with an ICR of >=150%. In general, if an existing line of credit's adjustment reduces its ICR, the transaction is only executed if the resulting TCR is above 150%
 
 Recovery Mode is structured to incentivize borrowers to behave in ways that promptly raise the TCR back above 150%, and to incentivize ZUSD holders to replenish the Stability Pool.
 
-Economically, Recovery Mode is designed to encourage collateral top-ups and debt repayments, and also itself acts as a self-negating deterrent: the possibility of it occurring actually guides the system away from ever reaching it.
+Economically, Recovery Mode is designed to encourage collateral top-ups and debt repayments. It also acts as a self-negating deterrent: the possibility of it occurring actually guides the system away from ever reaching it.
+
 
 ## Project Structure
 
@@ -265,41 +260,43 @@ Economically, Recovery Mode is designed to encourage collateral top-ups and debt
 - `packages/lib-ethers/` - [ethers](https://github.com/ethers-io/ethers.js)-based middleware that can read Zero state and send transactions
 - `packages/lib-react/` - Components and hooks that React-based apps can use to view Zero contract state
 - `packages/providers/` - Subclassed Ethers providers used by the frontend
-- `packages/contracts/` - The backend development folder, contains the Hardhat project, contracts and tests
+- `packages/contracts/` - The backend development folder that contains the Hardhat project, contracts, and tests
 - `packages/contracts/contracts/` - The core back end smart contracts written in Solidity
 - `packages/contracts/test/` - JS test suite for the system. Tests run in Mocha/Chai
 - `packages/contracts/tests/` - Python test suite for the system. Tests run in Brownie
 - `packages/contracts/gasTest/` - Non-assertive tests that return gas costs for Zero operations under various scenarios
 - `packages/contracts/fuzzTests/` - Echidna tests, and naive "random operation" tests 
-- `packages/contracts/migrations/` - contains Hardhat script for deploying the smart contracts to the blockchain
+- `packages/contracts/migrations/` - contains the Hardhat script for deploying the smart contracts to the blockchain
 - `packages/contracts/utils/` - external Hardhat and node scripts - deployment helpers, gas calculators, etc
 - `packages/contracts/mathProofs/` - core mathematical proofs of Zero properties, and a derivation of the scalable Stability Pool staking formula
 
-Backend development is done in the Hardhat framework, and allows Zero to be deployed on the Hardhat EVM network for fast compilation and test execution.
+Backend development is done in the Hardhat framework and allows Zero to be deployed on the Hardhat EVM network for fast compilation and test execution.
+
 
 ### Branches
 
-As of 18/01/2021, the current working branch is `main`. `master` is out of date.
+As of 18/01/2021, the current working branch is `main`. The`master` branch is out of date.
 
 ## ZERO Token Architecture
 
-The Zero system incorporates a secondary token, ZERO. This token entitles the holder to a share of the system revenue generated by redemption fees and  issuance fees.
+The Zero system incorporates a secondary token, ZERO. This token entitles the holder to a share of the system revenue generated by redemption fees and issuance fees.
 
 To earn a share of system fees, the ZERO holder must stake their ZERO in a staking contract.
 
-Zero also issues ZERO to Stability Providers, in a continous time-based manner.
+Zero also issues ZERO to Stability Providers in a continuous time-based manner.
 
 The ZERO contracts consist of:
 
-`ZEROStaking.sol` - the staking contract, containing stake and unstake functionality for ZERO holders. This contract receives rBTC fees from redemptions, and ZUSD fees from new debt issuance.
+`ZEROStaking.sol` - the staking contract, containing stake and unstake functionality for ZERO holders. This contract receives rBTC fees from redemptions and ZUSD fees from new debt issuance.
 
-`CommunityIssuance.sol` - This contract handles the issuance of ZERO tokens to Stability Providers as a function of time. It is controlled by the `StabilityPool`. Upon system launch, the `CommunityIssuance` automatically receives 30 million ZERO - the “community issuance” supply. The contract steadily issues these ZERO tokens to the Stability Providers over time.
+`CommunityIssuance.sol` - This contract handles the issuance of ZERO tokens to Stability Providers as a function of time, and it is controlled by the `StabilityPool`. Upon system launch, the `CommunityIssuance` automatically receives 30 million ZERO - the “community issuance” supply. The contract steadily issues these ZERO tokens to the Stability Providers over time.
 
-`ZEROToken.sol` - This is the ZERO ERC20 contract. It has a hard cap supply of 100 million, and during the first year, restricts transfers from the Zero admin address, a regular RSK address controlled by the project company Zero AG. **Note that the Zero admin address has no extra privileges and does not retain any control over the Zero protocol once deployed.**
+`ZEROToken.sol` - This is the ZERO ERC20 contract. It has a hard cap supply of 100 million and, during the first year, restricts transfers from the Zero admin address, a regular RSK address controlled by the project company Zero AG. **Note that the Zero admin address has no extra privileges and does not retain any control over the Zero protocol once deployed.**
+
 
 ### ZERO Lockup contracts and token vesting
 
-Some ZERO is reserved for team members and partners, and is locked up for one year upon system launch. Additionally, some team members receive ZERO vested on a monthly basis, which during the first year, is transferred directly to their lockup contract.
+Some ZERO is reserved for team members and partners and is locked up for one year upon system launch. Additionally, some team members receive ZERO vested monthly, which is transferred directly to their lockup contract during the first year.
 
 In the first year after launch:
 
@@ -307,11 +304,12 @@ In the first year after launch:
 
 - The Zero admin address may transfer tokens **only to verified lockup contracts with an unlock date at least one year after system deployment**
 
-Also, separate ZERO allocations are made at deployent to an EOA that will hold an amount of ZERO for bug bounties/hackathons and to a Uniswap LP reward contract. Aside from these allocations, the only ZERO made freely available in this first year is the ZERO that is publicly issued to Stability Providers via the `CommunityIssuance` contract.
+Also, separate ZERO allocations are made at deployment to an EOA that will hold an amount of ZERO for bug bounties/hackathons and to a Uniswap LP reward contract. Aside from these allocations, the only ZERO made freely available in this first year is the ZERO that is publicly issued to Stability Providers via the `CommunityIssuance` contract.
 
 ### Lockup Implementation and admin transfer restriction
 
 A `LockupContractFactory` is used to deploy `LockupContracts` in the first year. During the first year, the `ZEROToken` checks that any transfer from the Zero admin address is to a valid `LockupContract` that is registered in and was deployed through the `LockupContractFactory`.
+
 
 ### Launch sequence and vesting process
 
@@ -320,8 +318,8 @@ A `LockupContractFactory` is used to deploy `LockupContracts` in the first year.
 2. Zero admin deploys `CommunityIssuance` and `SovStakersIssuance`
 3. Zero admin deploys `ZEROStaking` 
 4. Zero admin deploys `ZEROToken`, which upon deployment:
-- Stores the `CommunityIssuance`, `SovStakersIssuance`, Sovryn's Liquidity Mining and `LockupContractFactory` addresses
-- Mints ZERO tokens to `CommunityIssuance`, `SovStakersIssuance`, the Zero admin address and the Liquidity Mining contract.
+- Stores the `CommunityIssuance`, `SovStakersIssuance`, Sovryn's Liquidity Mining, and `LockupContractFactory` addresses
+- Mints ZERO tokens to `CommunityIssuance`, `SovStakersIssuance`, the Zero admin address, and the Liquidity Mining contract.
 1. Zero admin sets `ZEROToken` address in `LockupContractFactory`, `CommunityIssuance`, `SovStakersIssuance`
 
 #### Deploy and fund Lockup Contracts
@@ -335,114 +333,119 @@ A `LockupContractFactory` is used to deploy `LockupContracts` in the first year.
 11. Zero admin connects `CommunityIssuance` and `SovStakersIssuance` to Zero core contracts and `ZEROToken`
 
 #### During one year lockup period
-- Zero admin periodically transfers newly vested tokens to team & partners’ `LockupContracts`, as per their vesting schedules
+- Zero admin periodically transfers newly vested tokens to team & partners' `LockupContracts`, as per their vesting schedules
 - Zero admin may only transfer ZERO to `LockupContracts`
-- Anyone may deploy new `LockupContracts` via the Factory, setting any `unlockTime` that is >= 1 year from system deployment
+- Anyone may deploy new `LockupContracts` via the Factory, setting any `unlockTime` that is >= one year from system deployment
 
-#### Upon end of one year lockup period
+#### Upon the end of one year lockup period
 - All beneficiaries may withdraw their entire entitlements
 - Zero admin address restriction on ZERO transfers is automatically lifted, and Zero admin may now transfer ZERO to any address
 - Anyone may deploy new `LockupContracts` via the Factory, setting any `unlockTime` in the future
 
-#### Post-lockup period
-- Zero admin periodically transfers newly vested tokens to team & partners, directly to their individual addresses, or to a fresh lockup contract if required.
 
-_NOTE: In the final architecture, a multi-sig contract will be used to move ZERO Tokens, rather than the single Zero admin EOA. It will be deployed at the start of the sequence, and have its address recorded in  `ZEROToken` in step 4, and receive ZERO tokens. It will be used to move ZERO in step 7, and during & after the lockup period. The Zero admin EOA will only be used for deployment of contracts in steps 1-4 and 9._
+#### Post-lockup period
+- Zero admin periodically transfers newly vested tokens to team & partners, directly to their individual addresses or to a fresh lockup contract if required.
+
+_NOTE: A multisig contract will be used to move ZERO Tokens in the final architecture, rather than the single Zero admin EOA. It will be deployed at the start of the sequence, have its address recorded in  `ZEROToken` in step 4, and receive ZERO tokens. It will be used to move ZERO in step 7, and during & after the lockup period. The Zero admin EOA will only be used for deployment of contracts in steps 1-4 and 9._
 
 _The current code does not utilize a multi-sig. It implements the launch architecture outlined above._
 
-_Additionally, a LP staking contract will receive the initial LP staking reward allowance, rather than an EOA. It will be used to hold and issue ZERO to users who stake LP tokens that correspond to certain pools on DEXs._
+_Additionally, an LP staking contract will receive the initial LP staking reward allowance rather than an EOA. It will be used to hold and issue ZERO to users who stake LP tokens that correspond to certain pools on DEXs._
 
 ## Core System Architecture
 
 The core Zero system consists of several smart contracts, which are deployable to the RSK blockchain.
 
-All application logic and data is contained in these contracts - there is no need for a separate database or back end logic running on a web server. In effect, the RSK network is itself the Zero back end. As such, all balances and contract data are public.
+All application logic and data are contained in these contracts - there is no need for a separate database or back-end logic running on a web server. In effect, the RSK network is itself the Zero back end. As such, all balances and contract data are public.
 
-The system ownership is granted to the [TimeLock](https://github.com/DistributedCollective/Sovryn-smart-contracts/blob/development/contracts/governance/Timelock.sol) contract so the system could be upgraded by the Sovryn's governance system.
+The system ownership is granted to the [TimeLock](https://github.com/DistributedCollective/Sovryn-smart-contracts/blob/development/contracts/governance/Timelock.sol) contract so the Sovryn's governance system could upgrade the system.
 
-The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `StabilityPool.sol` - hold the user-facing public functions, and contain most of the internal system logic. TogrBTC they control line of credit  state updates and movements of rBTC and ZUSD tokens around the system.
+The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `StabilityPool.sol` - hold the user-facing public functions, and contain most of the internal system logic. TogrBTC control line of credit state updates and movements of rBTC and ZUSD tokens around the system.
+
 
 ### Core Smart Contracts
 
-`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their line of credit : line of credit  creation, rBTC top-up / withdrawal, stablecoin issuance and repayment. It also sends issuance fees to the `ZEROStaking` contract. BorrowerOperations functions call in to line of credit Manager, telling it to update line of credit  state, where necessary. BorrowerOperations functions also call in to the various Pools, telling them to move rBTC/Tokens between Pools or between Pool <> user, where necessary.
+`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their line of credit: line of credit creation, rBTC top-up/withdrawal, stablecoin issuance, and repayment. It also sends issuance fees to the `ZEROStaking` contract. BorrowerOperations functions call into the line of credit Manager, telling it to update the line of credit state, where necessary. BorrowerOperations functions also call into the various Pools, telling them to move rBTC/Tokens between Pools or between Pool <> user, where necessary.
 
-`TroveManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `ZEROStaking` contract. Also contains the state of each line of credit  - i.e. a record of the line of credit ’s collateral and debt. line of credit Manager does not hold value (i.e. rBTC / other tokens). line of credit Manager functions call in to the various Pools to tell them to move rBTC/tokens between Pools, where necessary.
+`TroveManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `ZEROStaking` contract. It also contains the state of each line of credit  - i.e., a record of the line of credit’s collateral and debt. The line of credit Manager does not hold value (i.e., rBTC / other tokens). Line of credit Manager functions calls into the various Pools to tell them to move rBTC/tokens between Pools, where necessary.
 
-`LiquityBase.sol` - Both line of credit Manager and BorrowerOperations inherit from the parent contract LiquityBase, which contains global constants and some common functions.
+`LiquityBase.sol` - Both line of credit Manager and BorrowerOperations inherit from the parent contract `LiquityBase`, which contains global constants and some common functions.
 
-`StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits, and withdrawing compounded deposits and accumulated rBTC and ZERO gains. Holds the ZUSD Stability Pool deposits, and the rBTC gains for depositors, from liquidations.
+`StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits and withdrawing compounded deposits and accumulated rBTC and ZERO gains. Holds the ZUSD Stability Pool deposits, and the rBTC gains for depositors, from liquidations.
 
-`ZUSDToken.sol` - the stablecoin token contract, which implements the ERC20 fungible token standard in conjunction with EIP-2612 and a mechanism that blocks (accidental) transfers to addresses like the StabilityPool and address(0) that are not supposed to receive funds through direct transfers. The contract mints, burns and transfers ZUSD tokens.
+`ZUSDToken.sol` - the stablecoin token contract, which implements the ERC20 fungible token standard in conjunction with EIP-2612 and a mechanism that blocks (accidental) transfers to addresses like the StabilityPool and address(0) that are not supposed to receive funds through direct transfers. The contract mints, burns, and transfers ZUSD tokens.
 
-`SortedTroves.sol` - a doubly linked list that stores addresses of line of credit  owners, sorted by their individual collateralization ratio (ICR). It inserts and re-inserts lines of credit at the correct position, based on their ICR.
+`SortedTroves.sol` - a doubly-linked list that stores addresses of the line of credit owners, sorted by their individual collateralization ratio (ICR). It inserts and re-inserts lines of credit at the correct position, based on their ICR.
 
-`PriceFeed.sol` - Contains functionality for obtaining the current rBTC:USD price, which the system uses for calculating collateralization ratios.
+`PriceFeed.sol` - Contains functionality for obtaining the current rBTC:USD price, which the system uses for calculating collateralization ratios.
 
-`HintHelpers.sol` - Helper contract, containing the read-only functionality for calculation of accurate hints to be supplied to borrower operations and redemptions.
+`HintHelpers.sol` - Helper contract, containing the read-only functionality for calculating accurate hints to be supplied to borrower operations and redemptions.
+
 
 ### Data and Value Silo Contracts
 
-Along with `StabilityPool.sol`, these contracts hold rBTC and/or tokens for their respective parts of the system, and contain minimal logic:
+Along with `StabilityPool.sol`, these contracts hold rBTC and/or tokens for their respective parts of the system and contain minimal logic:
 
 `ActivePool.sol` - holds the total rBTC balance and records the total stablecoin debt of the active line of credit s.
 
-`DefaultPool.sol` - holds the total rBTC balance and records the total stablecoin debt of the liquidated lines of credit that are pending redistribution to active line of credit s. If a line of credit  has pending rBTC/debt “rewards” in the DefaultPool, then they will be applied to the line of credit  when it next undergoes a borrower operation, a redemption, or a liquidation.
+`DefaultPool.sol` - holds the total rBTC balance and records the total stablecoin debt of the liquidated lines of credit that are pending redistribution to the active line of credit s. If a line of credit has pending rBTC/debt “rewards” in the DefaultPool, they will be applied to the line of credit when it next undergoes a borrower operation, a redemption, or a liquidation.
 
-`CollSurplusPool.sol` - holds the rBTC surplus from lines of credit that have been fully redeemed from as well as from lines of credit with an ICR > MCR that were liquidated in Recovery Mode. Sends the surplus back to the owning borrower, when told to do so by `BorrowerOperations.sol`.
+`CollSurplusPool.sol` - holds the rBTC surplus from lines of credit that have been fully redeemed from as well as from lines of credit with an ICR > MCR that were liquidated in Recovery Mode. Sends the surplus back to the owning borrower when told by `BorrowerOperations.sol`.
 
-`GasPool.sol` - holds the total ZUSD liquidation reserves. ZUSD is moved into the `GasPool` when a line of credit  is opened, and moved out when a line of credit  is liquidated or closed.
+`GasPool.sol` - holds the total ZUSD liquidation reserves. ZUSD is moved into the `GasPool` when a line of credit is opened, and moved out when a line of credit  is liquidated or closed.
 
 ### Contract Interfaces
 
-`ITroveManager.sol`, `IPool.sol` etc. These provide specification for a contract’s functions, without implementation. They are similar to interfaces in Java or C#.
+`ITroveManager.sol`, `IPool.sol` etc. These provide a specification for a contract’s functions without implementation. They are similar to interfaces in Java or C#.
+
 
 ### PriceFeed and Oracle
 
-Zero functions that require the most current rBTC:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the MoC Medianizer rBTC:USD reference contract as its primary and RSK's rBTC:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e. it records the last good price that may come from either of the two sources based on the contract's current state.
+Zero functions that require the most current rBTC:USD price data fetch the price dynamically, as needed, via the core `PriceFeed.sol` contract using the MoC Medianizer rBTC:USD reference contract as its primary and RSK's rBTC:USD price feed as its secondary (fallback) data source. PriceFeed is stateful, i.e., it records the last good price that may come from either of the two sources based on the contract's current state.
 
-The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Zero functions which require a current rBTC:USD price.  `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
+The current `PriceFeed.sol` contract has an external `fetchPrice()` function that is called by core Zero functions which require a current rBTC:USD price. `fetchPrice()` calls each oracle's proxy, asserts on the responses, and converts returned prices to 18 digits.
 
 ### PriceFeed Logic
 
-The PriceFeed contract uses the main price feed and fallback to the backup one in case of an error. If both fail return the last good price seen.
+The PriceFeed contract uses the main price feed and fallback to the backup one in case of an error. If both fail, return the last good price seen.
 
 ### Testnet PriceFeed and PriceFeed tests
 
-The `PriceFeedTestnet.sol` is a mock PriceFeed for testnet and general back end testing purposes, with no oracle connection. It contains a manual price setter, `setPrice()`, and a getter, `getPrice()`, which returns the latest stored price.
+The `PriceFeedTestnet.sol` is a mock PriceFeed for testnet and general back-end testing purposes, with no oracle connection. It contains a manual price setter, `setPrice()`, and a getter, `getPrice()`, which returns the latest stored price.
 
 The mainnet PriceFeed is tested in `test/PriceFeedTest.js`, using `ExternalPriceFeedTester` contract as mocks for primary and secondary price feeds.
 
 ### PriceFeed limitations and known issues
 
-The purpose of the PriceFeed is to have some resilience in case of MoC Medianizer failure / timeout, and chance of recovery.
+The purpose of the PriceFeed is to have some resilience in case of MoC Medianizer failure/timeout and the chance of recovery.
 
-The PriceFeed logic consists of automatic on-chain decision-making for obtaining fallback price data from RSK Oracle, and if possible, for returning to MoC Medianizer if/when it recovers.
+The PriceFeed logic consists of automatic on-chain decision-making for obtaining fallback price data from RSK Oracle and, if possible, returning to MoC Medianizer if/when it recovers.
 
 ### Keeping a sorted list of lines of credit ordered by ICR
 
-Zero relies on a particular data structure: a sorted doubly-linked list of lines of credit that remains ordered by individual collateralization ratio (ICR), i.e. the amount of collateral (in USD) divided by the amount of debt (in ZUSD).
+Zero relies on a particular data structure: a sorted doubly-linked list of lines of credit that remains ordered by individual collateralization ratio (ICR), i.e., the amount of collateral (in USD) divided by the amount of debt (in ZUSD).
 
-This ordered list is critical for gas-efficient redemption sequences and for the `liquidateTroves` sequence, both of which target lines of credit in ascending order of ICR.
+This ordered list is critical for gas-efficient redemption sequences and the `liquidateTroves` sequence, both of which target lines of credit in ascending order of ICR.
 
 The sorted doubly-linked list is found in `SortedTroves.sol`. 
 
-Nodes map to active lines of credit in the system - the ID property is the address of a line of credit  owner. The list accepts positional hints for efficient O(1) insertion - please see the [hints](#supplying-hints-to-cdp-operations) section for more details.
+Nodes map to active lines of credit in the system - the ID property is the address of a line of credit owner. The list accepts positional hints for efficient O(1) insertion - please see the [hints](#supplying-hints-to-cdp-operations) section for more details.
 
-ICRs are computed dynamically at runtime, and not stored on the node. This is because ICRs of active lines of credit change dynamically, when:
+ICRs are computed dynamically at runtime and not stored on the node. This is because ICRs of active lines of credit change dynamically, when:
 
 - The rBTC:USD price varies, altering the USD of the collateral of every line of credit 
 - A liquidation that redistributes collateral and debt to active lines of credit occurs
 
-The list relies on the fact that a collateral and debt redistribution due to a liquidation preserves the ordering of all active lines of credit (though it does decrease the ICR of each active line of credit  above the MCR).
+The list relies on the fact that a collateral and debt redistribution due to a liquidation preserves the ordering of all active lines of credit (though it does decrease the ICR of each active line of credit above the MCR).
 
-The fact that ordering is maintained as redistributions occur, is not immediately obvious: please see the [mathematical proof](https://github.com/liquity/dev/blob/main/papers) which shows that this holds in Liquity.
+The fact that ordering is maintained as redistributions occur is not immediately obvious: please see the [mathematical proof](https://github.com/liquity/dev/blob/main/papers) which shows that this holds in Liquity.
 
-A node inserted based on current ICR will maintain the correct position, relative to its peers, as liquidation gains accumulate, as long as its raw collateral and debt have not changed.
+A node inserted based on current ICR will maintain the correct position relative to its peers as liquidation gains accumulate, as long as its raw collateral and debt have not changed.
 
-Nodes also remain sorted as the rBTC:USD price varies, since price fluctuations change the collateral value of each line of credit  by the same proportion.
+Nodes also remain sorted as the rBTC:USD price varies, since price fluctuations change the collateral value of each line of credit by the same proportion.
 
-Thus, nodes need only be re-inserted to the sorted list upon a line of credit  operation - when the owner adds or removes collateral or debt to their position.
+Thus, nodes need only be re-inserted to the sorted list upon a line of credit operation - when the owner adds or removes collateral or debt to their position.
+
 
 ### Flow of rBTC in Liquity
 
