@@ -8,7 +8,7 @@ import { InfoMessage } from "../components/InfoMessage";
 export const RedemptionPage: React.FC = () => {
   return (
     <Container variant="columns">
-      <Container variant="leftRedemption">
+      <Container variant="left">
         <Card>
           <InfoMessage title="Bot functionality">
             <Paragraph>
@@ -34,7 +34,7 @@ export const RedemptionPage: React.FC = () => {
         <Redemption />
       </Container>
 
-      <Container variant="rightRedemption">
+      <Container variant="right">
         <SystemStats />
       </Container>
     </Container>
