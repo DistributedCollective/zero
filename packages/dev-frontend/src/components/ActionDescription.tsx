@@ -6,25 +6,28 @@ export const ActionDescription: React.FC = ({ children }) => (
   <Box
     sx={{
       display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-around",
+      justifyContent: "center",
+      alignItems: "center",
 
       mb: [2, 3],
-      p: 3,
+      py: 2,
+      px: 4,
 
       border: 1,
       borderRadius: "8px",
       borderColor: "primary",
       boxShadow: 2,
-      bg: "background",
-      '& svg': {
+      bg: "transparent",
+      color: "primary",
+      textAlign: "center",
+      "& svg": {
         color: "primary"
       }
     }}
   >
     <Flex sx={{ alignItems: "center" }}>
-      <Icon name="info-circle" size="lg" />
-      <Text sx={{ ml: 2 }}>{children}</Text>
+      <Icon name="info-circle" size="sm" />
+      <Text sx={{ ml: 2, fontSize: 2, fontWeight: 300, fontStyle: "italic" }}>{children}</Text>
     </Flex>
   </Box>
 );
