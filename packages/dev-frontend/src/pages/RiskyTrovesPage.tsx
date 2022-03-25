@@ -7,7 +7,7 @@ import { InfoMessage } from "../components/InfoMessage";
 
 export const RiskyTrovesPage: React.FC = () => (
   <Container variant="columns">
-    <Container variant="leftLiquidation">
+    <Container variant="leftDashboard">
       <Card>
         <Box sx={{ p: [2, 3] }}>
           <InfoMessage title="Bot functionality">
@@ -22,7 +22,7 @@ export const RiskyTrovesPage: React.FC = () => (
       <LiquidationManager />
     </Container>
 
-    <Container variant="rightLiquidation">
+    <Container variant="rightDashboard">
       <SystemStats />
     </Container>
     <RiskyTroves pageSize={10} />

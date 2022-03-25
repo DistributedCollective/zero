@@ -11,7 +11,7 @@ export const LiquidationManager: React.FC = () => {
   const {
     liquity: { send: liquity }
   } = useLiquity();
-  const [numberOfTrovesToLiquidate, setNumberOfTrovesToLiquidate] = useState("90");
+  const [numberOfTrovesToLiquidate, setNumberOfTrovesToLiquidate] = useState("");
 
   return (
     <Card>
@@ -24,8 +24,9 @@ export const LiquidationManager: React.FC = () => {
             min="1"
             step="1"
             value={numberOfTrovesToLiquidate}
+            placeholder="90"
             onChange={e => setNumberOfTrovesToLiquidate(e.target.value)}
-            sx={{border:"solid",borderColor:"rgba(255, 255, 255, 0.3)", width:"70px",color:"text", textAlign:"center"}}
+            sx={{border:"solid", maxWidth:"70px",color:"text", textAlign:"center"}}
           />
 
           <Label sx={{pl:"18px"}} >Lines of Credit</Label>

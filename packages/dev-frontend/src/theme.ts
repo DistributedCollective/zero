@@ -465,30 +465,12 @@ const theme: Theme = {
       justifyItems: "center"
     },
 
-    leftDashboard: {
+    left: {
       pr: cardGapX,
       width: ["100%", "64%"]
     },
 
-    rightDashboard: {
-      width: ["100%", "36%"]
-    },
-
-    leftLiquidation: {
-      pr: 15,
-      width: ["100%", "40%"]
-    },
-
-    rightLiquidation: {
-      width: ["100%", "35%"]
-    },
-
-    leftRedemption: {
-      pr: cardGapX,
-      width: ["100%", "64%"]
-    },
-
-    rightRedemption: {
+    right: {
       width: ["100%", "36%"]
     },
 
