@@ -1,6 +1,5 @@
-import { text } from "@fortawesome/fontawesome-svg-core";
 import React, { useState } from "react";
-import { Card, Box, Heading, Flex, Button, Label, Input } from "theme-ui";
+import { Card, Box, Flex, Button, Label, Input } from "theme-ui";
 
 import { useLiquity } from "../hooks/LiquityContext";
 
