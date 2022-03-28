@@ -10,21 +10,22 @@ export const ErrorDescription: React.FC = ({ children }) => (
       justifyContent: "space-around",
 
       mb: [2, 3],
-      p: 3,
+      py: 2,
+      px: 4,
 
       border: 1,
       borderRadius: "8px",
       borderColor: "danger",
       boxShadow: 2,
       bg: "rgba(220, 44, 16, 0.05)",
-      '& svg': {
+      "& svg": {
         color: "danger"
       }
     }}
   >
     <Flex sx={{ alignItems: "center" }}>
-      <Icon name="exclamation-triangle" size="lg" />
-      <Text sx={{ ml: 2 }}>{children}</Text>
+      <Icon name="exclamation-triangle" size="sm" />
+      <Text sx={{ ml: 2, fontSize: 2, fontWeight: 300, fontStyle: "italic" }}>{children}</Text>
     </Flex>
   </Box>
 );
