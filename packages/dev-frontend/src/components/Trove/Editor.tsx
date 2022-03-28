@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Text, Flex, Label, Input, SxProp, Button, ThemeUICSSProperties } from "theme-ui";
 
 import { Icon } from "../Icon";
@@ -128,7 +128,8 @@ const staticStyle: ThemeUICSSProperties = {
   flexGrow: 1,
 
   mb: 0,
-  px: "8px",
+  pr: "11px",
+  pb: 0,
 
   fontSize: 3,
 
@@ -212,7 +213,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
 
-  return editing !== inputId ? (
+  return (
     <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2 }}>
       <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
         <Input
@@ -234,48 +235,85 @@ export const EditableRow: React.FC<EditableRowProps> = ({
             setEditing(undefined);
             setInvalid(false);
           }}
+          min="0"
           variant="editor"
           sx={{
             ...editableStyle,
-            borderRadius: 8,
+            maxHeight: 40,
             fontWeight: "medium",
-            bg: invalid ? "danger" : "transparent",
-            outline: "none"
+            px: 20,
+            borderRadius: 8,
+            bg: invalid ? "danger" : "transparent"
           }}
         />
-      </Flex>
-    </Row>
-  ) : (
-    <Row
-      labelId={`${inputId}-label`}
-      {...{ label, labelFor: inputId, unit }}
-      sx={{ flex: 1, px: 2 }}
-    >
-      <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
-        <StaticAmounts
-          sx={{
-            ...editableStyle,
-            borderRadius: 8,
-            bg: invalid ? "invalid" : "transparent"
-          }}
-          labelledBy={`${inputId}-label`}
-          onClick={() => setEditing(inputId)}
-          {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid }}
-        >
-          {maxAmount && (
-            <Button
-              sx={{ fontSize: 1, p: 1, px: 3, position: "absolute", right: 2 }}
-              onClick={event => {
-                setEditedAmount(maxAmount);
-                event.stopPropagation();
-              }}
-              disabled={maxedOut}
-            >
-              max
-            </Button>
-          )}
-        </StaticAmounts>
+        {maxAmount && (
+          <Button
+            sx={{ fontSize: 1, p: 1, px: 3, position: "absolute", right: 1 }}
+            onClick={event => {
+              setEditedAmount(maxAmount);
+              event.stopPropagation();
+            }}
+            disabled={maxedOut}
+          >
+            max
+          </Button>
+        )}
       </Flex>
     </Row>
   );
+  // return editing === inputId ? (
+  //   <Row {...{ label, labelFor: inputId, unit }}>
+  //     <Input
+  //       autoFocus
+  //       id={inputId}
+  //       type="number"
+  //       step="any"
+  //       defaultValue={editedAmount}
+  //       {...{ invalid }}
+  //       onChange={e => {
+  //         try {
+  //           setEditedAmount(e.target.value);
+  //           setInvalid(false);
+  //         } catch {
+  //           setInvalid(true);
+  //         }
+  //       }}
+  //       onBlur={() => {
+  //         setEditing(undefined);
+  //         setInvalid(false);
+  //       }}
+  //       variant="editor"
+  //       sx={{
+  //         ...editableStyle,
+  //         fontWeight: "medium",
+  //         bg: invalid ? "danger" : "background"
+  //       }}
+  //     />
+  //   </Row>
+  // ) : (
+  //   <Row labelId={`${inputId}-label`} {...{ label, unit }}>
+  //     <StaticAmounts
+  //       sx={{
+  //         ...editableStyle,
+  //         bg: invalid ? "invalid" : "background"
+  //       }}
+  //       labelledBy={`${inputId}-label`}
+  //       onClick={() => setEditing(inputId)}
+  //       {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid }}
+  //     >
+  //       {maxAmount && (
+  //         <Button
+  //           sx={{ fontSize: 1, p: 1, px: 3 }}
+  //           onClick={event => {
+  //             setEditedAmount(maxAmount);
+  //             event.stopPropagation();
+  //           }}
+  //           disabled={maxedOut}
+  //         >
+  //           max
+  //         </Button>
+  //       )}
+  //     </StaticAmounts>
+  //   </Row>
+  // );
 };
