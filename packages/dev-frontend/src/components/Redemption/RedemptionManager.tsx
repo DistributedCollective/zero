@@ -106,50 +106,58 @@ export const RedemptionManager: React.FC = () => {
         </>
       }
     >
-      {((dirty || !canRedeem) && description) || (
-        <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
-      )}
+      <Box
+        sx={{
+          mx: "auto",
+          width: "75%"
+        }}
+      >
+        {((dirty || !canRedeem) && description) || (
+          <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
+        )}
+        <Flex>
+          <EditableRow
+            label="Redeem"
+            inputId="redeem-zusd"
+            amount={zusdAmount.prettify()}
+            maxAmount={zusdBalance.toString()}
+            maxedOut={zusdAmount.eq(zusdBalance)}
+            unit={COIN}
+            {...{ editingState }}
+            editedAmount={zusdAmount.toString(2)}
+            setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
+          />
 
-      <EditableRow
-        label="Redeem"
-        inputId="redeem-zusd"
-        amount={zusdAmount.prettify()}
-        maxAmount={zusdBalance.toString()}
-        maxedOut={zusdAmount.eq(zusdBalance)}
-        unit={COIN}
-        {...{ editingState }}
-        editedAmount={zusdAmount.toString(2)}
-        setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
-      />
-
-      <StaticRow
-        label="Redemption Fee"
-        inputId="redeem-fee"
-        amount={ethFee.toString(4)}
-        pendingAmount={feePct.toString(2)}
-        unit="ETH"
-        infoIcon={
-          <InfoIcon
-            tooltip={
-              <Card>
-                The Redemption Fee is charged as a percentage of the redeemed RBTC. The Redemption
-                Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
-              </Card>
+          <StaticRow
+            label="Redemption Fee"
+            inputId="redeem-fee"
+            amount={ethFee.toString(4)}
+            pendingAmount={feePct.toString(2)}
+            unit="ETH"
+            infoIcon={
+              <InfoIcon
+                tooltip={
+                  <Card>
+                    The Redemption Fee is charged as a percentage of the redeemed RBTC. The
+                    Redemption Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
+                  </Card>
+                }
+              />
             }
           />
-        }
-      />
+        </Flex>
 
-      <Flex variant="layout.actions">
-        <RedemptionAction
-          transactionId={transactionId}
-          disabled={!dirty || !canRedeem}
-          zusdAmount={zusdAmount}
-          maxRedemptionRate={maxRedemptionRate}
-        />
-      </Flex>
+        <Flex variant="layout.actions">
+          <RedemptionAction
+            transactionId={transactionId}
+            disabled={!dirty || !canRedeem}
+            zusdAmount={zusdAmount}
+            maxRedemptionRate={maxRedemptionRate}
+          />
+        </Flex>
 
-      {changePending && <LoadingOverlay />}
+        {changePending && <LoadingOverlay />}
+      </Box>
     </Card>
   );
 };

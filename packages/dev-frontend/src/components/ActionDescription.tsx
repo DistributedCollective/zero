@@ -5,23 +5,20 @@ import { Icon } from "./Icon";
 export const ActionDescription: React.FC = ({ children }) => (
   <Box
     sx={{
-      mx: "150px",
       mb: "20px",
-      mt: "50px",
       py: 3,
-      px:25,
+      px: 25,
 
       border: 1,
       borderRadius: "10px",
       borderColor: "primary",
-      color:"primary",
-      width:"65%"
+      color: "primary",
+      width: "100%",
+      textAlign: "center"
     }}
   >
-    <Flex sx={{ alignSelf: "center" }}>
-      <Icon name="info-circle" size="lg" />
-      <Text sx={{ ml: 2 }}>{children}</Text>
-    </Flex>
+    <Icon name="info-circle" size="lg" />
+    <Text sx={{ ml: 2, fontSize: 14 }}>{children}</Text>
   </Box>
 );
 
