@@ -571,6 +571,12 @@ const theme: Theme = {
       textTransform: "uppercase",
       letterSpacing: "2px",
       width: ["100%", "auto"]
+    },
+
+    redemption: {
+      color: "primary",
+      ":hover": { fontWeight: "bold", cursor: "pointer" },
+      textDecoration: "underline"
     }
   }
 };

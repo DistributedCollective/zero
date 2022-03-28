@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Box, Flex, Card, Heading } from "theme-ui";
+import { Button, Box, Flex, Heading } from "theme-ui";
+import { Card } from "../Card";
 
 import { Decimal, Percent, LiquityStoreState, MINIMUM_COLLATERAL_RATIO } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
@@ -87,64 +88,66 @@ export const RedemptionManager: React.FC = () => {
       ];
 
   return (
-    <Card>
-      <Heading>
-        Redeem
-        {dirty && !changePending && (
-          <Button
-            variant="titleIcon"
-            sx={{ ":enabled:hover": { color: "danger" } }}
-            onClick={() => setZUSDAmount(Decimal.ZERO)}
-          >
-            <Icon name="history" size="lg" />
-          </Button>
-        )}
-      </Heading>
+    <Card
+      heading={
+        <>
+          <Heading className="heading">
+            Redeem
+            {dirty && !changePending && (
+              <Button
+                variant="titleIcon"
+                sx={{ ":enabled:hover": { color: "danger" } }}
+                onClick={() => setZUSDAmount(Decimal.ZERO)}
+              >
+                <Icon name="history" size="lg" />
+              </Button>
+            )}
+          </Heading>
+        </>
+      }
+    >
+      {((dirty || !canRedeem) && description) || (
+        <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
+      )}
 
-      <Box sx={{ p: [2, 3] }}>
-        <EditableRow
-          label="Redeem"
-          inputId="redeem-zusd"
-          amount={zusdAmount.prettify()}
-          maxAmount={zusdBalance.toString()}
-          maxedOut={zusdAmount.eq(zusdBalance)}
-          unit={COIN}
-          {...{ editingState }}
-          editedAmount={zusdAmount.toString(2)}
-          setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
-        />
+      <EditableRow
+        label="Redeem"
+        inputId="redeem-zusd"
+        amount={zusdAmount.prettify()}
+        maxAmount={zusdBalance.toString()}
+        maxedOut={zusdAmount.eq(zusdBalance)}
+        unit={COIN}
+        {...{ editingState }}
+        editedAmount={zusdAmount.toString(2)}
+        setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
+      />
 
-        <StaticRow
-          label="Redemption Fee"
-          inputId="redeem-fee"
-          amount={ethFee.toString(4)}
-          pendingAmount={feePct.toString(2)}
-          unit="ETH"
-          infoIcon={
-            <InfoIcon
-              tooltip={
-                <Card variant="tooltip" sx={{ minWidth: "240px" }}>
-                  The Redemption Fee is charged as a percentage of the redeemed RBTC. The Redemption
-                  Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
-                </Card>
-              }
-            />
-          }
-        />
-
-        {((dirty || !canRedeem) && description) || (
-          <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
-        )}
-
-        <Flex variant="layout.actions">
-          <RedemptionAction
-            transactionId={transactionId}
-            disabled={!dirty || !canRedeem}
-            zusdAmount={zusdAmount}
-            maxRedemptionRate={maxRedemptionRate}
+      <StaticRow
+        label="Redemption Fee"
+        inputId="redeem-fee"
+        amount={ethFee.toString(4)}
+        pendingAmount={feePct.toString(2)}
+        unit="ETH"
+        infoIcon={
+          <InfoIcon
+            tooltip={
+              <Card>
+                The Redemption Fee is charged as a percentage of the redeemed RBTC. The Redemption
+                Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
+              </Card>
+            }
           />
-        </Flex>
-      </Box>
+        }
+      />
+
+      <Flex variant="layout.actions">
+        <RedemptionAction
+          transactionId={transactionId}
+          disabled={!dirty || !canRedeem}
+          zusdAmount={zusdAmount}
+          maxRedemptionRate={maxRedemptionRate}
+        />
+      </Flex>
 
       {changePending && <LoadingOverlay />}
     </Card>
