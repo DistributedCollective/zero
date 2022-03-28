@@ -20,10 +20,6 @@ export const CollateralRatio: React.FC<CollateralRatioProps> = ({ value, change 
   return (
     <>
       <Flex>
-        <Box sx={{ mt: [2, 0], ml: 3, mr: -2, fontSize: "24px" }}>
-          <Icon name="heartbeat" />
-        </Box>
-
         <StaticRow
           label="Collateral ratio"
           inputId="trove-collateral-ratio"

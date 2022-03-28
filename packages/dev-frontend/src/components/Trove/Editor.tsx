@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Text, Flex, Label, Input, SxProp, Button, ThemeUICSSProperties } from "theme-ui";
 
 import { Icon } from "../Icon";
@@ -12,16 +12,13 @@ type RowProps = SxProp & {
 
 export const Row: React.FC<RowProps> = ({ sx, label, labelId, labelFor, children, infoIcon }) => {
   return (
-    <Flex sx={{ alignItems: "stretch", ...sx }}>
+    <Flex sx={{ flexDirection: "column", ...sx }}>
       <Label
         id={labelId}
         htmlFor={labelFor}
         sx={{
           p: 0,
-          pl: 3,
-          pt: "12px",
-          position: "absolute",
-
+          pt: 1,
           fontSize: 1,
           border: 1,
           borderColor: "transparent"
@@ -131,10 +128,8 @@ const staticStyle: ThemeUICSSProperties = {
   flexGrow: 1,
 
   mb: 0,
-  pl: 3,
   pr: "11px",
   pb: 0,
-  pt: "28px",
 
   fontSize: 3,
 
@@ -143,13 +138,7 @@ const staticStyle: ThemeUICSSProperties = {
 };
 
 const editableStyle: ThemeUICSSProperties = {
-  flexGrow: 1,
-
-  mb: [2, 3],
-  pl: 3,
-  pr: "11px",
-  pb: 2,
-  pt: "28px",
+  py: 2,
 
   fontSize: 4,
 
@@ -219,49 +208,42 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
 
-  return editing === inputId ? (
-    <Row {...{ label, labelFor: inputId, unit }}>
-      <Input
-        autoFocus
-        id={inputId}
-        type="number"
-        step="any"
-        defaultValue={editedAmount}
-        {...{ invalid }}
-        onChange={e => {
-          try {
-            setEditedAmount(e.target.value);
+  return (
+    <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2 }}>
+      <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
+        <Input
+          autoFocus
+          id={inputId}
+          type="number"
+          step="any"
+          defaultValue={editedAmount}
+          {...{ invalid }}
+          onChange={e => {
+            try {
+              setEditedAmount(e.target.value);
+              setInvalid(false);
+            } catch {
+              setInvalid(true);
+            }
+          }}
+          onBlur={() => {
+            setEditing(undefined);
             setInvalid(false);
-          } catch {
-            setInvalid(true);
-          }
-        }}
-        onBlur={() => {
-          setEditing(undefined);
-          setInvalid(false);
-        }}
-        variant="editor"
-        sx={{
-          ...editableStyle,
-          fontWeight: "medium",
-          bg: invalid ? "danger" : "background"
-        }}
-      />
-    </Row>
-  ) : (
-    <Row labelId={`${inputId}-label`} {...{ label, unit }}>
-      <StaticAmounts
-        sx={{
-          ...editableStyle,
-          bg: invalid ? "invalid" : "background"
-        }}
-        labelledBy={`${inputId}-label`}
-        onClick={() => setEditing(inputId)}
-        {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid }}
-      >
+          }}
+          min="0"
+          variant="editor"
+          sx={{
+            ...editableStyle,
+            maxHeight: 40,
+            fontWeight: "medium",
+            px: 20,
+            borderRadius: 8,
+            bg: invalid ? "danger" : "transparent"
+          }}
+        />
         {maxAmount && (
           <Button
-            sx={{ fontSize: 1, p: 1, px: 3 }}
+            sx={{ fontSize: 1, p: 1, px: 3, position: "absolute", right: 1 }}
             onClick={event => {
               setEditedAmount(maxAmount);
               event.stopPropagation();
@@ -271,7 +253,62 @@ export const EditableRow: React.FC<EditableRowProps> = ({
             max
           </Button>
         )}
-      </StaticAmounts>
+      </Flex>
     </Row>
   );
+  // return editing === inputId ? (
+  //   <Row {...{ label, labelFor: inputId, unit }}>
+  //     <Input
+  //       autoFocus
+  //       id={inputId}
+  //       type="number"
+  //       step="any"
+  //       defaultValue={editedAmount}
+  //       {...{ invalid }}
+  //       onChange={e => {
+  //         try {
+  //           setEditedAmount(e.target.value);
+  //           setInvalid(false);
+  //         } catch {
+  //           setInvalid(true);
+  //         }
+  //       }}
+  //       onBlur={() => {
+  //         setEditing(undefined);
+  //         setInvalid(false);
+  //       }}
+  //       variant="editor"
+  //       sx={{
+  //         ...editableStyle,
+  //         fontWeight: "medium",
+  //         bg: invalid ? "danger" : "background"
+  //       }}
+  //     />
+  //   </Row>
+  // ) : (
+  //   <Row labelId={`${inputId}-label`} {...{ label, unit }}>
+  //     <StaticAmounts
+  //       sx={{
+  //         ...editableStyle,
+  //         bg: invalid ? "invalid" : "background"
+  //       }}
+  //       labelledBy={`${inputId}-label`}
+  //       onClick={() => setEditing(inputId)}
+  //       {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid }}
+  //     >
+  //       {maxAmount && (
+  //         <Button
+  //           sx={{ fontSize: 1, p: 1, px: 3 }}
+  //           onClick={event => {
+  //             setEditedAmount(maxAmount);
+  //             event.stopPropagation();
+  //           }}
+  //           disabled={maxedOut}
+  //         >
+  //           max
+  //         </Button>
+  //       )}
+  //     </StaticAmounts>
+  //   </Row>
+  // );
 };
