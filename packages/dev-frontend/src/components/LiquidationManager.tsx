@@ -17,7 +17,7 @@ export const LiquidationManager: React.FC = () => {
     <Card>
       <Box sx={{ p: [2, 3] }}>
         <Flex sx={{ alignItems: "center" }}>
-          <Label sx={{pr:"18px"}}>Liquidate up to</Label>
+          <Label sx={{ pr: "18px" }}>Liquidate up to</Label>
 
           <Input
             type="number"
@@ -26,10 +26,10 @@ export const LiquidationManager: React.FC = () => {
             value={numberOfTrovesToLiquidate}
             placeholder="90"
             onChange={e => setNumberOfTrovesToLiquidate(e.target.value)}
-            sx={{border:"solid", maxWidth:"70px",color:"text", textAlign:"center"}}
+            sx={{ border: "solid", maxWidth: "70px", color: "text", textAlign: "center" }}
           />
 
-          <Label sx={{pl:"18px"}} >Lines of Credit</Label>
+          <Label sx={{ pl: "18px" }}>Lines of Credit</Label>
 
           <Flex sx={{ ml: 2, alignItems: "center" }}>
             <Transaction
@@ -43,7 +43,7 @@ export const LiquidationManager: React.FC = () => {
                 return liquity.liquidateUpTo(parseInt(numberOfTrovesToLiquidate, 10), overrides);
               }}
             >
-              <Button variant="dangerIcon" sx={{pl:"23px", pr:"66px"}}>
+              <Button variant="dangerIcon" sx={{ pl: "23px", pr: "66px" }}>
                 <Icon name="trash" size="lg" />
               </Button>
             </Transaction>

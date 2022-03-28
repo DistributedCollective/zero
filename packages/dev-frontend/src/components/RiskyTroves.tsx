@@ -157,7 +157,7 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
   return (
     <Box sx={{ width: "100%" }}>
       <Card>
-        <Heading sx={{display:"flex", justifyContent:"space-between", width: "100%"}}>
+        <Heading sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
           <Abbreviation short="LoC">Risky Lines of Credit</Abbreviation>
 
           <Flex sx={{ alignItems: "center" }}>
@@ -171,7 +171,12 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                   {Math.min((clampedPage + 1) * pageSize, numberOfTroves)} of {numberOfTroves}
                 </Abbreviation>
 
-                <Button variant="titleIcon" onClick={previousPage} disabled={clampedPage <= 0}>
+                <Button
+                  variant="titleIcon"
+                  onClick={previousPage}
+                  disabled={clampedPage <= 0}
+                  sx={{ mr: "50px" }}
+                >
                   <Icon name="chevron-left" size="lg" />
                 </Button>
 
@@ -179,6 +184,7 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                   variant="titleIcon"
                   onClick={nextPage}
                   disabled={clampedPage >= numberOfPages - 1}
+                  sx={{ mr: "40px" }}
                 >
                   <Icon name="chevron-right" size="lg" />
                 </Button>
@@ -209,9 +215,9 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                 mt: 2,
                 pl: [1, 4],
                 width: "100%",
-
                 textAlign: "center",
-                lineHeight: 1.15
+                lineHeight: 1.15,
+                borderSpacing: "0 11px"
               }}
             >
               <colgroup>
@@ -227,17 +233,17 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                   <th>Owner</th>
                   <th>
                     <Abbreviation short="Coll.">Collateral</Abbreviation>
-                    <Box sx={{ fontSize: [0, 1], fontWeight: "body", opacity: 0.5 }}>RBTC</Box>
+                    <Text sx={{ ml: 2, fontSize: 12, fontWeight: "body", opacity: 0.5 }}>
+                      (RBTC)
+                    </Text>
                   </th>
                   <th>
                     Debt
-                    <Box sx={{ fontSize: [0, 1], fontWeight: "body", opacity: 0.5 }}>{COIN}</Box>
+                    <Text sx={{ ml: 2, fontSize: 12, fontWeight: "body", opacity: 0.5 }}>
+                      ({COIN})
+                    </Text>
                   </th>
-                  <th>
-                    Coll.
-                    <br />
-                    Ratio
-                  </th>
+                  <th>Collateral Ratio</th>
                   <th></th>
                 </tr>
               </thead>
@@ -247,12 +253,13 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                   trove =>
                     !trove.isEmpty && ( // making sure the Trove hasn't been liquidated
                       // (TODO: remove check after we can fetch multiple Troves in one call)
-                      <tr key={trove.ownerAddress}>
+                      <tr key={trove.ownerAddress} style={{ backgroundColor: "#2B2B2B" }}>
                         <td
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            height: rowHeight
+                            height: rowHeight,
+                            marginLeft: "20px"
                           }}
                         >
                           <Tooltip message={trove.ownerAddress} placement="top">
