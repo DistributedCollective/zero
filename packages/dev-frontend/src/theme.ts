@@ -420,7 +420,8 @@ const theme: Theme = {
       flex: 1
     },
 
-    editor: {}
+    editor: {
+    }
   },
 
   layout: {
@@ -575,8 +576,9 @@ const theme: Theme = {
 
     redemption: {
       color: "primary",
-      ":hover": { fontWeight: "bold", cursor: "pointer" },
-      textDecoration: "underline"
+      ":hover": {cursor: "pointer" },
+      textDecoration: "underline",
+      fontWeight: "bold"
     }
   }
 };
