@@ -123,7 +123,7 @@ export const WaitListSignup: React.FC = () => {
           {((email && !isValidEmail) || errorMessage) && (
             <Paragraph
               sx={{
-                fontSize: 2,
+                fontSize: 1,
                 fontWeight: 500,
                 position: "absolute",
                 bottom: -30,
@@ -156,7 +156,7 @@ export const WaitListSignup: React.FC = () => {
       >
         <Paragraph
           sx={{
-            fontSize: 2,
+            fontSize: 1,
             fontWeight: 500,
             mb: 30,
             mt: -14,

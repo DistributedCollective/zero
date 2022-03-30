@@ -5,7 +5,7 @@ enum WhitelistType {
 }
 
 const whitelistClient = axios.create({
-  baseURL: "http://localhost:3000/whitelist"
+  baseURL: "https://whitelist.test.sovryn.app/whitelist/"
 });
 
 export const registerEmail = (email: string): Promise<AxiosResponse<any>> =>
