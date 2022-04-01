@@ -1,10 +1,9 @@
 import React, { useCallback } from "react";
-import { Card, Heading, Box, Flex, Button } from "theme-ui";
+import { Card, Box, Flex, Button } from "theme-ui";
 import { useLiquitySelector } from "@liquity/lib-react";
 import { LiquityStoreState } from "@liquity/lib-base";
 import { DisabledEditableRow } from "./Editor";
 import { useTroveView } from "./context/TroveViewContext";
-import { Icon } from "../Icon";
 import { COIN } from "../../strings";
 import { CollateralRatio } from "./CollateralRatio";
 
@@ -24,9 +23,8 @@ export const ReadOnlyTrove: React.FC = () => {
   // console.log("READONLY TROVE", trove.collateral.prettify(4));
   return (
     <Card>
-      <Heading>Line of Credit</Heading>
       <Box sx={{ p: [2, 3] }}>
-        <Box>
+        <Flex>
           <DisabledEditableRow
             label="Collateral"
             inputId="trove-collateral"
@@ -40,7 +38,8 @@ export const ReadOnlyTrove: React.FC = () => {
             amount={trove.debt.prettify()}
             unit={COIN}
           />
-
+        </Flex>
+        <Box sx={{ mt: 30 }}>
           <CollateralRatio value={trove.collateralRatio(price)} />
         </Box>
 
@@ -48,10 +47,7 @@ export const ReadOnlyTrove: React.FC = () => {
           <Button variant="outline" onClick={handleCloseTrove}>
             Close Line of Credit
           </Button>
-          <Button onClick={handleAdjustTrove}>
-            <Icon name="pen" size="sm" />
-            &nbsp;Adjust
-          </Button>
+          <Button onClick={handleAdjustTrove}>Adjust</Button>
         </Flex>
       </Box>
     </Card>
