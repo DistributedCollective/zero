@@ -8,7 +8,7 @@ import { RedeemedTrove } from "./RedeemedTrove";
 import { useTroveView } from "./context/TroveViewContext";
 import { LiquidatedTrove } from "./LiquidatedTrove";
 import { Decimal } from "@liquity/lib-base";
-import { Heading, Flex } from "theme-ui";
+import { Heading } from "theme-ui";
 import { Card } from "../Card";
 
 export const Trove: React.FC = props => {
