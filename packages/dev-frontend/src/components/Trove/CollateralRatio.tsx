@@ -1,9 +1,7 @@
 import React from "react";
-import { Flex, Box, Card } from "theme-ui";
+import { Flex, Card } from "theme-ui";
 
 import { CRITICAL_COLLATERAL_RATIO, Decimal, Difference, Percent } from "@liquity/lib-base";
-
-import { Icon } from "../Icon";
 
 import { StaticRow } from "./Editor";
 import { InfoIcon } from "../InfoIcon";
