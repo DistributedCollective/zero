@@ -79,12 +79,25 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
             unit={borrowedToken}
           />
 
-        <StaticRow
-          label="Debt"
-          inputId="trove-debt"
-          amount={edited.debt.prettify()}
-          unit={borrowedToken}
-        />
+          {original.isEmpty && (
+            <StaticRow
+              label="Liquidation Reserve"
+              inputId="trove-liquidation-reserve"
+              amount={`${ZUSD_LIQUIDATION_RESERVE}`}
+              unit={borrowedToken}
+              infoIcon={
+                <InfoIcon
+                  tooltip={
+                    <Card variant="tooltip" sx={{ width: "200px" }}>
+                      An amount set aside to cover the liquidator’s gas costs if your Line of Credit
+                      needs to be liquidated. The amount increases your debt and is refunded if you
+                      close your Line of Credit by fully paying off its net debt.
+                    </Card>
+                  }
+                />
+              }
+            />
+          )}
 
           <StaticRow
             label="Borrowing Fee"
@@ -95,10 +108,9 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
             infoIcon={
               <InfoIcon
                 tooltip={
-                  <Card variant="tooltip" sx={{ width: "200px" }}>
-                    An amount set aside to cover the liquidator’s gas costs if your Line of Credit
-                    needs to be liquidated. The amount increases your debt and is refunded if you
-                    close your Line of Credit by fully paying off its net debt.
+                  <Card variant="tooltip" sx={{ width: "240px" }}>
+                    This amount is deducted from the borrowed amount as a one-time fee. There are no
+                    recurring fees for borrowing, which is thus interest-free.
                   </Card>
                 }
               />

@@ -134,7 +134,9 @@ export const Opening: React.FC = () => {
             <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
           </Flex>
         </Flex>
-        <Flex sx={{ mt: 30, alignItems: "center", justifyContent: "space-between" }}>
+        <Flex
+          sx={{ mt: 30, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}
+        >
           <StaticRow
             label="Liquidation Reserve"
             inputId="trove-liquidation-reserve"
@@ -193,7 +195,6 @@ export const Opening: React.FC = () => {
               />
             }
           />
-
           <CollateralRatio value={collateralRatio} />
         </Flex>
 
