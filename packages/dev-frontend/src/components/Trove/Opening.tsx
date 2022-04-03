@@ -91,17 +91,20 @@ export const Opening: React.FC = () => {
   }, [collateral, borrowAmount]);
 
   return (
-    <Card>
-      <Heading>
-        Line of Credit
+    <>
+      {description ?? (
+        <Flex sx={{ justifyContent: "center" }}>
+          <ActionDescription>
+            Start by entering the amount of RBTC you'd like to deposit as collateral.
+          </ActionDescription>
+        </Flex>
+      )}
+      <Box sx={{ p: [2, 3] }}>
         {isDirty && !isTransactionPending && (
           <Button variant="titleIcon" sx={{ ":enabled:hover": { color: "danger" } }} onClick={reset}>
             <Icon name="history" size="lg" />
           </Button>
         )}
-      </Heading>
-
-      <Box sx={{ p: [2, 3] }}>
         <EditableRow
           label="Collateral"
           inputId="trove-collateral"
@@ -134,9 +137,9 @@ export const Opening: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "200px" }}>
-                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs to be
-                  liquidated. The amount increases your debt and is refunded if you close your Line of Credit
-                  by fully paying off its net debt.
+                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit
+                  needs to be liquidated. The amount increases your debt and is refunded if you close
+                  your Line of Credit by fully paying off its net debt.
                 </Card>
               }
             />
@@ -174,8 +177,8 @@ export const Opening: React.FC = () => {
                   {isDirty && (
                     <>
                       You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
-                      {borrowedToken} to reclaim your collateral ({ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD
-                      Liquidation Reserve excluded).
+                      {borrowedToken} to reclaim your collateral (
+                      {ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD Liquidation Reserve excluded).
                     </>
                   )}
                 </Card>
@@ -185,12 +188,6 @@ export const Opening: React.FC = () => {
         />
 
         <CollateralRatio value={collateralRatio} />
-
-        {description ?? (
-          <ActionDescription>
-            Start by entering the amount of RBTC you'd like to deposit as collateral.
-          </ActionDescription>
-        )}
 
         <Flex variant="layout.actions">
           <Button variant="cancel" onClick={handleCancelPressed}>
@@ -212,6 +209,6 @@ export const Opening: React.FC = () => {
         </Flex>
       </Box>
       {isTransactionPending && <LoadingOverlay />}
-    </Card>
+    </>
   );
 };
