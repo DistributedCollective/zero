@@ -54,9 +54,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
   const collateralRatioChange = Difference.between(collateralRatio, originalCollateralRatio);
 
   return (
-    <Card>
-      <Heading>Line of Credit</Heading>
-
+    <>
       <Box sx={{ p: [2, 3] }}>
         <StaticRow
           label="Collateral"
@@ -67,7 +65,12 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
 
         <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
 
-        <StaticRow label="Debt" inputId="trove-debt" amount={edited.debt.prettify()} unit={borrowedToken} />
+        <StaticRow
+          label="Debt"
+          inputId="trove-debt"
+          amount={edited.debt.prettify()}
+          unit={borrowedToken}
+        />
 
         {original.isEmpty && (
           <StaticRow
@@ -79,9 +82,9 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
               <InfoIcon
                 tooltip={
                   <Card variant="tooltip" sx={{ width: "200px" }}>
-                    An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs 
-                    to be liquidated. The amount increases your debt and is refunded if you close your
-                    Line of Credit by fully paying off its net debt.
+                    An amount set aside to cover the liquidator’s gas costs if your Line of Credit
+                    needs to be liquidated. The amount increases your debt and is refunded if you
+                    close your Line of Credit by fully paying off its net debt.
                   </Card>
                 }
               />
@@ -113,6 +116,6 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
       </Box>
 
       {changePending && <LoadingOverlay />}
-    </Card>
+    </>
   );
 };
