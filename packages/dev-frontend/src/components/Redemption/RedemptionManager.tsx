@@ -108,6 +108,7 @@ export const RedemptionManager: React.FC = () => {
     >
       <Box
         sx={{
+          pt: "50px",
           mx: "auto",
           width: "75%"
         }}
@@ -115,7 +116,7 @@ export const RedemptionManager: React.FC = () => {
         {((dirty || !canRedeem) && description) || (
           <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
         )}
-        <Flex>
+        <Flex sx={{ flexDirection: "row" }}>
           <EditableRow
             label="Redeem"
             inputId="redeem-zusd"
@@ -127,27 +128,36 @@ export const RedemptionManager: React.FC = () => {
             editedAmount={zusdAmount.toString(2)}
             setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
           />
-
-          <StaticRow
-            label="Redemption Fee"
-            inputId="redeem-fee"
-            amount={ethFee.toString(4)}
-            pendingAmount={feePct.toString(2)}
-            unit="ETH"
-            infoIcon={
-              <InfoIcon
-                tooltip={
-                  <Card>
-                    The Redemption Fee is charged as a percentage of the redeemed RBTC. The
-                    Redemption Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
-                  </Card>
-                }
-              />
-            }
-          />
+          <Box sx={{ mt: 40, pl: "8px" }}>
+            <StaticRow
+              label="Redemption Fee"
+              inputId="redeem-fee"
+              amount={ethFee.toString(4)}
+              pendingAmount={feePct.toString(2)}
+              unit="ETH"
+              infoIcon={
+                <InfoIcon
+                  tooltip={
+                    <Card>
+                      The Redemption Fee is charged as a percentage of the redeemed RBTC. The
+                      Redemption Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
+                    </Card>
+                  }
+                />
+              }
+            />
+          </Box>
         </Flex>
 
-        <Flex variant="layout.actions">
+        <Flex
+          sx={{
+            justifyContent: "flex-end",
+            mt: 50,
+            button: {
+              ml: 2
+            }
+          }}
+        >
           <RedemptionAction
             transactionId={transactionId}
             disabled={!dirty || !canRedeem}

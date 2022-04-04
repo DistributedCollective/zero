@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Link, Paragraph } from "theme-ui";
+import { Container, Link, Paragraph } from "theme-ui";
 import { Card } from "../components/Card";
 import { SystemStats } from "../components/SystemStats";
 import { Redemption } from "../components/Redemption/Redemption";
