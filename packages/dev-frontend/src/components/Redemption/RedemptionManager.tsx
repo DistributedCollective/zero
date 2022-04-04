@@ -91,7 +91,7 @@ export const RedemptionManager: React.FC = () => {
     <Card
       heading={
         <>
-          <Heading className="heading">
+          <Heading className="heading" sx={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems:"center" }}>
             Redeem
             {dirty && !changePending && (
               <Button
