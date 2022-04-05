@@ -16,6 +16,8 @@ import { RedemptionPage } from "./pages/RedemptionPage";
 
 import { TroveViewProvider } from "./components/Trove/context/TroveViewProvider";
 import { StabilityViewProvider } from "./components/Stability/context/StabilityViewProvider";
+import { StakingViewProvider } from "./components/Staking/context/StakingViewProvider";
+import { Nav } from "./components/Nav";
 
 type LiquityFrontendProps = {
   loader?: React.ReactNode;
@@ -39,30 +41,33 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
       <Router>
         <TroveViewProvider>
           <StabilityViewProvider>
-            <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
-              <Header />
-              <Container
-                variant="main"
-                sx={{
-                  display: "flex",
-                  flexGrow: 1,
-                  flexDirection: "column",
-                  alignItems: "center"
-                }}
-              >
-                <Switch>
-                  <Route path="/" exact>
-                    <PageSwitcher />
-                  </Route>
-                  <Route path="/liquidation">
-                    <RiskyTrovesPage />
-                  </Route>
-                  <Route path="/redemption">
-                    <RedemptionPage />
-                  </Route>
-                </Switch>
-              </Container>
-            </Flex>
+            <StakingViewProvider>
+              <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
+                <Header />
+                <Nav/>
+                <Container
+                  variant="main"
+                  sx={{
+                    display: "flex",
+                    flexGrow: 1,
+                    flexDirection: "column",
+                    alignItems: "center"
+                  }}
+                >
+                  <Switch>
+                    <Route path="/" exact>
+                      <PageSwitcher />
+                    </Route>
+                    <Route path="/liquidation">
+                      <RiskyTrovesPage />
+                    </Route>
+                    <Route path="/redemption">
+                      <RedemptionPage />
+                    </Route>
+                  </Switch>
+                </Container>
+              </Flex>
+            </StakingViewProvider>
           </StabilityViewProvider>
         </TroveViewProvider>
       </Router>
