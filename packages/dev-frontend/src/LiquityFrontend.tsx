@@ -41,7 +41,6 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
       <Router>
         <TroveViewProvider>
           <StabilityViewProvider>
-            <StakingViewProvider>
               <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
                 <Header />
                 <Nav />
@@ -67,7 +66,6 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
                   </Switch>
                 </Container>
               </Flex>
-            </StakingViewProvider>
           </StabilityViewProvider>
         </TroveViewProvider>
       </Router>
