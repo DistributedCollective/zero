@@ -4,8 +4,9 @@ import { Link } from "./Link";
 export const Nav: React.FC = () => {
   return (
     <Box as="nav" sx={{ display: ["none", "flex"] }}>
-      <Flex sx={{ justifyContent: "center", mr: 3, flex: 9 }}>
-        <Image sx={{ height: 40}} src="/images/zerologo.svg" alt="Zero" />
+      <Flex sx={{flex:1}}/>
+      <Flex sx={{ justifyContent: "flex-start", alignItems:"center",my:20, flex: 2 }}>
+        <Image sx={{ height: 40, pr:20}} src="/images/zerologo.svg" alt="Zero" />
         <Link to="/">Dashboard</Link>
         <Link sx={{ fontSize: 1 }} to="/liquidation">
           Liquidation
@@ -14,11 +15,15 @@ export const Nav: React.FC = () => {
           Redemption
         </Link>
       </Flex>
-      <Flex sx={{ justifyContent: "flex-end", mr: 3, flex: 5 }}>
+      <Flex sx={{ justifyContent: "flex-end",alignItems:"center", flex: 2 }}>
+      <NavLink href="https://wiki.sovryn.app/en/sovryn-dapp/subprotocols/zero-zusd" target="_blank">
+          DOCS
+        </NavLink>
         <NavLink href="https://live.sovryn.app/swap" target="_blank">
           Trade
         </NavLink>
       </Flex>
+      <Flex sx={{flex:1}}/>
     </Box>
   );
 };
