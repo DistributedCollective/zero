@@ -77,7 +77,7 @@ const colors = {
   invalid: baseColors["pink-1"],
   text: baseColors["sov-white"],
   background: baseColors["gray-1"],
-  cardBackground: baseColors.black,
+  cardBackground: baseColors["gray-4"],
   muted: baseColors["sov-white"],
   bonded: baseColors["gray-6"],
   highlight: baseColors["gray-6"]
@@ -142,17 +142,14 @@ const cardGapY = [3, 3, 4];
 
 const card: ThemeUIStyleObject = {
   position: "relative",
-  mt: cardGapY,
-  boxShadow: [1, null, 2],
-  borderRadius: 13
+  borderRadius: 10
 };
 
 const infoCard: ThemeUIStyleObject = {
   ...card,
 
-  padding: 3,
-  borderColor: "rgba(122,199,240,0.4)",
-  background: `linear-gradient(200deg, #26899b, #030c0d)`,
+  padding: 4,
+  background: colors.cardBackground,
 
   h2: {
     mb: 2,
@@ -206,8 +203,8 @@ const theme: Theme = {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
 
   fonts: {
-    body: 'Montserrat", "sans-serif',
-    heading: 'Montserrat", "sans-serif',
+    body: '"Montserrat", "sans-serif"',
+    heading: '"Montserrat", "sans-serif"',
     monospace: "Menlo, monospace"
   },
 
@@ -357,9 +354,7 @@ const theme: Theme = {
     },
 
     info: {
-      ...infoCard,
-
-      display: ["none", "block"]
+      ...infoCard
     },
 
     infoPopup: {
@@ -403,9 +398,9 @@ const theme: Theme = {
     },
 
     input: {
-      ...formCell,
-
-      flex: 1
+      borderRadius: 8,
+      outline: "none",
+      color: "cardBackground"
     },
 
     editor: {}

@@ -3,3 +3,18 @@
 html {
   height: 100%;
 }
+
+.dialog-enter {
+  opacity: 0.01;
+}
+.dialog-enter.dialog-enter-active {
+  opacity: 1;
+  transition: opacity 120ms ease-in;
+}
+.dialog-exit {
+  opacity: 1;
+}
+.dialog-exit.dialog-exit-active {
+  opacity: 0.01;
+  transition: opacity 120ms ease-in;
+}
