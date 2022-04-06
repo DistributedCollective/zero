@@ -212,7 +212,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
 
-  return editing !== inputId ? (
+  return editing === inputId ? (
     <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2 }}>
       <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
         <Input
