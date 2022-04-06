@@ -420,7 +420,8 @@ const theme: Theme = {
       flex: 1
     },
 
-    editor: {}
+    editor: {
+    }
   },
 
   layout: {
@@ -571,6 +572,13 @@ const theme: Theme = {
       textTransform: "uppercase",
       letterSpacing: "2px",
       width: ["100%", "auto"]
+    },
+
+    redemption: {
+      color: "primary",
+      ":hover": {cursor: "pointer" },
+      textDecoration: "underline",
+      fontWeight: "bold"
     }
   }
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Heading, Box, Card } from "theme-ui";
+import { Box, Card, Flex } from "theme-ui";
 
 import {
   Percent,
@@ -54,58 +54,70 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
   const collateralRatioChange = Difference.between(collateralRatio, originalCollateralRatio);
 
   return (
-    <Card>
-      <Heading>Line of Credit</Heading>
-
+    <>
       <Box sx={{ p: [2, 3] }}>
-        <StaticRow
-          label="Collateral"
-          inputId="trove-collateral"
-          amount={edited.collateral.prettify(4)}
-          unit="RBTC"
-        />
-
-        <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
-
-        <StaticRow label="Debt" inputId="trove-debt" amount={edited.debt.prettify()} unit={borrowedToken} />
-
-        {original.isEmpty && (
+        <Flex
+          sx={{
+            mt: 30,
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 2
+          }}
+        >
           <StaticRow
-            label="Liquidation Reserve"
-            inputId="trove-liquidation-reserve"
-            amount={`${ZUSD_LIQUIDATION_RESERVE}`}
+            label="Collateral"
+            inputId="trove-collateral"
+            amount={edited.collateral.prettify(4)}
+            unit="RBTC"
+          />
+          <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
+
+          <StaticRow
+            label="Debt"
+            inputId="trove-debt"
+            amount={edited.debt.prettify()}
+            unit={borrowedToken}
+          />
+
+          {original.isEmpty && (
+            <StaticRow
+              label="Liquidation Reserve"
+              inputId="trove-liquidation-reserve"
+              amount={`${ZUSD_LIQUIDATION_RESERVE}`}
+              unit={borrowedToken}
+              infoIcon={
+                <InfoIcon
+                  tooltip={
+                    <Card variant="tooltip" sx={{ width: "200px" }}>
+                      An amount set aside to cover the liquidator’s gas costs if your Line of Credit
+                      needs to be liquidated. The amount increases your debt and is refunded if you
+                      close your Line of Credit by fully paying off its net debt.
+                    </Card>
+                  }
+                />
+              }
+            />
+          )}
+
+          <StaticRow
+            label="Borrowing Fee"
+            inputId="trove-borrowing-fee"
+            amount={fee.toString(2)}
+            pendingAmount={feePct.toString(2)}
             unit={borrowedToken}
             infoIcon={
               <InfoIcon
                 tooltip={
-                  <Card variant="tooltip" sx={{ width: "200px" }}>
-                    An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs 
-                    to be liquidated. The amount increases your debt and is refunded if you close your
-                    Line of Credit by fully paying off its net debt.
+                  <Card variant="tooltip" sx={{ width: "240px" }}>
+                    This amount is deducted from the borrowed amount as a one-time fee. There are no
+                    recurring fees for borrowing, which is thus interest-free.
                   </Card>
                 }
               />
             }
           />
-        )}
-
-        <StaticRow
-          label="Borrowing Fee"
-          inputId="trove-borrowing-fee"
-          amount={fee.toString(2)}
-          pendingAmount={feePct.toString(2)}
-          unit={borrowedToken}
-          infoIcon={
-            <InfoIcon
-              tooltip={
-                <Card variant="tooltip" sx={{ width: "240px" }}>
-                  This amount is deducted from the borrowed amount as a one-time fee. There are no
-                  recurring fees for borrowing, which is thus interest-free.
-                </Card>
-              }
-            />
-          }
-        />
+        </Flex>
 
         <CollateralRatio value={collateralRatio} change={collateralRatioChange} />
 
@@ -113,6 +125,6 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
       </Box>
 
       {changePending && <LoadingOverlay />}
-    </Card>
+    </>
   );
 };
