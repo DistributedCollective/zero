@@ -1,21 +1,35 @@
-import { Flex, Box, NavLink } from "theme-ui";
+import { Flex, NavLink, Image, Container } from "theme-ui";
 import { Link } from "./Link";
 
 export const Nav: React.FC = () => {
   return (
-    <Box as="nav" sx={{ display: ["none", "flex"], alignItems: "center", flex: 1 }}>
-      <Flex>
+    <Container
+      variant="main"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        mt: 3,
+        flexDirection: ["column", "column", "row"]
+      }}
+    >
+      <Flex sx={{ alignItems: "center", flexDirection: ["column", "row"] }}>
+        <Image sx={{ height: 40, pr: 20 }} src="/images/zerologo.svg" alt="Zero" />
         <Link to="/">Dashboard</Link>
-        <NavLink href="https://live.sovryn.app/swap" target="_blank">Trade</NavLink>
+        <Link to="/liquidation">Liquidation</Link>
+        <Link to="/redemption">Redemption</Link>
       </Flex>
-      <Flex sx={{ justifyContent: "flex-end", mr: 3, flex: 1 }}>
-        <Link sx={{ fontSize: 1 }} to="/liquidation">
-          Liquidation
-        </Link>
-        <Link sx={{ fontSize: 1 }} to="/redemption">
-          Redemption
-        </Link>
+      <Flex sx={{ alignItems: "center", flexDirection: ["column", "row"] }}>
+        <NavLink
+          href="https://wiki.sovryn.app/en/sovryn-dapp/subprotocols/zero-zusd"
+          target="_blank"
+        >
+          DOCS
+        </NavLink>
+        <NavLink href="https://live.sovryn.app/swap" target="_blank">
+          Trade
+        </NavLink>
       </Flex>
-    </Box>
+    </Container>
   );
 };

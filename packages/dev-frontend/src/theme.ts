@@ -75,7 +75,7 @@ const colors = {
   primary: baseColors.primary,
   secondary: baseColors.secondary,
   accent: baseColors.primary,
-  success: baseColors["blue-1"],
+  success: baseColors.success,
   warning: baseColors.primary,
   danger: baseColors.warning,
   dangerHover: baseColors["orange-2"],
