@@ -91,7 +91,15 @@ export const RedemptionManager: React.FC = () => {
     <Card
       heading={
         <>
-          <Heading className="heading" sx={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems:"center" }}>
+          <Heading
+            className="heading"
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              alignItems: "center"
+            }}
+          >
             Redeem
             {dirty && !changePending && (
               <Button
@@ -99,7 +107,7 @@ export const RedemptionManager: React.FC = () => {
                 sx={{ ":enabled:hover": { color: "danger" } }}
                 onClick={() => setZUSDAmount(Decimal.ZERO)}
               >
-                <Icon name="history" size="lg" />
+                <Icon name="history" size="sm" />
               </Button>
             )}
           </Heading>
@@ -108,9 +116,9 @@ export const RedemptionManager: React.FC = () => {
     >
       <Box
         sx={{
-          pt: "50px",
+          pt: 36,
           mx: "auto",
-          width: "75%"
+          px: 36
         }}
       >
         {((dirty || !canRedeem) && description) || (
