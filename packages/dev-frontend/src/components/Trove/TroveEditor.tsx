@@ -8,6 +8,7 @@ import {
   Decimal,
   Trove,
   LiquityStoreState,
+  ZUSD_LIQUIDATION_RESERVE
 } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
 
