@@ -83,7 +83,7 @@ const colors = {
   invalid: baseColors["pink-1"],
   text: baseColors["sov-white"],
   background: baseColors["gray-1"],
-  cardBackground: baseColors.black,
+  cardBackground: baseColors["gray-4"],
   muted: baseColors["sov-white"],
   bonded: baseColors["gray-6"],
   highlight: baseColors["gray-6"],
@@ -159,6 +159,7 @@ const infoCard: ThemeUIStyleObject = {
   ...card,
 
   padding: 3,
+  background: colors.cardBackground,
 
   h2: {
     mb: 2,
@@ -369,9 +370,7 @@ const theme: Theme = {
     },
 
     info: {
-      ...infoCard,
-
-      display: ["none", "block"]
+      ...infoCard
     },
 
     infoPopup: {
@@ -415,9 +414,9 @@ const theme: Theme = {
     },
 
     input: {
-      ...formCell,
-
-      flex: 1
+      borderRadius: 8,
+      outline: "none",
+      color: "cardBackground"
     },
 
     editor: {
