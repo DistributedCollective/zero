@@ -44,7 +44,7 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
             <StakingViewProvider>
               <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
                 <Header />
-                <Nav/>
+                <Nav />
                 <Container
                   variant="main"
                   sx={{
