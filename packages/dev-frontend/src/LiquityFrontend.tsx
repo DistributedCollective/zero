@@ -16,7 +16,6 @@ import { RedemptionPage } from "./pages/RedemptionPage";
 
 import { TroveViewProvider } from "./components/Trove/context/TroveViewProvider";
 import { StabilityViewProvider } from "./components/Stability/context/StabilityViewProvider";
-import { StakingViewProvider } from "./components/Staking/context/StakingViewProvider";
 import { Nav } from "./components/Nav";
 
 type LiquityFrontendProps = {
