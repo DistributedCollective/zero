@@ -47,7 +47,8 @@ export const PriceManager: React.FC = () => {
             value={editedPrice}
             onChange={e => setEditedPrice(e.target.value)}
             disabled={!canSetPrice}
-            sx={{ pl: 42, py: 3 }}
+            sx={{ pl: 42, py: 3, color: "white", border: "none" }}
+            bg="zeroCardHeading"
             min={0}
           />
         </Box>
