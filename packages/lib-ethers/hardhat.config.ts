@@ -60,7 +60,7 @@ const governanceAddresses = {
 
 const sovFeeCollectorAddresses = {
   mainnet: "",
-  rsktestnet: "0x85B19DD6E3c6cCC54D40c1bAEC15058962B8245b",
+  rsktestnet: "0x1F41C758f65E6d985AE3c373BD4B721EE6c63960",
   dev: ""
 };
 
@@ -72,13 +72,13 @@ const wrbtcAddresses = {
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d",
+  rsktestnet: "0x572b8990067785d1c601aDE6359c05C296deC718",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0xC4C82fE6d6D531cf7bE8DaC7F9F0Ba63FED4c8d0",
+  rsktestnet: "0x25E79f651e85da501706514358640b96d8b07Db6",
   dev: ""
 };
 
@@ -88,7 +88,7 @@ const oracleAddresses : Record<string, OracleAddresses> = {
     rskOracleAddress: ""
   },
   rsktestnet: {
-    mocOracleAddress: "0x26a00aF444928d689DDEC7b4D17c0E4a8c9D407d",
+    mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
     rskOracleAddress: "0xE00243Bc6912BF148302e8478996c98c22fE8739"
   },
   dev: {
@@ -331,12 +331,6 @@ task("deploy", "Deploys the contracts to the network")
   .addOptionalParam(
     "governanceAddress",
     "Governance contract address to be the owner",
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    "sovCommunityPotAddress",
-    "SOV Stakers pool contract address",
     undefined,
     types.string
   )
