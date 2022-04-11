@@ -124,32 +124,29 @@ export const StabilityDepositManager: React.FC = () => {
   }, [myTransactionState.type, dispatch, dispatchEvent]);
 
   return (
-    <StabilityDepositEditor
-      originalDeposit={originalDeposit}
-      editedZUSD={editedZUSD}
-      changePending={changePending}
-      dispatch={dispatch}
-    >
-      {description ??
-        (makingNewDeposit ? (
-          <ActionDescription>Enter the amount of {COIN} you'd like to deposit.</ActionDescription>
-        ) : (
-          <ActionDescription>Adjust the {COIN} amount to deposit or withdraw.</ActionDescription>
-        ))}
+    <>
+      <StabilityDepositEditor
+        originalDeposit={originalDeposit}
+        editedZUSD={editedZUSD}
+        changePending={changePending}
+        description={description}
+        dispatch={dispatch}
+        makingNewDeposit={makingNewDeposit}
+      >
+        <Flex variant="layout.actions">
+          <Button variant="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>
 
-      <Flex variant="layout.actions">
-        <Button variant="cancel" onClick={handleCancel}>
-          Cancel
-        </Button>
-
-        {validChange ? (
-          <StabilityDepositAction transactionId={transactionId} change={validChange}>
-            Confirm
-          </StabilityDepositAction>
-        ) : (
-          <Button disabled>Confirm</Button>
-        )}
-      </Flex>
-    </StabilityDepositEditor>
+          {validChange ? (
+            <StabilityDepositAction transactionId={transactionId} change={validChange}>
+              Confirm
+            </StabilityDepositAction>
+          ) : (
+            <Button disabled>Confirm</Button>
+          )}
+        </Flex>
+      </StabilityDepositEditor>
+    </>
   );
 };
