@@ -4,9 +4,6 @@ import { Button, Flex } from "theme-ui";
 import { Decimal, Decimalish, LiquityStoreState } from "@liquity/lib-base";
 import { LiquityStoreUpdate, useLiquityReducer, useLiquitySelector } from "@liquity/lib-react";
 
-import { COIN } from "../../strings";
-
-import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 
 import { StabilityDepositEditor } from "./StabilityDepositEditor";
@@ -124,32 +121,29 @@ export const StabilityDepositManager: React.FC = () => {
   }, [myTransactionState.type, dispatch, dispatchEvent]);
 
   return (
-    <StabilityDepositEditor
-      originalDeposit={originalDeposit}
-      editedZUSD={editedZUSD}
-      changePending={changePending}
-      dispatch={dispatch}
-    >
-      {description ??
-        (makingNewDeposit ? (
-          <ActionDescription>Enter the amount of {COIN} you'd like to deposit.</ActionDescription>
-        ) : (
-          <ActionDescription>Adjust the {COIN} amount to deposit or withdraw.</ActionDescription>
-        ))}
+    <>
+      <StabilityDepositEditor
+        originalDeposit={originalDeposit}
+        editedZUSD={editedZUSD}
+        changePending={changePending}
+        description={description}
+        dispatch={dispatch}
+        makingNewDeposit={makingNewDeposit}
+      >
+        <Flex variant="layout.cta">
+          <Button variant="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>
 
-      <Flex variant="layout.cta">
-        <Button variant="cancel" onClick={handleCancel}>
-          Cancel
-        </Button>
-
-        {validChange ? (
-          <StabilityDepositAction transactionId={transactionId} change={validChange}>
-            Confirm
-          </StabilityDepositAction>
-        ) : (
-          <Button disabled>Confirm</Button>
-        )}
-      </Flex>
-    </StabilityDepositEditor>
+          {validChange ? (
+            <StabilityDepositAction transactionId={transactionId} change={validChange}>
+              Confirm
+            </StabilityDepositAction>
+          ) : (
+            <Button disabled>Confirm</Button>
+          )}
+        </Flex>
+      </StabilityDepositEditor>
+    </>
   );
 };

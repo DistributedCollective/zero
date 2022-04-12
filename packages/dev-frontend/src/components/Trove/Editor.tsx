@@ -213,7 +213,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   const [invalid, setInvalid] = useState(false);
 
   return editing === inputId ? (
-    <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2 }}>
+    <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2, maxWidth: 355 }}>
       <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
         <Input
           autoFocus
@@ -249,7 +249,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
     <Row
       labelId={`${inputId}-label`}
       {...{ label, labelFor: inputId, unit }}
-      sx={{ flex: 1, px: 2 }}
+      sx={{ flex: 1, px: 2, maxWidth: 355 }}
     >
       <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
         <StaticAmounts
