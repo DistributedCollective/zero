@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Card, Box, Button, Flex } from "theme-ui";
+import { Box, Button, Flex } from "theme-ui";
 import { CollateralSurplusAction } from "../CollateralSurplusAction";
 import { LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
@@ -19,7 +19,7 @@ export const RedeemedTrove: React.FC = () => {
   }, [dispatchEvent]);
 
   return (
-    <Card>
+    <>
       <Box sx={{ p: [2, 3] }}>
         <InfoMessage title="Your Line of Credit has been redeemed.">
           {hasSurplusCollateral
@@ -27,11 +27,11 @@ export const RedeemedTrove: React.FC = () => {
             : "You can borrow ZUSD by opening a new Line of Credit."}
         </InfoMessage>
 
-        <Flex variant="layout.actions">
+        <Flex variant="layout.cta">
           {hasSurplusCollateral && <CollateralSurplusAction />}
           {!hasSurplusCollateral && <Button onClick={handleOpenTrove}>Open Line of Credit</Button>}
         </Flex>
       </Box>
-    </Card>
+    </>
   );
 };

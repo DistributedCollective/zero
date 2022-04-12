@@ -102,28 +102,27 @@ export const ActiveDeposit: React.FC = () => {
             </Flex>
           </Flex>
         </Flex>
-
-        <Flex variant="layout.cta">
-          <ClaimRewards disabled={!hasGain && !hasReward}>Claim RBTC</ClaimRewards>
-          {hasTrove && (
-            <Box sx={{ position: "relative" }}>
-              <Box sx={{ position: "absolute", top: -25, right: -1 }}>
-                <InfoIcon
-                  tooltip={
-                    <Card variant="tooltip" sx={{ width: "240px" }}>
-                      Claim ZERO and move RBTC to Line of Credit
-                    </Card>
-                  }
-                  size="xs"
-                />
-              </Box>
-              <ClaimAndMove disabled={!hasGain}>Claim and Move</ClaimAndMove>{" "}
-            </Box>
-          )}
-          <Button onClick={handleAdjustDeposit}>&nbsp;Adjust</Button>
-        </Flex>
       </Box>
 
+      <Flex variant="layout.cta">
+        <ClaimRewards disabled={!hasGain && !hasReward}>Claim RBTC</ClaimRewards>
+        {hasTrove && (
+          <Box sx={{ position: "relative" }}>
+            <Box sx={{ position: "absolute", top: -25, right: -1 }}>
+              <InfoIcon
+                tooltip={
+                  <Card variant="tooltip" sx={{ width: "240px" }}>
+                    Claim ZERO and move RBTC to Line of Credit
+                  </Card>
+                }
+                size="xs"
+              />
+            </Box>
+            <ClaimAndMove disabled={!hasGain}>Claim and Move</ClaimAndMove>{" "}
+          </Box>
+        )}
+        <Button onClick={handleAdjustDeposit}>&nbsp;Adjust</Button>
+      </Flex>
       {isWaitingForTransaction && <LoadingOverlay />}
     </>
   );

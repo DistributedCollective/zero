@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Card, Box, Flex, Button } from "theme-ui";
+import { Box, Flex, Button } from "theme-ui";
 import { useLiquitySelector } from "@liquity/lib-react";
 import { LiquityStoreState } from "@liquity/lib-base";
 import { DisabledEditableRow } from "./Editor";
@@ -22,7 +22,7 @@ export const ReadOnlyTrove: React.FC = () => {
 
   // console.log("READONLY TROVE", trove.collateral.prettify(4));
   return (
-    <Card>
+    <>
       <Box sx={{ p: [2, 3] }}>
         <Flex>
           <DisabledEditableRow
@@ -42,12 +42,11 @@ export const ReadOnlyTrove: React.FC = () => {
         <Box sx={{ mt: 30 }}>
           <CollateralRatio value={trove.collateralRatio(price)} />
         </Box>
-
-        <Flex variant="layout.cta">
-          <Button onClick={handleCloseTrove}>Close Line of Credit</Button>
-          <Button onClick={handleAdjustTrove}>Adjust</Button>
-        </Flex>
       </Box>
-    </Card>
+      <Flex variant="layout.cta">
+        <Button onClick={handleCloseTrove}>Close Line of Credit</Button>
+        <Button onClick={handleAdjustTrove}>Adjust</Button>
+      </Flex>
+    </>
   );
 };

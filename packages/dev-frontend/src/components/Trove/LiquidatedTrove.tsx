@@ -26,7 +26,7 @@ export const LiquidatedTrove: React.FC = () => {
           : "You can borrow ZUSD by opening a new Line of Credit."}
       </InfoMessage>
 
-      <Flex variant="layout.actions">
+      <Flex variant="layout.cta">
         {hasSurplusCollateral && <CollateralSurplusAction />}
         {!hasSurplusCollateral && <Button onClick={handleOpenTrove}>Open Line of Credit</Button>}
       </Flex>

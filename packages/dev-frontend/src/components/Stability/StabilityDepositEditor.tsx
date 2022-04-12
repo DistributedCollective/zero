@@ -151,8 +151,8 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
             />
           </Flex>
         )}
-        {children}
       </Box>
+      {children}
 
       {changePending && <LoadingOverlay />}
     </>

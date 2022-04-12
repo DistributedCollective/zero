@@ -262,26 +262,25 @@ export const Adjusting: React.FC = () => {
             Adjust your Line of Credit by modifying its collateral, debt, or both.
           </ActionDescription>
         )}
-
-        <Flex variant="layout.cta">
-          <Button variant="cancel" onClick={handleCancelPressed}>
-            Cancel
-          </Button>
-
-          {troveChange ? (
-            <TroveAction
-              transactionId={TRANSACTION_ID}
-              change={troveChange}
-              useNueToken={useNueToken}
-              maxBorrowingRate={maxBorrowingRate}
-            >
-              Confirm
-            </TroveAction>
-          ) : (
-            <Button disabled>Confirm</Button>
-          )}
-        </Flex>
       </Box>
+      <Flex variant="layout.cta">
+        <Button variant="cancel" onClick={handleCancelPressed}>
+          Cancel
+        </Button>
+
+        {troveChange ? (
+          <TroveAction
+            transactionId={TRANSACTION_ID}
+            change={troveChange}
+            useNueToken={useNueToken}
+            maxBorrowingRate={maxBorrowingRate}
+          >
+            Confirm
+          </TroveAction>
+        ) : (
+          <Button disabled>Confirm</Button>
+        )}
+      </Flex>
       {isTransactionPending && <LoadingOverlay />}
     </>
   );

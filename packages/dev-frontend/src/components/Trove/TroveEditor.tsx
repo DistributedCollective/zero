@@ -120,9 +120,8 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
         </Flex>
 
         <CollateralRatio value={collateralRatio} change={collateralRatioChange} />
-
-        {children}
       </Box>
+      {children}
 
       {changePending && <LoadingOverlay />}
     </>
