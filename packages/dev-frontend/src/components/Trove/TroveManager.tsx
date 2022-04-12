@@ -231,7 +231,7 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
           </ActionDescription>
         ))}
 
-      <Flex variant="layout.actions">
+      <Flex variant="layout.cta">
         <Button variant="cancel" onClick={handleCancel}>
           Cancel
         </Button>

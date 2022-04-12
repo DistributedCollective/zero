@@ -148,7 +148,7 @@ export const StakingManager: React.FC = () => {
           <ActionDescription>Adjust the {GT} amount to stake or withdraw.</ActionDescription>
         ))}
 
-      <Flex variant="layout.actions">
+      <Flex variant="layout.cta">
         <Button
           variant="cancel"
           onClick={() => dispatchStakingViewAction({ type: "cancelAdjusting" })}

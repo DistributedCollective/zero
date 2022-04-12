@@ -35,7 +35,8 @@ export const PriceManager: React.FC = () => {
             bg="zeroCardHeading"
             sx={{
               position: "absolute",
-              left: 3
+              left: 3,
+              pr: 0
             }}
           >
             $

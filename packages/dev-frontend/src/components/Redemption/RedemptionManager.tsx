@@ -62,7 +62,7 @@ export const RedemptionManager: React.FC = () => {
         false,
         <ErrorDescription>
           You can't redeem ZUSD when the total collateral ratio is less than{" "}
-          <Amount>{mcrPercent}</Amount>. Please try again later.
+          <Amount> {mcrPercent}</Amount>. Please try again later.
         </ErrorDescription>
       ]
     : zusdAmount.gt(zusdBalance)
@@ -71,6 +71,7 @@ export const RedemptionManager: React.FC = () => {
         <ErrorDescription>
           The amount you're trying to redeem exceeds your balance by{" "}
           <Amount>
+            {" "}
             {zusdAmount.sub(zusdBalance).prettify()} {COIN}
           </Amount>
           .
@@ -104,7 +105,7 @@ export const RedemptionManager: React.FC = () => {
             {dirty && !changePending && (
               <Button
                 variant="titleIcon"
-                sx={{ ":enabled:hover": { color: "danger" } }}
+                sx={{ position: "absolute", right: 20, ":enabled:hover": { color: "danger" } }}
                 onClick={() => setZUSDAmount(Decimal.ZERO)}
               >
                 <Icon name="history" size="sm" />
@@ -117,14 +118,13 @@ export const RedemptionManager: React.FC = () => {
       <Box
         sx={{
           pt: 36,
-          mx: "auto",
-          px: 36
+          mx: "auto"
         }}
       >
         {((dirty || !canRedeem) && description) || (
           <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
         )}
-        <Flex sx={{ flexDirection: "row" }}>
+        <Flex sx={{ px: 36, flexDirection: ["column", "column", "column", "row"] }}>
           <EditableRow
             label="Redeem"
             inputId="redeem-zusd"
@@ -142,7 +142,7 @@ export const RedemptionManager: React.FC = () => {
               inputId="redeem-fee"
               amount={ethFee.toString(4)}
               pendingAmount={feePct.toString(2)}
-              unit="ETH"
+              unit="RBTC"
               infoIcon={
                 <InfoIcon
                   tooltip={

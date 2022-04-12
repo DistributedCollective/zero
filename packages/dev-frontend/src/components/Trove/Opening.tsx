@@ -198,7 +198,7 @@ export const Opening: React.FC = () => {
           <CollateralRatio value={collateralRatio} />
         </Flex>
 
-        <Flex variant="layout.actions">
+        <Flex variant="layout.cta">
           <Button variant="cancel" onClick={handleCancelPressed}>
             Cancel
           </Button>

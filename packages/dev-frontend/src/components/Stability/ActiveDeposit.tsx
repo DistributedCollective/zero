@@ -107,7 +107,7 @@ export const ActiveDeposit: React.FC = () => {
           </Flex>
         </Box>
 
-        <Flex variant="layout.actions">
+        <Flex variant="layout.cta">
           <Button variant="outline" onClick={handleAdjustDeposit}>
             <Icon name="pen" size="sm" />
             &nbsp;Adjust

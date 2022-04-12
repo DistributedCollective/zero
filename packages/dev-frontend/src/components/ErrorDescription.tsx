@@ -16,15 +16,15 @@ export const ErrorDescription: React.FC = ({ children }) => (
       border: 1,
       borderRadius: "8px",
       borderColor: "danger",
+      color: "danger",
       boxShadow: 2,
-      bg: "rgba(220, 44, 16, 0.05)",
       "& svg": {
         color: "danger"
       }
     }}
   >
     <Flex sx={{ alignItems: "center" }}>
-      <Icon name="exclamation-triangle" size="sm" />
+      <Icon name="info-circle" size="sm" />
       <Text sx={{ ml: 2, fontSize: 2, fontWeight: 300, fontStyle: "italic" }}>{children}</Text>
     </Flex>
   </Box>

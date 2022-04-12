@@ -7,7 +7,7 @@ const baseColors = {
   primary: "#fec004",
   "primary-75": "#fec004C0",
   "primary-50": "#fec00480",
-  "primary-25": "#fec00440",
+  "primary-25": "#fec00426",
   "primary-10": "#fec0041a",
 
   secondary: "#2274a5",
@@ -46,7 +46,7 @@ const baseColors = {
   "success-50": "#27A52280",
   "success-25": "#27A52240",
   "success-10": "#27A5221a",
-  warning: "#A52222",
+  warning: "#FF3131",
   "warning-75": "#A52222C0",
   "warning-50": "#A5222280",
   "warning-25": "#A5222240",
@@ -287,7 +287,8 @@ const theme: Theme = {
       ...button,
 
       ":enabled:hover": {
-        opacity: 0.75
+        opacity: 0.75,
+        backgroundColor: baseColors["primary-25"]
       }
     },
 
@@ -362,8 +363,8 @@ const theme: Theme = {
         display: "flex",
         borderRadius: "10px 10px 0px 0px",
         flexDirection: "column",
-        px: 3,
-        py: 3,
+        px: 20,
+        py: 20,
 
         bg: zeroCardColors.heading
       }
@@ -419,8 +420,7 @@ const theme: Theme = {
       color: "cardBackground"
     },
 
-    editor: {
-    }
+    editor: {}
   },
 
   layout: {
@@ -476,6 +476,14 @@ const theme: Theme = {
 
     actions: {
       justifyContent: "space-between",
+      mt: 50,
+      button: {
+        ml: 2
+      }
+    },
+
+    cta: {
+      justifyContent: "flex-end",
       mt: 50,
       button: {
         ml: 2
@@ -575,7 +583,7 @@ const theme: Theme = {
 
     redemption: {
       color: "primary",
-      ":hover": {cursor: "pointer" },
+      ":hover": { cursor: "pointer" },
       textDecoration: "underline",
       fontWeight: "bold"
     }

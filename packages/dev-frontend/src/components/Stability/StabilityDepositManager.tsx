@@ -137,7 +137,7 @@ export const StabilityDepositManager: React.FC = () => {
           <ActionDescription>Adjust the {COIN} amount to deposit or withdraw.</ActionDescription>
         ))}
 
-      <Flex variant="layout.actions">
+      <Flex variant="layout.cta">
         <Button variant="cancel" onClick={handleCancel}>
           Cancel
         </Button>

@@ -263,7 +263,7 @@ export const Adjusting: React.FC = () => {
           </ActionDescription>
         )}
 
-        <Flex variant="layout.actions">
+        <Flex variant="layout.cta">
           <Button variant="cancel" onClick={handleCancelPressed}>
             Cancel
           </Button>

@@ -68,14 +68,9 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
     }
   } = useLiquity();
 
-  const {
-    numberOfTroves,
-    price,
-    zusdInStabilityPool,
-    total,
-    borrowingRate,
-    totalStakedZERO
-  } = useLiquitySelector(select);
+  const { numberOfTroves, price, zusdInStabilityPool, total, borrowingRate } = useLiquitySelector(
+    select
+  );
 
   const zusdInStabilityPoolPct =
     total.debt.nonZero && new Percent(zusdInStabilityPool.div(total.debt));
@@ -109,7 +104,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
       <Statistic
         name="Credit Lines"
-        tooltip="The total number of active Lin es of Credit in the system."
+        tooltip="The total number of active Lines of Credit in the system."
       >
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
@@ -126,12 +121,6 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
           <Text sx={{ fontSize: 1 }}>&nbsp;({zusdInStabilityPoolPct.toString(1)})</Text>
         </Statistic>
       )}
-      <Statistic
-        name="Staked ZERO"
-        tooltip="The total amount of ZERO that is staked for earning fee revenue."
-      >
-        {totalStakedZERO.shorten()}
-      </Statistic>
       <Statistic
         name="Total Collateral Ratio"
         tooltip="The ratio of the USD value of the entire system collateral at the current RBTC:USD price, to the entire system debt."
