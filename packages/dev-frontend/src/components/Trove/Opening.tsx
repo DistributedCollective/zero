@@ -109,7 +109,7 @@ export const Opening: React.FC = () => {
             <Icon name="history" size="sm" />
           </Button>
         )}
-        <Flex>
+        <Flex sx={{ flexDirection: ["column", "column", "column", "row"] }}>
           <EditableRow
             label="Collateral"
             inputId="trove-collateral"
@@ -197,26 +197,25 @@ export const Opening: React.FC = () => {
           />
           <CollateralRatio value={collateralRatio} />
         </Flex>
-
-        <Flex variant="layout.cta">
-          <Button variant="cancel" onClick={handleCancelPressed}>
-            Cancel
-          </Button>
-
-          {troveChange ? (
-            <TroveAction
-              transactionId={TRANSACTION_ID}
-              change={troveChange}
-              useNueToken={useNueToken}
-              maxBorrowingRate={maxBorrowingRate}
-            >
-              Confirm
-            </TroveAction>
-          ) : (
-            <Button disabled>Confirm</Button>
-          )}
-        </Flex>
       </Box>
+      <Flex variant="layout.cta">
+        <Button variant="cancel" onClick={handleCancelPressed}>
+          Cancel
+        </Button>
+
+        {troveChange ? (
+          <TroveAction
+            transactionId={TRANSACTION_ID}
+            change={troveChange}
+            useNueToken={useNueToken}
+            maxBorrowingRate={maxBorrowingRate}
+          >
+            Confirm
+          </TroveAction>
+        ) : (
+          <Button disabled>Confirm</Button>
+        )}
+      </Flex>
       {isTransactionPending && <LoadingOverlay />}
     </>
   );

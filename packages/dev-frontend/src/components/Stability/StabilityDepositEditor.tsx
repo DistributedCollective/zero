@@ -78,7 +78,7 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
             {edited && !changePending && (
               <Button
                 variant="titleIcon"
-                sx={{ ":enabled:hover": { color: "danger" } }}
+                sx={{ position: "absolute", right: 20, ":enabled:hover": { color: "danger" } }}
                 onClick={() => dispatch({ type: "revert" })}
               >
                 <Icon name="history" size="sm" />
@@ -94,8 +94,7 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
       <Box
         sx={{
           pt: 36,
-          mx: "auto",
-          px: 36
+          mx: "auto"
         }}
       >
         {description ??
@@ -105,7 +104,13 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
             <ActionDescription>Adjust the {COIN} amount to deposit or withdraw.</ActionDescription>
           ))}
 
-        <Flex sx={{ flexDirection: "row" }}>
+        <Flex
+          sx={{
+            px: 36,
+            justifyContent: "center",
+            flexDirection: ["column", "column", "column", "row"]
+          }}
+        >
           <EditableRow
             label="Deposit"
             inputId="deposit-zero"
@@ -118,7 +123,7 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
             setEditedAmount={newValue => dispatch({ type: "setDeposit", newValue })}
           />
 
-          <Box sx={{ mt: 40, pl: "8px" }}>
+          <Box sx={{ mt: 40, pl: "8px", minWidth: 140 }}>
             {newPoolShare.infinite ? (
               <StaticRow label="Pool share" inputId="deposit-share" amount="N/A" />
             ) : (
