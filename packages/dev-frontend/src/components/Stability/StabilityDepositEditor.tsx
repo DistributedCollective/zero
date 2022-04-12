@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heading, Box, Flex, Button } from "theme-ui";
+import { Box, Flex, Button } from "theme-ui";
 import { Card } from "../Card";
 import { ActionDescription } from "../ActionDescription";
 
@@ -62,41 +62,23 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
     Difference.between(newPoolShare, originalPoolShare).nonZero;
 
   return (
-    <Card
-      heading={
-        <>
-          <Heading
-            className="heading"
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              alignItems: "center"
-            }}
-          >
-            Stability Pool
-            {edited && !changePending && (
-              <Button
-                variant="titleIcon"
-                sx={{ position: "absolute", right: 20, ":enabled:hover": { color: "danger" } }}
-                onClick={() => dispatch({ type: "revert" })}
-              >
-                <Icon name="history" size="sm" />
-              </Button>
-            )}
-          </Heading>
-          <Heading as="h3" className="subheading">
-            You can earn RBTC by depositing ZUSD.
-          </Heading>
-        </>
-      }
-    >
+    <>
       <Box
         sx={{
           pt: 36,
-          mx: "auto"
+          mx: "auto",
+          position: "relative"
         }}
       >
+        {edited && !changePending && (
+          <Button
+            variant="titleIcon"
+            sx={{ position: "absolute", right: 0, top: 0, ":enabled:hover": { color: "danger" } }}
+            onClick={() => dispatch({ type: "revert" })}
+          >
+            <Icon name="history" size="sm" />
+          </Button>
+        )}
         {description ??
           (makingNewDeposit ? (
             <ActionDescription>Enter the amount of {COIN} you'd like to deposit.</ActionDescription>
@@ -140,7 +122,7 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
         </Flex>
 
         {!originalDeposit.isEmpty && (
-          <>
+          <Flex sx={{ mt: 3, justifyContent: "center" }}>
             <StaticRow
               label="Liquidation gain"
               inputId="deposit-gain"
@@ -167,12 +149,12 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
                 />
               }
             />
-          </>
+          </Flex>
         )}
         {children}
       </Box>
 
       {changePending && <LoadingOverlay />}
-    </Card>
+    </>
   );
 };

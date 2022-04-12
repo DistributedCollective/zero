@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect } from "react";
-import { Card, Heading, Box, Flex, Button } from "theme-ui";
+import { Card, Box, Flex, Button } from "theme-ui";
 
 import { LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
 
 import { COIN, GT } from "../../strings";
-import { Icon } from "../Icon";
 import { LoadingOverlay } from "../LoadingOverlay";
 import { useMyTransactionState } from "../Transaction";
 import { DisabledEditableRow, StaticRow } from "../Trove/Editor";
@@ -49,17 +48,14 @@ export const ActiveDeposit: React.FC = () => {
   }, [transactionState.type, dispatchEvent]);
 
   return (
-    <Card>
-      <Heading>
-        Stability Pool
+    <>
+      <Box sx={{ p: [2, 3], position: "relative" }}>
         {!isWaitingForTransaction && (
-          <Flex sx={{ justifyContent: "flex-end" }}>
+          <Flex sx={{ justifyContent: "flex-end", position: "absolute", right: 0, top: 0 }}>
             <RemainingZERO />
           </Flex>
         )}
-      </Heading>
-      <Box sx={{ p: [2, 3] }}>
-        <Box>
+        <Flex sx={{ alignItems: "flex-end", mt: 3 }}>
           <DisabledEditableRow
             label="Deposit"
             inputId="deposit-zusd"
@@ -105,23 +101,30 @@ export const ActiveDeposit: React.FC = () => {
               <Yield />
             </Flex>
           </Flex>
-        </Box>
-
-        <Flex variant="layout.cta">
-          <Button variant="outline" onClick={handleAdjustDeposit}>
-            <Icon name="pen" size="sm" />
-            &nbsp;Adjust
-          </Button>
-
-          <ClaimRewards disabled={!hasGain && !hasReward}>Claim RBTC and ZERO</ClaimRewards>
         </Flex>
 
-        {hasTrove && (
-          <ClaimAndMove disabled={!hasGain}>Claim ZERO and move RBTC to Line of Credit</ClaimAndMove>
-        )}
+        <Flex variant="layout.cta">
+          <ClaimRewards disabled={!hasGain && !hasReward}>Claim RBTC</ClaimRewards>
+          {hasTrove && (
+            <Box sx={{ position: "relative" }}>
+              <Box sx={{ position: "absolute", top: -25, right: -1 }}>
+                <InfoIcon
+                  tooltip={
+                    <Card variant="tooltip" sx={{ width: "240px" }}>
+                      Claim ZERO and move RBTC to Line of Credit
+                    </Card>
+                  }
+                  size="xs"
+                />
+              </Box>
+              <ClaimAndMove disabled={!hasGain}>Claim and Move</ClaimAndMove>{" "}
+            </Box>
+          )}
+          <Button onClick={handleAdjustDeposit}>&nbsp;Adjust</Button>
+        </Flex>
       </Box>
 
       {isWaitingForTransaction && <LoadingOverlay />}
-    </Card>
+    </>
   );
 };
