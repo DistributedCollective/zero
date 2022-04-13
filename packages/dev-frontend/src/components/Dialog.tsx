@@ -1,60 +1,75 @@
-import React from "react";
-import { Heading, Flex, Card, Button, Box } from "theme-ui";
+import React, { useEffect, useRef } from "react";
+import { CSSTransition } from "react-transition-group";
+import { Box, Card, ThemeUIStyleObject } from "theme-ui";
+import { useOnClickOutside } from "../hooks/useOnClickOutside";
 
-import { Icon } from "./Icon";
+interface Props {
+  className?: string;
+  wrapperClass?: string;
+  open: boolean;
+  onClose?: () => void;
+  onExited?: () => void;
+  children?: React.ReactNode;
+  disableClose?: boolean;
+  hideCloseIcon?: boolean;
+  sx?: ThemeUIStyleObject;
+}
 
-type DialogIntent = "success" | "warning" | "danger" | "info";
+export const Dialog: React.FC<Props> = ({
+  className,
+  open,
+  onClose,
+  onExited,
+  children,
+  disableClose,
+  sx
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useOnClickOutside(ref, () => !disableClose && onClose?.());
 
-type DialogProps = {
-  intent?: DialogIntent;
-  title: string;
-  icon?: React.ReactNode;
-  cancelLabel?: string;
-  onCancel: () => void;
-};
+  useEffect(() => {
+    if (open) document.documentElement.classList.add("stop-scrolling");
+    else document.documentElement.classList.remove("stop-scrolling");
+  }, [open]);
+  const nodeRef = useRef(null);
 
-const iconFromIntent = (intent: DialogIntent | undefined) => {
-  switch (intent) {
-    case "success":
-      return <Icon name="check-circle" color="success" aria-label="Success" />;
-    case "warning":
-      return <Icon name="exclamation-triangle" color="warning" aria-label="Warning" />;
-    case "danger":
-      return <Icon name="exclamation-triangle" color="danger" aria-label="Danger" />;
-    case "info":
-      return <Icon name="info-circle" color="info" aria-label="Info" />;
-  }
-  return null;
-};
-
-export const Dialog: React.FC<DialogProps> = ({
-  intent,
-  title,
-  icon,
-  cancelLabel,
-  onCancel,
-  children
-}) => (
-  <Card sx={{ p: 0, borderRadius: "4px" }}>
-    {intent ? <Box sx={{ height: "4px", bg: intent, borderRadius: "3px 3px 0 0" }} /> : null}
-    <Flex
-      sx={{
-        justifyContent: "space-between",
-        alignItems: "center",
-        borderBottom: 1,
-        borderColor: "muted",
-        p: [3, 4],
-        pb: 3
-      }}
+  return (
+    <CSSTransition
+      unmountOnExit
+      classNames="dialog"
+      nodeRef={nodeRef}
+      in={open}
+      timeout={{ enter: 500, exit: 300 }}
     >
-      {icon || iconFromIntent(intent)}
-      <Heading as="h1" sx={{ textAlign: "center", fontSize: [2, 3], px: [3, 0] }}>
-        {title}
-      </Heading>
-      <Button variant="icon" onClick={onCancel}>
-        <Icon name="times" size="lg" aria-label={cancelLabel || "Cancel"} />
-      </Button>
-    </Flex>
-    {children}
-  </Card>
-);
+      <Box
+        className={className}
+        ref={nodeRef}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "fixed",
+          width: "100vw",
+          height: "100vh",
+          bg: "rgba(22,22,22,0.85)",
+          top: 0,
+          left: 0,
+          zIndex: 99
+        }}
+      >
+        <Card
+          variant="info"
+          sx={{
+            maxWidth: "100vw",
+            maxHeight: "100vh",
+            wordBreak: "break-all",
+            ...sx
+          }}
+        >
+          {children}
+        </Card>
+      </Box>
+    </CSSTransition>
+  );
+};
