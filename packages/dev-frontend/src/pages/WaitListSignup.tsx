@@ -6,7 +6,7 @@ import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 
-export const WaitListSignup: React.FC = () => {
+export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -113,7 +113,10 @@ export const WaitListSignup: React.FC = () => {
               bg: "primary",
               color: "cardBackground",
               display: "flex",
-              alignItems: "center"
+              alignItems: "center",
+              "&: hover": {
+                color: "primary"
+              }
             }}
             disabled={!isValidEmail || isLoading}
           >
@@ -150,8 +153,7 @@ export const WaitListSignup: React.FC = () => {
           justifyContent: "center",
           alignItems: "center",
           width: "377px",
-          maxWidth: "100%",
-          opacity: "50%"
+          maxWidth: "100%"
         }}
       >
         <Paragraph
@@ -166,16 +168,7 @@ export const WaitListSignup: React.FC = () => {
         >
           Or connect wallet if you have been invited to the Zero private beta.
         </Paragraph>
-        <Button
-          sx={{
-            width: "174px",
-            height: "40px",
-            p: 0
-          }}
-          disabled
-        >
-          Connect Wallet
-        </Button>
+        {children}
       </Box>
       <WaitlistSuccess isOpen={success} onClose={() => setSuccess(false)} />
     </Box>

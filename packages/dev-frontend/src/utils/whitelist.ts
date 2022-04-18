@@ -5,11 +5,23 @@ enum WhitelistType {
 }
 
 const whitelistClient = axios.create({
-  baseURL: "https://whitelist.test.sovryn.app/whitelist/"
+  baseURL: "https://whitelist.test.sovryn.app/"
 });
 
 export const registerEmail = (email: string): Promise<AxiosResponse<any>> =>
-  whitelistClient.post("register", {
+  whitelistClient.post("register/" + WhitelistType.ZERO, {
+    email
+  });
+
+export const checkAccountAccess = (account: string): Promise<AxiosResponse<any>> =>
+  whitelistClient.get(`${WhitelistType.ZERO}/${account}`);
+
+export const activateAccount = (
+  account: string,
+  email: string,
+  code: string
+): Promise<AxiosResponse<any>> =>
+  whitelistClient.post(`activate/${WhitelistType.ZERO}/${account}`, {
     email,
-    whitelistType: WhitelistType.ZERO
+    code
   });

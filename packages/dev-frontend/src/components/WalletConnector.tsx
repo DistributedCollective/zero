@@ -1,16 +1,15 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { Button, Text, Flex, Link, Box } from "theme-ui";
+import { Button, Text } from "theme-ui";
 
 import { injectedConnector } from "../connectors/injectedConnector";
 import { useAuthorizedConnection } from "../hooks/useAuthorizedConnection";
 
-import { RetryDialog } from "./RetryDialog";
-import { ConnectionConfirmationDialog } from "./ConnectionConfirmationDialog";
-import { MetaMaskIcon } from "./MetaMaskIcon";
-import { Icon } from "./Icon";
-import { Modal } from "./Modal";
+import { WaitListSignup } from "../pages/WaitListSignup";
+import { shortenAddress } from "../utils/shortenAddress";
+import { checkAccountAccess } from "../utils/whitelist";
+import { useLocation } from "react-router-dom";
 
 interface MaybeHasMetaMask {
   ethereum?: {
@@ -80,17 +79,19 @@ const connectionReducer: React.Reducer<ConnectionState, ConnectionAction> = (sta
   return state;
 };
 
-const detectMetaMask = () => (window as MaybeHasMetaMask).ethereum?.isMetaMask ?? false;
+export const detectMetaMask = () => (window as MaybeHasMetaMask).ethereum?.isMetaMask ?? false;
 
 type WalletConnectorProps = {
   loader?: React.ReactNode;
 };
 
 export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, loader }) => {
-  const { activate, deactivate, active, error } = useWeb3React<unknown>();
+  const { activate, deactivate, active, error, account } = useWeb3React<unknown>();
   const triedAuthorizedConnection = useAuthorizedConnection();
   const [connectionState, dispatch] = useReducer(connectionReducer, { type: "inactive" });
-  const isMetaMask = detectMetaMask();
+  const [hasAccess, setHasAccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (error) {
@@ -100,6 +101,25 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
   }, [error, deactivate]);
 
   useEffect(() => {
+    const checkAccess = async (account: string) => {
+      setLoading(true);
+      setHasAccess(false);
+      try {
+        const { data } = await checkAccountAccess(account);
+        setHasAccess(!!data.access);
+      } catch (error) {
+        console.log("error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (account) {
+      console.log("account:", account);
+      checkAccess(account);
+    }
+  }, [active, account]);
+
+  useEffect(() => {
     if (active) {
       dispatch({ type: "finishActivating" });
     } else {
@@ -107,107 +127,56 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
     }
   }, [active]);
 
-  if (!triedAuthorizedConnection) {
+  const onClick = useCallback(() => {
+    if (active) {
+      deactivate();
+    } else {
+      dispatch({ type: "startActivating", connector: injectedConnector });
+      activate(injectedConnector);
+    }
+  }, [activate, active, deactivate]);
+
+  if (!triedAuthorizedConnection || loading) {
     return <>{loader}</>;
   }
 
-  if (connectionState.type === "active") {
+  if (
+    (location && location.pathname === "/access") ||
+    (connectionState.type === "active" && hasAccess)
+  ) {
     return <>{children}</>;
   }
 
   return (
-    <>
-      <Flex sx={{ height: "100vh", justifyContent: "center", alignItems: "center" }}>
-        <Button
-          onClick={() => {
-            dispatch({ type: "startActivating", connector: injectedConnector });
-            activate(injectedConnector);
-          }}
-        >
-          {isMetaMask ? (
-            <>
-              <MetaMaskIcon />
-              <Box sx={{ ml: 2 }}>Connect to MetaMask</Box>
-            </>
-          ) : (
-            <>
-              <Icon name="plug" size="lg" />
-              <Box sx={{ ml: 2 }}>Connect wallet</Box>
-            </>
-          )}
-        </Button>
-      </Flex>
-
-      {connectionState.type === "failed" && (
-        <Modal>
-          <RetryDialog
-            title={isMetaMask ? "Failed to connect to MetaMask" : "Failed to connect wallet"}
-            onCancel={() => dispatch({ type: "cancel" })}
-            onRetry={() => {
-              dispatch({ type: "retry" });
-              activate(connectionState.connector);
-            }}
-          >
-            <Box sx={{ textAlign: "center" }}>
-              You might need to install MetaMask or use a different browser.
-            </Box>
-            <Link sx={{ lineHeight: 3 }} href="https://metamask.io/download.html" target="_blank">
-              Learn more <Icon size="xs" name="external-link-alt" />
-            </Link>
-          </RetryDialog>
-        </Modal>
-      )}
-
-      {connectionState.type === "activating" && (
-        <Modal>
-          <ConnectionConfirmationDialog
-            title={
-              isMetaMask ? "Confirm connection in MetaMask" : "Confirm connection in your wallet"
-            }
-            icon={isMetaMask ? <MetaMaskIcon /> : <Icon name="wallet" size="lg" />}
-            onCancel={() => dispatch({ type: "cancel" })}
-          >
-            <Text sx={{ textAlign: "center" }}>
-              Confirm the request that&apos;s just appeared.
-              {isMetaMask ? (
-                <> If you can&apos;t see a request, open your MetaMask extension via your browser.</>
-              ) : (
-                <> If you can&apos;t see a request, you might have to open your wallet.</>
-              )}
-            </Text>
-          </ConnectionConfirmationDialog>
-        </Modal>
-      )}
-
-      {connectionState.type === "rejectedByUser" && (
-        <Modal>
-          <RetryDialog
-            title="Cancel connection?"
-            onCancel={() => dispatch({ type: "cancel" })}
-            onRetry={() => {
-              dispatch({ type: "retry" });
-              activate(connectionState.connector);
-            }}
-          >
-            <Text>To use Zero, you need to connect your RSK account.</Text>
-          </RetryDialog>
-        </Modal>
-      )}
-
-      {connectionState.type === "alreadyPending" && (
-        <Modal>
-          <RetryDialog
-            title="Connection already requested"
-            onCancel={() => dispatch({ type: "cancel" })}
-            onRetry={() => {
-              dispatch({ type: "retry" });
-              activate(connectionState.connector);
-            }}
-          >
-            <Text>Please check your wallet and accept the connection request before retrying.</Text>
-          </RetryDialog>
-        </Modal>
-      )}
-    </>
+    <WaitListSignup>
+      <Button
+        onClick={onClick}
+        sx={{
+          width: "174px",
+          height: "40px",
+          p: 0
+        }}
+      >
+        {!account ? (
+          "Connect Wallet"
+        ) : (
+          <Text as="span" sx={{ fontSize: 2, fontWeight: 600 }}>
+            {shortenAddress(account!, 4)}
+          </Text>
+        )}
+      </Button>
+      <Text
+        as="p"
+        sx={{
+          fontSize: 2,
+          fontWeight: 600,
+          color: "danger",
+          mt: 2,
+          visibility: account && !hasAccess && !loading ? "visible" : "hidden"
+        }}
+      >
+        Sign up above to get added to the waitlist.
+      </Text>
+    </WaitListSignup>
   );
 };

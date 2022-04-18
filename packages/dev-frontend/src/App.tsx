@@ -12,6 +12,7 @@ import theme from "./theme";
 
 import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
 import { LiquityFrontend } from "./LiquityFrontend";
+import { BrowserRouter } from "react-router-dom";
 
 if (window.ethereum) {
   // Silence MetaMask warning in console
@@ -97,17 +98,19 @@ const App = () => {
   return (
     <EthersWeb3ReactProvider>
       <ThemeProvider theme={theme}>
-        <WalletConnector loader={loader}>
-          <LiquityProvider
-            loader={loader}
-            unsupportedNetworkFallback={unsupportedNetworkFallback}
-            unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
-          >
-            <TransactionProvider>
-              <LiquityFrontend loader={loader} />
-            </TransactionProvider>
-          </LiquityProvider>
-        </WalletConnector>
+        <BrowserRouter>
+          <WalletConnector loader={loader}>
+            <LiquityProvider
+              loader={loader}
+              unsupportedNetworkFallback={unsupportedNetworkFallback}
+              unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
+            >
+              <TransactionProvider>
+                <LiquityFrontend loader={loader} />
+              </TransactionProvider>
+            </LiquityProvider>
+          </WalletConnector>
+        </BrowserRouter>
       </ThemeProvider>
     </EthersWeb3ReactProvider>
   );
