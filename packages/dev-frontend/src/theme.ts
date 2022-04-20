@@ -493,7 +493,7 @@ const theme: Theme = {
     disabledOverlay: {
       ...overlay,
 
-      bg: "rgba(255, 255, 255, 0.5)"
+      bg: "rgba(34, 34, 34, 0.83)"
     },
 
     modalOverlay: {

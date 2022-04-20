@@ -216,7 +216,7 @@ export const Opening: React.FC = () => {
           <Button disabled>Confirm</Button>
         )}
       </Flex>
-      {isTransactionPending && <LoadingOverlay />}
+      {!isTransactionPending && <LoadingOverlay />}
     </>
   );
 };
