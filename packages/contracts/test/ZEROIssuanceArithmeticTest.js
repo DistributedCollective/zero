@@ -63,7 +63,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
 
     await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
     await zeroToken.approve(communityIssuanceTester.address, toBN(dec(30,24)))
-    // await communityIssuanceTester.receiveZero(owner, toBN(dec(30,24)))
+    await communityIssuanceTester.receiveZero(owner, toBN(dec(30,24)))
 
     
   })
