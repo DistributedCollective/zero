@@ -92,7 +92,7 @@ n_sim= 8640
 
 """# Exogenous Factors
 
-Ether Price
+RBtcer Price
 """
 
 #ether price
@@ -123,7 +123,7 @@ Liquidate Troves
 """
 
 def liquidate_troves(troves, index, data):
-  troves['CR_current'] = troves['Ether_Price']*troves['Ether_Quantity']/troves['Supply']
+  troves['CR_current'] = troves['RBtcer_Price']*troves['RBtcer_Quantity']/troves['Supply']
   price_ZUSD_previous = data.loc[index-1,'Price_ZUSD']
   price_ZERO_previous = data.loc[index-1,'price_ZERO']
   stability_pool_previous = data.loc[index-1, 'stability']
@@ -131,7 +131,7 @@ def liquidate_troves(troves, index, data):
   troves_liquidated = troves[troves.CR_current < 1.1]
   troves = troves[troves.CR_current >= 1.1]
   debt_liquidated = troves_liquidated['Supply'].sum()
-  ether_liquidated = troves_liquidated['Ether_Quantity'].sum()
+  ether_liquidated = troves_liquidated['RBtcer_Quantity'].sum()
   n_liquidate = troves_liquidated.shape[0]
   troves = troves.reset_index(drop = True)
 
@@ -190,14 +190,14 @@ def adjust_troves(troves, index):
   #A part of the troves are adjusted by adjusting debt
     if p >= ratio:
       if check<-1:
-        working_trove['Supply'] = working_trove['Ether_Price']*working_trove['Ether_Quantity']/working_trove['CR_initial']
+        working_trove['Supply'] = working_trove['RBtcer_Price']*working_trove['RBtcer_Quantity']/working_trove['CR_initial']
       if check>2:
-        supply_new = working_trove['Ether_Price']*working_trove['Ether_Quantity']/working_trove['CR_initial']
+        supply_new = working_trove['RBtcer_Price']*working_trove['RBtcer_Quantity']/working_trove['CR_initial']
         issuance_ZUSD_adjust = issuance_ZUSD_adjust + rate_issuance * (supply_new - working_trove['Supply'])
         working_trove['Supply'] = supply_new
   #Another part of the troves are adjusted by adjusting collaterals
     if p < ratio and (check < -1 or check > 2):
-      working_trove['Ether_Quantity'] = working_trove['CR_initial']*working_trove['Supply']/working_trove['Ether_Price']
+      working_trove['RBtcer_Quantity'] = working_trove['CR_initial']*working_trove['Supply']/working_trove['RBtcer_Price']
     
     troves.loc[i] = working_trove
   return[troves, issuance_ZUSD_adjust]
@@ -234,7 +234,7 @@ def open_troves(troves, index1, price_ZUSD_previous):
     supply_trove = price_ether_current * quantity_ether / CR_ratio
     issuance_ZUSD_open = issuance_ZUSD_open + rate_issuance * supply_trove
 
-    new_row = {"Ether_Price": price_ether_current, "Ether_Quantity": quantity_ether, 
+    new_row = {"RBtcer_Price": price_ether_current, "RBtcer_Quantity": quantity_ether, 
                "CR_initial": CR_ratio, "Supply": supply_trove, 
                "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
     troves = troves.append(new_row, ignore_index=True)
@@ -288,7 +288,7 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
     quantity_ether = supply_trove * CR_ratio / price_ether_current
     issuance_ZUSD_stabilizer = rate_issuance * supply_trove
 
-    new_row = {"Ether_Price": price_ether_current, "Ether_Quantity": quantity_ether, "CR_initial": CR_ratio,
+    new_row = {"RBtcer_Price": price_ether_current, "RBtcer_Quantity": quantity_ether, "CR_initial": CR_ratio,
                "Supply": supply_trove, "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
     troves = troves.append(new_row, ignore_index=True)
     price_ZUSD_current = 1.1 + rate_issuance
@@ -330,8 +330,8 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
     residual = redemption_pool - redempted
     wk = troves.index[0]
     troves['Supply'][wk] = troves['Supply'][wk] - residual
-    troves['Ether_Quantity'][wk] = troves['Ether_Quantity'][wk] - residual/price_ether_current
-    troves['CR_current'][wk] = price_ether_current * troves['Ether_Quantity'][wk] / troves['Supply'][wk]
+    troves['RBtcer_Quantity'][wk] = troves['RBtcer_Quantity'][wk] - residual/price_ether_current
+    troves['CR_current'][wk] = price_ether_current * troves['RBtcer_Quantity'][wk] / troves['Supply'][wk]
 
     #Redemption Fee
     redemption_fee = rate_redemption * redemption_pool
@@ -364,12 +364,12 @@ def ZERO_market(index, data):
 """# Simulation Program"""
 
 #Defining Initials
-initials = {"Price_ZUSD":[1.00], "Price_Ether":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
+initials = {"Price_ZUSD":[1.00], "Price_RBtcer":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
             "n_troves":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
             "supply_ZUSD":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
             "price_ZERO":[price_ZERO_initial], "MC_ZERO":[0], "annualized_earning":[0]}
 data = pd.DataFrame(initials)
-troves= pd.DataFrame({"Ether_Price":[], "Ether_Quantity":[], "CR_initial":[], 
+troves= pd.DataFrame({"RBtcer_Price":[], "RBtcer_Quantity":[], "CR_initial":[], 
               "Supply":[], "Rational_inattention":[], "CR_current":[]})
 result_open = open_troves(troves, 0, data['Price_ZUSD'][0])
 troves = result_open[0]
@@ -383,7 +383,7 @@ data.loc[0,'stability'] = 0.5*troves["Supply"].sum()
 for index in range(1, n_sim):
 #exogenous ether price input
   price_ether_current = price_ether[index]
-  troves['Ether_Price'] = price_ether_current
+  troves['RBtcer_Price'] = price_ether_current
   price_ZUSD_previous = data.loc[index-1,'Price_ZUSD']
   price_ZERO_previous = data.loc[index-1,'price_ZERO']
 
@@ -444,7 +444,7 @@ for index in range(1, n_sim):
   if index >= month:
     price_ZERO.append(price_ZERO_current)
 
-  new_row = {"Price_ZUSD":float(price_ZUSD_current), "Price_Ether":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
+  new_row = {"Price_ZUSD":float(price_ZUSD_current), "Price_RBtcer":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
              "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_troves":float(n_troves),
               "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_ZUSD":float(supply_ZUSD),
              "issuance_fee":float(issuance_fee), "redemption_fee":float(redemption_fee),
@@ -469,15 +469,15 @@ fig.add_trace(
     secondary_y=False,
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['Price_Ether'], name="Ether Price"),
+    go.Scatter(x=data.index/720, y=data['Price_RBtcer'], name="RBtcer Price"),
     secondary_y=True,
 )
 fig.update_layout(
-    title_text="Price Dynamics of ZUSD and Ether"
+    title_text="Price Dynamics of ZUSD and RBtcer"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
 fig.update_yaxes(title_text="ZUSD Price", secondary_y=False)
-fig.update_yaxes(title_text="Ether Price", secondary_y=True)
+fig.update_yaxes(title_text="RBtcer Price", secondary_y=True)
 fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -615,14 +615,14 @@ def trove_histogram(measure):
 
 troves
 
-trove_histogram('Ether_Quantity')
+trove_histogram('RBtcer_Quantity')
 trove_histogram('CR_initial')
 trove_histogram('Supply')
 trove_histogram('Rational_inattention')
 trove_histogram('CR_current')
 
 import matplotlib.pyplot as plt
-plt.plot(troves["Ether_Quantity"])
+plt.plot(troves["RBtcer_Quantity"])
 plt.show()
 
 plt.plot(troves["CR_initial"])
@@ -644,12 +644,12 @@ issuance fee = redemption fee = base rate
 """
 
 #Defining Initials
-initials = {"Price_ZUSD":[1.00], "Price_Ether":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
+initials = {"Price_ZUSD":[1.00], "Price_RBtcer":[price_ether_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
             "n_troves":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
             "supply_ZUSD":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
             "price_ZERO":[price_ZERO_initial], "MC_ZERO":[0], "annualized_earning":[0], "base_rate":[base_rate_initial]}
 data2 = pd.DataFrame(initials)
-troves2= pd.DataFrame({"Ether_Price":[], "Ether_Quantity":[], "CR_initial":[], 
+troves2= pd.DataFrame({"RBtcer_Price":[], "RBtcer_Quantity":[], "CR_initial":[], 
               "Supply":[], "Rational_inattention":[], "CR_current":[]})
 result_open = open_troves(troves2, 0, data2['Price_ZUSD'][0])
 troves2 = result_open[0]
@@ -663,7 +663,7 @@ data2.loc[0,'stability'] = 0.5*troves2["Supply"].sum()
 for index in range(1, n_sim):
 #exogenous ether price input
   price_ether_current = price_ether[index]
-  troves2['Ether_Price'] = price_ether_current
+  troves2['RBtcer_Price'] = price_ether_current
   price_ZUSD_previous = data2.loc[index-1,'Price_ZUSD']
   price_ZERO_previous = data2.loc[index-1,'price_ZERO']
 
@@ -729,7 +729,7 @@ for index in range(1, n_sim):
   if index >= month:
     price_ZERO.append(price_ZERO_current)
 
-  new_row = {"Price_ZUSD":float(price_ZUSD_current), "Price_Ether":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
+  new_row = {"Price_ZUSD":float(price_ZUSD_current), "Price_RBtcer":float(price_ether_current), "n_open":float(n_open), "n_close":float(n_close), 
              "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_troves":float(n_troves),
               "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_ZUSD":float(supply_ZUSD),
              "issuance_fee":float(issuance_fee), "redemption_fee":float(redemption_fee),
@@ -750,7 +750,7 @@ fig.add_trace(
     secondary_y=False,
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['Price_Ether'], name="Ether Price"),
+    go.Scatter(x=data.index/720, y=data['Price_RBtcer'], name="RBtcer Price"),
     secondary_y=True,
 )
 fig.add_trace(
@@ -758,11 +758,11 @@ fig.add_trace(
     secondary_y=False,
 )
 fig.update_layout(
-    title_text="Price Dynamics of ZUSD and Ether"
+    title_text="Price Dynamics of ZUSD and RBtcer"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
 fig.update_yaxes(title_text="ZUSD Price", secondary_y=False)
-fig.update_yaxes(title_text="Ether Price", secondary_y=True)
+fig.update_yaxes(title_text="RBtcer Price", secondary_y=True)
 fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -1000,7 +1000,7 @@ def trove2_histogram(measure):
   fig = px.histogram(troves2, x=measure, title='Distribution of '+measure, nbins=25)
   fig.show()
 
-trove2_histogram('Ether_Quantity')
+trove2_histogram('RBtcer_Quantity')
 trove2_histogram('CR_initial')
 trove2_histogram('Supply')
 trove2_histogram('Rational_inattention')

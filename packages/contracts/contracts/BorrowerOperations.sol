@@ -213,18 +213,18 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         emit ZUSDBorrowingFeePaid(_sender, vars.ZUSDFee);
     }
 
-    /// Send ETH as collateral to a trove
+    /// Send RBTC as collateral to a trove
     function addColl(address _upperHint, address _lowerHint) external payable override {
         _adjustTrove(msg.sender, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    /// Send ETH as collateral to a trove. Called by only the Stability Pool.
-    function moveETHGainToTrove(address _borrower, address _upperHint, address _lowerHint) external payable override {
+    /// Send RBTC as collateral to a trove. Called by only the Stability Pool.
+    function moveRBTCGainToTrove(address _borrower, address _upperHint, address _lowerHint) external payable override {
         _requireCallerIsStabilityPool();
         _adjustTrove(_borrower, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    /// Withdraw ETH collateral from a trove
+    /// Withdraw RBTC collateral from a trove
     function withdrawColl(uint _collWithdrawal, address _upperHint, address _lowerHint) external override {
         _adjustTrove(msg.sender, _collWithdrawal, 0, false, _upperHint, _lowerHint, 0);
     }
@@ -282,12 +282,12 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _requireNonZeroAdjustment(_collWithdrawal, _ZUSDChange);
         _requireTroveisActive(contractsCache.troveManager, _borrower);
 
-        // Confirm the operation is either a borrower adjusting their own trove, or a pure ETH transfer from the Stability Pool to a trove
+        // Confirm the operation is either a borrower adjusting their own trove, or a pure RBTC transfer from the Stability Pool to a trove
         assert(_sender == _borrower || (_sender == stabilityPoolAddress && _value > 0 && _ZUSDChange == 0));
 
         contractsCache.troveManager.applyPendingRewards(_borrower);
 
-        // Get the collChange based on whether or not ETH was sent in the transaction
+        // Get the collChange based on whether or not RBTC was sent in the transaction
         (vars.collChange, vars.isCollIncrease) = _getCollChange(_value, _collWithdrawal);
 
         vars.netDebtChange = _ZUSDChange;
@@ -327,7 +327,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         emit ZUSDBorrowingFeePaid(_sender,  vars.ZUSDFee);
 
         // Use the unmodified _ZUSDChange here, as we don't send the fee to the user
-        _moveTokensAndETHfromAdjustment(
+        _moveTokensAndRBTCfromAdjustment(
             contractsCache.activePool,
             contractsCache.zusdToken,
             _sender,
@@ -382,14 +382,14 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         _repayZUSD(activePoolCached, zusdTokenCached, gasPoolAddress, ZUSD_GAS_COMPENSATION);
 
         // Send the collateral back to the user
-        activePoolCached.sendETH(msg.sender, coll);
+        activePoolCached.sendRBTC(msg.sender, coll);
     }
 
     /**
      * Claim remaining collateral from a redemption or from a liquidation with ICR > MCR in Recovery Mode
      */
     function claimCollateral() external override {
-        // send ETH from CollSurplus Pool to owner
+        // send RBTC from CollSurplus Pool to owner
         collSurplusPool.claimColl(msg.sender);
     }
 
@@ -449,7 +449,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         return (newColl, newDebt);
     }
 
-    function _moveTokensAndETHfromAdjustment
+    function _moveTokensAndRBTCfromAdjustment
     (
         IActivePool _activePool,
         IZUSDToken _zusdToken,
@@ -472,14 +472,14 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         if (_isCollIncrease) {
             _activePoolAddColl(_activePool, _collChange);
         } else {
-            _activePool.sendETH(_borrower, _collChange);
+            _activePool.sendRBTC(_borrower, _collChange);
         }
     }
 
-    /// Send ETH to Active Pool and increase its recorded ETH balance
+    /// Send RBTC to Active Pool and increase its recorded RBTC balance
     function _activePoolAddColl(IActivePool _activePool, uint _amount) internal {
         (bool success, ) = address(_activePool).call{value: _amount}("");
-        require(success, "BorrowerOps: Sending ETH to ActivePool failed");
+        require(success, "BorrowerOps: Sending RBTC to ActivePool failed");
     }
 
     /// Issue the specified amount of ZUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a ZUSDFee)

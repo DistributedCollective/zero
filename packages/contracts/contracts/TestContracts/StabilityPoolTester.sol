@@ -7,6 +7,6 @@ import "../StabilityPool.sol";
 contract StabilityPoolTester is StabilityPool {
     
     function unprotectedPayable() external payable {
-        ETH = ETH.add(msg.value);
+        RBTC = RBTC.add(msg.value);
     }
 }

@@ -73,10 +73,10 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
   })
 
   describe('BorrowerOperations', async accounts => { 
-    it("moveETHGainToTrove(): reverts when called by an account that is not StabilityPool", async () => {
+    it("moveRBTCGainToTrove(): reverts when called by an account that is not StabilityPool", async () => {
       // Attempt call from alice
       try {
-        const tx1= await borrowerOperations.moveETHGainToTrove(bob, bob, bob, { from: bob })
+        const tx1= await borrowerOperations.moveRBTCGainToTrove(bob, bob, bob, { from: bob })
       } catch (err) {
          assert.include(err.message, "revert")
         // assert.include(err.message, "BorrowerOps: Caller is not Stability Pool")
@@ -219,11 +219,11 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
   })
 
   describe('ActivePool', async accounts => {
-    // sendETH
-    it("sendETH(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
+    // sendRBTC
+    it("sendRBTC(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
       // Attempt call from alice
       try {
-        const txAlice = await activePool.sendETH(alice, 100, { from: alice })
+        const txAlice = await activePool.sendRBTC(alice, 100, { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")
@@ -269,11 +269,11 @@ contract('Access Control: Liquity functions with the caller restricted to Liquit
   })
 
   describe('DefaultPool', async accounts => {
-    // sendETHToActivePool
-    it("sendETHToActivePool(): reverts when called by an account that is not TroveManager", async () => {
+    // sendRBTCToActivePool
+    it("sendRBTCToActivePool(): reverts when called by an account that is not TroveManager", async () => {
       // Attempt call from alice
       try {
-        const txAlice = await defaultPool.sendETHToActivePool(100, { from: alice })
+        const txAlice = await defaultPool.sendRBTCToActivePool(100, { from: alice })
         
       } catch (err) {
         assert.include(err.message, "revert")

@@ -57,7 +57,7 @@
           },
           {
             "internalType": "uint256",
-            "name": "snapshotETH",
+            "name": "snapshotRBTC",
             "type": "uint256"
           },
           {

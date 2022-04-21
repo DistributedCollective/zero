@@ -9,7 +9,7 @@
 # Buidler compilation cache
 /cache
 
-# Ethereum accounts for testing
+# RBtcereum accounts for testing
 /accountsList.js 
 
 # Exported function gas costs and test outputs
