@@ -216,7 +216,7 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
 
     with open('tests/simulation.csv', 'w', newline='') as csvfile:
         datawriter = csv.writer(csvfile, delimiter=',')
-        datawriter.writerow(['iteration', 'ETH_price', 'price_ZUSD', 'price_ZERO', 'num_troves', 'total_coll', 'total_debt', 'TCR', 'recovery_mode', 'last_ICR', 'SP_ZUSD', 'SP_ETH', 'total_coll_added', 'total_coll_liquidated', 'total_zusd_redempted'])
+        datawriter.writerow(['iteration', 'RBTC_price', 'price_ZUSD', 'price_ZERO', 'num_troves', 'total_coll', 'total_debt', 'TCR', 'recovery_mode', 'last_ICR', 'SP_ZUSD', 'SP_RBTC', 'total_coll_added', 'total_coll_liquidated', 'total_zusd_redempted'])
 
         #Simulation Process
         for index in range(1, n_sim):
@@ -261,13 +261,13 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             #annualized_earning = result_ZERO[1]
             #MC_ZERO_current = result_ZERO[2]
 
-            [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_ETH] = logGlobalState(contracts)
+            [RBTC_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_RBTC] = logGlobalState(contracts)
             print('Total redempted ', total_zusd_redempted)
-            print('Total ETH added ', total_coll_added)
-            print('Total ETH liquid', total_coll_liquidated)
-            print(f'Ratio ETH liquid {100 * total_coll_liquidated / total_coll_added}%')
+            print('Total RBTC added ', total_coll_added)
+            print('Total RBTC liquid', total_coll_liquidated)
+            print(f'Ratio RBTC liquid {100 * total_coll_liquidated / total_coll_added}%')
             print(' ----------------------\n')
 
-            datawriter.writerow([index, ETH_price, price_ZUSD, price_ZERO_current, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_ETH, total_coll_added, total_coll_liquidated, total_zusd_redempted])
+            datawriter.writerow([index, RBTC_price, price_ZUSD, price_ZERO_current, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_RBTC, total_coll_added, total_coll_liquidated, total_zusd_redempted])
 
             assert price_ZUSD > 0

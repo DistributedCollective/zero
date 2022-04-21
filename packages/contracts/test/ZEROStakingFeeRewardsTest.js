@@ -17,10 +17,10 @@ const assertRevert = th.assertRevert
 const toBN = th.toBN
 const ZERO = th.toBN('0')
 
-/* NOTE: These tests do not test for specific ETH and ZUSD gain values. They only test that the 
+/* NOTE: These tests do not test for specific RBTC and ZUSD gain values. They only test that the 
  * gains are non-zero, occur when they should, and are in correct proportion to the user's stake. 
  *
- * Specific ETH/ZUSD gain values will depend on the final fee schedule used, and the final choices for
+ * Specific RBTC/ZUSD gain values will depend on the final fee schedule used, and the final choices for
  * parameters BETA and MINUTE_DECAY_FACTOR in the TroveManager, which are still TBD based on economic
  * modelling.
  * 
@@ -100,7 +100,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       await assertRevert(zeroStaking.stake(0, {from: A}), "ZEROStaking: Amount must be non-zero")
     })
   
-    it("ETH fee per ZERO staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
+    it("RBTC fee per ZERO staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -118,9 +118,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       await zeroToken.approve(zeroStaking.address, dec(100, 18), {from: A})
       await zeroStaking.stake(dec(100, 18), {from: A})
   
-      // Check ETH fee per unit staked is zero
-      const F_ETH_Before = await zeroStaking.F_ETH()
-      assert.equal(F_ETH_Before, '0')
+      // Check RBTC fee per unit staked is zero
+      const F_RBTC_Before = await zeroStaking.F_RBTC()
+      assert.equal(F_RBTC_Before, '0')
   
       const B_BalBeforeREdemption = await zusdToken.balanceOf(B)
       // B redeems
@@ -129,23 +129,23 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const B_BalAfterRedemption = await zusdToken.balanceOf(B)
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
-      // check ETH fee emitted in event is non-zero
-      const emittedETHFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3])
-      assert.isTrue(emittedETHFee.gt(toBN('0')))
+      // check RBTC fee emitted in event is non-zero
+      const emittedRBTCFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3])
+      assert.isTrue(emittedRBTCFee.gt(toBN('0')))
   
-      // Check ETH fee per unit staked has increased by correct amount
-      const F_ETH_After = await zeroStaking.F_ETH()
+      // Check RBTC fee per unit staked has increased by correct amount
+      const F_RBTC_After = await zeroStaking.F_RBTC()
   
       // Expect fee per unit staked = fee/100, since there is 100 ZUSD totalStaked
       // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector = emittedETHFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking = emittedETHFee.sub(ethFeeToSovCollector)
-      const expected_F_ETH_After = ethFeeToZeroStalking.div(toBN('100')) 
+      const ethFeeToSovCollector = emittedRBTCFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking = emittedRBTCFee.sub(ethFeeToSovCollector)
+      const expected_F_RBTC_After = ethFeeToZeroStalking.div(toBN('100')) 
   
-      assert.isTrue(expected_F_ETH_After.eq(F_ETH_After))
+      assert.isTrue(expected_F_RBTC_After.eq(F_RBTC_After))
     })
   
-    it("ETH fee per ZERO staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
+    it("RBTC fee per ZERO staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -158,9 +158,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       // multisig transfers ZERO to staker A
       await zeroToken.transfer(A, dec(100, 18), {from: multisig})
   
-      // Check ETH fee per unit staked is zero
-      const F_ETH_Before = await zeroStaking.F_ETH()
-      assert.equal(F_ETH_Before, '0')
+      // Check RBTC fee per unit staked is zero
+      const F_RBTC_Before = await zeroStaking.F_RBTC()
+      assert.equal(F_RBTC_Before, '0')
   
       const B_BalBeforeREdemption = await zusdToken.balanceOf(B)
       // B redeems
@@ -169,13 +169,13 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const B_BalAfterRedemption = await zusdToken.balanceOf(B)
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
-      // check ETH fee emitted in event is non-zero
-      const emittedETHFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3])
-      assert.isTrue(emittedETHFee.gt(toBN('0')))
+      // check RBTC fee emitted in event is non-zero
+      const emittedRBTCFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3])
+      assert.isTrue(emittedRBTCFee.gt(toBN('0')))
   
-      // Check ETH fee per unit staked has not increased 
-      const F_ETH_After = await zeroStaking.F_ETH()
-      assert.equal(F_ETH_After, '0')
+      // Check RBTC fee per unit staked has not increased 
+      const F_RBTC_After = await zeroStaking.F_RBTC()
+      assert.equal(F_RBTC_After, '0')
     })
   
     it("ZUSD fee per ZERO staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
@@ -196,7 +196,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       await zeroStaking.stake(dec(100, 18), {from: A})
   
       // Check ZUSD fee per unit staked is zero
-      const F_ZUSD_Before = await zeroStaking.F_ETH()
+      const F_ZUSD_Before = await zeroStaking.F_RBTC()
       assert.equal(F_ZUSD_Before, '0')
   
       const B_BalBeforeREdemption = await zusdToken.balanceOf(B)
@@ -243,7 +243,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       await zeroToken.transfer(A, dec(100, 18), {from: multisig})
   
       // Check ZUSD fee per unit staked is zero
-      const F_ZUSD_Before = await zeroStaking.F_ETH()
+      const F_ZUSD_Before = await zeroStaking.F_RBTC()
       assert.equal(F_ZUSD_Before, '0')
   
       const B_BalBeforeREdemption = await zusdToken.balanceOf(B)
@@ -269,7 +269,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       assert.equal(F_ZUSD_After, '0')
     })
   
-    it("ZERO Staking: A single staker earns all ETH and ZERO fees that occur", async () => {
+    it("ZERO Staking: A single staker earns all RBTC and ZERO fees that occur", async () => {
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -293,9 +293,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const B_BalAfterRedemption = await zusdToken.balanceOf(B)
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
-      // check ETH fee 1 emitted in event is non-zero
-      const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
-      assert.isTrue(emittedETHFee_1.gt(toBN('0')))
+      // check RBTC fee 1 emitted in event is non-zero
+      const emittedRBTCFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
+      assert.isTrue(emittedRBTCFee_1.gt(toBN('0')))
   
       const C_BalBeforeREdemption = await zusdToken.balanceOf(C)
       // C redeems
@@ -304,9 +304,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const C_BalAfterRedemption = await zusdToken.balanceOf(C)
       assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
    
-       // check ETH fee 2 emitted in event is non-zero
-       const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
-       assert.isTrue(emittedETHFee_2.gt(toBN('0')))
+       // check RBTC fee 2 emitted in event is non-zero
+       const emittedRBTCFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
+       assert.isTrue(emittedRBTCFee_2.gt(toBN('0')))
   
       // D draws debt
       const borrowingTx_1 = await borrowerOperations.withdrawZUSD(th._100pct, dec(104, 18), D, D, {from: D})
@@ -323,11 +323,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
   
       // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const rethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
-      const expectedTotalETHGain = ethFeeToZeroStalking_1.add(rethFeeToZeroStalking_2)
+      const ethFeeToSovCollector_1 = emittedRBTCFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedRBTCFee_1.sub(ethFeeToSovCollector_1)
+      const ethFeeToSovCollector_2 = emittedRBTCFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const rethFeeToZeroStalking_2 = emittedRBTCFee_2.sub(ethFeeToSovCollector_2)
+      const expectedTotalRBTCGain = ethFeeToZeroStalking_1.add(rethFeeToZeroStalking_2)
   
       // 20% sent to SovFeeCollector address
       const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
@@ -336,24 +336,24 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToSovCollector_2)
       const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
   
-      const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
+      const A_RBTCBalance_Before = toBN(await web3.eth.getBalance(A))
       const A_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(A))
   
       // A un-stakes
       await zeroStaking.unstake(dec(100, 18), {from: A, gasPrice: 0})
   
-      const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
+      const A_RBTCBalance_After = toBN(await web3.eth.getBalance(A))
       const A_ZUSDBalance_After = toBN(await zusdToken.balanceOf(A))
   
   
-      const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before)
+      const A_RBTCGain = A_RBTCBalance_After.sub(A_RBTCBalance_Before)
       const A_ZUSDGain = A_ZUSDBalance_After.sub(A_ZUSDBalance_Before)
   
-      assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedTotalRBTCGain, A_RBTCGain), 1000)
       assert.isAtMost(th.getDifference(expectedTotalZUSDGain, A_ZUSDGain), 1000)
     })
   
-    it("stake(): Top-up sends out all accumulated ETH and ZUSD gains to the staker", async () => { 
+    it("stake(): Top-up sends out all accumulated RBTC and ZUSD gains to the staker", async () => { 
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -377,9 +377,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const B_BalAfterRedemption = await zusdToken.balanceOf(B)
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
-      // check ETH fee 1 emitted in event is non-zero
-      const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
-      assert.isTrue(emittedETHFee_1.gt(toBN('0')))
+      // check RBTC fee 1 emitted in event is non-zero
+      const emittedRBTCFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
+      assert.isTrue(emittedRBTCFee_1.gt(toBN('0')))
   
       const C_BalBeforeREdemption = await zusdToken.balanceOf(C)
       // C redeems
@@ -388,9 +388,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const C_BalAfterRedemption = await zusdToken.balanceOf(C)
       assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
    
-       // check ETH fee 2 emitted in event is non-zero
-       const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
-       assert.isTrue(emittedETHFee_2.gt(toBN('0')))
+       // check RBTC fee 2 emitted in event is non-zero
+       const emittedRBTCFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
+       assert.isTrue(emittedRBTCFee_2.gt(toBN('0')))
   
       // D draws debt
       const borrowingTx_1 = await borrowerOperations.withdrawZUSD(th._100pct, dec(104, 18), D, D, {from: D})
@@ -408,11 +408,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
   
       // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
-      const expectedTotalETHGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
+      const ethFeeToSovCollector_1 = emittedRBTCFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedRBTCFee_1.sub(ethFeeToSovCollector_1)
+      const ethFeeToSovCollector_2 = emittedRBTCFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_2 = emittedRBTCFee_2.sub(ethFeeToSovCollector_2)
+      const expectedTotalRBTCGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
   
       // 20% sent to SovFeeCollector address
       const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
@@ -421,23 +421,23 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToSovCollector_2)
       const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
   
-      const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
+      const A_RBTCBalance_Before = toBN(await web3.eth.getBalance(A))
       const A_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(A))
   
       // A tops up
       await zeroStaking.stake(dec(50, 18), {from: A, gasPrice: 0})
   
-      const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
+      const A_RBTCBalance_After = toBN(await web3.eth.getBalance(A))
       const A_ZUSDBalance_After = toBN(await zusdToken.balanceOf(A))
   
-      const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before)
+      const A_RBTCGain = A_RBTCBalance_After.sub(A_RBTCBalance_Before)
       const A_ZUSDGain = A_ZUSDBalance_After.sub(A_ZUSDBalance_Before)
   
-      assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedTotalRBTCGain, A_RBTCGain), 1000)
       assert.isAtMost(th.getDifference(expectedTotalZUSDGain, A_ZUSDGain), 1000)
     })
   
-    it("getPendingETHGain(): Returns the staker's correct pending ETH gain", async () => { 
+    it("getPendingRBTCGain(): Returns the staker's correct pending RBTC gain", async () => { 
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -461,9 +461,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const B_BalAfterRedemption = await zusdToken.balanceOf(B)
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
-      // check ETH fee 1 emitted in event is non-zero
-      const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
-      assert.isTrue(emittedETHFee_1.gt(toBN('0')))
+      // check RBTC fee 1 emitted in event is non-zero
+      const emittedRBTCFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
+      assert.isTrue(emittedRBTCFee_1.gt(toBN('0')))
   
       const C_BalBeforeREdemption = await zusdToken.balanceOf(C)
       // C redeems
@@ -472,20 +472,20 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const C_BalAfterRedemption = await zusdToken.balanceOf(C)
       assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
    
-       // check ETH fee 2 emitted in event is non-zero
-       const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
-       assert.isTrue(emittedETHFee_2.gt(toBN('0')))
+       // check RBTC fee 2 emitted in event is non-zero
+       const emittedRBTCFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
+       assert.isTrue(emittedRBTCFee_2.gt(toBN('0')))
   
       // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
-      const expectedTotalETHGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
+      const ethFeeToSovCollector_1 = emittedRBTCFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedRBTCFee_1.sub(ethFeeToSovCollector_1)
+      const ethFeeToSovCollector_2 = emittedRBTCFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_2 = emittedRBTCFee_2.sub(ethFeeToSovCollector_2)
+      const expectedTotalRBTCGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
   
-      const A_ETHGain = await zeroStaking.getPendingETHGain(A)
+      const A_RBTCGain = await zeroStaking.getPendingRBTCGain(A)
   
-      assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedTotalRBTCGain, A_RBTCGain), 1000)
     })
   
     it("getPendingZUSDGain(): Returns the staker's correct pending ZUSD gain", async () => { 
@@ -512,9 +512,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const B_BalAfterRedemption = await zusdToken.balanceOf(B)
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
-      // check ETH fee 1 emitted in event is non-zero
-      const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
-      assert.isTrue(emittedETHFee_1.gt(toBN('0')))
+      // check RBTC fee 1 emitted in event is non-zero
+      const emittedRBTCFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
+      assert.isTrue(emittedRBTCFee_1.gt(toBN('0')))
   
       const C_BalBeforeREdemption = await zusdToken.balanceOf(C)
       // C redeems
@@ -523,9 +523,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const C_BalAfterRedemption = await zusdToken.balanceOf(C)
       assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption))
    
-       // check ETH fee 2 emitted in event is non-zero
-       const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
-       assert.isTrue(emittedETHFee_2.gt(toBN('0')))
+       // check RBTC fee 2 emitted in event is non-zero
+       const emittedRBTCFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
+       assert.isTrue(emittedRBTCFee_2.gt(toBN('0')))
   
       // D draws debt
       const borrowingTx_1 = await borrowerOperations.withdrawZUSD(th._100pct, dec(104, 18), D, D, {from: D})
@@ -553,7 +553,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     // - multi depositors, several rewards
-    it("ZERO Staking: Multiple stakers earn the correct share of all ETH and ZERO fees, based on their stake size", async () => {
+    it("ZERO Staking: Multiple stakers earn the correct share of all RBTC and ZERO fees, based on their stake size", async () => {
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -586,13 +586,13 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
       // F redeems
       const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(F, contracts, dec(45, 18))
-      const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
-      assert.isTrue(emittedETHFee_1.gt(toBN('0')))
+      const emittedRBTCFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3])
+      assert.isTrue(emittedRBTCFee_1.gt(toBN('0')))
   
        // G redeems
        const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(G, contracts, dec(197, 18))
-       const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
-       assert.isTrue(emittedETHFee_2.gt(toBN('0')))
+       const emittedRBTCFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
+       assert.isTrue(emittedRBTCFee_2.gt(toBN('0')))
   
       // F draws debt
       const borrowingTx_1 = await borrowerOperations.withdrawZUSD(th._100pct, dec(104, 18), F, F, {from: F})
@@ -615,8 +615,8 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
        // G redeems
        const redemptionTx_3 = await th.redeemCollateralAndGetTxObject(C, contracts, dec(197, 18))
-       const emittedETHFee_3 = toBN((await th.getEmittedRedemptionValues(redemptionTx_3))[3])
-       assert.isTrue(emittedETHFee_3.gt(toBN('0')))
+       const emittedRBTCFee_3 = toBN((await th.getEmittedRedemptionValues(redemptionTx_3))[3])
+       assert.isTrue(emittedRBTCFee_3.gt(toBN('0')))
   
        // G draws debt
       const borrowingTx_3 = await borrowerOperations.withdrawZUSD(th._100pct, dec(17, 18), G, G, {from: G})
@@ -626,10 +626,10 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       /*  
       Expected rewards:
   
-      A_ETH: (100* ETHFee_1)/600 + (100* ETHFee_2)/600 + (100*ETH_Fee_3)/650
-      B_ETH: (200* ETHFee_1)/600 + (200* ETHFee_2)/600 + (200*ETH_Fee_3)/650
-      C_ETH: (300* ETHFee_1)/600 + (300* ETHFee_2)/600 + (300*ETH_Fee_3)/650
-      D_ETH:                                             (100*ETH_Fee_3)/650
+      A_RBTC: (100* RBTCFee_1)/600 + (100* RBTCFee_2)/600 + (100*RBTC_Fee_3)/650
+      B_RBTC: (200* RBTCFee_1)/600 + (200* RBTCFee_2)/600 + (200*RBTC_Fee_3)/650
+      C_RBTC: (300* RBTCFee_1)/600 + (300* RBTCFee_2)/600 + (300*RBTC_Fee_3)/650
+      D_RBTC:                                             (100*RBTC_Fee_3)/650
   
       A_ZUSD: (100*ZUSDFee_1 )/600 + (100* ZUSDFee_2)/600 + (100*ZUSDFee_3)/650
       B_ZUSD: (200* ZUSDFee_1)/600 + (200* ZUSDFee_2)/600 + (200*ZUSDFee_3)/650
@@ -637,28 +637,28 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       D_ZUSD:                                               (100*ZUSDFee_3)/650
       */
   
-      // Expected ETH gains
+      // Expected RBTC gains
   
       // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
-      const ethFeeToSovCollector_3 = emittedETHFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_3 = emittedETHFee_3.sub(ethFeeToSovCollector_3)
-      const expectedETHGain_A = toBN('100').mul(ethFeeToZeroStalking_1).div( toBN('600'))
+      const ethFeeToSovCollector_1 = emittedRBTCFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedRBTCFee_1.sub(ethFeeToSovCollector_1)
+      const ethFeeToSovCollector_2 = emittedRBTCFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_2 = emittedRBTCFee_2.sub(ethFeeToSovCollector_2)
+      const ethFeeToSovCollector_3 = emittedRBTCFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_3 = emittedRBTCFee_3.sub(ethFeeToSovCollector_3)
+      const expectedRBTCGain_A = toBN('100').mul(ethFeeToZeroStalking_1).div( toBN('600'))
                               .add(toBN('100').mul(ethFeeToZeroStalking_2).div( toBN('600')))
                               .add(toBN('100').mul(ethFeeToZeroStalking_3).div( toBN('650')))
   
-      const expectedETHGain_B = toBN('200').mul(ethFeeToZeroStalking_1).div( toBN('600'))
+      const expectedRBTCGain_B = toBN('200').mul(ethFeeToZeroStalking_1).div( toBN('600'))
                               .add(toBN('200').mul(ethFeeToZeroStalking_2).div( toBN('600')))
                               .add(toBN('200').mul(ethFeeToZeroStalking_3).div( toBN('650')))
   
-      const expectedETHGain_C = toBN('300').mul(ethFeeToZeroStalking_1).div( toBN('600'))
+      const expectedRBTCGain_C = toBN('300').mul(ethFeeToZeroStalking_1).div( toBN('600'))
                               .add(toBN('300').mul(ethFeeToZeroStalking_2).div( toBN('600')))
                               .add(toBN('300').mul(ethFeeToZeroStalking_3).div( toBN('650')))
   
-      const expectedETHGain_D = toBN('50').mul(ethFeeToZeroStalking_3).div( toBN('650'))
+      const expectedRBTCGain_D = toBN('50').mul(ethFeeToZeroStalking_3).div( toBN('650'))
   
       // Expected ZUSD gains:
   
@@ -684,13 +684,13 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const expectedZUSDGain_D = toBN('50').mul(zusdFeeToZeroStalking_3).div( toBN('650'))
   
   
-      const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
+      const A_RBTCBalance_Before = toBN(await web3.eth.getBalance(A))
       const A_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(A))
-      const B_ETHBalance_Before = toBN(await web3.eth.getBalance(B))
+      const B_RBTCBalance_Before = toBN(await web3.eth.getBalance(B))
       const B_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(B))
-      const C_ETHBalance_Before = toBN(await web3.eth.getBalance(C))
+      const C_RBTCBalance_Before = toBN(await web3.eth.getBalance(C))
       const C_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(C))
-      const D_ETHBalance_Before = toBN(await web3.eth.getBalance(D))
+      const D_RBTCBalance_Before = toBN(await web3.eth.getBalance(D))
       const D_ZUSDBalance_Before = toBN(await zusdToken.balanceOf(D))
   
       // A-D un-stake
@@ -705,38 +705,38 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       assert.equal((await zeroToken.balanceOf(zeroStaking.address)), '0')
       assert.equal((await zeroStaking.totalZEROStaked()), '0')
   
-      // Get A-D ETH and ZUSD balances
-      const A_ETHBalance_After = toBN(await web3.eth.getBalance(A))
+      // Get A-D RBTC and ZUSD balances
+      const A_RBTCBalance_After = toBN(await web3.eth.getBalance(A))
       const A_ZUSDBalance_After = toBN(await zusdToken.balanceOf(A))
-      const B_ETHBalance_After = toBN(await web3.eth.getBalance(B))
+      const B_RBTCBalance_After = toBN(await web3.eth.getBalance(B))
       const B_ZUSDBalance_After = toBN(await zusdToken.balanceOf(B))
-      const C_ETHBalance_After = toBN(await web3.eth.getBalance(C))
+      const C_RBTCBalance_After = toBN(await web3.eth.getBalance(C))
       const C_ZUSDBalance_After = toBN(await zusdToken.balanceOf(C))
-      const D_ETHBalance_After = toBN(await web3.eth.getBalance(D))
+      const D_RBTCBalance_After = toBN(await web3.eth.getBalance(D))
       const D_ZUSDBalance_After = toBN(await zusdToken.balanceOf(D))
   
-      // Get ETH and ZUSD gains
-      const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before)
+      // Get RBTC and ZUSD gains
+      const A_RBTCGain = A_RBTCBalance_After.sub(A_RBTCBalance_Before)
       const A_ZUSDGain = A_ZUSDBalance_After.sub(A_ZUSDBalance_Before)
-      const B_ETHGain = B_ETHBalance_After.sub(B_ETHBalance_Before)
+      const B_RBTCGain = B_RBTCBalance_After.sub(B_RBTCBalance_Before)
       const B_ZUSDGain = B_ZUSDBalance_After.sub(B_ZUSDBalance_Before)
-      const C_ETHGain = C_ETHBalance_After.sub(C_ETHBalance_Before)
+      const C_RBTCGain = C_RBTCBalance_After.sub(C_RBTCBalance_Before)
       const C_ZUSDGain = C_ZUSDBalance_After.sub(C_ZUSDBalance_Before)
-      const D_ETHGain = D_ETHBalance_After.sub(D_ETHBalance_Before)
+      const D_RBTCGain = D_RBTCBalance_After.sub(D_RBTCBalance_Before)
       const D_ZUSDGain = D_ZUSDBalance_After.sub(D_ZUSDBalance_Before)
   
       // Check gains match expected amounts
-      assert.isAtMost(th.getDifference(expectedETHGain_A, A_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedRBTCGain_A, A_RBTCGain), 1000)
       assert.isAtMost(th.getDifference(expectedZUSDGain_A, A_ZUSDGain), 1000)
-      assert.isAtMost(th.getDifference(expectedETHGain_B, B_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedRBTCGain_B, B_RBTCGain), 1000)
       assert.isAtMost(th.getDifference(expectedZUSDGain_B, B_ZUSDGain), 1000)
-      assert.isAtMost(th.getDifference(expectedETHGain_C, C_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedRBTCGain_C, C_RBTCGain), 1000)
       assert.isAtMost(th.getDifference(expectedZUSDGain_C, C_ZUSDGain), 1000)
-      assert.isAtMost(th.getDifference(expectedETHGain_D, D_ETHGain), 1000)
+      assert.isAtMost(th.getDifference(expectedRBTCGain_D, D_RBTCGain), 1000)
       assert.isAtMost(th.getDifference(expectedZUSDGain_D, D_ZUSDGain), 1000)
     })
    
-    it("unstake(): reverts if caller has ETH gains and can't receive ETH",  async () => {
+    it("unstake(): reverts if caller has RBTC gains and can't receive RBTC",  async () => {
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })  
       await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
       await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
@@ -758,22 +758,22 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       await nonPayable.forward(zeroStaking.address, proxystakeTxData, {from: A})
   
   
-      // B makes a redemption, creating ETH gain for proxy
+      // B makes a redemption, creating RBTC gain for proxy
       const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(45, 18))
       
-      const proxy_ETHGain = await zeroStaking.getPendingETHGain(nonPayable.address)
-      assert.isTrue(proxy_ETHGain.gt(toBN('0')))
+      const proxy_RBTCGain = await zeroStaking.getPendingRBTCGain(nonPayable.address)
+      assert.isTrue(proxy_RBTCGain.gt(toBN('0')))
   
-      // Expect this tx to revert: stake() tries to send nonPayable proxy's accumulated ETH gain (albeit 0),
+      // Expect this tx to revert: stake() tries to send nonPayable proxy's accumulated RBTC gain (albeit 0),
       //  A tells proxy to unstake
       const proxyUnStakeTxData = await th.getTransactionData('unstake(uint256)', ['0x56bc75e2d63100000'])  // proxy stakes 100 ZERO
       const proxyUnstakeTxPromise = nonPayable.forward(zeroStaking.address, proxyUnStakeTxData, {from: A})
      
-      // but nonPayable proxy can not accept ETH - therefore stake() reverts.
+      // but nonPayable proxy can not accept RBTC - therefore stake() reverts.
       await assertRevert(proxyUnstakeTxPromise)
     })
   
-    it("receive(): reverts when it receives ETH from an address that is not the Active Pool",  async () => { 
+    it("receive(): reverts when it receives RBTC from an address that is not the Active Pool",  async () => { 
       const ethSendTxPromise1 = web3.eth.sendTransaction({to: zeroStaking.address, from: A, value: dec(1, 'ether')})
       const ethSendTxPromise2 = web3.eth.sendTransaction({to: zeroStaking.address, from: owner, value: dec(1, 'ether')})
   

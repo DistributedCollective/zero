@@ -12,12 +12,12 @@ interface IZEROStaking {
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint ZUSDGain, uint ETHGain);
-    event F_ETHUpdated(uint _F_ETH);
+    event StakingGainsWithdrawn(address indexed staker, uint ZUSDGain, uint RBTCGain);
+    event F_RBTCUpdated(uint _F_RBTC);
     event F_ZUSDUpdated(uint _F_ZUSD);
     event TotalZEROStakedUpdated(uint _totalZEROStaked);
-    event EtherSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_ZUSD);
+    event RBtcerSent(address _account, uint _amount);
+    event StakerSnapshotsUpdated(address _staker, uint _F_RBTC, uint _F_ZUSD);
 
     // --- Functions ---
     
@@ -37,28 +37,28 @@ interface IZEROStaking {
         address _activePoolAddress
     )  external;
 
-    /// @notice If caller has a pre-existing stake, send any accumulated ETH and ZUSD gains to them.
+    /// @notice If caller has a pre-existing stake, send any accumulated RBTC and ZUSD gains to them.
     /// @param _ZEROamount ZERO tokens to stake 
     function stake(uint _ZEROamount) external;
 
     /**
-     * @notice Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & ETH gains. 
+     * @notice Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & RBTC gains. 
      * If requested amount > stake, send their entire stake.
      * @param _ZEROamount ZERO tokens to unstake
      */
     function unstake(uint _ZEROamount) external;
 
-    /// @param _ETHFee ETH fee
-    /// @notice increase ETH fee
-    function increaseF_ETH(uint _ETHFee) external; 
+    /// @param _RBTCFee RBTC fee
+    /// @notice increase RBTC fee
+    function increaseF_RBTC(uint _RBTCFee) external; 
 
     /// @param _ZEROFee ZUSD fee
     /// @notice increase ZUSD fee
     function increaseF_ZUSD(uint _ZEROFee) external;  
 
     /// @param _user user address
-    /// @return pending ETH gain of given user
-    function getPendingETHGain(address _user) external view returns (uint);
+    /// @return pending RBTC gain of given user
+    function getPendingRBTCGain(address _user) external view returns (uint);
 
     /// @param _user user address
     /// @return pending ZUSD gain of given user
