@@ -249,11 +249,11 @@ export class PopulatedEthersRedemption
       ({ logs }) =>
         troveManager
           .extractEvents(logs, "Redemption")
-          .map(({ args: { _ETHSent, _ETHFee, _actualZUSDAmount, _attemptedZUSDAmount } }) => ({
+          .map(({ args: { _RBTCSent, _RBTCFee, _actualZUSDAmount, _attemptedZUSDAmount } }) => ({
             attemptedZUSDAmount: decimalify(_attemptedZUSDAmount),
             actualZUSDAmount: decimalify(_actualZUSDAmount),
-            collateralTaken: decimalify(_ETHSent),
-            fee: decimalify(_ETHFee)
+            collateralTaken: decimalify(_RBTCSent),
+            fee: decimalify(_RBTCFee)
           }))[0]
     );
 
@@ -357,7 +357,7 @@ export class PopulatableEthersLiquity
           .map(({ args: { value } }) => decimalify(value));
 
         const [withdrawCollateral] = activePool
-          .extractEvents(logs, "EtherSent")
+          .extractEvents(logs, "RBtcerSent")
           .filter(({ args: { _to } }) => _to === userAddress)
           .map(({ args: { _amount } }) => decimalify(_amount));
 
@@ -412,8 +412,8 @@ export class PopulatableEthersLiquity
       .map(({ args: { _newDeposit } }) => decimalify(_newDeposit));
 
     const [[collateralGain, zusdLoss]] = stabilityPool
-      .extractEvents(logs, "ETHGainWithdrawn")
-      .map(({ args: { _ETH, _ZUSDLoss } }) => [decimalify(_ETH), decimalify(_ZUSDLoss)]);
+      .extractEvents(logs, "RBTCGainWithdrawn")
+      .map(({ args: { _RBTC, _ZUSDLoss } }) => [decimalify(_RBTC), decimalify(_ZUSDLoss)]);
 
     const [zeroReward] = stabilityPool
       .extractEvents(logs, "ZEROPaidToDepositor")
@@ -925,7 +925,7 @@ export class PopulatableEthersLiquity
     const finalTrove = initialTrove.addCollateral(stabilityDeposit.collateralGain);
 
     return this._wrapCollateralGainTransfer(
-      await stabilityPool.estimateAndPopulate.withdrawETHGainToTrove(
+      await stabilityPool.estimateAndPopulate.withdrawRBTCGainToTrove(
         { ...overrides },
         compose(addGasForPotentialListTraversal, addGasForZEROIssuance),
         ...(await this._findHints(finalTrove))
