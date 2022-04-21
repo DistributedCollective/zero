@@ -54,7 +54,8 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         zusdToken = IZUSDToken(_zusdTokenAddress);
         activePoolAddress = _activePoolAddress;
 
-        FEE_TO_SOV_COLLECTOR = LiquityMath.DECIMAL_PRECISION / 100 * 20; // 20%
+        // Not entirely removing this as per request from @light
+        FEE_TO_SOV_COLLECTOR = LiquityMath.DECIMAL_PRECISION; // 100%
 
         emit SOVFeeCollectorAddressChanged(_sovFeeCollectorAddress);
         emit ZeroStakingAddressChanged(_zeroStakingAddress);
