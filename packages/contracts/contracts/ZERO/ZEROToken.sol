@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
@@ -147,7 +147,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         external 
         override 
     {            
-        require(deadline >= now, 'ZERO: expired deadline');
+        require(deadline >= block.timestamp, 'ZERO: expired deadline');
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 

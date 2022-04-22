@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "../Interfaces/IActivePool.sol";
 import "../Interfaces/IDefaultPool.sol";
@@ -8,10 +8,14 @@ import "../Interfaces/IZUSDToken.sol";
 import "../Interfaces/IZEROStaking.sol";
 import "../Interfaces/ISortedTroves.sol";
 import "../Interfaces/ICollSurplusPool.sol";
+import "../Interfaces/ITroveManager.sol";
 import "../TroveManagerStorage.sol";
 import "./LiquityBase.sol";
 
-contract TroveManagerBase is LiquityBase, TroveManagerStorage {
+abstract contract TroveManagerBase is ITroveManager, LiquityBase, TroveManagerStorage {
+
+    using SafeMath for uint256;
+
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
@@ -108,20 +112,8 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         bool cancelledPartial;
     }
 
-    // --- Events ---
+    // --- Events not covered by interface ---
 
-    event Liquidation(
-        uint256 _liquidatedDebt,
-        uint256 _liquidatedColl,
-        uint256 _collGasCompensation,
-        uint256 _ZUSDGasCompensation
-    );
-    event Redemption(
-        uint256 _attemptedZUSDAmount,
-        uint256 _actualZUSDAmount,
-        uint256 _RBTCSent,
-        uint256 _RBTCFee
-    );
     event TroveUpdated(
         address indexed _borrower,
         uint256 _debt,
@@ -129,20 +121,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 _stake,
         TroveManagerOperation _operation
     );
-    event TroveLiquidated(
-        address indexed _borrower,
-        uint256 _debt,
-        uint256 _coll,
-        TroveManagerOperation _operation
-    );
-    event BaseRateUpdated(uint256 _baseRate);
-    event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
-    event TotalStakesUpdated(uint256 _newTotalStakes);
-    event SystemSnapshotsUpdated(uint256 _totalStakesSnapshot, uint256 _totalCollateralSnapshot);
-    event LTermsUpdated(uint256 _L_RBTC, uint256 _L_ZUSDDebt);
-    event TroveSnapshotsUpdated(uint256 _L_RBTC, uint256 _L_ZUSDDebt);
-    event TroveIndexUpdated(address _borrower, uint256 _newIndex);
-
+    
     enum TroveManagerOperation {
         applyPendingRewards,
         liquidateInNormalMode,

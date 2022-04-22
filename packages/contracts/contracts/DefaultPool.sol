@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import './Interfaces/IDefaultPool.sol';
 import "./Dependencies/SafeMath.sol";
@@ -18,10 +18,6 @@ import "./DefaultPoolStorage.sol";
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     using SafeMath for uint256;
     
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event DefaultPoolRBTCBalanceUpdated(uint _RBTC);
-
     // --- Dependency setters ---
 
     function setAddresses(

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
@@ -18,13 +18,6 @@ contract CommunityIssuance is
     BaseMath
 {
     using SafeMath for uint256;
-
-    // --- Events ---
-
-    event ZEROTokenAddressSet(address _zeroTokenAddress);
-    event CommunityPotAddressSet(address _communityPotAddress);
-    event FundingWalletAddressSet(address _zeroTokenAddress);
-    event TotalZEROIssuedUpdated(uint256 _fundingWalletAddress);
 
     // --- Functions ---
 

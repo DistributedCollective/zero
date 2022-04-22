@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/IActivePool.sol";
 import "./Dependencies/SafeMath.sol";
@@ -17,12 +17,7 @@ import "./ActivePoolStorage.sol";
  */
 contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     using SafeMath for uint256;
-    // --- Events ---
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event ActivePoolRBTCBalanceUpdated(uint _RBTC);
-
+    
     // --- Contract setters ---
     /// @notice initializer function that sets required addresses
     /// @dev Checks addresses are contracts. Only callable by contract owner.

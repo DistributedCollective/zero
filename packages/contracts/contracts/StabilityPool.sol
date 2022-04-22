@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
@@ -146,39 +146,7 @@ import "./StabilityPoolStorage.sol";
  */
 contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, IStabilityPool {
     using LiquitySafeMath128 for uint128;
-
-    // --- Events ---
-
-    event StabilityPoolRBTCBalanceUpdated(uint _newBalance);
-    event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
-
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _newActivePoolAddress);
-    event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
-    event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
-    event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
-    event PriceFeedAddressChanged(address _newPriceFeedAddress);
-    event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
-
-    event P_Updated(uint _P);
-    event S_Updated(uint _S, uint128 _epoch, uint128 _scale);
-    event G_Updated(uint _G, uint128 _epoch, uint128 _scale);
-    event EpochUpdated(uint128 _currentEpoch);
-    event ScaleUpdated(uint128 _currentScale);
-
-    event FrontEndRegistered(address indexed _frontEnd, uint _kickbackRate);
-    event FrontEndTagSet(address indexed _depositor, address indexed _frontEnd);
-
-    event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S, uint _G);
-    event FrontEndSnapshotUpdated(address indexed _frontEnd, uint _P, uint _G);
-    event UserDepositChanged(address indexed _depositor, uint _newDeposit);
-    event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
-
-    event RBTCGainWithdrawn(address indexed _depositor, uint _RBTC, uint _ZUSDLoss);
-    event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
-    event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
-    event RBtcerSent(address _to, uint _amount);
+    using SafeMath for uint256;
 
     // --- Contract setters ---
 

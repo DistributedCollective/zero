@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/IZUSDToken.sol";
 import "./Dependencies/SafeMath.sol";
@@ -27,11 +27,7 @@ import "./ZUSDTokenStorage.sol";
 
 contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken {
     using SafeMath for uint256;
-    // --- Events ---
-    event TroveManagerAddressChanged(address _troveManagerAddress);
-    event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-
+    
     function initialize( 
         address _troveManagerAddress,
         address _stabilityPoolAddress,
@@ -146,7 +142,7 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken {
         external 
         override 
     {            
-        require(deadline >= now, 'ZUSD: expired deadline');
+        require(deadline >= block.timestamp, 'ZUSD: expired deadline');
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 

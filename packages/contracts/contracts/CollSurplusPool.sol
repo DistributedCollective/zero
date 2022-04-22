@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Dependencies/SafeMath.sol";
@@ -11,15 +11,7 @@ import "./CollSurplusPoolStorage.sol";
 
 contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusPool {
     using SafeMath for uint256;
-    // --- Events ---
-
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _newActivePoolAddress);
-
-    event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event RBtcerSent(address _to, uint _amount);
-    
+      
     // --- Contract setters ---
 
     function setAddresses(

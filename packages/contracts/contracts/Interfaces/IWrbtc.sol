@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "../Dependencies/IERC20.sol";
 

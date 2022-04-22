@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "../LiquityBaseParams.sol";
 import "../TroveManager.sol";
@@ -50,7 +50,7 @@ contract EchidnaTester {
 
     constructor() public payable {
         liquityBaseParams = new LiquityBaseParams();
-        troveManagerRedeemOps = new TroveManagerRedeemOps();
+        //troveManagerRedeemOps = new TroveManagerRedeemOps();
         troveManager = new TroveManager();
         borrowerOperations = new BorrowerOperations();
         activePool = new ActivePool();

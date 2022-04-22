@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/CheckContract.sol";
@@ -10,18 +10,6 @@ import "./Dependencies/SafeMath.sol";
 
 contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor {
     using SafeMath for uint256;
-    // --- Events ---
-    
-    event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
-    event ZeroStakingAddressChanged(address _zeroStakingAddress);
-    event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _troveManagerAddress);
-    event WrbtcAddressChanged(address _wrbtcAddress);
-    event ZUSDTokenAddressChanged(address _zusdTokenAddress);
-    event ActivePoolAddressSet(address _activePoolAddress);
-
-    event ZUSDDistributed(uint256 _zusdDistributedAmount);
-    event RBTCistributed(uint256 _rbtcDistributedAmount);
 
     // --- Dependency setters ---
 

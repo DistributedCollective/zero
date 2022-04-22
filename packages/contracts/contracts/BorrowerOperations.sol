@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/ITroveManager.sol";
@@ -15,6 +15,8 @@ import "./Dependencies/console.sol";
 import "./BorrowerOperationsStorage.sol";
 
 contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckContract, IBorrowerOperations {
+    
+    using SafeMath for uint256;
     /* --- Variable container structs  ---
 
     Used to hold, return and assign variables inside a function, in order to avoid the error:
@@ -60,23 +62,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         closeTrove,
         adjustTrove
     }
-    
-    event FeeDistributorAddressChanged(address _feeDistributorAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _activePoolAddress);
-    event DefaultPoolAddressChanged(address _defaultPoolAddress);
-    event StabilityPoolAddressChanged(address _stabilityPoolAddress);
-    event GasPoolAddressChanged(address _gasPoolAddress);
-    event CollSurplusPoolAddressChanged(address _collSurplusPoolAddress);
-    event PriceFeedAddressChanged(address  _newPriceFeedAddress);
-    event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event ZUSDTokenAddressChanged(address _zusdTokenAddress);
-    event ZEROStakingAddressChanged(address _zeroStakingAddress);
-
-    event TroveCreated(address indexed _borrower, uint arrayIndex);
-    event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, BorrowerOperation operation);
-    event ZUSDBorrowingFeePaid(address indexed _borrower, uint _ZUSDFee);
-    
+      
     // --- Dependency setters ---
 
     function setAddresses(

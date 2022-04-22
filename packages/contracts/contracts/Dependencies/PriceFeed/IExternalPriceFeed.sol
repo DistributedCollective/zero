@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 /// @title A generic interface for external price providers  
 interface IExternalPriceFeed {

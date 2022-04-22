@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./TroveManagerBase.sol";
 
-contract TroveManagerRedeemOps is TroveManagerBase {
+abstract contract TroveManagerRedeemOps is TroveManagerBase {
+
+    using SafeMath for uint256;
+
     /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
       request.  Applies pending rewards to a Trove before reducing its debt and coll.
      
@@ -26,7 +29,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
       redemption will stop after the last completely redeemed Trove and the sender will keep the remaining ZUSD amount, which they can attempt
       to redeem later.
      */
-    function redeemCollateral(
+    function redeemCollateral (
         uint256 _ZUSDamount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
@@ -34,7 +37,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage
-    ) external {
+    ) external override {
         ContractsCache memory contractsCache = ContractsCache(
             activePool,
             defaultPool,

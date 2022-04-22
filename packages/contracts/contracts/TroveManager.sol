@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IStabilityPool.sol";
@@ -16,24 +16,10 @@ import "./Dependencies/console.sol";
 import "./Dependencies/TroveManagerBase.sol";
 import "./TroveManagerStorage.sol";
 
-contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
+contract TroveManager is TroveManagerBase, CheckContract {
 
-    event FeeDistributorAddressChanged(address _feeDistributorAddress);
-    event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
-    event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event PriceFeedAddressChanged(address _newPriceFeedAddress);
-    event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
-    event ActivePoolAddressChanged(address _activePoolAddress);
-    event DefaultPoolAddressChanged(address _defaultPoolAddress);
-    event StabilityPoolAddressChanged(address _stabilityPoolAddress);
-    event GasPoolAddressChanged(address _gasPoolAddress);
-    event CollSurplusPoolAddressChanged(address _collSurplusPoolAddress);
-    event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event ZEROTokenAddressChanged(address _zeroTokenAddress);
-    event ZEROStakingAddressChanged(address _zeroStakingAddress);
-
-
+    using SafeMath for uint256;
+    
     // --- Dependency setter ---
     function setAddresses(
         address _feeDistributorAddress,

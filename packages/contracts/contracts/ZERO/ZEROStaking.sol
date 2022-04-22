@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "../Dependencies/BaseMath.sol";
 import "../Dependencies/SafeMath.sol";
@@ -16,20 +16,8 @@ import "./ZEROStakingStorage.sol";
 contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMath {
     using SafeMath for uint;
 
-    // --- Events ---
-
-    event ZEROTokenAddressSet(address _zeroTokenAddress);
-    event ZUSDTokenAddressSet(address _zusdTokenAddress);
+    // --- Events not covered by interface ---
     event FeeDistributorAddressSet(address _feeDistributorAddress);
-    event ActivePoolAddressSet(address _activePoolAddress);
-
-    event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint ZUSDGain, uint RBTCGain);
-    event F_RBTCUpdated(uint _F_RBTC);
-    event F_ZUSDUpdated(uint _F_ZUSD);
-    event TotalZEROStakedUpdated(uint _totalZEROStaked);
-    event RBtcerSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_RBTC, uint _F_ZUSD);
 
     // --- Functions ---
 

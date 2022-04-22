@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./ILiquityBase.sol";
 import "./IStabilityPool.sol";
@@ -146,7 +146,7 @@ interface ITroveManager is ILiquityBase {
         uint _partialRedemptionHintNICR,
         uint _maxIterations,
         uint _maxFee
-    ) external; 
+    ) external virtual; 
 
     /// @notice Update borrower's stake based on their latest collateral value
     /// @param _borrower borrower address

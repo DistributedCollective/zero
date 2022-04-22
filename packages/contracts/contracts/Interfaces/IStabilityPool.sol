@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 /*
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.

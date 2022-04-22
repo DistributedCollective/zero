@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.7.6;
 
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/ISortedTroves.sol";
@@ -10,6 +10,8 @@ import "./HintHelpersStorage.sol";
 
 contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
 
+    using SafeMath for uint256;
+    
     // --- Events ---
 
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
