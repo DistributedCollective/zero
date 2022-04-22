@@ -6,7 +6,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../BorrowerOperationsStorage.sol";
 
 contract NueToken is ERC20("Nuestro", "NUE"), Ownable {
-    constructor () public {}
+    constructor () {}
 
     function mint (address _account, uint256 _amount) onlyOwner public {
         _mint(_account, _amount);
@@ -20,7 +20,7 @@ contract NueToken is ERC20("Nuestro", "NUE"), Ownable {
 contract MassetTester is IMasset {
     NueToken public token;
 
-    constructor () public {
+    constructor () {
         token = new NueToken();
     }
 

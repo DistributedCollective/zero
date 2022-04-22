@@ -10,9 +10,7 @@ contract ZEROTokenTester is ZEROToken {
         address _zeroStakingAddress,
         address _marketMakerAddress,
         address _presaleAddress
-    ) 
-        public 
-    {
+    ) {
         initialize(
             _zeroStakingAddress,
             _marketMakerAddress,

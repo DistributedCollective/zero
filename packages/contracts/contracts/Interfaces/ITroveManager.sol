@@ -146,7 +146,7 @@ interface ITroveManager is ILiquityBase {
         uint _partialRedemptionHintNICR,
         uint _maxIterations,
         uint _maxFee
-    ) external virtual; 
+    ) external; 
 
     /// @notice Update borrower's stake based on their latest collateral value
     /// @param _borrower borrower address

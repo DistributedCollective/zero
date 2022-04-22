@@ -10,7 +10,7 @@ contract ZUSDTokenTester is ZUSDToken {
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
-    ) public  {
+    ) {
         initialize(_troveManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress);
     }
     

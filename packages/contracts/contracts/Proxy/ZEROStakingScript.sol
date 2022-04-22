@@ -9,7 +9,7 @@ import "../Interfaces/IZEROStaking.sol";
 contract ZEROStakingScript is CheckContract {
     IZEROStaking immutable ZEROStaking;
 
-    constructor(address _zeroStakingAddress) public {
+    constructor(address _zeroStakingAddress) {
         checkContract(_zeroStakingAddress);
         ZEROStaking = IZEROStaking(_zeroStakingAddress);
     }

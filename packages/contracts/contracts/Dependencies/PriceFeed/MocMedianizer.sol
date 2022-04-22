@@ -10,7 +10,7 @@ interface IMoCBaseOracle {
 contract MoCMedianizer is IExternalPriceFeed {
     IMoCBaseOracle medianizer;
 
-    constructor(address _medianizer) public {
+    constructor(address _medianizer) {
         medianizer = IMoCBaseOracle(_medianizer);
     }
 

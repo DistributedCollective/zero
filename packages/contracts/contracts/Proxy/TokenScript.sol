@@ -11,7 +11,7 @@ contract TokenScript is CheckContract {
 
     IERC20 immutable token;
 
-    constructor(address _tokenAddress) public {
+    constructor(address _tokenAddress) {
         checkContract(_tokenAddress);
         token = IERC20(_tokenAddress);
     }

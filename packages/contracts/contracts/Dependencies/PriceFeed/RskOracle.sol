@@ -11,7 +11,7 @@ contract RskOracle is IExternalPriceFeed {
   
     IRSKOracle rskOracle;
 
-    constructor(address _address) public {
+    constructor(address _address) {
         rskOracle = IRSKOracle(_address);
     }
 

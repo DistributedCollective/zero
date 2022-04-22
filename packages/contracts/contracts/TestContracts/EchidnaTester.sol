@@ -48,7 +48,7 @@ contract EchidnaTester {
 
     uint private numberOfTroves;
 
-    constructor() public payable {
+    constructor() payable {
         liquityBaseParams = new LiquityBaseParams();
         //troveManagerRedeemOps = new TroveManagerRedeemOps();
         troveManager = new TroveManager();

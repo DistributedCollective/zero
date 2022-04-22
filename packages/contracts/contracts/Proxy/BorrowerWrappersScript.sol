@@ -39,7 +39,6 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
     )
         BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress))
         ZEROStakingScript(_zeroStakingAddress)
-        public
     {
         checkContract(_troveManagerAddress);
         ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
