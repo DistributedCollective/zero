@@ -85,7 +85,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
         firstRedemptionHint = currentTroveuser;
 
         if (_maxIterations == 0) {
-            _maxIterations = uint(-1);
+            _maxIterations = ~uint(0);
         }
 
         while (currentTroveuser != address(0) && remainingZUSD > 0 && _maxIterations-- > 0) {

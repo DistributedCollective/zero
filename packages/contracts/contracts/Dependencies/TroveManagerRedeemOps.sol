@@ -84,7 +84,7 @@ abstract contract TroveManagerRedeemOps is TroveManagerBase {
 
         // Loop through the Troves starting from the one with lowest collateral ratio until _amount of ZUSD is exchanged for collateral
         if (_maxIterations == 0) {
-            _maxIterations = uint256(-1);
+            _maxIterations = ~uint256(0);
         }
         while (currentBorrower != address(0) && totals.remainingZUSD > 0 && _maxIterations > 0) {
             _maxIterations--;

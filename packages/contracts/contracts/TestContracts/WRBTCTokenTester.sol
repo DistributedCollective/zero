@@ -40,7 +40,7 @@ contract WRBTCTokenTester {
 	function withdraw(uint256 wad) public {
 		require(balanceOf[msg.sender] >= wad);
 		balanceOf[msg.sender] -= wad;
-		msg.sender.transfer(wad);
+		payable(msg.sender).transfer(wad);
 		emit Withdrawal(msg.sender, wad);
 	}
 
@@ -65,7 +65,7 @@ contract WRBTCTokenTester {
 	) public returns (bool) {
 		require(balanceOf[src] >= wad);
 
-		if (src != msg.sender && allowance[src][msg.sender] != uint256(-1)) {
+		if (src != msg.sender && allowance[src][msg.sender] != ~uint256(0)) {
 			require(allowance[src][msg.sender] >= wad);
 			allowance[src][msg.sender] -= wad;
 		}
