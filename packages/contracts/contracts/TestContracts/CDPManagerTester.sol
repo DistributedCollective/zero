@@ -46,7 +46,7 @@ contract TroveManagerTester is TroveManager {
     }
 
     function callGetRedemptionFee(uint _RBTCDrawn) external view returns (uint) {
-        _getRedemptionFee(_RBTCDrawn);
+        return _getRedemptionFee(_RBTCDrawn);
     }  
 
     function getActualDebtFromComposite(uint _debtVal) external pure returns (uint) {

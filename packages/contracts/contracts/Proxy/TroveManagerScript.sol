@@ -24,7 +24,7 @@ contract TroveManagerScript is CheckContract {
         uint _partialRedemptionHintNICR,
         uint _maxIterations,
         uint _maxFee
-    ) external returns (uint) {
+    ) external {
         troveManager.redeemCollateral(
             _ZUSDAmount,
             _firstRedemptionHint,

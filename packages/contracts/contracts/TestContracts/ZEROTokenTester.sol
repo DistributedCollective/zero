@@ -32,10 +32,12 @@ contract ZEROTokenTester is ZEROToken {
 
     function callInternalApprove(address owner, address spender, uint256 amount) external returns (bool) {
         _approve(owner, spender, amount);
+        return true;
     }
 
     function callInternalTransfer(address sender, address recipient, uint256 amount) external returns (bool) {
         _transfer(sender, recipient, amount);
+        return true;
     }
 
     function getChainId() external view returns (uint256 chainID) {

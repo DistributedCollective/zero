@@ -265,27 +265,27 @@ contract EchidnaTester {
 
     function transferExt(uint _i, address recipient, uint256 amount) external returns (bool) {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].transferPrx(recipient, amount);
+        return echidnaProxies[actor].transferPrx(recipient, amount);
     }
 
     function approveExt(uint _i, address spender, uint256 amount) external returns (bool) {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].approvePrx(spender, amount);
+        return echidnaProxies[actor].approvePrx(spender, amount);
     }
 
     function transferFromExt(uint _i, address sender, address recipient, uint256 amount) external returns (bool) {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].transferFromPrx(sender, recipient, amount);
+        return echidnaProxies[actor].transferFromPrx(sender, recipient, amount);
     }
 
     function increaseAllowanceExt(uint _i, address spender, uint256 addedValue) external returns (bool) {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].increaseAllowancePrx(spender, addedValue);
+        return echidnaProxies[actor].increaseAllowancePrx(spender, addedValue);
     }
 
     function decreaseAllowanceExt(uint _i, address spender, uint256 subtractedValue) external returns (bool) {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].decreaseAllowancePrx(spender, subtractedValue);
+        return echidnaProxies[actor].decreaseAllowancePrx(spender, subtractedValue);
     }
 
     // PriceFeed
