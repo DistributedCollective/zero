@@ -1,6 +1,6 @@
 {
   "name": "@liquity/lib-base",
-  "version": "0.0.0-semantic-release",
+  "version": "3.103.0",
   "description": "Liquity SDK shared interfaces",
   "keywords": [
     "Liquity",
