@@ -195,7 +195,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         // Move the ZUSD gas compensation to the Gas Pool
         _withdrawZUSD(contractsCache.activePool, contractsCache.zusdToken, gasPoolAddress, ZUSD_GAS_COMPENSATION, ZUSD_GAS_COMPENSATION);
 
-        emit TroveUpdated(_sender, vars.compositeDebt, value, vars.stake, BorrowerOperation.openTrove);
+        emit TroveUpdated(_sender, vars.compositeDebt, value, vars.stake, uint8(BorrowerOperation.openTrove));
         emit ZUSDBorrowingFeePaid(_sender, vars.ZUSDFee);
     }
 
@@ -309,7 +309,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         vars.newNICR = _getNewNominalICRFromTroveChange(vars.coll, vars.debt, vars.collChange, vars.isCollIncrease, vars.netDebtChange, _isDebtIncrease);
         sortedTroves.reInsert(_borrower, vars.newNICR, _upperHint, _lowerHint);
 
-        emit TroveUpdated(_borrower, vars.newDebt, vars.newColl, vars.stake, BorrowerOperation.adjustTrove);
+        emit TroveUpdated(_borrower, vars.newDebt, vars.newColl, vars.stake, uint8(BorrowerOperation.adjustTrove));
         emit ZUSDBorrowingFeePaid(_sender,  vars.ZUSDFee);
 
         // Use the unmodified _ZUSDChange here, as we don't send the fee to the user
@@ -361,7 +361,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         troveManagerCached.removeStake(msg.sender);
         troveManagerCached.closeTrove(msg.sender);
 
-        emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
+        emit TroveUpdated(msg.sender, 0, 0, 0, uint8(BorrowerOperation.closeTrove));
 
         // Burn the repaid ZUSD from the user's balance and the gas compensation from the Gas Pool
         _repayZUSD(activePoolCached, zusdTokenCached, msg.sender, debt.sub(ZUSD_GAS_COMPENSATION));

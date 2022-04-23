@@ -156,7 +156,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
             _borrower,
             singleLiquidation.entireTroveDebt,
             singleLiquidation.entireTroveColl,
-            TroveManagerOperation.liquidateInNormalMode
+            uint8(TroveManagerOperation.liquidateInNormalMode)
         );
         emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInNormalMode);
         return singleLiquidation;
@@ -211,7 +211,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                 _borrower,
                 singleLiquidation.entireTroveDebt,
                 singleLiquidation.entireTroveColl,
-                TroveManagerOperation.liquidateInRecoveryMode
+                uint8(TroveManagerOperation.liquidateInRecoveryMode)
             );
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
 
@@ -241,7 +241,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                 _borrower,
                 singleLiquidation.entireTroveDebt,
                 singleLiquidation.entireTroveColl,
-                TroveManagerOperation.liquidateInRecoveryMode
+                uint8(TroveManagerOperation.liquidateInRecoveryMode)
             );
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
             /*
@@ -279,7 +279,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                 _borrower,
                 singleLiquidation.entireTroveDebt,
                 singleLiquidation.collToSendToSP,
-                TroveManagerOperation.liquidateInRecoveryMode
+                uint8(TroveManagerOperation.liquidateInRecoveryMode)
             );
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
         } else {
