@@ -163,7 +163,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- Internal operations ---
 
-    function _chainID() private pure returns (uint256 chainID) {
+    function _chainID() private view returns (uint256 chainID) {
         assembly {
             chainID := chainid()
         }
@@ -227,23 +227,23 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- Optional functions ---
 
-    function name() external view override returns (string memory) {
+    function name() external pure override returns (string memory) {
         return _NAME;
     }
 
-    function symbol() external view override returns (string memory) {
+    function symbol() external pure override returns (string memory) {
         return _SYMBOL;
     }
 
-    function decimals() external view override returns (uint8) {
+    function decimals() external pure override returns (uint8) {
         return _DECIMALS;
     }
 
-    function version() external view override returns (string memory) {
+    function version() external pure override returns (string memory) {
         return _VERSION;
     }
 
-    function permitTypeHash() external view override returns (bytes32) {
+    function permitTypeHash() external pure override returns (bytes32) {
         return _PERMIT_TYPEHASH;
     }
 }
