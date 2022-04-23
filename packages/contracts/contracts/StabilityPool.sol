@@ -879,6 +879,6 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     receive() external payable {
         _requireCallerIsActivePool();
         RBTC = RBTC.add(msg.value);
-        StabilityPoolRBTCBalanceUpdated(RBTC);
+        emit StabilityPoolRBTCBalanceUpdated(RBTC);
     }
 }

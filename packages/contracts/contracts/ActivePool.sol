@@ -83,7 +83,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     function increaseZUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
         ZUSDDebt = ZUSDDebt.add(_amount);
-        ActivePoolZUSDDebtUpdated(ZUSDDebt);
+        emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     /// @notice Decreases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
@@ -91,7 +91,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     function decreaseZUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         ZUSDDebt = ZUSDDebt.sub(_amount);
-        ActivePoolZUSDDebtUpdated(ZUSDDebt);
+        emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     // --- 'require' functions ---

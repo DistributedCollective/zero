@@ -171,7 +171,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
 
         delete data.nodes[_id];
         data.size = data.size.sub(1);
-        NodeRemoved(_id);
+        emit NodeRemoved(_id);
     }
 
     /**
