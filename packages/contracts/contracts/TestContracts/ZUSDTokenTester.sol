@@ -40,6 +40,9 @@ contract ZUSDTokenTester is ZUSDToken {
 
     function callInternalApprove(address owner, address spender, uint256 amount) external returns (bool) {
         _approve(owner, spender, amount);
+        // Since this is basically a "naked" transfer, mimic transfer function signature
+        // and satisfy this function's sig too.
+        return true;
     }
 
     function getChainId() external view returns (uint256 chainID) {

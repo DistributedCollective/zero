@@ -28,7 +28,7 @@ contract MassetTester is IMasset {
     /// TODO:   Rationalize this asap to avoid misleading code resulting in frontend errors.
    function onTokensMinted(
         uint256 _orderAmount,
-        address /* _tokenAddress, */
+        address /* _tokenAddress */,
         bytes calldata _userData
     ) external override {
         token.mint(abi.decode(_userData, (address)), _orderAmount);
