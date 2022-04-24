@@ -49,7 +49,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
         _HASHED_NAME = hashedName;
         _HASHED_VERSION = hashedVersion;
-        _CACHED_CHAIN_ID = _chainID();
+        _CACHED_CHAIN_ID = block.chainid;
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
         
     }
@@ -127,7 +127,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     // --- EIP 2612 functionality ---
 
     function domainSeparator() public view override returns (bytes32) {    
-        if (_chainID() == _CACHED_CHAIN_ID) {
+        if (block.chainid == _CACHED_CHAIN_ID) {
             return _CACHED_DOMAIN_SEPARATOR;
         } else {
             return _buildDomainSeparator(_TYPE_HASH, _HASHED_NAME, _HASHED_VERSION);
@@ -163,12 +163,12 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- Internal operations ---
 
-    function _chainID() private view returns (uint256 chainID) {
+    function block.chainid private view returns (uint256 chainID) {
         chainID = block.chainid;
     }
 
     function _buildDomainSeparator(bytes32 _typeHash, bytes32 _name, bytes32 _version) private view returns (bytes32) {
-        return keccak256(abi.encode(_typeHash, _name, _version, _chainID(), address(this)));
+        return keccak256(abi.encode(_typeHash, _name, _version, block.chainid, address(this)));
     }
 
     function _transfer(address sender, address recipient, uint256 amount) internal {

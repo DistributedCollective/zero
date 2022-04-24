@@ -45,10 +45,6 @@ contract ZUSDTokenTester is ZUSDToken {
         return true;
     }
 
-    function getChainId() external view returns (uint256 chainID) {
-        chainID = block.chainid;
-    }
-
     function getDigest(address owner, address spender, uint amount, uint nonce, uint deadline) external view returns (bytes32) {
         return keccak256(abi.encodePacked(
                 uint16(0x1901),
