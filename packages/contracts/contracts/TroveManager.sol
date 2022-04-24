@@ -1129,6 +1129,10 @@ contract TroveManager is TroveManagerBase, CheckContract {
 
     /// @dev    this function forwards the call to the troveManagerRedeemOps in a delegate call fashion
     ///         so the parameters are not needed
+    /// @dev    Static analysis does not follow delegatecall nor consider msg.data content,
+    ///         so params "look" unused to it. Warnings are normal
+    ///         Consider silencing them by removing the names, frontend should use an interface to get the names anyway.
+    
     function redeemCollateral(
         uint256 _ZUSDamount,
         address _firstRedemptionHint,
@@ -1138,6 +1142,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         uint256 _maxIterations,
         uint256 _maxFeePercentage
     ) external override {
+
         (bool success, bytes memory returndata) = troveManagerRedeemOps.delegatecall(msg.data);
         require(success, string(returndata));
     }

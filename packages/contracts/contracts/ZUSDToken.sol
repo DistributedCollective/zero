@@ -158,7 +158,7 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken {
 
     // --- Internal operations ---
 
-    function _chainID() private pure returns (uint256 chainID) {
+    function _chainID() private view returns (uint256 chainID) {
         assembly {
             chainID := chainid()
         }

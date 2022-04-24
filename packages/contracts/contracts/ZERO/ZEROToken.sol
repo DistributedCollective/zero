@@ -169,8 +169,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         }
     }
 
-    function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {
-        return keccak256(abi.encode(typeHash, name, version, _chainID(), address(this)));
+    function _buildDomainSeparator(bytes32 _typeHash, bytes32 _name, bytes32 _version) private view returns (bytes32) {
+        return keccak256(abi.encode(_typeHash, _name, _version, _chainID(), address(this)));
     }
 
     function _transfer(address sender, address recipient, uint256 amount) internal {

@@ -680,7 +680,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         return newTCR;
     }
 
-    function getCompositeDebt(uint _debt) external view override returns (uint) {
+    function getCompositeDebt(uint _debt) external pure override returns (uint) {
         return _getCompositeDebt(_debt);
     }
 
