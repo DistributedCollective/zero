@@ -163,10 +163,6 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- Internal operations ---
 
-    function block.chainid private view returns (uint256 chainID) {
-        chainID = block.chainid;
-    }
-
     function _buildDomainSeparator(bytes32 _typeHash, bytes32 _name, bytes32 _version) private view returns (bytes32) {
         return keccak256(abi.encode(_typeHash, _name, _version, block.chainid, address(this)));
     }
