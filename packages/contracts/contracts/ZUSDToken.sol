@@ -159,9 +159,10 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken {
     // --- Internal operations ---
 
     function _chainID() private view returns (uint256 chainID) {
-        assembly {
+        /*assembly {
             chainID := chainid()
-        }
+        }*/
+        chainID = block.chainid;
     }
     
     function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {

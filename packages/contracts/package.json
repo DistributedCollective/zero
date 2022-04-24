@@ -9,7 +9,7 @@
   "scripts": {
     "hardhat": "hardhat",
     "prepare": "run-s prepare:*",
-    "prepare:compile": "hardhat compile",
+    "prepare:compile": "hardhat compile --verbose",
     "prepare:set-version": "node scripts/set-version.js",
     "test": "hardhat test",
     "coverage": "hardhat coverage",

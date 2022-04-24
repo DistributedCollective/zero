@@ -164,9 +164,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     // --- Internal operations ---
 
     function _chainID() private view returns (uint256 chainID) {
-        assembly {
-            chainID := chainid()
-        }
+        chainID = block.chainid;
     }
 
     function _buildDomainSeparator(bytes32 _typeHash, bytes32 _name, bytes32 _version) private view returns (bytes32) {

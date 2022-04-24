@@ -41,9 +41,6 @@ contract ZEROTokenTester is ZEROToken {
     }
 
     function getChainId() external view returns (uint256 chainID) {
-        //return _chainID(); // it’s private
-        assembly {
-            chainID := chainid()
-        }
+        chainID = block.chainid;
     }
 }

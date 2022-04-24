@@ -46,10 +46,7 @@ contract ZUSDTokenTester is ZUSDToken {
     }
 
     function getChainId() external view returns (uint256 chainID) {
-        //return _chainID(); // it’s private
-        assembly {
-            chainID := chainid()
-        }
+        chainID = block.chainid;
     }
 
     function getDigest(address owner, address spender, uint amount, uint nonce, uint deadline) external view returns (bytes32) {
