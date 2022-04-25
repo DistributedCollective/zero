@@ -69,16 +69,17 @@ contract EchidnaTester {
 
         sortedTroves = new SortedTroves();
 
-/* TODO : uncomment when function is fixed
         troveManager.setAddresses(
-            address(0),
-            address(troveManagerRedeemOps),
-            address(liquityBaseParams), address(borrowerOperations), 
-            address(activePool), address(defaultPool), 
-            address(stabilityPool), address(gasPool), address(collSurplusPool),
-            address(priceFeedTestnet), address(zusdToken), 
-            address(sortedTroves), address(0), address(0));
-   */    
+            [
+                address(0),
+                address(troveManagerRedeemOps),
+                address(liquityBaseParams), address(borrowerOperations), 
+                address(activePool), address(defaultPool), 
+                address(stabilityPool), address(gasPool), address(collSurplusPool),
+                address(priceFeedTestnet), address(zusdToken), 
+                address(sortedTroves), address(0), address(0)
+            ]);
+       
         borrowerOperations.setAddresses(
             address(0),
             address(liquityBaseParams), address(troveManager), 

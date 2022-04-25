@@ -43,40 +43,26 @@ interface ITroveManager is ILiquityBase {
 
     // --- Functions ---
     /**
-     * @|notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
-     * @|dev initializer function, checks addresses are contracts
-     * @|param _feeDistributorAddress feeDistributor contract address
-     * @|param _troveManagerRedeemOps TroveManagerRedeemOps contract address
-     * @|param _liquityBaseParamsAddress LiquityBaseParams contract address
-     * @|param _borrowerOperationsAddress BorrowerOperations contract address
-     * @|param _activePoolAddress ActivePool contract address
-     * @|param _defaultPoolAddress DefaultPool contract address
-     * @|param _stabilityPoolAddress StabilityPool contract address
-     * @|param _gasPoolAddress GasPool contract address
-     * @|param _collSurplusPoolAddress CollSurplusPool contract address
-     * @|param _priceFeedAddress PriceFeed contract address
-     * @|param _zusdTokenAddress ZUSDToken contract address
-     * @|param _sortedTrovesAddress SortedTroves contract address
-     * @|param _zeroTokenAddress ZEROToken contract address
-     * @|param _zeroStakingAddress ZEROStaking contract address
+     * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
+     * @dev initializer function, checks addresses are contracts
+     * ##array-ordered-param _feeDistributorAddress feeDistributor contract address
+     * ##array-ordered-param _troveManagerRedeemOps TroveManagerRedeemOps contract address
+     * ##array-ordered-param _liquityBaseParamsAddress LiquityBaseParams contract address
+     * ##array-ordered-param _borrowerOperationsAddress BorrowerOperations contract address
+     * ##array-ordered-param _activePoolAddress ActivePool contract address
+     * ##array-ordered-param _defaultPoolAddress DefaultPool contract address
+     * ##array-ordered-param _stabilityPoolAddress StabilityPool contract address
+     * ##array-ordered-param _gasPoolAddress GasPool contract address
+     * ##array-ordered-param _collSurplusPoolAddress CollSurplusPool contract address
+     * ##array-ordered-param _priceFeedAddress PriceFeed contract address
+     * ##array-ordered-param _zusdTokenAddress ZUSDToken contract address
+     * ##array-ordered-param _sortedTrovesAddress SortedTroves contract address
+     * ##array-ordered-param _zeroTokenAddress ZEROToken contract address
+     * ##array-ordered-param _zeroStakingAddress ZEROStaking contract address
      */
-    /*function setAddresses(
-        address _feeDistributorAddress,
-        address _troveManagerRedeemOps,
-        address _liquityBaseParamsAddress,
-        address _borrowerOperationsAddress,
-        address _activePoolAddress,
-        address _defaultPoolAddress,
-        address _stabilityPoolAddress,
-        address _gasPoolAddress,
-        address _collSurplusPoolAddress,
-        address _priceFeedAddress,
-        address _zusdTokenAddress,
-        address _sortedTrovesAddress,
-        address _zeroTokenAddress,
-        address _zeroStakingAddress
+    function setAddresses(
+        address[14] calldata addresses
     ) external;
-    */
 
     /// @return Trove owners count
     function getTroveOwnersCount() external view returns (uint);

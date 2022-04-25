@@ -21,69 +21,43 @@ contract TroveManager is TroveManagerBase, CheckContract {
     using SafeMath for uint256;
     
     // --- Dependency setter ---
-    /*function setAddresses(
-        address _feeDistributorAddress,
-        address _troveManagerRedeemOps,
-        address _liquityBaseParamsAddress,
-        address _borrowerOperationsAddress,
-        address _activePoolAddress,
-        address _defaultPoolAddress,
-        address _stabilityPoolAddress,
-        address _gasPoolAddress,
-        address _collSurplusPoolAddress,
-        address _priceFeedAddress,
-        address _zusdTokenAddress,
-        address _sortedTrovesAddress,
-        address _zeroTokenAddress,
-        address _zeroStakingAddress
-    ) external override onlyOwner {
+    function setAddresses(address[14] calldata _addresses) external override onlyOwner {
 
-        checkContract(_feeDistributorAddress);
-        checkContract(_troveManagerRedeemOps);
-        checkContract(_liquityBaseParamsAddress);
-        checkContract(_borrowerOperationsAddress);
-        checkContract(_activePoolAddress);
-        checkContract(_defaultPoolAddress);
-        checkContract(_stabilityPoolAddress);
-        checkContract(_gasPoolAddress);
-        checkContract(_collSurplusPoolAddress);
-        checkContract(_priceFeedAddress);
-        checkContract(_zusdTokenAddress);
-        checkContract(_sortedTrovesAddress);
-        checkContract(_zeroTokenAddress);
-        checkContract(_zeroStakingAddress);
+        for (uint256 i = 0; i<_addresses.length; i++) {
+            checkContract(_addresses[i]);
+        }
 
-        feeDistributor = IFeeDistributor(_feeDistributorAddress);
-        troveManagerRedeemOps = _troveManagerRedeemOps;
-        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
-        borrowerOperationsAddress = _borrowerOperationsAddress;
-        activePool = IActivePool(_activePoolAddress);
-        defaultPool = IDefaultPool(_defaultPoolAddress);
-        _stabilityPool = IStabilityPool(_stabilityPoolAddress);
-        gasPoolAddress = _gasPoolAddress;
-        collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
-        priceFeed = IPriceFeed(_priceFeedAddress);
-        _zusdToken = IZUSDToken(_zusdTokenAddress);
-        sortedTroves = ISortedTroves(_sortedTrovesAddress);
-        _zeroToken = IZEROToken(_zeroTokenAddress);
-        _zeroStaking = IZEROStaking(_zeroStakingAddress);        
+        feeDistributor = IFeeDistributor(_addresses[0]);
+        troveManagerRedeemOps = _addresses[1];
+        liquityBaseParams = ILiquityBaseParams(_addresses[2]);
+        borrowerOperationsAddress = _addresses[3];
+        activePool = IActivePool(_addresses[4]);
+        defaultPool = IDefaultPool(_addresses[5]);
+        _stabilityPool = IStabilityPool(_addresses[6]);
+        gasPoolAddress = _addresses[7];
+        collSurplusPool = ICollSurplusPool(_addresses[8]);
+        priceFeed = IPriceFeed(_addresses[9]);
+        _zusdToken = IZUSDToken(_addresses[10]);
+        sortedTroves = ISortedTroves(_addresses[11]);
+        _zeroToken = IZEROToken(_addresses[12]);
+        _zeroStaking = IZEROStaking(_addresses[13]);        
 
-        emit FeeDistributorAddressChanged(_feeDistributorAddress);
-        emit TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps);
-        emit LiquityBaseParamsAddressChanges(_borrowerOperationsAddress);
-        emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit ActivePoolAddressChanged(_activePoolAddress);
-        emit DefaultPoolAddressChanged(_defaultPoolAddress);
-        emit StabilityPoolAddressChanged(_stabilityPoolAddress);
-        emit GasPoolAddressChanged(_gasPoolAddress);
-        emit CollSurplusPoolAddressChanged(_collSurplusPoolAddress);
-        emit PriceFeedAddressChanged(_priceFeedAddress);
-        emit ZUSDTokenAddressChanged(_zusdTokenAddress);
-        emit SortedTrovesAddressChanged(_sortedTrovesAddress);
-        emit ZEROTokenAddressChanged(_zeroTokenAddress);
-        emit ZEROStakingAddressChanged(_zeroStakingAddress);
+        emit FeeDistributorAddressChanged(_addresses[0]);
+        emit TroveManagerRedeemOpsAddressChanged(_addresses[1]);
+        emit LiquityBaseParamsAddressChanges(_addresses[2]);
+        emit BorrowerOperationsAddressChanged(_addresses[3]);
+        emit ActivePoolAddressChanged(_addresses[4]);
+        emit DefaultPoolAddressChanged(_addresses[5]);
+        emit StabilityPoolAddressChanged(_addresses[6]);
+        emit GasPoolAddressChanged(_addresses[7]);
+        emit CollSurplusPoolAddressChanged(_addresses[8]);
+        emit PriceFeedAddressChanged(_addresses[9]);
+        emit ZUSDTokenAddressChanged(_addresses[10]);
+        emit SortedTrovesAddressChanged(_addresses[11]);
+        emit ZEROTokenAddressChanged(_addresses[12]);
+        emit ZEROStakingAddressChanged(_addresses[13]);
 
-    }*/
+    }
 
     // --- Getters ---
 
