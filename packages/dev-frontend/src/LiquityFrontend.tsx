@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex, Container } from "theme-ui";
-import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import { Wallet } from "@ethersproject/wallet";
 
 import { Decimal, Difference, Trove } from "@liquity/lib-base";
@@ -10,13 +10,14 @@ import { useLiquity } from "./hooks/LiquityContext";
 import { TransactionMonitor } from "./components/Transaction";
 import { Header } from "./components/Header";
 
-import { PageSwitcher } from "./pages/PageSwitcher";
 import { RiskyTrovesPage } from "./pages/RiskyTrovesPage";
 import { RedemptionPage } from "./pages/RedemptionPage";
 
 import { TroveViewProvider } from "./components/Trove/context/TroveViewProvider";
 import { StabilityViewProvider } from "./components/Stability/context/StabilityViewProvider";
 import { Nav } from "./components/Nav";
+import { AccessPage } from "./pages/AccessPage";
+import { Dashboard } from "./pages/Dashboard";
 
 type LiquityFrontendProps = {
   loader?: React.ReactNode;
@@ -37,37 +38,38 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
 
   return (
     <LiquityStoreProvider {...{ loader }} store={liquity.store}>
-      <Router>
+      <Switch>
+        <Route path="/access" exact>
+          <AccessPage />
+        </Route>
         <TroveViewProvider>
           <StabilityViewProvider>
-              <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
-                <Header />
-                <Nav />
-                <Container
-                  variant="main"
-                  sx={{
-                    display: "flex",
-                    flexGrow: 1,
-                    flexDirection: "column",
-                    alignItems: "center"
-                  }}
-                >
-                  <Switch>
-                    <Route path="/" exact>
-                      <PageSwitcher />
-                    </Route>
-                    <Route path="/liquidation">
-                      <RiskyTrovesPage />
-                    </Route>
-                    <Route path="/redemption">
-                      <RedemptionPage />
-                    </Route>
-                  </Switch>
-                </Container>
-              </Flex>
+            <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
+              <Header />
+              <Nav />
+              <Container
+                variant="main"
+                sx={{
+                  display: "flex",
+                  flexGrow: 1,
+                  flexDirection: "column",
+                  alignItems: "center"
+                }}
+              >
+                <Route path="/" exact>
+                  <Dashboard />
+                </Route>
+                <Route path="/liquidation">
+                  <RiskyTrovesPage />
+                </Route>
+                <Route path="/redemption">
+                  <RedemptionPage />
+                </Route>
+              </Container>
+            </Flex>
           </StabilityViewProvider>
         </TroveViewProvider>
-      </Router>
+      </Switch>
       <TransactionMonitor />
     </LiquityStoreProvider>
   );

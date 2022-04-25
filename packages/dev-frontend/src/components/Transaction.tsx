@@ -293,6 +293,7 @@ export const TransactionMonitor: React.FC = () => {
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;
   const tx = transactionState.type === "waitingForConfirmation" ? transactionState.tx : undefined;
 
+  console.log('transactionState:', transactionState)
   useEffect(() => {
     if (id && tx) {
       let cancelled = false;

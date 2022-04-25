@@ -292,6 +292,15 @@ const theme: Theme = {
       }
     },
 
+    secondary: {
+      ...button,
+      bg: "primary",
+      color: "cardBackground",
+      ":enabled:hover": {
+        opacity: 0.75
+      }
+    },
+
     outline: {
       ...button,
       ...buttonOutline("primary", "secondary")
