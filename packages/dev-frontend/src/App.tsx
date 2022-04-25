@@ -12,6 +12,7 @@ import theme from "./theme";
 
 import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
 import { LiquityFrontend } from "./LiquityFrontend";
+import { BrowserRouter } from "react-router-dom";
 
 if (window.ethereum) {
   // Silence MetaMask warning in console
@@ -52,11 +53,11 @@ const UnsupportedMainnetFallback: React.FC = () => (
       textAlign: "center"
     }}
   >
-    <Heading sx={{ mb: 3 }}>
-      <Icon name="exclamation-triangle" /> This app is for testing purposes only.
-    </Heading>
-
-    <Paragraph sx={{ mb: 3 }}>Please change your network to RSK Testnet.</Paragraph>
+    <Icon name="info-circle" />
+    <Paragraph sx={{ mt: 3 }}>
+      Please switch your wallet network to
+      <br /> RSK Testnet.
+    </Paragraph>
 
     <Paragraph>
       If you'd like to use Zero on mainnet, please go{" "}
@@ -86,10 +87,10 @@ const App = () => {
         textAlign: "center"
       }}
     >
-      <Heading sx={{ mb: 3 }}>
-        <Icon name="exclamation-triangle" /> Zero is not yet deployed to{" "}
-        {chainId === 30 ? "mainnet" : "this network"}.
-      </Heading>
+      <Icon name="info-circle" />
+      <Paragraph sx={{ mt: 3, mb: 1 }}>
+        Zero is not yet deployed to {chainId === 30 ? "RSK Mainnet" : "this network"}.
+      </Paragraph>
       Please switch to RSK Testnet.
     </Flex>
   );
@@ -97,17 +98,19 @@ const App = () => {
   return (
     <EthersWeb3ReactProvider>
       <ThemeProvider theme={theme}>
-        <WalletConnector loader={loader}>
-          <LiquityProvider
-            loader={loader}
-            unsupportedNetworkFallback={unsupportedNetworkFallback}
-            unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
-          >
-            <TransactionProvider>
-              <LiquityFrontend loader={loader} />
-            </TransactionProvider>
-          </LiquityProvider>
-        </WalletConnector>
+        <BrowserRouter>
+          <WalletConnector loader={loader}>
+            <LiquityProvider
+              loader={loader}
+              unsupportedNetworkFallback={unsupportedNetworkFallback}
+              unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
+            >
+              <TransactionProvider>
+                <LiquityFrontend loader={loader} />
+              </TransactionProvider>
+            </LiquityProvider>
+          </WalletConnector>
+        </BrowserRouter>
       </ThemeProvider>
     </EthersWeb3ReactProvider>
   );
