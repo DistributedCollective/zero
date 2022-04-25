@@ -1,6 +1,6 @@
 import React from "react";
 import { Web3ReactProvider } from "@web3-react/core";
-import { Flex, Spinner, Heading, ThemeProvider, Paragraph, Link } from "theme-ui";
+import { Flex, Spinner, Heading, ThemeProvider, Paragraph, Link, Image } from "theme-ui";
 
 import { BatchedWebSocketAugmentedWeb3Provider } from "@liquity/providers";
 import { LiquityProvider } from "./hooks/LiquityContext";
@@ -13,6 +13,7 @@ import theme from "./theme";
 import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
 import { LiquityFrontend } from "./LiquityFrontend";
 import { BrowserRouter } from "react-router-dom";
+import { Header } from "./components/Header";
 
 if (window.ethereum) {
   // Silence MetaMask warning in console
@@ -43,17 +44,35 @@ const EthersWeb3ReactProvider: React.FC = ({ children }) => {
   );
 };
 
+const UnsupportedLayout: React.FC = ({ children }) => (
+  <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
+    <Header hideDetails />
+    <Image
+      sx={{
+        width: 138,
+        mx: "auto",
+        mt: 58
+      }}
+      src="/zero-logo.svg"
+    />
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        flex: "1",
+        textAlign: "center",
+        pb: 95
+      }}
+    >
+      <Icon name="info-circle" />
+      {children}
+    </Flex>
+  </Flex>
+);
+
 const UnsupportedMainnetFallback: React.FC = () => (
-  <Flex
-    sx={{
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh",
-      textAlign: "center"
-    }}
-  >
-    <Icon name="info-circle" />
+  <UnsupportedLayout>
     <Paragraph sx={{ mt: 3 }}>
       Please switch your wallet network to
       <br /> RSK Testnet.
@@ -66,7 +85,7 @@ const UnsupportedMainnetFallback: React.FC = () => (
       </Link>
       .
     </Paragraph>
-  </Flex>
+  </UnsupportedLayout>
 );
 
 const App = () => {
@@ -78,21 +97,12 @@ const App = () => {
   );
 
   const unsupportedNetworkFallback = (chainId: number) => (
-    <Flex
-      sx={{
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        textAlign: "center"
-      }}
-    >
-      <Icon name="info-circle" />
+    <UnsupportedLayout>
       <Paragraph sx={{ mt: 3, mb: 1 }}>
         Zero is not yet deployed to {chainId === 30 ? "RSK Mainnet" : "this network"}.
       </Paragraph>
       Please switch to RSK Testnet.
-    </Flex>
+    </UnsupportedLayout>
   );
 
   return (

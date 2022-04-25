@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useCallback, useMemo } from "react";
-import { Flex, Text, Image } from "theme-ui";
+import { Flex, Text, Image, Button } from "theme-ui";
 import { Provider, TransactionResponse, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { hexDataSlice, hexDataLength } from "@ethersproject/bytes";
 import { defaultAbiCoder } from "@ethersproject/abi";
@@ -24,6 +24,7 @@ type TransactionFailed = {
   type: "failed";
   id: string;
   error: Error;
+  send?: TransactionFunction;
 };
 
 type TransactionWaitingForApproval = {
@@ -34,6 +35,7 @@ type TransactionWaitingForApproval = {
 type TransactionCancelled = {
   type: "cancelled";
   id: string;
+  send?: TransactionFunction;
 };
 
 type TransactionWaitingForConfirmations = {
@@ -141,14 +143,15 @@ export const useTransactionFunction = (
       });
     } catch (error) {
       if (hasMessage(error) && error.message.includes("User denied transaction signature")) {
-        setTransactionState({ type: "cancelled", id });
+        setTransactionState({ type: "cancelled", id, send });
       } else {
         console.error(error);
 
         setTransactionState({
           type: "failed",
           id,
-          error: new Error("Failed to send transaction (try again)")
+          error: new Error("Failed to send transaction (try again)"),
+          send
         });
       }
     }
@@ -246,15 +249,100 @@ const getTransactionTitle = (tx: TransactionState) => {
   }
 };
 
+const getTransactionImage = (tx: TransactionState) => {
+  switch (tx.type) {
+    case "failed":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src="/images/failed-tx.svg"
+        />
+      );
+    case "cancelled":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src="/images/failed-tx.svg"
+        />
+      );
+
+    case "waitingForConfirmation":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          className="spiner"
+          src="/images/pending-tx.svg"
+        />
+      );
+
+    case "confirmed":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src="/images/confirm-tx.svg"
+        />
+      );
+    case "confirmedOneShot":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src="/images/confirm-tx.svg"
+        />
+      );
+
+    default:
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            ml: 22,
+            width: 85
+          }}
+          src="/images/rsk.svg"
+        />
+      );
+  }
+};
+
+type RetryTransactionProps = {
+  id: string;
+  send: TransactionFunction;
+};
+
+export const RetryTransaction: React.FC<RetryTransactionProps> = ({ id, send }) => {
+  const [sendTransaction] = useTransactionFunction(id, send);
+
+  return (
+    <Button sx={{ width: "100%", maxWidth: 320, height: 50 }} onClick={sendTransaction}>
+      Retry
+    </Button>
+  );
+};
+
 export const TransactionMonitor: React.FC = () => {
   const { provider } = useLiquity();
   const [transactionState, setTransactionState] = useTransactionState();
   const { chainId } = useWeb3React<Web3Provider>();
+  const [open, setOpen] = useState(false);
 
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;
   const tx = transactionState.type === "waitingForConfirmation" ? transactionState.tx : undefined;
 
-  console.log('transactionState:', transactionState)
   useEffect(() => {
     if (id && tx) {
       let cancelled = false;
@@ -339,12 +427,17 @@ export const TransactionMonitor: React.FC = () => {
 
   const isIdle = useMemo(() => transactionState.type === "idle", [transactionState.type]);
 
+  useEffect(() => {
+    setOpen(!isIdle);
+  }, [isIdle]);
+
   return (
     <Dialog
       disableClose
       sx={{ width: 468, bg: "#000000" }}
-      open={!isIdle}
-      onClose={() => setTransactionState({ type: "idle" })}
+      open={open}
+      onExited={() => setTransactionState({ type: "idle" })}
+      onClose={() => setOpen(false)}
     >
       <Flex
         sx={{
@@ -357,32 +450,41 @@ export const TransactionMonitor: React.FC = () => {
         <Text sx={{ fontSize: 22, fontWeight: 600, mb: 50, minHeight: 33 }}>
           {getTransactionTitle(transactionState)}
         </Text>
-        <Image
+        {getTransactionImage(transactionState)}
+
+        {["idle", "waitingForApproval"].includes(transactionState.type) && (
+          <Text>RSK {chainId === 30 ? "Mainnet" : "Testnet"}</Text>
+        )}
+
+        <Text
           sx={{
-            mb: 20,
-            ml: 22,
-            width: 85
+            fontSize: 3,
+            color: ["cancelled", "failed"].includes(transactionState.type) ? "danger" : "white",
+            textAlign: "center",
+            mt: 40
           }}
-          src="/images/rsk.svg"
-        />
-
-        <Text>RSK {chainId === 30 ? "Mainnet" : "Testnet"}</Text>
-
-        <Text sx={{ fontSize: 3, color: "white", textAlign: "center", mt: 55 }}>
+        >
           {transactionState.type === "waitingForConfirmation" ? (
-            <>Transaction processing...</>
+            "Transaction processing..."
           ) : transactionState.type === "cancelled" ? (
-            <>Your transaction is rejected by the user</>
+            "You have chosen to reject the transaction Please cancel or retry your transaction"
           ) : transactionState.type === "waitingForApproval" ? (
             <>
               Please confirm the transaction <br /> in your RSK wallet
             </>
           ) : transactionState.type === "failed" ? (
-            transactionState.error.message
+            transactionState.error.message + " Please cancel or retry your transaction"
           ) : (
-            "Confirmed"
+            "Transaction is Successful"
           )}
+          <br />
+          <br />
         </Text>
+
+        {(transactionState.type === "cancelled" || transactionState.type === "failed") &&
+          transactionState.send && (
+            <RetryTransaction send={transactionState.send} id={transactionState.id} />
+          )}
       </Flex>
     </Dialog>
   );

@@ -19,6 +19,7 @@ export const Dialog: React.FC<Props> = ({
   className,
   open,
   onClose,
+  onExited,
   children,
   disableClose,
   hideCloseIcon,
@@ -39,6 +40,7 @@ export const Dialog: React.FC<Props> = ({
       classNames="dialog"
       nodeRef={nodeRef}
       in={open}
+      onExited={onExited}
       timeout={{ enter: 500, exit: 300 }}
     >
       <Box
