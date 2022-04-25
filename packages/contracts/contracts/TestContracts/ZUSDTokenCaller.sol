@@ -11,11 +11,11 @@ contract ZUSDTokenCaller {
         ZUSD = _ZUSD;
     }
 
-    function zusdMint(address _account, uint _amount) external {
+    function zusdMint(address _account, uint256 _amount) external {
         ZUSD.mint(_account, _amount);
     }
 
-    function zusdBurn(address _account, uint _amount) external {
+    function zusdBurn(address _account, uint256 _amount) external {
         ZUSD.burn(_account, _amount);
     }
 

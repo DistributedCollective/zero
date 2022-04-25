@@ -8,7 +8,7 @@ contract CommunityIssuanceTester is CommunityIssuance {
 
     using SafeMath for uint256;
     
-    function obtainZERO(uint _amount) external {
+    function obtainZERO(uint256 _amount) external {
         zeroToken.transfer(msg.sender, _amount);
     }
 
@@ -19,8 +19,8 @@ contract CommunityIssuanceTester is CommunityIssuance {
     function unprotectedIssueZERO() external returns (uint) {
         // No checks on caller address
        
-        uint latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint issuance = latestTotalZEROIssued.sub(totalZEROIssued);
+        uint256 latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
+        uint256 issuance = latestTotalZEROIssued.sub(totalZEROIssued);
       
         totalZEROIssued = latestTotalZEROIssued;
         return issuance;

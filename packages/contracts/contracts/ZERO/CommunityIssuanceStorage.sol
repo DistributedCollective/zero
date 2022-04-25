@@ -10,7 +10,7 @@ contract CommunityIssuanceStorage is Ownable {
 
     string constant public NAME = "CommunityIssuance";
 
-    uint constant public SECONDS_IN_ONE_MINUTE = 60;
+    uint256 constant public SECONDS_IN_ONE_MINUTE = 60;
 
    /** The issuance factor F determines the curvature of the issuance curve.
     *
@@ -26,13 +26,13 @@ contract CommunityIssuanceStorage is Ownable {
     * F = 0.5 ** (1/525600)
     * F = 0.999998681227695000 
     */
-    uint public constant ISSUANCE_FACTOR = 999998681227695000;
+    uint256 public constant ISSUANCE_FACTOR = 999998681227695000;
 
     /** 
     * The community ZERO supply cap is the starting balance of the Community Issuance contract.
     * It should be minted to this contract by ZEROToken, when the token is deployed.
     */
-    uint public ZEROSupplyCap = 0;
+    uint256 public ZEROSupplyCap = 0;
 
     IZEROToken public zeroToken;
 
@@ -41,7 +41,7 @@ contract CommunityIssuanceStorage is Ownable {
     // Address that will send the Zero tokens to distribute funds
     address public fundingWalletAddress;
 
-    uint public totalZEROIssued;
-    uint public deploymentTime;
+    uint256 public totalZEROIssued;
+    uint256 public deploymentTime;
 
 }

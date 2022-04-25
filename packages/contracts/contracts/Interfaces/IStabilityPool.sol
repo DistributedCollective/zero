@@ -37,8 +37,8 @@ interface IStabilityPool {
 
     // --- Events ---
     
-    event StabilityPoolRBTCBalanceUpdated(uint _newBalance);
-    event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
+    event StabilityPoolRBTCBalanceUpdated(uint256 _newBalance);
+    event StabilityPoolZUSDBalanceUpdated(uint256 _newBalance);
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
@@ -49,24 +49,24 @@ interface IStabilityPool {
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
 
-    event P_Updated(uint _P);
-    event S_Updated(uint _S, uint128 _epoch, uint128 _scale);
-    event G_Updated(uint _G, uint128 _epoch, uint128 _scale);
+    event P_Updated(uint256 _P);
+    event S_Updated(uint256 _S, uint128 _epoch, uint128 _scale);
+    event G_Updated(uint256 _G, uint128 _epoch, uint128 _scale);
     event EpochUpdated(uint128 _currentEpoch);
     event ScaleUpdated(uint128 _currentScale);
 
-    event FrontEndRegistered(address indexed _frontEnd, uint _kickbackRate);
+    event FrontEndRegistered(address indexed _frontEnd, uint256 _kickbackRate);
     event FrontEndTagSet(address indexed _depositor, address indexed _frontEnd);
 
-    event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S, uint _G);
-    event FrontEndSnapshotUpdated(address indexed _frontEnd, uint _P, uint _G);
-    event UserDepositChanged(address indexed _depositor, uint _newDeposit);
-    event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
+    event DepositSnapshotUpdated(address indexed _depositor, uint256 _P, uint256 _S, uint256 _G);
+    event FrontEndSnapshotUpdated(address indexed _frontEnd, uint256 _P, uint256 _G);
+    event UserDepositChanged(address indexed _depositor, uint256 _newDeposit);
+    event FrontEndStakeChanged(address indexed _frontEnd, uint256 _newFrontEndStake, address _depositor);
 
-    event RBTCGainWithdrawn(address indexed _depositor, uint _RBTC, uint _ZUSDLoss);
-    event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
-    event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
-    event RBtcerSent(address _to, uint _amount);
+    event RBTCGainWithdrawn(address indexed _depositor, uint256 _RBTC, uint256 _ZUSDLoss);
+    event ZEROPaidToDepositor(address indexed _depositor, uint256 _ZERO);
+    event ZEROPaidToFrontEnd(address indexed _frontEnd, uint256 _ZERO);
+    event RBtcerSent(address _to, uint256 _amount);
 
     // --- Functions ---
 
@@ -107,7 +107,7 @@ interface IStabilityPool {
      * @param _amount amount to provide
      * @param _frontEndTag frontend address to receive accumulated ZERO gains
      */
-    function provideToSP(uint _amount, address _frontEndTag) external;
+    function provideToSP(uint256 _amount, address _frontEndTag) external;
 
     /**
      * @notice Initial checks:
@@ -123,7 +123,7 @@ interface IStabilityPool {
      *    If _amount > userDeposit, the user withdraws all of their compounded deposit.
      * @param _amount amount to withdraw
      */
-    function withdrawFromSP(uint _amount) external;
+    function withdrawFromSP(uint256 _amount) external;
 
     /**
      * @notice Initial checks:
@@ -151,7 +151,7 @@ interface IStabilityPool {
      *    Front end makes a one-time selection of kickback rate upon registering
      * @param _kickbackRate kickback rate selected by frontend
      */
-    function registerFrontEnd(uint _kickbackRate) external;
+    function registerFrontEnd(uint256 _kickbackRate) external;
 
     /**
      * @notice Initial checks:
@@ -163,7 +163,7 @@ interface IStabilityPool {
      * @param _debt debt to cancel
      * @param _coll collateral to transfer
      */
-    function offset(uint _debt, uint _coll) external;
+    function offset(uint256 _debt, uint256 _coll) external;
 
     /**
      * @return the total amount of RBTC held by the pool, accounted in an internal variable instead of `balance`,

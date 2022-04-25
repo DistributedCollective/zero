@@ -11,8 +11,8 @@ interface ICollSurplusPool {
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
-    event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event RBtcerSent(address _to, uint _amount);
+    event CollBalanceUpdated(address indexed _account, uint256 _newBalance);
+    event RBtcerSent(address _to, uint256 _amount);
 
     // --- Contract setters ---
 
@@ -40,7 +40,7 @@ interface ICollSurplusPool {
     /// @notice adds amount to current account balance. Only callable by TroveManager.
     /// @param _account account to add amount
     /// @param _amount amount to add
-    function accountSurplus(address _account, uint _amount) external;
+    function accountSurplus(address _account, uint256 _amount) external;
 
     /// @notice claims collateral for given account. Only callable by BorrowerOperations.
     /// @param _account account to send claimable collateral

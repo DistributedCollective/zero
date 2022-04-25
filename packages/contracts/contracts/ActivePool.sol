@@ -68,7 +68,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @notice Send RBTC amount to given account. Updates ActivePool balance. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _account account to receive the RBTC amount
     /// @param _amount RBTC amount to send
-    function sendRBTC(address _account, uint _amount) external override {
+    function sendRBTC(address _account, uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         RBTC = RBTC.sub(_amount);
         emit ActivePoolRBTCBalanceUpdated(RBTC);
@@ -80,7 +80,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     /// @notice Increases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _amount ZUSD amount to add to the pool debt
-    function increaseZUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveM();
         ZUSDDebt = ZUSDDebt.add(_amount);
         emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
@@ -88,7 +88,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     /// @notice Decreases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _amount ZUSD amount to sub to the pool debt
-    function decreaseZUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         ZUSDDebt = ZUSDDebt.sub(_amount);
         emit ActivePoolZUSDDebtUpdated(ZUSDDebt);

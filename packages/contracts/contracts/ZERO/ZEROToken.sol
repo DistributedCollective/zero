@@ -59,7 +59,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     /// @notice Generates `amount` tokens that are assigned to `account`
     /// @param account The address that will be assigned the new tokens
     /// @param amount The quantity of tokens generated
-    function mint (address account, uint amount) external {
+    function mint (address account, uint256 amount) external {
         require(msg.sender == marketMakerAddress || msg.sender == address(presale), 'Invalid caller');
         _mint(account,amount);
     }
@@ -67,7 +67,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     /// @notice Burns `amount` tokens from `account`
     /// @param account The address that will lose the tokens
     /// @param amount The quantity of tokens to burn
-    function burn (address account, uint amount) external {
+    function burn (address account, uint256 amount) external {
         require(msg.sender == marketMakerAddress , 'Invalid caller');
         _burn(account, amount);
     }
@@ -138,8 +138,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     (
         address owner, 
         address spender, 
-        uint amount, 
-        uint deadline, 
+        uint256 amount, 
+        uint256 deadline, 
         uint8 v, 
         bytes32 r, 
         bytes32 s

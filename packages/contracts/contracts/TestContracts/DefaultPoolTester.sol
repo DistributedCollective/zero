@@ -8,7 +8,7 @@ contract DefaultPoolTester is DefaultPool {
     
     using SafeMath for uint256;
     
-    function unprotectedIncreaseZUSDDebt(uint _amount) external {
+    function unprotectedIncreaseZUSDDebt(uint256 _amount) external {
         ZUSDDebt  = ZUSDDebt.add(_amount);
     }
 

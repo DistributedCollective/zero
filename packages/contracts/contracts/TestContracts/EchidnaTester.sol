@@ -25,11 +25,11 @@ import "./EchidnaProxy.sol";
 contract EchidnaTester {
     using SafeMath for uint;
 
-    uint constant private NUMBER_OF_ACTORS = 100;
-    uint constant private INITIAL_BALANCE = 1e24;
-    uint private MCR;
-    uint private CCR;
-    uint private ZUSD_GAS_COMPENSATION;
+    uint256 constant private NUMBER_OF_ACTORS = 100;
+    uint256 constant private INITIAL_BALANCE = 1e24;
+    uint256 private MCR;
+    uint256 private CCR;
+    uint256 private ZUSD_GAS_COMPENSATION;
 
     LiquityBaseParams public liquityBaseParams;
     TroveManagerRedeemOps public troveManagerRedeemOps;
@@ -46,7 +46,7 @@ contract EchidnaTester {
 
     EchidnaProxy[NUMBER_OF_ACTORS] public echidnaProxies;
 
-    uint private numberOfTroves;
+    uint256 private numberOfTroves;
 
     constructor() payable {
         liquityBaseParams = new LiquityBaseParams();
@@ -103,7 +103,7 @@ contract EchidnaTester {
     
         sortedTroves.setParams(1e18, address(troveManager), address(borrowerOperations));
 
-        for (uint i = 0; i < NUMBER_OF_ACTORS; i++) {
+        for (uint256 i = 0; i < NUMBER_OF_ACTORS; i++) {
             echidnaProxies[i] = new EchidnaProxy(troveManager, borrowerOperations, stabilityPool, zusdToken);
             (bool success, ) = address(echidnaProxies[i]).call{value: INITIAL_BALANCE}("");
             require(success);
@@ -121,49 +121,49 @@ contract EchidnaTester {
 
     // TroveManager
 
-    function liquidateExt(uint _i, address _user) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function liquidateExt(uint256 _i, address _user) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].liquidatePrx(_user);
     }
 
-    function liquidateTrovesExt(uint _i, uint _n) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function liquidateTrovesExt(uint256 _i, uint256 _n) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].liquidateTrovesPrx(_n);
     }
 
-    function batchLiquidateTrovesExt(uint _i, address[] calldata _troveArray) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function batchLiquidateTrovesExt(uint256 _i, address[] calldata _troveArray) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].batchLiquidateTrovesPrx(_troveArray);
     }
 
     function redeemCollateralExt(
-        uint _i,
-        uint _ZUSDAmount,
+        uint256 _i,
+        uint256 _ZUSDAmount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
-        uint _partialRedemptionHintNICR
+        uint256 _partialRedemptionHintNICR
     ) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].redeemCollateralPrx(_ZUSDAmount, _firstRedemptionHint, _upperPartialRedemptionHint, _lowerPartialRedemptionHint, _partialRedemptionHintNICR, 0, 0);
     }
 
     // Borrower Operations
 
-    function getAdjustedRBTC(uint actorBalance, uint _RBTC, uint ratio) internal view returns (uint) {
-        uint price = priceFeedTestnet.getPrice();
+    function getAdjustedRBTC(uint256 actorBalance, uint256 _RBTC, uint256 ratio) internal view returns (uint) {
+        uint256 price = priceFeedTestnet.getPrice();
         require(price > 0);
-        uint minRBTC = ratio.mul(ZUSD_GAS_COMPENSATION).div(price);
+        uint256 minRBTC = ratio.mul(ZUSD_GAS_COMPENSATION).div(price);
         require(actorBalance > minRBTC);
-        uint RBTC = minRBTC + _RBTC % (actorBalance - minRBTC);
+        uint256 RBTC = minRBTC + _RBTC % (actorBalance - minRBTC);
         return RBTC;
     }
 
-    function getAdjustedZUSD(uint RBTC, uint _ZUSDAmount, uint ratio) internal view returns (uint) {
-        uint price = priceFeedTestnet.getPrice();
-        uint ZUSDAmount = _ZUSDAmount;
-        uint compositeDebt = ZUSDAmount.add(ZUSD_GAS_COMPENSATION);
-        uint ICR = LiquityMath._computeCR(RBTC, compositeDebt, price);
+    function getAdjustedZUSD(uint256 RBTC, uint256 _ZUSDAmount, uint256 ratio) internal view returns (uint) {
+        uint256 price = priceFeedTestnet.getPrice();
+        uint256 ZUSDAmount = _ZUSDAmount;
+        uint256 compositeDebt = ZUSDAmount.add(ZUSD_GAS_COMPENSATION);
+        uint256 ICR = LiquityMath._computeCR(RBTC, compositeDebt, price);
         if (ICR < ratio) {
             compositeDebt = RBTC.mul(price).div(ratio);
             ZUSDAmount = compositeDebt.sub(ZUSD_GAS_COMPENSATION);
@@ -171,14 +171,14 @@ contract EchidnaTester {
         return ZUSDAmount;
     }
 
-    function openTroveExt(uint _i, uint _RBTC, uint _ZUSDAmount) public payable {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function openTroveExt(uint256 _i, uint256 _RBTC, uint256 _ZUSDAmount) public payable {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
-        uint actorBalance = address(echidnaProxy).balance;
+        uint256 actorBalance = address(echidnaProxy).balance;
 
         // we pass in CCR instead of MCR in case it’s the first one
-        uint RBTC = getAdjustedRBTC(actorBalance, _RBTC, CCR);
-        uint ZUSDAmount = getAdjustedZUSD(RBTC, _ZUSDAmount, CCR);
+        uint256 RBTC = getAdjustedRBTC(actorBalance, _RBTC, CCR);
+        uint256 ZUSDAmount = getAdjustedZUSD(RBTC, _ZUSDAmount, CCR);
 
         //console.log('RBTC', RBTC);
         //console.log('ZUSDAmount', ZUSDAmount);
@@ -191,53 +191,53 @@ contract EchidnaTester {
         //assert(numberOfTroves == 0);
     }
 
-    function openTroveRawExt(uint _i, uint _RBTC, uint _ZUSDAmount, address _upperHint, address _lowerHint, uint _maxFee) public payable {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function openTroveRawExt(uint256 _i, uint256 _RBTC, uint256 _ZUSDAmount, address _upperHint, address _lowerHint, uint256 _maxFee) public payable {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].openTrovePrx(_RBTC, _ZUSDAmount, _upperHint, _lowerHint, _maxFee);
     }
 
-    function addCollExt(uint _i, uint _RBTC) external payable {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function addCollExt(uint256 _i, uint256 _RBTC) external payable {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
-        uint actorBalance = address(echidnaProxy).balance;
+        uint256 actorBalance = address(echidnaProxy).balance;
 
-        uint RBTC = getAdjustedRBTC(actorBalance, _RBTC, MCR);
+        uint256 RBTC = getAdjustedRBTC(actorBalance, _RBTC, MCR);
 
         echidnaProxy.addCollPrx(RBTC, address(0), address(0));
     }
 
-    function addCollRawExt(uint _i, uint _RBTC, address _upperHint, address _lowerHint) external payable {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function addCollRawExt(uint256 _i, uint256 _RBTC, address _upperHint, address _lowerHint) external payable {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].addCollPrx(_RBTC, _upperHint, _lowerHint);
     }
 
-    function withdrawCollExt(uint _i, uint _amount, address _upperHint, address _lowerHint) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function withdrawCollExt(uint256 _i, uint256 _amount, address _upperHint, address _lowerHint) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].withdrawCollPrx(_amount, _upperHint, _lowerHint);
     }
 
-    function withdrawZUSDExt(uint _i, uint _amount, address _upperHint, address _lowerHint, uint _maxFee) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function withdrawZUSDExt(uint256 _i, uint256 _amount, address _upperHint, address _lowerHint, uint256 _maxFee) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].withdrawZUSDPrx(_amount, _upperHint, _lowerHint, _maxFee);
     }
 
-    function repayZUSDExt(uint _i, uint _amount, address _upperHint, address _lowerHint) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function repayZUSDExt(uint256 _i, uint256 _amount, address _upperHint, address _lowerHint) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].repayZUSDPrx(_amount, _upperHint, _lowerHint);
     }
 
-    function closeTroveExt(uint _i) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function closeTroveExt(uint256 _i) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].closeTrovePrx();
     }
 
-    function adjustTroveExt(uint _i, uint _RBTC, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease) external payable {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function adjustTroveExt(uint256 _i, uint256 _RBTC, uint256 _collWithdrawal, uint256 _debtChange, bool _isDebtIncrease) external payable {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
-        uint actorBalance = address(echidnaProxy).balance;
+        uint256 actorBalance = address(echidnaProxy).balance;
 
-        uint RBTC = getAdjustedRBTC(actorBalance, _RBTC, MCR);
-        uint debtChange = _debtChange;
+        uint256 RBTC = getAdjustedRBTC(actorBalance, _RBTC, MCR);
+        uint256 debtChange = _debtChange;
         if (_isDebtIncrease) {
             // TODO: add current amount already withdrawn:
             debtChange = getAdjustedZUSD(RBTC, uint(_debtChange), MCR);
@@ -246,47 +246,47 @@ contract EchidnaTester {
         echidnaProxy.adjustTrovePrx(RBTC, _collWithdrawal, debtChange, _isDebtIncrease, address(0), address(0), 0);
     }
 
-    function adjustTroveRawExt(uint _i, uint _RBTC, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFee) external payable {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function adjustTroveRawExt(uint256 _i, uint256 _RBTC, uint256 _collWithdrawal, uint256 _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint256 _maxFee) external payable {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].adjustTrovePrx(_RBTC, _collWithdrawal, _debtChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFee);
     }
 
     // Pool Manager
 
-    function provideToSPExt(uint _i, uint _amount, address _frontEndTag) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function provideToSPExt(uint256 _i, uint256 _amount, address _frontEndTag) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].provideToSPPrx(_amount, _frontEndTag);
     }
 
-    function withdrawFromSPExt(uint _i, uint _amount) external {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function withdrawFromSPExt(uint256 _i, uint256 _amount) external {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         echidnaProxies[actor].withdrawFromSPPrx(_amount);
     }
 
     // ZUSD Token
 
-    function transferExt(uint _i, address recipient, uint256 amount) external returns (bool) {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function transferExt(uint256 _i, address recipient, uint256 amount) external returns (bool) {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         return echidnaProxies[actor].transferPrx(recipient, amount);
     }
 
-    function approveExt(uint _i, address spender, uint256 amount) external returns (bool) {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function approveExt(uint256 _i, address spender, uint256 amount) external returns (bool) {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         return echidnaProxies[actor].approvePrx(spender, amount);
     }
 
-    function transferFromExt(uint _i, address sender, address recipient, uint256 amount) external returns (bool) {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function transferFromExt(uint256 _i, address sender, address recipient, uint256 amount) external returns (bool) {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         return echidnaProxies[actor].transferFromPrx(sender, recipient, amount);
     }
 
-    function increaseAllowanceExt(uint _i, address spender, uint256 addedValue) external returns (bool) {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function increaseAllowanceExt(uint256 _i, address spender, uint256 addedValue) external returns (bool) {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         return echidnaProxies[actor].increaseAllowancePrx(spender, addedValue);
     }
 
-    function decreaseAllowanceExt(uint _i, address spender, uint256 subtractedValue) external returns (bool) {
-        uint actor = _i % NUMBER_OF_ACTORS;
+    function decreaseAllowanceExt(uint256 _i, address spender, uint256 subtractedValue) external returns (bool) {
+        uint256 actor = _i % NUMBER_OF_ACTORS;
         return echidnaProxies[actor].decreaseAllowancePrx(spender, subtractedValue);
     }
 
@@ -406,7 +406,7 @@ contract EchidnaTester {
 
     // TODO: What should we do with this? Should it be allowed? Should it be a canary?
     function echidna_price() public view returns(bool) {
-        uint price = priceFeedTestnet.getPrice();
+        uint256 price = priceFeedTestnet.getPrice();
         
         if (price == 0) {
             return false;
@@ -419,18 +419,18 @@ contract EchidnaTester {
 
     // Total ZUSD matches
     function echidna_ZUSD_global_balances() public view returns(bool) {
-        uint totalSupply = zusdToken.totalSupply();
-        uint gasPoolBalance = zusdToken.balanceOf(address(gasPool));
+        uint256 totalSupply = zusdToken.totalSupply();
+        uint256 gasPoolBalance = zusdToken.balanceOf(address(gasPool));
 
-        uint activePoolBalance = activePool.getZUSDDebt();
-        uint defaultPoolBalance = defaultPool.getZUSDDebt();
+        uint256 activePoolBalance = activePool.getZUSDDebt();
+        uint256 defaultPoolBalance = defaultPool.getZUSDDebt();
         if (totalSupply != activePoolBalance + defaultPoolBalance) {
             return false;
         }
 
-        uint stabilityPoolBalance = stabilityPool.getTotalZUSDDeposits();
+        uint256 stabilityPoolBalance = stabilityPool.getTotalZUSDDeposits();
         address currentTrove = sortedTroves.getFirst();
-        uint trovesBalance;
+        uint256 trovesBalance;
         while (currentTrove != address(0)) {
             trovesBalance += zusdToken.balanceOf(address(currentTrove));
             currentTrove = sortedTroves.getNext(currentTrove);

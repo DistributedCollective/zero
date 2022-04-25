@@ -54,7 +54,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         emit ActivePoolAddressSet(_activePoolAddress);
     }
 
-    function setFeeToSOVCollector(uint FEE_TO_SOV_COLLECTOR_) public onlyOwner {
+    function setFeeToSOVCollector(uint256 FEE_TO_SOV_COLLECTOR_) public onlyOwner {
         FEE_TO_SOV_COLLECTOR = FEE_TO_SOV_COLLECTOR_;
     }
 

@@ -30,5 +30,5 @@ contract FeeDistributorStorage is Ownable {
     address public activePoolAddress;
 
     //pct of fees sent to feeSOVCollector address
-    uint public FEE_TO_SOV_COLLECTOR;
+    uint256 public FEE_TO_SOV_COLLECTOR;
 }

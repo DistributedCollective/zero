@@ -4,7 +4,7 @@ pragma solidity 0.8.13;
 
 interface IPriceFeed {
     // --- Events ---
-    event LastGoodPriceUpdated(uint _lastGoodPrice);
+    event LastGoodPriceUpdated(uint256 _lastGoodPrice);
 
     // --- Function ---
 

@@ -14,7 +14,7 @@ contract ZEROStakingScript is CheckContract {
         ZEROStaking = IZEROStaking(_zeroStakingAddress);
     }
 
-    function stake(uint _ZEROamount) external {
+    function stake(uint256 _ZEROamount) external {
         ZEROStaking.stake(_ZEROamount);
     }
 }

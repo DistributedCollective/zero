@@ -56,7 +56,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     // --- Pool functionality ---
 
-    function sendRBTCToActivePool(uint _amount) external override {
+    function sendRBTCToActivePool(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
         RBTC = RBTC.sub(_amount);
@@ -67,13 +67,13 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         require(success, "DefaultPool: sending RBTC failed");
     }
 
-    function increaseZUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         ZUSDDebt = ZUSDDebt.add(_amount);
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
-    function decreaseZUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         ZUSDDebt = ZUSDDebt.sub(_amount);
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);

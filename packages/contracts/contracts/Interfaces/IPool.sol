@@ -6,12 +6,12 @@ pragma solidity 0.8.13;
 interface IPool {
     // --- Events ---
 
-    event RBTCBalanceUpdated(uint _newBalance);
-    event ZUSDBalanceUpdated(uint _newBalance);
+    event RBTCBalanceUpdated(uint256 _newBalance);
+    event ZUSDBalanceUpdated(uint256 _newBalance);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
     event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
-    event RBtcerSent(address _to, uint _amount);
+    event RBtcerSent(address _to, uint256 _amount);
 
     // --- Functions ---
 
@@ -24,9 +24,9 @@ interface IPool {
 
     /// @notice Increases ZUSD debt of the pool.
     /// @param _amount ZUSD amount to add to the pool debt
-    function increaseZUSDDebt(uint _amount) external;
+    function increaseZUSDDebt(uint256 _amount) external;
 
     /// @notice Decreases ZUSD debt of the pool.
     /// @param _amount ZUSD amount to subtract to the pool debt
-    function decreaseZUSDDebt(uint _amount) external;
+    function decreaseZUSDDebt(uint256 _amount) external;
 }

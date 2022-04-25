@@ -51,13 +51,13 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     }
 
     // If caller has a pre-existing stake, send any accumulated RBTC and ZUSD gains to them. 
-    function stake(uint _ZEROamount) external override {
+    function stake(uint256 _ZEROamount) external override {
         _requireNonZeroAmount(_ZEROamount);
 
-        uint currentStake = stakes[msg.sender];
+        uint256 currentStake = stakes[msg.sender];
 
-        uint RBTCGain;
-        uint ZUSDGain;
+        uint256 RBTCGain;
+        uint256 ZUSDGain;
         // Grab any accumulated RBTC and ZUSD gains from the current stake
         if (currentStake != 0) {
             RBTCGain = _getPendingRBTCGain(msg.sender);
@@ -66,7 +66,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     
        _updateUserSnapshots(msg.sender);
 
-        uint newStake = currentStake.add(_ZEROamount);
+        uint256 newStake = currentStake.add(_ZEROamount);
 
         // Increase user’s stake and total ZERO staked
         stakes[msg.sender] = newStake;
@@ -88,20 +88,20 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     /// Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & RBTC gains. 
     /// If requested amount > stake, send their entire stake.
-    function unstake(uint _ZEROamount) external override {
-        uint currentStake = stakes[msg.sender];
+    function unstake(uint256 _ZEROamount) external override {
+        uint256 currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);
 
         // Grab any accumulated RBTC and ZUSD gains from the current stake
-        uint RBTCGain = _getPendingRBTCGain(msg.sender);
-        uint ZUSDGain = _getPendingZUSDGain(msg.sender);
+        uint256 RBTCGain = _getPendingRBTCGain(msg.sender);
+        uint256 ZUSDGain = _getPendingZUSDGain(msg.sender);
         
         _updateUserSnapshots(msg.sender);
 
         if (_ZEROamount > 0) {
-            uint ZEROToWithdraw = LiquityMath._min(_ZEROamount, currentStake);
+            uint256 ZEROToWithdraw = LiquityMath._min(_ZEROamount, currentStake);
 
-            uint newStake = currentStake.sub(ZEROToWithdraw);
+            uint256 newStake = currentStake.sub(ZEROToWithdraw);
 
             // Decrease user's stake and total ZERO staked
             stakes[msg.sender] = newStake;
@@ -123,9 +123,9 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     // --- Reward-per-unit-staked increase functions. Called by Liquity core contracts ---
 
-    function increaseF_RBTC(uint _RBTCFee) external override {
+    function increaseF_RBTC(uint256 _RBTCFee) external override {
         _requireCallerIsFeeDistributor();
-        uint RBTCFeePerZEROStaked;
+        uint256 RBTCFeePerZEROStaked;
      
         if (totalZEROStaked > 0) {RBTCFeePerZEROStaked = _RBTCFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
 
@@ -133,9 +133,9 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         emit F_RBTCUpdated(F_RBTC);
     }
 
-    function increaseF_ZUSD(uint _ZUSDFee) external override {
+    function increaseF_ZUSD(uint256 _ZUSDFee) external override {
         _requireCallerIsFeeDistributor();
-        uint ZUSDFeePerZEROStaked;
+        uint256 ZUSDFeePerZEROStaked;
         
         if (totalZEROStaked > 0) {ZUSDFeePerZEROStaked = _ZUSDFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
         
@@ -150,8 +150,8 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     }
 
     function _getPendingRBTCGain(address _user) internal view returns (uint) {
-        uint F_RBTC_Snapshot = snapshots[_user].F_RBTC_Snapshot;
-        uint RBTCGain = stakes[_user].mul(F_RBTC.sub(F_RBTC_Snapshot)).div(DECIMAL_PRECISION);
+        uint256 F_RBTC_Snapshot = snapshots[_user].F_RBTC_Snapshot;
+        uint256 RBTCGain = stakes[_user].mul(F_RBTC.sub(F_RBTC_Snapshot)).div(DECIMAL_PRECISION);
         return RBTCGain;
     }
 
@@ -160,8 +160,8 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     }
 
     function _getPendingZUSDGain(address _user) internal view returns (uint) {
-        uint F_ZUSD_Snapshot = snapshots[_user].F_ZUSD_Snapshot;
-        uint ZUSDGain = stakes[_user].mul(F_ZUSD.sub(F_ZUSD_Snapshot)).div(DECIMAL_PRECISION);
+        uint256 F_ZUSD_Snapshot = snapshots[_user].F_ZUSD_Snapshot;
+        uint256 ZUSDGain = stakes[_user].mul(F_ZUSD.sub(F_ZUSD_Snapshot)).div(DECIMAL_PRECISION);
         return ZUSDGain;
     }
 
@@ -173,7 +173,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         emit StakerSnapshotsUpdated(_user, F_RBTC, F_ZUSD);
     }
 
-    function _sendRBTCGainToUser(uint RBTCGain) internal {
+    function _sendRBTCGainToUser(uint256 RBTCGain) internal {
         emit RBtcerSent(msg.sender, RBTCGain);
         (bool success, ) = msg.sender.call{value: RBTCGain}("");
         require(success, "ZEROStaking: Failed to send accumulated RBTCGain");
@@ -189,11 +189,11 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         require(msg.sender == activePoolAddress, "ZEROStaking: caller is not ActivePool");
     }
 
-    function _requireUserHasStake(uint currentStake) internal pure {  
+    function _requireUserHasStake(uint256 currentStake) internal pure {  
         require(currentStake > 0, 'ZEROStaking: User must have a non-zero stake');  
     }
 
-    function _requireNonZeroAmount(uint _amount) internal pure {
+    function _requireNonZeroAmount(uint256 _amount) internal pure {
         require(_amount > 0, 'ZEROStaking: Amount must be non-zero');
     }
 

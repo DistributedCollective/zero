@@ -8,7 +8,7 @@ contract ActivePoolTester is ActivePool {
 
     using SafeMath for uint256;
     
-    function unprotectedIncreaseZUSDDebt(uint _amount) external {
+    function unprotectedIncreaseZUSDDebt(uint256 _amount) external {
         ZUSDDebt  = ZUSDDebt.add(_amount);
     }
 
