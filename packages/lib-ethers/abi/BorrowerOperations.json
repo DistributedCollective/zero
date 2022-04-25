@@ -183,7 +183,7 @@
       },
       {
         "indexed": false,
-        "internalType": "enum BorrowerOperations.BorrowerOperation",
+        "internalType": "uint8",
         "name": "operation",
         "type": "uint8"
       }
@@ -484,7 +484,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
