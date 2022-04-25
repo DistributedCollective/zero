@@ -6,6 +6,7 @@ import { validateEmail } from "../utils/helpers";
 import { Dialog } from "../components/Dialog";
 import { WaitListAccessSuccess } from "../components/WaitListAccessSuccess";
 import { useWeb3React } from "@web3-react/core";
+import { isAddress } from "@ethersproject/address";
 
 export const AccessPage: React.FC = () => {
   const { account } = useWeb3React();
@@ -38,6 +39,11 @@ export const AccessPage: React.FC = () => {
       }
       if (!validateEmail(email)) {
         setErrorMessage("Please enter a valid email address.");
+        return;
+      }
+
+      if (!isAddress(address)) {
+        setErrorMessage("Please enter a valid RSK address.");
         return;
       }
 
