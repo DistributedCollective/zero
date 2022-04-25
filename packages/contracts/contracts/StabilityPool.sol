@@ -10,7 +10,7 @@ import './Interfaces/IZUSDToken.sol';
 import './Interfaces/ISortedTroves.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/LiquityBase.sol";
-import "./Dependencies/LiquitySafeMath128.sol";
+//import "./Dependencies/LiquitySafeMath128.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./StabilityPoolStorage.sol";
@@ -145,9 +145,8 @@ import "./StabilityPoolStorage.sol";
  *
  */
 contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, IStabilityPool {
-    using LiquitySafeMath128 for uint128;
-    using SafeMath for uint256;
-
+    //using LiquitySafeMath128 for uint128;
+    
     // --- Contract setters ---
 
     function setAddresses(
@@ -274,7 +273,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint256 depositorRBTCGain = getDepositorRBTCGain(msg.sender);
 
         uint256 compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
-        uint256 ZUSDtoWithdraw = LiquityMath._min(_amount, compoundedZUSDDeposit);
+        uint256 ZUSDtoWithdraw = _amount < compoundedZUSDDeposit ? _amount : compoundedZUSDDeposit;
         uint256 ZUSDLoss = initialDeposit - compoundedZUSDDeposit; // Needed only for event log
 
         // First pay out any ZERO gains

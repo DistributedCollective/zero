@@ -16,7 +16,6 @@ import "./BorrowerOperationsStorage.sol";
 
 contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckContract, IBorrowerOperations {
     
-    using SafeMath for uint256;
     /* --- Variable container structs  ---
 
     Used to hold, return and assign variables inside a function, in order to avoid the error:

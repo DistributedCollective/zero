@@ -10,7 +10,6 @@ import "./HintHelpersStorage.sol";
 
 contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
 
-    using SafeMath for uint256;
     
     // --- Events ---
 

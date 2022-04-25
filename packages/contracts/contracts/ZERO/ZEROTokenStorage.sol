@@ -38,7 +38,6 @@ contract ZEROTokenStorage is Initializable {
 
     uint256 public constant ONE_YEAR_IN_SECONDS = 31536000;  // 60 * 60 * 24 * 365
 
-    // uint256 for use with SafeMath
     uint256 internal constant _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
 
     uint256 internal deploymentStartTime;

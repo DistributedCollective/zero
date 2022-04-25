@@ -5,7 +5,6 @@ pragma solidity 0.8.13;
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IBorrowerOperations.sol";
-import "./Dependencies/SafeMath.sol";
 import "./SortedTrovesStorage.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -44,8 +43,7 @@ import "./Dependencies/console.sol";
 * - Public functions with parameters have been made internal to save gas, and given an external wrapper function for external access
 */
 contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
-    using SafeMath for uint256;
-
+    
     event TroveManagerAddressChanged(address _troveManagerAddress);
 
     // --- Dependency setters ---

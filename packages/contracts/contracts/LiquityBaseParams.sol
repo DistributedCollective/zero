@@ -10,8 +10,7 @@ import "./Dependencies/Ownable.sol";
 import "./Dependencies/Initializable.sol";
 
 contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMath {
-    using SafeMath for uint;
-
+    
     /// Minimum collateral ratio for individual troves
     uint256 override public MCR;
 

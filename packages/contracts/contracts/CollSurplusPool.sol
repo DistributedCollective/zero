@@ -3,14 +3,12 @@
 pragma solidity 0.8.13;
 
 import "./Interfaces/ICollSurplusPool.sol";
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./CollSurplusPoolStorage.sol";
 
 
 contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusPool {
-    using SafeMath for uint256;
       
     // --- Contract setters ---
 

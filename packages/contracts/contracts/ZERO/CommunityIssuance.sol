@@ -8,7 +8,6 @@ import "../Dependencies/BaseMath.sol";
 import "../Dependencies/LiquityMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 import "./CommunityIssuanceStorage.sol";
 
 contract CommunityIssuance is
@@ -17,8 +16,7 @@ contract CommunityIssuance is
     CheckContract,
     BaseMath
 {
-    using SafeMath for uint256;
-
+    
     // --- Functions ---
 
     function initialize(

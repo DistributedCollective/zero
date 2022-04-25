@@ -6,8 +6,7 @@ import "./TroveManagerBase.sol";
 
 abstract contract TroveManagerRedeemOps is TroveManagerBase {
 
-    using SafeMath for uint256;
-
+    
     /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
       request.  Applies pending rewards to a Trove before reducing its debt and coll.
      

@@ -18,7 +18,6 @@ import "./TroveManagerStorage.sol";
 
 contract TroveManager is TroveManagerBase, CheckContract {
 
-    using SafeMath for uint256;
     
     // --- Dependency setter ---
     function setAddresses(address[14] calldata _addresses) external override onlyOwner {

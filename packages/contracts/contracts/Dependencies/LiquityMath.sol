@@ -2,12 +2,10 @@
 
 pragma solidity 0.8.13;
 
-import "./SafeMath.sol";
 import "./console.sol";
 
 library LiquityMath {
-    using SafeMath for uint;
-
+    
     uint256 internal constant DECIMAL_PRECISION = 1e18;
 
     /* Precision for Nominal ICR (independent of price). Rationale for the value:

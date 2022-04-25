@@ -2,7 +2,6 @@
 pragma solidity 0.8.13;
 
 import "./Interfaces/IActivePool.sol";
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
@@ -16,7 +15,6 @@ import "./ActivePoolStorage.sol";
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  */
 contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
-    using SafeMath for uint256;
     
     // --- Contract setters ---
     /// @notice initializer function that sets required addresses

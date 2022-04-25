@@ -15,8 +15,7 @@ import "../Interfaces/ILiquityBaseParams.sol";
  * common functions.
  */
 contract LiquityBase is BaseMath, ILiquityBase {
-    using SafeMath for uint256;
-
+    
     uint256 public constant _100pct = 1000000000000000000; // 1e18 == 100%
 
     /// Amount of ZUSD to be locked in gas pool on opening troves

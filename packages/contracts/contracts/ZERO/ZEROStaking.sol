@@ -3,7 +3,6 @@
 pragma solidity 0.8.13;
 
 import "../Dependencies/BaseMath.sol";
-import "../Dependencies/SafeMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/console.sol";
@@ -14,8 +13,7 @@ import "../Interfaces/IZUSDToken.sol";
 import "./ZEROStakingStorage.sol";
 
 contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMath {
-    using SafeMath for uint;
-
+    
     // --- Events not covered by interface ---
     event FeeDistributorAddressSet(address _feeDistributorAddress);
 

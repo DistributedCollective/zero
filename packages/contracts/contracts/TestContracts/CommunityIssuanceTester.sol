@@ -6,7 +6,6 @@ import "../ZERO/CommunityIssuance.sol";
 
 contract CommunityIssuanceTester is CommunityIssuance {
 
-    using SafeMath for uint256;
     
     function obtainZERO(uint256 _amount) external {
         zeroToken.transfer(msg.sender, _amount);

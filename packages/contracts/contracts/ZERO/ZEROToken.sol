@@ -3,7 +3,6 @@
 pragma solidity 0.8.13;
 
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IZEROToken.sol";
 import "./ZEROTokenStorage.sol";
 
@@ -26,8 +25,7 @@ import "./ZEROTokenStorage.sol";
 */
 
 contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
-    using SafeMath for uint256;
-
+    
     // --- Functions ---
 
     function initialize (

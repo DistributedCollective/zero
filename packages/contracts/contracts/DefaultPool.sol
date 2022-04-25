@@ -3,7 +3,6 @@
 pragma solidity 0.8.13;
 
 import './Interfaces/IDefaultPool.sol';
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
@@ -16,7 +15,6 @@ import "./DefaultPoolStorage.sol";
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
-    using SafeMath for uint256;
     
     // --- Dependency setters ---
 

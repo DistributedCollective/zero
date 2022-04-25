@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.13;
 
-import "../Dependencies/SafeMath.sol";
 import "../Dependencies/LiquityMath.sol";
 import "../Dependencies/IERC20.sol";
 import "../Interfaces/IBorrowerOperations.sol";
@@ -17,8 +16,7 @@ import "../Dependencies/console.sol";
 
 
 contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript, ZEROStakingScript {
-    using SafeMath for uint;
-
+    
     string constant public NAME = "BorrowerWrappersScript";
 
     ITroveManager immutable troveManager;

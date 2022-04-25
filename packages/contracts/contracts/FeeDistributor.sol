@@ -6,11 +6,9 @@ import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/LiquityMath.sol";
 import "./FeeDistributorStorage.sol";
-import "./Dependencies/SafeMath.sol";
 
 contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor {
-    using SafeMath for uint256;
-
+    
     // --- Dependency setters ---
 
     function setAddresses(

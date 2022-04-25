@@ -6,7 +6,6 @@ import "../ActivePool.sol";
 
 contract ActivePoolTester is ActivePool {
 
-    using SafeMath for uint256;
     
     function unprotectedIncreaseZUSDDebt(uint256 _amount) external {
         ZUSDDebt += _amount;
