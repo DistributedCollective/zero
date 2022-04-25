@@ -66,6 +66,7 @@ export const Dialog: React.FC<Props> = ({
             wordBreak: "break-all",
             ...sx
           }}
+          ref={ref}
         >
           {children}
         </Card>

@@ -14,6 +14,7 @@ import { useLiquity } from "../hooks/LiquityContext";
 
 import { Icon } from "./Icon";
 import { Tooltip, TooltipProps, Hoverable } from "./Tooltip";
+import { Dialog } from "./Dialog";
 
 const strokeWidth = 10;
 
@@ -290,8 +291,15 @@ export const TransactionMonitor: React.FC = () => {
   const { provider } = useLiquity();
   const [transactionState, setTransactionState] = useTransactionState();
 
+  const [open, setOpen] = useState(false);
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;
   const tx = transactionState.type === "waitingForConfirmation" ? transactionState.tx : undefined;
+
+  useEffect(() => {
+    if (transactionState.type !== "idle") {
+      setOpen(true);
+    }
+  }, [transactionState.type]);
 
   useEffect(() => {
     if (id && tx) {
@@ -391,43 +399,43 @@ export const TransactionMonitor: React.FC = () => {
     }
   }, [transactionState.type, setTransactionState, id]);
 
-  if (transactionState.type === "idle" || transactionState.type === "waitingForApproval") {
+  if (transactionState.type === "idle") {
     return null;
   }
 
   return (
-    <Flex
-      sx={{
-        alignItems: "center",
-        bg:
-          transactionState.type === "confirmed"
-            ? "success"
-            : transactionState.type === "cancelled"
-            ? "warning"
-            : transactionState.type === "failed"
-            ? "danger"
-            : "primary",
-        p: 3,
-        pl: 4,
-        position: "fixed",
-        width: "100vw",
-        bottom: 0,
-        overflow: "hidden"
-      }}
-    >
-      <Box sx={{ mr: 3, width: "40px", height: "40px" }}>
-        <TransactionProgressDonut state={transactionState.type} />
-      </Box>
+    <Dialog open={open} onClose={() => setOpen(false)}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          bg:
+            transactionState.type === "confirmed"
+              ? "success"
+              : transactionState.type === "cancelled"
+              ? "warning"
+              : transactionState.type === "failed"
+              ? "danger"
+              : "primary",
+          p: 3,
+          pl: 4
+        }}
+      >
+        <Box sx={{ mr: 3, width: "40px", height: "40px" }}>
+          <TransactionProgressDonut state={transactionState.type} />
+        </Box>
 
-      <Text sx={{ fontSize: 3, color: "white" }}>
-        {transactionState.type === "waitingForConfirmation"
-          ? "Waiting for confirmation"
-          : transactionState.type === "cancelled"
-          ? "Cancelled"
-          : transactionState.type === "failed"
-          ? transactionState.error.message
-          : "Confirmed"}
-      </Text>
-    </Flex>
+        <Text sx={{ fontSize: 3, color: "white" }}>
+          {transactionState.type === "waitingForConfirmation"
+            ? "Waiting for confirmation"
+            : transactionState.type === "cancelled"
+            ? "Cancelled"
+            : transactionState.type === "waitingForApproval"
+            ? "waitingForApproval"
+            : transactionState.type === "failed"
+            ? transactionState.error.message
+            : "Confirmed"}
+        </Text>
+      </Flex>
+    </Dialog>
   );
 };
