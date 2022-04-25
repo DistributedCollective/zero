@@ -26,7 +26,6 @@ contract ZEROTokenTester is ZEROToken {
 
     function unprotectedSendToZEROStaking(address _sender, uint256 _amount) external {
         // No check for the caller here
- 
         _transfer(_sender, zeroStakingAddress, _amount);
     }
 
@@ -38,9 +37,5 @@ contract ZEROTokenTester is ZEROToken {
     function callInternalTransfer(address sender, address recipient, uint256 amount) external returns (bool) {
         _transfer(sender, recipient, amount);
         return true;
-    }
-
-    function getChainId() external view returns (uint256 chainID) {
-        chainID = block.chainid;
     }
 }

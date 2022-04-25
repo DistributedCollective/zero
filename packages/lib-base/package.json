@@ -17,7 +17,7 @@
   "scripts": {
     "prepare": "run-s prepare:*",
     "prepare:eslint": "eslint src",
-    "prepare:tsc": "tsc --project tsconfig.dist.json",
+    
     "prepare:api": "api-extractor run --local",
     "test": "mocha --require ts-node/register"
   },

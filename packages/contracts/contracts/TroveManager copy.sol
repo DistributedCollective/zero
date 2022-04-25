@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.13;
 
-import "./Interfaces/ITroveManager.sol"; // redundant
+import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IStabilityPool.sol";
 import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/IZUSDToken.sol";
