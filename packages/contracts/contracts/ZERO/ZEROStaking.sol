@@ -8,7 +8,6 @@ import "../Dependencies/CheckContract.sol";
 import "../Dependencies/console.sol";
 import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/IZEROStaking.sol";
-import "../Dependencies/LiquityMath.sol";
 import "../Interfaces/IZUSDToken.sol";
 import "./ZEROStakingStorage.sol";
 
@@ -97,7 +96,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         _updateUserSnapshots(msg.sender);
 
         if (_ZEROamount > 0) {
-            uint256 ZEROToWithdraw = LiquityMath._min(_ZEROamount, currentStake);
+            uint256 ZEROToWithdraw = _ZEROamount < currentStake ? _ZEROamount : currentStake;
 
             uint256 newStake = currentStake - ZEROToWithdraw;
 
