@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import { Flex, Text, Box } from "theme-ui";
+import React, { useState, useContext, useEffect, useCallback, useMemo } from "react";
+import { Flex, Text, Image } from "theme-ui";
 import { Provider, TransactionResponse, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { hexDataSlice, hexDataLength } from "@ethersproject/bytes";
 import { defaultAbiCoder } from "@ethersproject/abi";
 
-import { buildStyles, CircularProgressbarWithChildren } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 import { EthersTransactionOverrides } from "@liquity/lib-ethers";
@@ -12,33 +11,10 @@ import { SentLiquityTransaction, LiquityReceipt } from "@liquity/lib-base";
 
 import { useLiquity } from "../hooks/LiquityContext";
 
-import { Icon } from "./Icon";
 import { Tooltip, TooltipProps, Hoverable } from "./Tooltip";
 import { Dialog } from "./Dialog";
-
-const strokeWidth = 10;
-
-const circularProgressbarStyle = {
-  strokeLinecap: "butt",
-  pathColor: "white",
-  trailColor: "rgba(255, 255, 255, 0.33)"
-};
-
-const slowProgress = {
-  strokeWidth,
-  styles: buildStyles({
-    ...circularProgressbarStyle,
-    pathTransitionDuration: 30
-  })
-};
-
-const fastProgress = {
-  strokeWidth,
-  styles: buildStyles({
-    ...circularProgressbarStyle,
-    pathTransitionDuration: 0.75
-  })
-};
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
 
 type TransactionIdle = {
   type: "idle";
@@ -251,55 +227,32 @@ const tryToGetRevertReason = async (provider: Provider, hash: string) => {
   }
 };
 
-const Donut = React.memo(
-  CircularProgressbarWithChildren,
-  ({ value: prev }, { value: next }) => prev === next
-);
-
-type TransactionProgressDonutProps = {
-  state: TransactionState["type"];
-};
-
-const TransactionProgressDonut: React.FC<TransactionProgressDonutProps> = ({ state }) => {
-  const [value, setValue] = useState(0);
-  const maxValue = 1;
-
-  useEffect(() => {
-    if (state === "confirmed") {
-      setTimeout(() => setValue(maxValue), 40);
-    } else {
-      setTimeout(() => setValue(maxValue * 0.67), 20);
-    }
-  }, [state]);
-
-  return state === "confirmed" ? (
-    <Donut {...{ value, maxValue, ...fastProgress }}>
-      <Icon name="check" color="white" size="lg" />
-    </Donut>
-  ) : state === "failed" || state === "cancelled" ? (
-    <Donut value={0} {...{ maxValue, ...fastProgress }}>
-      <Icon name="times" color="white" size="lg" />
-    </Donut>
-  ) : (
-    <Donut {...{ value, maxValue, ...slowProgress }}>
-      <Icon name="cog" color="white" size="lg" spin />
-    </Donut>
-  );
+const getTransactionTitle = (tx: TransactionState) => {
+  switch (tx.type) {
+    case "idle":
+      return "";
+    case "failed":
+      return "Confirm Failed";
+    case "waitingForApproval":
+      return "Confirm Transaction";
+    case "waitingForConfirmation":
+      return "Transaction Processing";
+    case "confirmed":
+      return "Transaction Succeeded";
+    case "confirmedOneShot":
+      return "Transaction Succeeded";
+    case "cancelled":
+      return "Confirm Rejected";
+  }
 };
 
 export const TransactionMonitor: React.FC = () => {
   const { provider } = useLiquity();
   const [transactionState, setTransactionState] = useTransactionState();
+  const { chainId } = useWeb3React<Web3Provider>();
 
-  const [open, setOpen] = useState(false);
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;
   const tx = transactionState.type === "waitingForConfirmation" ? transactionState.tx : undefined;
-
-  useEffect(() => {
-    if (transactionState.type !== "idle") {
-      setOpen(true);
-    }
-  }, [transactionState.type]);
 
   useEffect(() => {
     if (id && tx) {
@@ -380,60 +333,54 @@ export const TransactionMonitor: React.FC = () => {
     if (transactionState.type === "confirmedOneShot" && id) {
       // hack: the txn confirmed state lasts 5 seconds which blocks other states, review with Dani
       setTransactionState({ type: "confirmed", id });
-    } else if (
-      transactionState.type === "confirmed" ||
-      transactionState.type === "failed" ||
-      transactionState.type === "cancelled"
-    ) {
-      let cancelled = false;
-
-      setTimeout(() => {
-        if (!cancelled) {
-          setTransactionState({ type: "idle" });
-        }
-      }, 5000);
-
-      return () => {
-        cancelled = true;
-      };
     }
   }, [transactionState.type, setTransactionState, id]);
 
-  if (transactionState.type === "idle") {
-    return null;
-  }
+  const isIdle = useMemo(() => transactionState.type === "idle", [transactionState.type]);
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)}>
+    <Dialog
+      disableClose
+      sx={{ width: 468, bg: "#000000" }}
+      open={!isIdle}
+      onClose={() => setTransactionState({ type: "idle" })}
+    >
       <Flex
         sx={{
           alignItems: "center",
-          bg:
-            transactionState.type === "confirmed"
-              ? "success"
-              : transactionState.type === "cancelled"
-              ? "warning"
-              : transactionState.type === "failed"
-              ? "danger"
-              : "primary",
+          flexDirection: "column",
           p: 3,
           pl: 4
         }}
       >
-        <Box sx={{ mr: 3, width: "40px", height: "40px" }}>
-          <TransactionProgressDonut state={transactionState.type} />
-        </Box>
+        <Text sx={{ fontSize: 22, fontWeight: 600, mb: 50, minHeight: 33 }}>
+          {getTransactionTitle(transactionState)}
+        </Text>
+        <Image
+          sx={{
+            mb: 20,
+            ml: 22,
+            width: 85
+          }}
+          src="/images/rsk.svg"
+        />
 
-        <Text sx={{ fontSize: 3, color: "white" }}>
-          {transactionState.type === "waitingForConfirmation"
-            ? "Waiting for confirmation"
-            : transactionState.type === "cancelled"
-            ? "Cancelled"
-            : transactionState.type === "waitingForApproval"
-            ? "waitingForApproval"
-            : transactionState.type === "failed"
-            ? transactionState.error.message
-            : "Confirmed"}
+        <Text>RSK {chainId === 30 ? "Mainnet" : "Testnet"}</Text>
+
+        <Text sx={{ fontSize: 3, color: "white", textAlign: "center", mt: 55 }}>
+          {transactionState.type === "waitingForConfirmation" ? (
+            <>Transaction processing...</>
+          ) : transactionState.type === "cancelled" ? (
+            <>Your transaction is rejected by the user</>
+          ) : transactionState.type === "waitingForApproval" ? (
+            <>
+              Please confirm the transaction <br /> in your RSK wallet
+            </>
+          ) : transactionState.type === "failed" ? (
+            transactionState.error.message
+          ) : (
+            "Confirmed"
+          )}
         </Text>
       </Flex>
     </Dialog>
