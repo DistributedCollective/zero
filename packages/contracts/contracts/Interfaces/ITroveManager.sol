@@ -43,22 +43,22 @@ interface ITroveManager is ILiquityBase {
 
     // --- Functions ---
     /**
-     * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
-     * @dev initializer function, checks addresses are contracts
-     * @param _feeDistributorAddress feeDistributor contract address
-     * @param _troveManagerRedeemOps TroveManagerRedeemOps contract address
-     * @param _liquityBaseParamsAddress LiquityBaseParams contract address
-     * @param _borrowerOperationsAddress BorrowerOperations contract address
-     * @param _activePoolAddress ActivePool contract address
-     * @param _defaultPoolAddress DefaultPool contract address
-     * @param _stabilityPoolAddress StabilityPool contract address
-     * @param _gasPoolAddress GasPool contract address
-     * @param _collSurplusPoolAddress CollSurplusPool contract address
-     * @param _priceFeedAddress PriceFeed contract address
-     * @param _zusdTokenAddress ZUSDToken contract address
-     * @param _sortedTrovesAddress SortedTroves contract address
-     * @param _zeroTokenAddress ZEROToken contract address
-     * @param _zeroStakingAddress ZEROStaking contract address
+     * @|notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
+     * @|dev initializer function, checks addresses are contracts
+     * @|param _feeDistributorAddress feeDistributor contract address
+     * @|param _troveManagerRedeemOps TroveManagerRedeemOps contract address
+     * @|param _liquityBaseParamsAddress LiquityBaseParams contract address
+     * @|param _borrowerOperationsAddress BorrowerOperations contract address
+     * @|param _activePoolAddress ActivePool contract address
+     * @|param _defaultPoolAddress DefaultPool contract address
+     * @|param _stabilityPoolAddress StabilityPool contract address
+     * @|param _gasPoolAddress GasPool contract address
+     * @|param _collSurplusPoolAddress CollSurplusPool contract address
+     * @|param _priceFeedAddress PriceFeed contract address
+     * @|param _zusdTokenAddress ZUSDToken contract address
+     * @|param _sortedTrovesAddress SortedTroves contract address
+     * @|param _zeroTokenAddress ZEROToken contract address
+     * @|param _zeroStakingAddress ZEROStaking contract address
      */
     /*function setAddresses(
         address _feeDistributorAddress,
@@ -76,7 +76,7 @@ interface ITroveManager is ILiquityBase {
         address _zeroTokenAddress,
         address _zeroStakingAddress
     ) external;
-
+    */
 
     /// @return Trove owners count
     function getTroveOwnersCount() external view returns (uint);
