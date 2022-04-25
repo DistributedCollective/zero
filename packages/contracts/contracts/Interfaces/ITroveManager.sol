@@ -60,7 +60,7 @@ interface ITroveManager is ILiquityBase {
      * @param _zeroTokenAddress ZEROToken contract address
      * @param _zeroStakingAddress ZEROStaking contract address
      */
-    function setAddresses(
+    /*function setAddresses(
         address _feeDistributorAddress,
         address _troveManagerRedeemOps,
         address _liquityBaseParamsAddress,
@@ -76,6 +76,7 @@ interface ITroveManager is ILiquityBase {
         address _zeroTokenAddress,
         address _zeroStakingAddress
     ) external;
+
 
     /// @return Trove owners count
     function getTroveOwnersCount() external view returns (uint);

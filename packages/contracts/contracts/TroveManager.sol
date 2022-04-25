@@ -21,7 +21,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
     using SafeMath for uint256;
     
     // --- Dependency setter ---
-    function setAddresses(
+    /*function setAddresses(
         address _feeDistributorAddress,
         address _troveManagerRedeemOps,
         address _liquityBaseParamsAddress,
@@ -83,7 +83,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         emit ZEROTokenAddressChanged(_zeroTokenAddress);
         emit ZEROStakingAddressChanged(_zeroStakingAddress);
 
-    }
+    }*/
 
     // --- Getters ---
 
