@@ -69,8 +69,8 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
             </Flex>
           </StabilityViewProvider>
         </TroveViewProvider>
-        <TransactionMonitor />
       </Switch>
+      <TransactionMonitor />
     </LiquityStoreProvider>
   );
 };
