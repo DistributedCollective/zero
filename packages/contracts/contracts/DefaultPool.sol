@@ -59,7 +59,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     function sendRBTCToActivePool(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        RBTC = RBTC.sub(_amount);
+        RBTC -= _amount;
         emit DefaultPoolRBTCBalanceUpdated(RBTC);
         emit RBtcerSent(activePool, _amount);
 
@@ -69,13 +69,13 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
-        ZUSDDebt = ZUSDDebt.add(_amount);
+        ZUSDDebt += _amount;
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
-        ZUSDDebt = ZUSDDebt.sub(_amount);
+        ZUSDDebt -= _amount;
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
@@ -93,7 +93,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC.add(msg.value);
+        RBTC += msg.value;
         emit DefaultPoolRBTCBalanceUpdated(RBTC);
     }
 }

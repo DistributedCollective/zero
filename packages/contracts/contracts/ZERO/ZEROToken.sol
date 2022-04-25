@@ -105,17 +105,17 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         _requireValidRecipient(recipient);
 
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(sender, msg.sender, _allowances[sender][msg.sender] - amount);
         return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) external override returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
         return true;
     }
 
@@ -176,8 +176,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(presale.isClosed(), "Presale is not over yet");
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
-        _balances[recipient] = _balances[recipient].add(amount);
+        _balances[sender] -= amount;
+        _balances[recipient] += amount;
 
         emit Transfer(sender, recipient, amount);
     }
@@ -185,8 +185,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
 
-        _totalSupply = _totalSupply.add(amount);
-        _balances[account] = _balances[account].add(amount);
+        _totalSupply += amount;
+        _balances[account] += amount;
         emit Transfer(address(0), account, amount);
     }
 
@@ -194,8 +194,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         require(account != address(0), "ERC20: mint to the zero address");
         require(amount <= _balances[account], "balance too low");
 
-        _totalSupply = _totalSupply.sub(amount);
-        _balances[account] = _balances[account].sub(amount);
+        _totalSupply -= amount;
+        _balances[account] -= amount;
         emit Transfer(account, address(0), amount);
     }
 

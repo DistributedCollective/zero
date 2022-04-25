@@ -90,32 +90,32 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
 
         while (currentTroveuser != address(0) && remainingZUSD > 0 && _maxIterations-- > 0) {
             uint256 netZUSDDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
-                .add(troveManager.getPendingZUSDDebtReward(currentTroveuser));
+                                  + troveManager.getPendingZUSDDebtReward(currentTroveuser);
 
             if (netZUSDDebt > remainingZUSD) {
                 if (netZUSDDebt > MIN_NET_DEBT) {
-                    uint256 maxRedeemableZUSD = LiquityMath._min(remainingZUSD, netZUSDDebt.sub(MIN_NET_DEBT));
+                    uint256 maxRedeemableZUSD = LiquityMath._min(remainingZUSD, netZUSDDebt - MIN_NET_DEBT);
 
                     uint256 RBTC = troveManager.getTroveColl(currentTroveuser)
-                        .add(troveManager.getPendingRBTCReward(currentTroveuser));
+                                    + troveManager.getPendingRBTCReward(currentTroveuser);
 
-                    uint256 newColl = RBTC.sub(maxRedeemableZUSD.mul(DECIMAL_PRECISION).div(_price));
-                    uint256 newDebt = netZUSDDebt.sub(maxRedeemableZUSD);
+                    uint256 newColl = RBTC - maxRedeemableZUSD * DECIMAL_PRECISION / _price;
+                    uint256 newDebt = netZUSDDebt - maxRedeemableZUSD;
 
                     uint256 compositeDebt = _getCompositeDebt(newDebt);
                     partialRedemptionHintNICR = LiquityMath._computeNominalCR(newColl, compositeDebt);
 
-                    remainingZUSD = remainingZUSD.sub(maxRedeemableZUSD);
+                    remainingZUSD -= maxRedeemableZUSD;
                 }
                 break;
             } else {
-                remainingZUSD = remainingZUSD.sub(netZUSDDebt);
+                remainingZUSD -= netZUSDDebt;
             }
 
             currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
         }
 
-        truncatedZUSDamount = _ZUSDamount.sub(remainingZUSD);
+        truncatedZUSDamount = _ZUSDamount - remainingZUSD;
     }
 
     /** getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 

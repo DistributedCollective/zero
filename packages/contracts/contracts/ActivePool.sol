@@ -70,7 +70,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @param _amount RBTC amount to send
     function sendRBTC(address _account, uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        RBTC = RBTC.sub(_amount);
+        RBTC -= _amount;
         emit ActivePoolRBTCBalanceUpdated(RBTC);
         emit RBtcerSent(_account, _amount);
 
@@ -82,7 +82,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @param _amount ZUSD amount to add to the pool debt
     function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveM();
-        ZUSDDebt = ZUSDDebt.add(_amount);
+        ZUSDDebt += _amount;
         emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
@@ -90,7 +90,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @param _amount ZUSD amount to sub to the pool debt
     function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        ZUSDDebt = ZUSDDebt.sub(_amount);
+        ZUSDDebt = ZUSDDebt -_amount;
         emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
@@ -123,7 +123,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     receive() external payable {
         _requireCallerIsBorrowerOperationsOrDefaultPool();
-        RBTC = RBTC.add(msg.value);
+        RBTC  += msg.value;
         emit ActivePoolRBTCBalanceUpdated(RBTC);
     }
 }

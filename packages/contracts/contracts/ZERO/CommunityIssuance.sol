@@ -40,10 +40,10 @@ contract CommunityIssuance is
     function issueZERO() public override returns (uint256) {
         _requireCallerIsStabilityPool();
 
-        uint256 latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(
-            DECIMAL_PRECISION
-        );
-        uint256 issuance = latestTotalZEROIssued.sub(totalZEROIssued);
+        uint256 latestTotalZEROIssued = ZEROSupplyCap
+                                        * _getCumulativeIssuanceFraction()
+                                        / DECIMAL_PRECISION;
+        uint256 issuance = latestTotalZEROIssued - totalZEROIssued;
 
         totalZEROIssued = latestTotalZEROIssued;
         emit TotalZEROIssuedUpdated(latestTotalZEROIssued);
@@ -57,13 +57,13 @@ contract CommunityIssuance is
     t:  time passed since last ZERO issuance event  */
     function _getCumulativeIssuanceFraction() internal view returns (uint256) {
         // Get the time passed since deployment
-        uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
+        uint256 timePassedInMinutes = (block.timestamp - deploymentTime) / SECONDS_IN_ONE_MINUTE;
 
         // f^t
         uint256 power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
 
         //  (1 - f^t)
-        uint256 cumulativeIssuanceFraction = (uint256(DECIMAL_PRECISION).sub(power));
+        uint256 cumulativeIssuanceFraction = uint256(DECIMAL_PRECISION) - power;
         assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
 
         return cumulativeIssuanceFraction;

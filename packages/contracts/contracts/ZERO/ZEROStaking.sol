@@ -66,11 +66,11 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     
        _updateUserSnapshots(msg.sender);
 
-        uint256 newStake = currentStake.add(_ZEROamount);
+        uint256 newStake = currentStake + _ZEROamount;
 
         // Increase user’s stake and total ZERO staked
         stakes[msg.sender] = newStake;
-        totalZEROStaked = totalZEROStaked.add(_ZEROamount);
+        totalZEROStaked += _ZEROamount;
         emit TotalZEROStakedUpdated(totalZEROStaked);
 
         // Transfer ZERO from caller to this contract
@@ -101,11 +101,11 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         if (_ZEROamount > 0) {
             uint256 ZEROToWithdraw = LiquityMath._min(_ZEROamount, currentStake);
 
-            uint256 newStake = currentStake.sub(ZEROToWithdraw);
+            uint256 newStake = currentStake - ZEROToWithdraw;
 
             // Decrease user's stake and total ZERO staked
             stakes[msg.sender] = newStake;
-            totalZEROStaked = totalZEROStaked.sub(ZEROToWithdraw);
+            totalZEROStaked -= ZEROToWithdraw;
             emit TotalZEROStakedUpdated(totalZEROStaked);
 
             // Transfer unstaked ZERO to user
@@ -127,9 +127,11 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         _requireCallerIsFeeDistributor();
         uint256 RBTCFeePerZEROStaked;
      
-        if (totalZEROStaked > 0) {RBTCFeePerZEROStaked = _RBTCFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
+        if (totalZEROStaked > 0) {
+            RBTCFeePerZEROStaked = _RBTCFee * DECIMAL_PRECISION / totalZEROStaked;
+        }
 
-        F_RBTC = F_RBTC.add(RBTCFeePerZEROStaked); 
+        F_RBTC += RBTCFeePerZEROStaked; 
         emit F_RBTCUpdated(F_RBTC);
     }
 
@@ -137,9 +139,11 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         _requireCallerIsFeeDistributor();
         uint256 ZUSDFeePerZEROStaked;
         
-        if (totalZEROStaked > 0) {ZUSDFeePerZEROStaked = _ZUSDFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
+        if (totalZEROStaked > 0) {
+            ZUSDFeePerZEROStaked = _ZUSDFee * DECIMAL_PRECISION / totalZEROStaked;
+        }
         
-        F_ZUSD = F_ZUSD.add(ZUSDFeePerZEROStaked);
+        F_ZUSD += ZUSDFeePerZEROStaked;
         emit F_ZUSDUpdated(F_ZUSD);
     }
 
@@ -151,7 +155,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     function _getPendingRBTCGain(address _user) internal view returns (uint) {
         uint256 F_RBTC_Snapshot = snapshots[_user].F_RBTC_Snapshot;
-        uint256 RBTCGain = stakes[_user].mul(F_RBTC.sub(F_RBTC_Snapshot)).div(DECIMAL_PRECISION);
+        uint256 RBTCGain = stakes[_user] * (F_RBTC - F_RBTC_Snapshot) / DECIMAL_PRECISION;
         return RBTCGain;
     }
 
@@ -161,7 +165,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     function _getPendingZUSDGain(address _user) internal view returns (uint) {
         uint256 F_ZUSD_Snapshot = snapshots[_user].F_ZUSD_Snapshot;
-        uint256 ZUSDGain = stakes[_user].mul(F_ZUSD.sub(F_ZUSD_Snapshot)).div(DECIMAL_PRECISION);
+        uint256 ZUSDGain = stakes[_user] * (F_ZUSD - F_ZUSD_Snapshot) / DECIMAL_PRECISION;
         return ZUSDGain;
     }
 

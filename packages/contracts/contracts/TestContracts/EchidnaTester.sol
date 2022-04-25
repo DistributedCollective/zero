@@ -153,7 +153,7 @@ contract EchidnaTester {
     function getAdjustedRBTC(uint256 actorBalance, uint256 _RBTC, uint256 ratio) internal view returns (uint) {
         uint256 price = priceFeedTestnet.getPrice();
         require(price > 0);
-        uint256 minRBTC = ratio.mul(ZUSD_GAS_COMPENSATION).div(price);
+        uint256 minRBTC = ratio * ZUSD_GAS_COMPENSATION / price;
         require(actorBalance > minRBTC);
         uint256 RBTC = minRBTC + _RBTC % (actorBalance - minRBTC);
         return RBTC;
@@ -162,11 +162,11 @@ contract EchidnaTester {
     function getAdjustedZUSD(uint256 RBTC, uint256 _ZUSDAmount, uint256 ratio) internal view returns (uint) {
         uint256 price = priceFeedTestnet.getPrice();
         uint256 ZUSDAmount = _ZUSDAmount;
-        uint256 compositeDebt = ZUSDAmount.add(ZUSD_GAS_COMPENSATION);
+        uint256 compositeDebt = ZUSDAmount + ZUSD_GAS_COMPENSATION;
         uint256 ICR = LiquityMath._computeCR(RBTC, compositeDebt, price);
         if (ICR < ratio) {
-            compositeDebt = RBTC.mul(price).div(ratio);
-            ZUSDAmount = compositeDebt.sub(ZUSD_GAS_COMPENSATION);
+            compositeDebt = RBTC * price / ratio;
+            ZUSDAmount = compositeDebt - ZUSD_GAS_COMPENSATION;
         }
         return ZUSDAmount;
     }

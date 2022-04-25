@@ -19,8 +19,8 @@ contract CommunityIssuanceTester is CommunityIssuance {
     function unprotectedIssueZERO() external returns (uint) {
         // No checks on caller address
        
-        uint256 latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint256 issuance = latestTotalZEROIssued.sub(totalZEROIssued);
+        uint256 latestTotalZEROIssued = ZEROSupplyCap * _getCumulativeIssuanceFraction() / DECIMAL_PRECISION;
+        uint256 issuance = latestTotalZEROIssued - totalZEROIssued;
       
         totalZEROIssued = latestTotalZEROIssued;
         return issuance;

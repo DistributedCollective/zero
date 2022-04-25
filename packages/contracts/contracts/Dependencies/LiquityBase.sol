@@ -37,11 +37,11 @@ contract LiquityBase is BaseMath, ILiquityBase {
 
     // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
     function _getCompositeDebt(uint256 _debt) internal pure returns (uint256) {
-        return _debt.add(ZUSD_GAS_COMPENSATION);
+        return _debt + ZUSD_GAS_COMPENSATION;
     }
 
     function _getNetDebt(uint256 _debt) internal pure returns (uint256) {
-        return _debt.sub(ZUSD_GAS_COMPENSATION);
+        return _debt - ZUSD_GAS_COMPENSATION;
     }
 
     /// Return the amount of RBTC to be drawn from a trove's collateral and sent as gas compensation.
@@ -53,14 +53,14 @@ contract LiquityBase is BaseMath, ILiquityBase {
         uint256 activeColl = activePool.getRBTC();
         uint256 liquidatedColl = defaultPool.getRBTC();
 
-        return activeColl.add(liquidatedColl);
+        return activeColl + liquidatedColl;
     }
 
     function getEntireSystemDebt() public view returns (uint256 entireSystemDebt) {
         uint256 activeDebt = activePool.getZUSDDebt();
         uint256 closedDebt = defaultPool.getZUSDDebt();
 
-        return activeDebt.add(closedDebt);
+        return activeDebt + closedDebt; 
     }
 
     function _getTCR(uint256 _price) internal view returns (uint256 TCR) {
@@ -83,7 +83,7 @@ contract LiquityBase is BaseMath, ILiquityBase {
         uint256 _amount,
         uint256 _maxFeePercentage
     ) internal pure {
-        uint256 feePercentage = _fee.mul(DECIMAL_PRECISION).div(_amount);
+        uint256 feePercentage = _fee * DECIMAL_PRECISION /_amount;
         require(feePercentage <= _maxFeePercentage, "Fee exceeded provided maximum");
     }
 }

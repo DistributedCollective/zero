@@ -53,7 +53,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     function accountSurplus(address _account, uint256 _amount) external override {
         _requireCallerIsTroveManager();
 
-        uint256 newAmount = balances[_account].add(_amount);
+        uint256 newAmount = balances[_account] + _amount;
         balances[_account] = newAmount;
 
         emit CollBalanceUpdated(_account, newAmount);
@@ -67,7 +67,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        RBTC = RBTC.sub(claimableColl);
+        RBTC -= claimableColl;
         emit RBtcerSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
@@ -98,6 +98,6 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC.add(msg.value);
+        RBTC += msg.value;
     }
 }

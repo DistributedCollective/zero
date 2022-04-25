@@ -124,7 +124,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
             data.nodes[nextId].prevId = _id;
         }
 
-        data.size = data.size.add(1);
+        data.size = data.size + 1;
         emit NodeAdded(_id, _NICR);
     }
 
@@ -170,7 +170,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         }
 
         delete data.nodes[_id];
-        data.size = data.size.sub(1);
+        data.size = data.size - 1;
         emit NodeRemoved(_id);
     }
 

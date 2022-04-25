@@ -158,7 +158,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
 
         if (!isRecoveryMode) {
             vars.ZUSDFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.zusdToken, _ZUSDAmount, _maxFeePercentage);
-            vars.netDebt = vars.netDebt.add(vars.ZUSDFee);
+            vars.netDebt += vars.ZUSDFee;
         }
         _requireAtLeastMinNetDebt(vars.netDebt);
 
@@ -281,7 +281,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         // If the adjustment incorporates a debt increase and system is in Normal Mode, then trigger a borrowing fee
         if (_isDebtIncrease && !vars.isRecoveryMode) { 
             vars.ZUSDFee = _triggerBorrowingFee(contractsCache.troveManager, contractsCache.zusdToken, _ZUSDChange, _maxFeePercentage);
-            vars.netDebtChange = vars.netDebtChange.add(vars.ZUSDFee); // The raw debt change includes the fee
+            vars.netDebtChange += vars.ZUSDFee; // The raw debt change includes the fee
         }
 
         vars.debt = contractsCache.troveManager.getTroveDebt(_borrower);
@@ -297,7 +297,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
             
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough ZUSD
         if (!_isDebtIncrease && _ZUSDChange > 0) {
-            _requireAtLeastMinNetDebt(_getNetDebt(vars.debt).sub(vars.netDebtChange));
+            _requireAtLeastMinNetDebt(_getNetDebt(vars.debt) - vars.netDebtChange);
             _requireValidZUSDRepayment(vars.debt, vars.netDebtChange);
             _requireSufficientZUSDBalance(contractsCache.zusdToken, _borrower, vars.netDebtChange);
         }
@@ -335,7 +335,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
 
         uint256 debt = troveManager.getTroveDebt(msg.sender);
 
-        masset.redeemByBridge(address(zusdToken), debt.sub(ZUSD_GAS_COMPENSATION), msg.sender);
+        masset.redeemByBridge(address(zusdToken), debt - ZUSD_GAS_COMPENSATION, msg.sender);
         _closeTrove();
     }
 
@@ -353,7 +353,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint256 coll = troveManagerCached.getTroveColl(msg.sender);
         uint256 debt = troveManagerCached.getTroveDebt(msg.sender);
 
-        _requireSufficientZUSDBalance(zusdTokenCached, msg.sender, debt.sub(ZUSD_GAS_COMPENSATION));
+        _requireSufficientZUSDBalance(zusdTokenCached, msg.sender, debt - ZUSD_GAS_COMPENSATION);
 
         uint256 newTCR = _getNewTCRFromTroveChange(coll, false, debt, false, price);
         _requireNewTCRisAboveCCR(newTCR);
@@ -364,7 +364,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         emit TroveUpdated(msg.sender, 0, 0, 0, uint8(BorrowerOperation.closeTrove));
 
         // Burn the repaid ZUSD from the user's balance and the gas compensation from the Gas Pool
-        _repayZUSD(activePoolCached, zusdTokenCached, msg.sender, debt.sub(ZUSD_GAS_COMPENSATION));
+        _repayZUSD(activePoolCached, zusdTokenCached, msg.sender, debt - ZUSD_GAS_COMPENSATION);
         _repayZUSD(activePoolCached, zusdTokenCached, gasPoolAddress, ZUSD_GAS_COMPENSATION);
 
         // Send the collateral back to the user
@@ -393,7 +393,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     }
 
     function _getUSDValue(uint256 _coll, uint256 _price) internal pure returns (uint) {
-        uint256 usdValue = _price.mul(_coll).div(DECIMAL_PRECISION);
+        uint256 usdValue = _price * _coll / DECIMAL_PRECISION;
 
         return usdValue;
     }
@@ -573,7 +573,7 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
     }
 
     function _requireValidZUSDRepayment(uint256 _currentDebt, uint256 _debtRepayment) internal pure {
-        require(_debtRepayment <= _currentDebt.sub(ZUSD_GAS_COMPENSATION), "BorrowerOps: Amount repaid must not be larger than the Trove's debt");
+        require(_debtRepayment <= _currentDebt - ZUSD_GAS_COMPENSATION, "BorrowerOps: Amount repaid must not be larger than the Trove's debt");
     }
 
     function _requireCallerIsStabilityPool() internal view {
@@ -652,8 +652,8 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint256 newColl = _coll;
         uint256 newDebt = _debt;
 
-        newColl = _isCollIncrease ? _coll.add(_collChange) :  _coll.sub(_collChange);
-        newDebt = _isDebtIncrease ? _debt.add(_debtChange) : _debt.sub(_debtChange);
+        newColl = _isCollIncrease ? _coll + _collChange :  _coll - _collChange;
+        newDebt = _isDebtIncrease ? _debt + _debtChange :  _debt - _debtChange;
 
         return (newColl, newDebt);
     }
@@ -673,8 +673,8 @@ contract BorrowerOperations is LiquityBase, BorrowerOperationsStorage, CheckCont
         uint256 totalColl = getEntireSystemColl();
         uint256 totalDebt = getEntireSystemDebt();
 
-        totalColl = _isCollIncrease ? totalColl.add(_collChange) : totalColl.sub(_collChange);
-        totalDebt = _isDebtIncrease ? totalDebt.add(_debtChange) : totalDebt.sub(_debtChange);
+        totalColl = _isCollIncrease ? totalColl + _collChange : totalColl - _collChange;
+        totalDebt = _isDebtIncrease ? totalDebt + _debtChange : totalDebt - _debtChange;
 
         uint256 newTCR = LiquityMath._computeCR(totalColl, totalDebt, _price);
         return newTCR;

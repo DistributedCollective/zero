@@ -72,12 +72,12 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
 
     function distributeZUSD(uint256 toDistribute) internal {
         // Send fee to the SOVFeeCollector address
-        uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(LiquityMath.DECIMAL_PRECISION);
+        uint256 feeToSovCollector = toDistribute * FEE_TO_SOV_COLLECTOR / LiquityMath.DECIMAL_PRECISION;
         zusdToken.approve(address(sovFeeCollector), feeToSovCollector);
         sovFeeCollector.transferTokens(address(zusdToken), uint96(feeToSovCollector));
 
         // Send fee to ZERO staking contract
-        uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
+        uint256 feeToZeroStaking = toDistribute - feeToSovCollector;
         zusdToken.transfer(address(zeroStaking), feeToZeroStaking);
         zeroStaking.increaseF_ZUSD(feeToZeroStaking);
 
@@ -87,13 +87,13 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
 
     function distributeRBTC(uint256 toDistribute) internal {
         // Send fee to the SOVFeeCollector address
-        uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(LiquityMath.DECIMAL_PRECISION);
+        uint256 feeToSovCollector = toDistribute * FEE_TO_SOV_COLLECTOR / LiquityMath.DECIMAL_PRECISION;
         wrbtc.deposit{value: feeToSovCollector}();
         wrbtc.approve(address(sovFeeCollector), feeToSovCollector);
         sovFeeCollector.transferTokens(address(wrbtc), uint96(feeToSovCollector));
 
         // Send the RBTC fee to the ZERO staking contract
-        uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
+        uint256 feeToZeroStaking = toDistribute - feeToSovCollector;
         (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
         require(success, "FeeDistributor: sending RBTC failed");
         zeroStaking.increaseF_RBTC(feeToZeroStaking);

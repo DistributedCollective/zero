@@ -110,9 +110,8 @@ contract TroveManager is TroveManagerBase, CheckContract {
             singleLiquidation.entireTroveColl
         );
         singleLiquidation.ZUSDGasCompensation = ZUSD_GAS_COMPENSATION;
-        uint256 collToLiquidate = singleLiquidation.entireTroveColl.sub(
-            singleLiquidation.collGasCompensation
-        );
+        uint256 collToLiquidate =
+          singleLiquidation.entireTroveColl - singleLiquidation.collGasCompensation;
 
         (
             singleLiquidation.debtToOffset,
@@ -161,9 +160,8 @@ contract TroveManager is TroveManagerBase, CheckContract {
             singleLiquidation.entireTroveColl
         );
         singleLiquidation.ZUSDGasCompensation = ZUSD_GAS_COMPENSATION;
-        vars.collToLiquidate = singleLiquidation.entireTroveColl.sub(
-            singleLiquidation.collGasCompensation
-        );
+        vars.collToLiquidate = 
+          singleLiquidation.entireTroveColl - singleLiquidation.collGasCompensation;
 
         // If ICR <= 100%, purely redistribute the Trove across all active Troves
         if (_ICR <= _100pct) {
@@ -294,9 +292,9 @@ contract TroveManager is TroveManagerBase, CheckContract {
              *
              */
             debtToOffset = LiquityMath._min(_debt, _ZUSDInStabPool);
-            collToSendToSP = _coll.mul(debtToOffset).div(_debt);
-            debtToRedistribute = _debt.sub(debtToOffset);
-            collToRedistribute = _coll.sub(collToSendToSP);
+            collToSendToSP = _coll * debtToOffset / _debt;
+            debtToRedistribute = _debt - debtToOffset;
+            collToRedistribute = _coll - collToSendToSP;
         } else {
             debtToOffset = 0;
             collToSendToSP = 0;
@@ -315,14 +313,14 @@ contract TroveManager is TroveManagerBase, CheckContract {
     ) internal view returns (LiquidationValues memory singleLiquidation) {
         singleLiquidation.entireTroveDebt = _entireTroveDebt;
         singleLiquidation.entireTroveColl = _entireTroveColl;
-        uint256 collToOffset = _entireTroveDebt.mul(liquityBaseParams.MCR()).div(_price);
+        uint256 collToOffset = _entireTroveDebt * liquityBaseParams.MCR() / _price;
 
         singleLiquidation.collGasCompensation = _getCollGasCompensation(collToOffset);
         singleLiquidation.ZUSDGasCompensation = ZUSD_GAS_COMPENSATION;
 
         singleLiquidation.debtToOffset = _entireTroveDebt;
-        singleLiquidation.collToSendToSP = collToOffset.sub(singleLiquidation.collGasCompensation);
-        singleLiquidation.collSurplus = _entireTroveColl.sub(collToOffset);
+        singleLiquidation.collToSendToSP = collToOffset - singleLiquidation.collGasCompensation;
+        singleLiquidation.collSurplus = _entireTroveColl - collToOffset;
         singleLiquidation.debtToRedistribute = 0;
         singleLiquidation.collToRedistribute = 0;
     }
@@ -391,9 +389,9 @@ contract TroveManager is TroveManagerBase, CheckContract {
         );
 
         vars.liquidatedDebt = totals.totalDebtInSequence;
-        vars.liquidatedColl = totals.totalCollInSequence.sub(totals.totalCollGasCompensation).sub(
-            totals.totalCollSurplus
-        );
+        vars.liquidatedColl = totals.totalCollInSequence
+                             - totals.totalCollGasCompensation 
+                             - totals.totalCollSurplus;
         emit Liquidation(
             vars.liquidatedDebt,
             vars.liquidatedColl,
@@ -459,14 +457,10 @@ contract TroveManager is TroveManagerBase, CheckContract {
                 );
 
                 // Update aggregate trackers
-                vars.remainingZUSDInStabPool = vars.remainingZUSDInStabPool.sub(
-                    singleLiquidation.debtToOffset
-                );
-                vars.entireSystemDebt = vars.entireSystemDebt.sub(singleLiquidation.debtToOffset);
-                vars.entireSystemColl = vars
-                .entireSystemColl
-                .sub(singleLiquidation.collToSendToSP)
-                .sub(singleLiquidation.collSurplus);
+                vars.remainingZUSDInStabPool -= singleLiquidation.debtToOffset;
+                vars.entireSystemDebt -= singleLiquidation.debtToOffset;
+                vars.entireSystemColl -= (singleLiquidation.collToSendToSP
+                                          + singleLiquidation.collSurplus);
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -484,9 +478,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                     vars.remainingZUSDInStabPool
                 );
 
-                vars.remainingZUSDInStabPool = vars.remainingZUSDInStabPool.sub(
-                    singleLiquidation.debtToOffset
-                );
+                vars.remainingZUSDInStabPool -= singleLiquidation.debtToOffset;
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -521,9 +513,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                     vars.remainingZUSDInStabPool
                 );
 
-                vars.remainingZUSDInStabPool = vars.remainingZUSDInStabPool.sub(
-                    singleLiquidation.debtToOffset
-                );
+                vars.remainingZUSDInStabPool -= singleLiquidation.debtToOffset;
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -589,9 +579,8 @@ contract TroveManager is TroveManagerBase, CheckContract {
         );
 
         vars.liquidatedDebt = totals.totalDebtInSequence;
-        vars.liquidatedColl = totals.totalCollInSequence.sub(totals.totalCollGasCompensation).sub(
-            totals.totalCollSurplus
-        );
+        vars.liquidatedColl -= (totals.totalCollGasCompensation
+                                + totals.totalCollSurplus);
         emit Liquidation(
             vars.liquidatedDebt,
             vars.liquidatedColl,
@@ -658,11 +647,9 @@ contract TroveManager is TroveManagerBase, CheckContract {
                 );
 
                 // Update aggregate trackers
-                vars.remainingZUSDInStabPool = vars.remainingZUSDInStabPool.sub(
-                    singleLiquidation.debtToOffset
-                );
-                vars.entireSystemDebt = vars.entireSystemDebt.sub(singleLiquidation.debtToOffset);
-                vars.entireSystemColl = vars.entireSystemColl.sub(singleLiquidation.collToSendToSP);
+                vars.remainingZUSDInStabPool -= singleLiquidation.debtToOffset;
+                vars.entireSystemDebt -= singleLiquidation.debtToOffset;
+                vars.entireSystemColl -= singleLiquidation.collToSendToSP;
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -679,9 +666,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                     vars.user,
                     vars.remainingZUSDInStabPool
                 );
-                vars.remainingZUSDInStabPool = vars.remainingZUSDInStabPool.sub(
-                    singleLiquidation.debtToOffset
-                );
+                vars.remainingZUSDInStabPool -= singleLiquidation.debtToOffset;
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -712,9 +697,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
                     vars.user,
                     vars.remainingZUSDInStabPool
                 );
-                vars.remainingZUSDInStabPool = vars.remainingZUSDInStabPool.sub(
-                    singleLiquidation.debtToOffset
-                );
+                vars.remainingZUSDInStabPool -= singleLiquidation.debtToOffset;
 
                 // Add liquidation values to their respective running totals
                 totals = _addLiquidationValuesToTotals(totals, singleLiquidation);
@@ -729,31 +712,31 @@ contract TroveManager is TroveManagerBase, CheckContract {
         LiquidationValues memory singleLiquidation
     ) internal pure returns (LiquidationTotals memory newTotals) {
         // Tally all the values with their respective running totals
-        newTotals.totalCollGasCompensation = oldTotals.totalCollGasCompensation.add(
+        newTotals.totalCollGasCompensation = oldTotals.totalCollGasCompensation + 
             singleLiquidation.collGasCompensation
-        );
-        newTotals.totalZUSDGasCompensation = oldTotals.totalZUSDGasCompensation.add(
+        ;
+        newTotals.totalZUSDGasCompensation = oldTotals.totalZUSDGasCompensation + 
             singleLiquidation.ZUSDGasCompensation
-        );
-        newTotals.totalDebtInSequence = oldTotals.totalDebtInSequence.add(
+        ;
+        newTotals.totalDebtInSequence = oldTotals.totalDebtInSequence + 
             singleLiquidation.entireTroveDebt
-        );
-        newTotals.totalCollInSequence = oldTotals.totalCollInSequence.add(
+        ;
+        newTotals.totalCollInSequence = oldTotals.totalCollInSequence + 
             singleLiquidation.entireTroveColl
-        );
-        newTotals.totalDebtToOffset = oldTotals.totalDebtToOffset.add(
+        ;
+        newTotals.totalDebtToOffset = oldTotals.totalDebtToOffset + 
             singleLiquidation.debtToOffset
-        );
-        newTotals.totalCollToSendToSP = oldTotals.totalCollToSendToSP.add(
+        ;
+        newTotals.totalCollToSendToSP = oldTotals.totalCollToSendToSP + 
             singleLiquidation.collToSendToSP
-        );
-        newTotals.totalDebtToRedistribute = oldTotals.totalDebtToRedistribute.add(
+        ;
+        newTotals.totalDebtToRedistribute = oldTotals.totalDebtToRedistribute + 
             singleLiquidation.debtToRedistribute
-        );
-        newTotals.totalCollToRedistribute = oldTotals.totalCollToRedistribute.add(
+        ;
+        newTotals.totalCollToRedistribute = oldTotals.totalCollToRedistribute + 
             singleLiquidation.collToRedistribute
-        );
-        newTotals.totalCollSurplus = oldTotals.totalCollSurplus.add(singleLiquidation.collSurplus);
+        ;
+        newTotals.totalCollSurplus = oldTotals.totalCollSurplus + singleLiquidation.collSurplus;
 
         return newTotals;
     }
@@ -812,8 +795,8 @@ contract TroveManager is TroveManagerBase, CheckContract {
         pendingZUSDDebtReward = getPendingZUSDDebtReward(_borrower);
         pendingRBTCReward = getPendingRBTCReward(_borrower);
 
-        debt = debt.add(pendingZUSDDebtReward);
-        coll = coll.add(pendingRBTCReward);
+        debt += pendingZUSDDebtReward;
+        coll += pendingRBTCReward;
     }
 
     function removeStake(address _borrower) external override {
@@ -847,23 +830,20 @@ contract TroveManager is TroveManagerBase, CheckContract {
          * 4) Store these errors for use in the next correction when this function is called.
          * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
          */
-        uint256 RBTCNumerator = _coll.mul(DECIMAL_PRECISION).add(lastRBTCError_Redistribution);
-        uint256 ZUSDDebtNumerator = _debt.mul(DECIMAL_PRECISION).add(
-            lastZUSDDebtError_Redistribution
-        );
+        uint256 RBTCNumerator = _coll * DECIMAL_PRECISION + lastRBTCError_Redistribution;
+        uint256 ZUSDDebtNumerator = _debt * DECIMAL_PRECISION + lastZUSDDebtError_Redistribution;
 
         // Get the per-unit-staked terms
-        uint256 RBTCRewardPerUnitStaked = RBTCNumerator.div(totalStakes);
-        uint256 ZUSDDebtRewardPerUnitStaked = ZUSDDebtNumerator.div(totalStakes);
+        uint256 RBTCRewardPerUnitStaked = RBTCNumerator / totalStakes;
+        uint256 ZUSDDebtRewardPerUnitStaked = ZUSDDebtNumerator / totalStakes;
 
-        lastRBTCError_Redistribution = RBTCNumerator.sub(RBTCRewardPerUnitStaked.mul(totalStakes));
-        lastZUSDDebtError_Redistribution = ZUSDDebtNumerator.sub(
-            ZUSDDebtRewardPerUnitStaked.mul(totalStakes)
-        );
+        lastRBTCError_Redistribution = RBTCNumerator - (RBTCRewardPerUnitStaked * totalStakes);
+        lastZUSDDebtError_Redistribution = ZUSDDebtNumerator
+                                            - (ZUSDDebtRewardPerUnitStaked * totalStakes);
 
         // Add per-unit-staked terms to the running totals
-        L_RBTC = L_RBTC.add(RBTCRewardPerUnitStaked);
-        L_ZUSDDebt = L_ZUSDDebt.add(ZUSDDebtRewardPerUnitStaked);
+        L_RBTC += RBTCRewardPerUnitStaked;
+        L_ZUSDDebt += ZUSDDebtRewardPerUnitStaked;
 
         emit LTermsUpdated(L_RBTC, L_ZUSDDebt);
 
@@ -896,7 +876,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
 
         uint256 activeColl = _activePool.getRBTC();
         uint256 liquidatedColl = defaultPool.getRBTC();
-        totalCollateralSnapshot = activeColl.sub(_collRemainder).add(liquidatedColl);
+        totalCollateralSnapshot = activeColl - _collRemainder + liquidatedColl;
 
         emit SystemSnapshotsUpdated(totalStakesSnapshot, totalCollateralSnapshot);
     }
@@ -915,7 +895,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         TroveOwners.push(_borrower);
 
         // Record the index of the new Troveowner on their Trove struct
-        index = uint128(TroveOwners.length.sub(1));
+        index = uint128(TroveOwners.length - 1);
         Troves[_borrower].arrayIndex = index;
 
         return index;
@@ -971,7 +951,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
     function _calcBorrowingRate(uint256 _baseRate) internal view returns (uint256) {
         return
             LiquityMath._min(
-                liquityBaseParams.BORROWING_FEE_FLOOR().add(_baseRate),
+                liquityBaseParams.BORROWING_FEE_FLOOR() + _baseRate,
                 liquityBaseParams.MAX_BORROWING_FEE()
             );
     }
@@ -989,7 +969,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         pure
         returns (uint256)
     {
-        return _borrowingRate.mul(_ZUSDDebt).div(DECIMAL_PRECISION);
+        return _borrowingRate * _ZUSDDebt / DECIMAL_PRECISION;
     }
 
     /// Updates the baseRate state variable based on time elapsed since the last redemption or ZUSD borrowing operation.
@@ -1038,7 +1018,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         returns (uint256)
     {
         _requireCallerIsBorrowerOperations();
-        uint256 newColl = Troves[_borrower].coll.add(_collIncrease);
+        uint256 newColl = Troves[_borrower].coll + _collIncrease;
         Troves[_borrower].coll = newColl;
         return newColl;
     }
@@ -1049,7 +1029,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         returns (uint256)
     {
         _requireCallerIsBorrowerOperations();
-        uint256 newColl = Troves[_borrower].coll.sub(_collDecrease);
+        uint256 newColl = Troves[_borrower].coll - _collDecrease;
         Troves[_borrower].coll = newColl;
         return newColl;
     }
@@ -1060,7 +1040,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         returns (uint256)
     {
         _requireCallerIsBorrowerOperations();
-        uint256 newDebt = Troves[_borrower].debt.add(_debtIncrease);
+        uint256 newDebt = Troves[_borrower].debt + _debtIncrease;
         Troves[_borrower].debt = newDebt;
         return newDebt;
     }
@@ -1071,7 +1051,7 @@ contract TroveManager is TroveManagerBase, CheckContract {
         returns (uint256)
     {
         _requireCallerIsBorrowerOperations();
-        uint256 newDebt = Troves[_borrower].debt.sub(_debtDecrease);
+        uint256 newDebt = Troves[_borrower].debt - _debtDecrease;
         Troves[_borrower].debt = newDebt;
         return newDebt;
     }

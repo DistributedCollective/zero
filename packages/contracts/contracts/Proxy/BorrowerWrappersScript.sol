@@ -74,7 +74,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
         // already checked in CollSurplusPool
         assert(balanceAfter > balanceBefore);
 
-        uint256 totalCollateral = balanceAfter.sub(balanceBefore).add(msg.value);
+        uint256 totalCollateral = balanceAfter - balanceBefore + msg.value;
 
         // Open trove with obtained collateral, plus collateral sent by user
         borrowerOperations.openTrove{ value: totalCollateral }(_maxFee, _ZUSDAmount, _upperHint, _lowerHint);
@@ -89,7 +89,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
 
         uint256 collBalanceAfter = address(this).balance;
         uint256 zeroBalanceAfter = zeroToken.balanceOf(address(this));
-        uint256 claimedCollateral = collBalanceAfter.sub(collBalanceBefore);
+        uint256 claimedCollateral = collBalanceAfter - collBalanceBefore;
 
         // Add claimed RBTC to trove, get more ZUSD and stake it into the Stability Pool
         if (claimedCollateral > 0) {
@@ -103,7 +103,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
         }
 
         // Stake claimed ZERO
-        uint256 claimedZERO = zeroBalanceAfter.sub(zeroBalanceBefore);
+        uint256 claimedZERO = zeroBalanceAfter - zeroBalanceBefore;
         if (claimedZERO > 0) {
             zeroStaking.stake(claimedZERO);
         }
@@ -117,8 +117,8 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
         // Claim gains
         zeroStaking.unstake(0);
 
-        uint256 gainedCollateral = address(this).balance.sub(collBalanceBefore); // stack too deep issues :'(
-        uint256 gainedZUSD = zusdToken.balanceOf(address(this)).sub(zusdBalanceBefore);
+        uint256 gainedCollateral = address(this).balance - collBalanceBefore; // stack too deep issues :'(
+        uint256 gainedZUSD = zusdToken.balanceOf(address(this)) - zusdBalanceBefore;
 
         uint256 netZUSDAmount;
         // Top up trove and get more ZUSD, keeping ICR constant
@@ -128,13 +128,13 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
             borrowerOperations.adjustTrove{ value: gainedCollateral }(_maxFee, 0, netZUSDAmount, true, _upperHint, _lowerHint);
         }
 
-        uint256 totalZUSD = gainedZUSD.add(netZUSDAmount);
+        uint256 totalZUSD = gainedZUSD + netZUSDAmount;
         if (totalZUSD > 0) {
             stabilityPool.provideToSP(totalZUSD, address(0));
 
             // Providing to Stability Pool also triggers ZERO claim, so stake it if any
             uint256 zeroBalanceAfter = zeroToken.balanceOf(address(this));
-            uint256 claimedZERO = zeroBalanceAfter.sub(zeroBalanceBefore);
+            uint256 claimedZERO = zeroBalanceAfter - zeroBalanceBefore;
             if (claimedZERO > 0) {
                 zeroStaking.stake(claimedZERO);
             }
@@ -146,9 +146,9 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
         uint256 price = priceFeed.fetchPrice();
         uint256 ICR = troveManager.getCurrentICR(address(this), price);
 
-        uint256 ZUSDAmount = _collateral.mul(price).div(ICR);
+        uint256 ZUSDAmount = _collateral * price / ICR;
         uint256 borrowingRate = troveManager.getBorrowingRateWithDecay();
-        uint256 netDebt = ZUSDAmount.mul(LiquityMath.DECIMAL_PRECISION).div(LiquityMath.DECIMAL_PRECISION.add(borrowingRate));
+        uint256 netDebt = ZUSDAmount * LiquityMath.DECIMAL_PRECISION / (LiquityMath.DECIMAL_PRECISION + borrowingRate);
 
         return netDebt;
     }

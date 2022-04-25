@@ -109,10 +109,10 @@ abstract contract TroveManagerRedeemOps is TroveManagerBase {
 
             if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
 
-            totals.totalZUSDToRedeem = totals.totalZUSDToRedeem.add(singleRedemption.ZUSDLot);
-            totals.totalRBTCDrawn = totals.totalRBTCDrawn.add(singleRedemption.RBTCLot);
+            totals.totalZUSDToRedeem += singleRedemption.ZUSDLot;
+            totals.totalRBTCDrawn += singleRedemption.RBTCLot;
 
-            totals.remainingZUSD = totals.remainingZUSD.sub(singleRedemption.ZUSDLot);
+            totals.remainingZUSD -= singleRedemption.ZUSDLot;
             currentBorrower = nextUserToCheck;
         }
         require(totals.totalRBTCDrawn > 0, "TroveManager: Unable to redeem any amount");
@@ -134,7 +134,7 @@ abstract contract TroveManagerRedeemOps is TroveManagerBase {
         contractsCache.activePool.sendRBTC(address(feeDistributor), totals.RBTCFee);
         feeDistributor.distributeFees();
 
-        totals.RBTCToSendToRedeemer = totals.totalRBTCDrawn.sub(totals.RBTCFee);
+        totals.RBTCToSendToRedeemer = totals.totalRBTCDrawn - totals.RBTCFee;
 
         emit Redemption(_ZUSDamount, totals.totalZUSDToRedeem, totals.totalRBTCDrawn, totals.RBTCFee);
 
@@ -175,15 +175,15 @@ abstract contract TroveManagerRedeemOps is TroveManagerBase {
         // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
         singleRedemption.ZUSDLot = LiquityMath._min(
             _maxZUSDamount,
-            Troves[_borrower].debt.sub(ZUSD_GAS_COMPENSATION)
+            Troves[_borrower].debt - ZUSD_GAS_COMPENSATION
         );
 
         // Get the RBTCLot of equivalent value in USD
-        singleRedemption.RBTCLot = singleRedemption.ZUSDLot.mul(DECIMAL_PRECISION).div(_price);
+        singleRedemption.RBTCLot = singleRedemption.ZUSDLot * DECIMAL_PRECISION / _price;
 
         // Decrease the debt and collateral of the current Trove according to the ZUSD lot and corresponding RBTC to send
-        uint256 newDebt = (Troves[_borrower].debt).sub(singleRedemption.ZUSDLot);
-        uint256 newColl = (Troves[_borrower].coll).sub(singleRedemption.RBTCLot);
+        uint256 newDebt = (Troves[_borrower].debt) - singleRedemption.ZUSDLot;
+        uint256 newColl = (Troves[_borrower].coll) - singleRedemption.RBTCLot;
 
         if (newDebt == ZUSD_GAS_COMPENSATION) {
             // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
@@ -243,9 +243,9 @@ abstract contract TroveManagerRedeemOps is TroveManagerBase {
 
         /* Convert the drawn RBTC back to ZUSD at face value rate (1 ZUSD:1 USD), in order to get
          * the fraction of total supply that was redeemed at face value. */
-        uint256 redeemedZUSDFraction = _RBTCDrawn.mul(_price).div(_totalZUSDSupply);
+        uint256 redeemedZUSDFraction = _RBTCDrawn * _price / _totalZUSDSupply;
 
-        uint256 newBaseRate = decayedBaseRate.add(redeemedZUSDFraction.div(BETA));
+        uint256 newBaseRate = decayedBaseRate + redeemedZUSDFraction / BETA;
         newBaseRate = LiquityMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
         //assert(newBaseRate <= DECIMAL_PRECISION); // This is already enforced in the line above
         assert(newBaseRate > 0); // Base rate is always non-zero after redemption

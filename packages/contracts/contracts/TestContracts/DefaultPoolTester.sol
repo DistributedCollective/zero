@@ -9,10 +9,10 @@ contract DefaultPoolTester is DefaultPool {
     using SafeMath for uint256;
     
     function unprotectedIncreaseZUSDDebt(uint256 _amount) external {
-        ZUSDDebt  = ZUSDDebt.add(_amount);
+        ZUSDDebt  += _amount;
     }
 
     function unprotectedPayable() external payable {
-        RBTC = RBTC.add(msg.value);
+        RBTC += msg.value;
     }
 }
