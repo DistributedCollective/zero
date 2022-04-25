@@ -143,10 +143,14 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken {
         override 
     {            
         require(deadline >= block.timestamp, 'ZUSD: expired deadline');
+        uint256 nonce;
+        unchecked {
+            nonce = _nonces[owner]++;
+        }
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 
-                         _nonces[owner]++, deadline))));
+                         nonce, deadline))));
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress == owner, 'ZUSD: invalid signature');
         _approve(owner, spender, amount);
