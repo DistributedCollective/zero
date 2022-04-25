@@ -39,17 +39,13 @@ export const WaitListAccessSuccess: React.FC = () => {
         sx={{
           fontSize: 3,
           my: 16,
-          bg: "primary",
-          color: "cardBackground",
-          "&: hover": {
-            color: "primary"
-          },
           display: "flex",
           alignItems: "center",
           mx: "auto",
           height: 32,
           fontWeight: 600
         }}
+        variant="secondary"
         onClick={refresh}
       >
         Go to landing page

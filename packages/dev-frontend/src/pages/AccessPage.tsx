@@ -116,16 +116,12 @@ export const AccessPage: React.FC = () => {
           <Button
             sx={{
               mt: 20,
-              bg: "primary",
-              color: "cardBackground",
-              "&: hover": {
-                color: "primary"
-              },
               display: "flex",
               alignItems: "center",
               mx: "auto",
               height: 32
             }}
+            variant="secondary"
             disabled={!isValidAddress || isLoading}
           >
             Confirm

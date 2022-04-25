@@ -110,14 +110,10 @@ export const WaitListSignup: React.FC = ({ children }) => {
               width: 285,
               height: "40px",
               mt: 20,
-              bg: "primary",
-              color: "cardBackground",
               display: "flex",
-              alignItems: "center",
-              "&: hover": {
-                color: "primary"
-              }
+              alignItems: "center"
             }}
+            variant="secondary"
             disabled={!isValidEmail || isLoading}
           >
             Sign Up
