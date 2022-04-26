@@ -187,8 +187,8 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken {
     function _burn(address account, uint256 amount) internal {
         assert(account != address(0));
         
-        _balances[account] = _balances[account] - amount;
-        _totalSupply = _totalSupply - amount;
+        _balances[account] -= amount;
+        _totalSupply -= amount;
         emit Transfer(account, address(0), amount);
     }
 

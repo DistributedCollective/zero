@@ -365,7 +365,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         ZEROPerUnitStaked =_computeZEROPerUnitStaked(_ZEROIssuance, totalZUSD);
 
         uint256 marginalZEROGain = ZEROPerUnitStaked * P;
-        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale] + marginalZEROGain;
+        epochToScaleToG[currentEpoch][currentScale] += marginalZEROGain;
 
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
@@ -876,7 +876,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC + msg.value;
+        RBTC += msg.value;
         emit StabilityPoolRBTCBalanceUpdated(RBTC);
     }
 }
