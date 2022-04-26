@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Image, Heading, Paragraph, Input, Spinner, Button } from "theme-ui";
+import { Box, Image, Heading, Paragraph, Input, Spinner, Button, NavLink } from "theme-ui";
 import { activateAccount } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
 import { validateEmail } from "../utils/helpers";
@@ -82,12 +82,14 @@ export const AccessPage: React.FC = () => {
         textAlign: "center"
       }}
     >
-      <Image
-        sx={{
-          mb: 60
-        }}
-        src="/zero-logo.svg"
-      />
+      <NavLink href="/">
+        <Image
+          sx={{
+            mb: 60
+          }}
+          src="/zero-logo.svg"
+        />
+      </NavLink>
       <Heading
         sx={{
           mb: 60,
