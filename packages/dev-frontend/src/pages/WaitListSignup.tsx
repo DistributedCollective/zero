@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useState } from "react";
 import { Box, Heading, Image, Paragraph, Button, Input, Spinner } from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
+import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 
@@ -166,7 +167,9 @@ export const WaitListSignup: React.FC = ({ children }) => {
         </Paragraph>
         {children}
       </Box>
-      <WaitlistSuccess isOpen={success} onClose={() => setSuccess(false)} />
+      <Dialog hideCloseIcon open={success} onClose={() => setSuccess(false)}>
+        <WaitlistSuccess onClose={() => setSuccess(false)} />
+      </Dialog>
     </Box>
   );
 };

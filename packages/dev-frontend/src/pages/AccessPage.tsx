@@ -12,6 +12,7 @@ export const AccessPage: React.FC = () => {
   const { account } = useWeb3React();
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showRefresh, setShowRefresh] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [address, setAddress] = useState("");
 
@@ -28,6 +29,7 @@ export const AccessPage: React.FC = () => {
     async (e: React.FormEvent<HTMLFormElement>) => {
       const params = new URLSearchParams(location.search);
       setErrorMessage("");
+      setShowRefresh(false);
       setIsLoading(false);
       e.preventDefault();
 
@@ -54,6 +56,9 @@ export const AccessPage: React.FC = () => {
           setSuccess(true);
         }
       } catch (error: any) {
+        if (error?.response?.status === 409) {
+          setShowRefresh(true);
+        }
         if (error?.response?.data?.message) {
           setErrorMessage(error?.response?.data?.message);
         } else {
@@ -65,6 +70,11 @@ export const AccessPage: React.FC = () => {
     },
     [address, isValidAddress, location.search]
   );
+
+  const refresh = useCallback(() => {
+    const origin = window.location.origin;
+    window.location.href = origin;
+  }, []);
 
   return (
     <Box
@@ -135,6 +145,7 @@ export const AccessPage: React.FC = () => {
             Confirm
             {isLoading && <Spinner sx={{ ml: 1 }} color={"cardBackground"} size={24} />}
           </Button>
+
           <Paragraph
             sx={{
               fontSize: 1,
@@ -143,16 +154,31 @@ export const AccessPage: React.FC = () => {
               margin: "auto",
               textAlign: "center",
               mt: 10,
-              minHeight: 40,
+              minHeight: 30,
               visibility: errorMessage ? "visible" : "hidden"
             }}
           >
             {errorMessage}
           </Paragraph>
+
+          {showRefresh && (
+            <Button
+              sx={{
+                fontSize: 2,
+                display: "flex",
+                alignItems: "center",
+                mx: "auto",
+                height: 32
+              }}
+              onClick={refresh}
+            >
+              Go to landing page
+            </Button>
+          )}
         </form>
       </Box>
-      <Dialog open={success} onClose={() => setSuccess(false)}>
-        <WaitListAccessSuccess />
+      <Dialog hideCloseIcon disableClose open={success} onClose={() => setSuccess(false)}>
+        <WaitListAccessSuccess refresh={refresh} />
       </Dialog>
     </Box>
   );
