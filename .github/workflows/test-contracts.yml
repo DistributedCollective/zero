@@ -39,6 +39,35 @@ jobs:
         run: yarn test-contracts
         env:
           NODE_OPTIONS: --max-old-space-size=4096
+  test-sdk-contracts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+
+      - id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Format and lint SDK Contracts
+        run: yarn format-lint-sdk-contracts
+
+      - name: Test SDK contracts
+        run: yarn test-sdk-contracts
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
 
   coverage:
     runs-on: ubuntu-latest
