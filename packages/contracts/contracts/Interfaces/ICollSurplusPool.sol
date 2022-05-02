@@ -12,7 +12,7 @@ interface ICollSurplusPool {
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event EtherSent(address _to, uint _amount);
+    event RBtcerSent(address _to, uint _amount);
 
     // --- Contract setters ---
 
@@ -30,8 +30,8 @@ interface ICollSurplusPool {
     ) external;
 
     /// @notice Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts.
-    /// @return ETH state variable
-    function getETH() external view returns (uint);
+    /// @return RBTC state variable
+    function getRBTC() external view returns (uint);
 
     /// @param _account account to retrieve collateral
     /// @return collateral

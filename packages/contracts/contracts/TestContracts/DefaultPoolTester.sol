@@ -11,6 +11,6 @@ contract DefaultPoolTester is DefaultPool {
     }
 
     function unprotectedPayable() external payable {
-        ETH = ETH.add(msg.value);
+        RBTC = RBTC.add(msg.value);
     }
 }

@@ -100,8 +100,8 @@ class MainnetDeploymentHelper {
       zusdTokenParams
     )
 
-    if (!this.configParams.ETHERSCAN_BASE_URL) {
-      console.log('No Etherscan Url defined, skipping verification')
+    if (!this.configParams.RBTCERSCAN_BASE_URL) {
+      console.log('No RBtcerscan Url defined, skipping verification')
     } else {
       await this.verifyContract('priceFeed', deploymentState)
       await this.verifyContract('sortedTroves', deploymentState)
@@ -155,8 +155,8 @@ class MainnetDeploymentHelper {
       zeroTokenParams
     )
 
-    if (!this.configParams.ETHERSCAN_BASE_URL) {
-      console.log('No Etherscan Url defined, skipping verification')
+    if (!this.configParams.RBTCERSCAN_BASE_URL) {
+      console.log('No RBtcerscan Url defined, skipping verification')
     } else {
       await this.verifyContract('zeroStaking', deploymentState)
       await this.verifyContract('communityIssuance', deploymentState)
@@ -184,8 +184,8 @@ class MainnetDeploymentHelper {
       multiTroveGetterParams
     )
 
-    if (!this.configParams.ETHERSCAN_BASE_URL) {
-      console.log('No Etherscan Url defined, skipping verification')
+    if (!this.configParams.RBTCERSCAN_BASE_URL) {
+      console.log('No RBtcerscan Url defined, skipping verification')
     } else {
       await this.verifyContract('multiTroveGetter', deploymentState, multiTroveGetterParams)
     }
@@ -320,7 +320,7 @@ class MainnetDeploymentHelper {
       ))
   }
 
-  // --- Verify on Ethrescan ---
+  // --- Verify on RBtcrescan ---
   async verifyContract(name, deploymentState, constructorArguments=[]) {
     if (!deploymentState[name] || !deploymentState[name].address) {
       console.error(`  --> No deployment state for contract ${name}!!`)
@@ -345,7 +345,7 @@ class MainnetDeploymentHelper {
       }
     }
 
-    deploymentState[name].verification = `${this.configParams.ETHERSCAN_BASE_URL}/${deploymentState[name].address}#code`
+    deploymentState[name].verification = `${this.configParams.RBTCERSCAN_BASE_URL}/${deploymentState[name].address}#code`
 
     this.saveDeployment(deploymentState)
   }

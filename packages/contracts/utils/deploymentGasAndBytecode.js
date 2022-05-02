@@ -72,9 +72,9 @@ const getBytecodeSize = (contractABI) => {
   // console.log(`${contractABI.contractName} deployed bytecode length: ${deployedBytecodeLength}`)
 }
 
-const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, ETHPrice) => {
-  const dollarCost = (deploymentGasTotal * gasPriceInGwei * ETHPrice) / 1e9
-  console.log(`At gas price ${gasPriceInGwei} GWei, and ETH Price $${ETHPrice} per ETH, the total cost of deployment in USD is: $${dollarCost}`)
+const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, RBTCPrice) => {
+  const dollarCost = (deploymentGasTotal * gasPriceInGwei * RBTCPrice) / 1e9
+  console.log(`At gas price ${gasPriceInGwei} GWei, and RBTC Price $${RBTCPrice} per RBTC, the total cost of deployment in USD is: $${dollarCost}`)
 }
 
 const logContractDeploymentCosts = async (contracts) => {

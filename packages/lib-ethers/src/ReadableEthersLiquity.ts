@@ -158,7 +158,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     const { troveManager } = _getContracts(this.connection);
 
     const [collateral, debt] = await Promise.all([
-      troveManager.L_ETH({ ...overrides }).then(decimalify),
+      troveManager.L_RBTC({ ...overrides }).then(decimalify),
       troveManager.L_ZUSDDebt({ ...overrides }).then(decimalify)
     ]);
 
@@ -185,7 +185,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
         decimalify(trove.coll),
         decimalify(trove.debt),
         decimalify(trove.stake),
-        new Trove(decimalify(snapshot.ETH), decimalify(snapshot.ZUSDDebt))
+        new Trove(decimalify(snapshot.RBTC), decimalify(snapshot.ZUSDDebt))
       );
     } else {
       return new TroveWithPendingRedistribution(address, userTroveStatusFrom(trove.status));
@@ -222,7 +222,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
 
     const [activeCollateral, activeDebt] = await Promise.all(
       [
-        activePool.getETH({ ...overrides }),
+        activePool.getRBTC({ ...overrides }),
         activePool.getZUSDDebt({ ...overrides })
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
@@ -236,7 +236,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
 
     const [liquidatedCollateral, closedDebt] = await Promise.all(
       [
-        defaultPool.getETH({ ...overrides }),
+        defaultPool.getRBTC({ ...overrides }),
         defaultPool.getZUSDDebt({ ...overrides })
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
@@ -270,7 +270,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     ] = await Promise.all([
       stabilityPool.deposits(address, { ...overrides }),
       stabilityPool.getCompoundedZUSDDeposit(address, { ...overrides }),
-      stabilityPool.getDepositorETHGain(address, { ...overrides }),
+      stabilityPool.getDepositorRBTCGain(address, { ...overrides }),
       stabilityPool.getDepositorZEROGain(address, { ...overrides })
     ]);
 
@@ -426,7 +426,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     const [stakedZERO, collateralGain, zusdGain] = await Promise.all(
       [
         zeroStaking.stakes(address, { ...overrides }),
-        zeroStaking.getPendingETHGain(address, { ...overrides }),
+        zeroStaking.getPendingRBTCGain(address, { ...overrides }),
         zeroStaking.getPendingZUSDGain(address, { ...overrides })
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
@@ -469,7 +469,7 @@ const mapBackendTroves = (troves: BackendTroves): TroveWithPendingRedistribution
         decimalify(trove.coll),
         decimalify(trove.debt),
         decimalify(trove.stake),
-        new Trove(decimalify(trove.snapshotETH), decimalify(trove.snapshotZUSDDebt))
+        new Trove(decimalify(trove.snapshotRBTC), decimalify(trove.snapshotZUSDDebt))
       )
   );
 

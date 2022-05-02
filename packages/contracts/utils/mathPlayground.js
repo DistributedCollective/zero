@@ -55,13 +55,13 @@ const ABDKOperations = async () => {
     const res12 = await functionCaller.abdkMath_toUInt_view(res11)
     console.log(`result of 0.5 * 6, performed in 64.64, converted back to uint64: ${res12}`)
 
-    // Example computaton: ZUSD -> Ether price conversion
+    // Example computaton: ZUSD -> RBtcer price conversion
 
     // price = 200.12345678, stored as uint
-    // convert 6123456700909.123456789123456789 ZUSD to Ether
+    // convert 6123456700909.123456789123456789 ZUSD to RBtcer
     // amount = 6123456700909.123456789123456789 ZUSD / 200.12345678 
 
-    // expect amount 30598395607.571232843807983401100033706903271291774255... Ether
+    // expect amount 30598395607.571232843807983401100033706903271291774255... RBtcer
 
     // 1)
     const storedPrice = '20012345678'
@@ -72,8 +72,8 @@ const ABDKOperations = async () => {
 
     // returns 30598395607571232843814242587
 
-    // expected: 30598395607.571232843807983401100033706903271291774255... Ether
-    //  actual:   30598395607.571232843814242587 Ether
+    // expected: 30598395607.571232843807983401100033706903271291774255... RBtcer
+    //  actual:   30598395607.571232843814242587 RBtcer
 
     // accurate to 22 digits.  So with 99 billion ether, it's accurate to 1 gwei. 
 
@@ -83,12 +83,12 @@ const ABDKOperations = async () => {
 
     // reward = stake * S - S0
 
-    // stake = 65032.123456789123456789 Ether
-    // S = 0.005555555888888888 Ether per unit staked
-    // S_0 = 0.003579246835792468 Ether per uint staked
+    // stake = 65032.123456789123456789 RBtcer
+    // S = 0.005555555888888888 RBtcer per unit staked
+    // S_0 = 0.003579246835792468 RBtcer per uint staked
     // S - S_0 = 0.001976309053096420 
     // r = s * S - S0
-    // r =  128.523574329736396343 Ether
+    // r =  128.523574329736396343 RBtcer
 
     let stake = '65032123456789123456789'
     let rewardPerUnitStaked = '1976309053096420'
@@ -103,12 +103,12 @@ const ABDKOperations = async () => {
     // 2) 
     // reward = stake * S - S0
 
-    /* stake = 5555565032.123456789123456789 Ether
-    S = 0.005555555888888888 Ether per unit staked
-    S_0 = 0.003579246835792468 Ether per uint staked
+    /* stake = 5555565032.123456789123456789 RBtcer
+    S = 0.005555555888888888 RBtcer per unit staked
+    S_0 = 0.003579246835792468 RBtcer per uint staked
     S - S_0 = 0.001976309053096420 
     r = s * S - S0
-    r = 10979513.468051491046396343 Ether
+    r = 10979513.468051491046396343 RBtcer
     */
 
     stake = '5555565032123456789123456789'
@@ -121,7 +121,7 @@ const ABDKOperations = async () => {
     // returns 10979513.468051490981687838
     // accurate to 17 digits
 
-    /* TODO: will L_ETH, L_ZUSD overflow if stored as 64.64? Possibly need to store as uint, divide by 1e18, then use
+    /* TODO: will L_RBTC, L_ZUSD overflow if stored as 64.64? Possibly need to store as uint, divide by 1e18, then use
     the resulting 64.64  */
 
     // // --- Ratio Multiplication ---
@@ -164,7 +164,7 @@ const ABDKOperations = async () => {
     
     ABDK.mulu is for: (64.64dec * uint)  -> uint.  i.e. for rewardPerUnitStaked  * stake -> reward
     
-    ABDK.divu is for: (uint / uint)  -> 64.64dec.  i.e. for liquidatedETH / totalStakes 
+    ABDK.divu is for: (uint / uint)  -> 64.64dec.  i.e. for liquidatedRBTC / totalStakes 
     
     */
 }
