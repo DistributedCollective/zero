@@ -10,6 +10,7 @@ import { isAddress } from "@ethersproject/address";
 
 export const AccessPage: React.FC = () => {
   const { account } = useWeb3React();
+  const [loaded, setLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showRefresh, setShowRefresh] = useState(false);
@@ -19,6 +20,19 @@ export const AccessPage: React.FC = () => {
   const location = useLocation();
 
   const isValidAddress = useMemo(() => !!address, [address]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const email = params.get("email") || "";
+    const code = params.get("code") || "";
+
+    if (!email || !code) {
+      refresh();
+    } else {
+      setLoaded(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (account) setAddress(account);
@@ -75,6 +89,8 @@ export const AccessPage: React.FC = () => {
     const origin = window.location.origin;
     window.location.href = origin;
   }, []);
+
+  if (!loaded) return null;
 
   return (
     <Box
