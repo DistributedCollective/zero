@@ -5,11 +5,9 @@ import { useLocation } from "react-router-dom";
 import { validateEmail } from "../utils/helpers";
 import { Dialog } from "../components/Dialog";
 import { WaitListAccessSuccess } from "../components/WaitListAccessSuccess";
-import { useWeb3React } from "@web3-react/core";
 import { isAddress } from "@ethersproject/address";
 
 export const AccessPage: React.FC = () => {
-  const { account } = useWeb3React();
   const [loaded, setLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -21,8 +19,14 @@ export const AccessPage: React.FC = () => {
 
   const isValidAddress = useMemo(() => !!address, [address]);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
+    const origin = window.location.origin;
+    window.location.href = origin;
+  }, []);
+
+  const checkParams = useCallback(async () => {
     const params = new URLSearchParams(location.search);
+
     const email = params.get("email") || "";
     const code = params.get("code") || "";
 
@@ -31,13 +35,17 @@ export const AccessPage: React.FC = () => {
     } else {
       setLoaded(true);
     }
+  }, [location.search, refresh]);
+
+  useEffect(() => {
+    checkParams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (account) setAddress(account);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   if (account) setAddress(account);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -84,11 +92,6 @@ export const AccessPage: React.FC = () => {
     },
     [address, isValidAddress, location.search]
   );
-
-  const refresh = useCallback(() => {
-    const origin = window.location.origin;
-    window.location.href = origin;
-  }, []);
 
   if (!loaded) return null;
 

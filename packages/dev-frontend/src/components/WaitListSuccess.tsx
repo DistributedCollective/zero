@@ -17,11 +17,11 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => 
           mb: 30
         }}
       >
-        <Paragraph sx={{ fontSize: 4, px: 4, fontWeight: "medium" }}>
+        <Paragraph sx={{ fontSize: 4, px: 4, fontWeight: "medium", wordBreak: "keep-all" }}>
           Thank you for signing up for the Zero private beta waitlist!
         </Paragraph>
         <br />
-        <Paragraph sx={{ fontSize: 4, fontWeight: "medium" }}>
+        <Paragraph sx={{ fontSize: 4, fontWeight: "medium", wordBreak: "keep-all" }}>
           You will receive an email soon with details about what happens next.
         </Paragraph>
       </Box>

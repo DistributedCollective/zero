@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Image, NavLink } from "theme-ui";
+import { Box, Container, NavLink } from "theme-ui";
 
 import { UserAddress } from "./UserAddress";
 import { UserAccount } from "./UserAccount";
 import { Icon } from "./Icon";
 import { useWeb3React } from "@web3-react/core";
+import { ReactComponent as SovLogo } from "../assets/logo.svg";
 import { getConfig, LiquityFrontendConfig } from "../config";
 
 interface Props {
@@ -27,7 +28,7 @@ export const Header: React.FC<Props> = ({ hideDetails }) => {
           <Icon name="chevron-left" />
         </NavLink>
       </Box>
-      <Image sx={{ height: 35, mx: 4 }} src="/images/logo.svg" alt="Sovryn-Labs" />
+      <SovLogo />
       {!hideDetails && (
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "end", flex: 1 }}>
           <Box sx={{ mr: 24 }}>
