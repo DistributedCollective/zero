@@ -74,26 +74,26 @@ contract TroveManagerStorage is Ownable, BaseMath {
     uint public totalCollateralSnapshot;
 
     /*
-    * L_RBTC and L_ZUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
+    * L_ETH and L_ZUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
     *
-    * An RBTC gain of ( stake * [L_RBTC - L_RBTC(0)] )
+    * An ETH gain of ( stake * [L_ETH - L_ETH(0)] )
     * A ZUSDDebt increase  of ( stake * [L_ZUSDDebt - L_ZUSDDebt(0)] )
     *
-    * Where L_RBTC(0) and L_ZUSDDebt(0) are snapshots of L_RBTC and L_ZUSDDebt for the active Trove taken at the instant the stake was made
+    * Where L_ETH(0) and L_ZUSDDebt(0) are snapshots of L_ETH and L_ZUSDDebt for the active Trove taken at the instant the stake was made
     */
-    uint public L_RBTC;
+    uint public L_ETH;
     uint public L_ZUSDDebt;
 
     // Map addresses with active troves to their RewardSnapshot
     mapping (address => RewardSnapshot) public rewardSnapshots;
 
-    // Object containing the RBTC and ZUSD snapshots for a given active trove
-    struct RewardSnapshot { uint RBTC; uint ZUSDDebt;}
+    // Object containing the ETH and ZUSD snapshots for a given active trove
+    struct RewardSnapshot { uint ETH; uint ZUSDDebt;}
 
     // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
     address[] public TroveOwners;
 
     // Error trackers for the trove redistribution calculation
-    uint public lastRBTCError_Redistribution;
+    uint public lastETHError_Redistribution;
     uint public lastZUSDDebtError_Redistribution;
 }

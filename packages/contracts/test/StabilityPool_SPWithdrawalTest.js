@@ -91,8 +91,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // --- withdrawFromSP()
 
     // --- Identical deposits, identical liquidation amounts---
-    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and RBTC Gain after one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -111,27 +111,27 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       // Defaulter liquidated
       await troveManager.liquidate(defaulter_1, { from: owner });
 
-      // Check depositors' compounded deposit is 6666.66 ZUSD and RBTC Gain is 33.16 RBTC
+      // Check depositors' compounded deposit is 6666.66 ZUSD and ETH Gain is 33.16 ETH
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '6666666666666666666666'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '6666666666666666666666'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '6666666666666666666666'), 10000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '33166666666666666667'), 10000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '33166666666666666667'), 10000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '33166666666666666667'), 10000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '33166666666666666667'), 10000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '33166666666666666667'), 10000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '33166666666666666667'), 10000)
     })
 
-    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and RBTC Gain after two identical liquidations", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after two identical liquidations", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -152,26 +152,26 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_1, { from: owner });
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Check depositors' compounded deposit is 3333.33 ZUSD and RBTC Gain is 66.33 RBTC
+      // Check depositors' compounded deposit is 3333.33 ZUSD and ETH Gain is 66.33 ETH
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '3333333333333333333333'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '3333333333333333333333'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '3333333333333333333333'), 10000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '66333333333333333333'), 10000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '66333333333333333333'), 10000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '66333333333333333333'), 10000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '66333333333333333333'), 10000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '66333333333333333333'), 10000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '66333333333333333333'), 10000)
     })
 
-    it("withdrawFromSP():  Depositors with equal initial deposit withdraw correct compounded deposit and RBTC Gain after three identical liquidations", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP():  Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after three identical liquidations", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -194,28 +194,28 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_2, { from: owner });
       await troveManager.liquidate(defaulter_3, { from: owner });
 
-      // Check depositors' compounded deposit is 0 ZUSD and RBTC Gain is 99.5 RBTC 
+      // Check depositors' compounded deposit is 0 ZUSD and ETH Gain is 99.5 ETH 
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '0'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '0'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '0'), 10000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(99500, 15)), 10000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(99500, 15)), 10000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(99500, 15)), 10000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(99500, 15)), 10000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(99500, 15)), 10000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(99500, 15)), 10000)
     })
 
     // --- Identical deposits, increasing liquidation amounts ---
-    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and RBTC Gain after two liquidations of increasing ZUSD", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after two liquidations of increasing ZUSD", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -241,23 +241,23 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '6000000000000000000000'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '6000000000000000000000'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '6000000000000000000000'), 10000)
 
       // (0.5 + 0.7) * 99.5 / 3
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(398, 17)), 10000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(398, 17)), 10000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(398, 17)), 10000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(398, 17)), 10000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(398, 17)), 10000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(398, 17)), 10000)
     })
 
-    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and RBTC Gain after three liquidations of increasing ZUSD", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositors with equal initial deposit withdraw correct compounded deposit and ETH Gain after three liquidations of increasing ZUSD", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -285,24 +285,24 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '4000000000000000000000'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '4000000000000000000000'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '4000000000000000000000'), 10000)
 
       // (0.5 + 0.6 + 0.7) * 99.5 / 3
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(597, 17)), 10000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(597, 17)), 10000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(597, 17)), 10000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(597, 17)), 10000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(597, 17)), 10000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(597, 17)), 10000)
     })
 
     // --- Increasing deposits, identical liquidation amounts ---
-    it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and RBTC Gain after two identical liquidations", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after two identical liquidations", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k, 20k, 30k ZUSD to A, B and C respectively who then deposit it to the SP
@@ -329,22 +329,22 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(20000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(30000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '6666666666666666666666'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '13333333333333333333333'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '20000000000000000000000'), 100000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '33166666666666666667'), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '66333333333333333333'), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '33166666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '66333333333333333333'), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(995, 17)), 100000)
     })
 
-    it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and RBTC Gain after three identical liquidations", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after three identical liquidations", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k, 20k, 30k ZUSD to A, B and C respectively who then deposit it to the SP
@@ -373,23 +373,23 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(20000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(30000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '5000000000000000000000'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '10000000000000000000000'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '15000000000000000000000'), 100000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '49750000000000000000'), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '149250000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '49750000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '149250000000000000000'), 100000)
     })
 
     // --- Varied deposits and varied liquidation amount ---
-    it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and RBTC Gain after three varying liquidations", async () => {
-      // Whale opens Trove with 1m RBTC
+    it("withdrawFromSP(): Depositors with varying deposits withdraw correct compounded deposit and ETH Gain after three varying liquidations", async () => {
+      // Whale opens Trove with 1m ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(1000000, 18)), whale, whale, { from: whale, value: dec(1000000, 'ether') })
 
       /* Depositors provide:-
@@ -406,9 +406,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       /* Defaulters open troves
      
-      Defaulter 1: 207000 ZUSD & 2160 RBTC
-      Defaulter 2: 5000 ZUSD & 50 RBTC
-      Defaulter 3: 46700 ZUSD & 500 RBTC
+      Defaulter 1: 207000 ZUSD & 2160 ETH
+      Defaulter 2: 5000 ZUSD & 50 ETH
+      Defaulter 3: 46700 ZUSD & 500 ETH
       */
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount('207000000000000000000000'), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(2160, 18) })
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(5, 21)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(50, 'ether') })
@@ -427,10 +427,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(500000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(500000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       // ()
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '901719380174061000000'), 100000000000)
@@ -438,15 +438,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '5906261940140100000000'), 10000000000)
 
       // 2710 * 0.995 * {2000, 456000, 13100}/4711
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '11447463383570366500'), 10000000000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '2610021651454043834000'), 10000000000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '74980885162385912900'), 10000000000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '11447463383570366500'), 10000000000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '2610021651454043834000'), 10000000000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '74980885162385912900'), 10000000000)
     })
 
     // --- Deposit enters at t > 0
 
-    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 ZUSD.  A, B, C, D withdraw correct ZUSD deposit and RBTC Gain", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 1 liquidation. All deposits and liquidations = 100 ZUSD.  A, B, C, D withdraw correct ZUSD deposit and ETH Gain", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -480,11 +480,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
       const txD = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: dennis })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
       console.log()
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '1666666666666666666666'), 100000)
@@ -493,15 +493,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '5000000000000000000000'), 100000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '82916666666666666667'), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '82916666666666666667'), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '82916666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '82916666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '82916666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '82916666666666666667'), 100000)
 
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '49750000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '49750000000000000000'), 100000)
     })
 
-    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 ZUSD.  A, B, C, D withdraw correct ZUSD deposit and RBTC Gain", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. All deposits and liquidations = 100 ZUSD.  A, B, C, D withdraw correct ZUSD deposit and ETH Gain", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -537,25 +537,25 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
       const txD = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: dennis })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '0'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '0'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '0'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '0'), 100000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, dec(995, 17)), 100000)
     })
 
-    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct ZUSD deposit and RBTC Gain", async () => {
-      // Whale opens Trove with 1m RBTC
+    it("withdrawFromSP(): A, B, C Deposit -> 2 liquidations -> D deposits -> 2 liquidations. Various deposit and liquidation vals.  A, B, C, D withdraw correct ZUSD deposit and ETH Gain", async () => {
+      // Whale opens Trove with 1m ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(1000000, 18)), whale, whale, { from: whale, value: dec(1000000, 'ether') })
 
       /* Depositors open troves and make SP deposit:
@@ -572,10 +572,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await stabilityPool.provideToSP(dec(15000, 18), ZERO_ADDRESS, { from: carol })
 
       /* Defaulters open troves:
-      Defaulter 1:  10000 ZUSD, 100 RBTC
-      Defaulter 2:  25000 ZUSD, 250 RBTC
-      Defaulter 3:  5000 ZUSD, 50 RBTC
-      Defaulter 4:  40000 ZUSD, 400 RBTC
+      Defaulter 1:  10000 ZUSD, 100 ETH
+      Defaulter 2:  25000 ZUSD, 250 ETH
+      Defaulter 3:  5000 ZUSD, 50 ETH
+      Defaulter 4:  40000 ZUSD, 400 ETH
       */
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(25000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: '250000000000000000000' })
@@ -603,11 +603,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txC = await stabilityPool.withdrawFromSP(dec(100000, 18), { from: carol })
       const txD = await stabilityPool.withdrawFromSP(dec(100000, 18), { from: dennis })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '17832817337461300000000'), 100000000000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '5944272445820430000000'), 100000000000)
@@ -615,16 +615,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '11764705882352900000000'), 100000000000)
 
       // 3.5*0.995 * {60000,20000,15000,0} / 95000 + 450*0.995 * {60000/950*{60000,20000,15000},25000} / (120000-35000)
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '419563467492260055900'), 100000000000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '139854489164086692700'), 100000000000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '104890866873065014000'), 100000000000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '131691176470588233700'), 100000000000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '419563467492260055900'), 100000000000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '139854489164086692700'), 100000000000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '104890866873065014000'), 100000000000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '131691176470588233700'), 100000000000)
     })
 
     // --- Depositor leaves ---
 
-    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 ZUSD.  A, B, C, D withdraw correct ZUSD deposit and RBTC Gain", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. All deposits and liquidations = 100 ZUSD.  A, B, C, D withdraw correct ZUSD deposit and ETH Gain", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and C who then deposit it to the SP
@@ -647,15 +647,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_1, { from: owner });
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Dennis withdraws his deposit and RBTC gain
+      // Dennis withdraws his deposit and ETH gain
       // Increasing the price for a moment to avoid pending liquidations to block withdrawal
       await priceFeed.setPrice(dec(200, 18))
       const txD = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: dennis })
       await priceFeed.setPrice(dec(100, 18))
 
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '5000000000000000000000'), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '49750000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '49750000000000000000'), 100000)
 
       // Two more defaulters are liquidated
       await troveManager.liquidate(defaulter_3, { from: owner });
@@ -665,22 +665,22 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '0'), 1000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '0'), 1000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '0'), 1000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(995, 17)), 100000)
     })
 
-    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct ZUSD deposit and RBTC Gain", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): A, B, C, D deposit -> 2 liquidations -> D withdraws -> 2 liquidations. Various deposit and liquidation vals. A, B, C, D withdraw correct ZUSD deposit and ETH Gain", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       /* Initial deposits:
@@ -717,16 +717,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       await troveManager.liquidate(defaulter_1, { from: owner });
       await troveManager.liquidate(defaulter_2, { from: owner });
 
-      // Dennis withdraws his deposit and RBTC gain
+      // Dennis withdraws his deposit and ETH gain
       // Increasing the price for a moment to avoid pending liquidations to block withdrawal
       await priceFeed.setPrice(dec(200, 18))
       const txD = await stabilityPool.withdrawFromSP(dec(40000, 18), { from: dennis })
       await priceFeed.setPrice(dec(100, 18))
 
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '27692307692307700000000'), 100000000000)
       // 300*0.995 * 40000/97500
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '122461538461538466100'), 100000000000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '122461538461538466100'), 100000000000)
 
       // Two more defaulters are liquidated
       await troveManager.liquidate(defaulter_3, { from: owner });
@@ -736,24 +736,24 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(100000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(100000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '1672240802675590000000'), 10000000000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '2090301003344480000000'), 100000000000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '1045150501672240000000'), 100000000000)
 
       // 300*0.995 * {20000,25000,12500}/97500 + 350*0.995 * {20000,25000,12500}/57500
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '182361204013377919900'), 100000000000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '227951505016722411000'), 100000000000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '113975752508361205500'), 100000000000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '182361204013377919900'), 100000000000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '227951505016722411000'), 100000000000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '113975752508361205500'), 100000000000)
     })
 
     // --- One deposit enters at t > 0, and another leaves later ---
-    it("withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 ZUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct ZUSD deposit and RBTC Gain", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): A, B, D deposit -> 2 liquidations -> C makes deposit -> 1 liquidation -> D withdraws -> 1 liquidation. All deposits: 100 ZUSD. Liquidations: 100,100,100,50.  A, B, C, D withdraw correct ZUSD deposit and ETH Gain", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B and D who then deposit it to the SP
@@ -782,15 +782,15 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       await troveManager.liquidate(defaulter_3, { from: owner });
 
-      // Dennis withdraws his deposit and RBTC gain
+      // Dennis withdraws his deposit and ETH gain
       // Increasing the price for a moment to avoid pending liquidations to block withdrawal
       await priceFeed.setPrice(dec(200, 18))
       const txD = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: dennis })
       await priceFeed.setPrice(dec(100, 18))
 
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '1666666666666666666666'), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '82916666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '82916666666666666667'), 100000)
 
       await troveManager.liquidate(defaulter_4, { from: owner });
 
@@ -798,18 +798,18 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '666666666666666666666'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '666666666666666666666'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '2000000000000000000000'), 100000)
 
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, '92866666666666666667'), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '92866666666666666667'), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '79600000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, '92866666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '92866666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '79600000000000000000'), 100000)
     })
 
     // --- Tests for full offset - Pool empties to 0 ---
@@ -822,7 +822,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // A, B withdraw 0ZUSD & 100e
     // C, D withdraw 5000ZUSD  & 500e
     it("withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool", async () => {
-      // Whale opens Trove with 100k RBTC
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B who then deposit it to the SP
@@ -860,26 +860,26 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
       const txD = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: dennis })
 
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
       // Expect Alice And Bob's compounded deposit to be 0 ZUSD
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '0'), 10000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '0'), 10000)
 
-      // Expect Alice and Bob's RBTC Gain to be 100 RBTC
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000)
+      // Expect Alice and Bob's ETH Gain to be 100 ETH
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
 
       // Expect Carol And Dennis' compounded deposit to be 50 ZUSD
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), '5000000000000000000000'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '5000000000000000000000'), 100000)
 
-      // Expect Carol and and Dennis RBTC Gain to be 50 RBTC
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '49750000000000000000'), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '49750000000000000000'), 100000)
+      // Expect Carol and and Dennis ETH Gain to be 50 ETH
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '49750000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '49750000000000000000'), 100000)
     })
 
     // A, B deposit 10000
@@ -889,7 +889,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L3 cancels 10000, 1 
     // L2 20000, 200 empties Pool
     it("withdrawFromSP(): Pool-emptying liquidation increases epoch by one, resets scaleFactor to 0, and resets P to 1e18", async () => {
-      // Whale opens Trove with 100k RBTC
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B who then deposit it to the SP
@@ -981,7 +981,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // A, B withdraw 0 ZUSD & 100e
     // C, D withdraw 5000 ZUSD  & 50e
     it("withdrawFromSP(): Depositors withdraw correct compounded deposit after liquidation empties the pool", async () => {
-      // Whale opens Trove with 100k RBTC
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Whale transfers 10k ZUSD to A, B who then deposit it to the SP
@@ -1020,11 +1020,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txD = await stabilityPool.withdrawFromSP(dec(20000, 18), { from: dennis })
       const txE = await stabilityPool.withdrawFromSP(dec(30000, 18), { from: erin })
 
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const erin_RBTCWithdrawn = th.getEventArgByName(txE, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
+      const erin_ETHWithdrawn = th.getEventArgByName(txE, 'ETHGainWithdrawn', '_ETH').toString()
 
       // Expect Alice And Bob's compounded deposit to be 0 ZUSD
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '0'), 10000)
@@ -1034,21 +1034,21 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), '16666666666666666666666'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(erin)).toString(), '25000000000000000000000'), 100000)
 
-      //Expect Alice and Bob's RBTC Gain to be 1 RBTC
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000)
+      //Expect Alice and Bob's ETH Gain to be 1 ETH
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
 
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '16583333333333333333'), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '33166666666666666667'), 100000)
-      assert.isAtMost(th.getDifference(erin_RBTCWithdrawn, '49750000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '16583333333333333333'), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '33166666666666666667'), 100000)
+      assert.isAtMost(th.getDifference(erin_ETHWithdrawn, '49750000000000000000'), 100000)
     })
 
     // A deposits 10000
     // L1, L2, L3 liquidated with 10000 ZUSD each
     // A withdraws all
     // Expect A to withdraw 0 deposit and ether only from reward L1
-    it("withdrawFromSP(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the RBTC Gain from one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the ETH Gain from one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await zusdToken.transfer(alice, dec(10000, 18), { from: whale })
@@ -1069,11 +1069,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
 
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), 0), 100000)
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
     })
 
     //--- Serial full offsets ---
@@ -1087,10 +1087,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // G,H deposits 10000
     // L4 cancels 20000, 200E
 
-    // Expect all depositors withdraw 0 ZUSD and 100 RBTC
+    // Expect all depositors withdraw 0 ZUSD and 100 ETH
 
     it("withdrawFromSP(): Depositor withdraws correct compounded deposit after liquidation empties the pool", async () => {
-      // Whale opens Trove with 100k RBTC
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // 4 Defaulters open trove with 200% ICR
@@ -1151,14 +1151,14 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txG = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: graham })
       const txH = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: harriet })
 
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const erin_RBTCWithdrawn = th.getEventArgByName(txE, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const flyn_RBTCWithdrawn = th.getEventArgByName(txF, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const graham_RBTCWithdrawn = th.getEventArgByName(txG, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const harriet_RBTCWithdrawn = th.getEventArgByName(txH, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
+      const erin_ETHWithdrawn = th.getEventArgByName(txE, 'ETHGainWithdrawn', '_ETH').toString()
+      const flyn_ETHWithdrawn = th.getEventArgByName(txF, 'ETHGainWithdrawn', '_ETH').toString()
+      const graham_ETHWithdrawn = th.getEventArgByName(txG, 'ETHGainWithdrawn', '_ETH').toString()
+      const harriet_ETHWithdrawn = th.getEventArgByName(txH, 'ETHGainWithdrawn', '_ETH').toString()
 
       // Expect all deposits to be 0 ZUSD
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(alice)).toString(), '0'), 100000)
@@ -1170,16 +1170,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(graham)).toString(), '0'), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(harriet)).toString(), '0'), 100000)
 
-      /* Expect all RBTC gains to be 100 RBTC:  Since each liquidation of empties the pool, depositors
-      should only earn RBTC from the single liquidation that cancelled with their deposit */
-      assert.isAtMost(th.getDifference(alice_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(erin_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(flyn_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(graham_RBTCWithdrawn, dec(995, 17)), 100000)
-      assert.isAtMost(th.getDifference(harriet_RBTCWithdrawn, dec(995, 17)), 100000)
+      /* Expect all ETH gains to be 100 ETH:  Since each liquidation of empties the pool, depositors
+      should only earn ETH from the single liquidation that cancelled with their deposit */
+      assert.isAtMost(th.getDifference(alice_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(erin_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(flyn_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(graham_ETHWithdrawn, dec(995, 17)), 100000)
+      assert.isAtMost(th.getDifference(harriet_ETHWithdrawn, dec(995, 17)), 100000)
 
       const finalEpoch = (await stabilityPool.currentEpoch()).toString()
       assert.equal(finalEpoch, 4)
@@ -1194,9 +1194,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L2 of 9900 ZUSD, should bring P slightly past boundary i.e. 1e-9 -> 1e-10
 
     // expect d(B) = d0(B)/100
-    // expect correct RBTC gain, i.e. all of the reward
-    it("withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and RBTC Gain after one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    // expect correct ETH gain, i.e. all of the reward
+    it("withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and ETH Gain after one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await zusdToken.transfer(alice, dec(10000, 18), { from: whale })
@@ -1222,8 +1222,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txA = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: alice })
       await priceFeed.setPrice(dec(100, 18))
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = await th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = await th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
 
       await zusdToken.transfer(bob, dec(10000, 18), { from: whale })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: bob })
@@ -1234,11 +1234,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.currentScale(), '1')
 
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
-      const bob_RBTCWithdrawn = await th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Expect Bob to withdraw 1% of initial deposit (100 ZUSD) and all the liquidated RBTC (60 ether)
+      // Expect Bob to withdraw 1% of initial deposit (100 ZUSD) and all the liquidated ETH (60 ether)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), '100000000000000000000'), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '59700000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '59700000000000000000'), 100000)
     })
 
     // A deposits 10000
@@ -1248,9 +1248,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L2 of 59400, should bring P slightly past boundary i.e. 1e-9 -> 1e-10
 
     // expect d(B) = d0(B)/100
-    // expect correct RBTC gain, i.e. all of the reward
-    it("withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and RBTC Gain after one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    // expect correct ETH gain, i.e. all of the reward
+    it("withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraw correct compounded deposit and ETH Gain after one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await zusdToken.transfer(alice, dec(10000, 18), { from: whale })
@@ -1296,29 +1296,29 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txC = await stabilityPool.withdrawFromSP(dec(20000, 18), { from: carol })
       const txD = await stabilityPool.withdrawFromSP(dec(30000, 18), { from: dennis })
 
-      /* Expect depositors to withdraw 1% of their initial deposit, and an RBTC gain 
+      /* Expect depositors to withdraw 1% of their initial deposit, and an ETH gain 
       in proportion to their initial deposit:
      
-      Bob:  1000 ZUSD, 55 RBtcer
-      Carol:  2000 ZUSD, 110 RBtcer
-      Dennis:  3000 ZUSD, 165 RBtcer
+      Bob:  1000 ZUSD, 55 Ether
+      Carol:  2000 ZUSD, 110 Ether
+      Dennis:  3000 ZUSD, 165 Ether
      
-      Total: 6000 ZUSD, 300 RBtcer
+      Total: 6000 ZUSD, 300 Ether
       */
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), dec(100, 18)), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), dec(200, 18)), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), dec(300, 18)), 100000)
 
-      const bob_RBTCWithdrawn = await th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = await th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = await th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = await th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = await th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, '54725000000000000000'), 100000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, '109450000000000000000'), 100000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, '164175000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '54725000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, '109450000000000000000'), 100000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, '164175000000000000000'), 100000)
     })
 
-    // Deposit's RBTC reward spans one scale change - deposit reduced by correct amount
+    // Deposit's ETH reward spans one scale change - deposit reduced by correct amount
 
     // A make deposit 10000 ZUSD
     // L1 brings P to 1e-5*P. L1:  9999.9000000000000000 ZUSD
@@ -1327,9 +1327,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L2 decreases P again by 1e-5, over the scale boundary: 9999.9000000000000000 (near to the 10000 ZUSD total deposits)
     // B withdraws
     // expect d(B) = d0(B) * 1e-5
-    // expect B gets entire RBTC gain from L2
-    it("withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and RBTC Gain after one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    // expect B gets entire ETH gain from L2
+    it("withdrawFromSP(): deposit spans one scale factor change: Single depositor withdraws correct compounded deposit and ETH Gain after one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await zusdToken.transfer(alice, dec(10000, 18), { from: whale })
@@ -1365,11 +1365,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.currentScale(), '1')
 
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
-      const bob_RBTCWithdrawn = await th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Bob should withdraw 1e-5 of initial deposit: 0.1 ZUSD and the full RBTC gain of 100 ether
+      // Bob should withdraw 1e-5 of initial deposit: 0.1 ZUSD and the full ETH gain of 100 ether
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), dec(1, 17)), 100000)
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 100000000000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000000000)
     })
 
     // A make deposit 10000 ZUSD
@@ -1379,9 +1379,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // L2 decreases P again by 1e-5, over boundary. L2: 59999.4000000000000000  (near to the 60000 ZUSD total deposits)
     // B withdraws
     // expect d(B) = d0(B) * 1e-5
-    // expect B gets entire RBTC gain from L2
-    it("withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and RBTC Gain after one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    // expect B gets entire ETH gain from L2
+    it("withdrawFromSP(): Several deposits of varying amounts span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       await zusdToken.transfer(alice, dec(10000, 18), { from: whale })
@@ -1422,29 +1422,29 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.currentScale(), '1')
 
       const txB = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: bob })
-      const bob_RBTCWithdrawn = await th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
       const txC = await stabilityPool.withdrawFromSP(dec(20000, 18), { from: carol })
-      const carol_RBTCWithdrawn = await th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const carol_ETHWithdrawn = await th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
 
       const txD = await stabilityPool.withdrawFromSP(dec(30000, 18), { from: dennis })
-      const dennis_RBTCWithdrawn = await th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const dennis_ETHWithdrawn = await th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
       // {B, C, D} should have a compounded deposit of {0.1, 0.2, 0.3} ZUSD
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(bob)).toString(), dec(1, 17)), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(carol)).toString(), dec(2, 17)), 100000)
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), dec(3, 17)), 100000)
 
-      assert.isAtMost(th.getDifference(bob_RBTCWithdrawn, dec(995, 17)), 10000000000)
-      assert.isAtMost(th.getDifference(carol_RBTCWithdrawn, dec(1990, 17)), 100000000000)
-      assert.isAtMost(th.getDifference(dennis_RBTCWithdrawn, dec(2985, 17)), 100000000000)
+      assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 10000000000)
+      assert.isAtMost(th.getDifference(carol_ETHWithdrawn, dec(1990, 17)), 100000000000)
+      assert.isAtMost(th.getDifference(dennis_ETHWithdrawn, dec(2985, 17)), 100000000000)
     })
 
     // A make deposit 10000 ZUSD
     // L1 brings P to (~1e-10)*P. L1: 9999.9999999000000000 ZUSD
     // Expect A to withdraw 0 deposit
     it("withdrawFromSP(): Deposit that decreases to less than 1e-9 of it's original value is reduced to 0", async () => {
-      // Whale opens Trove with 100k RBTC
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Defaulters 1 withdraws 9999.9999999 ZUSD
@@ -1468,17 +1468,17 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // --- Serial scale changes ---
 
     /* A make deposit 10000 ZUSD
-    L1 brings P to 0.0001P. L1:  9999.900000000000000000 ZUSD, 1 RBTC
+    L1 brings P to 0.0001P. L1:  9999.900000000000000000 ZUSD, 1 ETH
     B makes deposit 9999.9, brings SP to 10k
-    L2 decreases P by(~1e-5)P. L2:  9999.900000000000000000 ZUSD, 1 RBTC
+    L2 decreases P by(~1e-5)P. L2:  9999.900000000000000000 ZUSD, 1 ETH
     C makes deposit 9999.9, brings SP to 10k
-    L3 decreases P by(~1e-5)P. L3:  9999.900000000000000000 ZUSD, 1 RBTC
+    L3 decreases P by(~1e-5)P. L3:  9999.900000000000000000 ZUSD, 1 ETH
     D makes deposit 9999.9, brings SP to 10k
-    L4 decreases P by(~1e-5)P. L4:  9999.900000000000000000 ZUSD, 1 RBTC
-    expect A, B, C, D each withdraw ~100 RBtcer
+    L4 decreases P by(~1e-5)P. L4:  9999.900000000000000000 ZUSD, 1 ETH
+    expect A, B, C, D each withdraw ~100 Ether
     */
-    it("withdrawFromSP(): Several deposits of 10000 ZUSD span one scale factor change. Depositors withdraws correct compounded deposit and RBTC Gain after one liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Several deposits of 10000 ZUSD span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Defaulters 1-4 each withdraw 9999.9 ZUSD
@@ -1534,10 +1534,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txC = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: carol })
       const txD = await stabilityPool.withdrawFromSP(dec(10000, 18), { from: dennis })
 
-      const alice_RBTCWithdrawn = await th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const bob_RBTCWithdrawn = await th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const carol_RBTCWithdrawn = await th.getEventArgByName(txC, 'RBTCGainWithdrawn', '_RBTC').toString()
-      const dennis_RBTCWithdrawn = await th.getEventArgByName(txD, 'RBTCGainWithdrawn', '_RBTC').toString()
+      const alice_ETHWithdrawn = await th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH').toString()
+      const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
+      const carol_ETHWithdrawn = await th.getEventArgByName(txC, 'ETHGainWithdrawn', '_ETH').toString()
+      const dennis_ETHWithdrawn = await th.getEventArgByName(txD, 'ETHGainWithdrawn', '_ETH').toString()
 
       // A, B, C should withdraw 0 - their deposits have been completely used up
       assert.equal(await zusdToken.balanceOf(alice), '0')
@@ -1546,16 +1546,16 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       // D should withdraw around 0.9999 ZUSD, since his deposit of 9999.9 was reduced by a factor of 1e-5
       assert.isAtMost(th.getDifference((await zusdToken.balanceOf(dennis)).toString(), dec(99999, 12)), 100000)
 
-      // 99.5 RBTC is offset at each L, 0.5 goes to gas comp
-      // Each depositor gets RBTC rewards of around 99.5 RBTC - 1e17 error tolerance
-      assert.isTrue(toBN(alice_RBTCWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
-      assert.isTrue(toBN(bob_RBTCWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
-      assert.isTrue(toBN(carol_RBTCWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
-      assert.isTrue(toBN(dennis_RBTCWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
+      // 99.5 ETH is offset at each L, 0.5 goes to gas comp
+      // Each depositor gets ETH rewards of around 99.5 ETH - 1e17 error tolerance
+      assert.isTrue(toBN(alice_ETHWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
+      assert.isTrue(toBN(bob_ETHWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
+      assert.isTrue(toBN(carol_ETHWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
+      assert.isTrue(toBN(dennis_ETHWithdrawn).sub(toBN(dec(995, 17))).abs().lte(toBN(dec(1, 17))))
     })
 
     it("withdrawFromSP(): 2 depositors can withdraw after each receiving half of a pool-emptying liquidation", async () => {
-      // Whale opens Trove with 100k RBTC
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Defaulters 1-3 each withdraw 24100, 24300, 24500 ZUSD (inc gas comp)
@@ -1680,8 +1680,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.isTrue(txF.receipt.status)
     })
 
-    it("withdrawFromSP(): Depositor's RBTC gain stops increasing after two scale changes", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Depositor's ETH gain stops increasing after two scale changes", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
       // Defaulters 1-5 each withdraw up to debt of 9999.9999999 ZUSD
@@ -1733,7 +1733,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 16)) // Scale changes and P changes to 1e(12-5+9) = 1e16
       assert.equal(await stabilityPool.currentScale(), '2')
 
-      const alice_RBTCGainAt2ndScaleChange = (await stabilityPool.getDepositorRBTCGain(alice)).toString()
+      const alice_ETHGainAt2ndScaleChange = (await stabilityPool.getDepositorETHGain(alice)).toString()
 
       // E deposits 9999.9 ZUSD
       await zusdToken.transfer(erin, dec(99999, 17), { from: whale })
@@ -1745,21 +1745,21 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       assert.equal(await stabilityPool.P(), dec(1, 11)) // P decreases to 1e(16-5) = 1e11
       assert.equal(await stabilityPool.currentScale(), '2')
 
-      const alice_RBTCGainAfterFurtherLiquidation = (await stabilityPool.getDepositorRBTCGain(alice)).toString()
+      const alice_ETHGainAfterFurtherLiquidation = (await stabilityPool.getDepositorETHGain(alice)).toString()
   
       const alice_scaleSnapshot = (await stabilityPool.depositSnapshots(alice))[2].toString()
 
       assert.equal(alice_scaleSnapshot, '0')
-      assert.equal(alice_RBTCGainAt2ndScaleChange, alice_RBTCGainAfterFurtherLiquidation)
+      assert.equal(alice_ETHGainAt2ndScaleChange, alice_ETHGainAfterFurtherLiquidation)
     })
 
     // --- Extreme values, confirm no overflows ---
 
-    it("withdrawFromSP(): Large liquidated coll/debt, deposits and RBTC price", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Large liquidated coll/debt, deposits and ETH price", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // RBTC:USD price is $2 billion per RBTC
+      // ETH:USD price is $2 billion per ETH
       await priceFeed.setPrice(dec(2, 27));
 
       const depositors = [alice, bob]
@@ -1771,7 +1771,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       // Defaulter opens trove with 200% ICR
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(1, 36)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(1, 27) })
 
-      // RBTC:USD price drops to $1 billion per RBTC
+      // ETH:USD price drops to $1 billion per ETH
       await priceFeed.setPrice(dec(1, 27));
 
       // Defaulter liquidated
@@ -1780,9 +1780,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txA = await stabilityPool.withdrawFromSP(dec(1, 36), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(1, 36), { from: bob })
 
-      // Grab the RBTC gain from the emitted event in the tx log
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC')
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC')
+      // Grab the ETH gain from the emitted event in the tx log
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH')
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH')
 
       // Check ZUSD balances
       const aliceZUSDBalance = await zusdToken.balanceOf(alice)
@@ -1797,23 +1797,23 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       assert.isTrue(bobZUSDBalDiff.lte(toBN(dec(1, 18))))
 
-      // Check RBTC gains
-      const aliceExpectedRBTCGain = toBN(dec(4975, 23))
-      const aliceRBTCDiff = aliceExpectedRBTCGain.sub(toBN(alice_RBTCWithdrawn))
+      // Check ETH gains
+      const aliceExpectedETHGain = toBN(dec(4975, 23))
+      const aliceETHDiff = aliceExpectedETHGain.sub(toBN(alice_ETHWithdrawn))
 
-      assert.isTrue(aliceRBTCDiff.lte(toBN(dec(1, 18))))
+      assert.isTrue(aliceETHDiff.lte(toBN(dec(1, 18))))
 
-      const bobExpectedRBTCGain = toBN(dec(4975, 23))
-      const bobRBTCDiff = bobExpectedRBTCGain.sub(toBN(bob_RBTCWithdrawn))
+      const bobExpectedETHGain = toBN(dec(4975, 23))
+      const bobETHDiff = bobExpectedETHGain.sub(toBN(bob_ETHWithdrawn))
 
-      assert.isTrue(bobRBTCDiff.lte(toBN(dec(1, 18))))
+      assert.isTrue(bobETHDiff.lte(toBN(dec(1, 18))))
     })
 
-    it("withdrawFromSP(): Small liquidated coll/debt, large deposits and RBTC price", async () => {
-      // Whale opens Trove with 100k RBTC
+    it("withdrawFromSP(): Small liquidated coll/debt, large deposits and ETH price", async () => {
+      // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
 
-      // RBTC:USD price is $2 billion per RBTC
+      // ETH:USD price is $2 billion per ETH
       await priceFeed.setPrice(dec(2, 27));
       const price = await priceFeed.getPrice()
 
@@ -1823,10 +1823,10 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
         await stabilityPool.provideToSP(dec(1, 38), ZERO_ADDRESS, { from: account })
       }
 
-      // Defaulter opens trove with 50e-7 RBTC and  5000 ZUSD. 200% ICR
+      // Defaulter opens trove with 50e-7 ETH and  5000 ZUSD. 200% ICR
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(5000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: '5000000000000' })
 
-      // RBTC:USD price drops to $1 billion per RBTC
+      // ETH:USD price drops to $1 billion per ETH
       await priceFeed.setPrice(dec(1, 27));
 
       // Defaulter liquidated
@@ -1835,8 +1835,8 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txA = await stabilityPool.withdrawFromSP(dec(1, 38), { from: alice })
       const txB = await stabilityPool.withdrawFromSP(dec(1, 38), { from: bob })
 
-      const alice_RBTCWithdrawn = th.getEventArgByName(txA, 'RBTCGainWithdrawn', '_RBTC')
-      const bob_RBTCWithdrawn = th.getEventArgByName(txB, 'RBTCGainWithdrawn', '_RBTC')
+      const alice_ETHWithdrawn = th.getEventArgByName(txA, 'ETHGainWithdrawn', '_ETH')
+      const bob_ETHWithdrawn = th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH')
 
       const aliceZUSDBalance = await zusdToken.balanceOf(alice)
       const aliceExpectedZUSDBalance = toBN('99999999999999997500000000000000000000')
@@ -1850,9 +1850,9 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
       assert.isTrue(bobZUSDBalDiff.lte(toBN('100000000000000000000')))
 
-      // Expect RBTC gain per depositor of ~1e11 wei to be rounded to 0 by the RBTCGainedPerUnitStaked calculation (e / D), where D is ~1e36.
-      assert.equal(alice_RBTCWithdrawn.toString(), '0')
-      assert.equal(bob_RBTCWithdrawn.toString(), '0')
+      // Expect ETH gain per depositor of ~1e11 wei to be rounded to 0 by the ETHGainedPerUnitStaked calculation (e / D), where D is ~1e36.
+      assert.equal(alice_ETHWithdrawn.toString(), '0')
+      assert.equal(bob_ETHWithdrawn.toString(), '0')
     })
   })
 })

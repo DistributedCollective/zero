@@ -148,40 +148,40 @@ contract EchidnaTester {
 
     // Borrower Operations
 
-    function getAdjustedRBTC(uint actorBalance, uint _RBTC, uint ratio) internal view returns (uint) {
+    function getAdjustedETH(uint actorBalance, uint _ETH, uint ratio) internal view returns (uint) {
         uint price = priceFeedTestnet.getPrice();
         require(price > 0);
-        uint minRBTC = ratio.mul(ZUSD_GAS_COMPENSATION).div(price);
-        require(actorBalance > minRBTC);
-        uint RBTC = minRBTC + _RBTC % (actorBalance - minRBTC);
-        return RBTC;
+        uint minETH = ratio.mul(ZUSD_GAS_COMPENSATION).div(price);
+        require(actorBalance > minETH);
+        uint ETH = minETH + _ETH % (actorBalance - minETH);
+        return ETH;
     }
 
-    function getAdjustedZUSD(uint RBTC, uint _ZUSDAmount, uint ratio) internal view returns (uint) {
+    function getAdjustedZUSD(uint ETH, uint _ZUSDAmount, uint ratio) internal view returns (uint) {
         uint price = priceFeedTestnet.getPrice();
         uint ZUSDAmount = _ZUSDAmount;
         uint compositeDebt = ZUSDAmount.add(ZUSD_GAS_COMPENSATION);
-        uint ICR = LiquityMath._computeCR(RBTC, compositeDebt, price);
+        uint ICR = LiquityMath._computeCR(ETH, compositeDebt, price);
         if (ICR < ratio) {
-            compositeDebt = RBTC.mul(price).div(ratio);
+            compositeDebt = ETH.mul(price).div(ratio);
             ZUSDAmount = compositeDebt.sub(ZUSD_GAS_COMPENSATION);
         }
         return ZUSDAmount;
     }
 
-    function openTroveExt(uint _i, uint _RBTC, uint _ZUSDAmount) public payable {
+    function openTroveExt(uint _i, uint _ETH, uint _ZUSDAmount) public payable {
         uint actor = _i % NUMBER_OF_ACTORS;
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
         uint actorBalance = address(echidnaProxy).balance;
 
         // we pass in CCR instead of MCR in case it’s the first one
-        uint RBTC = getAdjustedRBTC(actorBalance, _RBTC, CCR);
-        uint ZUSDAmount = getAdjustedZUSD(RBTC, _ZUSDAmount, CCR);
+        uint ETH = getAdjustedETH(actorBalance, _ETH, CCR);
+        uint ZUSDAmount = getAdjustedZUSD(ETH, _ZUSDAmount, CCR);
 
-        //console.log('RBTC', RBTC);
+        //console.log('ETH', ETH);
         //console.log('ZUSDAmount', ZUSDAmount);
 
-        echidnaProxy.openTrovePrx(RBTC, ZUSDAmount, address(0), address(0), 0);
+        echidnaProxy.openTrovePrx(ETH, ZUSDAmount, address(0), address(0), 0);
 
         numberOfTroves = troveManager.getTroveOwnersCount();
         assert(numberOfTroves > 0);
@@ -189,24 +189,24 @@ contract EchidnaTester {
         //assert(numberOfTroves == 0);
     }
 
-    function openTroveRawExt(uint _i, uint _RBTC, uint _ZUSDAmount, address _upperHint, address _lowerHint, uint _maxFee) public payable {
+    function openTroveRawExt(uint _i, uint _ETH, uint _ZUSDAmount, address _upperHint, address _lowerHint, uint _maxFee) public payable {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].openTrovePrx(_RBTC, _ZUSDAmount, _upperHint, _lowerHint, _maxFee);
+        echidnaProxies[actor].openTrovePrx(_ETH, _ZUSDAmount, _upperHint, _lowerHint, _maxFee);
     }
 
-    function addCollExt(uint _i, uint _RBTC) external payable {
+    function addCollExt(uint _i, uint _ETH) external payable {
         uint actor = _i % NUMBER_OF_ACTORS;
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
         uint actorBalance = address(echidnaProxy).balance;
 
-        uint RBTC = getAdjustedRBTC(actorBalance, _RBTC, MCR);
+        uint ETH = getAdjustedETH(actorBalance, _ETH, MCR);
 
-        echidnaProxy.addCollPrx(RBTC, address(0), address(0));
+        echidnaProxy.addCollPrx(ETH, address(0), address(0));
     }
 
-    function addCollRawExt(uint _i, uint _RBTC, address _upperHint, address _lowerHint) external payable {
+    function addCollRawExt(uint _i, uint _ETH, address _upperHint, address _lowerHint) external payable {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].addCollPrx(_RBTC, _upperHint, _lowerHint);
+        echidnaProxies[actor].addCollPrx(_ETH, _upperHint, _lowerHint);
     }
 
     function withdrawCollExt(uint _i, uint _amount, address _upperHint, address _lowerHint) external {
@@ -229,24 +229,24 @@ contract EchidnaTester {
         echidnaProxies[actor].closeTrovePrx();
     }
 
-    function adjustTroveExt(uint _i, uint _RBTC, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease) external payable {
+    function adjustTroveExt(uint _i, uint _ETH, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease) external payable {
         uint actor = _i % NUMBER_OF_ACTORS;
         EchidnaProxy echidnaProxy = echidnaProxies[actor];
         uint actorBalance = address(echidnaProxy).balance;
 
-        uint RBTC = getAdjustedRBTC(actorBalance, _RBTC, MCR);
+        uint ETH = getAdjustedETH(actorBalance, _ETH, MCR);
         uint debtChange = _debtChange;
         if (_isDebtIncrease) {
             // TODO: add current amount already withdrawn:
-            debtChange = getAdjustedZUSD(RBTC, uint(_debtChange), MCR);
+            debtChange = getAdjustedZUSD(ETH, uint(_debtChange), MCR);
         }
         // TODO: collWithdrawal, debtChange
-        echidnaProxy.adjustTrovePrx(RBTC, _collWithdrawal, debtChange, _isDebtIncrease, address(0), address(0), 0);
+        echidnaProxy.adjustTrovePrx(ETH, _collWithdrawal, debtChange, _isDebtIncrease, address(0), address(0), 0);
     }
 
-    function adjustTroveRawExt(uint _i, uint _RBTC, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFee) external payable {
+    function adjustTroveRawExt(uint _i, uint _ETH, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFee) external payable {
         uint actor = _i % NUMBER_OF_ACTORS;
-        echidnaProxies[actor].adjustTrovePrx(_RBTC, _collWithdrawal, _debtChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFee);
+        echidnaProxies[actor].adjustTrovePrx(_ETH, _collWithdrawal, _debtChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFee);
     }
 
     // Pool Manager
@@ -366,7 +366,7 @@ contract EchidnaTester {
         return true;
     }
 
-    function echidna_RBTC_balances() public view returns(bool) {
+    function echidna_ETH_balances() public view returns(bool) {
         if (address(troveManager).balance > 0) {
             return false;
         }
@@ -375,15 +375,15 @@ contract EchidnaTester {
             return false;
         }
 
-        if (address(activePool).balance != activePool.getRBTC()) {
+        if (address(activePool).balance != activePool.getETH()) {
             return false;
         }
 
-        if (address(defaultPool).balance != defaultPool.getRBTC()) {
+        if (address(defaultPool).balance != defaultPool.getETH()) {
             return false;
         }
 
-        if (address(stabilityPool).balance != stabilityPool.getRBTC()) {
+        if (address(stabilityPool).balance != stabilityPool.getETH()) {
             return false;
         }
 

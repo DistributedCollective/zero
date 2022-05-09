@@ -13,10 +13,10 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 
-/* NOTE: Some tests involving RBTC redemption fees do not test for specific fee values.
+/* NOTE: Some tests involving ETH redemption fees do not test for specific fee values.
  * Some only test that the fees are non-zero when they should occur.
  *
- * Specific RBTC gain values will depend on the final fee schedule used, and the final choices for
+ * Specific ETH gain values will depend on the final fee schedule used, and the final choices for
  * the parameter BETA in the TroveManager, which is still TBD based on economic modelling.
  * 
  */ 
@@ -121,7 +121,7 @@ contract('TroveManager', async accounts => {
     const ICR_AfterWithdrawal = await troveManager.getCurrentICR(alice, price)
     assert.isAtMost(th.getDifference(ICR_AfterWithdrawal, targetICR), 100)
 
-    // price drops to 1RBTC:100ZUSD, reducing Alice's ICR below MCR
+    // price drops to 1ETH:100ZUSD, reducing Alice's ICR below MCR
     await priceFeed.setPrice('100000000000000000000');
 
     // Confirm system is not in Recovery Mode
@@ -137,23 +137,23 @@ contract('TroveManager', async accounts => {
     assert.isFalse(alice_Trove_isInSortedList)
   })
 
-  it("liquidate(): decreases ActivePool RBTC and ZUSDDebt by correct amounts", async () => {
+  it("liquidate(): decreases ActivePool ETH and ZUSDDebt by correct amounts", async () => {
     // --- SETUP ---
     const { collateral: A_collateral, totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: alice } })
     const { collateral: B_collateral, totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(21, 17)), extraParams: { from: bob } })
 
     // --- TEST ---
 
-    // check ActivePool RBTC and ZUSD debt before
-    const activePool_RBTC_Before = (await activePool.getRBTC()).toString()
-    const activePool_RawRBtcer_Before = (await web3.eth.getBalance(activePool.address)).toString()
+    // check ActivePool ETH and ZUSD debt before
+    const activePool_ETH_Before = (await activePool.getETH()).toString()
+    const activePool_RawEther_Before = (await web3.eth.getBalance(activePool.address)).toString()
     const activePool_ZUSDDebt_Before = (await activePool.getZUSDDebt()).toString()
 
-    assert.equal(activePool_RBTC_Before, A_collateral.add(B_collateral))
-    assert.equal(activePool_RawRBtcer_Before, A_collateral.add(B_collateral))
+    assert.equal(activePool_ETH_Before, A_collateral.add(B_collateral))
+    assert.equal(activePool_RawEther_Before, A_collateral.add(B_collateral))
     th.assertIsApproximatelyEqual(activePool_ZUSDDebt_Before, A_totalDebt.add(B_totalDebt))
 
-    // price drops to 1RBTC:100ZUSD, reducing Bob's ICR below MCR
+    // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
     await priceFeed.setPrice('100000000000000000000');
 
     // Confirm system is not in Recovery Mode
@@ -163,33 +163,33 @@ contract('TroveManager', async accounts => {
     leaving Alice’s ether and ZUSD debt in the ActivePool. */
     await troveManager.liquidate(bob, { from: owner });
 
-    // check ActivePool RBTC and ZUSD debt 
-    const activePool_RBTC_After = (await activePool.getRBTC()).toString()
-    const activePool_RawRBtcer_After = (await web3.eth.getBalance(activePool.address)).toString()
+    // check ActivePool ETH and ZUSD debt 
+    const activePool_ETH_After = (await activePool.getETH()).toString()
+    const activePool_RawEther_After = (await web3.eth.getBalance(activePool.address)).toString()
     const activePool_ZUSDDebt_After = (await activePool.getZUSDDebt()).toString()
 
-    assert.equal(activePool_RBTC_After, A_collateral)
-    assert.equal(activePool_RawRBtcer_After, A_collateral)
+    assert.equal(activePool_ETH_After, A_collateral)
+    assert.equal(activePool_RawEther_After, A_collateral)
     th.assertIsApproximatelyEqual(activePool_ZUSDDebt_After, A_totalDebt)
   })
 
-  it("liquidate(): increases DefaultPool RBTC and ZUSD debt by correct amounts", async () => {
+  it("liquidate(): increases DefaultPool ETH and ZUSD debt by correct amounts", async () => {
     // --- SETUP ---
     const { collateral: A_collateral, totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: alice } })
     const { collateral: B_collateral, totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(21, 17)), extraParams: { from: bob } })
 
     // --- TEST ---
 
-    // check DefaultPool RBTC and ZUSD debt before
-    const defaultPool_RBTC_Before = (await defaultPool.getRBTC())
-    const defaultPool_RawRBtcer_Before = (await web3.eth.getBalance(defaultPool.address)).toString()
+    // check DefaultPool ETH and ZUSD debt before
+    const defaultPool_ETH_Before = (await defaultPool.getETH())
+    const defaultPool_RawEther_Before = (await web3.eth.getBalance(defaultPool.address)).toString()
     const defaultPool_ZUSDDebt_Before = (await defaultPool.getZUSDDebt()).toString()
 
-    assert.equal(defaultPool_RBTC_Before, '0')
-    assert.equal(defaultPool_RawRBtcer_Before, '0')
+    assert.equal(defaultPool_ETH_Before, '0')
+    assert.equal(defaultPool_RawEther_Before, '0')
     assert.equal(defaultPool_ZUSDDebt_Before, '0')
 
-    // price drops to 1RBTC:100ZUSD, reducing Bob's ICR below MCR
+    // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
     await priceFeed.setPrice('100000000000000000000');
 
     // Confirm system is not in Recovery Mode
@@ -199,13 +199,13 @@ contract('TroveManager', async accounts => {
     await troveManager.liquidate(bob, { from: owner });
 
     // check after
-    const defaultPool_RBTC_After = (await defaultPool.getRBTC()).toString()
-    const defaultPool_RawRBtcer_After = (await web3.eth.getBalance(defaultPool.address)).toString()
+    const defaultPool_ETH_After = (await defaultPool.getETH()).toString()
+    const defaultPool_RawEther_After = (await web3.eth.getBalance(defaultPool.address)).toString()
     const defaultPool_ZUSDDebt_After = (await defaultPool.getZUSDDebt()).toString()
 
-    const defaultPool_RBTC = th.applyLiquidationFee(B_collateral)
-    assert.equal(defaultPool_RBTC_After, defaultPool_RBTC)
-    assert.equal(defaultPool_RawRBtcer_After, defaultPool_RBTC)
+    const defaultPool_ETH = th.applyLiquidationFee(B_collateral)
+    assert.equal(defaultPool_ETH_After, defaultPool_ETH)
+    assert.equal(defaultPool_RawEther_After, defaultPool_ETH)
     th.assertIsApproximatelyEqual(defaultPool_ZUSDDebt_After, B_totalDebt)
   })
 
@@ -220,7 +220,7 @@ contract('TroveManager', async accounts => {
     const totalStakes_Before = (await troveManager.totalStakes()).toString()
     assert.equal(totalStakes_Before, A_collateral.add(B_collateral))
 
-    // price drops to 1RBTC:100ZUSD, reducing Bob's ICR below MCR
+    // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
     await priceFeed.setPrice('100000000000000000000');
 
     // Confirm system is not in Recovery Mode
@@ -312,7 +312,7 @@ contract('TroveManager', async accounts => {
     assert.equal(totalStakesSnapshot_Before, '0')
     assert.equal(totalCollateralSnapshot_Before, '0')
 
-    // price drops to 1RBTC:100ZUSD, reducing Bob's ICR below MCR
+    // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
     await priceFeed.setPrice('100000000000000000000');
 
     // Confirm system is not in Recovery Mode
@@ -324,7 +324,7 @@ contract('TroveManager', async accounts => {
     /* check snapshots after. Total stakes should be equal to the  remaining stake then the system: 
     10 ether, Alice's stake.
      
-    Total collateral should be equal to Alice's collateral plus her pending RBTC reward (Bob’s collaterale*0.995 ether), earned
+    Total collateral should be equal to Alice's collateral plus her pending ETH reward (Bob’s collaterale*0.995 ether), earned
     from the liquidation of Bob's Trove */
     const totalStakesSnapshot_After = (await troveManager.totalStakesSnapshot()).toString()
     const totalCollateralSnapshot_After = (await troveManager.totalCollateralSnapshot()).toString()
@@ -333,7 +333,7 @@ contract('TroveManager', async accounts => {
     assert.equal(totalCollateralSnapshot_After, A_collateral.add(th.applyLiquidationFee(B_collateral)))
   })
 
-  it("liquidate(): updates the L_RBTC and L_ZUSDDebt reward-per-unit-staked totals", async () => {
+  it("liquidate(): updates the L_ETH and L_ZUSDDebt reward-per-unit-staked totals", async () => {
     // --- SETUP ---
     const { collateral: A_collateral, totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(8, 18)), extraParams: { from: alice } })
     const { collateral: B_collateral, totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: bob } })
@@ -341,7 +341,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // price drops to 1RBTC:100ZUSD, reducing Carols's ICR below MCR
+    // price drops to 1ETH:100ZUSD, reducing Carols's ICR below MCR
     await priceFeed.setPrice('100000000000000000000');
 
     // Confirm system is not in Recovery Mode
@@ -353,12 +353,12 @@ contract('TroveManager', async accounts => {
     assert.isFalse(await sortedTroves.contains(carol))
 
     // Carol's ether*0.995 and ZUSD should be added to the DefaultPool.
-    const L_RBTC_AfterCarolLiquidated = await troveManager.L_RBTC()
+    const L_ETH_AfterCarolLiquidated = await troveManager.L_ETH()
     const L_ZUSDDebt_AfterCarolLiquidated = await troveManager.L_ZUSDDebt()
 
-    const L_RBTC_expected_1 = th.applyLiquidationFee(C_collateral).mul(mv._1e18BN).div(A_collateral.add(B_collateral))
+    const L_ETH_expected_1 = th.applyLiquidationFee(C_collateral).mul(mv._1e18BN).div(A_collateral.add(B_collateral))
     const L_ZUSDDebt_expected_1 = C_totalDebt.mul(mv._1e18BN).div(A_collateral.add(B_collateral))
-    assert.isAtMost(th.getDifference(L_RBTC_AfterCarolLiquidated, L_RBTC_expected_1), 100)
+    assert.isAtMost(th.getDifference(L_ETH_AfterCarolLiquidated, L_ETH_expected_1), 100)
     assert.isAtMost(th.getDifference(L_ZUSDDebt_AfterCarolLiquidated, L_ZUSDDebt_expected_1), 100)
 
     // Bob now withdraws ZUSD, bringing his ICR to 1.11
@@ -367,7 +367,7 @@ contract('TroveManager', async accounts => {
     // Confirm system is not in Recovery Mode
     assert.isFalse(await th.checkRecoveryMode(contracts));
 
-    // price drops to 1RBTC:50ZUSD, reducing Bob's ICR below MCR
+    // price drops to 1ETH:50ZUSD, reducing Bob's ICR below MCR
     await priceFeed.setPrice(dec(50, 18));
     const price = await priceFeed.getPrice()
 
@@ -384,27 +384,27 @@ contract('TroveManager', async accounts => {
    
    The system rewards-per-unit-staked should now be:
    
-   L_RBTC = (0.995 / 20) + (10.4975*0.995  / 10) = 1.09425125 RBTC
+   L_ETH = (0.995 / 20) + (10.4975*0.995  / 10) = 1.09425125 ETH
    L_ZUSDDebt = (180 / 20) + (890 / 10) = 98 ZUSD */
-    const L_RBTC_AfterBobLiquidated = await troveManager.L_RBTC()
+    const L_ETH_AfterBobLiquidated = await troveManager.L_ETH()
     const L_ZUSDDebt_AfterBobLiquidated = await troveManager.L_ZUSDDebt()
 
-    const L_RBTC_expected_2 = L_RBTC_expected_1.add(th.applyLiquidationFee(B_collateral.add(B_collateral.mul(L_RBTC_expected_1).div(mv._1e18BN))).mul(mv._1e18BN).div(A_collateral))
+    const L_ETH_expected_2 = L_ETH_expected_1.add(th.applyLiquidationFee(B_collateral.add(B_collateral.mul(L_ETH_expected_1).div(mv._1e18BN))).mul(mv._1e18BN).div(A_collateral))
     const L_ZUSDDebt_expected_2 = L_ZUSDDebt_expected_1.add(B_totalDebt.add(B_increasedTotalDebt).add(B_collateral.mul(L_ZUSDDebt_expected_1).div(mv._1e18BN)).mul(mv._1e18BN).div(A_collateral))
-    assert.isAtMost(th.getDifference(L_RBTC_AfterBobLiquidated, L_RBTC_expected_2), 100)
+    assert.isAtMost(th.getDifference(L_ETH_AfterBobLiquidated, L_ETH_expected_2), 100)
     assert.isAtMost(th.getDifference(L_ZUSDDebt_AfterBobLiquidated, L_ZUSDDebt_expected_2), 100)
   })
 
   it("liquidate(): Liquidates undercollateralized trove if there are two troves in the system", async () => {
     await openTrove({ ICR: toBN(dec(200, 18)), extraParams: { from: bob, value: dec(100, 'ether') } })
 
-    // Alice creates a single trove with 0.7 RBTC and a debt of 70 ZUSD, and provides 10 ZUSD to SP
+    // Alice creates a single trove with 0.7 ETH and a debt of 70 ZUSD, and provides 10 ZUSD to SP
     const { collateral: A_collateral, totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
 
     // Alice proves 10 ZUSD to SP
     await stabilityPool.provideToSP(dec(10, 18), ZERO_ADDRESS, { from: alice })
 
-    // Set RBTC:USD price to 105
+    // Set ETH:USD price to 105
     await priceFeed.setPrice('105000000000000000000')
     const price = await priceFeed.getPrice()
 
@@ -710,7 +710,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(expectedTCR_4.eq(TCR_4))
   })
 
-  it("liquidate(): does not affect the SP deposit or RBTC gain when called on an SP depositor's address that has no trove", async () => {
+  it("liquidate(): does not affect the SP deposit or ETH gain when called on an SP depositor's address that has no trove", async () => {
     await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     const spDeposit = toBN(dec(1, 24))
     await openTrove({ ICR: toBN(dec(3, 18)), extraZUSDAmount: spDeposit, extraParams: { from: bob } })
@@ -728,11 +728,11 @@ contract('TroveManager', async accounts => {
     const [liquidatedDebt, liquidatedColl, gasComp] = th.getEmittedLiquidationValues(liquidationTX_C)
 
     assert.isFalse(await sortedTroves.contains(carol))
-    // Check Dennis' SP deposit has absorbed Carol's debt, and he has received her liquidated RBTC
+    // Check Dennis' SP deposit has absorbed Carol's debt, and he has received her liquidated ETH
     const dennis_Deposit_Before = (await stabilityPool.getCompoundedZUSDDeposit(dennis)).toString()
-    const dennis_RBTCGain_Before = (await stabilityPool.getDepositorRBTCGain(dennis)).toString()
+    const dennis_ETHGain_Before = (await stabilityPool.getDepositorETHGain(dennis)).toString()
     assert.isAtMost(th.getDifference(dennis_Deposit_Before, spDeposit.sub(liquidatedDebt)), 1000000)
-    assert.isAtMost(th.getDifference(dennis_RBTCGain_Before, liquidatedColl), 1000)
+    assert.isAtMost(th.getDifference(dennis_ETHGain_Before, liquidatedColl), 1000)
 
     // Confirm system is not in Recovery Mode
     assert.isFalse(await th.checkRecoveryMode(contracts));
@@ -748,12 +748,12 @@ contract('TroveManager', async accounts => {
 
     // Check Dennis' SP deposit does not change after liquidation attempt
     const dennis_Deposit_After = (await stabilityPool.getCompoundedZUSDDeposit(dennis)).toString()
-    const dennis_RBTCGain_After = (await stabilityPool.getDepositorRBTCGain(dennis)).toString()
+    const dennis_ETHGain_After = (await stabilityPool.getDepositorETHGain(dennis)).toString()
     assert.equal(dennis_Deposit_Before, dennis_Deposit_After)
-    assert.equal(dennis_RBTCGain_Before, dennis_RBTCGain_After)
+    assert.equal(dennis_ETHGain_Before, dennis_ETHGain_After)
   })
 
-  it("liquidate(): does not liquidate a SP depositor's trove with ICR > 110%, and does not affect their SP deposit or RBTC gain", async () => {
+  it("liquidate(): does not liquidate a SP depositor's trove with ICR > 110%, and does not affect their SP deposit or ETH gain", async () => {
     await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
     const spDeposit = toBN(dec(1, 24))
     await openTrove({ ICR: toBN(dec(3, 18)), extraZUSDAmount: spDeposit, extraParams: { from: bob } })
@@ -773,11 +773,11 @@ contract('TroveManager', async accounts => {
     const price = await priceFeed.getPrice()
     assert.isTrue((await troveManager.getCurrentICR(bob, price)).gt(mv._MCR))
 
-    // Check Bob' SP deposit has absorbed Carol's debt, and he has received her liquidated RBTC
+    // Check Bob' SP deposit has absorbed Carol's debt, and he has received her liquidated ETH
     const bob_Deposit_Before = (await stabilityPool.getCompoundedZUSDDeposit(bob)).toString()
-    const bob_RBTCGain_Before = (await stabilityPool.getDepositorRBTCGain(bob)).toString()
+    const bob_ETHGain_Before = (await stabilityPool.getDepositorETHGain(bob)).toString()
     assert.isAtMost(th.getDifference(bob_Deposit_Before, spDeposit.sub(liquidatedDebt)), 1000000)
-    assert.isAtMost(th.getDifference(bob_RBTCGain_Before, liquidatedColl), 1000)
+    assert.isAtMost(th.getDifference(bob_ETHGain_Before, liquidatedColl), 1000)
 
     // Confirm system is not in Recovery Mode
     assert.isFalse(await th.checkRecoveryMode(contracts));
@@ -790,12 +790,12 @@ contract('TroveManager', async accounts => {
 
     // Check Bob' SP deposit does not change after liquidation attempt
     const bob_Deposit_After = (await stabilityPool.getCompoundedZUSDDeposit(bob)).toString()
-    const bob_RBTCGain_After = (await stabilityPool.getDepositorRBTCGain(bob)).toString()
+    const bob_ETHGain_After = (await stabilityPool.getDepositorETHGain(bob)).toString()
     assert.equal(bob_Deposit_Before, bob_Deposit_After)
-    assert.equal(bob_RBTCGain_Before, bob_RBTCGain_After)
+    assert.equal(bob_ETHGain_Before, bob_ETHGain_After)
   })
 
-  it("liquidate(): liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and RBTC gain", async () => {
+  it("liquidate(): liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and ETH gain", async () => {
     const A_spDeposit = toBN(dec(3, 24))
     const B_spDeposit = toBN(dec(1, 24))
     await openTrove({ ICR: toBN(dec(20, 18)), extraParams: { from: whale } })
@@ -810,11 +810,11 @@ contract('TroveManager', async accounts => {
     await priceFeed.setPrice(dec(100, 18))
     await troveManager.liquidate(carol)
 
-    // Check Bob' SP deposit has absorbed Carol's debt, and he has received her liquidated RBTC
+    // Check Bob' SP deposit has absorbed Carol's debt, and he has received her liquidated ETH
     const bob_Deposit_Before = await stabilityPool.getCompoundedZUSDDeposit(bob)
-    const bob_RBTCGain_Before = await stabilityPool.getDepositorRBTCGain(bob)
+    const bob_ETHGain_Before = await stabilityPool.getDepositorETHGain(bob)
     assert.isAtMost(th.getDifference(bob_Deposit_Before, B_spDeposit.sub(C_debt)), 1000000)
-    assert.isAtMost(th.getDifference(bob_RBTCGain_Before, th.applyLiquidationFee(C_collateral)), 1000)
+    assert.isAtMost(th.getDifference(bob_ETHGain_Before, th.applyLiquidationFee(C_collateral)), 1000)
 
     // Alice provides ZUSD to SP
     await stabilityPool.provideToSP(A_spDeposit, ZERO_ADDRESS, { from: alice })
@@ -832,27 +832,27 @@ contract('TroveManager', async accounts => {
 
     /* 
        Alice's ZUSD Loss = (300 / 400) * 200 = 150 ZUSD
-       Alice's RBTC gain = (300 / 400) * 2*0.995 = 1.4925 RBTC
+       Alice's ETH gain = (300 / 400) * 2*0.995 = 1.4925 ETH
 
        Bob's ZUSDLoss = (100 / 400) * 200 = 50 ZUSD
-       Bob's RBTC gain = (100 / 400) * 2*0.995 = 0.4975 RBTC
+       Bob's ETH gain = (100 / 400) * 2*0.995 = 0.4975 ETH
 
-     Check Bob' SP deposit has been reduced to 50 ZUSD, and his RBTC gain has increased to 1.5 RBTC. */
+     Check Bob' SP deposit has been reduced to 50 ZUSD, and his ETH gain has increased to 1.5 ETH. */
     const alice_Deposit_After = (await stabilityPool.getCompoundedZUSDDeposit(alice)).toString()
-    const alice_RBTCGain_After = (await stabilityPool.getDepositorRBTCGain(alice)).toString()
+    const alice_ETHGain_After = (await stabilityPool.getDepositorETHGain(alice)).toString()
 
     const totalDeposits = bob_Deposit_Before.add(A_spDeposit)
 
     // Note: The difference was 1000000 but it's it got a little bit bigger after changing system parameters.
     //       I'm not sure why but the difference is way deep into the decimals
     assert.isAtMost(th.getDifference(alice_Deposit_After, A_spDeposit.sub(B_debt.mul(A_spDeposit).div(totalDeposits))), 2000000)
-    assert.isAtMost(th.getDifference(alice_RBTCGain_After, th.applyLiquidationFee(B_collateral).mul(A_spDeposit).div(totalDeposits)), 3000000)
+    assert.isAtMost(th.getDifference(alice_ETHGain_After, th.applyLiquidationFee(B_collateral).mul(A_spDeposit).div(totalDeposits)), 3000000)
 
     const bob_Deposit_After = await stabilityPool.getCompoundedZUSDDeposit(bob)
-    const bob_RBTCGain_After = await stabilityPool.getDepositorRBTCGain(bob)
+    const bob_ETHGain_After = await stabilityPool.getDepositorETHGain(bob)
 
     assert.isAtMost(th.getDifference(bob_Deposit_After, bob_Deposit_Before.sub(B_debt.mul(bob_Deposit_Before).div(totalDeposits))), 1000000)
-    assert.isAtMost(th.getDifference(bob_RBTCGain_After, bob_RBTCGain_Before.add(th.applyLiquidationFee(B_collateral).mul(bob_Deposit_Before).div(totalDeposits))), 1000000)
+    assert.isAtMost(th.getDifference(bob_ETHGain_After, bob_ETHGain_Before.add(th.applyLiquidationFee(B_collateral).mul(bob_Deposit_Before).div(totalDeposits))), 1000000)
   })
 
   it("liquidate(): does not alter the liquidated user's token balance", async () => {
@@ -902,7 +902,7 @@ contract('TroveManager', async accounts => {
     await openTrove({ ICR: toBN(dec(221, 16)), extraZUSDAmount: toBN(dec(100, 18)), extraParams: { from: bob } })
     await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: toBN(dec(100, 18)), extraParams: { from: carol } })
 
-    // Defaulter opens with 60 ZUSD, 0.6 RBTC
+    // Defaulter opens with 60 ZUSD, 0.6 ETH
     await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter_1 } })
 
     // Price drops
@@ -926,11 +926,11 @@ contract('TroveManager', async accounts => {
     // Confirm system is not in Recovery Mode
     assert.isFalse(await th.checkRecoveryMode(contracts));
 
-    /* Liquidate defaulter. 30 ZUSD and 0.3 RBTC is distributed between A, B and C.
+    /* Liquidate defaulter. 30 ZUSD and 0.3 ETH is distributed between A, B and C.
 
-    A receives (30 * 2/4) = 15 ZUSD, and (0.3*2/4) = 0.15 RBTC
-    B receives (30 * 1/4) = 7.5 ZUSD, and (0.3*1/4) = 0.075 RBTC
-    C receives (30 * 1/4) = 7.5 ZUSD, and (0.3*1/4) = 0.075 RBTC
+    A receives (30 * 2/4) = 15 ZUSD, and (0.3*2/4) = 0.15 ETH
+    B receives (30 * 1/4) = 7.5 ZUSD, and (0.3*1/4) = 0.075 ETH
+    C receives (30 * 1/4) = 7.5 ZUSD, and (0.3*1/4) = 0.075 ETH
     */
     await troveManager.liquidate(defaulter_1)
 
@@ -998,7 +998,7 @@ contract('TroveManager', async accounts => {
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
-    // Price drops to 1RBTC:100ZUSD, reducing defaulters to below MCR
+    // Price drops to 1ETH:100ZUSD, reducing defaulters to below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
     assert.isFalse(await th.checkRecoveryMode(contracts))
@@ -1040,7 +1040,7 @@ contract('TroveManager', async accounts => {
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
-    // Price drops to 1RBTC:100ZUSD, reducing defaulters to below MCR
+    // Price drops to 1ETH:100ZUSD, reducing defaulters to below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
     assert.isFalse(await th.checkRecoveryMode(contracts))
@@ -1111,14 +1111,14 @@ contract('TroveManager', async accounts => {
     assert.isFalse(await troveManager.hasPendingRewards(E))
 
     // Check C's pending coll and debt rewards are <= the coll and debt in the DefaultPool
-    const pendingRBTC_C = await troveManager.getPendingRBTCReward(C)
+    const pendingETH_C = await troveManager.getPendingETHReward(C)
     const pendingZUSDDebt_C = await troveManager.getPendingZUSDDebtReward(C)
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
-    assert.isTrue(pendingRBTC_C.lte(defaultPoolRBTC))
+    assert.isTrue(pendingETH_C.lte(defaultPoolETH))
     assert.isTrue(pendingZUSDDebt_C.lte(defaultPoolZUSDDebt))
     //Check only difference is dust
-    assert.isAtMost(th.getDifference(pendingRBTC_C, defaultPoolRBTC), 1000)
+    assert.isAtMost(th.getDifference(pendingETH_C, defaultPoolETH), 1000)
     assert.isAtMost(th.getDifference(pendingZUSDDebt_C, defaultPoolZUSDDebt), 1000)
 
     // Confirm system is still in Recovery Mode
@@ -1161,7 +1161,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing Bob and Carol's ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing Bob and Carol's ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -1328,7 +1328,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(bob_ICR_Before.gte(mv._MCR))
     assert.isTrue(carol_ICR_Before.lte(mv._MCR))
 
-    // Liquidate defaulter. 30 ZUSD and 0.3 RBTC is distributed uniformly between A, B and C. Each receive 10 ZUSD, 0.1 RBTC
+    // Liquidate defaulter. 30 ZUSD and 0.3 ETH is distributed uniformly between A, B and C. Each receive 10 ZUSD, 0.1 ETH
     await troveManager.liquidate(defaulter_1)
 
     const alice_ICR_After = await troveManager.getCurrentICR(alice, price)
@@ -1620,7 +1620,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(TCR_After.gte(TCR_Before.mul(toBN(995)).div(toBN(1000))))
   })
 
-  it("liquidateTroves(): Liquidating troves with SP deposits correctly impacts their SP deposit and RBTC gain", async () => {
+  it("liquidateTroves(): Liquidating troves with SP deposits correctly impacts their SP deposit and ETH gain", async () => {
     // Whale provides 400 ZUSD to the SP
     const whaleDeposit = toBN(dec(40000, 18))
     await openTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: whaleDeposit, extraParams: { from: whale } })
@@ -1673,7 +1673,7 @@ contract('TroveManager', async accounts => {
     Then, liquidation hits A,B,C: 
 
     Total liquidated debt = 150 + 350 + 150 = 650 ZUSD
-    Total liquidated RBTC = 1.1 + 3.1 + 1.1 = 5.3 RBTC
+    Total liquidated ETH = 1.1 + 3.1 + 1.1 = 5.3 ETH
 
     whale zusd loss: 650 * (400/800) = 325 zusd
     alice zusd loss:  650 *(100/800) = 81.25 zusd
@@ -1688,31 +1688,31 @@ contract('TroveManager', async accounts => {
     bob eth gain: 5*0.995 * (300/800) = 1.865625 eth
 
     Total remaining deposits: 150 ZUSD
-    Total RBTC gain: 4.975 RBTC */
+    Total ETH gain: 4.975 ETH */
 
-    // Check remaining ZUSD Deposits and RBTC gain, for whale and depositors whose troves were liquidated
+    // Check remaining ZUSD Deposits and ETH gain, for whale and depositors whose troves were liquidated
     const whale_Deposit_After = await stabilityPool.getCompoundedZUSDDeposit(whale)
     const alice_Deposit_After = await stabilityPool.getCompoundedZUSDDeposit(alice)
     const bob_Deposit_After = await stabilityPool.getCompoundedZUSDDeposit(bob)
 
-    const whale_RBTCGain = await stabilityPool.getDepositorRBTCGain(whale)
-    const alice_RBTCGain = await stabilityPool.getDepositorRBTCGain(alice)
-    const bob_RBTCGain = await stabilityPool.getDepositorRBTCGain(bob)
+    const whale_ETHGain = await stabilityPool.getDepositorETHGain(whale)
+    const alice_ETHGain = await stabilityPool.getDepositorETHGain(alice)
+    const bob_ETHGain = await stabilityPool.getDepositorETHGain(bob)
 
     assert.isAtMost(th.getDifference(whale_Deposit_After, whaleDeposit.sub(liquidatedDebt.mul(whaleDeposit).div(totalDeposits))), 100000)
     assert.isAtMost(th.getDifference(alice_Deposit_After, A_deposit.sub(liquidatedDebt.mul(A_deposit).div(totalDeposits))), 100000)
     assert.isAtMost(th.getDifference(bob_Deposit_After, B_deposit.sub(liquidatedDebt.mul(B_deposit).div(totalDeposits))), 100000)
 
-    assert.isAtMost(th.getDifference(whale_RBTCGain, th.applyLiquidationFee(liquidatedColl).mul(whaleDeposit).div(totalDeposits)), 100000)
-    assert.isAtMost(th.getDifference(alice_RBTCGain, th.applyLiquidationFee(liquidatedColl).mul(A_deposit).div(totalDeposits)), 100000)
-    assert.isAtMost(th.getDifference(bob_RBTCGain, th.applyLiquidationFee(liquidatedColl).mul(B_deposit).div(totalDeposits)), 100000)
+    assert.isAtMost(th.getDifference(whale_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(whaleDeposit).div(totalDeposits)), 100000)
+    assert.isAtMost(th.getDifference(alice_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(A_deposit).div(totalDeposits)), 100000)
+    assert.isAtMost(th.getDifference(bob_ETHGain, th.applyLiquidationFee(liquidatedColl).mul(B_deposit).div(totalDeposits)), 100000)
 
-    // Check total remaining deposits and RBTC gain in Stability Pool
+    // Check total remaining deposits and ETH gain in Stability Pool
     const total_ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString()
-    const total_RBTCinSP = (await stabilityPool.getRBTC()).toString()
+    const total_ETHinSP = (await stabilityPool.getETH()).toString()
 
     assert.isAtMost(th.getDifference(total_ZUSDinSP, totalDeposits.sub(liquidatedDebt)), 1000)
-    assert.isAtMost(th.getDifference(total_RBTCinSP, th.applyLiquidationFee(liquidatedColl)), 1000)
+    assert.isAtMost(th.getDifference(total_ETHinSP, th.applyLiquidationFee(liquidatedColl)), 1000)
   })
 
   it("liquidateTroves(): when SP > 0, triggers ZERO reward event - increases the sum G", async () => {
@@ -1734,7 +1734,7 @@ contract('TroveManager', async accounts => {
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
-    // Price drops to 1RBTC:100ZUSD, reducing defaulters to below MCR
+    // Price drops to 1ETH:100ZUSD, reducing defaulters to below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
     assert.isFalse(await th.checkRecoveryMode(contracts))
@@ -1778,7 +1778,7 @@ contract('TroveManager', async accounts => {
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
-    // Price drops to 1RBTC:100ZUSD, reducing defaulters to below MCR
+    // Price drops to 1ETH:100ZUSD, reducing defaulters to below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
     assert.isFalse(await th.checkRecoveryMode(contracts))
@@ -1851,14 +1851,14 @@ contract('TroveManager', async accounts => {
     assert.isFalse(await troveManager.hasPendingRewards(E))
 
     // Check C's pending coll and debt rewards are <= the coll and debt in the DefaultPool
-    const pendingRBTC_C = await troveManager.getPendingRBTCReward(C)
+    const pendingETH_C = await troveManager.getPendingETHReward(C)
     const pendingZUSDDebt_C = await troveManager.getPendingZUSDDebtReward(C)
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
-    assert.isTrue(pendingRBTC_C.lte(defaultPoolRBTC))
+    assert.isTrue(pendingETH_C.lte(defaultPoolETH))
     assert.isTrue(pendingZUSDDebt_C.lte(defaultPoolZUSDDebt))
     //Check only difference is dust
-    assert.isAtMost(th.getDifference(pendingRBTC_C, defaultPoolRBTC), 1000)
+    assert.isAtMost(th.getDifference(pendingETH_C, defaultPoolETH), 1000)
     assert.isAtMost(th.getDifference(pendingZUSDDebt_C, defaultPoolZUSDDebt), 1000)
 
     // Confirm system is still in Recovery Mode
@@ -1898,7 +1898,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing A, B, C ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing A, B, C ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -1953,7 +1953,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing A, B, C ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing A, B, C ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -2011,7 +2011,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing A, B, C ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing A, B, C ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -2066,7 +2066,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing A, B, C ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing A, B, C ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -2102,7 +2102,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing A, B, C ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing A, B, C ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -2170,7 +2170,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST ---
 
-    // Price drops to 1RBTC:100ZUSD, reducing A, B, C ICR below MCR
+    // Price drops to 1ETH:100ZUSD, reducing A, B, C ICR below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
 
@@ -2239,7 +2239,7 @@ contract('TroveManager', async accounts => {
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
-    // Price drops to 1RBTC:100ZUSD, reducing defaulters to below MCR
+    // Price drops to 1ETH:100ZUSD, reducing defaulters to below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
     assert.isFalse(await th.checkRecoveryMode(contracts))
@@ -2283,7 +2283,7 @@ contract('TroveManager', async accounts => {
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
-    // Price drops to 1RBTC:100ZUSD, reducing defaulters to below MCR
+    // Price drops to 1ETH:100ZUSD, reducing defaulters to below MCR
     await priceFeed.setPrice(dec(100, 18));
     const price = await priceFeed.getPrice()
     assert.isFalse(await th.checkRecoveryMode(contracts))
@@ -2347,7 +2347,7 @@ contract('TroveManager', async accounts => {
     assert.equal(partialRedemptionHintNICR, '0')
   });
 
-  it('redeemCollateral(): cancels the provided ZUSD with debt from Troves with the lowest ICRs and sends an equivalent amount of RBtcer', async () => {
+  it('redeemCollateral(): cancels the provided ZUSD with debt from Troves with the lowest ICRs and sends an equivalent amount of Ether', async () => {
     // --- SETUP ---
     const { totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(310, 16)), extraZUSDAmount: dec(10, 18), extraParams: { from: alice } })
     const { netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(290, 16)), extraZUSDAmount: dec(8, 18), extraParams: { from: bob } })
@@ -2357,7 +2357,7 @@ contract('TroveManager', async accounts => {
     // start Dennis with a high ICR
     await openTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: redemptionAmount, extraParams: { from: dennis } })
 
-    const dennis_RBTCBalance_Before = toBN(await web3.eth.getBalance(dennis))
+    const dennis_ETHBalance_Before = toBN(await web3.eth.getBalance(dennis))
 
     const dennis_ZUSDBalance_Before = await zusdToken.balanceOf(dennis)
 
@@ -2384,7 +2384,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received RBtcer
+    // Don't pay for gas, as it makes it easier to calculate the received Ether
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       firstRedemptionHint,
@@ -2398,7 +2398,7 @@ contract('TroveManager', async accounts => {
       }
     )
 
-    const RBTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+    const ETHFee = th.getEmittedRedemptionValues(redemptionTx)[3]
 
     const alice_Trove_After = await troveManager.Troves(alice)
     const bob_Trove_After = await troveManager.Troves(bob)
@@ -2415,13 +2415,13 @@ contract('TroveManager', async accounts => {
     assert.equal(bob_debt_After, '0')
     assert.equal(carol_debt_After, '0')
 
-    const dennis_RBTCBalance_After = toBN(await web3.eth.getBalance(dennis))
-    const receivedRBTC = dennis_RBTCBalance_After.sub(dennis_RBTCBalance_Before)
+    const dennis_ETHBalance_After = toBN(await web3.eth.getBalance(dennis))
+    const receivedETH = dennis_ETHBalance_After.sub(dennis_ETHBalance_Before)
 
-    const expectedTotalRBTCDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to RBTC, at RBTC:USD price 200
-    const expectedReceivedRBTC = expectedTotalRBTCDrawn.sub(toBN(RBTCFee))
+    const expectedTotalETHDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to ETH, at ETH:USD price 200
+    const expectedReceivedETH = expectedTotalETHDrawn.sub(toBN(ETHFee))
 
-    th.assertIsApproximatelyEqual(expectedReceivedRBTC, receivedRBTC)
+    th.assertIsApproximatelyEqual(expectedReceivedETH, receivedETH)
 
     const dennis_ZUSDBalance_After = (await zusdToken.balanceOf(dennis)).toString()
     assert.equal(dennis_ZUSDBalance_After, dennis_ZUSDBalance_Before.sub(redemptionAmount))
@@ -2437,7 +2437,7 @@ contract('TroveManager', async accounts => {
     // start Dennis with a high ICR
     await openTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: redemptionAmount, extraParams: { from: dennis } })
 
-    const dennis_RBTCBalance_Before = toBN(await web3.eth.getBalance(dennis))
+    const dennis_ETHBalance_Before = toBN(await web3.eth.getBalance(dennis))
 
     const dennis_ZUSDBalance_Before = await zusdToken.balanceOf(dennis)
 
@@ -2464,7 +2464,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received RBtcer
+    // Don't pay for gas, as it makes it easier to calculate the received Ether
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       ZERO_ADDRESS, // invalid first hint
@@ -2478,7 +2478,7 @@ contract('TroveManager', async accounts => {
       }
     )
 
-    const RBTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+    const ETHFee = th.getEmittedRedemptionValues(redemptionTx)[3]
 
     const alice_Trove_After = await troveManager.Troves(alice)
     const bob_Trove_After = await troveManager.Troves(bob)
@@ -2495,13 +2495,13 @@ contract('TroveManager', async accounts => {
     assert.equal(bob_debt_After, '0')
     assert.equal(carol_debt_After, '0')
 
-    const dennis_RBTCBalance_After = toBN(await web3.eth.getBalance(dennis))
-    const receivedRBTC = dennis_RBTCBalance_After.sub(dennis_RBTCBalance_Before)
+    const dennis_ETHBalance_After = toBN(await web3.eth.getBalance(dennis))
+    const receivedETH = dennis_ETHBalance_After.sub(dennis_ETHBalance_Before)
 
-    const expectedTotalRBTCDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to RBTC, at RBTC:USD price 200
-    const expectedReceivedRBTC = expectedTotalRBTCDrawn.sub(toBN(RBTCFee))
+    const expectedTotalETHDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to ETH, at ETH:USD price 200
+    const expectedReceivedETH = expectedTotalETHDrawn.sub(toBN(ETHFee))
 
-    th.assertIsApproximatelyEqual(expectedReceivedRBTC, receivedRBTC)
+    th.assertIsApproximatelyEqual(expectedReceivedETH, receivedETH)
 
     const dennis_ZUSDBalance_After = (await zusdToken.balanceOf(dennis)).toString()
     assert.equal(dennis_ZUSDBalance_After, dennis_ZUSDBalance_Before.sub(redemptionAmount))
@@ -2517,7 +2517,7 @@ contract('TroveManager', async accounts => {
     // start Dennis with a high ICR
     await openTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: redemptionAmount, extraParams: { from: dennis } })
 
-    const dennis_RBTCBalance_Before = toBN(await web3.eth.getBalance(dennis))
+    const dennis_ETHBalance_Before = toBN(await web3.eth.getBalance(dennis))
 
     const dennis_ZUSDBalance_Before = await zusdToken.balanceOf(dennis)
 
@@ -2544,7 +2544,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received RBtcer
+    // Don't pay for gas, as it makes it easier to calculate the received Ether
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       erin, // invalid first hint, it doesn’t have a trove
@@ -2558,7 +2558,7 @@ contract('TroveManager', async accounts => {
       }
     )
 
-    const RBTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+    const ETHFee = th.getEmittedRedemptionValues(redemptionTx)[3]
 
     const alice_Trove_After = await troveManager.Troves(alice)
     const bob_Trove_After = await troveManager.Troves(bob)
@@ -2575,13 +2575,13 @@ contract('TroveManager', async accounts => {
     assert.equal(bob_debt_After, '0')
     assert.equal(carol_debt_After, '0')
 
-    const dennis_RBTCBalance_After = toBN(await web3.eth.getBalance(dennis))
-    const receivedRBTC = dennis_RBTCBalance_After.sub(dennis_RBTCBalance_Before)
+    const dennis_ETHBalance_After = toBN(await web3.eth.getBalance(dennis))
+    const receivedETH = dennis_ETHBalance_After.sub(dennis_ETHBalance_Before)
 
-    const expectedTotalRBTCDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to RBTC, at RBTC:USD price 200
-    const expectedReceivedRBTC = expectedTotalRBTCDrawn.sub(toBN(RBTCFee))
+    const expectedTotalETHDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to ETH, at ETH:USD price 200
+    const expectedReceivedETH = expectedTotalETHDrawn.sub(toBN(ETHFee))
 
-    th.assertIsApproximatelyEqual(expectedReceivedRBTC, receivedRBTC)
+    th.assertIsApproximatelyEqual(expectedReceivedETH, receivedETH)
 
     const dennis_ZUSDBalance_After = (await zusdToken.balanceOf(dennis)).toString()
     assert.equal(dennis_ZUSDBalance_After, dennis_ZUSDBalance_Before.sub(redemptionAmount))
@@ -2597,7 +2597,7 @@ contract('TroveManager', async accounts => {
     // start Dennis with a high ICR
     await openTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: redemptionAmount, extraParams: { from: dennis } })
 
-    const dennis_RBTCBalance_Before = toBN(await web3.eth.getBalance(dennis))
+    const dennis_ETHBalance_Before = toBN(await web3.eth.getBalance(dennis))
 
     const dennis_ZUSDBalance_Before = await zusdToken.balanceOf(dennis)
 
@@ -2630,7 +2630,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received RBtcer
+    // Don't pay for gas, as it makes it easier to calculate the received Ether
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       erin, // invalid trove, below MCR
@@ -2644,7 +2644,7 @@ contract('TroveManager', async accounts => {
       }
     )
 
-    const RBTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+    const ETHFee = th.getEmittedRedemptionValues(redemptionTx)[3]
 
     const alice_Trove_After = await troveManager.Troves(alice)
     const bob_Trove_After = await troveManager.Troves(bob)
@@ -2661,13 +2661,13 @@ contract('TroveManager', async accounts => {
     assert.equal(bob_debt_After, '0')
     assert.equal(carol_debt_After, '0')
 
-    const dennis_RBTCBalance_After = toBN(await web3.eth.getBalance(dennis))
-    const receivedRBTC = dennis_RBTCBalance_After.sub(dennis_RBTCBalance_Before)
+    const dennis_ETHBalance_After = toBN(await web3.eth.getBalance(dennis))
+    const receivedETH = dennis_ETHBalance_After.sub(dennis_ETHBalance_Before)
 
-    const expectedTotalRBTCDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to RBTC, at RBTC:USD price 200
-    const expectedReceivedRBTC = expectedTotalRBTCDrawn.sub(toBN(RBTCFee))
+    const expectedTotalETHDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to ETH, at ETH:USD price 200
+    const expectedReceivedETH = expectedTotalETHDrawn.sub(toBN(ETHFee))
 
-    th.assertIsApproximatelyEqual(expectedReceivedRBTC, receivedRBTC)
+    th.assertIsApproximatelyEqual(expectedReceivedETH, receivedETH)
 
     const dennis_ZUSDBalance_After = (await zusdToken.balanceOf(dennis)).toString()
     assert.equal(dennis_ZUSDBalance_After, dennis_ZUSDBalance_Before.sub(redemptionAmount))
@@ -2687,7 +2687,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST --- 
 
-    // open trove from redeemer.  Redeemer has highest ICR (100RBTC, 100 ZUSD), 20000%
+    // open trove from redeemer.  Redeemer has highest ICR (100ETH, 100 ZUSD), 20000%
     const { zusdAmount: F_zusdAmount } = await openTrove({ ICR: toBN(dec(200, 18)), extraZUSDAmount: redemptionAmount.mul(toBN(2)), extraParams: { from: flyn } })
 
     // skip bootstrapping phase
@@ -2744,7 +2744,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST --- 
 
-    // open trove from redeemer.  Redeemer has highest ICR (100RBTC, 100 ZUSD), 20000%
+    // open trove from redeemer.  Redeemer has highest ICR (100ETH, 100 ZUSD), 20000%
     const { zusdAmount: F_zusdAmount } = await openTrove({ ICR: toBN(dec(200, 18)), extraZUSDAmount: redemptionAmount.mul(toBN(2)), extraParams: { from: flyn } })
 
     // skip bootstrapping phase
@@ -2846,7 +2846,7 @@ contract('TroveManager', async accounts => {
 
     await openTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: redemptionAmount, extraParams: { from: dennis } })
 
-    const dennis_RBTCBalance_Before = toBN(await web3.eth.getBalance(dennis))
+    const dennis_ETHBalance_Before = toBN(await web3.eth.getBalance(dennis))
 
     const dennis_ZUSDBalance_Before = await zusdToken.balanceOf(dennis)
 
@@ -2909,7 +2909,7 @@ contract('TroveManager', async accounts => {
       }
     )
 
-    const RBTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+    const ETHFee = th.getEmittedRedemptionValues(redemptionTx)[3]
 
     // Since Alice already redeemed 1 ZUSD from Carol's Trove, Dennis was  able to redeem:
     //  - 9 ZUSD from Carol's
@@ -2920,14 +2920,14 @@ contract('TroveManager', async accounts => {
     // got in the way, he would have needed to redeem 3 ZUSD to fully complete his redemption of 20 ZUSD.
     // This would have required a different hint, therefore he ended up with a partial redemption.
 
-    const dennis_RBTCBalance_After = toBN(await web3.eth.getBalance(dennis))
-    const receivedRBTC = dennis_RBTCBalance_After.sub(dennis_RBTCBalance_Before)
+    const dennis_ETHBalance_After = toBN(await web3.eth.getBalance(dennis))
+    const receivedETH = dennis_ETHBalance_After.sub(dennis_ETHBalance_Before)
 
-    // Expect only 17 worth of RBTC drawn
-    const expectedTotalRBTCDrawn = fullfilledRedemptionAmount.sub(frontRunRedepmtion).div(toBN(200)) // redempted ZUSD converted to RBTC, at RBTC:USD price 200
-    const expectedReceivedRBTC = expectedTotalRBTCDrawn.sub(RBTCFee)
+    // Expect only 17 worth of ETH drawn
+    const expectedTotalETHDrawn = fullfilledRedemptionAmount.sub(frontRunRedepmtion).div(toBN(200)) // redempted ZUSD converted to ETH, at ETH:USD price 200
+    const expectedReceivedETH = expectedTotalETHDrawn.sub(ETHFee)
 
-    th.assertIsApproximatelyEqual(expectedReceivedRBTC, receivedRBTC)
+    th.assertIsApproximatelyEqual(expectedReceivedETH, receivedETH)
 
     const dennis_ZUSDBalance_After = (await zusdToken.balanceOf(dennis)).toString()
     th.assertIsApproximatelyEqual(dennis_ZUSDBalance_After, dennis_ZUSDBalance_Before.sub(fullfilledRedemptionAmount.sub(frontRunRedepmtion)))
@@ -2951,7 +2951,7 @@ contract('TroveManager', async accounts => {
 
     // --- TEST --- 
 
-    const carol_RBTCBalance_Before = toBN(await web3.eth.getBalance(carol))
+    const carol_ETHBalance_Before = toBN(await web3.eth.getBalance(carol))
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -2970,15 +2970,15 @@ contract('TroveManager', async accounts => {
       }
     )
 
-    const RBTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+    const ETHFee = th.getEmittedRedemptionValues(redemptionTx)[3]
 
-    const carol_RBTCBalance_After = toBN(await web3.eth.getBalance(carol))
+    const carol_ETHBalance_After = toBN(await web3.eth.getBalance(carol))
 
-    const expectedTotalRBTCDrawn = toBN(amount).div(toBN(100)) // convert 100 ZUSD to RBTC at RBTC:USD price of 100
-    const expectedReceivedRBTC = expectedTotalRBTCDrawn.sub(RBTCFee)
+    const expectedTotalETHDrawn = toBN(amount).div(toBN(100)) // convert 100 ZUSD to ETH at ETH:USD price of 100
+    const expectedReceivedETH = expectedTotalETHDrawn.sub(ETHFee)
 
-    const receivedRBTC = carol_RBTCBalance_After.sub(carol_RBTCBalance_Before)
-    assert.isTrue(expectedReceivedRBTC.eq(receivedRBTC))
+    const receivedETH = carol_ETHBalance_After.sub(carol_ETHBalance_Before)
+    assert.isTrue(expectedReceivedETH.eq(receivedETH))
 
     const carol_ZUSDBalance_After = (await zusdToken.balanceOf(carol)).toString()
     assert.equal(carol_ZUSDBalance_After, '0')
@@ -3199,15 +3199,15 @@ contract('TroveManager', async accounts => {
 
     // Attempt with maxFee > 5.5%
     const price = await priceFeed.getPrice()
-    const RBTCDrawn = attemptedZUSDRedemption.mul(mv._1e18BN).div(price)
-    const slightlyMoreThanFee = (await troveManager.getRedemptionFeeWithDecay(RBTCDrawn))
+    const ETHDrawn = attemptedZUSDRedemption.mul(mv._1e18BN).div(price)
+    const slightlyMoreThanFee = (await troveManager.getRedemptionFeeWithDecay(ETHDrawn))
     const tx1 = await th.redeemCollateralAndGetTxObject(A, contracts, attemptedZUSDRedemption, slightlyMoreThanFee)
     assert.isTrue(tx1.receipt.status)
 
     await troveManager.setBaseRate(0)  // Artificially zero the baseRate
     
     // Attempt with maxFee = 5.5%
-    const exactSameFee = (await troveManager.getRedemptionFeeWithDecay(RBTCDrawn))
+    const exactSameFee = (await troveManager.getRedemptionFeeWithDecay(ETHDrawn))
     const tx2 = await th.redeemCollateralAndGetTxObject(C, contracts, attemptedZUSDRedemption, exactSameFee)
     assert.isTrue(tx2.receipt.status)
 
@@ -3230,7 +3230,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(tx5.receipt.status)
   })
 
-  it("redeemCollateral(): doesn't affect the Stability Pool deposits or RBTC gain of redeemed-from troves", async () => {
+  it("redeemCollateral(): doesn't affect the Stability Pool deposits or ETH gain of redeemed-from troves", async () => {
     await openTrove({ ICR: toBN(dec(20, 18)), extraParams: { from: whale } })
 
     // B, C, D, F open trove
@@ -3270,15 +3270,15 @@ contract('TroveManager', async accounts => {
     const carol_SPDeposit_before = (await stabilityPool.getCompoundedZUSDDeposit(carol)).toString()
     const dennis_SPDeposit_before = (await stabilityPool.getCompoundedZUSDDeposit(dennis)).toString()
 
-    const bob_RBTCGain_before = (await stabilityPool.getDepositorRBTCGain(bob)).toString()
-    const carol_RBTCGain_before = (await stabilityPool.getDepositorRBTCGain(carol)).toString()
-    const dennis_RBTCGain_before = (await stabilityPool.getDepositorRBTCGain(dennis)).toString()
+    const bob_ETHGain_before = (await stabilityPool.getDepositorETHGain(bob)).toString()
+    const carol_ETHGain_before = (await stabilityPool.getDepositorETHGain(carol)).toString()
+    const dennis_ETHGain_before = (await stabilityPool.getDepositorETHGain(dennis)).toString()
 
-    // Check the remaining ZUSD and RBTC in Stability Pool after liquidation is non-zero
+    // Check the remaining ZUSD and ETH in Stability Pool after liquidation is non-zero
     const ZUSDinSP = await stabilityPool.getTotalZUSDDeposits()
-    const RBTCinSP = await stabilityPool.getRBTC()
+    const ETHinSP = await stabilityPool.getETH()
     assert.isTrue(ZUSDinSP.gte(mv._zeroBN))
-    assert.isTrue(RBTCinSP.gte(mv._zeroBN))
+    assert.isTrue(ETHinSP.gte(mv._zeroBN))
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -3300,18 +3300,18 @@ contract('TroveManager', async accounts => {
     const carol_SPDeposit_after = (await stabilityPool.getCompoundedZUSDDeposit(carol)).toString()
     const dennis_SPDeposit_after = (await stabilityPool.getCompoundedZUSDDeposit(dennis)).toString()
 
-    const bob_RBTCGain_after = (await stabilityPool.getDepositorRBTCGain(bob)).toString()
-    const carol_RBTCGain_after = (await stabilityPool.getDepositorRBTCGain(carol)).toString()
-    const dennis_RBTCGain_after = (await stabilityPool.getDepositorRBTCGain(dennis)).toString()
+    const bob_ETHGain_after = (await stabilityPool.getDepositorETHGain(bob)).toString()
+    const carol_ETHGain_after = (await stabilityPool.getDepositorETHGain(carol)).toString()
+    const dennis_ETHGain_after = (await stabilityPool.getDepositorETHGain(dennis)).toString()
 
-    // Check B, C, D Stability Pool deposits and RBTC gain have not been affected by redemptions from their troves
+    // Check B, C, D Stability Pool deposits and ETH gain have not been affected by redemptions from their troves
     assert.equal(bob_SPDeposit_before, bob_SPDeposit_after)
     assert.equal(carol_SPDeposit_before, carol_SPDeposit_after)
     assert.equal(dennis_SPDeposit_before, dennis_SPDeposit_after)
 
-    assert.equal(bob_RBTCGain_before, bob_RBTCGain_after)
-    assert.equal(carol_RBTCGain_before, carol_RBTCGain_after)
-    assert.equal(dennis_RBTCGain_before, dennis_RBTCGain_after)
+    assert.equal(bob_ETHGain_before, bob_ETHGain_after)
+    assert.equal(carol_ETHGain_before, carol_ETHGain_after)
+    assert.equal(dennis_ETHGain_before, dennis_ETHGain_after)
   })
 
   it("redeemCollateral(): caller can redeem their entire ZUSDToken balance", async () => {
@@ -3335,7 +3335,7 @@ contract('TroveManager', async accounts => {
 
     // Get active debt and coll before redemption
     const activePool_debt_before = await activePool.getZUSDDebt()
-    const activePool_coll_before = await activePool.getRBTC()
+    const activePool_coll_before = await activePool.getETH()
 
     th.assertIsApproximatelyEqual(activePool_debt_before, totalDebt)
     assert.equal(activePool_coll_before.toString(), totalColl)
@@ -3370,10 +3370,10 @@ contract('TroveManager', async accounts => {
     const activePool_debt_after = await activePool.getZUSDDebt()
     assert.equal(activePool_debt_before.sub(activePool_debt_after), dec(400, 18))
 
-    /* Check ActivePool coll reduced by $400 worth of RBtcer: at RBTC:USD price of $200, this should be 2 RBTC.
+    /* Check ActivePool coll reduced by $400 worth of Ether: at ETH:USD price of $200, this should be 2 ETH.
 
-    therefore remaining ActivePool RBTC should be 198 */
-    const activePool_coll_after = await activePool.getRBTC()
+    therefore remaining ActivePool ETH should be 198 */
+    const activePool_coll_after = await activePool.getETH()
     // console.log(`activePool_coll_after: ${activePool_coll_after}`)
     assert.equal(activePool_coll_after.toString(), activePool_coll_before.sub(toBN(dec(2, 18))))
 
@@ -3403,7 +3403,7 @@ contract('TroveManager', async accounts => {
 
     // Get active debt and coll before redemption
     const activePool_debt_before = await activePool.getZUSDDebt()
-    const activePool_coll_before = (await activePool.getRBTC()).toString()
+    const activePool_coll_before = (await activePool.getETH()).toString()
 
     th.assertIsApproximatelyEqual(activePool_debt_before, totalDebt)
     assert.equal(activePool_coll_before, totalColl)
@@ -3525,7 +3525,7 @@ contract('TroveManager', async accounts => {
     }
   })
 
-  it("redeemCollateral(): value of issued RBTC == face value of redeemed ZUSD (assuming 1 ZUSD has value of $1)", async () => {
+  it("redeemCollateral(): value of issued ETH == face value of redeemed ZUSD (assuming 1 ZUSD has value of $1)", async () => {
     const { collateral: W_coll } = await openTrove({ ICR: toBN(dec(20, 18)), extraParams: { from: whale } })
 
     // Alice opens trove and transfers 1000 ZUSD each to Erin, Flyn, Graham
@@ -3547,9 +3547,9 @@ contract('TroveManager', async accounts => {
     const _373_ZUSD = '373000000000000000000'
     const _950_ZUSD = '950000000000000000000'
 
-    // Check RBtcer in activePool
-    const activeRBTC_0 = await activePool.getRBTC()
-    assert.equal(activeRBTC_0, totalColl.toString());
+    // Check Ether in activePool
+    const activeETH_0 = await activePool.getETH()
+    assert.equal(activeETH_0, totalColl.toString());
 
     let firstRedemptionHint
     let partialRedemptionHintNICR
@@ -3581,12 +3581,12 @@ contract('TroveManager', async accounts => {
 
     assert.isTrue(redemption_1.receipt.status);
 
-    /* 120 ZUSD redeemed.  Expect $120 worth of RBTC removed. At RBTC:USD price of $200, 
-    RBTC removed = (120/200) = 0.6 RBTC
-    Total active RBTC = 280 - 0.6 = 279.4 RBTC */
+    /* 120 ZUSD redeemed.  Expect $120 worth of ETH removed. At ETH:USD price of $200, 
+    ETH removed = (120/200) = 0.6 ETH
+    Total active ETH = 280 - 0.6 = 279.4 ETH */
 
-    const activeRBTC_1 = await activePool.getRBTC()
-    assert.equal(activeRBTC_1.toString(), activeRBTC_0.sub(toBN(_120_ZUSD).mul(mv._1e18BN).div(price)));
+    const activeETH_1 = await activePool.getETH()
+    assert.equal(activeETH_1.toString(), activeETH_0.sub(toBN(_120_ZUSD).mul(mv._1e18BN).div(price)));
 
     // Flyn redeems 373 ZUSD
     ({
@@ -3611,11 +3611,11 @@ contract('TroveManager', async accounts => {
 
     assert.isTrue(redemption_2.receipt.status);
 
-    /* 373 ZUSD redeemed.  Expect $373 worth of RBTC removed. At RBTC:USD price of $200, 
-    RBTC removed = (373/200) = 1.865 RBTC
-    Total active RBTC = 279.4 - 1.865 = 277.535 RBTC */
-    const activeRBTC_2 = await activePool.getRBTC()
-    assert.equal(activeRBTC_2.toString(), activeRBTC_1.sub(toBN(_373_ZUSD).mul(mv._1e18BN).div(price)));
+    /* 373 ZUSD redeemed.  Expect $373 worth of ETH removed. At ETH:USD price of $200, 
+    ETH removed = (373/200) = 1.865 ETH
+    Total active ETH = 279.4 - 1.865 = 277.535 ETH */
+    const activeETH_2 = await activePool.getETH()
+    assert.equal(activeETH_2.toString(), activeETH_1.sub(toBN(_373_ZUSD).mul(mv._1e18BN).div(price)));
 
     // Graham redeems 950 ZUSD
     ({
@@ -3640,11 +3640,11 @@ contract('TroveManager', async accounts => {
 
     assert.isTrue(redemption_3.receipt.status);
 
-    /* 950 ZUSD redeemed.  Expect $950 worth of RBTC removed. At RBTC:USD price of $200, 
-    RBTC removed = (950/200) = 4.75 RBTC
-    Total active RBTC = 277.535 - 4.75 = 272.785 RBTC */
-    const activeRBTC_3 = (await activePool.getRBTC()).toString()
-    assert.equal(activeRBTC_3.toString(), activeRBTC_2.sub(toBN(_950_ZUSD).mul(mv._1e18BN).div(price)));
+    /* 950 ZUSD redeemed.  Expect $950 worth of ETH removed. At ETH:USD price of $200, 
+    ETH removed = (950/200) = 4.75 ETH
+    Total active ETH = 277.535 - 4.75 = 272.785 ETH */
+    const activeETH_3 = (await activePool.getETH()).toString()
+    assert.equal(activeETH_3.toString(), activeETH_2.sub(toBN(_950_ZUSD).mul(mv._1e18BN).div(price)));
   })
 
   // it doesn’t make much sense as there’s now min debt enforced and at least one trove must remain active
@@ -3850,7 +3850,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(lastFeeOpTime_3.gt(lastFeeOpTime_1))
   })
 
-  it("redeemCollateral(): a redemption made at zero base rate send a non-zero RBTCFee to ZERO staking contract", async () => {
+  it("redeemCollateral(): a redemption made at zero base rate send a non-zero ETHFee to ZERO staking contract", async () => {
     // time fast-forwards 1 year, and multisig stakes 1 ZERO
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
     await zeroToken.approve(zeroStaking.address, dec(1, 18), { from: multisig })
@@ -3886,7 +3886,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(zeroStakingBalance_After.eq(toBN('0')))
   })
 
-  it("redeemCollateral(): a redemption made at zero base increases the RBTC-fees-per-ZERO-staked in ZERO Staking contract", async () => {
+  it("redeemCollateral(): a redemption made at zero base increases the ETH-fees-per-ZERO-staked in ZERO Staking contract", async () => {
     // time fast-forwards 1 year, and multisig stakes 1 ZERO
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
     await zeroToken.approve(zeroStaking.address, dec(1, 18), { from: multisig })
@@ -3901,9 +3901,9 @@ contract('TroveManager', async accounts => {
     // Check baseRate == 0
     assert.equal(await troveManager.baseRate(), '0')
 
-    // Check ZERO Staking RBTC-fees-per-ZERO-staked before is zero
-    const F_RBTC_Before = await zeroStaking.F_RBTC()
-    assert.equal(F_RBTC_Before, '0')
+    // Check ZERO Staking ETH-fees-per-ZERO-staked before is zero
+    const F_ETH_Before = await zeroStaking.F_ETH()
+    assert.equal(F_ETH_Before, '0')
 
     const A_balanceBefore = await zusdToken.balanceOf(A)
 
@@ -3917,12 +3917,12 @@ contract('TroveManager', async accounts => {
     const baseRate_1 = await troveManager.baseRate()
     assert.isTrue(baseRate_1.gt(toBN('0')))
 
-    // Check ZERO Staking RBTC-fees-per-ZERO-staked after is non-zero
-    const F_RBTC_After = await zeroStaking.F_RBTC()
-    assert.isTrue(F_RBTC_After.gt('0'))
+    // Check ZERO Staking ETH-fees-per-ZERO-staked after is non-zero
+    const F_ETH_After = await zeroStaking.F_ETH()
+    assert.isTrue(F_ETH_After.gt('0'))
   })
 
-  it("redeemCollateral(): a redemption made at a non-zero base rate send a non-zero RBTCFee to ZERO staking contract", async () => {
+  it("redeemCollateral(): a redemption made at a non-zero base rate send a non-zero ETHFee to ZERO staking contract", async () => {
     // time fast-forwards 1 year, and multisig stakes 1 ZERO
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
     await zeroToken.approve(zeroStaking.address, dec(1, 18), { from: multisig })
@@ -3964,7 +3964,7 @@ contract('TroveManager', async accounts => {
     assert.isTrue(zeroStakingBalance_After.eq(zeroStakingBalance_Before))
   })
 
-  it("redeemCollateral(): a redemption made at a non-zero base rate increases RBTC-per-ZERO-staked in the staking contract", async () => {
+  it("redeemCollateral(): a redemption made at a non-zero base rate increases ETH-per-ZERO-staked in the staking contract", async () => {
     // time fast-forwards 1 year, and multisig stakes 1 ZERO
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
     await zeroToken.approve(zeroStaking.address, dec(1, 18), { from: multisig })
@@ -3992,8 +3992,8 @@ contract('TroveManager', async accounts => {
     const baseRate_1 = await troveManager.baseRate()
     assert.isTrue(baseRate_1.gt(toBN('0')))
 
-    // Check ZERO Staking RBTC-fees-per-ZERO-staked before is zero
-    const F_RBTC_Before = await zeroStaking.F_RBTC()
+    // Check ZERO Staking ETH-fees-per-ZERO-staked before is zero
+    const F_ETH_Before = await zeroStaking.F_ETH()
 
     // B redeems 10 ZUSD
     await th.redeemCollateral(B, contracts, dec(10, 18))
@@ -4001,13 +4001,13 @@ contract('TroveManager', async accounts => {
     // Check B's balance has decreased by 10 ZUSD
     assert.equal(await zusdToken.balanceOf(B), B_balanceBefore.sub(toBN(dec(10, 18))).toString())
 
-    const F_RBTC_After = await zeroStaking.F_RBTC()
+    const F_ETH_After = await zeroStaking.F_ETH()
 
     // check ZERO Staking balance hasn't increased
-    assert.isTrue(F_RBTC_After.eq(F_RBTC_Before))
+    assert.isTrue(F_ETH_After.eq(F_ETH_Before))
   })
 
-  it("redeemCollateral(): a redemption sends the RBTC remainder (RBTCDrawn - RBTCFee) to the redeemer", async () => {
+  it("redeemCollateral(): a redemption sends the ETH remainder (ETHDrawn - ETHFee) to the redeemer", async () => {
     // time fast-forwards 1 year, and multisig stakes 1 ZERO
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
     await zeroToken.approve(zeroStaking.address, dec(1, 18), { from: multisig })
@@ -4038,22 +4038,22 @@ contract('TroveManager', async accounts => {
     await th.redeemCollateral(A, contracts, redemptionAmount)
 
     /*
-    At RBTC:USD price of 200:
-    RBTCDrawn = (9 / 200) = 0.045 RBTC
-    RBTCfee = (0.005 + (1/2) *( 9/260)) * RBTCDrawn = 0.00100384615385 RBTC
-    RBTCRemainder = 0.045 - 0.001003... = 0.0439961538462
+    At ETH:USD price of 200:
+    ETHDrawn = (9 / 200) = 0.045 ETH
+    ETHfee = (0.005 + (1/2) *( 9/260)) * ETHDrawn = 0.00100384615385 ETH
+    ETHRemainder = 0.045 - 0.001003... = 0.0439961538462
     */
 
     const A_balanceAfter = toBN(await web3.eth.getBalance(A))
 
-    // check A's RBTC balance has increased by 0.045 RBTC 
+    // check A's ETH balance has increased by 0.045 ETH 
     const price = await priceFeed.getPrice()
-    const RBTCDrawn = redemptionAmount.mul(mv._1e18BN).div(price)
+    const ETHDrawn = redemptionAmount.mul(mv._1e18BN).div(price)
     th.assertIsApproximatelyEqual(
       A_balanceAfter.sub(A_balanceBefore),
-      RBTCDrawn.sub(
+      ETHDrawn.sub(
         toBN(dec(5, 15)).add(redemptionAmount.mul(mv._1e18BN).div(totalDebt).div(toBN(2)))
-          .mul(RBTCDrawn).div(mv._1e18BN)
+          .mul(ETHDrawn).div(mv._1e18BN)
       ),
       100000
     )
@@ -4129,11 +4129,11 @@ contract('TroveManager', async accounts => {
     assert.isTrue(await sortedTroves.contains(D))
     
     /*
-    At RBTC:USD price of 200, with full redemptions from A, B, C:
+    At ETH:USD price of 200, with full redemptions from A, B, C:
 
-    RBTCDrawn from A = 100/200 = 0.5 RBTC --> Surplus = (1-0.5) = 0.5
-    RBTCDrawn from B = 120/200 = 0.6 RBTC --> Surplus = (1-0.6) = 0.4
-    RBTCDrawn from C = 130/200 = 0.65 RBTC --> Surplus = (2-0.65) = 1.35
+    ETHDrawn from A = 100/200 = 0.5 ETH --> Surplus = (1-0.5) = 0.5
+    ETHDrawn from B = 120/200 = 0.6 ETH --> Surplus = (1-0.6) = 0.4
+    ETHDrawn from C = 130/200 = 0.65 ETH --> Surplus = (2-0.65) = 1.35
     */
 
     const A_balanceAfter = toBN(await web3.eth.getBalance(A))
@@ -4209,14 +4209,14 @@ contract('TroveManager', async accounts => {
     assert.equal(C_emittedDebt, '0')
     assert.equal(C_emittedColl, '0')
 
-    /* Expect D to have lost 15 debt and (at RBTC price of 200) 15/200 = 0.075 RBTC. 
-    So, expect remaining debt = (85 - 15) = 70, and remaining RBTC = 1 - 15/200 = 0.925 remaining. */
+    /* Expect D to have lost 15 debt and (at ETH price of 200) 15/200 = 0.075 ETH. 
+    So, expect remaining debt = (85 - 15) = 70, and remaining ETH = 1 - 15/200 = 0.925 remaining. */
     const price = await priceFeed.getPrice()
     th.assertIsApproximatelyEqual(D_emittedDebt, D_totalDebt.sub(partialAmount))
     th.assertIsApproximatelyEqual(D_emittedColl, D_coll.sub(partialAmount.mul(mv._1e18BN).div(price)))
   })
 
-  it("redeemCollateral(): a redemption that closes a trove leaves the trove's RBTC surplus (collateral - RBTC drawn) available for the trove owner to claim", async () => {
+  it("redeemCollateral(): a redemption that closes a trove leaves the trove's ETH surplus (collateral - ETH drawn) available for the trove owner to claim", async () => {
     const {
       A_netDebt, A_coll,
       B_netDebt, B_coll,
@@ -4245,7 +4245,7 @@ contract('TroveManager', async accounts => {
     th.assertIsApproximatelyEqual(C_balanceAfter, C_balanceBefore.add(C_coll.sub(C_netDebt.mul(mv._1e18BN).div(price))))
   })
 
-  it("redeemCollateral(): a redemption that closes a trove leaves the trove's RBTC surplus (collateral - RBTC drawn) available for the trove owner after re-opening trove", async () => {
+  it("redeemCollateral(): a redemption that closes a trove leaves the trove's ETH surplus (collateral - ETH drawn) available for the trove owner after re-opening trove", async () => {
     const {
       A_netDebt, A_coll: A_collBefore,
       B_netDebt, B_coll: B_collBefore,
@@ -4307,7 +4307,7 @@ contract('TroveManager', async accounts => {
         partialRedemptionHintNICR
       } = await hintHelpers.getRedemptionHints(zusdAmount, price, 0)
 
-      // Don't pay for gas, as it makes it easier to calculate the received RBtcer
+      // Don't pay for gas, as it makes it easier to calculate the received Ether
       const redemptionTx = await troveManager.redeemCollateral(
         zusdAmount,
         firstRedemptionHint,
@@ -4375,7 +4375,7 @@ contract('TroveManager', async accounts => {
     assert.equal(carol_PendingZUSDDebtReward, 0)
   })
 
-  it("getPendingRBTCReward(): Returns 0 if there is no pending RBTC reward", async () => {
+  it("getPendingETHReward(): Returns 0 if there is no pending ETH reward", async () => {
     // make some troves
     const { totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: defaulter_1 } })
 
@@ -4393,14 +4393,14 @@ contract('TroveManager', async accounts => {
     assert.isFalse(await sortedTroves.contains(defaulter_1))
 
     // Confirm there are no pending rewards from liquidation
-    const current_L_RBTC = await troveManager.L_RBTC()
-    assert.equal(current_L_RBTC, 0)
+    const current_L_ETH = await troveManager.L_ETH()
+    assert.equal(current_L_ETH, 0)
 
-    const carolSnapshot_L_RBTC = (await troveManager.rewardSnapshots(carol))[0]
-    assert.equal(carolSnapshot_L_RBTC, 0)
+    const carolSnapshot_L_ETH = (await troveManager.rewardSnapshots(carol))[0]
+    assert.equal(carolSnapshot_L_ETH, 0)
 
-    const carol_PendingRBTCReward = await troveManager.getPendingRBTCReward(carol)
-    assert.equal(carol_PendingRBTCReward, 0)
+    const carol_PendingETHReward = await troveManager.getPendingETHReward(carol)
+    assert.equal(carol_PendingETHReward, 0)
   })
 
   // --- computeICR ---
@@ -4415,7 +4415,7 @@ contract('TroveManager', async accounts => {
     assert.equal(ICR, 0)
   })
 
-  it("computeICR(): Returns 2^256-1 for RBTC:USD = 100, coll = 1 RBTC, debt = 100 ZUSD", async () => {
+  it("computeICR(): Returns 2^256-1 for ETH:USD = 100, coll = 1 ETH, debt = 100 ZUSD", async () => {
     const price = dec(100, 18)
     const coll = dec(1, 'ether')
     const debt = dec(100, 18)
@@ -4425,7 +4425,7 @@ contract('TroveManager', async accounts => {
     assert.equal(ICR, dec(1, 18))
   })
 
-  it("computeICR(): returns correct ICR for RBTC:USD = 100, coll = 200 RBTC, debt = 30 ZUSD", async () => {
+  it("computeICR(): returns correct ICR for ETH:USD = 100, coll = 200 ETH, debt = 30 ZUSD", async () => {
     const price = dec(100, 18)
     const coll = dec(200, 'ether')
     const debt = dec(30, 18)
@@ -4435,7 +4435,7 @@ contract('TroveManager', async accounts => {
     assert.isAtMost(th.getDifference(ICR, '666666666666666666666'), 1000)
   })
 
-  it("computeICR(): returns correct ICR for RBTC:USD = 250, coll = 1350 RBTC, debt = 127 ZUSD", async () => {
+  it("computeICR(): returns correct ICR for ETH:USD = 250, coll = 1350 ETH, debt = 127 ZUSD", async () => {
     const price = '250000000000000000000'
     const coll = '1350000000000000000000'
     const debt = '127000000000000000000'
@@ -4445,7 +4445,7 @@ contract('TroveManager', async accounts => {
     assert.isAtMost(th.getDifference(ICR, '2657480314960630000000'), 1000000)
   })
 
-  it("computeICR(): returns correct ICR for RBTC:USD = 100, coll = 1 RBTC, debt = 54321 ZUSD", async () => {
+  it("computeICR(): returns correct ICR for ETH:USD = 100, coll = 1 ETH, debt = 54321 ZUSD", async () => {
     const price = dec(100, 18)
     const coll = dec(1, 'ether')
     const debt = '54321000000000000000000'

@@ -91,7 +91,7 @@ module.exports = {
         },
     },
     etherscan: {
-        apiKey: getSecret("RBTCERSCAN_API_KEY")
+        apiKey: getSecret("ETHERSCAN_API_KEY")
     },
     mocha: { timeout: 12000000 },
     rpc: {

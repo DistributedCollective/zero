@@ -64,7 +64,7 @@
 //     const price_aggregatorTestnet = (await testnetAggregator.latestAnswer()).toString();
 //     const timestamp_aggregatorTestnet = (await testnetAggregator.latestTimestamp()).toString()
 //     const latestAnswerID_aggregatorTestnet = (await testnetAggregator.latestRound()).toString()
-//     console.log(`Testnet: Latest RBTC:USD price from aggregator: ${price_aggregatorTestnet}`);
+//     console.log(`Testnet: Latest ETH:USD price from aggregator: ${price_aggregatorTestnet}`);
 //     console.log(`Testnet: Timestamp of latest price from aggregator: ${timestamp_aggregatorTestnet}`);
 //     console.log(`Testnet: ID of latest price answer from  aggregator: ${latestAnswerID_aggregatorTestnet}`)
 //     console.log('\n')
@@ -72,7 +72,7 @@
 //     // Call our testnet PriceFeed - get current price, and timestamp
 //     const price_PriceFeedTestnet = await testnetPriceFeed.getLatestPrice_Testnet()
 //     const timestamp_PriceFeedTestnet = await testnetPriceFeed.getLatestTimestamp_Testnet()
-//     console.log(`Testnet: Latest RBTC:USD price from deployed PriceFeed: ${price_PriceFeedTestnet}`)
+//     console.log(`Testnet: Latest ETH:USD price from deployed PriceFeed: ${price_PriceFeedTestnet}`)
 //     console.log(`Testnet: Timestamp of latest price from deployed PriceFeed: ${timestamp_PriceFeedTestnet}`)
 //     console.log('\n')
    
@@ -94,7 +94,7 @@
 //     const price_aggregatorMainnet = (await mainnetAggregator.currentAnswer()).toString();
 //     const timestamp_aggregatorMainnet = (await mainnetAggregator.updatedHeight()).toString()
 //     const latestAnswerID_aggregatorMainnet = (await mainnetAggregator.latestCompletedAnswer()).toString()
-//     console.log(`Mainnet: Latest RBTC:USD price from aggregator: ${price_aggregatorMainnet}`);
+//     console.log(`Mainnet: Latest ETH:USD price from aggregator: ${price_aggregatorMainnet}`);
 //     console.log(`Mainnet: Timestamp of latest price from aggregator: ${timestamp_aggregatorMainnet}`);
 //     console.log(`Mainnet: ID of latest price answer from aggregator: ${latestAnswerID_aggregatorMainnet}`)
 //     console.log('\n')
@@ -103,7 +103,7 @@
 //     const price_PriceFeedMainnet = (await mainnetPriceFeed.getLatestPrice()).toString()
 //     const timestap_PriceFeedMainnet = (await mainnetPriceFeed.getLatestTimestamp()).toString()
 //     const latestAnswerID_PriceFeedMainnet = (await mainnetPriceFeed.getLatestAnswerID()).toString()
-//     console.log(`Mainnet: Latest RBTC:USD price from deployed PriceFeed: ${price_PriceFeedMainnet}`)
+//     console.log(`Mainnet: Latest ETH:USD price from deployed PriceFeed: ${price_PriceFeedMainnet}`)
 //     console.log(`Mainnet: Timestamp of latest price from deployed PriceFeed: ${timestap_PriceFeedMainnet}`)
 //     console.log(`Mainnet: ID of latest price answer from deployed PriceFeed: ${latestAnswerID_PriceFeedMainnet}`)
 //     console.log('\n')

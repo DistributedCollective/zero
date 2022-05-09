@@ -13,14 +13,14 @@ contract ZEROStakingStorage is Ownable {
     mapping( address => uint) public stakes;
     uint public totalZEROStaked;
 
-    uint public F_RBTC;  // Running sum of RBTC fees per-ZERO-staked
+    uint public F_ETH;  // Running sum of ETH fees per-ZERO-staked
     uint public F_ZUSD; // Running sum of ZERO fees per-ZERO-staked
 
-    // User snapshots of F_RBTC and F_ZUSD, taken at the point at which their latest deposit was made
+    // User snapshots of F_ETH and F_ZUSD, taken at the point at which their latest deposit was made
     mapping (address => Snapshot) public snapshots; 
 
     struct Snapshot {
-        uint F_RBTC_Snapshot;
+        uint F_ETH_Snapshot;
         uint F_ZUSD_Snapshot;
     }
     
