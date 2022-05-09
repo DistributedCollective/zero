@@ -12,10 +12,10 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 
-/* NOTE: Some tests involving RBTC redemption fees do not test for specific fee values.
+/* NOTE: Some tests involving ETH redemption fees do not test for specific fee values.
  * Some only test that the fees are non-zero when they should occur.
  *
- * Specific RBTC gain values will depend on the final fee schedule used, and the final choices for
+ * Specific ETH gain values will depend on the final fee schedule used, and the final choices for
  * the parameter BETA in the TroveManager, which is still TBD based on economic modelling.
  * 
  */
@@ -117,7 +117,7 @@ contract('TroveManager', async accounts => {
     console.log(`totalStakesSnapshot after L1: ${await troveManager.totalStakesSnapshot()}`)
     console.log(`totalCollateralSnapshot after L1: ${await troveManager.totalCollateralSnapshot()}`)
     console.log(`Snapshots ratio after L1: ${await getSnapshotsRatio()}`)
-    console.log(`B pending RBTC reward after L1: ${await troveManager.getPendingRBTCReward(B)}`)
+    console.log(`B pending ETH reward after L1: ${await troveManager.getPendingETHReward(B)}`)
     console.log(`B stake after L1: ${(await troveManager.Troves(B))[2]}`)
 
     // adjust trove B 1 wei: apply rewards

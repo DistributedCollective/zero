@@ -85,8 +85,8 @@ contract('Gas compensation tests', async accounts => {
 
   it('_getCollGasCompensation(): returns the 0.5% of collaterall if it is < $10 in value', async () => {
     /* 
-    RBTC:USD price = 1
-    coll = 1 RBTC: $1 in value
+    ETH:USD price = 1
+    coll = 1 ETH: $1 in value
     -> Expect 0.5% of collaterall as gas compensation */
     await priceFeed.setPrice(dec(1, 18))
     // const price_1 = await priceFeed.getPrice()
@@ -94,8 +94,8 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(gasCompensation_1, dec(5, 15))
 
     /* 
-    RBTC:USD price = 28.4
-    coll = 0.1 RBTC: $2.84 in value
+    ETH:USD price = 28.4
+    coll = 0.1 ETH: $2.84 in value
     -> Expect 0.5% of collaterall as gas compensation */
     await priceFeed.setPrice('28400000000000000000')
     // const price_2 = await priceFeed.getPrice()
@@ -103,8 +103,8 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(gasCompensation_2, dec(5, 14))
 
     /* 
-    RBTC:USD price = 1000000000 (1 billion)
-    coll = 0.000000005 RBTC (5e9 wei): $5 in value 
+    ETH:USD price = 1000000000 (1 billion)
+    coll = 0.000000005 ETH (5e9 wei): $5 in value 
     -> Expect 0.5% of collaterall as gas compensation */
     await priceFeed.setPrice(dec(1, 27))
     // const price_3 = await priceFeed.getPrice()
@@ -117,23 +117,23 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(price, dec(200, 18))
 
     /* 
-    RBTC:USD price = 200
-    coll = 9.999 RBTC  
-    0.5% of coll = 0.04995 RBTC. USD value: $9.99
+    ETH:USD price = 200
+    coll = 9.999 ETH  
+    0.5% of coll = 0.04995 ETH. USD value: $9.99
     -> Expect 0.5% of collaterall as gas compensation */
     const gasCompensation_1 = (await troveManager.getCollGasCompensation('9999000000000000000')).toString()
     assert.equal(gasCompensation_1, '49995000000000000')
 
-    /* RBTC:USD price = 200
-     coll = 0.055 RBTC  
-     0.5% of coll = 0.000275 RBTC. USD value: $0.055
+    /* ETH:USD price = 200
+     coll = 0.055 ETH  
+     0.5% of coll = 0.000275 ETH. USD value: $0.055
      -> Expect 0.5% of collaterall as gas compensation */
     const gasCompensation_2 = (await troveManager.getCollGasCompensation('55000000000000000')).toString()
     assert.equal(gasCompensation_2, dec(275, 12))
 
-    /* RBTC:USD price = 200
-    coll = 6.09232408808723580 RBTC  
-    0.5% of coll = 0.004995 RBTC. USD value: $6.09
+    /* ETH:USD price = 200
+    coll = 6.09232408808723580 ETH  
+    0.5% of coll = 0.004995 ETH. USD value: $6.09
     -> Expect 0.5% of collaterall as gas compensation */
     const gasCompensation_3 = (await troveManager.getCollGasCompensation('6092324088087235800')).toString()
     assert.equal(gasCompensation_3, '30461620440436179')
@@ -144,9 +144,9 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(price, dec(200, 18))
 
     /* 
-    RBTC:USD price = 200
-    coll = 10 RBTC  
-    0.5% of coll = 0.5 RBTC. USD value: $10
+    ETH:USD price = 200
+    coll = 10 ETH  
+    0.5% of coll = 0.5 ETH. USD value: $10
     -> Expect 0.5% of collaterall as gas compensation */
     const gasCompensation = (await troveManager.getCollGasCompensation(dec(10, 'ether'))).toString()
     assert.equal(gasCompensation, '50000000000000000')
@@ -157,43 +157,43 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(price, dec(200, 18))
 
     /* 
-    RBTC:USD price = 200 $/E
-    coll = 100 RBTC  
-    0.5% of coll = 0.5 RBTC. USD value: $100
-    -> Expect $100 gas compensation, i.e. 0.5 RBTC */
+    ETH:USD price = 200 $/E
+    coll = 100 ETH  
+    0.5% of coll = 0.5 ETH. USD value: $100
+    -> Expect $100 gas compensation, i.e. 0.5 ETH */
     const gasCompensation_1 = (await troveManager.getCollGasCompensation(dec(100, 'ether'))).toString()
     assert.equal(gasCompensation_1, dec(500, 'finney'))
 
     /* 
-    RBTC:USD price = 200 $/E
-    coll = 10.001 RBTC  
-    0.5% of coll = 0.050005 RBTC. USD value: $10.001
-    -> Expect $100 gas compensation, i.e.  0.050005  RBTC */
+    ETH:USD price = 200 $/E
+    coll = 10.001 ETH  
+    0.5% of coll = 0.050005 ETH. USD value: $10.001
+    -> Expect $100 gas compensation, i.e.  0.050005  ETH */
     const gasCompensation_2 = (await troveManager.getCollGasCompensation('10001000000000000000')).toString()
     assert.equal(gasCompensation_2, '50005000000000000')
 
     /* 
-    RBTC:USD price = 200 $/E
-    coll = 37.5 RBTC  
-    0.5% of coll = 0.1875 RBTC. USD value: $37.5
-    -> Expect $37.5 gas compensation i.e.  0.1875  RBTC */
+    ETH:USD price = 200 $/E
+    coll = 37.5 ETH  
+    0.5% of coll = 0.1875 ETH. USD value: $37.5
+    -> Expect $37.5 gas compensation i.e.  0.1875  ETH */
     const gasCompensation_3 = (await troveManager.getCollGasCompensation('37500000000000000000')).toString()
     assert.equal(gasCompensation_3, '187500000000000000')
 
     /* 
-    RBTC:USD price = 45323.54542 $/E
-    coll = 94758.230582309850 RBTC  
-    0.5% of coll = 473.7911529 RBTC. USD value: $21473894.84
-    -> Expect $21473894.8385808 gas compensation, i.e.  473.7911529115490  RBTC */
+    ETH:USD price = 45323.54542 $/E
+    coll = 94758.230582309850 ETH  
+    0.5% of coll = 473.7911529 ETH. USD value: $21473894.84
+    -> Expect $21473894.8385808 gas compensation, i.e.  473.7911529115490  ETH */
     await priceFeed.setPrice('45323545420000000000000')
     const gasCompensation_4 = await troveManager.getCollGasCompensation('94758230582309850000000')
     assert.isAtMost(th.getDifference(gasCompensation_4, '473791152911549000000'), 1000000)
 
     /* 
-    RBTC:USD price = 1000000 $/E (1 million)
-    coll = 300000000 RBTC   (300 million)
-    0.5% of coll = 1500000 RBTC. USD value: $150000000000
-    -> Expect $150000000000 gas compensation, i.e. 1500000 RBTC */
+    ETH:USD price = 1000000 $/E (1 million)
+    coll = 300000000 ETH   (300 million)
+    0.5% of coll = 1500000 ETH. USD value: $150000000000
+    -> Expect $150000000000 gas compensation, i.e. 1500000 ETH */
     await priceFeed.setPrice(dec(1, 24))
     const price_2 = await priceFeed.getPrice()
     const gasCompensation_5 = (await troveManager.getCollGasCompensation('300000000000000000000000000')).toString()
@@ -208,41 +208,41 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(price, dec(200, 18))
 
     /* 
-    RBTC:USD price = 200
-    coll = 9.999 RBTC 
+    ETH:USD price = 200
+    coll = 9.999 ETH 
     debt = 10 ZUSD
-    0.5% of coll = 0.04995 RBTC. USD value: $9.99
+    0.5% of coll = 0.04995 ETH. USD value: $9.99
     -> Expect composite debt = 10 + 20  = 30 ZUSD*/
     const compositeDebt_1 = await troveManager.getCompositeDebt(dec(10, 18))
     assert.equal(compositeDebt_1, dec(30, 18))
 
-    /* RBTC:USD price = 200
-     coll = 0.055 RBTC  
+    /* ETH:USD price = 200
+     coll = 0.055 ETH  
      debt = 0 ZUSD
-     0.5% of coll = 0.000275 RBTC. USD value: $0.055
+     0.5% of coll = 0.000275 ETH. USD value: $0.055
      -> Expect composite debt = 0 + 20 = 20 ZUSD*/
     const compositeDebt_2 = await troveManager.getCompositeDebt(0)
     assert.equal(compositeDebt_2, dec(20, 18))
 
-    // /* RBTC:USD price = 200
-    // coll = 6.09232408808723580 RBTC 
+    // /* ETH:USD price = 200
+    // coll = 6.09232408808723580 ETH 
     // debt = 200 ZUSD 
-    // 0.5% of coll = 0.004995 RBTC. USD value: $6.09
+    // 0.5% of coll = 0.004995 ETH. USD value: $6.09
     // -> Expect  composite debt =  200 + 20 = 220  ZUSD */
     const compositeDebt_3 = await troveManager.getCompositeDebt(dec(200, 18))
     assert.equal(compositeDebt_3, '220000000000000000000')
   })
 
-  // returns $10 worth of RBTC when 0.5% of coll == $10
+  // returns $10 worth of ETH when 0.5% of coll == $10
   it('getCompositeDebt(): returns (debt + 50) collateral = $10 in value', async () => {
     const price = await priceFeed.getPrice()
     assert.equal(price, dec(200, 18))
 
     /* 
-    RBTC:USD price = 200
-    coll = 10 RBTC  
+    ETH:USD price = 200
+    coll = 10 ETH  
     debt = 123.45 ZUSD
-    0.5% of coll = 0.5 RBTC. USD value: $10
+    0.5% of coll = 0.5 ETH. USD value: $10
     -> Expect composite debt = (123.45 + 20) = 143.45 ZUSD  */
     const compositeDebt = await troveManager.getCompositeDebt('123450000000000000000')
     assert.equal(compositeDebt, '143450000000000000000')
@@ -256,32 +256,32 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(price, dec(200, 18))
 
     /* 
-    RBTC:USD price = 200 $/E
-    coll = 100 RBTC  
+    ETH:USD price = 200 $/E
+    coll = 100 ETH  
     debt = 2000 ZUSD
     -> Expect composite debt = (2000 + 20) = 2020 ZUSD  */
     const compositeDebt_1 = (await troveManager.getCompositeDebt(dec(2000, 18))).toString()
     assert.equal(compositeDebt_1, '2020000000000000000000')
 
     /* 
-    RBTC:USD price = 200 $/E
-    coll = 10.001 RBTC  
+    ETH:USD price = 200 $/E
+    coll = 10.001 ETH  
     debt = 200 ZUSD
     -> Expect composite debt = (200 + 20) = 220 ZUSD  */
     const compositeDebt_2 = (await troveManager.getCompositeDebt(dec(200, 18))).toString()
     assert.equal(compositeDebt_2, '220000000000000000000')
 
     /* 
-    RBTC:USD price = 200 $/E
-    coll = 37.5 RBTC  
+    ETH:USD price = 200 $/E
+    coll = 37.5 ETH  
     debt = 500 ZUSD
     -> Expect composite debt = (500 + 20) = 520 ZUSD  */
     const compositeDebt_3 = (await troveManager.getCompositeDebt(dec(500, 18))).toString()
     assert.equal(compositeDebt_3, '520000000000000000000')
 
     /* 
-    RBTC:USD price = 45323.54542 $/E
-    coll = 94758.230582309850 RBTC  
+    ETH:USD price = 45323.54542 $/E
+    coll = 94758.230582309850 ETH  
     debt = 1 billion ZUSD
     -> Expect composite debt = (1000000000 + 20) = 1000000020 ZUSD  */
     await priceFeed.setPrice('45323545420000000000000')
@@ -290,8 +290,8 @@ contract('Gas compensation tests', async accounts => {
     assert.isAtMost(th.getDifference(compositeDebt_4, '1000000020000000000000000000'), 100000000000)
 
     /* 
-    RBTC:USD price = 1000000 $/E (1 million)
-    coll = 300000000 RBTC   (300 million)
+    ETH:USD price = 1000000 $/E (1 million)
+    coll = 300000000 ETH   (300 million)
     debt = 54321.123456789 ZUSD
    -> Expect composite debt = (54321.123456789 + 20) = 54341.123456789 ZUSD */
     await priceFeed.setPrice(dec(1, 24))
@@ -305,43 +305,43 @@ contract('Gas compensation tests', async accounts => {
     const price = await priceFeed.getPrice()
     await openTrove({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
 
-    // A opens with 1 RBTC, 110 ZUSD
+    // A opens with 1 ETH, 110 ZUSD
     await openTrove({ ICR: toBN('1818181818181818181'), extraParams: { from: alice } })
     const alice_ICR = (await troveManager.getCurrentICR(alice, price)).toString()
     // Expect aliceICR = (1 * 200) / (110) = 181.81%
     assert.isAtMost(th.getDifference(alice_ICR, '1818181818181818181'), 1000)
 
-    // B opens with 0.5 RBTC, 50 ZUSD
+    // B opens with 0.5 ETH, 50 ZUSD
     await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
     const bob_ICR = (await troveManager.getCurrentICR(bob, price)).toString()
     // Expect Bob's ICR = (0.5 * 200) / 50 = 200%
     assert.isAtMost(th.getDifference(bob_ICR, dec(2, 18)), 1000)
 
-    // F opens with 1 RBTC, 100 ZUSD
+    // F opens with 1 ETH, 100 ZUSD
     await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: flyn } })
     const flyn_ICR = (await troveManager.getCurrentICR(flyn, price)).toString()
     // Expect Flyn's ICR = (1 * 200) / 100 = 200%
     assert.isAtMost(th.getDifference(flyn_ICR, dec(2, 18)), 1000)
 
-    // C opens with 2.5 RBTC, 160 ZUSD
+    // C opens with 2.5 ETH, 160 ZUSD
     await openTrove({ ICR: toBN(dec(3125, 15)), extraParams: { from: carol } })
     const carol_ICR = (await troveManager.getCurrentICR(carol, price)).toString()
     // Expect Carol's ICR = (2.5 * 200) / (160) = 312.50%
     assert.isAtMost(th.getDifference(carol_ICR, '3125000000000000000'), 1000)
 
-    // D opens with 1 RBTC, 0 ZUSD
+    // D opens with 1 ETH, 0 ZUSD
     await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: dennis } })
     const dennis_ICR = (await troveManager.getCurrentICR(dennis, price)).toString()
     // Expect Dennis's ICR = (1 * 200) / (50) = 400.00%
     assert.isAtMost(th.getDifference(dennis_ICR, dec(4, 18)), 1000)
 
-    // E opens with 4405.45 RBTC, 32598.35 ZUSD
+    // E opens with 4405.45 ETH, 32598.35 ZUSD
     await openTrove({ ICR: toBN('27028668628933700000'), extraParams: { from: erin } })
     const erin_ICR = (await troveManager.getCurrentICR(erin, price)).toString()
     // Expect Erin's ICR = (4405.45 * 200) / (32598.35) = 2702.87%
     assert.isAtMost(th.getDifference(erin_ICR, '27028668628933700000'), 100000)
 
-    // H opens with 1 RBTC, 180 ZUSD
+    // H opens with 1 ETH, 180 ZUSD
     await openTrove({ ICR: toBN('1111111111111111111'), extraParams: { from: harriet } })
     const harriet_ICR = (await troveManager.getCurrentICR(harriet, price)).toString()
     // Expect Harriet's ICR = (1 * 200) / (180) = 111.11%
@@ -371,7 +371,7 @@ contract('Gas compensation tests', async accounts => {
     const price_1 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 9.99
+    ETH:USD price = 9.99
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
@@ -384,7 +384,7 @@ contract('Gas compensation tests', async accounts => {
     await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
-    // Check liquidator's balance increases by 0.5% of A's coll (1 RBTC)
+    // Check liquidator's balance increases by 0.5% of A's coll (1 ETH)
     const compensationReceived_A = (liquidatorBalance_after_A.sub(liquidatorBalance_before_A)).toString()
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
     assert.equal(compensationReceived_A, _0pt5percent_aliceColl)
@@ -393,16 +393,16 @@ contract('Gas compensation tests', async accounts => {
     const ZUSDinSP_A = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_A.lte(ZUSDinSP_0))
 
-    // Check RBTC in SP has received the liquidation
-    const RBTCinSP_A = await stabilityPool.getRBTC()
-    assert.equal(RBTCinSP_A.toString(), aliceColl.sub(_0pt5percent_aliceColl)) // 1 RBTC - 0.5%
+    // Check ETH in SP has received the liquidation
+    const ETHinSP_A = await stabilityPool.getETH()
+    assert.equal(ETHinSP_A.toString(), aliceColl.sub(_0pt5percent_aliceColl)) // 1 ETH - 0.5%
 
     // --- Price drops to 3 ---
     await priceFeed.setPrice(dec(3, 18))
     const price_2 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 3
+    ETH:USD price = 3
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
@@ -414,18 +414,18 @@ contract('Gas compensation tests', async accounts => {
     await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
-    // Check liquidator's balance increases by B's 0.5% of coll, 2 RBTC
+    // Check liquidator's balance increases by B's 0.5% of coll, 2 ETH
     const compensationReceived_B = (liquidatorBalance_after_B.sub(liquidatorBalance_before_B)).toString()
     const _0pt5percent_bobColl = bobColl.div(web3.utils.toBN('200'))
-    assert.equal(compensationReceived_B, _0pt5percent_bobColl) // 0.5% of 2 RBTC
+    assert.equal(compensationReceived_B, _0pt5percent_bobColl) // 0.5% of 2 ETH
 
     // Check SP ZUSD has decreased due to the liquidation of B
     const ZUSDinSP_B = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_B.lt(ZUSDinSP_A))
 
-    // Check RBTC in SP has received the liquidation
-    const RBTCinSP_B = await stabilityPool.getRBTC()
-    assert.equal(RBTCinSP_B.toString(), aliceColl.sub(_0pt5percent_aliceColl).add(bobColl).sub(_0pt5percent_bobColl)) // (1 + 2 RBTC) * 0.995
+    // Check ETH in SP has received the liquidation
+    const ETHinSP_B = await stabilityPool.getETH()
+    assert.equal(ETHinSP_B.toString(), aliceColl.sub(_0pt5percent_aliceColl).add(bobColl).sub(_0pt5percent_bobColl)) // (1 + 2 ETH) * 0.995
 
 
     // --- Price drops to 3 ---
@@ -433,8 +433,8 @@ contract('Gas compensation tests', async accounts => {
     const price_3 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 3.141592653589793238
-    Carol coll = 3 RBTC. Value = (3 * 3.141592653589793238) = $6
+    ETH:USD price = 3.141592653589793238
+    Carol coll = 3 ETH. Value = (3 * 3.141592653589793238) = $6
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
@@ -446,7 +446,7 @@ contract('Gas compensation tests', async accounts => {
     await troveManager.liquidate(carol, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_C = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
-    // Check liquidator's balance increases by C's 0.5% of coll, 3 RBTC
+    // Check liquidator's balance increases by C's 0.5% of coll, 3 ETH
     const compensationReceived_C = (liquidatorBalance_after_C.sub(liquidatorBalance_before_C)).toString()
     const _0pt5percent_carolColl = carolColl.div(web3.utils.toBN('200'))
     assert.equal(compensationReceived_C, _0pt5percent_carolColl)
@@ -455,9 +455,9 @@ contract('Gas compensation tests', async accounts => {
     const ZUSDinSP_C = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_C.lt(ZUSDinSP_B))
 
-    // Check RBTC in SP has not changed due to the lquidation of C
-    const RBTCinSP_C = await stabilityPool.getRBTC()
-    assert.equal(RBTCinSP_C.toString(), aliceColl.sub(_0pt5percent_aliceColl).add(bobColl).sub(_0pt5percent_bobColl).add(carolColl).sub(_0pt5percent_carolColl)) // (1+2+3 RBTC) * 0.995
+    // Check ETH in SP has not changed due to the lquidation of C
+    const ETHinSP_C = await stabilityPool.getETH()
+    assert.equal(ETHinSP_C.toString(), aliceColl.sub(_0pt5percent_aliceColl).add(bobColl).sub(_0pt5percent_bobColl).add(carolColl).sub(_0pt5percent_carolColl)) // (1+2+3 ETH) * 0.995
   })
 
   it('gas compensation from pool-offset liquidations: 0.5% collateral < $10 in value. Compensates $10 worth of collateral, liquidates the remainder', async () => {
@@ -476,19 +476,19 @@ contract('Gas compensation tests', async accounts => {
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: erin })
 
     const ZUSDinSP_0 = await stabilityPool.getTotalZUSDDeposits()
-    const RBTCinSP_0 = await stabilityPool.getRBTC()
+    const ETHinSP_0 = await stabilityPool.getETH()
 
     // --- Price drops to 199.999 ---
     await priceFeed.setPrice('199999000000000000000')
     const price_1 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 199.999
-    Alice coll = 1 RBTC. Value: $199.999
-    0.5% of coll  = 0.05 RBTC. Value: (0.05 * 199.999) = $9.99995
-    Minimum comp = $10 = 0.05000025000125001 RBTC.
-    -> Expect 0.05000025000125001 RBTC sent to liquidator, 
-    and (1 - 0.05000025000125001) = 0.94999974999875 RBTC remainder liquidated */
+    ETH:USD price = 199.999
+    Alice coll = 1 ETH. Value: $199.999
+    0.5% of coll  = 0.05 ETH. Value: (0.05 * 199.999) = $9.99995
+    Minimum comp = $10 = 0.05000025000125001 ETH.
+    -> Expect 0.05000025000125001 ETH sent to liquidator, 
+    and (1 - 0.05000025000125001) = 0.94999974999875 ETH remainder liquidated */
 
     // Check collateral value in USD is > $10
     const aliceColl = (await troveManager.Troves(alice))[1]
@@ -512,25 +512,25 @@ contract('Gas compensation tests', async accounts => {
     const ZUSDinSP_A = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_A.lt(ZUSDinSP_0))
 
-    // Check RBTC in SP has increased by the remainder of B's coll
+    // Check ETH in SP has increased by the remainder of B's coll
     const collRemainder_A = aliceColl.sub(_0pt5percent_aliceColl)
-    const RBTCinSP_A = await stabilityPool.getRBTC()
+    const ETHinSP_A = await stabilityPool.getETH()
 
-    const SPRBTCIncrease_A = RBTCinSP_A.sub(RBTCinSP_0)
+    const SPETHIncrease_A = ETHinSP_A.sub(ETHinSP_0)
 
-    assert.isAtMost(th.getDifference(SPRBTCIncrease_A, collRemainder_A), 1000)
+    assert.isAtMost(th.getDifference(SPETHIncrease_A, collRemainder_A), 1000)
 
     // --- Price drops to 15 ---
     await priceFeed.setPrice(dec(15, 18))
     const price_2 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 15
-    Bob coll = 15 RBTC. Value: $165
-    0.5% of coll  = 0.75 RBTC. Value: (0.75 * 11) = $8.25
-    Minimum comp = $10 =  0.66666...RBTC.
-    -> Expect 0.666666666666666666 RBTC sent to liquidator, 
-    and (15 - 0.666666666666666666) RBTC remainder liquidated */
+    ETH:USD price = 15
+    Bob coll = 15 ETH. Value: $165
+    0.5% of coll  = 0.75 ETH. Value: (0.75 * 11) = $8.25
+    Minimum comp = $10 =  0.66666...ETH.
+    -> Expect 0.666666666666666666 ETH sent to liquidator, 
+    and (15 - 0.666666666666666666) ETH remainder liquidated */
 
     // Check collateral value in USD is > $10
     const bobColl = (await troveManager.Troves(bob))[1]
@@ -554,13 +554,13 @@ contract('Gas compensation tests', async accounts => {
     const ZUSDinSP_B = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_B.lt(ZUSDinSP_A))
 
-    // Check RBTC in SP has increased by the remainder of B's coll
+    // Check ETH in SP has increased by the remainder of B's coll
     const collRemainder_B = bobColl.sub(_0pt5percent_bobColl)
-    const RBTCinSP_B = await stabilityPool.getRBTC()
+    const ETHinSP_B = await stabilityPool.getETH()
 
-    const SPRBTCIncrease_B = RBTCinSP_B.sub(RBTCinSP_A)
+    const SPETHIncrease_B = ETHinSP_B.sub(ETHinSP_A)
 
-    assert.isAtMost(th.getDifference(SPRBTCIncrease_B, collRemainder_B), 1000)
+    assert.isAtMost(th.getDifference(SPETHIncrease_B, collRemainder_B), 1000)
   })
 
   it('gas compensation from pool-offset liquidations: 0.5% collateral > $10 in value. Compensates 0.5% of  collateral, liquidates the remainder', async () => {
@@ -580,18 +580,18 @@ contract('Gas compensation tests', async accounts => {
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: erin })
 
     const ZUSDinSP_0 = await stabilityPool.getTotalZUSDDeposits()
-    const RBTCinSP_0 = await stabilityPool.getRBTC()
+    const ETHinSP_0 = await stabilityPool.getETH()
 
     await priceFeed.setPrice(dec(200, 18))
     const price_1 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 200
-    Alice coll = 10.001 RBTC. Value: $2000.2
-    0.5% of coll  = 0.050005 RBTC. Value: (0.050005 * 200) = $10.01
-    Minimum comp = $10 = 0.05 RBTC.
-    -> Expect  0.050005 RBTC sent to liquidator, 
-    and (10.001 - 0.050005) RBTC remainder liquidated */
+    ETH:USD price = 200
+    Alice coll = 10.001 ETH. Value: $2000.2
+    0.5% of coll  = 0.050005 ETH. Value: (0.050005 * 200) = $10.01
+    Minimum comp = $10 = 0.05 ETH.
+    -> Expect  0.050005 ETH sent to liquidator, 
+    and (10.001 - 0.050005) ETH remainder liquidated */
 
     // Check value of 0.5% of collateral in USD is > $10
     const aliceColl = (await troveManager.Troves(alice))[1]
@@ -615,22 +615,22 @@ contract('Gas compensation tests', async accounts => {
     const ZUSDinSP_A = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_A.lt(ZUSDinSP_0))
 
-    // Check RBTC in SP has increased by the remainder of A's coll
+    // Check ETH in SP has increased by the remainder of A's coll
     const collRemainder_A = aliceColl.sub(_0pt5percent_aliceColl)
-    const RBTCinSP_A = await stabilityPool.getRBTC()
+    const ETHinSP_A = await stabilityPool.getETH()
 
-    const SPRBTCIncrease_A = RBTCinSP_A.sub(RBTCinSP_0)
+    const SPETHIncrease_A = ETHinSP_A.sub(ETHinSP_0)
 
-    assert.isAtMost(th.getDifference(SPRBTCIncrease_A, collRemainder_A), 1000)
+    assert.isAtMost(th.getDifference(SPETHIncrease_A, collRemainder_A), 1000)
 
 
     /* 
-   RBTC:USD price = 200
-   Bob coll = 37.5 RBTC. Value: $7500
-   0.5% of coll  = 0.1875 RBTC. Value: (0.1875 * 200) = $37.5
-   Minimum comp = $10 = 0.05 RBTC.
-   -> Expect 0.1875 RBTC sent to liquidator, 
-   and (37.5 - 0.1875 RBTC) RBTC remainder liquidated */
+   ETH:USD price = 200
+   Bob coll = 37.5 ETH. Value: $7500
+   0.5% of coll  = 0.1875 ETH. Value: (0.1875 * 200) = $37.5
+   Minimum comp = $10 = 0.05 ETH.
+   -> Expect 0.1875 ETH sent to liquidator, 
+   and (37.5 - 0.1875 ETH) ETH remainder liquidated */
 
     // Check value of 0.5% of collateral in USD is > $10
     const bobColl = (await troveManager.Troves(bob))[1]
@@ -654,13 +654,13 @@ contract('Gas compensation tests', async accounts => {
     const ZUSDinSP_B = await stabilityPool.getTotalZUSDDeposits()
     assert.isTrue(ZUSDinSP_B.lt(ZUSDinSP_A))
 
-    // Check RBTC in SP has increased by the remainder of B's coll
+    // Check ETH in SP has increased by the remainder of B's coll
     const collRemainder_B = bobColl.sub(_0pt5percent_bobColl)
-    const RBTCinSP_B = await stabilityPool.getRBTC()
+    const ETHinSP_B = await stabilityPool.getETH()
 
-    const SPRBTCIncrease_B = RBTCinSP_B.sub(RBTCinSP_A)
+    const SPETHIncrease_B = ETHinSP_B.sub(ETHinSP_A)
 
-    assert.isAtMost(th.getDifference(SPRBTCIncrease_B, collRemainder_B), 1000)
+    assert.isAtMost(th.getDifference(SPETHIncrease_B, collRemainder_B), 1000)
 
   })
 
@@ -688,7 +688,7 @@ contract('Gas compensation tests', async accounts => {
     const price_1 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 9.99
+    ETH:USD price = 9.99
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
@@ -716,7 +716,7 @@ contract('Gas compensation tests', async accounts => {
     const price_2 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 3
+    ETH:USD price = 3
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
@@ -755,19 +755,19 @@ contract('Gas compensation tests', async accounts => {
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: erin })
 
     const ZUSDinSP_0 = await stabilityPool.getTotalZUSDDeposits()
-    const RBTCinSP_0 = await stabilityPool.getRBTC()
+    const ETHinSP_0 = await stabilityPool.getETH()
 
     // --- Price drops to 199.999 ---
     await priceFeed.setPrice('199999000000000000000')
     const price_1 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 199.999
-    Alice coll = 1 RBTC. Value: $199.999
-    0.5% of coll  = 0.05 RBTC. Value: (0.05 * 199.999) = $9.99995
-    Minimum comp = $10 = 0.05000025000125001 RBTC.
-    -> Expect 0.05000025000125001 RBTC sent to liquidator, 
-    and (1 - 0.05000025000125001) = 0.94999974999875 RBTC remainder liquidated */
+    ETH:USD price = 199.999
+    Alice coll = 1 ETH. Value: $199.999
+    0.5% of coll  = 0.05 ETH. Value: (0.05 * 199.999) = $9.99995
+    Minimum comp = $10 = 0.05000025000125001 ETH.
+    -> Expect 0.05000025000125001 ETH sent to liquidator, 
+    and (1 - 0.05000025000125001) = 0.94999974999875 ETH remainder liquidated */
 
     // Check collateral value in USD is > $10
     const aliceColl = (await troveManager.Troves(alice))[1]
@@ -801,12 +801,12 @@ contract('Gas compensation tests', async accounts => {
       const price_2 = await priceFeed.getPrice()
 
     /* 
-    RBTC:USD price = 15
-    Bob coll = 15 RBTC. Value: $165
-    0.5% of coll  = 0.75 RBTC. Value: (0.75 * 11) = $8.25
-    Minimum comp = $10 =  0.66666...RBTC.
-    -> Expect 0.666666666666666666 RBTC sent to liquidator, 
-    and (15 - 0.666666666666666666) RBTC remainder liquidated */
+    ETH:USD price = 15
+    Bob coll = 15 ETH. Value: $165
+    0.5% of coll  = 0.75 ETH. Value: (0.75 * 11) = $8.25
+    Minimum comp = $10 =  0.66666...ETH.
+    -> Expect 0.666666666666666666 ETH sent to liquidator, 
+    and (15 - 0.666666666666666666) ETH remainder liquidated */
 
     // Check collateral value in USD is > $10
     const bobColl = (await troveManager.Troves(bob))[1]
@@ -851,7 +851,7 @@ contract('Gas compensation tests', async accounts => {
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: erin })
 
     const ZUSDinSP_0 = await stabilityPool.getTotalZUSDDeposits()
-    const RBTCinSP_0 = await stabilityPool.getRBTC()
+    const ETHinSP_0 = await stabilityPool.getETH()
 
     await priceFeed.setPrice(dec(200, 18))
     const price_1 = await priceFeed.getPrice()
@@ -881,12 +881,12 @@ contract('Gas compensation tests', async accounts => {
 
 
     /* 
-   RBTC:USD price = 200
-   Bob coll = 37.5 RBTC. Value: $7500
-   0.5% of coll  = 0.1875 RBTC. Value: (0.1875 * 200) = $37.5
-   Minimum comp = $10 = 0.05 RBTC.
-   -> Expect 0.1875 RBTC sent to liquidator, 
-   and (37.5 - 0.1875 RBTC) RBTC remainder liquidated */
+   ETH:USD price = 200
+   Bob coll = 37.5 ETH. Value: $7500
+   0.5% of coll  = 0.1875 ETH. Value: (0.1875 * 200) = $37.5
+   Minimum comp = $10 = 0.05 ETH.
+   -> Expect 0.1875 ETH sent to liquidator, 
+   and (37.5 - 0.1875 ETH) ETH remainder liquidated */
 
     // Check value of 0.5% of collateral in USD is > $10
     const bobColl = (await troveManager.Troves(bob))[1]
@@ -996,9 +996,9 @@ contract('Gas compensation tests', async accounts => {
     const compensationReceived = (liquidatorBalance_after.sub(liquidatorBalance_before)).toString()
     assert.equal(expectedGasComp, compensationReceived)
 
-    // Check RBTC in stability pool now equals the expected liquidated collateral
-    const RBTCinSP = (await stabilityPool.getRBTC()).toString()
-    assert.equal(expectedLiquidatedColl, RBTCinSP)
+    // Check ETH in stability pool now equals the expected liquidated collateral
+    const ETHinSP = (await stabilityPool.getETH()).toString()
+    assert.equal(expectedLiquidatedColl, ETHinSP)
   })
 
   // liquidateTroves - full redistribution
@@ -1073,9 +1073,9 @@ contract('Gas compensation tests', async accounts => {
 
     assert.isAtMost(th.getDifference(expectedGasComp, compensationReceived), 1000)
 
-    // Check RBTC in defaultPool now equals the expected liquidated collateral
-    const RBTCinDefaultPool = (await defaultPool.getRBTC()).toString()
-    assert.isAtMost(th.getDifference(expectedLiquidatedColl, RBTCinDefaultPool), 1000)
+    // Check ETH in defaultPool now equals the expected liquidated collateral
+    const ETHinDefaultPool = (await defaultPool.getETH()).toString()
+    assert.isAtMost(th.getDifference(expectedLiquidatedColl, ETHinDefaultPool), 1000)
   })
 
   //  --- event emission in liquidation sequence ---
@@ -1279,7 +1279,7 @@ contract('Gas compensation tests', async accounts => {
           try {
             assert.isTrue(ICR.gte(prevICR))
           } catch (error) {
-            console.log(`RBTC price at which trove ordering breaks: ${price}`)
+            console.log(`ETH price at which trove ordering breaks: ${price}`)
             logICRs(ICRList)
           }
         }
@@ -1324,7 +1324,7 @@ contract('Gas compensation tests', async accounts => {
           try {
             assert.isTrue(ICR.gte(prevICR))
           } catch (error) {
-            console.log(`RBTC price at which trove ordering breaks: ${price}`)
+            console.log(`ETH price at which trove ordering breaks: ${price}`)
             logICRs(ICRList)
           }
         }
@@ -1373,7 +1373,7 @@ contract('Gas compensation tests', async accounts => {
             assert.isTrue(ICR.gte(prevICR))
           } catch (error) {
             console.log(error)
-            console.log(`RBTC price at which trove ordering breaks: ${price}`)
+            console.log(`ETH price at which trove ordering breaks: ${price}`)
             logICRs(ICRList)
           }
         }

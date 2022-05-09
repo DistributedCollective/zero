@@ -24,12 +24,12 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint ZUSDGain, uint RBTCGain);
-    event F_RBTCUpdated(uint _F_RBTC);
+    event StakingGainsWithdrawn(address indexed staker, uint ZUSDGain, uint ETHGain);
+    event F_ETHUpdated(uint _F_ETH);
     event F_ZUSDUpdated(uint _F_ZUSD);
     event TotalZEROStakedUpdated(uint _totalZEROStaked);
-    event RBtcerSent(address _account, uint _amount);
-    event StakerSnapshotsUpdated(address _staker, uint _F_RBTC, uint _F_ZUSD);
+    event EtherSent(address _account, uint _amount);
+    event StakerSnapshotsUpdated(address _staker, uint _F_ETH, uint _F_ZUSD);
 
     // --- Functions ---
 
@@ -62,17 +62,17 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         
     }
 
-    // If caller has a pre-existing stake, send any accumulated RBTC and ZUSD gains to them. 
+    // If caller has a pre-existing stake, send any accumulated ETH and ZUSD gains to them. 
     function stake(uint _ZEROamount) external override {
         _requireNonZeroAmount(_ZEROamount);
 
         uint currentStake = stakes[msg.sender];
 
-        uint RBTCGain;
+        uint ETHGain;
         uint ZUSDGain;
-        // Grab any accumulated RBTC and ZUSD gains from the current stake
+        // Grab any accumulated ETH and ZUSD gains from the current stake
         if (currentStake != 0) {
-            RBTCGain = _getPendingRBTCGain(msg.sender);
+            ETHGain = _getPendingETHGain(msg.sender);
             ZUSDGain = _getPendingZUSDGain(msg.sender);
         }
     
@@ -89,23 +89,23 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         zeroToken.sendToZEROStaking(msg.sender, _ZEROamount);
 
         emit StakeChanged(msg.sender, newStake);
-        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, RBTCGain);
+        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, ETHGain);
 
-         // Send accumulated ZUSD and RBTC gains to the caller
+         // Send accumulated ZUSD and ETH gains to the caller
         if (currentStake != 0) {
             zusdToken.transfer(msg.sender, ZUSDGain);
-            _sendRBTCGainToUser(RBTCGain);
+            _sendETHGainToUser(ETHGain);
         }
     }
 
-    /// Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & RBTC gains. 
+    /// Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & ETH gains. 
     /// If requested amount > stake, send their entire stake.
     function unstake(uint _ZEROamount) external override {
         uint currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);
 
-        // Grab any accumulated RBTC and ZUSD gains from the current stake
-        uint RBTCGain = _getPendingRBTCGain(msg.sender);
+        // Grab any accumulated ETH and ZUSD gains from the current stake
+        uint ETHGain = _getPendingETHGain(msg.sender);
         uint ZUSDGain = _getPendingZUSDGain(msg.sender);
         
         _updateUserSnapshots(msg.sender);
@@ -126,23 +126,23 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
             emit StakeChanged(msg.sender, newStake);
         }
 
-        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, RBTCGain);
+        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, ETHGain);
 
-        // Send accumulated ZUSD and RBTC gains to the caller
+        // Send accumulated ZUSD and ETH gains to the caller
         zusdToken.transfer(msg.sender, ZUSDGain);
-        _sendRBTCGainToUser(RBTCGain);
+        _sendETHGainToUser(ETHGain);
     }
 
     // --- Reward-per-unit-staked increase functions. Called by Liquity core contracts ---
 
-    function increaseF_RBTC(uint _RBTCFee) external override {
+    function increaseF_ETH(uint _ETHFee) external override {
         _requireCallerIsFeeDistributor();
-        uint RBTCFeePerZEROStaked;
+        uint ETHFeePerZEROStaked;
      
-        if (totalZEROStaked > 0) {RBTCFeePerZEROStaked = _RBTCFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
+        if (totalZEROStaked > 0) {ETHFeePerZEROStaked = _ETHFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);}
 
-        F_RBTC = F_RBTC.add(RBTCFeePerZEROStaked); 
-        emit F_RBTCUpdated(F_RBTC);
+        F_ETH = F_ETH.add(ETHFeePerZEROStaked); 
+        emit F_ETHUpdated(F_ETH);
     }
 
     function increaseF_ZUSD(uint _ZUSDFee) external override {
@@ -157,14 +157,14 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     // --- Pending reward functions ---
 
-    function getPendingRBTCGain(address _user) external view override returns (uint) {
-        return _getPendingRBTCGain(_user);
+    function getPendingETHGain(address _user) external view override returns (uint) {
+        return _getPendingETHGain(_user);
     }
 
-    function _getPendingRBTCGain(address _user) internal view returns (uint) {
-        uint F_RBTC_Snapshot = snapshots[_user].F_RBTC_Snapshot;
-        uint RBTCGain = stakes[_user].mul(F_RBTC.sub(F_RBTC_Snapshot)).div(DECIMAL_PRECISION);
-        return RBTCGain;
+    function _getPendingETHGain(address _user) internal view returns (uint) {
+        uint F_ETH_Snapshot = snapshots[_user].F_ETH_Snapshot;
+        uint ETHGain = stakes[_user].mul(F_ETH.sub(F_ETH_Snapshot)).div(DECIMAL_PRECISION);
+        return ETHGain;
     }
 
     function getPendingZUSDGain(address _user) external view override returns (uint) {
@@ -180,15 +180,15 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     // --- Internal helper functions ---
 
     function _updateUserSnapshots(address _user) internal {
-        snapshots[_user].F_RBTC_Snapshot = F_RBTC;
+        snapshots[_user].F_ETH_Snapshot = F_ETH;
         snapshots[_user].F_ZUSD_Snapshot = F_ZUSD;
-        emit StakerSnapshotsUpdated(_user, F_RBTC, F_ZUSD);
+        emit StakerSnapshotsUpdated(_user, F_ETH, F_ZUSD);
     }
 
-    function _sendRBTCGainToUser(uint RBTCGain) internal {
-        emit RBtcerSent(msg.sender, RBTCGain);
-        (bool success, ) = msg.sender.call{value: RBTCGain}("");
-        require(success, "ZEROStaking: Failed to send accumulated RBTCGain");
+    function _sendETHGainToUser(uint ETHGain) internal {
+        emit EtherSent(msg.sender, ETHGain);
+        (bool success, ) = msg.sender.call{value: ETHGain}("");
+        require(success, "ZEROStaking: Failed to send accumulated ETHGain");
     }
 
     // --- 'require' functions ---

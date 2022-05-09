@@ -112,36 +112,36 @@ contract('BorrowerWrappers', async accounts => {
     await revertToSnapshot();
   });
 
-  it('proxy owner can recover RBTC', async () => {
+  it('proxy owner can recover ETH', async () => {
     const amount = toBN(dec(1, 18))
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
 
-    // send some RBTC to proxy
+    // send some ETH to proxy
     await web3.eth.sendTransaction({ from: owner, to: proxyAddress, value: amount })
     assert.equal(await web3.eth.getBalance(proxyAddress), amount.toString())
 
     const balanceBefore = toBN(await web3.eth.getBalance(alice))
 
-    // recover RBTC
-    await borrowerWrappers.transferRBTC(alice, amount, { from: alice, gasPrice: 0 })
+    // recover ETH
+    await borrowerWrappers.transferETH(alice, amount, { from: alice, gasPrice: 0 })
     const balanceAfter = toBN(await web3.eth.getBalance(alice))
 
     assert.equal(balanceAfter.sub(balanceBefore), amount.toString())
   })
 
-  it('non proxy owner cannot recover RBTC', async () => {
+  it('non proxy owner cannot recover ETH', async () => {
     const amount = toBN(dec(1, 18))
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
 
-    // send some RBTC to proxy
+    // send some ETH to proxy
     await web3.eth.sendTransaction({ from: owner, to: proxyAddress, value: amount })
     assert.equal(await web3.eth.getBalance(proxyAddress), amount.toString())
 
     const balanceBefore = toBN(await web3.eth.getBalance(alice))
 
-    // try to recover RBTC
+    // try to recover ETH
     const proxy = borrowerWrappers.getProxyFromUser(alice)
-    const signature = 'transferRBTC(address,uint256)'
+    const signature = 'transferETH(address,uint256)'
     const calldata = th.getTransactionData(signature, [alice, amount])
     await assertRevert(proxy.methods["execute(address,bytes)"](borrowerWrappers.scriptAddress, calldata, { from: bob }), 'ds-auth-unauthorized')
 
@@ -304,7 +304,7 @@ contract('BorrowerWrappers', async accounts => {
     const expectedCompoundedZUSDDeposit_A = toBN(dec(150, 18)).sub(expectedZUSDLoss_A)
     const compoundedZUSDDeposit_A = await stabilityPool.getCompoundedZUSDDeposit(alice)
     // collateral * 150 / 2500 * 0.995
-    const expectedRBTCGain_A = collateral.mul(aliceDeposit).div(totalDeposits).mul(toBN(dec(995, 15))).div(mv._1e18BN)
+    const expectedETHGain_A = collateral.mul(aliceDeposit).div(totalDeposits).mul(toBN(dec(995, 15))).div(mv._1e18BN)
 
     assert.isAtMost(th.getDifference(expectedCompoundedZUSDDeposit_A, compoundedZUSDDeposit_A), 1000)
 
@@ -318,7 +318,7 @@ contract('BorrowerWrappers', async accounts => {
     const stakeBefore = await zeroStaking.stakes(alice)
 
     
-    const proportionalZUSD = expectedRBTCGain_A.mul(price).div(ICRBefore)
+    const proportionalZUSD = expectedETHGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(mv._1e18BN).div(mv._1e18BN.add(borrowingRate))
 
@@ -349,10 +349,10 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
     assert.equal(zusdBalanceAfter.toString(), zusdBalanceBefore.toString())
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
-    // check trove has increased debt by the ICR proportional amount to RBTC gain
+    // check trove has increased debt by the ICR proportional amount to ETH gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalZUSD))
-    // check trove has increased collateral by the RBTC gain
-    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedRBTCGain_A))
+    // check trove has increased collateral by the ETH gain
+    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
     // check that Stability Pool deposit
@@ -363,9 +363,9 @@ contract('BorrowerWrappers', async accounts => {
     // ZERO staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
 
-    // Expect Alice has withdrawn all RBTC gain
-    const alice_pendingRBTCGain = await stabilityPool.getDepositorRBTCGain(alice)
-    assert.equal(alice_pendingRBTCGain, 0)
+    // Expect Alice has withdrawn all ETH gain
+    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
+    assert.equal(alice_pendingETHGain, 0)
   })
 
 
@@ -474,12 +474,12 @@ contract('BorrowerWrappers', async accounts => {
     // ZERO staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore)
 
-    // Expect Alice has withdrawn all RBTC gain
-    const alice_pendingRBTCGain = await stabilityPool.getDepositorRBTCGain(alice)
-    assert.equal(alice_pendingRBTCGain, 0)
+    // Expect Alice has withdrawn all ETH gain
+    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
+    assert.equal(alice_pendingETHGain, 0)
   })
 
-  it('claimStakingGainsAndRecycle(): with only RBTC gain', async () => {
+  it('claimStakingGainsAndRecycle(): with only ETH gain', async () => {
     const price = toBN(dec(200, 18))
   
     // Whale opens Trove
@@ -515,14 +515,14 @@ contract('BorrowerWrappers', async accounts => {
     await th.redeemCollateral(whale, contracts, redeemedAmount)
     const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
  
-    // Alice RBTC gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
+    // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
     // 20% sent to SovFeeCollector address
     const redemptionFeeToSovCollector = redemptionFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const expectedRBTCGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
+    const expectedETHGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
 
     const redemptionFeeToZeroStalking = redemptionFee.sub(redemptionFeeToSovCollector)
-    const expectedRBTCGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
+    const expectedETHGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
 
     const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
@@ -533,7 +533,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await zeroStaking.stakes(alice)
 
-    const proportionalZUSD = expectedRBTCGain_A.mul(price).div(ICRBefore)
+    const proportionalZUSD = expectedETHGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
 
@@ -565,10 +565,10 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     // check proxy zusd balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(zusdBalanceAfter, zusdBalanceBefore.add(expectedNewZUSDGain_A))
-    // check trove has increased debt by the ICR proportional amount to RBTC gain
+    // check trove has increased debt by the ICR proportional amount to ETH gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalZUSD), 10000)
-    // check trove has increased collateral by the RBTC gain
-    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedRBTCGain_A))
+    // check trove has increased collateral by the ETH gain
+    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
     // check that Stability Pool deposit
@@ -581,12 +581,12 @@ contract('BorrowerWrappers', async accounts => {
 
     // check sovFeeCollector has increased ZUSD balance
     th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
-    // check sovFeeCollector has increased RBTC balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedRBTCGainSovCollector), 10000)
+    // check sovFeeCollector has increased ETH balance
+    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
 
-    // Expect Alice has withdrawn all RBTC gain
-    const alice_pendingRBTCGain = await stabilityPool.getDepositorRBTCGain(alice)
-    assert.equal(alice_pendingRBTCGain, 0)
+    // Expect Alice has withdrawn all ETH gain
+    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
+    assert.equal(alice_pendingETHGain, 0)
   })
 
   it('claimStakingGainsAndRecycle(): with only ZUSD gain', async () => {
@@ -649,9 +649,9 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     // check proxy zusd balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(zusdBalanceAfter, zusdBalanceBefore)
-    // check trove has increased debt by the ICR proportional amount to RBTC gain
+    // check trove has increased debt by the ICR proportional amount to ETH gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore, 10000)
-    // check trove has increased collateral by the RBTC gain
+    // check trove has increased collateral by the ETH gain
     th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore)
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
@@ -662,12 +662,12 @@ contract('BorrowerWrappers', async accounts => {
     // check sovFeeCollector has increased ZUSD balance
     th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
 
-    // Expect Alice has withdrawn all RBTC gain
-    const alice_pendingRBTCGain = await stabilityPool.getDepositorRBTCGain(alice)
-    assert.equal(alice_pendingRBTCGain, 0)
+    // Expect Alice has withdrawn all ETH gain
+    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
+    assert.equal(alice_pendingETHGain, 0)
   })
 
-  it('claimStakingGainsAndRecycle(): with both RBTC and ZUSD gains', async () => {
+  it('claimStakingGainsAndRecycle(): with both ETH and ZUSD gains', async () => {
     const price = toBN(dec(200, 18))
 
     // Whale opens Trove
@@ -708,14 +708,14 @@ contract('BorrowerWrappers', async accounts => {
     await th.redeemCollateral(whale, contracts, redeemedAmount)
     const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
 
-    // Alice RBTC gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
+    // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
     // 100% sent to SovFeeCollector address
     const redemptionFeeToSovCollector = redemptionFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const expectedRBTCGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
+    const expectedETHGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
 
     const redemptionFeeToZeroStalking = redemptionFee.sub(redemptionFeeToSovCollector)
-    const expectedRBTCGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
+    const expectedETHGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
 
     const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
@@ -726,7 +726,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await zeroStaking.stakes(alice)
 
-    const proportionalZUSD = expectedRBTCGain_A.mul(price).div(ICRBefore)
+    const proportionalZUSD = expectedETHGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
     const expectedTotalZUSD = expectedZUSDGain_A.add(netDebtChange)
@@ -757,10 +757,10 @@ contract('BorrowerWrappers', async accounts => {
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     // check proxy zusd balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(zusdBalanceAfter, zusdBalanceBefore.add(expectedNewZUSDGain_A))
-    // check trove has increased debt by the ICR proportional amount to RBTC gain
+    // check trove has increased debt by the ICR proportional amount to ETH gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalZUSD), 10000)
-    // check trove has increased collateral by the RBTC gain
-    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedRBTCGain_A))
+    // check trove has increased collateral by the ETH gain
+    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
     // check that Stability Pool deposit
@@ -773,12 +773,12 @@ contract('BorrowerWrappers', async accounts => {
 
     // check sovFeeCollector has increased ZUSD balance
     th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
-    // check sovFeeCollector has increased RBTC balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedRBTCGainSovCollector), 10000)
+    // check sovFeeCollector has increased ETH balance
+    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
 
-    // Expect Alice has withdrawn all RBTC gain
-    const alice_pendingRBTCGain = await stabilityPool.getDepositorRBTCGain(alice)
-    assert.equal(alice_pendingRBTCGain, 0)
+    // Expect Alice has withdrawn all ETH gain
+    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
+    assert.equal(alice_pendingETHGain, 0)
   })
 
 })

@@ -57,7 +57,7 @@ interface IBorrowerOperations {
     ) external;
 
     /**
-     * @notice payable function that creates a Trove for the caller with the requested debt, and the RBtcer received as collateral.
+     * @notice payable function that creates a Trove for the caller with the requested debt, and the Ether received as collateral.
      * Successful execution is conditional mainly on the resulting collateralization ratio which must exceed the minimum (110% in Normal Mode, 150% in Recovery Mode).
      * In addition to the requested debt, extra debt is issued to pay the issuance fee, and cover the gas compensation. 
      * The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee. 
@@ -69,7 +69,7 @@ interface IBorrowerOperations {
     function openTrove(uint _maxFee, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable;
 
     /**
-     * @notice payable function that creates a Trove for the caller with the requested debt, and the RBtcer received as collateral.
+     * @notice payable function that creates a Trove for the caller with the requested debt, and the Ether received as collateral.
      * Successful execution is conditional mainly on the resulting collateralization ratio which must exceed the minimum (110% in Normal Mode, 150% in Recovery Mode).
      * In addition to the requested debt, extra debt is issued to pay the issuance fee, and cover the gas compensation. 
      * The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee.
@@ -81,16 +81,16 @@ interface IBorrowerOperations {
      */
     function openNueTrove(uint _maxFee, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable;
 
-    /// @notice payable function that adds the received RBtcer to the caller's active Trove.
+    /// @notice payable function that adds the received Ether to the caller's active Trove.
     /// @param _upperHint upper trove id hint
     /// @param _lowerHint lower trove id hint
     function addColl(address _upperHint, address _lowerHint) external payable;
 
-    /// @notice send RBTC as collateral to a trove. Called by only the Stability Pool.
+    /// @notice send ETH as collateral to a trove. Called by only the Stability Pool.
     /// @param _user user trove address
     /// @param _upperHint upper trove id hint
     /// @param _lowerHint lower trove id hint
-    function moveRBTCGainToTrove(address _user, address _upperHint, address _lowerHint) external payable;
+    function moveETHGainToTrove(address _user, address _upperHint, address _lowerHint) external payable;
     
     /**
      * @notice withdraws `_amount` of collateral from the caller’s Trove. 
@@ -163,7 +163,7 @@ interface IBorrowerOperations {
 
     /** 
     * @notice when a borrower’s Trove has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%, 
-    * this function allows the borrower to claim their RBTC collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation). 
+    * this function allows the borrower to claim their ETH collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation). 
     */
     function claimCollateral() external;
 

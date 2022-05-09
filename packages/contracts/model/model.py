@@ -14,14 +14,14 @@ class ModelParams:
         self.T = 5 # weighting for price change in trove issuance
         self.F = 5 # weighting for momentum change in trove issuance
 
-        self.lookback = 5 # Lookback parameter for RBTC price momentum
+        self.lookback = 5 # Lookback parameter for ETH price momentum
 
         self.max_redemption_fraction = 0.5 # Maximum fraction of supply that can be redeemed in a timestep
 
 # time series data 
 class Data:
     def __init__(self):
-        self.RBTC_price = [500.0]
+        self.ETH_price = [500.0]
         self.momentum = [0.0]
         self.base_fee = [0.0]
         self.redeemed_amount = [0.0]
@@ -33,28 +33,28 @@ class Data:
   
         
 ### Functions
-def get_new_momentum(data, params, RBTC_price):
+def get_new_momentum(data, params, ETH_price):
     lookback = params.lookback
     if lookback == 0:
         return 0
 
-    RBTC_price_past = get_past_RBTC_price(data, params)
+    ETH_price_past = get_past_ETH_price(data, params)
 
-    new_momentum = (RBTC_price - RBTC_price_past) /  RBTC_price_past
+    new_momentum = (ETH_price - ETH_price_past) /  ETH_price_past
     return new_momentum
 
-def get_past_RBTC_price(data, params):
-    length = len(data.RBTC_price)
+def get_past_ETH_price(data, params):
+    length = len(data.ETH_price)
     
-    RBTC_price_past = None
+    ETH_price_past = None
     if (params.lookback > length):
-        RBTC_price_past = data.RBTC_price[0]
+        ETH_price_past = data.ETH_price[0]
     else:
-        RBTC_price_past = data.RBTC_price[length - params.lookback - 1]
+        ETH_price_past = data.ETH_price[length - params.lookback - 1]
 
-    if RBTC_price_past == 0:
+    if ETH_price_past == 0:
         return 1
-    return RBTC_price_past
+    return ETH_price_past
 
 def get_new_redeemed_amount(data, params):
     max_redeemable  = data.token_supply[-1] * params.max_redemption_fraction 
@@ -125,13 +125,13 @@ def get_new_token_supply(trove_issuance, redeemed):
     else: 
         return new_supply
   
-### Various RBTC price functions
+### Various ETH price functions
 
-def constant_RBTC_price(last_price):
+def constant_ETH_price(last_price):
     return last_price
 
-# RBTC price generator is a random walk (normal dist.), with occasional large +ve and -ve jumps
-def randomwalk_RBTC_price(last_price):
+# ETH price generator is a random walk (normal dist.), with occasional large +ve and -ve jumps
+def randomwalk_ETH_price(last_price):
     big_event = 0
     big_event_chance = np.random.normal()
 
@@ -145,19 +145,19 @@ def randomwalk_RBTC_price(last_price):
     else:
         return new_price
 
-def linear_increasing_RBTC_price(last_price, gradient):
+def linear_increasing_ETH_price(last_price, gradient):
     return last_price + gradient
 
-def oscillating_RBTC_price(min, magnitude, i):
+def oscillating_ETH_price(min, magnitude, i):
     return min + magnitude + magnitude*np.sin(i)
 
-def linear_decreasing_RBTC_price(last_price, gradient):
+def linear_decreasing_ETH_price(last_price, gradient):
     return last_price - gradient
 
-def quadratic_RBTC_price(scale, i):
+def quadratic_ETH_price(scale, i):
     return scale*(i**2)
 
-def sublinear_RBTC_price(last_price, steepness, i):
+def sublinear_ETH_price(last_price, steepness, i):
     return last_price + 1/(2*np.sqrt(steepness*(i+1)))
     
 
@@ -167,20 +167,20 @@ params = ModelParams()
 data = Data() # initialize data timeseries
 
 for i in range(1, 100):
-    # update exogenous RBTC price
-    last_RBTC_price =  data.RBTC_price[-1]
+    # update exogenous ETH price
+    last_ETH_price =  data.ETH_price[-1]
 
-    # RBTC_price = last_RBTC_price
-    # RBTC_price = randomwalk_RBTC_price(last_RBTC_price)
-    # RBTC_price = oscillating_RBTC_price(500, 10, i)
-    # RBTC_price = quadratic_RBTC_price(10, i)
-    # RBTC_price = linear_increasing_RBTC_price(last_RBTC_price, 100)
-    # RBTC_price = linear_decreasing_RBTC_price(last_RBTC_price, 1)
-    RBTC_price = sublinear_RBTC_price(last_RBTC_price, 10, i)
+    # ETH_price = last_ETH_price
+    # ETH_price = randomwalk_ETH_price(last_ETH_price)
+    # ETH_price = oscillating_ETH_price(500, 10, i)
+    # ETH_price = quadratic_ETH_price(10, i)
+    # ETH_price = linear_increasing_ETH_price(last_ETH_price, 100)
+    # ETH_price = linear_decreasing_ETH_price(last_ETH_price, 1)
+    ETH_price = sublinear_ETH_price(last_ETH_price, 10, i)
     
-    # print(RBTC_price)
+    # print(ETH_price)
 
-    momentum = get_new_momentum(data, params, RBTC_price)
+    momentum = get_new_momentum(data, params, ETH_price)
     redeemed_amount = get_new_redeemed_amount(data, params)
     base_fee = get_new_base_fee(data, redeemed_amount)
 
@@ -195,7 +195,7 @@ for i in range(1, 100):
     
     # display all new data
     print(f'step: {i}')
-    print(f'RBTC price: {RBTC_price}')
+    print(f'ETH price: {ETH_price}')
     print(f'momentum: {momentum}')
     print(f'redeemed amount: {redeemed_amount}')
     print(f'base fee: {base_fee}')
@@ -205,7 +205,7 @@ for i in range(1, 100):
     print(f'token_supply: {token_supply}')
 
     # update all time series
-    data.RBTC_price.append(RBTC_price)
+    data.ETH_price.append(ETH_price)
     data.momentum.append(momentum)
     data.redeemed_amount.append(redeemed_amount)
     data.base_fee.append(base_fee)
@@ -232,8 +232,8 @@ ax2.set_title('Redeemed amount')
 plt.plot(data.redeemed_amount)
 
 ax3 = fig.add_subplot(223)
-ax3.set_title('RBTC Price')
-plt.plot(data.RBTC_price)
+ax3.set_title('ETH Price')
+plt.plot(data.ETH_price)
 
 ax4 = fig.add_subplot(224)
 ax4.set_title('Base Fee')

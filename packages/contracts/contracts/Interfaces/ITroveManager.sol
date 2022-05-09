@@ -30,15 +30,15 @@ interface ITroveManager is ILiquityBase {
     event ZEROStakingAddressChanged(address _zeroStakingAddress);
 
     event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _ZUSDGasCompensation);
-    event Redemption(uint _attemptedZUSDAmount, uint _actualZUSDAmount, uint _RBTCSent, uint _RBTCFee);
+    event Redemption(uint _attemptedZUSDAmount, uint _actualZUSDAmount, uint _ETHSent, uint _ETHFee);
     event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, uint8 operation);
     event TroveLiquidated(address indexed _borrower, uint _debt, uint _coll, uint8 operation);
     event BaseRateUpdated(uint _baseRate);
     event LastFeeOpTimeUpdated(uint _lastFeeOpTime);
     event TotalStakesUpdated(uint _newTotalStakes);
     event SystemSnapshotsUpdated(uint _totalStakesSnapshot, uint _totalCollateralSnapshot);
-    event LTermsUpdated(uint _L_RBTC, uint _L_ZUSDDebt);
-    event TroveSnapshotsUpdated(uint _L_RBTC, uint _L_ZUSDDebt);
+    event LTermsUpdated(uint _L_ETH, uint _L_ZUSDDebt);
+    event TroveSnapshotsUpdated(uint _L_ETH, uint _L_ZUSDDebt);
     event TroveIndexUpdated(address _borrower, uint _newIndex);
 
     // --- Functions ---
@@ -90,7 +90,7 @@ interface ITroveManager is ILiquityBase {
 
     /// @notice computes the user’s individual collateralization ratio (ICR) based on their total collateral and total ZUSD debt. Returns 2^256 -1 if they have 0 debt.
     /// @param _borrower borrower address
-    /// @param _price RBTC price
+    /// @param _price ETH price
     /// @return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
     function getCurrentICR(address _borrower, uint _price) external view returns (uint);
 
@@ -152,7 +152,7 @@ interface ITroveManager is ILiquityBase {
     /// @param _borrower borrower address
     function updateStakeAndTotalStakes(address _borrower) external returns (uint);
 
-    /// @notice Update borrower's snapshots of L_RBTC and L_ZUSDDebt to reflect the current values
+    /// @notice Update borrower's snapshots of L_ETH and L_ZUSDDebt to reflect the current values
     /// @param _borrower borrower address
     function updateTroveRewardSnapshots(address _borrower) external;
 
@@ -166,8 +166,8 @@ interface ITroveManager is ILiquityBase {
     function applyPendingRewards(address _borrower) external;
 
     /// @param _borrower borrower address
-    /// @return the borrower's pending accumulated RBTC reward, earned by their stake
-    function getPendingRBTCReward(address _borrower) external view returns (uint);
+    /// @return the borrower's pending accumulated ETH reward, earned by their stake
+    function getPendingETHReward(address _borrower) external view returns (uint);
 
     /// @param _borrower borrower address
     /// @return the borrower's pending accumulated ZUSD reward, earned by their stake
@@ -189,7 +189,7 @@ interface ITroveManager is ILiquityBase {
         uint debt, 
         uint coll, 
         uint pendingZUSDDebtReward, 
-        uint pendingRBTCReward
+        uint pendingETHReward
     );
 
     /// @notice Close given trove. Called by BorrowerOperations.
@@ -206,9 +206,9 @@ interface ITroveManager is ILiquityBase {
     /// @return calculated redemption rate using calculated decayed as base rate
     function getRedemptionRateWithDecay() external view returns (uint);
 
-    /// @notice The redemption fee is taken as a cut of the total RBTC drawn from the system in a redemption. It is based on the current redemption rate.
-    /// @param _RBTCDrawn RBTC drawn
-    function getRedemptionFeeWithDecay(uint _RBTCDrawn) external view returns (uint);
+    /// @notice The redemption fee is taken as a cut of the total ETH drawn from the system in a redemption. It is based on the current redemption rate.
+    /// @param _ETHDrawn ETH drawn
+    function getRedemptionFeeWithDecay(uint _ETHDrawn) external view returns (uint);
 
     /// @return borrowing rate
     function getBorrowingRate() external view returns (uint);
@@ -268,7 +268,7 @@ interface ITroveManager is ILiquityBase {
     function decreaseTroveDebt(address _borrower, uint _debtDecrease) external returns (uint); 
 
     /**
-     * @param _price RBTC price
+     * @param _price ETH price
      * @return the total collateralization ratio (TCR) of the system. 
      * The TCR is based on the the entire system debt and collateral (including pending rewards).
      */

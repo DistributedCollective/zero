@@ -48,7 +48,7 @@ contract('TroveManager', async accounts => {
     await borrowerOperations.openTrove(0, 0, accounts[99], { from: accounts[99], value: dec(100, 'ether') })
     await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
-    await th.openTrove_allAccounts_randomRBTC(1, 2, accounts.slice(1, 10), contracts, dec(170, 18))
+    await th.openTrove_allAccounts_randomETH(1, 2, accounts.slice(1, 10), contracts, dec(170, 18))
 
     await priceFeed.setPrice(dec(100, 18))
 
@@ -61,22 +61,22 @@ contract('TroveManager', async accounts => {
     await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 })
     
     // check DefaultPool
-    const RBTC_DefaultPool = await defaultPool.getRBTC()
+    const ETH_DefaultPool = await defaultPool.getETH()
     const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-    console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}`)
   })
 
   /* ABDK64, no error correction:
-    RBTC left in Default Pool is: 34
+    ETH left in Default Pool is: 34
     ZUSDDebt left in Default Pool is: 98
 
     DeciMath, no error correction:
-    RBTC left in Default Pool is: 7
+    ETH left in Default Pool is: 7
     ZUSDDebt left in Default Pool is: 37
 
     Pure division, no correction for rewards:
-    RBTC left in Default Pool is: 52
+    ETH left in Default Pool is: 52
     ZUSDDebt left in Default Pool is: 96
   */
 
@@ -84,7 +84,7 @@ contract('TroveManager', async accounts => {
     await borrowerOperations.openTrove(0, 0, accounts[999], { from: accounts[999], value: dec(1000, 'ether') })
     await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
-    await th.openTrove_allAccounts_randomRBTC(1, 2, accounts.slice(1, 100), contracts, dec(170, 18))
+    await th.openTrove_allAccounts_randomETH(1, 2, accounts.slice(1, 100), contracts, dec(170, 18))
 
     await priceFeed.setPrice(dec(100, 18))
 
@@ -96,21 +96,21 @@ contract('TroveManager', async accounts => {
    
     await borrowerOperations.addColl(accounts[999], accounts[999], { from: accounts[999], value: 1 })
     // check DefaultPool
-    const RBTC_DefaultPool = await defaultPool.getRBTC()
+    const ETH_DefaultPool = await defaultPool.getETH()
     const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-    console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}`)
   })
 
   /* ABDK64, no error correction:
-    RBTC left in Default Pool is: 908
+    ETH left in Default Pool is: 908
     ZUSDDebt left in Default Pool is: 108
 
     DeciMath, no error correction:
     --Subtraction Overflow
 
     Pure division, no correction for rewards:
-    RBTC left in Default Pool is: 167
+    ETH left in Default Pool is: 167
     ZUSDDebt left in Default Pool is: 653
   */
 
@@ -129,21 +129,21 @@ contract('TroveManager', async accounts => {
 
     await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 })
     // check DefaultPool
-    const RBTC_DefaultPool = await defaultPool.getRBTC()
+    const ETH_DefaultPool = await defaultPool.getETH()
     const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-    console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}`)
   })
   
   /* ABDK64, no error correction:
-    RBTC left in Default Pool is: 64
+    ETH left in Default Pool is: 64
     ZUSDDebt left in Default Pool is: 75 
     
     DeciMath, no error correction:
     --Subtraction Overflow
 
     Pure division, no correction:
-    RBTC left in Default Pool is: 64
+    ETH left in Default Pool is: 64
     ZUSDDebt left in Default Pool is: 75
   */
 
@@ -162,21 +162,21 @@ contract('TroveManager', async accounts => {
     await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 })
 
     // check DefaultPool
-    const RBTC_DefaultPool = await defaultPool.getRBTC()
+    const ETH_DefaultPool = await defaultPool.getETH()
     const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-    console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}`)
   })
   
   /* ABDK64, no error correction:
-    RBTC left in Default Pool is: 100
+    ETH left in Default Pool is: 100
     ZUSDDebt left in Default Pool is: 180 
     
     DeciMath, no error correction:
     --Subtraction Overflow
 
     Pure division, no correction:
-    RBTC left in Default Pool is: 100
+    ETH left in Default Pool is: 100
     ZUSDDebt left in Default Pool is: 180
   */
 
@@ -195,22 +195,22 @@ contract('TroveManager', async accounts => {
     await borrowerOperations.addColl(accounts[999], accounts[999], { from: accounts[999], value: 1 })
 
     // check DefaultPool
-    const RBTC_DefaultPool = await defaultPool.getRBTC()
+    const ETH_DefaultPool = await defaultPool.getETH()
     const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-    console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+    console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
     console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}:`)
   })
 
   /*
     ABDK64, no error correction:
-    RBTC left in Default Pool is: 1000
+    ETH left in Default Pool is: 1000
     ZUSDDebt left in Default Pool is: 180: 
     
     DeciMath, no error correction:
     -- overflow
 
     Pure division, no correction:
-    RBTC left in Default Pool is: 1000
+    ETH left in Default Pool is: 1000
     ZUSDDebt left in Default Pool is: 180:
   */
 
@@ -231,36 +231,36 @@ contract('TroveManager', async accounts => {
     await troveManager.liquidate(accounts[0])
 
     // Grab total active coll and debt before liquidations
-    let totalRBTCPoolDifference = web3.utils.toBN(0)
+    let totalETHPoolDifference = web3.utils.toBN(0)
     let totalZUSDDebtPoolDifference = web3.utils.toBN(0)
 
     for (account of accounts.slice(1, 11)) {
-      const activePoolRBTC = await activePool.getRBTC()
+      const activePoolETH = await activePool.getETH()
       const activePoolZUSDDebt = await activePool.getZUSD()
 
       await troveManager.liquidate(account)
 
-      const defaultPoolRBTC = await defaultPool.getRBTC()
+      const defaultPoolETH = await defaultPool.getETH()
       const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-      totalRBTCPoolDifference.add(activePoolRBTC.sub(defaultPoolRBTC))
+      totalETHPoolDifference.add(activePoolETH.sub(defaultPoolETH))
       totalZUSDDebtPoolDifference.add(activePoolZUSDDebt.sub(defaultPoolZUSDDebt))
     }
     
-    console.log(`Accumulated RBTC difference between Default and Active Pools is: ${totalRBTCPoolDifference}`)
+    console.log(`Accumulated ETH difference between Default and Active Pools is: ${totalETHPoolDifference}`)
     console.log(`Accumulated ZUSDDebt difference between Active and Default Pools is: ${totalZUSDDebtPoolDifference}`)
   })
   
   /* ABDK64, no error correction
-    Accumulated RBTC difference between Default and Active Pools is: 0
+    Accumulated ETH difference between Default and Active Pools is: 0
     Accumulated ZUSDDebt difference between Active and Default Pools is: 0
     
     DeciMath, no error correction:
-    Accumulated RBTC difference between Default and Active Pools is: 0
+    Accumulated ETH difference between Default and Active Pools is: 0
     Accumulated ZUSDDebt difference between Active and Default Pools is: 0
     
     Pure division with correction:
-    Accumulated RBTC difference between Default and Active Pools is: 0
+    Accumulated ETH difference between Default and Active Pools is: 0
     Accumulated ZUSDDebt difference between Active and Default Pools is: 0
   */
 
@@ -277,39 +277,39 @@ contract('TroveManager', async accounts => {
       await troveManager.liquidate(account)
     }
 
-    const L_RBTC = await troveManager.L_RBTC()
+    const L_ETH = await troveManager.L_ETH()
     const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-    const totalColl = await activePool.getRBTC()
+    const totalColl = await activePool.getETH()
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18))
-    const totalRBTCRewards = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+    const totalETHRewards = (totalColl.mul(L_ETH)).div(_1e18_BN)
     const totalZUSDRewards = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-    const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards)
+    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards)
 
-    console.log(`RBTC difference between total pending rewards and DefaultPool: ${RBTCRewardDifference} `)
+    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`ZUSDDebt difference between total pending rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: 700
+    ETH difference between total pending rewards and DefaultPool: 700
     ZUSDDebt difference between total pending rewards and DefaultPool: 800
 
     ABDK64 WITH correction:
-    RBTC difference between total pending rewards and DefaultPool: 300
+    ETH difference between total pending rewards and DefaultPool: 300
     ZUSDDebt difference between total pending rewards and DefaultPool: 400
     
     DeciMath, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: -100
+    ETH difference between total pending rewards and DefaultPool: -100
     ZUSDDebt difference between total pending rewards and DefaultPool: -200
 
     Pure division with correction: 
-    RBTC difference between total pending rewards and DefaultPool: 0
+    ETH difference between total pending rewards and DefaultPool: 0
     ZUSDDebt difference between total pending rewards and DefaultPool: 0
   */
 
@@ -326,46 +326,46 @@ contract('TroveManager', async accounts => {
       await troveManager.liquidate(account)
     }
 
-    const L_RBTC = await troveManager.L_RBTC()
+    const L_ETH = await troveManager.L_ETH()
     const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-    const totalColl = await activePool.getRBTC()
+    const totalColl = await activePool.getETH()
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18))
-    const totalRBTCRewards = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+    const totalETHRewards = (totalColl.mul(L_ETH)).div(_1e18_BN)
     const totalZUSDRewards = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-    const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards)
+    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards)
 
-    console.log(`RBTC difference between total pending rewards and DefaultPool: ${RBTCRewardDifference} `)
+    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`ZUSDDebt difference between total pending rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
   })
   
   /* ABDK64, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: 51000
+    ETH difference between total pending rewards and DefaultPool: 51000
     ZUSDDebt difference between total pending rewards and DefaultPool: 55000
     
     ABDK64 WITH correction:
-    RBTC difference between total pending rewards and DefaultPool: 31000
+    ETH difference between total pending rewards and DefaultPool: 31000
     ZUSDDebt difference between total pending rewards and DefaultPool: 31000
 
     DeciMath, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: 2000
+    ETH difference between total pending rewards and DefaultPool: 2000
     ZUSDDebt difference between total pending rewards and DefaultPool: -2000
     
     Pure division with correction:
-    RBTC difference between total pending rewards and DefaultPool: 0
+    ETH difference between total pending rewards and DefaultPool: 0
     ZUSDDebt difference between total pending rewards and DefaultPool: 0
   */
 
- it("11 accounts with random RBTC and proportional ZUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+ it("11 accounts with random ETH and proportional ZUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(100, 'ether') })
 
-  await th.openTrove_allAccounts_randomRBTC_ProportionalZUSD(1, 2, accounts.slice(0, 11), contracts, 180)
+  await th.openTrove_allAccounts_randomETH_ProportionalZUSD(1, 2, accounts.slice(0, 11), contracts, 180)
 
     await priceFeed.setPrice(dec(100, 18))
 
@@ -375,46 +375,46 @@ contract('TroveManager', async accounts => {
       await troveManager.liquidate(account)
 
     }
-    const L_RBTC = await troveManager.L_RBTC()
+    const L_ETH = await troveManager.L_ETH()
     const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-    const totalColl = await activePool.getRBTC()
+    const totalColl = await activePool.getETH()
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18))
-    const totalRBTCRewards = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+    const totalETHRewards = (totalColl.mul(L_ETH)).div(_1e18_BN)
     const totalZUSDRewards = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-    const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards)
+    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards)
 
-    console.log(`RBTC difference between total pending rewards and DefaultPool: ${RBTCRewardDifference} `)
+    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`ZUSDDebt difference between total pending rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: 4500
+    ETH difference between total pending rewards and DefaultPool: 4500
     ZUSDDebt difference between total pending rewards and DefaultPool: 8000
 
     ABDK64 WITH correction:
-    RBTC difference between total pending rewards and DefaultPool: 300
+    ETH difference between total pending rewards and DefaultPool: 300
     ZUSDDebt difference between total pending rewards and DefaultPool: 300
       
     DeciMath, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: 0
+    ETH difference between total pending rewards and DefaultPool: 0
     ZUSDDebt difference between total pending rewards and DefaultPool: -200
 
     Pure division with correction:
-    RBTC difference between total pending rewards and DefaultPool: 100
+    ETH difference between total pending rewards and DefaultPool: 100
     ZUSDDebt difference between total pending rewards and DefaultPool: 100
   */
 
-  it("101 accounts with random RBTC and proportional ZUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
+  it("101 accounts with random ETH and proportional ZUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
     await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1000, 'ether') })
 
-    await th.openTrove_allAccounts_randomRBTC_ProportionalZUSD(1, 2, accounts.slice(0, 101), contracts, 180)
+    await th.openTrove_allAccounts_randomETH_ProportionalZUSD(1, 2, accounts.slice(0, 101), contracts, 180)
 
     await priceFeed.setPrice(dec(100, 18))
 
@@ -425,39 +425,39 @@ contract('TroveManager', async accounts => {
     }
 
     // check (DefaultPool  - totalRewards)
-    const L_RBTC = await troveManager.L_RBTC()
+    const L_ETH = await troveManager.L_ETH()
     const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-    const totalColl = await activePool.getRBTC()
+    const totalColl = await activePool.getETH()
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18))
-    const totalRBTCRewards = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+    const totalETHRewards = (totalColl.mul(L_ETH)).div(_1e18_BN)
     const totalZUSDRewards = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-    const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards)
+    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards)
 
-    console.log(`RBTC difference between total pending rewards and DefaultPool: ${RBTCRewardDifference} `)
+    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`ZUSDDebt difference between total pending rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: 53900
+    ETH difference between total pending rewards and DefaultPool: 53900
     ZUSDDebt difference between total pending rewards and DefaultPool: 61000
 
     ABDK64 WITH correction:
-    RBTC difference between total pending rewards and DefaultPool: 31300
+    ETH difference between total pending rewards and DefaultPool: 31300
     ZUSDDebt difference between total pending rewards and DefaultPool: 30000
     
     DeciMath, no error correction:
-    RBTC difference between total pending rewards and DefaultPool: -4300
+    ETH difference between total pending rewards and DefaultPool: -4300
     ZUSDDebt difference between total pending rewards and DefaultPool: -8000
   
     Pure division with correction:
-    RBTC difference between total pending rewards and DefaultPool: 400
+    ETH difference between total pending rewards and DefaultPool: 400
     ZUSDDebt difference between total pending rewards and DefaultPool: 1000
   */
 
@@ -479,35 +479,35 @@ contract('TroveManager', async accounts => {
       await troveManager.liquidate(account)
     }
     // check (DefaultPool - totalRewards from distribution)
-    const L_RBTC = await troveManager.L_RBTC()
+    const L_ETH = await troveManager.L_ETH()
     const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-    const totalColl = await activePool.getRBTC()
+    const totalColl = await activePool.getETH()
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18))
-    const totalRBTCRewards_Distribution = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+    const totalETHRewards_Distribution = (totalColl.mul(L_ETH)).div(_1e18_BN)
     const totalZUSDRewards_Distribution = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-    const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards_Distribution)
+    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards_Distribution)
     const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards_Distribution)
 
-    console.log(`RBTC difference between total pending distribution rewards and DefaultPool: ${RBTCRewardDifference} `)
+    console.log(`ETH difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`ZUSDDebt difference between total pending distribution rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
   })
 
   /* ABDK64, no error correction
-    RBTC difference between total pending distribution rewards and DefaultPool: 550
+    ETH difference between total pending distribution rewards and DefaultPool: 550
     ZUSDDebt difference between total pending distribution rewards and DefaultPool: 600
     
     DeciMath, no error correction:
-    RBTC difference between total pending distribution rewards and DefaultPool: 150
+    ETH difference between total pending distribution rewards and DefaultPool: 150
     ZUSDDebt difference between total pending distribution rewards and DefaultPool: -200
     
     Pure division with error correction:
-    RBTC difference between total pending distribution rewards and DefaultPool: 50
+    ETH difference between total pending distribution rewards and DefaultPool: 50
     ZUSDDebt difference between total pending distribution rewards and DefaultPool: 0
   */
 
@@ -527,35 +527,35 @@ contract('TroveManager', async accounts => {
        await troveManager.liquidate(account)
      }
      // check (DefaultPool - totalRewards from distribution)
-     const L_RBTC = await troveManager.L_RBTC()
+     const L_ETH = await troveManager.L_ETH()
      const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
  
-     const totalColl = await activePool.getRBTC()
+     const totalColl = await activePool.getETH()
  
      const _1e18_BN = web3.utils.toBN(dec(1, 18))
-     const totalRBTCRewards_Distribution = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+     const totalETHRewards_Distribution = (totalColl.mul(L_ETH)).div(_1e18_BN)
      const totalZUSDRewards_Distribution = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
  
-     const defaultPoolRBTC = await defaultPool.getRBTC()
+     const defaultPoolETH = await defaultPool.getETH()
      const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
  
-     const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards_Distribution)
+     const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards_Distribution)
      const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards_Distribution)
  
-     console.log(`RBTC difference between total pending distribution rewards and DefaultPool: ${RBTCRewardDifference} `)
+     console.log(`ETH difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `)
      console.log(`ZUSDDebt difference between total pending distribution rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
    })
 
   /* ABDK64, no error correction
-    RBTC difference between total pending distribution rewards and DefaultPool: 7600 
+    ETH difference between total pending distribution rewards and DefaultPool: 7600 
     ZUSDDebt difference between total pending distribution rewards and DefaultPool: 8900
     
     DeciMath, no error correction:
-    RBTC difference between total pending distribution rewards and DefaultPool: -700
+    ETH difference between total pending distribution rewards and DefaultPool: -700
     ZUSDDebt difference between total pending distribution rewards and DefaultPool: 200
     
     Pure division with error correction:
-    RBTC difference between total pending distribution rewards and DefaultPool: 0
+    ETH difference between total pending distribution rewards and DefaultPool: 0
     ZUSDDebt difference between total pending distribution rewards and DefaultPool: 0
   */
 
@@ -587,13 +587,13 @@ contract('TroveManager', async accounts => {
     await stabilityPool.provideToSP(whaleSPDeposit,ZERO_ADDRESS, {from: accounts[999]} )
     
     await stabilityPool.withdrawFromSP(dec(50, 18), {from: accounts[1]} )
-    const SP_RBTC = await stabilityPool.getRBTC()
+    const SP_ETH = await stabilityPool.getETH()
     const SP_ZUSD = await stabilityPool.getTotalZUSDDeposits()  
 
     const SP_ZUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_ZUSD)
 
      // check Stability Pool
-    console.log(`Surplus RBTC left in in Stability Pool is ${SP_RBTC}`)
+    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
     console.log(`ZUSD insufficiency in Stability Pool is ${SP_ZUSD_Insufficiency}`)
    })
 
@@ -601,16 +601,16 @@ contract('TroveManager', async accounts => {
       Sometimes subtraction overflows on last withdrawal from SP - error leaves insufficient ZUSD in Pool.
       Noticed when reward shares are recurring fractions.
 
-      Error in RBTC gain accumulates in the Pool.
-      Surplus RBTC left in in Stability Pool is 530
+      Error in ETH gain accumulates in the Pool.
+      Surplus ETH left in in Stability Pool is 530
       ZUSD insufficiency in Stability Pool is 530
       
       DeciMath, no error correction:
-      Surplus RBTC left in in Stability Pool is 0
+      Surplus ETH left in in Stability Pool is 0
       ZUSD insufficiency in Stability Pool is 0
 
       Pure division with error correction:
-      Surplus RBTC left in in Stability Pool is 0
+      Surplus ETH left in in Stability Pool is 0
       ZUSD insufficiency in Stability Pool is 0
     */
 
@@ -640,26 +640,26 @@ contract('TroveManager', async accounts => {
     await stabilityPool.provideToSP(whaleSPDeposit,ZERO_ADDRESS, {from: accounts[999]} )
     
     await stabilityPool.withdrawFromSP(dec(50, 18), {from: accounts[1]} )
-    const SP_RBTC = await stabilityPool.getRBTC()
+    const SP_ETH = await stabilityPool.getETH()
     const SP_ZUSD = await stabilityPool.getTotalZUSDDeposits()  
 
     const SP_ZUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_ZUSD)
 
      // check Stability Pool
-    console.log(`Surplus RBTC left in in Stability Pool is ${SP_RBTC}`)
+    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
     console.log(`ZUSD insufficiency in Stability Pool is ${SP_ZUSD_Insufficiency}`)
    })
 
    /* ABDK64, no error correction
-    Surplus RBTC left in in Stability Pool is 5300
+    Surplus ETH left in in Stability Pool is 5300
     ZUSD insufficiency in Stability Pool is 5300
       
     DeciMath, no error correction:
-    Surplus RBTC left in in Stability Pool is 0
+    Surplus ETH left in in Stability Pool is 0
     ZUSD insufficiency in Stability Pool is 0
 
     Pure division with error correction:
-    Surplus RBTC left in in Stability Pool is 0
+    Surplus ETH left in in Stability Pool is 0
     ZUSD insufficiency in Stability Pool is 0
    */
 
@@ -693,13 +693,13 @@ contract('TroveManager', async accounts => {
     await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, {from: accounts[999]} )
     
     await stabilityPool.withdrawFromSP(account1SPDeposit, {from: accounts[1]} )
-    const SP_RBTC = await stabilityPool.getRBTC()
+    const SP_ETH = await stabilityPool.getETH()
     const SP_ZUSD = await stabilityPool.getTotalZUSDDeposits()  
 
     const SP_ZUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_ZUSD)
 
      // check Stability Pool
-    console.log(`Surplus RBTC left in in Stability Pool is ${SP_RBTC}`)
+    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
     console.log(`ZUSD insufficiency in Stability Pool is ${SP_ZUSD_Insufficiency}`)
    })
 
@@ -707,19 +707,19 @@ contract('TroveManager', async accounts => {
       Sometimes subtraction overflows on last withdrawal from SP - error leaves insufficient ZUSD in Pool.
       Noticed when reward shares are recurring fractions.
 
-      Error in RBTC gain accumulates in the Pool.
-      Surplus RBTC left in in Stability Pool is 84
+      Error in ETH gain accumulates in the Pool.
+      Surplus ETH left in in Stability Pool is 84
       ZUSD insufficiency in Stability Pool is 442
 
       DeciMath, no error correction:
       -- Subtraction Overflow
 
       Pure division with no error correction:
-      Surplus RBTC left in in Stability Pool is 366
+      Surplus ETH left in in Stability Pool is 366
       ZUSD insufficiency in Stability Pool is 67
 
       Pure division with error correction:
-      Surplus RBTC left in in Stability Pool is 446
+      Surplus ETH left in in Stability Pool is 446
       ZUSD insufficiency in Stability Pool is 507
     */
 
@@ -753,30 +753,30 @@ contract('TroveManager', async accounts => {
     
     await stabilityPool.withdrawFromSP(account1SPDeposit, {from: accounts[1]} )
 
-    const SP_RBTC = await stabilityPool.getRBTC()
+    const SP_ETH = await stabilityPool.getETH()
     const SP_ZUSD = await stabilityPool.getTotalZUSDDeposits()  
 
     const SP_ZUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_ZUSD)
 
      // check Stability Pool
-    console.log(`Surplus RBTC left in in Stability Pool is ${SP_RBTC}`)
+    console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
     console.log(`ZUSD insufficiency in Stability Pool is ${SP_ZUSD_Insufficiency}`)
    })
 
    /* ABDK64, no error correction
-    Surplus RBTC left in in Stability Pool is 3321
+    Surplus ETH left in in Stability Pool is 3321
     ZUSD insufficiency in Stability Pool is 1112
 
     DeciMath, no error correction:
-    Surplus RBTC left in in Stability Pool is 1373
+    Surplus ETH left in in Stability Pool is 1373
     ZUSD insufficiency in Stability Pool is -13
 
     Pure division with no error correction:
-    Surplus RBTC left in in Stability Pool is 4087
+    Surplus ETH left in in Stability Pool is 4087
     ZUSD insufficiency in Stability Pool is 1960
 
     Pure division with error correction:
-    Surplus RBTC left in in Stability Pool is 3072
+    Surplus ETH left in in Stability Pool is 3072
     ZUSD insufficiency in Stability Pool is 452
   */ 
 
@@ -810,27 +810,27 @@ contract('TroveManager', async accounts => {
   
   await stabilityPool.withdrawFromSP(account1SPDeposit, {from: accounts[1]} )
 
-  const SP_RBTC = await stabilityPool.getRBTC()
+  const SP_ETH = await stabilityPool.getETH()
   const SP_ZUSD = await stabilityPool.getTotalZUSDDeposits()  
 
   const SP_ZUSD_Insufficiency = web3.utils.toBN(whaleSPDeposit).sub(SP_ZUSD)
 
    // check Stability Pool
-  console.log(`Surplus RBTC left in in Stability Pool is ${SP_RBTC}`)
+  console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`)
   console.log(`ZUSD insufficiency in Stability Pool is ${SP_ZUSD_Insufficiency}`)
  })
 
   /* ABDK64, no error correction:
     DeciMath, no error correction:
-    Surplus RBTC left in in Stability Pool is 2691
+    Surplus ETH left in in Stability Pool is 2691
     ZUSD insufficiency in Stability Pool is -8445
 
     Pure division, no correction:
-    Surplus RBTC left in in Stability Pool is 18708
+    Surplus ETH left in in Stability Pool is 18708
     ZUSD insufficiency in Stability Pool is 25427
 
     Pure division with error correction:
-    Surplus RBTC left in in Stability Pool is 1573
+    Surplus ETH left in in Stability Pool is 1573
     ZUSD insufficiency in Stability Pool is 6037
   */ 
 
@@ -842,7 +842,7 @@ contract('TroveManager', async accounts => {
  
   // Starting values for parallel off-chain computation
   let offchainTotalStakes = await troveManager.totalStakes()
-  let offchainTotalColl = await activePool.getRBTC()
+  let offchainTotalColl = await activePool.getETH()
   let offchainStake = web3.utils.toBN(0)
   let stakeDifference = web3.utils.toBN(0)
   let totalStakesDifference = web3.utils.toBN(0)
@@ -898,7 +898,7 @@ contract('TroveManager', async accounts => {
  
   // Starting values for parallel off-chain computation
   let offchainTotalStakes = await troveManager.totalStakes()
-  let offchainTotalColl = await activePool.getRBTC()
+  let offchainTotalColl = await activePool.getETH()
   let offchainStake = web3.utils.toBN(0)
   let stakeDifference = web3.utils.toBN(0)
   let totalStakesDifference = web3.utils.toBN(0)
@@ -955,7 +955,7 @@ it("100 accounts. 100x liquidate -> addColl. Random coll. Check stake and totalS
  
   // Starting values for parallel off-chain computation
   let offchainTotalStakes = await troveManager.totalStakes()
-  let offchainTotalColl = await activePool.getRBTC()
+  let offchainTotalColl = await activePool.getETH()
   let offchainStake = web3.utils.toBN(0)
   let stakeDifference = web3.utils.toBN(0)
   let totalStakesDifference = web3.utils.toBN(0)
@@ -1011,7 +1011,7 @@ it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 
   await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
   // Troves open with 100-200 million ether
-  await th.openTrove_allAccounts_randomRBTC(100000000, 200000000, accounts.slice(1, 10), contracts, dec(170, 18))
+  await th.openTrove_allAccounts_randomETH(100000000, 200000000, accounts.slice(1, 10), contracts, dec(170, 18))
 
   await priceFeed.setPrice(dec(100, 18))
 
@@ -1024,22 +1024,22 @@ it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 
 
   await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 })
   // check DefaultPool
-  const RBTC_DefaultPool = await defaultPool.getRBTC()
+  const ETH_DefaultPool = await defaultPool.getETH()
   const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-  console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+  console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
   console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}`)
 })
 
 /* DeciMath:
-  RBTC left in Default Pool is: 563902502
+  ETH left in Default Pool is: 563902502
   ZUSDDebt left in Default Pool is: 308731912
 
   Pure division, correction:
-  RBTC left in Default Pool is: 1136050360
+  ETH left in Default Pool is: 1136050360
   ZUSDDebt left in Default Pool is: 997601870
 
   Pure division, no correction:
-  RBTC left in Default Pool is: 810899932
+  ETH left in Default Pool is: 810899932
   ZUSDDebt left in Default Pool is: 535042995
 */
 
@@ -1048,7 +1048,7 @@ it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 50
   await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
    // Troves open with 100-200 million ether
-  await th.openTrove_allAccounts_randomRBTC(100000000, 200000000, accounts.slice(1, 100), contracts, dec(170, 18))
+  await th.openTrove_allAccounts_randomETH(100000000, 200000000, accounts.slice(1, 100), contracts, dec(170, 18))
 
   await priceFeed.setPrice(dec(100, 18))
 
@@ -1061,29 +1061,29 @@ it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 50
  
   await borrowerOperations.addColl(accounts[999], accounts[999], { from: accounts[999], value: 1 })
   // check DefaultPool
-  const RBTC_DefaultPool = await defaultPool.getRBTC()
+  const ETH_DefaultPool = await defaultPool.getETH()
   const ZUSDDebt_DefaultPool = await defaultPool.getZUSDDebt()
-  console.log(`RBTC left in Default Pool is: ${RBTC_DefaultPool}`)
+  console.log(`ETH left in Default Pool is: ${ETH_DefaultPool}`)
   console.log(`ZUSDDebt left in Default Pool is: ${ZUSDDebt_DefaultPool}`)
 })
 
  /*
   Pure division, no correction:
-  RBTC left in Default Pool is: 8356761440
+  ETH left in Default Pool is: 8356761440
   ZUSDDebt left in Default Pool is: 14696382412
 
   Pure division, correction:
-  RBTC left in Default Pool is: 9281255535
+  ETH left in Default Pool is: 9281255535
   ZUSDDebt left in Default Pool is: 5854012464
   */
 
 // --- Liquidations, large coll and debt ---
 
-it("11 accounts with random RBTC and proportional ZUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+it("11 accounts with random ETH and proportional ZUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1, 27) })
 
   // Troves open with 100-200 million ether and proportional ZUSD Debt
-  await th.openTrove_allAccounts_randomRBTC_ProportionalZUSD(100000000, 200000000, accounts.slice(0, 11), contracts, 180)
+  await th.openTrove_allAccounts_randomETH_ProportionalZUSD(100000000, 200000000, accounts.slice(0, 11), contracts, 180)
 
   await priceFeed.setPrice(dec(100, 18))
 
@@ -1093,40 +1093,40 @@ it("11 accounts with random RBTC and proportional ZUSD (180:1). 10 liquidations.
     await troveManager.liquidate(account)
   }
 
-  const L_RBTC = await troveManager.L_RBTC()
+  const L_ETH = await troveManager.L_ETH()
   const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-  const totalColl = await activePool.getRBTC()
+  const totalColl = await activePool.getETH()
 
   const _1e18_BN = web3.utils.toBN(dec(1, 18))
-  const totalRBTCRewards = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+  const totalETHRewards = (totalColl.mul(L_ETH)).div(_1e18_BN)
   const totalZUSDRewards = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-  const defaultPoolRBTC = await defaultPool.getRBTC()
+  const defaultPoolETH = await defaultPool.getETH()
   const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-  const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards)
+  const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
   const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards)
 
-  console.log(`RBTC difference between total pending rewards and DefaultPool: ${RBTCRewardDifference} `)
+  console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
   console.log(`ZUSDDebt difference between total pending rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
 })
  
 /* 
   Pure division, no error correction:
-  RBTC difference between total pending rewards and DefaultPool: 9000000000
+  ETH difference between total pending rewards and DefaultPool: 9000000000
   ZUSDDebt difference between total pending rewards and DefaultPool: 12000000000
 
   Pure division with correction:
-  RBTC difference between total pending rewards and DefaultPool: 1000000000
+  ETH difference between total pending rewards and DefaultPool: 1000000000
   ZUSDDebt difference between total pending rewards and DefaultPool: 1000000000
   */
 
-  it("101 accounts with random RBTC and proportional ZUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
+  it("101 accounts with random ETH and proportional ZUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
     await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1, 28) })
 
     // Troves open with 100-200 million ether and proportional ZUSD Debt
-    await th.openTrove_allAccounts_randomRBTC_ProportionalZUSD(100000000, 200000000, accounts.slice(0, 101), contracts, 180)
+    await th.openTrove_allAccounts_randomETH_ProportionalZUSD(100000000, 200000000, accounts.slice(0, 101), contracts, 180)
 
     await priceFeed.setPrice(dec(100, 18))
 
@@ -1138,31 +1138,31 @@ it("11 accounts with random RBTC and proportional ZUSD (180:1). 10 liquidations.
     }
 
     // check (DefaultPool  - totalRewards)
-    const L_RBTC = await troveManager.L_RBTC()
+    const L_ETH = await troveManager.L_ETH()
     const L_ZUSDDebt = await troveManager.L_ZUSDDebt()
 
-    const totalColl = await activePool.getRBTC()
+    const totalColl = await activePool.getETH()
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18))
-    const totalRBTCRewards = (totalColl.mul(L_RBTC)).div(_1e18_BN)
+    const totalETHRewards = (totalColl.mul(L_ETH)).div(_1e18_BN)
     const totalZUSDRewards = (totalColl.mul(L_ZUSDDebt)).div(_1e18_BN)
 
-    const defaultPoolRBTC = await defaultPool.getRBTC()
+    const defaultPoolETH = await defaultPool.getETH()
     const defaultPoolZUSDDebt = await defaultPool.getZUSDDebt()
 
-    const RBTCRewardDifference = defaultPoolRBTC.sub(totalRBTCRewards)
+    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards)
     const ZUSDDebtRewardDifference = defaultPoolZUSDDebt.sub(totalZUSDRewards)
 
-    console.log(`RBTC difference between total pending rewards and DefaultPool: ${RBTCRewardDifference} `)
+    console.log(`ETH difference between total pending rewards and DefaultPool: ${ETHRewardDifference} `)
     console.log(`ZUSDDebt difference between total pending rewards and DefaultPool: ${ZUSDDebtRewardDifference} `)
   })
   /*
     Pure division, no correction:
-    RBTC difference between total pending rewards and DefaultPool: 910000000000
+    ETH difference between total pending rewards and DefaultPool: 910000000000
     ZUSDDebt difference between total pending rewards and DefaultPool: 870000000000
 
     Pure division with correction:
-    RBTC difference between total pending rewards and DefaultPool: 10000000000
+    ETH difference between total pending rewards and DefaultPool: 10000000000
     ZUSDDebt difference between total pending rewards and DefaultPool: 10000000000
   */
 })
@@ -1184,13 +1184,13 @@ it("11 accounts with random RBTC and proportional ZUSD (180:1). 10 liquidations.
 
   ABDK64:
 
-  1) Reward applications accumulate RBTC and ZUSDDebt error in DefaultPool
+  1) Reward applications accumulate ETH and ZUSDDebt error in DefaultPool
 
-  2) Liquidations accumulate RBTC and ZUSDDebt error in DefaultPool
+  2) Liquidations accumulate ETH and ZUSDDebt error in DefaultPool
 
   3) Liquidations with partial offset send slightly too little to StabilityPool, and redistribute slightly too much
   
-  4) StabilityPool Withdrawals accumulate RBTC error in the StabilityPool
+  4) StabilityPool Withdrawals accumulate ETH error in the StabilityPool
 
   5) StabilityPool Withdrawals can accumulate ZUSDLoss in the StabilityPool (i.e. they distribute too much ZUSD), and can block
   the final deposit withdrawal
