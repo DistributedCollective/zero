@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 contract WRBTCTokenTester {
 	string public name = "Wrapped BTC";
@@ -40,7 +40,7 @@ contract WRBTCTokenTester {
 	function withdraw(uint256 wad) public {
 		require(balanceOf[msg.sender] >= wad);
 		balanceOf[msg.sender] -= wad;
-		msg.sender.transfer(wad);
+		payable(msg.sender).transfer(wad);
 		emit Withdrawal(msg.sender, wad);
 	}
 
@@ -65,7 +65,7 @@ contract WRBTCTokenTester {
 	) public returns (bool) {
 		require(balanceOf[src] >= wad);
 
-		if (src != msg.sender && allowance[src][msg.sender] != uint256(-1)) {
+		if (src != msg.sender && allowance[src][msg.sender] != ~uint256(0)) {
 			require(allowance[src][msg.sender] >= wad);
 			allowance[src][msg.sender] -= wad;
 		}
@@ -83,7 +83,7 @@ contract WRBTCTokenTester {
 	 * */
 	function mint(address _to, uint256 _value) public {
 		require(_to != address(0), "no burn allowed");
-		balanceOf[_to] = balanceOf[_to] + _value;
+		balanceOf[_to] += _value;
 		emit Transfer(address(0), _to, _value);
 	}
 
@@ -95,7 +95,7 @@ contract WRBTCTokenTester {
 		// no need to require _value <= totalSupply, since that would imply the
 		// sender's balance is greater than the totalSupply, which *should* be an assertion failure
 
-		balanceOf[_who] = balanceOf[_who] - _value;
+		balanceOf[_who] -= _value;
 		emit Transfer(_who, address(0), _value);
 	}
 }

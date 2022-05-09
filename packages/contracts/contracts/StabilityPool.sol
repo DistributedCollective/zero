@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
@@ -10,7 +10,7 @@ import './Interfaces/IZUSDToken.sol';
 import './Interfaces/ISortedTroves.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/LiquityBase.sol";
-import "./Dependencies/LiquitySafeMath128.sol";
+//import "./Dependencies/LiquitySafeMath128.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./StabilityPoolStorage.sol";
@@ -145,41 +145,8 @@ import "./StabilityPoolStorage.sol";
  *
  */
 contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, IStabilityPool {
-    using LiquitySafeMath128 for uint128;
-
-    // --- Events ---
-
-    event StabilityPoolRBTCBalanceUpdated(uint _newBalance);
-    event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
-
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _newActivePoolAddress);
-    event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
-    event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
-    event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
-    event PriceFeedAddressChanged(address _newPriceFeedAddress);
-    event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
-
-    event P_Updated(uint _P);
-    event S_Updated(uint _S, uint128 _epoch, uint128 _scale);
-    event G_Updated(uint _G, uint128 _epoch, uint128 _scale);
-    event EpochUpdated(uint128 _currentEpoch);
-    event ScaleUpdated(uint128 _currentScale);
-
-    event FrontEndRegistered(address indexed _frontEnd, uint _kickbackRate);
-    event FrontEndTagSet(address indexed _depositor, address indexed _frontEnd);
-
-    event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S, uint _G);
-    event FrontEndSnapshotUpdated(address indexed _frontEnd, uint _P, uint _G);
-    event UserDepositChanged(address indexed _depositor, uint _newDeposit);
-    event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
-
-    event RBTCGainWithdrawn(address indexed _depositor, uint _RBTC, uint _ZUSDLoss);
-    event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
-    event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
-    event RBtcerSent(address _to, uint _amount);
-
+    //using LiquitySafeMath128 for uint128;
+    
     // --- Contract setters ---
 
     function setAddresses(
@@ -247,35 +214,35 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
     * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
     */
-    function provideToSP(uint _amount, address _frontEndTag) external override {
+    function provideToSP(uint256 _amount, address _frontEndTag) external override {
         _requireFrontEndIsRegisteredOrZero(_frontEndTag);
         _requireFrontEndNotRegistered(msg.sender);
         _requireNonZeroAmount(_amount);
 
-        uint initialDeposit = deposits[msg.sender].initialValue;
+        uint256 initialDeposit = deposits[msg.sender].initialValue;
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
         _triggerZEROIssuance(communityIssuanceCached);
 
         if (initialDeposit == 0) {_setFrontEndTag(msg.sender, _frontEndTag);}
-        uint depositorRBTCGain = getDepositorRBTCGain(msg.sender);
-        uint compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
-        uint ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
+        uint256 depositorRBTCGain = getDepositorRBTCGain(msg.sender);
+        uint256 compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
+        uint256 ZUSDLoss = initialDeposit - compoundedZUSDDeposit; // Needed only for event log
 
         // First pay out any ZERO gains
         address frontEnd = deposits[msg.sender].frontEndTag;
         _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
 
         // Update front end stake
-        uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
-        uint newFrontEndStake = compoundedFrontEndStake.add(_amount);
+        uint256 compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
+        uint256 newFrontEndStake = compoundedFrontEndStake + _amount;
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
         _sendZUSDtoStabilityPool(msg.sender, _amount);
 
-        uint newDeposit = compoundedZUSDDeposit.add(_amount);
+        uint256 newDeposit = compoundedZUSDDeposit + _amount;
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
@@ -294,35 +261,35 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     *
     * If _amount > userDeposit, the user withdraws all of their compounded deposit.
     */
-    function withdrawFromSP(uint _amount) external override {
+    function withdrawFromSP(uint256 _amount) external override {
         if (_amount !=0) {_requireNoUnderCollateralizedTroves();}
-        uint initialDeposit = deposits[msg.sender].initialValue;
+        uint256 initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
         _triggerZEROIssuance(communityIssuanceCached);
 
-        uint depositorRBTCGain = getDepositorRBTCGain(msg.sender);
+        uint256 depositorRBTCGain = getDepositorRBTCGain(msg.sender);
 
-        uint compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
-        uint ZUSDtoWithdraw = LiquityMath._min(_amount, compoundedZUSDDeposit);
-        uint ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
+        uint256 compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
+        uint256 ZUSDtoWithdraw = _amount < compoundedZUSDDeposit ? _amount : compoundedZUSDDeposit;
+        uint256 ZUSDLoss = initialDeposit - compoundedZUSDDeposit; // Needed only for event log
 
         // First pay out any ZERO gains
         address frontEnd = deposits[msg.sender].frontEndTag;
         _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
         
         // Update front end stake
-        uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
-        uint newFrontEndStake = compoundedFrontEndStake.sub(ZUSDtoWithdraw);
+        uint256 compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
+        uint256 newFrontEndStake = compoundedFrontEndStake - ZUSDtoWithdraw;
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
         _sendZUSDToDepositor(msg.sender, ZUSDtoWithdraw);
 
         // Update deposit
-        uint newDeposit = compoundedZUSDDeposit.sub(ZUSDtoWithdraw);
+        uint256 newDeposit = compoundedZUSDDeposit - ZUSDtoWithdraw;
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
@@ -339,7 +306,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * - Leaves their compounded deposit in the Stability Pool
     * - Updates snapshots for deposit and tagged front end stake */
     function withdrawRBTCGainToTrove(address _upperHint, address _lowerHint) external override {
-        uint initialDeposit = deposits[msg.sender].initialValue;
+        uint256 initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
         _requireUserHasTrove(msg.sender);
         _requireUserHasRBTCGain(msg.sender);
@@ -348,18 +315,18 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         _triggerZEROIssuance(communityIssuanceCached);
 
-        uint depositorRBTCGain = getDepositorRBTCGain(msg.sender);
+        uint256 depositorRBTCGain = getDepositorRBTCGain(msg.sender);
 
-        uint compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
-        uint ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
+        uint256 compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
+        uint256 ZUSDLoss = initialDeposit - compoundedZUSDDeposit; // Needed only for event log
 
         // First pay out any ZERO gains
         address frontEnd = deposits[msg.sender].frontEndTag;
         _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
 
         // Update front end stake
-        uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
-        uint newFrontEndStake = compoundedFrontEndStake;
+        uint256 compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
+        uint256 newFrontEndStake = compoundedFrontEndStake;
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
@@ -371,7 +338,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit RBTCGainWithdrawn(msg.sender, depositorRBTCGain, ZUSDLoss);
         emit UserDepositChanged(msg.sender, compoundedZUSDDeposit);
 
-        RBTC = RBTC.sub(depositorRBTCGain);
+        RBTC -= depositorRBTCGain;
         emit StabilityPoolRBTCBalanceUpdated(RBTC);
         emit RBtcerSent(msg.sender, depositorRBTCGain);
 
@@ -381,12 +348,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- ZERO issuance functions ---
 
     function _triggerZEROIssuance(ICommunityIssuance _communityIssuance) internal {
-        uint ZEROIssuance = _communityIssuance.issueZERO();
+        uint256 ZEROIssuance = _communityIssuance.issueZERO();
        _updateG(ZEROIssuance);
     }
 
-    function _updateG(uint _ZEROIssuance) internal {
-        uint totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
+    function _updateG(uint256 _ZEROIssuance) internal {
+        uint256 totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
         /*
         * When total deposits is 0, G is not updated. In this case, the ZERO issued can not be obtained by later
         * depositors - it is missed out on, and remains in the balanceof the CommunityIssuance contract.
@@ -394,16 +361,16 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         */
         if (totalZUSD == 0 || _ZEROIssuance == 0) {return;}
 
-        uint ZEROPerUnitStaked;
+        uint256 ZEROPerUnitStaked;
         ZEROPerUnitStaked =_computeZEROPerUnitStaked(_ZEROIssuance, totalZUSD);
 
-        uint marginalZEROGain = ZEROPerUnitStaked.mul(P);
-        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale].add(marginalZEROGain);
+        uint256 marginalZEROGain = ZEROPerUnitStaked * P;
+        epochToScaleToG[currentEpoch][currentScale] += marginalZEROGain;
 
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
 
-    function _computeZEROPerUnitStaked(uint _ZEROIssuance, uint _totalZUSDDeposits) internal returns (uint) {
+    function _computeZEROPerUnitStaked(uint256 _ZEROIssuance, uint256 _totalZUSDDeposits) internal returns (uint) {
         /*  
         * Calculate the ZERO-per-unit staked.  Division uses a "feedback" error correction, to keep the 
         * cumulative error low in the running total G:
@@ -415,10 +382,10 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         * 4) Store this error for use in the next correction when this function is called.
         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
         */
-        uint ZERONumerator = _ZEROIssuance.mul(DECIMAL_PRECISION).add(lastZEROError);
+        uint256 ZERONumerator = _ZEROIssuance * DECIMAL_PRECISION + lastZEROError;
 
-        uint ZEROPerUnitStaked = ZERONumerator.div(_totalZUSDDeposits);
-        lastZEROError = ZERONumerator.sub(ZEROPerUnitStaked.mul(_totalZUSDDeposits));
+        uint256 ZEROPerUnitStaked = ZERONumerator / _totalZUSDDeposits;
+        lastZEROError = ZERONumerator - ZEROPerUnitStaked * _totalZUSDDeposits;
 
         return ZEROPerUnitStaked;
     }
@@ -430,15 +397,15 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * and transfers the Trove's RBTC collateral from ActivePool to StabilityPool.
     * Only called by liquidation functions in the TroveManager.
     */
-    function offset(uint _debtToOffset, uint _collToAdd) external override {
+    function offset(uint256 _debtToOffset, uint256 _collToAdd) external override {
         _requireCallerIsTroveManager();
-        uint totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
+        uint256 totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
         if (totalZUSD == 0 || _debtToOffset == 0) { return; }
 
         _triggerZEROIssuance(communityIssuance);
 
-        (uint RBTCGainPerUnitStaked,
-            uint ZUSDLossPerUnitStaked) = _computeRewardsPerUnitStaked(_collToAdd, _debtToOffset, totalZUSD);
+        (uint256 RBTCGainPerUnitStaked,
+            uint256 ZUSDLossPerUnitStaked) = _computeRewardsPerUnitStaked(_collToAdd, _debtToOffset, totalZUSD);
 
         _updateRewardSumAndProduct(RBTCGainPerUnitStaked, ZUSDLossPerUnitStaked);  // updates S and P
 
@@ -448,12 +415,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- Offset helper functions ---
 
     function _computeRewardsPerUnitStaked(
-        uint _collToAdd,
-        uint _debtToOffset,
-        uint _totalZUSDDeposits
+        uint256 _collToAdd,
+        uint256 _debtToOffset,
+        uint256 _totalZUSDDeposits
     )
         internal
-        returns (uint RBTCGainPerUnitStaked, uint ZUSDLossPerUnitStaked)
+        returns (uint256 RBTCGainPerUnitStaked, uint256 ZUSDLossPerUnitStaked)
     {
         /*
         * Compute the ZUSD and RBTC rewards. Uses a "feedback" error correction, to keep
@@ -466,43 +433,43 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         * 4) Store these errors for use in the next correction when this function is called.
         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
         */
-        uint RBTCNumerator = _collToAdd.mul(DECIMAL_PRECISION).add(lastRBTCError_Offset);
+        uint256 RBTCNumerator = _collToAdd * DECIMAL_PRECISION + lastRBTCError_Offset;
 
         assert(_debtToOffset <= _totalZUSDDeposits);
         if (_debtToOffset == _totalZUSDDeposits) {
             ZUSDLossPerUnitStaked = DECIMAL_PRECISION;  // When the Pool depletes to 0, so does each deposit 
             lastZUSDLossError_Offset = 0;
         } else {
-            uint ZUSDLossNumerator = _debtToOffset.mul(DECIMAL_PRECISION).sub(lastZUSDLossError_Offset);
+            uint256 ZUSDLossNumerator = _debtToOffset * DECIMAL_PRECISION - lastZUSDLossError_Offset;
             /*
             * Add 1 to make error in quotient positive. We want "slightly too much" ZUSD loss,
             * which ensures the error in any given compoundedZUSDDeposit favors the Stability Pool.
             */
-            ZUSDLossPerUnitStaked = (ZUSDLossNumerator.div(_totalZUSDDeposits)).add(1);
-            lastZUSDLossError_Offset = (ZUSDLossPerUnitStaked.mul(_totalZUSDDeposits)).sub(ZUSDLossNumerator);
+            ZUSDLossPerUnitStaked = ZUSDLossNumerator / _totalZUSDDeposits + 1;
+            lastZUSDLossError_Offset = ZUSDLossPerUnitStaked * _totalZUSDDeposits - ZUSDLossNumerator;
         }
 
-        RBTCGainPerUnitStaked = RBTCNumerator.div(_totalZUSDDeposits);
-        lastRBTCError_Offset = RBTCNumerator.sub(RBTCGainPerUnitStaked.mul(_totalZUSDDeposits));
+        RBTCGainPerUnitStaked = RBTCNumerator / _totalZUSDDeposits;
+        lastRBTCError_Offset = RBTCNumerator - RBTCGainPerUnitStaked * _totalZUSDDeposits;
 
         return (RBTCGainPerUnitStaked, ZUSDLossPerUnitStaked);
     }
 
     /// Update the Stability Pool reward sum S and product P
-    function _updateRewardSumAndProduct(uint _RBTCGainPerUnitStaked, uint _ZUSDLossPerUnitStaked) internal {
-        uint currentP = P;
-        uint newP;
+    function _updateRewardSumAndProduct(uint256 _RBTCGainPerUnitStaked, uint256 _ZUSDLossPerUnitStaked) internal {
+        uint256 currentP = P;
+        uint256 newP;
 
         assert(_ZUSDLossPerUnitStaked <= DECIMAL_PRECISION);
         /*
         * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool ZUSD in the liquidation.
         * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - ZUSDLossPerUnitStaked)
         */
-        uint newProductFactor = uint(DECIMAL_PRECISION).sub(_ZUSDLossPerUnitStaked);
+        uint256 newProductFactor = uint(DECIMAL_PRECISION) - _ZUSDLossPerUnitStaked;
 
         uint128 currentScaleCached = currentScale;
         uint128 currentEpochCached = currentEpoch;
-        uint currentS = epochToScaleToSum[currentEpochCached][currentScaleCached];
+        uint256 currentS = epochToScaleToSum[currentEpochCached][currentScaleCached];
 
         /*
         * Calculate the new S first, before we update P.
@@ -511,26 +478,26 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         *
         * Since S corresponds to RBTC gain, and P to deposit loss, we update S first.
         */
-        uint marginalRBTCGain = _RBTCGainPerUnitStaked.mul(currentP);
-        uint newS = currentS.add(marginalRBTCGain);
+        uint256 marginalRBTCGain = _RBTCGainPerUnitStaked * currentP;
+        uint256 newS = currentS + marginalRBTCGain;
         epochToScaleToSum[currentEpochCached][currentScaleCached] = newS;
         emit S_Updated(newS, currentEpochCached, currentScaleCached);
 
         // If the Stability Pool was emptied, increment the epoch, and reset the scale and product P
         if (newProductFactor == 0) {
-            currentEpoch = currentEpochCached.add(1);
+            currentEpoch = currentEpochCached + 1;
             emit EpochUpdated(currentEpoch);
             currentScale = 0;
             emit ScaleUpdated(currentScale);
             newP = DECIMAL_PRECISION;
 
         // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
-        } else if (currentP.mul(newProductFactor).div(DECIMAL_PRECISION) < SCALE_FACTOR) {
-            newP = currentP.mul(newProductFactor).mul(SCALE_FACTOR).div(DECIMAL_PRECISION); 
-            currentScale = currentScaleCached.add(1);
+        } else if (currentP * newProductFactor / DECIMAL_PRECISION < SCALE_FACTOR) {
+            newP = currentP * newProductFactor * SCALE_FACTOR / DECIMAL_PRECISION; 
+            currentScale = currentScaleCached + 1;
             emit ScaleUpdated(currentScale);
         } else {
-            newP = currentP.mul(newProductFactor).div(DECIMAL_PRECISION);
+            newP = currentP * newProductFactor / DECIMAL_PRECISION;
         }
 
         assert(newP > 0);
@@ -539,7 +506,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit P_Updated(newP);
     }
 
-    function _moveOffsetCollAndDebt(uint _collToAdd, uint _debtToOffset) internal {
+    function _moveOffsetCollAndDebt(uint256 _collToAdd, uint256 _debtToOffset) internal {
         IActivePool activePoolCached = activePool;
 
         // Cancel the liquidated ZUSD debt with the ZUSD in the stability pool
@@ -552,8 +519,8 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         activePoolCached.sendRBTC(address(this), _collToAdd);
     }
 
-    function _decreaseZUSD(uint _amount) internal {
-        uint newTotalZUSDDeposits = totalZUSDDeposits.sub(_amount);
+    function _decreaseZUSD(uint256 _amount) internal {
+        uint256 newTotalZUSDDeposits = totalZUSDDeposits - _amount;
         totalZUSDDeposits = newTotalZUSDDeposits;
         emit StabilityPoolZUSDBalanceUpdated(newTotalZUSDDeposits);
     }
@@ -566,17 +533,17 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * d0 is the last recorded deposit value.
     */
     function getDepositorRBTCGain(address _depositor) public view override returns (uint) {
-        uint initialDeposit = deposits[_depositor].initialValue;
+        uint256 initialDeposit = deposits[_depositor].initialValue;
 
         if (initialDeposit == 0) { return 0; }
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
-        uint RBTCGain = _getRBTCGainFromSnapshots(initialDeposit, snapshots);
+        uint256 RBTCGain = _getRBTCGainFromSnapshots(initialDeposit, snapshots);
         return RBTCGain;
     }
 
-    function _getRBTCGainFromSnapshots(uint initialDeposit, Snapshots memory snapshots) internal view returns (uint) {
+    function _getRBTCGainFromSnapshots(uint256 initialDeposit, Snapshots memory snapshots) internal view returns (uint) {
         /*
         * Grab the sum 'S' from the epoch at which the stake was made. The RBTC gain may span up to one scale change.
         * If it does, the second portion of the RBTC gain is scaled by 1e9.
@@ -584,13 +551,13 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         */
         uint128 epochSnapshot = snapshots.epoch;
         uint128 scaleSnapshot = snapshots.scale;
-        uint S_Snapshot = snapshots.S;
-        uint P_Snapshot = snapshots.P;
+        uint256 S_Snapshot = snapshots.S;
+        uint256 P_Snapshot = snapshots.P;
 
-        uint firstPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot].sub(S_Snapshot);
-        uint secondPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
+        uint256 firstPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot] - S_Snapshot;
+        uint256 secondPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot + 1] / SCALE_FACTOR;
 
-        uint RBTCGain = initialDeposit.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
+        uint256 RBTCGain = initialDeposit * (firstPortion + secondPortion) / (P_Snapshot * DECIMAL_PRECISION);
 
         return RBTCGain;
     }
@@ -602,7 +569,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * d0 is the last recorded deposit value.
     */
     function getDepositorZEROGain(address _depositor) public view override returns (uint) {
-        uint initialDeposit = deposits[_depositor].initialValue;
+        uint256 initialDeposit = deposits[_depositor].initialValue;
         if (initialDeposit == 0) {return 0;}
 
         address frontEndTag = deposits[_depositor].frontEndTag;
@@ -612,11 +579,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         * Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
         * which they made their deposit.
         */
-        uint kickbackRate = frontEndTag == address(0) ? DECIMAL_PRECISION : frontEnds[frontEndTag].kickbackRate;
+        uint256 kickbackRate = frontEndTag == address(0) ? DECIMAL_PRECISION : frontEnds[frontEndTag].kickbackRate;
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
-        uint ZEROGain = kickbackRate.mul(_getZEROGainFromSnapshots(initialDeposit, snapshots)).div(DECIMAL_PRECISION);
+        uint256 ZEROGain = kickbackRate * _getZEROGainFromSnapshots(initialDeposit, snapshots) / DECIMAL_PRECISION;
 
         return ZEROGain;
     }
@@ -628,19 +595,19 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * D0 is the last recorded value of the front end's total tagged deposits.
     */
     function getFrontEndZEROGain(address _frontEnd) public view override returns (uint) {
-        uint frontEndStake = frontEndStakes[_frontEnd];
+        uint256 frontEndStake = frontEndStakes[_frontEnd];
         if (frontEndStake == 0) { return 0; }
 
-        uint kickbackRate = frontEnds[_frontEnd].kickbackRate;
-        uint frontEndShare = uint(DECIMAL_PRECISION).sub(kickbackRate);
+        uint256 kickbackRate = frontEnds[_frontEnd].kickbackRate;
+        uint256 frontEndShare = uint(DECIMAL_PRECISION) - kickbackRate;
 
         Snapshots memory snapshots = frontEndSnapshots[_frontEnd];
 
-        uint ZEROGain = frontEndShare.mul(_getZEROGainFromSnapshots(frontEndStake, snapshots)).div(DECIMAL_PRECISION);
+        uint256 ZEROGain = frontEndShare * _getZEROGainFromSnapshots(frontEndStake, snapshots) / DECIMAL_PRECISION;
         return ZEROGain;
     }
 
-    function _getZEROGainFromSnapshots(uint initialStake, Snapshots memory snapshots) internal view returns (uint) {
+    function _getZEROGainFromSnapshots(uint256 initialStake, Snapshots memory snapshots) internal view returns (uint) {
        /*
         * Grab the sum 'G' from the epoch at which the stake was made. The ZERO gain may span up to one scale change.
         * If it does, the second portion of the ZERO gain is scaled by 1e9.
@@ -648,14 +615,13 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         */
         uint128 epochSnapshot = snapshots.epoch;
         uint128 scaleSnapshot = snapshots.scale;
-        uint G_Snapshot = snapshots.G;
-        uint P_Snapshot = snapshots.P;
+        uint256 G_Snapshot = snapshots.G;
+        uint256 P_Snapshot = snapshots.P;
 
-        uint firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot].sub(G_Snapshot);
-        uint secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
+        uint256 firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot] - G_Snapshot;
+        uint256 secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot+1] / SCALE_FACTOR;
 
-        uint ZEROGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
-
+        uint256 ZEROGain = initialStake * (firstPortion + secondPortion) / (DECIMAL_PRECISION * P_Snapshot);
         return ZEROGain;
     }
 
@@ -666,12 +632,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
     */
     function getCompoundedZUSDDeposit(address _depositor) public view override returns (uint) {
-        uint initialDeposit = deposits[_depositor].initialValue;
+        uint256 initialDeposit = deposits[_depositor].initialValue;
         if (initialDeposit == 0) { return 0; }
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
-        uint compoundedDeposit = _getCompoundedStakeFromSnapshots(initialDeposit, snapshots);
+        uint256 compoundedDeposit = _getCompoundedStakeFromSnapshots(initialDeposit, snapshots);
         return compoundedDeposit;
     }
 
@@ -683,42 +649,42 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * The front end's compounded stake is equal to the sum of its depositors' compounded deposits.
     */
     function getCompoundedFrontEndStake(address _frontEnd) public view override returns (uint) {
-        uint frontEndStake = frontEndStakes[_frontEnd];
+        uint256 frontEndStake = frontEndStakes[_frontEnd];
         if (frontEndStake == 0) { return 0; }
 
         Snapshots memory snapshots = frontEndSnapshots[_frontEnd];
 
-        uint compoundedFrontEndStake = _getCompoundedStakeFromSnapshots(frontEndStake, snapshots);
+        uint256 compoundedFrontEndStake = _getCompoundedStakeFromSnapshots(frontEndStake, snapshots);
         return compoundedFrontEndStake;
     }
 
     // Internal function, used to calculcate compounded deposits and compounded front end stakes.
     function _getCompoundedStakeFromSnapshots(
-        uint initialStake,
+        uint256 initialStake,
         Snapshots memory snapshots
     )
         internal
         view
         returns (uint)
     {
-        uint snapshot_P = snapshots.P;
+        uint256 snapshot_P = snapshots.P;
         uint128 scaleSnapshot = snapshots.scale;
         uint128 epochSnapshot = snapshots.epoch;
 
         // If stake was made before a pool-emptying event, then it has been fully cancelled with debt -- so, return 0
         if (epochSnapshot < currentEpoch) { return 0; }
 
-        uint compoundedStake;
-        uint128 scaleDiff = currentScale.sub(scaleSnapshot);
+        uint256 compoundedStake;
+        uint128 scaleDiff = currentScale - scaleSnapshot;
 
         /* Compute the compounded stake. If a scale change in P was made during the stake's lifetime,
         * account for it. If more than one scale change was made, then the stake has decreased by a factor of
         * at least 1e-9 -- so return 0.
         */
         if (scaleDiff == 0) {
-            compoundedStake = initialStake.mul(P).div(snapshot_P);
+            compoundedStake = initialStake * P / snapshot_P;
         } else if (scaleDiff == 1) {
-            compoundedStake = initialStake.mul(P).div(snapshot_P).div(SCALE_FACTOR);
+            compoundedStake = initialStake * P  / (snapshot_P * SCALE_FACTOR);
         } else { // if scaleDiff >= 2
             compoundedStake = 0;
         }
@@ -732,7 +698,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         *
         * Thus it's unclear whether this line is still really needed.
         */
-        if (compoundedStake < initialStake.div(1e9)) {return 0;}
+        if (compoundedStake < initialStake / 1e9) {return 0;}
 
         return compoundedStake;
     }
@@ -740,16 +706,16 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- Sender functions for ZUSD deposit, RBTC gains and ZERO gains ---
 
     /// Transfer the ZUSD tokens from the user to the Stability Pool's address, and update its recorded ZUSD
-    function _sendZUSDtoStabilityPool(address _address, uint _amount) internal {
+    function _sendZUSDtoStabilityPool(address _address, uint256 _amount) internal {
         zusdToken.sendToPool(_address, address(this), _amount);
-        uint newTotalZUSDDeposits = totalZUSDDeposits.add(_amount);
+        uint256 newTotalZUSDDeposits = totalZUSDDeposits + _amount;
         totalZUSDDeposits = newTotalZUSDDeposits;
         emit StabilityPoolZUSDBalanceUpdated(newTotalZUSDDeposits);
     }
 
-    function _sendRBTCGainToDepositor(uint _amount) internal {
+    function _sendRBTCGainToDepositor(uint256 _amount) internal {
         if (_amount == 0) {return;}
-        uint newRBTC = RBTC.sub(_amount);
+        uint256 newRBTC = RBTC - _amount;
         RBTC = newRBTC;
         emit StabilityPoolRBTCBalanceUpdated(newRBTC);
         emit RBtcerSent(msg.sender, _amount);
@@ -759,7 +725,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     /// Send ZUSD to user and decrease ZUSD in Pool
-    function _sendZUSDToDepositor(address _depositor, uint ZUSDWithdrawal) internal {
+    function _sendZUSDToDepositor(address _depositor, uint256 ZUSDWithdrawal) internal {
         if (ZUSDWithdrawal == 0) {return;}
 
         zusdToken.returnFromPool(address(this), _depositor, ZUSDWithdrawal);
@@ -769,7 +735,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- External Front End functions ---
 
     /// Front end makes a one-time selection of kickback rate upon registering
-    function registerFrontEnd(uint _kickbackRate) external override {
+    function registerFrontEnd(uint256 _kickbackRate) external override {
         _requireFrontEndNotRegistered(msg.sender);
         _requireUserHasNoDeposit(msg.sender);
         _requireValidKickbackRate(_kickbackRate);
@@ -788,7 +754,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
 
-    function _updateDepositAndSnapshots(address _depositor, uint _newValue) internal {
+    function _updateDepositAndSnapshots(address _depositor, uint256 _newValue) internal {
         deposits[_depositor].initialValue = _newValue;
 
         if (_newValue == 0) {
@@ -799,11 +765,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         }
         uint128 currentScaleCached = currentScale;
         uint128 currentEpochCached = currentEpoch;
-        uint currentP = P;
+        uint256 currentP = P;
 
         // Get S and G for the current epoch and current scale
-        uint currentS = epochToScaleToSum[currentEpochCached][currentScaleCached];
-        uint currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
+        uint256 currentS = epochToScaleToSum[currentEpochCached][currentScaleCached];
+        uint256 currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
 
         // Record new snapshots of the latest running product P, sum S, and sum G, for the depositor
         depositSnapshots[_depositor].P = currentP;
@@ -815,7 +781,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit DepositSnapshotUpdated(_depositor, currentP, currentS, currentG);
     }
 
-    function _updateFrontEndStakeAndSnapshots(address _frontEnd, uint _newValue) internal {
+    function _updateFrontEndStakeAndSnapshots(address _frontEnd, uint256 _newValue) internal {
         frontEndStakes[_frontEnd] = _newValue;
 
         if (_newValue == 0) {
@@ -826,10 +792,10 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         uint128 currentScaleCached = currentScale;
         uint128 currentEpochCached = currentEpoch;
-        uint currentP = P;
+        uint256 currentP = P;
 
         // Get G for the current epoch and current scale
-        uint currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
+        uint256 currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
 
         // Record new snapshots of the latest running product P and sum G for the front end
         frontEndSnapshots[_frontEnd].P = currentP;
@@ -843,13 +809,13 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     function _payOutZEROGains(ICommunityIssuance _communityIssuance, address _depositor, address _frontEnd) internal {
         // Pay out front end's ZERO gain
         if (_frontEnd != address(0)) {
-            uint frontEndZEROGain = getFrontEndZEROGain(_frontEnd);
+            uint256 frontEndZEROGain = getFrontEndZEROGain(_frontEnd);
             _communityIssuance.sendZERO(_frontEnd, frontEndZEROGain);
             emit ZEROPaidToFrontEnd(_frontEnd, frontEndZEROGain);
         }
 
         // Pay out depositor's ZERO gain
-        uint depositorZEROGain = getDepositorZEROGain(_depositor);
+        uint256 depositorZEROGain = getDepositorZEROGain(_depositor);
         _communityIssuance.sendZERO(_depositor, depositorZEROGain);
         emit ZEROPaidToDepositor(_depositor, depositorZEROGain);
     }
@@ -865,22 +831,22 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     function _requireNoUnderCollateralizedTroves() internal {
-        uint price = priceFeed.fetchPrice();
+        uint256 price = priceFeed.fetchPrice();
         address lowestTrove = sortedTroves.getLast();
-        uint ICR = troveManager.getCurrentICR(lowestTrove, price);
+        uint256 ICR = troveManager.getCurrentICR(lowestTrove, price);
         require(ICR >= liquityBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
     }
 
-    function _requireUserHasDeposit(uint _initialDeposit) internal pure {
+    function _requireUserHasDeposit(uint256 _initialDeposit) internal pure {
         require(_initialDeposit > 0, 'StabilityPool: User must have a non-zero deposit');
     }
 
      function _requireUserHasNoDeposit(address _address) internal view {
-        uint initialDeposit = deposits[_address].initialValue;
+        uint256 initialDeposit = deposits[_address].initialValue;
         require(initialDeposit == 0, 'StabilityPool: User must have no deposit');
     }
 
-    function _requireNonZeroAmount(uint _amount) internal pure {
+    function _requireNonZeroAmount(uint256 _amount) internal pure {
         require(_amount > 0, 'StabilityPool: Amount must be non-zero');
     }
 
@@ -889,7 +855,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     function _requireUserHasRBTCGain(address _depositor) internal view {
-        uint RBTCGain = getDepositorRBTCGain(_depositor);
+        uint256 RBTCGain = getDepositorRBTCGain(_depositor);
         require(RBTCGain > 0, "StabilityPool: caller must have non-zero RBTC Gain");
     }
 
@@ -902,7 +868,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             "StabilityPool: Tag must be a registered front end, or the zero address");
     }
 
-    function  _requireValidKickbackRate(uint _kickbackRate) internal pure {
+    function  _requireValidKickbackRate(uint256 _kickbackRate) internal pure {
         require (_kickbackRate <= DECIMAL_PRECISION, "StabilityPool: Kickback rate must be in range [0,1]");
     }
 
@@ -910,7 +876,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC.add(msg.value);
-        StabilityPoolRBTCBalanceUpdated(RBTC);
+        RBTC += msg.value;
+        emit StabilityPoolRBTCBalanceUpdated(RBTC);
     }
 }

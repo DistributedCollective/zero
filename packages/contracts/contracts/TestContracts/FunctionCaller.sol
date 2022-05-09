@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import '../Interfaces/ITroveManager.sol';
 import '../Interfaces/ISortedTroves.sol';
 import '../Interfaces/IPriceFeed.sol';
-import '../Dependencies/LiquityMath.sol';
+//import '../Dependencies/LiquityMath.sol';
 
 /* Wrapper contract - used for calculating gas of read-only and internal functions. 
 Not part of the Liquity application. */
@@ -39,11 +39,11 @@ contract FunctionCaller {
 
     // --- Non-view wrapper functions used for calculating gas ---
     
-    function troveManager_getCurrentICR(address _address, uint _price) external returns (uint) {
+    function troveManager_getCurrentICR(address _address, uint256 _price) external view returns (uint) {
         return troveManager.getCurrentICR(_address, _price);  
     }
 
-    function sortedTroves_findInsertPosition(uint _NICR, address _prevId, address _nextId) external returns (address, address) {
+    function sortedTroves_findInsertPosition(uint256 _NICR, address _prevId, address _nextId) external view returns (address, address) {
         return sortedTroves.findInsertPosition(_NICR, _prevId, _nextId);
     }
 }

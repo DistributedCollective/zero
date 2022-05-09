@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 import "../Interfaces/IZEROToken.sol";
 import "./ZEROTokenStorage.sol";
 
@@ -26,8 +25,7 @@ import "./ZEROTokenStorage.sol";
 */
 
 contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
-    using SafeMath for uint256;
-
+    
     // --- Functions ---
 
     function initialize (
@@ -49,7 +47,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
         _HASHED_NAME = hashedName;
         _HASHED_VERSION = hashedVersion;
-        _CACHED_CHAIN_ID = _chainID();
+        _CACHED_CHAIN_ID = block.chainid;
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
         
     }
@@ -59,7 +57,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     /// @notice Generates `amount` tokens that are assigned to `account`
     /// @param account The address that will be assigned the new tokens
     /// @param amount The quantity of tokens generated
-    function mint (address account, uint amount) external {
+    function mint (address account, uint256 amount) external {
         require(msg.sender == marketMakerAddress || msg.sender == address(presale), 'Invalid caller');
         _mint(account,amount);
     }
@@ -67,7 +65,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     /// @notice Burns `amount` tokens from `account`
     /// @param account The address that will lose the tokens
     /// @param amount The quantity of tokens to burn
-    function burn (address account, uint amount) external {
+    function burn (address account, uint256 amount) external {
         require(msg.sender == marketMakerAddress , 'Invalid caller');
         _burn(account, amount);
     }
@@ -105,17 +103,17 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         _requireValidRecipient(recipient);
 
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(sender, msg.sender, _allowances[sender][msg.sender] - amount);
         return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) external override returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
         return true;
     }
 
@@ -127,7 +125,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     // --- EIP 2612 functionality ---
 
     function domainSeparator() public view override returns (bytes32) {    
-        if (_chainID() == _CACHED_CHAIN_ID) {
+        if (block.chainid == _CACHED_CHAIN_ID) {
             return _CACHED_DOMAIN_SEPARATOR;
         } else {
             return _buildDomainSeparator(_TYPE_HASH, _HASHED_NAME, _HASHED_VERSION);
@@ -138,8 +136,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     (
         address owner, 
         address spender, 
-        uint amount, 
-        uint deadline, 
+        uint256 amount, 
+        uint256 deadline, 
         uint8 v, 
         bytes32 r, 
         bytes32 s
@@ -147,11 +145,15 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         external 
         override 
     {            
-        require(deadline >= now, 'ZERO: expired deadline');
+        require(deadline >= block.timestamp, 'ZERO: expired deadline');
+        uint256 nonce;
+        unchecked {
+            nonce = _nonces[owner]++;
+        }
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 
-                         _nonces[owner]++, deadline))));
+                         nonce, deadline))));
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress == owner, 'ZERO: invalid signature');
         _approve(owner, spender, amount);
@@ -163,14 +165,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- Internal operations ---
 
-    function _chainID() private pure returns (uint256 chainID) {
-        assembly {
-            chainID := chainid()
-        }
-    }
-
-    function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {
-        return keccak256(abi.encode(typeHash, name, version, _chainID(), address(this)));
+    function _buildDomainSeparator(bytes32 _typeHash, bytes32 _name, bytes32 _version) private view returns (bytes32) {
+        return keccak256(abi.encode(_typeHash, _name, _version, block.chainid, address(this)));
     }
 
     function _transfer(address sender, address recipient, uint256 amount) internal {
@@ -178,8 +174,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(presale.isClosed(), "Presale is not over yet");
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
-        _balances[recipient] = _balances[recipient].add(amount);
+        _balances[sender] -= amount;
+        _balances[recipient] += amount;
 
         emit Transfer(sender, recipient, amount);
     }
@@ -187,8 +183,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
 
-        _totalSupply = _totalSupply.add(amount);
-        _balances[account] = _balances[account].add(amount);
+        _totalSupply += amount;
+        _balances[account] += amount;
         emit Transfer(address(0), account, amount);
     }
 
@@ -196,8 +192,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         require(account != address(0), "ERC20: mint to the zero address");
         require(amount <= _balances[account], "balance too low");
 
-        _totalSupply = _totalSupply.sub(amount);
-        _balances[account] = _balances[account].sub(amount);
+        _totalSupply -= amount;
+        _balances[account] -= amount;
         emit Transfer(account, address(0), amount);
     }
 
@@ -227,23 +223,23 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- Optional functions ---
 
-    function name() external view override returns (string memory) {
+    function name() external pure override returns (string memory) {
         return _NAME;
     }
 
-    function symbol() external view override returns (string memory) {
+    function symbol() external pure override returns (string memory) {
         return _SYMBOL;
     }
 
-    function decimals() external view override returns (uint8) {
+    function decimals() external pure override returns (uint8) {
         return _DECIMALS;
     }
 
-    function version() external view override returns (string memory) {
+    function version() external pure override returns (string memory) {
         return _VERSION;
     }
 
-    function permitTypeHash() external view override returns (bytes32) {
+    function permitTypeHash() external pure override returns (bytes32) {
         return _PERMIT_TYPEHASH;
     }
 }

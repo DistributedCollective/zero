@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IBorrowerOperations.sol";
-import "./Dependencies/SafeMath.sol";
 import "./SortedTrovesStorage.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -44,17 +43,13 @@ import "./Dependencies/console.sol";
 * - Public functions with parameters have been made internal to save gas, and given an external wrapper function for external access
 */
 contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
-    using SafeMath for uint256;
-
+    
     event TroveManagerAddressChanged(address _troveManagerAddress);
-    event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event NodeAdded(address _id, uint _NICR);
-    event NodeRemoved(address _id);
 
     // --- Dependency setters ---
 
     function setParams(uint256 _size, address _troveManagerAddress, address _borrowerOperationsAddress) external override onlyOwner {
-        require(_size > 0, "SortedTroves: Size can’t be zero");
+        require(_size > 0, "ST01"); // SortedTroves:setParams: Size can’t be zero
         checkContract(_troveManagerAddress);
         checkContract(_borrowerOperationsAddress);
 
@@ -86,13 +81,13 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
 
     function _insert(ITroveManager _troveManager, address _id, uint256 _NICR, address _prevId, address _nextId) internal {
         // List must not be full
-        require(!isFull(), "SortedTroves: List is full");
+        require(!isFull(), "ST02"); // SortedTroves:_insert: List is full
         // List must not already contain node
-        require(!contains(_id), "SortedTroves: List already contains the node");
+        require(!contains(_id), "ST03"); // SortedTroves:_insert: List already contains the node
         // Node id must not be null
-        require(_id != address(0), "SortedTroves: Id cannot be zero");
+        require(_id != address(0), "ST04"); // SortedTroves:_insert: Id cannot be zero
         // NICR must be non-zero
-        require(_NICR > 0, "SortedTroves: NICR must be positive");
+        require(_NICR > 0, "ST05"); // SortedTroves:_insert: NICR must be positive
 
         address prevId = _prevId;
         address nextId = _nextId;
@@ -127,7 +122,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
             data.nodes[nextId].prevId = _id;
         }
 
-        data.size = data.size.add(1);
+        data.size++;
         emit NodeAdded(_id, _NICR);
     }
 
@@ -142,7 +137,7 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
      */
     function _remove(address _id) internal {
         // List must contain the node
-        require(contains(_id), "SortedTroves: List does not contain the id");
+        require(contains(_id), "ST06"); // SortedTroves:_remove: NICR must be positive
 
         if (data.size > 1) {
             // List contains more than a single node
@@ -173,8 +168,8 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
         }
 
         delete data.nodes[_id];
-        data.size = data.size.sub(1);
-        NodeRemoved(_id);
+        data.size--;
+        emit NodeRemoved(_id);
     }
 
     /**
@@ -189,9 +184,9 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
 
         _requireCallerIsBOorTroveM(troveManagerCached);
         // List must contain the node
-        require(contains(_id), "SortedTroves: List does not contain the id");
+        require(contains(_id), "ST07"); // SortedTroves:reInsert: List does not contain the id
         // NICR must be non-zero
-        require(_newNICR > 0, "SortedTroves: NICR must be positive");
+        require(_newNICR > 0, "ST08"); // SortedTroves:reInsert: NICR must be positive
 
         // Remove node from the list
         _remove(_id);
@@ -386,11 +381,11 @@ contract SortedTroves is SortedTrovesStorage, CheckContract, ISortedTroves {
     // --- 'require' functions ---
 
     function _requireCallerIsTroveManager() internal view {
-        require(msg.sender == address(troveManager), "SortedTroves: Caller is not the TroveManager");
+        require(msg.sender == address(troveManager), "ST09"); // SortedTroves:_requireCallerIsTroveManager: Caller is not the TroveManager
     }
 
     function _requireCallerIsBOorTroveM(ITroveManager _troveManager) internal view {
         require(msg.sender == borrowerOperationsAddress || msg.sender == address(_troveManager),
-                "SortedTroves: Caller is neither BO nor TroveM");
+                "ST10"); // SortedTroves:_requireCallerIsBOorTroveM: Caller is neither BO nor TroveM
     }
 }

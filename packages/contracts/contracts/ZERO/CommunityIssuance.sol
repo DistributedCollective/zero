@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
@@ -8,7 +8,6 @@ import "../Dependencies/BaseMath.sol";
 import "../Dependencies/LiquityMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
-import "../Dependencies/SafeMath.sol";
 import "./CommunityIssuanceStorage.sol";
 
 contract CommunityIssuance is
@@ -17,15 +16,7 @@ contract CommunityIssuance is
     CheckContract,
     BaseMath
 {
-    using SafeMath for uint256;
-
-    // --- Events ---
-
-    event ZEROTokenAddressSet(address _zeroTokenAddress);
-    event CommunityPotAddressSet(address _communityPotAddress);
-    event FundingWalletAddressSet(address _zeroTokenAddress);
-    event TotalZEROIssuedUpdated(uint256 _fundingWalletAddress);
-
+    
     // --- Functions ---
 
     function initialize(
@@ -47,10 +38,10 @@ contract CommunityIssuance is
     function issueZERO() public override returns (uint256) {
         _requireCallerIsStabilityPool();
 
-        uint256 latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(
-            DECIMAL_PRECISION
-        );
-        uint256 issuance = latestTotalZEROIssued.sub(totalZEROIssued);
+        uint256 latestTotalZEROIssued = ZEROSupplyCap
+                                        * _getCumulativeIssuanceFraction()
+                                        / DECIMAL_PRECISION;
+        uint256 issuance = latestTotalZEROIssued - totalZEROIssued;
 
         totalZEROIssued = latestTotalZEROIssued;
         emit TotalZEROIssuedUpdated(latestTotalZEROIssued);
@@ -64,13 +55,13 @@ contract CommunityIssuance is
     t:  time passed since last ZERO issuance event  */
     function _getCumulativeIssuanceFraction() internal view returns (uint256) {
         // Get the time passed since deployment
-        uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
+        uint256 timePassedInMinutes = (block.timestamp - deploymentTime) / SECONDS_IN_ONE_MINUTE;
 
         // f^t
         uint256 power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
 
         //  (1 - f^t)
-        uint256 cumulativeIssuanceFraction = (uint256(DECIMAL_PRECISION).sub(power));
+        uint256 cumulativeIssuanceFraction = uint256(DECIMAL_PRECISION) - power;
         assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
 
         return cumulativeIssuanceFraction;

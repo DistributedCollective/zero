@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./Interfaces/IPriceFeed.sol";
 import "./Dependencies/CheckContract.sol";
@@ -10,7 +10,7 @@ import "./PriceFeedStorage.sol";
 /// @notice The PriceFeed relies upon a main oracle and a secondary as a fallback in case of error 
 contract PriceFeed is PriceFeedStorage, IPriceFeed {
 
-    event LastGoodPriceUpdated(uint256 _lastGoodPrice);
+    //event LastGoodPriceUpdated(uint256 _lastGoodPrice);
     event PriceFeedBroken(uint8 index, address priceFeedAddress);
     event PriceFeedUpdated(uint8 index, address newPriceFeedAddress);
     

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./Interfaces/IFeeSharingProxy.sol";
 import "./Interfaces/IZEROStaking.sol";
@@ -30,5 +30,5 @@ contract FeeDistributorStorage is Ownable {
     address public activePoolAddress;
 
     //pct of fees sent to feeSOVCollector address
-    uint public FEE_TO_SOV_COLLECTOR;
+    uint256 public FEE_TO_SOV_COLLECTOR;
 }

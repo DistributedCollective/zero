@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * Based on OpenZeppelin's Ownable contract:
@@ -14,7 +14,7 @@ pragma solidity 0.6.11;
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
-contract Ownable {
+abstract contract Ownable {
     bytes32 private constant KEY_OWNER = keccak256("key.ownable.owner");
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -22,7 +22,7 @@ contract Ownable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor () internal {
+    constructor () {
         _setOwner(msg.sender);
     }
 

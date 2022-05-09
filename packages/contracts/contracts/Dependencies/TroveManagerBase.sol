@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../Interfaces/IActivePool.sol";
 import "../Interfaces/IDefaultPool.sol";
@@ -8,10 +8,13 @@ import "../Interfaces/IZUSDToken.sol";
 import "../Interfaces/IZEROStaking.sol";
 import "../Interfaces/ISortedTroves.sol";
 import "../Interfaces/ICollSurplusPool.sol";
+import "../Interfaces/ITroveManager.sol";
 import "../TroveManagerStorage.sol";
 import "./LiquityBase.sol";
 
-contract TroveManagerBase is LiquityBase, TroveManagerStorage {
+abstract contract TroveManagerBase is ITroveManager, LiquityBase, TroveManagerStorage {
+
+    
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
@@ -108,20 +111,8 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         bool cancelledPartial;
     }
 
-    // --- Events ---
+    // --- Events not covered by interface ---
 
-    event Liquidation(
-        uint256 _liquidatedDebt,
-        uint256 _liquidatedColl,
-        uint256 _collGasCompensation,
-        uint256 _ZUSDGasCompensation
-    );
-    event Redemption(
-        uint256 _attemptedZUSDAmount,
-        uint256 _actualZUSDAmount,
-        uint256 _RBTCSent,
-        uint256 _RBTCFee
-    );
     event TroveUpdated(
         address indexed _borrower,
         uint256 _debt,
@@ -129,20 +120,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 _stake,
         TroveManagerOperation _operation
     );
-    event TroveLiquidated(
-        address indexed _borrower,
-        uint256 _debt,
-        uint256 _coll,
-        TroveManagerOperation _operation
-    );
-    event BaseRateUpdated(uint256 _baseRate);
-    event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
-    event TotalStakesUpdated(uint256 _newTotalStakes);
-    event SystemSnapshotsUpdated(uint256 _totalStakesSnapshot, uint256 _totalCollateralSnapshot);
-    event LTermsUpdated(uint256 _L_RBTC, uint256 _L_ZUSDDebt);
-    event TroveSnapshotsUpdated(uint256 _L_RBTC, uint256 _L_ZUSDDebt);
-    event TroveIndexUpdated(address _borrower, uint256 _newIndex);
-
+    
     enum TroveManagerOperation {
         applyPendingRewards,
         liquidateInNormalMode,
@@ -162,8 +140,8 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 pendingRBTCReward = _getPendingRBTCReward(_borrower);
         uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
-        uint256 currentRBTC = Troves[_borrower].coll.add(pendingRBTCReward);
-        uint256 currentZUSDDebt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
+        uint256 currentRBTC = Troves[_borrower].coll + pendingRBTCReward;
+        uint256 currentZUSDDebt = Troves[_borrower].debt + pendingZUSDDebtReward;
 
         return (currentRBTC, currentZUSDDebt);
     }
@@ -171,7 +149,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     /// Get the borrower's pending accumulated RBTC reward, earned by their stake
     function _getPendingRBTCReward(address _borrower) public view returns (uint256) {
         uint256 snapshotRBTC = rewardSnapshots[_borrower].RBTC;
-        uint256 rewardPerUnitStaked = L_RBTC.sub(snapshotRBTC);
+        uint256 rewardPerUnitStaked = L_RBTC - snapshotRBTC;
 
         if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
             return 0;
@@ -179,7 +157,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
         uint256 stake = Troves[_borrower].stake;
 
-        uint256 pendingRBTCReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
+        uint256 pendingRBTCReward = stake * rewardPerUnitStaked / DECIMAL_PRECISION;
 
         return pendingRBTCReward;
     }
@@ -187,7 +165,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     /// Get the borrower's pending accumulated ZUSD reward, earned by their stake
     function _getPendingZUSDDebtReward(address _borrower) public view returns (uint256) {
         uint256 snapshotZUSDDebt = rewardSnapshots[_borrower].ZUSDDebt;
-        uint256 rewardPerUnitStaked = L_ZUSDDebt.sub(snapshotZUSDDebt);
+        uint256 rewardPerUnitStaked = L_ZUSDDebt - snapshotZUSDDebt;
 
         if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
             return 0;
@@ -195,7 +173,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
         uint256 stake = Troves[_borrower].stake;
 
-        uint256 pendingZUSDDebtReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
+        uint256 pendingZUSDDebtReward = stake * rewardPerUnitStaked / DECIMAL_PRECISION;
 
         return pendingZUSDDebtReward;
     }
@@ -214,8 +192,8 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
             uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
             // Apply pending rewards to trove's state
-            Troves[_borrower].coll = Troves[_borrower].coll.add(pendingRBTCReward);
-            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
+            Troves[_borrower].coll += pendingRBTCReward;
+            Troves[_borrower].debt += pendingZUSDDebtReward;
 
             _updateTroveRewardSnapshots(_borrower);
 
@@ -271,7 +249,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     /// Remove borrower's stake from the totalStakes sum, and set their stake to 0
     function _removeStake(address _borrower) internal {
         uint256 stake = Troves[_borrower].stake;
-        totalStakes = totalStakes.sub(stake);
+        totalStakes -= stake;
         Troves[_borrower].stake = 0;
     }
 
@@ -298,7 +276,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 oldStake = Troves[_borrower].stake;
         Troves[_borrower].stake = newStake;
 
-        totalStakes = totalStakes.sub(oldStake).add(newStake);
+        totalStakes = totalStakes - oldStake + newStake;
         emit TotalStakesUpdated(totalStakes);
 
         return newStake;
@@ -317,7 +295,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
              * rewards would’ve been emptied and totalCollateralSnapshot would be zero too.
              */
             assert(totalStakesSnapshot > 0);
-            stake = _coll.mul(totalStakesSnapshot).div(totalCollateralSnapshot);
+            stake = _coll * totalStakesSnapshot / totalCollateralSnapshot;
         }
         return stake;
     }
@@ -326,16 +304,16 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         uint256 minutesPassed = _minutesPassedSinceLastFeeOp();
         uint256 decayFactor = LiquityMath._decPow(MINUTE_DECAY_FACTOR, minutesPassed);
 
-        return baseRate.mul(decayFactor).div(DECIMAL_PRECISION);
+        return baseRate * decayFactor / DECIMAL_PRECISION;
     }
 
     function _minutesPassedSinceLastFeeOp() internal view returns (uint256) {
-        return (block.timestamp.sub(lastFeeOperationTime)).div(SECONDS_IN_ONE_MINUTE);
+        return (block.timestamp - lastFeeOperationTime) / SECONDS_IN_ONE_MINUTE;
     }
 
     // Update the last fee operation time only if time passed >= decay interval. This prevents base rate griefing.
     function _updateLastFeeOpTime() internal {
-        uint256 timePassed = block.timestamp.sub(lastFeeOperationTime);
+        uint256 timePassed = block.timestamp - lastFeeOperationTime;
 
         if (timePassed >= SECONDS_IN_ONE_MINUTE) {
             lastFeeOperationTime = block.timestamp;
@@ -348,7 +326,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         pure
         returns (uint256)
     {
-        uint256 redemptionFee = _redemptionRate.mul(_RBTCDrawn).div(DECIMAL_PRECISION);
+        uint256 redemptionFee = _redemptionRate * _RBTCDrawn / DECIMAL_PRECISION;
         require(redemptionFee < _RBTCDrawn, "TroveManager: Fee would eat up all returned collateral");
         return redemptionFee;
     }
@@ -364,7 +342,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     function _calcRedemptionRate(uint256 _baseRate) internal view returns (uint256) {
         return
             LiquityMath._min(
-                liquityBaseParams.REDEMPTION_FEE_FLOOR().add(_baseRate),
+                liquityBaseParams.REDEMPTION_FEE_FLOOR() + _baseRate,
                 DECIMAL_PRECISION // cap at a maximum of 100%
             );
     }
@@ -380,7 +358,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
 
         uint128 index = Troves[_borrower].arrayIndex;
         uint256 length = TroveOwnersArrayLength;
-        uint256 idxLast = length.sub(1);
+        uint256 idxLast = length - 1;
 
         assert(index <= idxLast);
 
@@ -441,7 +419,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     function _requireAfterBootstrapPeriod() internal view {
         uint256 systemDeploymentTime = _zeroToken.getDeploymentStartTime();
         require(
-            block.timestamp >= systemDeploymentTime.add(BOOTSTRAP_PERIOD),
+            block.timestamp >= systemDeploymentTime + BOOTSTRAP_PERIOD,
             "TroveManager: Redemptions are not allowed during bootstrap phase"
         );
     }

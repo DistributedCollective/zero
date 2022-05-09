@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * @dev Interface of the ERC2612 standard as defined in the EIP.
@@ -47,7 +47,7 @@ interface IERC2612 {
      * prevents a signature from being used multiple times.
      *
      * `owner` can limit the time a Permit is valid for by setting `deadline` to 
-     * a value in the near future. The deadline argument can be set to uint(-1) to 
+     * a value in the near future. The deadline argument can be set to ~uint(0) to 
      * create Permits that effectively never expire.
      */
     function nonces(address owner) external view returns (uint256);

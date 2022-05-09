@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./IPool.sol";
 
@@ -15,13 +15,13 @@ interface IActivePool is IPool {
     // --- Events ---
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event ActivePoolRBTCBalanceUpdated(uint _RBTC);
+    event ActivePoolZUSDDebtUpdated(uint256 _ZUSDDebt);
+    event ActivePoolRBTCBalanceUpdated(uint256 _RBTC);
 
     // --- Functions ---
 
     /// @notice Send RBTC amount to given account. Updates ActivePool balance. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _account account to receive the RBTC amount
     /// @param _amount RBTC amount to send
-    function sendRBTC(address _account, uint _amount) external;
+    function sendRBTC(address _account, uint256 _amount) external;
 }

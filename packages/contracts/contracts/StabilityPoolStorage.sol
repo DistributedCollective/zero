@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
@@ -34,19 +34,19 @@ contract StabilityPoolStorage is Ownable, BaseMath {
    // --- Data structures ---
 
     struct FrontEnd {
-        uint kickbackRate;
+        uint256 kickbackRate;
         bool registered;
     }
 
     struct Deposit {
-        uint initialValue;
+        uint256 initialValue;
         address frontEndTag;
     }
 
     struct Snapshots {
-        uint S;
-        uint P;
-        uint G;
+        uint256 S;
+        uint256 P;
+        uint256 G;
         uint128 scale;
         uint128 epoch;
     }
@@ -64,9 +64,9 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
     * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
     */
-    uint public P;
+    uint256 public P;
 
-    uint public constant SCALE_FACTOR = 1e9;
+    uint256 public constant SCALE_FACTOR = 1e9;
 
     // Each time the scale of P shifts by SCALE_FACTOR, the scale is incremented by 1
     uint128 public currentScale;
@@ -94,9 +94,9 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     mapping (uint128 => mapping(uint128 => uint)) public epochToScaleToG;
 
     // Error tracker for the error correction in the ZERO issuance calculation
-    uint public lastZEROError;
+    uint256 public lastZEROError;
     // Error trackers for the error correction in the offset calculation
-    uint public lastRBTCError_Offset;
-    uint public lastZUSDLossError_Offset;
+    uint256 public lastRBTCError_Offset;
+    uint256 public lastZUSDLossError_Offset;
 
 }

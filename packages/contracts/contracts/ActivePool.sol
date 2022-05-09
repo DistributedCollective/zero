@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./Interfaces/IActivePool.sol";
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
@@ -16,13 +15,7 @@ import "./ActivePoolStorage.sol";
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  */
 contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
-    using SafeMath for uint256;
-    // --- Events ---
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event ActivePoolRBTCBalanceUpdated(uint _RBTC);
-
+    
     // --- Contract setters ---
     /// @notice initializer function that sets required addresses
     /// @dev Checks addresses are contracts. Only callable by contract owner.
@@ -73,9 +66,9 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @notice Send RBTC amount to given account. Updates ActivePool balance. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _account account to receive the RBTC amount
     /// @param _amount RBTC amount to send
-    function sendRBTC(address _account, uint _amount) external override {
+    function sendRBTC(address _account, uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        RBTC = RBTC.sub(_amount);
+        RBTC -= _amount;
         emit ActivePoolRBTCBalanceUpdated(RBTC);
         emit RBtcerSent(_account, _amount);
 
@@ -85,18 +78,18 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     /// @notice Increases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _amount ZUSD amount to add to the pool debt
-    function increaseZUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveM();
-        ZUSDDebt = ZUSDDebt.add(_amount);
-        ActivePoolZUSDDebtUpdated(ZUSDDebt);
+        ZUSDDebt += _amount;
+        emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     /// @notice Decreases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _amount ZUSD amount to sub to the pool debt
-    function decreaseZUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
-        ZUSDDebt = ZUSDDebt.sub(_amount);
-        ActivePoolZUSDDebtUpdated(ZUSDDebt);
+        ZUSDDebt = ZUSDDebt -_amount;
+        emit ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     // --- 'require' functions ---
@@ -128,7 +121,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     receive() external payable {
         _requireCallerIsBorrowerOperationsOrDefaultPool();
-        RBTC = RBTC.add(msg.value);
+        RBTC  += msg.value;
         emit ActivePoolRBTCBalanceUpdated(RBTC);
     }
 }

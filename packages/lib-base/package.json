@@ -1,6 +1,6 @@
 {
   "name": "@liquity/lib-base",
-  "version": "0.0.0-semantic-release",
+  "version": "3.103.0",
   "description": "Liquity SDK shared interfaces",
   "keywords": [
     "Liquity",
@@ -17,7 +17,7 @@
   "scripts": {
     "prepare": "run-s prepare:*",
     "prepare:eslint": "eslint src",
-    "prepare:tsc": "tsc --project tsconfig.dist.json",
+    
     "prepare:api": "api-extractor run --local",
     "test": "mocha --require ts-node/register"
   },

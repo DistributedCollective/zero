@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import './Interfaces/IDefaultPool.sol';
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
@@ -16,12 +15,7 @@ import "./DefaultPoolStorage.sol";
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
-    using SafeMath for uint256;
     
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event DefaultPoolRBTCBalanceUpdated(uint _RBTC);
-
     // --- Dependency setters ---
 
     function setAddresses(
@@ -60,10 +54,10 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     // --- Pool functionality ---
 
-    function sendRBTCToActivePool(uint _amount) external override {
+    function sendRBTCToActivePool(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        RBTC = RBTC.sub(_amount);
+        RBTC -= _amount;
         emit DefaultPoolRBTCBalanceUpdated(RBTC);
         emit RBtcerSent(activePool, _amount);
 
@@ -71,15 +65,15 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         require(success, "DefaultPool: sending RBTC failed");
     }
 
-    function increaseZUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
-        ZUSDDebt = ZUSDDebt.add(_amount);
+        ZUSDDebt += _amount;
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
-    function decreaseZUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
-        ZUSDDebt = ZUSDDebt.sub(_amount);
+        ZUSDDebt -= _amount;
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
@@ -97,7 +91,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC.add(msg.value);
+        RBTC += msg.value;
         emit DefaultPoolRBTCBalanceUpdated(RBTC);
     }
 }

@@ -393,13 +393,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "stake",
+        "name": "_stake",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "uint8",
-        "name": "operation",
+        "internalType": "enum TroveManagerBase.TroveManagerOperation",
+        "name": "_operation",
         "type": "uint8"
       }
     ],
@@ -1641,84 +1641,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_feeDistributorAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_troveManagerRedeemOps",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_liquityBaseParamsAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_borrowerOperationsAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_activePoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_defaultPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_stabilityPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_gasPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_collSurplusPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_priceFeedAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_zusdTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_sortedTrovesAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_zeroTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_zeroStakingAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setAddresses",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

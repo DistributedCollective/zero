@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./IExternalPriceFeed.sol";
 
@@ -10,7 +10,7 @@ interface IMoCBaseOracle {
 contract MoCMedianizer is IExternalPriceFeed {
     IMoCBaseOracle medianizer;
 
-    constructor(address _medianizer) public {
+    constructor(address _medianizer) {
         medianizer = IMoCBaseOracle(_medianizer);
     }
 

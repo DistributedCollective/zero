@@ -16,19 +16,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_zeroTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "FundingWalletAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -50,7 +37,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_fundingWalletAddress",
+        "name": "_totalZEROIssued",
         "type": "uint256"
       }
     ],

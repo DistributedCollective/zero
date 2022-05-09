@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./IExternalPriceFeed.sol";
 
@@ -11,7 +11,7 @@ contract RskOracle is IExternalPriceFeed {
   
     IRSKOracle rskOracle;
 
-    constructor(address _address) public {
+    constructor(address _address) {
         rskOracle = IRSKOracle(_address);
     }
 

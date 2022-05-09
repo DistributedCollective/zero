@@ -1,4 +1,4 @@
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 /**
  * @title Interface for contract governance/FeeSharingProxy.sol

@@ -1,10 +1,10 @@
 
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../Proxy/UpgradableProxy.sol";
 contract Storage {
-    uint someVar;
+    uint256 someVar;
 }
 
 contract ProxiableContract is Storage {
@@ -13,13 +13,13 @@ contract ProxiableContract is Storage {
         return someVar;
     }
 
-    function setSomeVar(uint value) public {
+    function setSomeVar(uint256 value) public {
         someVar = value;
     }
 }
 
 contract Storage2 {
-    uint anotherVar;
+    uint256 anotherVar;
 }
 
 contract ProxiableContract2 is ProxiableContract, Storage2 {
@@ -28,7 +28,7 @@ contract ProxiableContract2 is ProxiableContract, Storage2 {
         return anotherVar;
     }
 
-    function setAnotherVar(uint value) public {
+    function setAnotherVar(uint256 value) public {
         anotherVar = value;
     }
 

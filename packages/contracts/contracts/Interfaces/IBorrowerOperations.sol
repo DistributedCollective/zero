@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 /// Common interface for the Trove Manager.
 interface IBorrowerOperations {
@@ -19,9 +19,9 @@ interface IBorrowerOperations {
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
     event ZEROStakingAddressChanged(address _zeroStakingAddress);
 
-    event TroveCreated(address indexed _borrower, uint arrayIndex);
-    event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake, uint8 operation);
-    event ZUSDBorrowingFeePaid(address indexed _borrower, uint _ZUSDFee);
+    event TroveCreated(address indexed _borrower, uint256 arrayIndex);
+    event TroveUpdated(address indexed _borrower, uint256 _debt, uint256 _coll, uint256 stake, uint8 operation);
+    event ZUSDBorrowingFeePaid(address indexed _borrower, uint256 _ZUSDFee);
 
     // --- Functions ---
     
@@ -66,7 +66,7 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function openTrove(uint _maxFee, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable;
+    function openTrove(uint256 _maxFee, uint256 _ZUSDAmount, address _upperHint, address _lowerHint) external payable;
 
     /**
      * @notice payable function that creates a Trove for the caller with the requested debt, and the RBtcer received as collateral.
@@ -79,7 +79,7 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function openNueTrove(uint _maxFee, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable;
+    function openNueTrove(uint256 _maxFee, uint256 _ZUSDAmount, address _upperHint, address _lowerHint) external payable;
 
     /// @notice payable function that adds the received RBtcer to the caller's active Trove.
     /// @param _upperHint upper trove id hint
@@ -100,7 +100,7 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function withdrawColl(uint _amount, address _upperHint, address _lowerHint) external;
+    function withdrawColl(uint256 _amount, address _upperHint, address _lowerHint) external;
 
     /**
      * @notice issues `_amount` of ZUSD from the caller’s Trove to the caller. 
@@ -111,13 +111,13 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function withdrawZUSD(uint _maxFee, uint _amount, address _upperHint, address _lowerHint) external;
+    function withdrawZUSD(uint256 _maxFee, uint256 _amount, address _upperHint, address _lowerHint) external;
 
     /// @notice repay `_amount` of ZUSD to the caller’s Trove, subject to leaving 50 debt in the Trove (which corresponds to the 50 ZUSD gas compensation).
     /// @param _amount ZUSD amount to repay
     /// @param _upperHint upper trove id hint
     /// @param _lowerHint lower trove id hint
-    function repayZUSD(uint _amount, address _upperHint, address _lowerHint) external;
+    function repayZUSD(uint256 _amount, address _upperHint, address _lowerHint) external;
 
     /**
      * @notice allows a borrower to repay all debt, withdraw all their collateral, and close their Trove. 
@@ -144,7 +144,7 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function adjustTrove(uint _maxFee, uint _collWithdrawal, uint _debtChange, bool isDebtIncrease, address _upperHint, address _lowerHint) external payable;
+    function adjustTrove(uint256 _maxFee, uint256 _collWithdrawal, uint256 _debtChange, bool isDebtIncrease, address _upperHint, address _lowerHint) external payable;
 
     /**
      * @notice enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity: 
@@ -159,7 +159,7 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function adjustNueTrove(uint _maxFee, uint _collWithdrawal, uint _debtChange, bool isDebtIncrease, address _upperHint, address _lowerHint) external payable;
+    function adjustNueTrove(uint256 _maxFee, uint256 _collWithdrawal, uint256 _debtChange, bool isDebtIncrease, address _upperHint, address _lowerHint) external payable;
 
     /** 
     * @notice when a borrower’s Trove has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%, 
@@ -167,7 +167,7 @@ interface IBorrowerOperations {
     */
     function claimCollateral() external;
 
-    function getCompositeDebt(uint _debt) external view returns (uint);
+    function getCompositeDebt(uint256 _debt) external view returns (uint);
 
     function BORROWING_FEE_FLOOR() external view returns (uint);
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../Interfaces/IBalanceRedirectPresale.sol";
 import "../Dependencies/Initializable.sol";
@@ -15,7 +15,7 @@ contract ZEROTokenStorage is Initializable {
 
     mapping (address => uint256) internal _balances;
     mapping (address => mapping (address => uint256)) internal _allowances;
-    uint internal _totalSupply;
+    uint256 internal _totalSupply;
 
     // --- EIP 2612 Data ---
 
@@ -36,12 +36,11 @@ contract ZEROTokenStorage is Initializable {
 
     // --- ZEROToken specific data ---
 
-    uint public constant ONE_YEAR_IN_SECONDS = 31536000;  // 60 * 60 * 24 * 365
+    uint256 public constant ONE_YEAR_IN_SECONDS = 31536000;  // 60 * 60 * 24 * 365
 
-    // uint for use with SafeMath
-    uint internal constant _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
+    uint256 internal constant _1_MILLION = 1e24;    // 1e6 * 1e18 = 1e24
 
-    uint internal deploymentStartTime;
+    uint256 internal deploymentStartTime;
 
     address public zeroStakingAddress;
     address public marketMakerAddress;

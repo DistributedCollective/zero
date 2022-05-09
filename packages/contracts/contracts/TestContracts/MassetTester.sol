@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../BorrowerOperationsStorage.sol";
 
 contract NueToken is ERC20("Nuestro", "NUE"), Ownable {
-    constructor () public {}
+    constructor () {}
 
     function mint (address _account, uint256 _amount) onlyOwner public {
         _mint(_account, _amount);
@@ -20,13 +20,15 @@ contract NueToken is ERC20("Nuestro", "NUE"), Ownable {
 contract MassetTester is IMasset {
     NueToken public token;
 
-    constructor () public {
+    constructor () {
         token = new NueToken();
     }
 
-    function onTokensMinted(
+    /// @dev    Unused uint256 param left for frontend compatibility.
+    /// TODO:   Rationalize this asap to avoid misleading code resulting in frontend errors.
+   function onTokensMinted(
         uint256 _orderAmount,
-        address _tokenAddress,
+        address /* _tokenAddress */,
         bytes calldata _userData
     ) external override {
         token.mint(abi.decode(_userData, (address)), _orderAmount);

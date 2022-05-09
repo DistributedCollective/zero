@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../TroveManager.sol";
 import "../BorrowerOperations.sol";
@@ -18,7 +18,7 @@ contract EchidnaProxy {
         BorrowerOperations _borrowerOperations,
         StabilityPool _stabilityPool,
         ZUSDToken _zusdToken
-    ) public {
+    ) {
         troveManager = _troveManager;
         borrowerOperations = _borrowerOperations;
         stabilityPool = _stabilityPool;
@@ -35,7 +35,7 @@ contract EchidnaProxy {
         troveManager.liquidate(_user);
     }
 
-    function liquidateTrovesPrx(uint _n) external {
+    function liquidateTrovesPrx(uint256 _n) external {
         troveManager.liquidateTroves(_n);
     }
 
@@ -44,35 +44,35 @@ contract EchidnaProxy {
     }
 
     function redeemCollateralPrx(
-        uint _ZUSDAmount,
+        uint256 _ZUSDAmount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
-        uint _partialRedemptionHintNICR,
-        uint _maxIterations,
-        uint _maxFee
+        uint256 _partialRedemptionHintNICR,
+        uint256 _maxIterations,
+        uint256 _maxFee
     ) external {
         troveManager.redeemCollateral(_ZUSDAmount, _firstRedemptionHint, _upperPartialRedemptionHint, _lowerPartialRedemptionHint, _partialRedemptionHintNICR, _maxIterations, _maxFee);
     }
 
     // Borrower Operations
-    function openTrovePrx(uint _RBTC, uint _ZUSDAmount, address _upperHint, address _lowerHint, uint _maxFee) external payable {
+    function openTrovePrx(uint256 _RBTC, uint256 _ZUSDAmount, address _upperHint, address _lowerHint, uint256 _maxFee) external payable {
         borrowerOperations.openTrove{value: _RBTC}(_maxFee, _ZUSDAmount, _upperHint, _lowerHint);
     }
 
-    function addCollPrx(uint _RBTC, address _upperHint, address _lowerHint) external payable {
+    function addCollPrx(uint256 _RBTC, address _upperHint, address _lowerHint) external payable {
         borrowerOperations.addColl{value: _RBTC}(_upperHint, _lowerHint);
     }
 
-    function withdrawCollPrx(uint _amount, address _upperHint, address _lowerHint) external {
+    function withdrawCollPrx(uint256 _amount, address _upperHint, address _lowerHint) external {
         borrowerOperations.withdrawColl(_amount, _upperHint, _lowerHint);
     }
 
-    function withdrawZUSDPrx(uint _amount, address _upperHint, address _lowerHint, uint _maxFee) external {
+    function withdrawZUSDPrx(uint256 _amount, address _upperHint, address _lowerHint, uint256 _maxFee) external {
         borrowerOperations.withdrawZUSD(_maxFee, _amount, _upperHint, _lowerHint);
     }
 
-    function repayZUSDPrx(uint _amount, address _upperHint, address _lowerHint) external {
+    function repayZUSDPrx(uint256 _amount, address _upperHint, address _lowerHint) external {
         borrowerOperations.repayZUSD(_amount, _upperHint, _lowerHint);
     }
 
@@ -80,16 +80,16 @@ contract EchidnaProxy {
         borrowerOperations.closeTrove();
     }
 
-    function adjustTrovePrx(uint _RBTC, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFee) external payable {
+    function adjustTrovePrx(uint256 _RBTC, uint256 _collWithdrawal, uint256 _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint256 _maxFee) external payable {
         borrowerOperations.adjustTrove{value: _RBTC}(_maxFee, _collWithdrawal, _debtChange, _isDebtIncrease, _upperHint, _lowerHint);
     }
 
     // Pool Manager
-    function provideToSPPrx(uint _amount, address _frontEndTag) external {
+    function provideToSPPrx(uint256 _amount, address _frontEndTag) external {
         stabilityPool.provideToSP(_amount, _frontEndTag);
     }
 
-    function withdrawFromSPPrx(uint _amount) external {
+    function withdrawFromSPPrx(uint256 _amount) external {
         stabilityPool.withdrawFromSP(_amount);
     }
 

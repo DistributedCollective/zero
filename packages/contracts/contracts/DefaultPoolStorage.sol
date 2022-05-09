@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 
 contract DefaultPoolStorage is Ownable {

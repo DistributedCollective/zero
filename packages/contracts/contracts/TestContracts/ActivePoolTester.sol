@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../ActivePool.sol";
 
 contract ActivePoolTester is ActivePool {
+
     
-    function unprotectedIncreaseZUSDDebt(uint _amount) external {
-        ZUSDDebt  = ZUSDDebt.add(_amount);
+    function unprotectedIncreaseZUSDDebt(uint256 _amount) external {
+        ZUSDDebt += _amount;
     }
 
     function unprotectedPayable() external payable {
-        RBTC = RBTC.add(msg.value);
+        RBTC += msg.value;
     }
 }

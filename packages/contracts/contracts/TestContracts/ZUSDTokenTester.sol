@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "../ZUSDToken.sol";
 
@@ -10,7 +10,7 @@ contract ZUSDTokenTester is ZUSDToken {
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
-    ) public  {
+    ) {
         initialize(_troveManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress);
     }
     
@@ -20,7 +20,7 @@ contract ZUSDTokenTester is ZUSDToken {
         _mint(_account, _amount);
     }
 
-    function unprotectedBurn(address _account, uint _amount) external {
+    function unprotectedBurn(address _account, uint256 _amount) external {
         // No check on caller here
         
         _burn(_account, _amount);
@@ -40,16 +40,12 @@ contract ZUSDTokenTester is ZUSDToken {
 
     function callInternalApprove(address owner, address spender, uint256 amount) external returns (bool) {
         _approve(owner, spender, amount);
+        // Since this is basically a "naked" transfer, mimic transfer function signature
+        // and satisfy this function's sig too.
+        return true;
     }
 
-    function getChainId() external pure returns (uint256 chainID) {
-        //return _chainID(); // it’s private
-        assembly {
-            chainID := chainid()
-        }
-    }
-
-    function getDigest(address owner, address spender, uint amount, uint nonce, uint deadline) external view returns (bytes32) {
+    function getDigest(address owner, address spender, uint256 amount, uint256 nonce, uint256 deadline) external view returns (bytes32) {
         return keccak256(abi.encodePacked(
                 uint16(0x1901),
                 domainSeparator(),

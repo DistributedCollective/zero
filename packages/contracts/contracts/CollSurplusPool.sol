@@ -1,25 +1,15 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.13;
 
 import "./Interfaces/ICollSurplusPool.sol";
-import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./CollSurplusPoolStorage.sol";
 
 
 contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusPool {
-    using SafeMath for uint256;
-    // --- Events ---
-
-    event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolAddressChanged(address _newActivePoolAddress);
-
-    event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event RBtcerSent(address _to, uint _amount);
-    
+      
     // --- Contract setters ---
 
     function setAddresses(
@@ -58,10 +48,10 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     // --- Pool functionality ---
 
-    function accountSurplus(address _account, uint _amount) external override {
+    function accountSurplus(address _account, uint256 _amount) external override {
         _requireCallerIsTroveManager();
 
-        uint newAmount = balances[_account].add(_amount);
+        uint256 newAmount = balances[_account] + _amount;
         balances[_account] = newAmount;
 
         emit CollBalanceUpdated(_account, newAmount);
@@ -69,13 +59,13 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     function claimColl(address _account) external override {
         _requireCallerIsBorrowerOperations();
-        uint claimableColl = balances[_account];
+        uint256 claimableColl = balances[_account];
         require(claimableColl > 0, "CollSurplusPool: No collateral available to claim");
 
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        RBTC = RBTC.sub(claimableColl);
+        RBTC -= claimableColl;
         emit RBtcerSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
@@ -106,6 +96,6 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC.add(msg.value);
+        RBTC += msg.value;
     }
 }
