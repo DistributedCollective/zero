@@ -18,7 +18,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_L_RBTC",
+        "name": "_L_ETH",
         "type": "uint256"
       },
       {
@@ -112,13 +112,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_RBTCSent",
+        "name": "_ETHSent",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_RBTCFee",
+        "name": "_ETHFee",
         "type": "uint256"
       }
     ],
@@ -213,7 +213,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_L_RBTC",
+        "name": "_L_ETH",
         "type": "uint256"
       },
       {
@@ -304,7 +304,7 @@
   },
   {
     "inputs": [],
-    "name": "L_RBTC",
+    "name": "L_ETH",
     "outputs": [
       {
         "internalType": "uint256",
@@ -496,7 +496,7 @@
         "type": "address"
       }
     ],
-    "name": "_getPendingRBTCReward",
+    "name": "_getPendingETHReward",
     "outputs": [
       {
         "internalType": "uint256",
@@ -716,7 +716,7 @@
   },
   {
     "inputs": [],
-    "name": "lastFeeOperationTime",
+    "name": "lastETHError_Redistribution",
     "outputs": [
       {
         "internalType": "uint256",
@@ -729,7 +729,7 @@
   },
   {
     "inputs": [],
-    "name": "lastRBTCError_Redistribution",
+    "name": "lastFeeOperationTime",
     "outputs": [
       {
         "internalType": "uint256",
@@ -834,7 +834,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "RBTC",
+        "name": "ETH",
         "type": "uint256"
       },
       {
