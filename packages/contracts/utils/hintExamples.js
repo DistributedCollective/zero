@@ -31,7 +31,7 @@ async function main() {
   await priceFeedTestnet.setPrice(toBN(toWei('2500')))
 
   const ZUSDAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 ZUSD
-  const RBTCColl = toBN(toWei('5')) // borrower wants to lock 5 RBTC collateral
+  const ETHColl = toBN(toWei('5')) // borrower wants to lock 5 ETH collateral
 
   // Call deployed TroveManager contract to read the liquidation reserve and latest borrowing fee
   const liquidationReserve = await troveManager.ZUSD_GAS_COMPENSATION()
@@ -42,7 +42,7 @@ async function main() {
 
   // Get the nominal NICR of the new trove
   const _1e20 = toBN(toWei('100'))
-  let NICR = RBTCColl.mul(_1e20).div(expectedDebt)
+  let NICR = ETHColl.mul(_1e20).div(expectedDebt)
 
   // Get an approximate address hint from the deployed HintHelper contract. Use (15 * number of troves) trials 
   // to get an approx. hint that is close to the right position.
@@ -55,11 +55,11 @@ async function main() {
 
   // Finally, call openTrove with the exact upperHint and lowerHint
   const maxFee = '5'.concat('0'.repeat(16)) // Slippage protection: 5%
-  await borrowerOperations.openTrove(maxFee, ZUSDAmount, upperHint, lowerHint, { value: RBTCColl })
+  await borrowerOperations.openTrove(maxFee, ZUSDAmount, upperHint, lowerHint, { value: ETHColl })
 
   // --- adjust trove --- 
 
-  const collIncrease = toBN(toWei('1'))  // borrower wants to add 1 RBTC
+  const collIncrease = toBN(toWei('1'))  // borrower wants to add 1 ETH
   const ZUSDRepayment = toBN(toWei('230')) // borrower wants to repay 230 ZUSD
 
   // Get trove's current debt and coll

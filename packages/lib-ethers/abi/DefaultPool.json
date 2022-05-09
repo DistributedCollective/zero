@@ -31,11 +31,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_RBTC",
+        "name": "_ETH",
         "type": "uint256"
       }
     ],
-    "name": "DefaultPoolRBTCBalanceUpdated",
+    "name": "DefaultPoolETHBalanceUpdated",
     "type": "event"
   },
   {
@@ -55,32 +55,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": false,
         "internalType": "uint256",
         "name": "_newBalance",
         "type": "uint256"
       }
     ],
-    "name": "RBTCBalanceUpdated",
+    "name": "ETHBalanceUpdated",
     "type": "event"
   },
   {
@@ -99,7 +80,26 @@
         "type": "uint256"
       }
     ],
-    "name": "RBtcerSent",
+    "name": "EtherSent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -182,12 +182,12 @@
   },
   {
     "inputs": [],
-    "name": "getOwner",
+    "name": "getETH",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -195,12 +195,12 @@
   },
   {
     "inputs": [],
-    "name": "getRBTC",
+    "name": "getOwner",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -240,7 +240,7 @@
         "type": "uint256"
       }
     ],
-    "name": "sendRBTCToActivePool",
+    "name": "sendETHToActivePool",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

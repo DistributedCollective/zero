@@ -570,7 +570,7 @@
         "type": "address"
       }
     ],
-    "name": "moveRBTCGainToTrove",
+    "name": "moveETHGainToTrove",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"

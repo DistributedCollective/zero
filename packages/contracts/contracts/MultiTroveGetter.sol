@@ -16,7 +16,7 @@ contract MultiTroveGetter is MultiTroveGetterStorage {
         uint coll;
         uint stake;
 
-        uint snapshotRBTC;
+        uint snapshotETH;
         uint snapshotZUSDDebt;
     }
 
@@ -79,7 +79,7 @@ contract MultiTroveGetter is MultiTroveGetterStorage {
                 /* arrayIndex */
             ) = troveManager.Troves(currentTroveowner);
             (
-                _troves[idx].snapshotRBTC,
+                _troves[idx].snapshotETH,
                 _troves[idx].snapshotZUSDDebt
             ) = troveManager.rewardSnapshots(currentTroveowner);
 
@@ -108,7 +108,7 @@ contract MultiTroveGetter is MultiTroveGetterStorage {
                 /* arrayIndex */
             ) = troveManager.Troves(currentTroveowner);
             (
-                _troves[idx].snapshotRBTC,
+                _troves[idx].snapshotETH,
                 _troves[idx].snapshotZUSDDebt
             ) = troveManager.rewardSnapshots(currentTroveowner);
 

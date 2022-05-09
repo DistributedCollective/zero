@@ -12,7 +12,7 @@ contract CollSurplusPoolStorage is Ownable {
     address public activePoolAddress;
 
     // deposited ether tracker
-    uint256 internal RBTC;
+    uint256 internal ETH;
     // Collateral surplus claimable by trove owners
     mapping(address => uint256) internal balances;
 }

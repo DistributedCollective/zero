@@ -18,7 +18,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event RBtcerSent(address _to, uint _amount);
+    event EtherSent(address _to, uint _amount);
     
     // --- Contract setters ---
 
@@ -46,10 +46,10 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         
     }
 
-    /** Returns the RBTC state variable at ActivePool address.
+    /** Returns the ETH state variable at ActivePool address.
        Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts. */
-    function getRBTC() external view override returns (uint) {
-        return RBTC;
+    function getETH() external view override returns (uint) {
+        return ETH;
     }
 
     function getCollateral(address _account) external view override returns (uint) {
@@ -75,11 +75,11 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        RBTC = RBTC.sub(claimableColl);
-        emit RBtcerSent(_account, claimableColl);
+        ETH = ETH.sub(claimableColl);
+        emit EtherSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
-        require(success, "CollSurplusPool: sending RBTC failed");
+        require(success, "CollSurplusPool: sending ETH failed");
     }
 
     // --- 'require' functions ---
@@ -106,6 +106,6 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     receive() external payable {
         _requireCallerIsActivePool();
-        RBTC = RBTC.add(msg.value);
+        ETH = ETH.add(msg.value);
     }
 }

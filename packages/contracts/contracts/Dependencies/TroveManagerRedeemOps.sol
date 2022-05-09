@@ -107,39 +107,39 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
 
             totals.totalZUSDToRedeem = totals.totalZUSDToRedeem.add(singleRedemption.ZUSDLot);
-            totals.totalRBTCDrawn = totals.totalRBTCDrawn.add(singleRedemption.RBTCLot);
+            totals.totalETHDrawn = totals.totalETHDrawn.add(singleRedemption.ETHLot);
 
             totals.remainingZUSD = totals.remainingZUSD.sub(singleRedemption.ZUSDLot);
             currentBorrower = nextUserToCheck;
         }
-        require(totals.totalRBTCDrawn > 0, "TroveManager: Unable to redeem any amount");
+        require(totals.totalETHDrawn > 0, "TroveManager: Unable to redeem any amount");
 
         // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
         // Use the saved total ZUSD supply value, from before it was reduced by the redemption.
         _updateBaseRateFromRedemption(
-            totals.totalRBTCDrawn,
+            totals.totalETHDrawn,
             totals.price,
             totals.totalZUSDSupplyAtStart
         );
 
-        // Calculate the RBTC fee
-        totals.RBTCFee = _getRedemptionFee(totals.totalRBTCDrawn);
+        // Calculate the ETH fee
+        totals.ETHFee = _getRedemptionFee(totals.totalETHDrawn);
 
-        _requireUserAcceptsFee(totals.RBTCFee, totals.totalRBTCDrawn, _maxFeePercentage);
+        _requireUserAcceptsFee(totals.ETHFee, totals.totalETHDrawn, _maxFeePercentage);
 
-        // Send the RBTC fee to the feeDistributorContract address
-        contractsCache.activePool.sendRBTC(address(feeDistributor), totals.RBTCFee);
+        // Send the ETH fee to the feeDistributorContract address
+        contractsCache.activePool.sendETH(address(feeDistributor), totals.ETHFee);
         feeDistributor.distributeFees();
 
-        totals.RBTCToSendToRedeemer = totals.totalRBTCDrawn.sub(totals.RBTCFee);
+        totals.ETHToSendToRedeemer = totals.totalETHDrawn.sub(totals.ETHFee);
 
-        emit Redemption(_ZUSDamount, totals.totalZUSDToRedeem, totals.totalRBTCDrawn, totals.RBTCFee);
+        emit Redemption(_ZUSDamount, totals.totalZUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
 
-        // Burn the total ZUSD that is cancelled with debt, and send the redeemed RBTC to msg.sender
+        // Burn the total ZUSD that is cancelled with debt, and send the redeemed ETH to msg.sender
         contractsCache.zusdToken.burn(msg.sender, totals.totalZUSDToRedeem);
-        // Update Active Pool ZUSD, and send RBTC to account
+        // Update Active Pool ZUSD, and send ETH to account
         contractsCache.activePool.decreaseZUSDDebt(totals.totalZUSDToRedeem);
-        contractsCache.activePool.sendRBTC(msg.sender, totals.RBTCToSendToRedeemer);
+        contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
 
     function _isValidFirstRedemptionHint(
@@ -175,12 +175,12 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             Troves[_borrower].debt.sub(ZUSD_GAS_COMPENSATION)
         );
 
-        // Get the RBTCLot of equivalent value in USD
-        singleRedemption.RBTCLot = singleRedemption.ZUSDLot.mul(DECIMAL_PRECISION).div(_price);
+        // Get the ETHLot of equivalent value in USD
+        singleRedemption.ETHLot = singleRedemption.ZUSDLot.mul(DECIMAL_PRECISION).div(_price);
 
-        // Decrease the debt and collateral of the current Trove according to the ZUSD lot and corresponding RBTC to send
+        // Decrease the debt and collateral of the current Trove according to the ZUSD lot and corresponding ETH to send
         uint256 newDebt = (Troves[_borrower].debt).sub(singleRedemption.ZUSDLot);
-        uint256 newColl = (Troves[_borrower].coll).sub(singleRedemption.RBTCLot);
+        uint256 newColl = (Troves[_borrower].coll).sub(singleRedemption.ETHLot);
 
         if (newDebt == ZUSD_GAS_COMPENSATION) {
             // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
@@ -232,15 +232,15 @@ contract TroveManagerRedeemOps is TroveManagerBase {
       2) increases the baseRate based on the amount redeemed, as a proportion of total supply
      */
     function _updateBaseRateFromRedemption(
-        uint256 _RBTCDrawn,
+        uint256 _ETHDrawn,
         uint256 _price,
         uint256 _totalZUSDSupply
     ) internal returns (uint256) {
         uint256 decayedBaseRate = _calcDecayedBaseRate();
 
-        /* Convert the drawn RBTC back to ZUSD at face value rate (1 ZUSD:1 USD), in order to get
+        /* Convert the drawn ETH back to ZUSD at face value rate (1 ZUSD:1 USD), in order to get
          * the fraction of total supply that was redeemed at face value. */
-        uint256 redeemedZUSDFraction = _RBTCDrawn.mul(_price).div(_totalZUSDSupply);
+        uint256 redeemedZUSDFraction = _ETHDrawn.mul(_price).div(_totalZUSDSupply);
 
         uint256 newBaseRate = decayedBaseRate.add(redeemedZUSDFraction.div(BETA));
         newBaseRate = LiquityMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
@@ -258,23 +258,23 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
     /**
       Called when a full redemption occurs, and closes the trove.
-      The redeemer swaps (debt - liquidation reserve) ZUSD for (debt - liquidation reserve) worth of RBTC, so the ZUSD liquidation reserve left corresponds to the remaining debt.
+      The redeemer swaps (debt - liquidation reserve) ZUSD for (debt - liquidation reserve) worth of ETH, so the ZUSD liquidation reserve left corresponds to the remaining debt.
       In order to close the trove, the ZUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
       The debt recorded on the trove's struct is zero'd elswhere, in _closeTrove.
-      Any surplus RBTC left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
+      Any surplus ETH left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
      */
     function _redeemCloseTrove(
         ContractsCache memory _contractsCache,
         address _borrower,
         uint256 _ZUSD,
-        uint256 _RBTC
+        uint256 _ETH
     ) internal {
         _contractsCache.zusdToken.burn(gasPoolAddress, _ZUSD);
-        // Update Active Pool ZUSD, and send RBTC to account
+        // Update Active Pool ZUSD, and send ETH to account
         _contractsCache.activePool.decreaseZUSDDebt(_ZUSD);
 
-        // send RBTC from Active Pool to CollSurplus Pool
-        _contractsCache.collSurplusPool.accountSurplus(_borrower, _RBTC);
-        _contractsCache.activePool.sendRBTC(address(_contractsCache.collSurplusPool), _RBTC);
+        // send ETH from Active Pool to CollSurplus Pool
+        _contractsCache.collSurplusPool.accountSurplus(_borrower, _ETH);
+        _contractsCache.activePool.sendETH(address(_contractsCache.collSurplusPool), _ETH);
     }
 }

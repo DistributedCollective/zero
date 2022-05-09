@@ -11,12 +11,12 @@ import "../Interfaces/IStabilityPool.sol";
 import "../Interfaces/IPriceFeed.sol";
 import "../Interfaces/IZEROStaking.sol";
 import "./BorrowerOperationsScript.sol";
-import "./RBTCTransferScript.sol";
+import "./ETHTransferScript.sol";
 import "./ZEROStakingScript.sol";
 import "../Dependencies/console.sol";
 
 
-contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript, ZEROStakingScript {
+contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, ZEROStakingScript {
     using SafeMath for uint;
 
     string constant public NAME = "BorrowerWrappersScript";
@@ -92,7 +92,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, RBTCTransferScript,
         uint zeroBalanceAfter = zeroToken.balanceOf(address(this));
         uint claimedCollateral = collBalanceAfter.sub(collBalanceBefore);
 
-        // Add claimed RBTC to trove, get more ZUSD and stake it into the Stability Pool
+        // Add claimed ETH to trove, get more ZUSD and stake it into the Stability Pool
         if (claimedCollateral > 0) {
             _requireUserHasTrove(address(this));
             uint ZUSDAmount = _getNetZUSDAmount(claimedCollateral);
