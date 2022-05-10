@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-import "../../../contracts/contracts/Interfaces/IBorrowerOperations.sol";
+import "../interfaces/IBorrowerOperations.sol";
 
 library Borrower {
     modifier isContractAddress(address contractAddress) {
@@ -30,18 +30,32 @@ library Borrower {
         borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint);
     }
 
-    function openCreditLineInNue(
-        uint256 _maxFeePercentage,
-        uint256 _ZUSDAmount,
+    function withdrawZUSD(
+        uint256 _maxFee,
+        uint256 _amount,
         address _upperHint,
         address _lowerHint,
         address borrowerContract
-    ) external nonZeroCollateral(msg.value) isContractAddress(borrowerContract) {
+    ) external isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
-        //TODO: handle invalid contract address
-        borrowerOperations.openNueTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint);
-        (_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint);
+        borrowerOperations.withdrawZUSD(_maxFee, _amount, _upperHint, _lowerHint);
     }
 
-    //TODO: wait for response from Noah dev if to include the withdraw of trove into the openCredit method or in separate one
+    function repayZUSD(
+        uint256 _amount,
+        address _upperHint,
+        address _lowerHint,
+        address borrowerContract
+    ) external isContractAddress(borrowerContract) {
+        IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
+        borrowerOperations.repayZUSD(_amount, _upperHint, _lowerHint);
+    }
+
+    function closeCreditLineAndWithdrawCollateral(address borrowerContract)
+        external
+        isContractAddress(borrowerContract)
+    {
+        IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
+        borrowerOperations.closeTrove();
+    }
 }
