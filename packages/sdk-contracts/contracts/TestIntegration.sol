@@ -16,7 +16,7 @@ contract TestIntegration {
         address _upperHint,
         address _lowerHint
     ) external {
-        Borrower.openCreditLineInNue(
+        Borrower.openCreditLineInZusd(
             _maxFeePercentage,
             _ZUSDAmount,
             _upperHint,
@@ -24,8 +24,4 @@ contract TestIntegration {
             borrowerContractAddress
         );
     }
-
-    //TODO: 1. research mock contracts (smock) for off chain testing
-    //TODO: 2. research fixtures (for on chain testing)
-    //TODO: 3. we need to have isolated folder/repo for testing the package (decide where TestIntegration.sol smart contract will reside)
 }

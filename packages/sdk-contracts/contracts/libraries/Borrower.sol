@@ -19,7 +19,7 @@ library Borrower {
         address _upperHint,
         address _lowerHint,
         address borrowerContract
-    ) external isContractAddress(borrowerContract) {
+    ) internal isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         //TODO: handle invalid contract address
         borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint);
@@ -31,7 +31,7 @@ library Borrower {
         address _upperHint,
         address _lowerHint,
         address borrowerContract
-    ) external isContractAddress(borrowerContract) {
+    ) internal isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         borrowerOperations.withdrawZUSD(_maxFee, _amount, _upperHint, _lowerHint);
     }
@@ -41,13 +41,13 @@ library Borrower {
         address _upperHint,
         address _lowerHint,
         address borrowerContract
-    ) external isContractAddress(borrowerContract) {
+    ) internal isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         borrowerOperations.repayZUSD(_amount, _upperHint, _lowerHint);
     }
 
     function closeCreditLineAndWithdrawCollateral(address borrowerContract)
-        external
+        internal
         isContractAddress(borrowerContract)
     {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
