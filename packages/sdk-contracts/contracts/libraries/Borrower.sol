@@ -13,18 +13,13 @@ library Borrower {
         _;
     }
 
-    modifier nonZeroCollateral(uint256 collateral) {
-        require(msg.value > 0, "You must provide collateral");
-        _;
-    }
-
     function openCreditLineInZusd(
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
         address _upperHint,
         address _lowerHint,
         address borrowerContract
-    ) external nonZeroCollateral(msg.value) isContractAddress(borrowerContract) {
+    ) external isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         //TODO: handle invalid contract address
         borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint);
