@@ -1,8 +1,9 @@
-# Sovryn Solidity Hardhat Typescript Boilerplate
+# SOVRYN SOLIDITY SDK
 
 ## PROJECT DESCRIPTION
-
+  SDK consisting of utilities for the Sovryn Protocol
 ## CONTRACTS ARCHITECTURE
+  All contracts are in the form of libraries, each one containing set of functionalities related to one product of the Sovryn ecosystem.
 
 ## STATE-MACHINE/INTERACTION/FLOW DIAGRAMS (where applicable)
 
