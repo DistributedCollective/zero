@@ -1,5 +1,5 @@
 {
-  "name": "@liquity/lib-base",
+  "name": "@sovryn-zero/lib-base",
   "version": "0.0.0-semantic-release",
   "description": "Liquity SDK shared interfaces",
   "keywords": [

@@ -7,8 +7,8 @@ import {
   ZUSD_LIQUIDATION_RESERVE,
   Percent,
   Difference
-} from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+} from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 import { TroveAction } from "./TroveAction";
@@ -199,9 +199,9 @@ export const Adjusting: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "200px" }}>
-                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs to be
-                  liquidated. The amount increases your debt and is refunded if you close your Line of Credit
-                  by fully paying off its net debt.
+                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit
+                  needs to be liquidated. The amount increases your debt and is refunded if you close
+                  your Line of Credit by fully paying off its net debt.
                 </Card>
               }
             />

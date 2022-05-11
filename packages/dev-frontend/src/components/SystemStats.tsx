@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, Heading, Link, Box, Text } from "theme-ui";
 import { AddressZero } from "@ethersproject/constants";
-import { Decimal, Percent, LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { Decimal, Percent, LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { useLiquity } from "../hooks/LiquityContext";
 import { COIN, GT } from "../strings";
@@ -29,7 +29,9 @@ const Balances: React.FC = () => {
 
 const GitHubCommit: React.FC<{ children?: string }> = ({ children }) =>
   children?.match(/[0-9a-f]{40}/) ? (
-    <Link href={`https://github.com/DistributedCollective/zero/commit/${children}`}>{children.substr(0, 7)}</Link>
+    <Link href={`https://github.com/DistributedCollective/zero/commit/${children}`}>
+      {children.substr(0, 7)}
+    </Link>
   ) : (
     <>unknown</>
   );
@@ -108,7 +110,10 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
           &nbsp;(${Decimal.from(total.collateral.mul(price)).shorten()})
         </Text>
       </Statistic>
-      <Statistic name="Credit Lines" tooltip="The total number of active Lines of Credit in the system.">
+      <Statistic
+        name="Credit Lines"
+        tooltip="The total number of active Lines of Credit in the system."
+      >
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
       <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Zero Protocol.">

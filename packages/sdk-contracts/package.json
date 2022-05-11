@@ -1,5 +1,5 @@
 {
-  "name": "@sovryn/sdk-zero-contracts",
+  "name": "@sovryn-zero/sdk-contracts",
   "version": "0.0.1",
   "description": "Sovryn ZERO solidity contracts SDK",
   "private": "true",

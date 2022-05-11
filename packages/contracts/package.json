@@ -1,5 +1,5 @@
 {
-  "name": "@sovryn/zero-contracts",
+  "name": "@sovryn-zero/contracts",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",

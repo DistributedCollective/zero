@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 
-import { Decimal, ZUSD_MINIMUM_NET_DEBT, Trove } from "@liquity/lib-base";
+import { Decimal, ZUSD_MINIMUM_NET_DEBT, Trove } from "@sovryn-zero/lib-base";
 
 import App from "./App";
 
