@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
+import { task } from "hardhat/config";
+import { HardhatUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
@@ -8,6 +9,7 @@ import "@primitivefi/hardhat-dodoc";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import "hardhat-deploy";
 
 dotenv.config();
 
@@ -24,7 +26,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
-const config: HardhatUserConfig = {
+export default {
   solidity: {
     compilers: [
       {
@@ -59,6 +61,11 @@ const config: HardhatUserConfig = {
     keepFileStructure: false,
     freshOutput: true,
   },
-};
-
-export default config;
+  external: {
+    contracts: [
+      {
+        artifacts: "external-contracts/*.json",
+      },
+    ],
+  },
+} as HardhatUserConfig;
