@@ -12,6 +12,9 @@
       "**/@babel/*",
       "**/babel*",
       "**/react-scripts"
+    ],
+    "sdk-contracts": [
+      "packages/sdk-contracts/*"
     ]
   },
   "release": {
