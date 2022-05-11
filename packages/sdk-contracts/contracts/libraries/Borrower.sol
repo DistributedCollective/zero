@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-import "../interfaces/IBorrowerOperations.sol";
+//import "../interfaces/IBorrowerOperations.sol";
+import "@sovryn/zero-contracts/contracts/Interfaces/IBorrowerOperations.sol";
 
 library Borrower {
     modifier isContractAddress(address contractAddress) {
