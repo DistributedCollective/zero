@@ -36,6 +36,17 @@
     "url": "https://github.com/DistributedCollective/zero"
   },
   "homepage": "https://github.com/DistributedCollective/solidity-hardhat-boilerplate#readme",
+  "nohoist": [
+    "**/web3-eth-abi/@ethersproject/abi",
+    "**/@graphprotocol/*",
+    "**/jest*",
+    "**/@babel/*",
+    "**/babel*",
+    "**/react-scripts",
+    "**/typechain",
+    "**/@typechain/*",
+    "@typechain/*"
+  ],
   "scripts": {
     "test": "hardhat test",
     "doc": "yarn hardhat docgen",

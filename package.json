@@ -11,10 +11,13 @@
       "**/jest*",
       "**/@babel/*",
       "**/babel*",
-      "**/react-scripts"
+      "**/react-scripts",
+      "**/typechain",
+      "**/@typechain/*",
+      "**/sdk-contracts/*"
     ],
     "sdk-contracts": [
-      "packages/sdk-contracts/*"
+      "packages/sdk-contracts"
     ]
   },
   "release": {
