@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import { task } from "hardhat/config";
 import { HardhatUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-etherscan";
-import "@typechain/ethers-v5";
+// import "@typechain/ethers-v5";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@primitivefi/hardhat-dodoc";
@@ -72,10 +72,18 @@ export default {
     freshOutput: true,
   },
   external: {
-    contracts: [
-      {
-        artifacts: "external-contracts/*.json",
-      },
-    ],
+    external: {
+      contracts: [
+        {
+          artifacts: "external-artifacts/*.json",
+        },
+      ],
+    },
+  },
+  typechain: {
+    outDir: "types",
+    target: "ethers-v5",
+    alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
+    externalArtifacts: ["external-artifacts/*.json"], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
   },
 } as HardhatUserConfig;
