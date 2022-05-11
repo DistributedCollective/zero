@@ -1,9 +1,9 @@
-import { objToString } from "../../fuzzer/src/utils";
-import { BorrowerImpl } from "../typechain/BorrowerImpl";
+import { objToString } from "@sovryn-zero/fuzzer/utils";
+import { BorrowerImpl } from "../types/BorrowerImpl";
 import { ethers } from "hardhat";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
-import { TestIntegration } from "../typechain/TestIntegration";
+import { TestIntegration } from "../types/TestIntegration";
 chai.use(solidity);
 const { expect } = chai;
 describe("Counter", () => {
