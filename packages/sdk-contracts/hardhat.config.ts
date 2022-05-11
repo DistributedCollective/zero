@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import { task } from "hardhat/config";
 import { HardhatUserConfig } from "hardhat/types";
 import "@nomiclabs/hardhat-etherscan";
+import "@typechain/ethers-v5";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@primitivefi/hardhat-dodoc";
@@ -29,6 +30,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 export default {
   solidity: {
     compilers: [
+      {
+        version: "0.6.11",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
       {
         version: "0.6.11",
         settings: {
