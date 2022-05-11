@@ -18,6 +18,7 @@ import { Web3Provider } from "@ethersproject/providers";
 
 type TransactionIdle = {
   type: "idle";
+  disableCheck?: boolean;
 };
 
 type TransactionFailed = {
@@ -25,33 +26,39 @@ type TransactionFailed = {
   id: string;
   error: Error;
   send?: TransactionFunction;
+  disableCheck?: boolean;
 };
 
 type TransactionWaitingForApproval = {
   type: "waitingForApproval";
   id: string;
+  disableCheck?: boolean;
 };
 
 type TransactionCancelled = {
   type: "cancelled";
   id: string;
   send?: TransactionFunction;
+  disableCheck?: boolean;
 };
 
 type TransactionWaitingForConfirmations = {
   type: "waitingForConfirmation";
   id: string;
   tx: SentTransaction;
+  disableCheck?: boolean;
 };
 
 type TransactionConfirmed = {
   type: "confirmed";
   id: string;
+  disableCheck?: boolean;
 };
 
 type TransactionConfirmedOneShot = {
   type: "confirmedOneShot";
   id: string;
+  disableCheck?: boolean;
 };
 
 type TransactionState =
@@ -74,7 +81,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
   );
 };
 
-const useTransactionState = () => {
+export const useTransactionState = () => {
   const transactionState = useContext(TransactionContext);
 
   if (!transactionState) {
@@ -230,8 +237,8 @@ const tryToGetRevertReason = async (provider: Provider, hash: string) => {
   }
 };
 
-const getTransactionTitle = (tx: TransactionState) => {
-  switch (tx.type) {
+const getTransactionTitle = (type: string) => {
+  switch (type) {
     case "idle":
       return "";
     case "failed":
@@ -249,8 +256,8 @@ const getTransactionTitle = (tx: TransactionState) => {
   }
 };
 
-const getTransactionImage = (tx: TransactionState) => {
-  switch (tx.type) {
+const getTransactionImage = (type: string) => {
+  switch (type) {
     case "failed":
       return (
         <Image
@@ -342,9 +349,10 @@ export const TransactionMonitor: React.FC = () => {
 
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;
   const tx = transactionState.type === "waitingForConfirmation" ? transactionState.tx : undefined;
+  const disableCheck = !!transactionState.disableCheck;
 
   useEffect(() => {
-    if (id && tx) {
+    if (id && tx && !disableCheck) {
       let cancelled = false;
       let finished = false;
 
@@ -416,7 +424,7 @@ export const TransactionMonitor: React.FC = () => {
         }
       };
     }
-  }, [provider, id, tx, setTransactionState]);
+  }, [provider, id, tx, setTransactionState, disableCheck]);
 
   useEffect(() => {
     if (transactionState.type === "confirmedOneShot" && id) {
@@ -448,9 +456,9 @@ export const TransactionMonitor: React.FC = () => {
         }}
       >
         <Text sx={{ fontSize: 22, fontWeight: 600, mb: 50, minHeight: 33 }}>
-          {getTransactionTitle(transactionState)}
+          {getTransactionTitle(transactionState.type)}
         </Text>
-        {getTransactionImage(transactionState)}
+        {getTransactionImage(transactionState.type)}
 
         {["idle", "waitingForApproval"].includes(transactionState.type) && (
           <Text>RSK {chainId === 30 ? "Mainnet" : "Testnet"}</Text>
@@ -461,7 +469,8 @@ export const TransactionMonitor: React.FC = () => {
             fontSize: 3,
             color: ["cancelled", "failed"].includes(transactionState.type) ? "danger" : "white",
             textAlign: "center",
-            mt: 40
+            mt: 40,
+            wordBreak: "keep-all"
           }}
         >
           {transactionState.type === "waitingForConfirmation" ? (
