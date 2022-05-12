@@ -1,8 +1,13 @@
 import { LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
+import { useWeb3React } from "@web3-react/core";
 import React from "react";
 
 import { Button, Flex, Heading, Text } from "theme-ui";
+import { addresses } from "../../contracts/config";
+import useTokenBalance from "../../hooks/useTokenBalance";
+import useZusdAggregator from "../../hooks/useZusdAggregator";
+import { isZero, parseBalance } from "../../utils";
 import { Card } from "../Card";
 
 const select = ({ zusdBalance }: LiquityStoreState) => ({
@@ -10,7 +15,10 @@ const select = ({ zusdBalance }: LiquityStoreState) => ({
 });
 
 export const Convert: React.FC = () => {
+  const { account } = useWeb3React();
   const { zusdBalance } = useLiquitySelector(select);
+  const { data, decimals } = useTokenBalance(account!, addresses.xusd);
+  const { mint, redeem } = useZusdAggregator(account);
   return (
     <Card
       heading={
@@ -26,15 +34,21 @@ export const Convert: React.FC = () => {
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300 }}>
           <Text> ZUSD Balane</Text>
           <Text sx={{ fontSize: 2, fontWeight: 700, mt: 2 }}>{zusdBalance.prettify()} ZUSD</Text>
-          <Button disabled={zusdBalance.isZero} sx={{ mt: 3 }}>
+          <Button
+            onClick={() => mint(zusdBalance.toString())}
+            disabled={zusdBalance.isZero}
+            sx={{ mt: 3 }}
+          >
             Convert All
           </Button>
         </Flex>
 
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300 }}>
           <Text> XUSD Balane</Text>
-          <Text sx={{ fontSize: 2, fontWeight: 700, mt: 2 }}>0 XUSD</Text>
-          <Button disabled={true} sx={{ mt: 3 }}>
+          <Text sx={{ fontSize: 2, fontWeight: 700, mt: 2 }}>
+            {parseBalance(data ?? 0, decimals)} XUSD
+          </Text>
+          <Button onClick={() => redeem(data.toString())} disabled={isZero(data.toString())} sx={{ mt: 3 }}>
             Convert All
           </Button>
         </Flex>
