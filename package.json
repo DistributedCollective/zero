@@ -1,5 +1,5 @@
 {
-  "name": "liquity",
+  "name": "sovryn-zero",
   "private": true,
   "workspaces": {
     "packages": [
@@ -11,7 +11,10 @@
       "**/jest*",
       "**/@babel/*",
       "**/babel*",
-      "**/react-scripts"
+      "**/react-scripts",
+      "**/typechain",
+      "**/@typechain/*",
+      "**/sdk-contracts/*"
     ]
   },
   "release": {
