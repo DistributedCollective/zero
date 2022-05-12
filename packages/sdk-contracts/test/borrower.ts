@@ -1,4 +1,4 @@
-import { objToString } from "@sovryn-zero/fuzzer/utils";
+import { objToString } from "@sovryn-zero/fuzzer/src/utils";
 import { BorrowerImpl } from "../types/BorrowerImpl";
 import { ethers } from "hardhat";
 import chai from "chai";
