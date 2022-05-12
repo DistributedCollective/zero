@@ -10,5 +10,5 @@ artifacts
 *.code-workspace
 ignore/
 tmp/
-docs/
-../../bin
+docs/*.md
+test/docs/
