@@ -24,4 +24,25 @@ contract TestIntegration {
             borrowerContractAddress
         );
     }
+
+    function testWithdrawZUSD(
+        uint256 _maxFee,
+        uint256 _amount,
+        address _upperHint,
+        address _lowerHint
+    ) external {
+        Borrower.withdrawZUSD(_maxFee, _amount, _upperHint, _lowerHint, borrowerContractAddress);
+    }
+
+    function testRepayZUSD(
+        uint256 _amount,
+        address _upperHint,
+        address _lowerHint
+    ) external {
+        Borrower.repayZUSD(_amount, _upperHint, _lowerHint, borrowerContractAddress);
+    }
+
+    function testCloseCreditLineAndWithdrawCollateral() external {
+        Borrower.closeCreditLineAndWithdrawCollateral(borrowerContractAddress);
+    }
 }

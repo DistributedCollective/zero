@@ -18,7 +18,7 @@ import {
 const { expect } = chai;
 chai.use(smock.matchers);
 
-describe("Borrower Library", () => {
+describe("Borrower Library Operations", () => {
   let testIntegrationFactory: MockContractFactory<TestIntegration__factory>;
   let testIntegration: MockContract<TestIntegration>;
   let borrower: FakeContract<BorrowerImpl>;
@@ -38,15 +38,40 @@ describe("Borrower Library", () => {
     await testIntegration.deployed();
   });
 
-  describe("Borrowing operations", async () => {
-    it("should call open trove", async () => {
-      await testIntegration.testOpenCreditLine(
+  describe("Borrowing ZUSD", async () => {
+    it("should call withdraw function with correct parameters", async () => {
+      await testIntegration.testWithdrawZUSD(
         1,
         100,
         signers[0].address,
         signers[2].address
       );
-      expect(borrower.openTrove).to.have.been.called;
+      expect(borrower.withdrawZUSD).to.have.been.calledOnceWith(
+        1,
+        100,
+        signers[0].address,
+        signers[2].address
+      );
+    });
+  });
+  describe("Repaying ZUSD", async () => {
+    it("should call repay function with correct parameters", async () => {
+      await testIntegration.testRepayZUSD(
+        100,
+        signers[0].address,
+        signers[2].address
+      );
+      expect(borrower.repayZUSD).to.have.been.calledOnceWith(
+        100,
+        signers[0].address,
+        signers[2].address
+      );
+    });
+  });
+  describe("Close Credit Line and Withdraw Collateral", async () => {
+    it("should call close trove function", async () => {
+      await testIntegration.testCloseCreditLineAndWithdrawCollateral();
+      expect(borrower.closeTrove).to.be.calledOnce;
     });
   });
 });
