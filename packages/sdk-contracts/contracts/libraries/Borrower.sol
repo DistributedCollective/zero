@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-//import "../interfaces/IBorrowerOperations.sol";
 import "@sovryn-zero/contracts/contracts/Interfaces/IBorrowerOperations.sol";
 
 library Borrower {
@@ -22,7 +21,6 @@ library Borrower {
         address borrowerContract
     ) internal isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
-        //TODO: handle invalid contract address
         borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint);
     }
 

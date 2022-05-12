@@ -1,46 +1,52 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable camelcase */
+/* eslint-disable node/no-missing-import */
+
+import { TestIntegration } from "./../types/TestIntegration";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { TestIntegration__factory } from "./../types/factories/TestIntegration__factory";
+import { BorrowerImpl } from "../types/BorrowerImpl";
 import { ethers } from "hardhat";
 import chai from "chai";
-import { solidity } from "ethereum-waffle";
-// import { TestIntegration } from "../types/TestIntegration";
+import {
+  MockContractFactory,
+  MockContract,
+  FakeContract,
+  smock,
+} from "@defi-wonderland/smock";
 
-chai.use(solidity);
 const { expect } = chai;
-describe("Counter", () => {
-  let testIntegration: any;
-  let borrowerImpl: any;
+chai.use(smock.matchers);
+
+describe("Borrower Library", () => {
+  let testIntegrationFactory: MockContractFactory<TestIntegration__factory>;
+  let testIntegration: MockContract<TestIntegration>;
+  let borrower: FakeContract<BorrowerImpl>;
+  let signers: SignerWithAddress[];
   beforeEach(async () => {
-    const signers = await ethers.getSigners();
+    signers = await ethers.getSigners();
 
-    // Integration Contract deploy
-    const integrationFactory = await ethers.getContractFactory(
-      "TestIntegration",
-      signers[0]
+    borrower = await smock.fake<BorrowerImpl>("BorrowerImpl", {
+      address: signers[3].address,
+    });
+
+    testIntegrationFactory = await smock.mock<TestIntegration__factory>(
+      "TestIntegration"
     );
 
-    // Borrower Contract deploy
-    const borrowerImplFactory = await ethers.getContractFactory(
-      "BorrowerOperations",
-      signers[1]
-    );
-    // borrowerImpl = await borrowerImplFactory.deploy();
-    // await borrowerImpl.deployed();
-
-    // testIntegration = await integrationFactory.deploy(borrowerImpl.address);
-    // await testIntegration.deployed();
-    // console.log(borrowerImpl.address);
+    testIntegration = await testIntegrationFactory.deploy(borrower.address);
+    await testIntegration.deployed();
   });
-  // 4
-  describe("count up", async () => {
-    it("should count up", async () => {
-      const signers = await ethers.getSigners();
-      // expect(
-      //   await testIntegration.testOpenCreditLine(
-      //     1,
-      //     100,
-      //     signers[0].address,
-      //     signers[0].address
-      //   )
-      // ).to.emit(borrowerImpl, "TroveCreated");
+
+  describe("Borrowing operations", async () => {
+    it("should call open trove", async () => {
+      await testIntegration.testOpenCreditLine(
+        1,
+        100,
+        signers[0].address,
+        signers[2].address
+      );
+      expect(borrower.openTrove).to.have.been.called;
     });
   });
 });

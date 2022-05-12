@@ -49,6 +49,13 @@ export default {
         },
       },
     ],
+    settings: {
+      outputSelection: {
+        "*": {
+          "*": ["storageLayout"],
+        },
+      },
+    },
   },
   networks: {
     ropsten: {
