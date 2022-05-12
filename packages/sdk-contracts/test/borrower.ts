@@ -1,32 +1,30 @@
-import { objToString } from "@sovryn-zero/fuzzer/src/utils";
-import { BorrowerImpl } from "../types/BorrowerImpl";
 import { ethers } from "hardhat";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
-import { TestIntegration } from "../types/TestIntegration";
+// import { TestIntegration } from "../types/TestIntegration";
+
 chai.use(solidity);
 const { expect } = chai;
 describe("Counter", () => {
-  let testIntegration: TestIntegration;
-  let borrowerImpl: BorrowerImpl;
+  let testIntegration: any;
+  let borrowerImpl: any;
   beforeEach(async () => {
-    // 1
     const signers = await ethers.getSigners();
-    // 2
+
+    // Borrower Contract deploy
+    const borrowerImplFactory = await ethers.getContractFactory(
+      "BorrowerOperations",
+      signers[1]
+    );
+    borrowerImpl = await borrowerImplFactory.deploy();
+    await borrowerImpl.deployed();
+
+    // Integration Contract deploy
     const integrationFactory = await ethers.getContractFactory(
       "TestIntegration",
       signers[0]
     );
-
-    const borrowerImplFactory = await ethers.getContractFactory(
-      "BorrowerImpl",
-      signers[1]
-    );
-    borrowerImpl = (await borrowerImplFactory.deploy()) as BorrowerImpl;
-    await borrowerImpl.deployed();
-    testIntegration = (await integrationFactory.deploy(
-      borrowerImpl.address
-    )) as TestIntegration;
+    testIntegration = await integrationFactory.deploy(borrowerImpl.address);
     await testIntegration.deployed();
     console.log(borrowerImpl.address);
   });
