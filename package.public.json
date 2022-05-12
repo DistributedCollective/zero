@@ -26,9 +26,7 @@
     "prepare:lib-ethers:tsc": "yarn workspace @sovryn-zero/lib-ethers prepare:tsc",
     "prepare:lib-ethers:api": "yarn workspace @sovryn-zero/lib-ethers prepare:api",
     "prepare:lib-react": "yarn workspace @sovryn-zero/lib-react prepare",
-    "prepare:lib-subgraph": "yarn workspace @sovryn-zero/lib-subgraph prepare",
     "prepare:providers": "yarn workspace @sovryn-zero/providers prepare",
-    "prepare:subgraph": "yarn workspace @sovryn-zero/subgraph prepare",
     "prepare:docs": "run-s docs",
     "rebuild": "run-s prepare build",
     "start-dev-frontend": "yarn workspace @sovryn-zero/dev-frontend start"
