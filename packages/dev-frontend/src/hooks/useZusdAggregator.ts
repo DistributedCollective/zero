@@ -16,7 +16,11 @@ export default function useZusdAggregator(account: string | undefined | null) {
       const id = "mint-xusd";
       const disableCheck = true;
       try {
-        setTransactionState({ type: "waitingForApproval", id, disableCheck });
+        setTransactionState({
+          type: "waitingForApproval",
+          id,
+          disableCheck
+        });
         const _amount = parseUnits(amount, 18).toString();
         let tx = await zusd?.approve(addresses.babelfish, _amount);
         setTransactionState({
