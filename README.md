@@ -345,8 +345,6 @@ Thus, nodes need only be re-inserted to the sorted list upon a Line of Credit op
 
 ### Flow of RBTC in Liquity
 
-![Flow of RBTC](images/RBTC_flows.svg)
-
 RBTC in the system lives in three Pools: the ActivePool, the DefaultPool, and the StabilityPool. When an operation is made, RBTC is transferred in one of three ways:
 
 - From a user to a Pool
@@ -392,8 +390,6 @@ Likewise, the StabilityPool holds the total accumulated RBTC gains from liquidat
 | withdrawRBTCGainToTrove | depositor's accumulated RBTC gain | StabilityPool -> BorrowerOperations -> ActivePool |
 
 ### Flow of ZUSD tokens in Liquity
-
-![Flow of ZUSD](images/ZUSD_flows.svg)
 
 When a user borrows from their Line of Credit, ZUSD tokens are minted to their own address, and a debt is recorded on the Line of Credit. Conversely, when they repay their Line of Credit’s ZUSD debt, ZUSD is burned from their address, and the debt on their Line of Credit is reduced.
 
