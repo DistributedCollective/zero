@@ -13,10 +13,7 @@
       "**/babel*",
       "**/react-scripts",
       "**/typechain",
-      "**/@typechain/*",
-      "**/sdk-contracts/*",
-      "**/@defi-wonderland/*",
-      "**/hardhat-deploy"
+      "**/@typechain/*"
     ]
   },
   "release": {
