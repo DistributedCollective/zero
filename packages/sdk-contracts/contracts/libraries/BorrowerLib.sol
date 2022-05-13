@@ -3,7 +3,7 @@
 pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/Interfaces/IBorrowerOperations.sol";
 
-library Borrower {
+library BorrowerLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;
         assembly {

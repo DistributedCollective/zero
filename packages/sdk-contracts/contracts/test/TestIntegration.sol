@@ -16,7 +16,7 @@ contract TestIntegration {
         address _upperHint,
         address _lowerHint
     ) external {
-        Borrower.openCreditLineInZusd(
+        BorrowerLib.openCreditLineInZusd(
             _maxFeePercentage,
             _ZUSDAmount,
             _upperHint,
@@ -31,7 +31,13 @@ contract TestIntegration {
         address _upperHint,
         address _lowerHint
     ) external {
-        Borrower.withdrawZUSD(_maxFee, _amount, _upperHint, _lowerHint, borrowerContractAddress);
+        BorrowerLib.withdrawZUSD(
+            _maxFee,
+            _amount,
+            _upperHint,
+            _lowerHint,
+            borrowerContractAddress
+        );
     }
 
     function testRepayZUSD(
@@ -39,10 +45,10 @@ contract TestIntegration {
         address _upperHint,
         address _lowerHint
     ) external {
-        Borrower.repayZUSD(_amount, _upperHint, _lowerHint, borrowerContractAddress);
+        BorrowerLib.repayZUSD(_amount, _upperHint, _lowerHint, borrowerContractAddress);
     }
 
     function testCloseCreditLineAndWithdrawCollateral() external {
-        Borrower.closeCreditLineAndWithdrawCollateral(borrowerContractAddress);
+        BorrowerLib.closeCreditLineAndWithdrawCollateral(borrowerContractAddress);
     }
 }

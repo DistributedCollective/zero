@@ -6,7 +6,7 @@ import { TestIntegration } from "../types/TestIntegration";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { TestIntegration__factory } from "./../types/factories/TestIntegration__factory";
 import { BorrowerOperations } from "../types/BorrowerOperations";
-import hre, { ethers, deployments } from "hardhat";
+import { ethers } from "hardhat";
 import chai from "chai";
 import {
   MockContractFactory,
@@ -16,7 +16,6 @@ import {
 } from "@defi-wonderland/smock";
 
 const { expect } = chai;
-// const { getExtendedArtifact } = deployments;
 chai.use(smock.matchers);
 
 describe("Borrower Library Operations", () => {
@@ -26,16 +25,8 @@ describe("Borrower Library Operations", () => {
   let signers: SignerWithAddress[];
   beforeEach(async () => {
     signers = await ethers.getSigners();
-    const borrowerFactory = await ethers.getContractFactory(
-      "BorrowerOperations"
-    );
 
-    // const borrowerFactory = await getExtendedArtifact("BorrowerOperations");
-    borrower = await smock.fake<BorrowerOperations>(borrowerFactory);
-
-    /*  borrower = await smock.fake<BorrowerOperations>("BorrowerOperations", {
-      address: signers[3].address,
-    }); */
+    borrower = await smock.fake<BorrowerOperations>("BorrowerOperations");
 
     testIntegrationFactory = await smock.mock<TestIntegration__factory>(
       "TestIntegration"
