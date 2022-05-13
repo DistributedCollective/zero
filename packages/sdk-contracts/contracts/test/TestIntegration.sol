@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-import "./libraries/Borrower.sol";
+import "../libraries/BorrowerLib.sol";
 
 contract TestIntegration {
     address private borrowerContractAddress;
