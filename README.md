@@ -4,7 +4,7 @@
 
 Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "Trove", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
 
-An unprecedented liquidation mechanism based on incentivized stability pool deposits and a redistribution cycle from riskier to safer lines of credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
+An unprecedented liquidation mechanism based on incentivized stability pool deposits and a redistribution cycle from riskier to safer Lines of Credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
 
 ## More information
 
