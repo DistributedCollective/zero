@@ -56,7 +56,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Hint Helper Functions - `HintHelpers.sol`](#hint-helper-functions---hinthelperssol)
     - [Stability Pool Functions - `StabilityPool.sol`](#stability-pool-functions---stabilitypoolsol)
     - [ZUSD token `ZUSDToken.sol`](#zusd-token-zusdtokensol)
-  - [Supplying Hints to Line of Credit  operations](#supplying-hints-to-line-of-credit--operations)
+  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit--operations)
     - [Example Borrower Operations with Hints](#example-borrower-operations-with-hints)
       - [Opening a Line of Credit](#opening-a-line-of-credit)
       - [Adjusting a Line of Credit](#adjusting-a-line-of-credit)
