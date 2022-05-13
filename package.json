@@ -14,7 +14,9 @@
       "**/react-scripts",
       "**/typechain",
       "**/@typechain/*",
-      "**/sdk-contracts/*"
+      "**/sdk-contracts/*",
+      "**/@defi-wonderland/*",
+      "**/hardhat-deploy"
     ]
   },
   "release": {
