@@ -2,11 +2,11 @@
 /* eslint-disable camelcase */
 /* eslint-disable node/no-missing-import */
 
-import { TestIntegration } from "./../types/TestIntegration";
+import { TestIntegration } from "../types/TestIntegration";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { TestIntegration__factory } from "./../types/factories/TestIntegration__factory";
-import { BorrowerImpl } from "../types/BorrowerImpl";
-import { ethers } from "hardhat";
+import { BorrowerOperations } from "../types/BorrowerOperations";
+import hre, { ethers, deployments } from "hardhat";
 import chai from "chai";
 import {
   MockContractFactory,
@@ -16,19 +16,26 @@ import {
 } from "@defi-wonderland/smock";
 
 const { expect } = chai;
+// const { getExtendedArtifact } = deployments;
 chai.use(smock.matchers);
 
 describe("Borrower Library Operations", () => {
   let testIntegrationFactory: MockContractFactory<TestIntegration__factory>;
   let testIntegration: MockContract<TestIntegration>;
-  let borrower: FakeContract<BorrowerImpl>;
+  let borrower: FakeContract<BorrowerOperations>;
   let signers: SignerWithAddress[];
   beforeEach(async () => {
     signers = await ethers.getSigners();
+    const borrowerFactory = await ethers.getContractFactory(
+      "BorrowerOperations"
+    );
 
-    borrower = await smock.fake<BorrowerImpl>("BorrowerImpl", {
+    // const borrowerFactory = await getExtendedArtifact("BorrowerOperations");
+    borrower = await smock.fake<BorrowerOperations>(borrowerFactory);
+
+    /*  borrower = await smock.fake<BorrowerOperations>("BorrowerOperations", {
       address: signers[3].address,
-    });
+    }); */
 
     testIntegrationFactory = await smock.mock<TestIntegration__factory>(
       "TestIntegration"
