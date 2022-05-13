@@ -13,8 +13,7 @@
       "**/babel*",
       "**/react-scripts",
       "**/typechain",
-      "**/@typechain/*",
-      "**/sdk-contracts/*"
+      "**/@typechain/*"
     ]
   },
   "release": {
