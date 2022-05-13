@@ -972,8 +972,6 @@ Upon each debt issuance:
 
 `REDEMPTION_FEE_FLOOR` and `BORROWING_FEE_FLOOR` are both set to 0.5%, while `MAX_BORROWING_FEE` is 5% and `DECIMAL_PRECISION` is 100%.
 
--- TODO --
-
 ### Intuition behind fees
 
 The larger the redemption volume, the greater the fee percentage.
@@ -982,11 +980,11 @@ The longer the time delay since the last operation, the more the `baseRate` decr
 
 The intent is to throttle large redemptions with higher fees, and to throttle borrowing directly after large redemption volumes. The `baseRate` decay over time ensures that the fee for both borrowers and redeemers will “cool down”, while redemptions volumes are low.
 
-Furthermore, the fees cannot become smaller than 0.5%, which in the case of redemptions protects the redemption facility from being front-run by arbitrageurs that are faster than the price feed. The 5% maximum on the issuance is meant to keep the system (somewhat) attractive for new borrowers even in phases where the monetary is contracting due to redemptions.
+Furthermore, the fees cannot become smaller than 0.5%, which in the case of redemptions protects the redemption facility from being front-run by arbitrageurs that are faster than the price feed. The 5% maximum on the issuance is meant to keep the system (somewhat) attractive for new borrowers even in phases where the monetary supply is contracting due to redemptions.
 
 ### Fee decay Implementation
 
-Time is measured in units of minutes. The `baseRate` decay is based on `block.timestamp - lastFeeOpTime`. If less than a minute has passed since the last fee event, then `lastFeeOpTime` is not updated. This prevents “base rate griefing”: i.e. it prevents an attacker stopping the `baseRate` from decaying by making a series of redemptions or issuing ZUSD with time intervals of < 1 minute.
+Time is measured in units of minutes. The `baseRate` decay is based on `block.timestamp - lastFeeOpTime`. If less than a minute has passed since the last fee event, then `lastFeeOpTime` is not updated. This prevents “base rate griefing” i.e. it prevents an attacker stopping the `baseRate` from decaying by making a series of redemptions or issuing ZUSD with time intervals of < 1 minute.
 
 The decay parameter is tuned such that the fee changes by a factor of 0.99 per hour, i.e. it loses 1% of its current value per hour. At that rate, after one week, the baseRate decays to 18% of its prior value. The exact decay parameter is subject to change, and will be fine-tuned via economic modelling.
 
@@ -1000,43 +998,43 @@ This staking formula and implementation follows the basic [“Batog” pull-base
 
 ## Redistributions and Corrected Stakes
 
-When a liquidation occurs and the Stability Pool is empty or smaller than the liquidated debt, the redistribution mechanism should distribute the remaining collateral and debt of the liquidated Line of Credit , to all active lines of credit in the system, in proportion to their collateral.
+When a liquidation occurs and the Stability Pool is empty or smaller than the liquidated debt, the redistribution mechanism should distribute the remaining collateral and debt of the liquidated Line of Credit to all active Lines of Credit in the system, in proportion to their collateral.
 
-For two lines of credit A and B with collateral `A.coll > B.coll`, Line of Credit  A should earn a bigger share of the liquidated collateral and debt.
+For two Lines of Credit A and B with collateral `A.coll > B.coll`, Line of Credit A should earn a bigger share of the liquidated collateral and debt.
 
-In Zero it is important that all active lines of credit remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Line of Credit s’ collateral, preserves the ordering of active lines of credit by ICR, as liquidations occur over time.  Please see the [proofs section](https://github.com/liquity/dev/tree/main/packages/contracts/mathProofs).
+In Zero it is important that all active Lines of Credit remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Lines of Credit collateral preserves the ordering of active Lines of Credit by ICR as liquidations occur over time. Please see the [proofs section](https://github.com/liquity/dev/tree/main/packages/contracts/mathProofs).
 
-However, when it comes to implementation, RSK gas costs make it too expensive to loop over all lines of credit and write new data to storage for each one. When a Line of Credit  receives redistribution rewards, the system does not update the Line of Credit 's collateral and debt properties - instead, the Line of Credit ’s rewards remain "pending" until the borrower's next operation.
+However, when it comes to implementation, RSK gas costs make it too expensive to loop over all Lines of Credit and write new data to storage for each one. When a Line of Credit receives redistribution rewards, the system does not update the Line of Credit's collateral and debt properties - instead, the Line of Credit’s rewards remain "pending" until the borrower's next operation.
 
 These “pending rewards” can not be accounted for in future reward calculations in a scalable way.
 
-However: the ICR of a Line of Credit  is always calculated as the ratio of its total collateral to its total debt. So, a Line of Credit ’s ICR calculation **does** include all its previous accumulated rewards.
+However: the ICR of a Line of Credit is always calculated as the ratio of its total collateral to its total debt. So, a Line of Credit’s ICR calculation **does** include all its previous accumulated rewards.
 
-**This causes a problem: redistributions proportional to initial collateral can break Line of Credit  ordering.**
+**This causes a problem: redistributions proportional to initial collateral can break Line of Credit ordering.**
 
-Consider the case where new Line of Credit  is created after all active lines of credit have received a redistribution from a liquidation. This “fresh” Line of Credit  has then experienced fewer rewards than the older Line of Credit s, and thus, it receives a disproportionate share of subsequent rewards, relative to its total collateral.
+Consider the case where new Line of Credit is created after all active Lines of Credit have received a redistribution from a liquidation. This “fresh” Line of Credit  has then experienced fewer rewards than the older Lines of Credit, and thus, it receives a disproportionate share of subsequent rewards, relative to its total collateral.
 
-The fresh Line of Credit  would earns rewards based on its **entire** collateral, whereas old lines of credit would earn rewards based only on **some portion** of their collateral - since a part of their collateral is pending, and not included in the Line of Credit ’s `coll` property.
+The fresh Line of Credit would earn rewards based on its **entire** collateral, whereas old lines of credit would earn rewards based only on **some portion** of their collateral - since a part of their collateral is pending, and not included in the Line of Credit’s `coll` property.
 
-This can break the ordering of lines of credit by ICR - see the [proofs section](https://github.com/liquity/dev/tree/main/packages/contracts/mathProofs).
+This can break the ordering of Lines of Credit by ICR - see the [proofs section](https://github.com/liquity/dev/tree/main/packages/contracts/mathProofs).
 
 ### Corrected Stake Solution
 
-We use a corrected stake to account for this discrepancy, and ensure that newer lines of credit earn the same liquidation rewards per unit of total collateral, as do older lines of credit with pending rewards. Thus the corrected stake ensures the sorted list remains ordered by ICR, as liquidation events occur over time.
+We use a corrected stake to account for this discrepancy, and ensure that newer Lines of Credit earn the same liquidation rewards per unit of total collateral, as do older Lines of Credit with pending rewards. Thus the corrected stake ensures the sorted list remains ordered by ICR, as liquidation events occur over time.
 
-When a Line of Credit  is opened, its stake is calculated based on its collateral, and snapshots of the entire system collateral and debt which were taken immediately after the last liquidation.
+When a Line of Credit is opened, its stake is calculated based on its collateral, and snapshots of the entire system collateral and debt which were taken immediately after the last liquidation.
 
-A Line of Credit ’s stake is given by:
+A Line of Credit’s stake is given by:
 
 ```
 stake = _coll.mul(totalStakesSnapshot).div(totalCollateralSnapshot)
 ```
 
-It then earns redistribution rewards based on this corrected stake. A newly opened Line of Credit ’s stake will be less than its raw collateral, if the system contains active lines of credit with pending redistribution rewards when it was made.
+It then earns redistribution rewards based on this corrected stake. A newly opened Line of Credit’s stake will be less than its raw collateral, if the system contains active Lines of Credit with pending redistribution rewards when it was made.
 
-Whenever a borrower adjusts their Line of Credit ’s collateral, their pending rewards are applied, and a fresh corrected stake is computed.
+Whenever a borrower adjusts their Line of Credit’s collateral, their pending rewards are applied, and a fresh corrected stake is computed.
 
-To convince yourself this corrected stake preserves ordering of active lines of credit by ICR, please see the [proofs section](https://github.com/liquity/dev/blob/main/papers).
+To convince yourself this corrected stake preserves ordering of active Lines of Credit by ICR, please see the [proofs section](https://github.com/liquity/dev/blob/main/papers).
 
 ## Math Proofs
 
@@ -1044,36 +1042,36 @@ The Zero implementation relies on some important system properties and mathemati
 
 In particular, we have:
 
-- Proofs that Line of Credit  ordering is maintained throughout a series of liquidations and new Line of Credit  openings
+- Proofs that Line of Credit ordering is maintained throughout a series of liquidations and new Line of Credit openings
 - A derivation of a formula and implementation for a highly scalable (O(1) complexity) reward distribution in the Stability Pool, involving compounding and decreasing stakes.
 
 PDFs of these can be found in https://github.com/liquity/dev/blob/main/papers
 
 ## Definitions
 
-_**Trove:**_ a collateralized debt position, bound to a single RSK address. Also referred to as a “CDP” in similar protocols.
+_**Line of Credit:**_ a collateralized debt position, aka "Trove", bound to a single RSK address. Also referred to as a “CDP” in similar protocols.
 
-_**ZUSD**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any RSK address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 ZUSD is always exchangeable for $1 USD worth of RBTC.
+_**ZUSD**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any RSK address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 ZUSD is always exchangeable for 1 USD worth of RBTC, minus a redemption fee.
 
-_**Active Line of Credit :**_ an RSK address owns an “active Line of Credit ” if there is a node in the `SortedTroves` list with ID equal to the address, and non-zero collateral is recorded on the Line of Credit  struct for that address.
+_**Active Line of Credit:**_ an RSK address owns an “active Line of Credit” if there is a node in the `SortedTroves` list with ID equal to the address, and non-zero collateral is recorded on the Line of Credit struct for that address.
 
-_**Closed Line of Credit :**_ a Line of Credit  that was once active, but now has zero debt and zero collateral recorded on its struct, and there is no node in the `SortedTroves` list with ID equal to the owning address.
+_**Closed Line of Credit:**_ a Line of Credit that was once active, but now has zero debt and zero collateral recorded on its struct, and there is no node in the `SortedTroves` list with ID equal to the owning address.
 
-_**Active collateral:**_ the amount of RBTC collateral recorded on a Line of Credit ’s struct
+_**Active collateral:**_ the amount of RBTC collateral recorded on a Line of Credit’s struct
 
-_**Active debt:**_ the amount of ZUSD debt recorded on a Line of Credit ’s struct
+_**Active debt:**_ the amount of ZUSD debt recorded on a Line of Credit’s struct
 
-_**Entire collateral:**_ the sum of a Line of Credit ’s active collateral plus its pending collateral rewards accumulated from distributions
+_**Entire collateral:**_ the sum of a Line of Credit’s active collateral plus its pending collateral rewards accumulated from distributions
 
-_**Entire debt:**_ the sum of a Line of Credit ’s active debt plus its pending debt rewards accumulated from distributions
+_**Entire debt:**_ the sum of a Line of Credit’s active debt plus its pending debt rewards accumulated from distributions
 
-_**Individual collateralization ratio (ICR):**_ a Line of Credit 's ICR is the ratio of the dollar value of its entire collateral at the current RBTC:USD price, to its entire debt
+_**Individual collateralization ratio (ICR):**_ a Line of Credit's ICR is the ratio of the dollar value of its entire collateral at the current RBTC:USD price, to its entire debt
 
-_**Nominal collateralization ratio (nominal ICR, NICR):**_ a Line of Credit 's nominal ICR is its entire collateral (in RBTC) multiplied by 100e18 and divided by its entire debt.
+_**Nominal collateralization ratio (nominal ICR, NICR):**_ a Line of Credit's nominal ICR is its entire collateral (in RBTC) multiplied by 100e18 and divided by its entire debt.
 
-_**Total active collateral:**_ the sum of active collateral over all Line of Credit s. Equal to the RBTC in the ActivePool.
+_**Total active collateral:**_ the sum of active collateral over all Lines of Credit. Equal to the RBTC in the ActivePool.
 
-_**Total active debt:**_ the sum of active debt over all Line of Credit s. Equal to the ZUSD in the ActivePool.
+_**Total active debt:**_ the sum of active debt over all Lines of Credit. Equal to the ZUSD in the ActivePool.
 
 _**Total defaulted collateral:**_ the total RBTC collateral in the DefaultPool
 
@@ -1087,31 +1085,31 @@ _**Total collateralization ratio (TCR):**_ the ratio of the dollar value of the 
 
 _**Critical collateralization ratio (CCR):**_ 150%. When the TCR is below the CCR, the system enters Recovery Mode.
 
-_**Borrower:**_ an externally owned account or contract that locks collateral in a Line of Credit  and issues ZUSD tokens to their own address. They “borrow” ZUSD tokens against their RBTC collateral.
+_**Borrower:**_ an externally owned account or contract that locks collateral in a Line of Credit and issues ZUSD tokens to their own address. They “borrow” ZUSD against their RBTC collateral.
 
-_**Depositor:**_ an externally owned account or contract that has assigned ZUSD tokens to the Stability Pool, in order to earn returns from liquidations, and receive ZERO token issuance.
+_**Depositor:**_ an externally owned account or contract that has assigned ZUSD to the Stability Pool, in order to earn returns from liquidations.
 
-_**Redemption:**_ the act of swapping ZUSD tokens with the system, in return for an equivalent value of RBTC. Any account with a ZUSD token balance may redeem them, whether or not they are a borrower.
+_**Redemption:**_ the act of swapping ZUSD with the system, in return for an equivalent value of RBTC. Any account with a ZUSD balance may redeem them, whether or not they are a borrower.
 
-When ZUSD is redeemed for RBTC, the RBTC is always withdrawn from the lowest collateral Line of Credit s, in ascending order of their collateralization ratio. A redeemer can not selectively target lines of credit with which to swap ZUSD for RBTC.
+When ZUSD is redeemed for RBTC, the RBTC is always withdrawn from the lowest collateral Lines of Credit, in ascending order of their collateralization ratio. A redeemer can not selectively target Lines of Credit with which to swap ZUSD for RBTC.
 
-_**Repayment:**_ when a borrower sends ZUSD tokens to their own Line of Credit , reducing their debt, and increasing their collateralization ratio.
+_**Repayment:**_ when a borrower sends ZUSD to their own Line of Credit, reducing their debt, and increasing their collateralization ratio.
 
-_**Retrieval:**_ when a borrower with an active Line of Credit  withdraws some or all of their RBTC collateral from their own Line of Credit , either reducing their collateralization ratio, or closing their Line of Credit  (if they have zero debt and withdraw all their RBTC)
+_**Retrieval:**_ when a borrower with an active Line of Credit withdraws some or all of their RBTC collateral from their own Line of Credit, either reducing their collateralization ratio, or closing their Line of Credit (if they have zero debt and withdraw all their RBTC)
 
-_**Liquidation:**_ the act of force-closing an undercollateralized Line of Credit  and redistributing its collateral and debt. When the Stability Pool is sufficiently large, the liquidated debt is offset with the Stability Pool, and the RBTC distributed to depositors. If the liquidated debt can not be offset with the Pool, the system redistributes the liquidated collateral and debt directly to the active lines of credit with >110% collateralization ratio.
+_**Liquidation:**_ the act of force-closing an undercollateralized Line of Credit and redistributing its collateral and debt. When the Stability Pool is sufficiently large, the liquidated debt is offset with the Stability Pool, and the RBTC distributed to depositors. If the liquidated debt can not be offset with the Stability Pool, the system redistributes the liquidated collateral and debt directly to the active Lines of Credit with >110% collateralization ratio.
 
-Liquidation functionality is permissionless and publically available - anyone may liquidate an undercollateralized Line of Credit , or batch liquidate lines of credit in ascending order of collateralization ratio.
+Liquidation functionality is permissionless and publicly available - anyone may liquidate an undercollateralized Line of Credit, or batch liquidate Lines of Credit in ascending order of collateralization ratio.
 
-_**Collateral Surplus**_: The difference between the dollar value of a Line of Credit 's RBTC collateral, and the dollar value of its ZUSD debt. In a full liquidation, this is the net gain earned by the recipients of the liquidation.
+_**Collateral Surplus**_: The difference between the dollar value of a Line of Credit's RBTC collateral, and the dollar value of its ZUSD debt. In a full liquidation, this is the net gain earned by the recipients of the liquidation.
 
 _**Offset:**_ cancellation of liquidated debt with ZUSD in the Stability Pool, and assignment of liquidated collateral to Stability Pool depositors, in proportion to their deposit.
 
-_**Redistribution:**_ assignment of liquidated debt and collateral directly to active Line of Credit s, in proportion to their collateral.
+_**Redistribution:**_ assignment of liquidated debt and collateral directly to active Lines of Credit, in proportion to their collateral.
 
-_**Pure offset:**_  when a Line of Credit's debt is entirely cancelled with ZUSD in the Stability Pool, and all of it's liquidated RBTC collateral is assigned to Stability Providers.
+_**Pure offset:**_  when a Line of Credit's debt is entirely cancelled with ZUSD in the Stability Pool, and all of its liquidated RBTC collateral is assigned to Stability Pool depositors.
 
-_**Mixed offset and redistribution:**_  When the Stability Pool ZUSD only covers a fraction of the liquidated Line of Credit's debt.  This fraction of debt is cancelled with ZUSD in the Stability Pool, and an equal fraction of the Line of Credit's collateral is assigned to depositors. The remaining collateral & debt is redistributed directly to active Lines of Credit.
+_**Mixed offset and redistribution:**_  When the Stability Pool ZUSD only covers a fraction of the liquidated Line of Credit's debt. This fraction of debt is cancelled with ZUSD in the Stability Pool, and an equal fraction of the Line of Credit's collateral is assigned to depositors. The remaining collateral & debt is redistributed directly to active Lines of Credit.
 
 _**Gas compensation:**_ A refund, in ZUSD and RBTC, automatically paid to the caller of a liquidation function, intended to at least cover the gas cost of the transaction. Designed to ensure that liquidators are not dissuaded by potentially high gas costs.
 
@@ -1182,7 +1180,7 @@ To publish a new deployment, you must execute the above command for all of the f
 | ------- | -------- |
 | rsktestnet | default  |
 | rsktestnet | internal |
-| rskmainnet   | default  |
+| rskmainnet | default  |
 
 At some point in the future, we will make this process automatic. Once you're done deploying to all the networks, execute the following command:
 
@@ -1340,14 +1338,14 @@ The content of this readme document (“Readme”) is of purely informational na
 
 Please read this Disclaimer carefully before accessing, interacting with, or using the Zero Protocol software, consisting of the Zero Protocol technology stack (in particular its smart contracts) as well as any other Zero technology such as e.g., the launch kit for frontend operators (together the “Zero Protocol Software”). 
 
-While Sovryn developed the Zero Protocol Software, the Zero Protocol Software runs in a fully decentralized and autonomous manner on the RSK network. Sovryn is not involved in the operation of the Zero Protocol Software nor has it any control over transactions made using its smart contracts. Further, Sovryn does neither enter into any relationship with users of the Zero Protocol Software and/or frontend operators, nor does it operate an own frontend. Any and all functionalities of the Zero Protocol Software, including ZUSD, are of purely technical nature and there is no claim towards any private individual or legal entity in this regard.
+While Sovryn developed the Zero Protocol Software, the Zero Protocol Software runs in a fully decentralized and autonomous manner on the RSK network. Any and all functionalities of the Zero Protocol Software, including ZUSD, are of purely technical nature and there is no claim towards any private individual or legal entity in this regard.
 
 SOVRYN IS NOT LIABLE TO ANY USER FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, IN CONNECTION WITH THE USE OR INABILITY TO USE THE ZERO PROTOCOL SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF RBTC, ZUSD, OR SOV, NON-ALLOCATION OF TECHNICAL FEES TO SOV HOLDERS, LOSS OF DATA, BUSINESS INTERRUPTION, DATA BEING RENDERED INACCURATE OR OTHER LOSSES SUSTAINED BY A USER OR THIRD PARTIES AS A RESULT OF THE ZERO PROTOCOL SOFTWARE AND/OR ANY ACTIVITY OF A FRONTEND OPERATOR OR A FAILURE OF THE ZERO PROTOCOL SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE).
 
 The Zero Protocol Software has been developed and published under the GNU GPL v3 open-source license, which forms an integral part of this disclaimer. 
 
-THE ZERO PROTOCOL SOFTWARE HAS BEEN PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE ZERO PROTOCOL SOFTWARE IS HIGHLY EXPERIMENTAL AND ANY REAL RBTC AND/OR ZUSD AND/OR SOV SENT, STAKED OR DEPOSITED TO THE ZERO PROTOCOL SOFTWARE ARE AT RISK OF BEING LOST INDEFINITELY, WITHOUT ANY KIND OF CONSIDERATION.
+THE ZERO PROTOCOL SOFTWARE HAS BEEN PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. THE ZERO PROTOCOL SOFTWARE IS HIGHLY EXPERIMENTAL AND ANY REAL RBTC AND/OR ZUSD AND/OR SOV SENT, STAKED, OR DEPOSITED TO THE ZERO PROTOCOL SOFTWARE ARE AT RISK OF BEING LOST INDEFINITELY, WITHOUT ANY KIND OF CONSIDERATION.
 
 There are no official frontend operators, and the use of any frontend is made by users at their own risk. To assess the trustworthiness of a frontend operator lies in the sole responsibility of the users and must be made carefully.
 
-User is solely responsible for complying with applicable law when interacting (in particular, when using RBTC, ZUSD, SOV, or other Token) with the Zero Protocol Software whatsoever. 
+User is solely responsible for complying with applicable law when interacting (in particular, when using RBTC, ZUSD, SOV, or other Token) with the Zero Protocol Software whatsoever.
