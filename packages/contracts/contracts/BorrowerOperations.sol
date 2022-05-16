@@ -208,8 +208,8 @@ contract BorrowerOperations is
         vars.compositeDebt = _getCompositeDebt(vars.netDebt);
         assert(vars.compositeDebt > 0);
 
-        vars.ICR = LiquityMath._computeCR(value, vars.compositeDebt, vars.price);
-        vars.NICR = LiquityMath._computeNominalCR(value, vars.compositeDebt);
+        vars.ICR = LiquityMath._computeCR(msg.value, vars.compositeDebt, vars.price);
+        vars.NICR = LiquityMath._computeNominalCR(msg.value, vars.compositeDebt);
 
         if (isRecoveryMode) {
             _requireICRisAboveCCR(vars.ICR);

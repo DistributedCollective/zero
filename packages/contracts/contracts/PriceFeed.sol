@@ -7,30 +7,26 @@ import "./Dependencies/CheckContract.sol";
 import "./PriceFeedStorage.sol";
 
 /// @title The system price feed adapter
-/// @notice The PriceFeed relies upon a main oracle and a secondary as a fallback in case of error 
+/// @notice The PriceFeed relies upon a main oracle and a secondary as a fallback in case of error
 contract PriceFeed is PriceFeedStorage, IPriceFeed {
-
     event LastGoodPriceUpdated(uint256 _lastGoodPrice);
     event PriceFeedBroken(uint8 index, address priceFeedAddress);
     event PriceFeedUpdated(uint8 index, address newPriceFeedAddress);
-    
+
     // --- Dependency setters ---
 
     function setAddresses(address _mainPriceFeed, address _backupPriceFeed) external onlyOwner {
         setAddress(0, _mainPriceFeed);
         setAddress(1, _backupPriceFeed);
 
-        // Get an initial price
-        (uint256 price, bool success) = priceFeeds[0].latestAnswer();
-        require(success, "PriceFeed: Main price feed must be working");
-
+        (uint256 price, ) = priceFeeds[0].latestAnswer();
         _storePrice(price);
     }
 
     // --- Functions ---
 
-    /// @notice Returns the latest price obtained from the Oracle. Called by Liquity functions that require a current price. 
-    ///         It uses the main price feed and fallback to the backup one in case of an error. If both fail return the last 
+    /// @notice Returns the latest price obtained from the Oracle. Called by Liquity functions that require a current price.
+    ///         It uses the main price feed and fallback to the backup one in case of an error. If both fail return the last
     ///         good price seen.
     /// @dev It's also callable by anyone externally
     /// @return The price
@@ -54,6 +50,8 @@ contract PriceFeed is PriceFeedStorage, IPriceFeed {
         require(_index < priceFeeds.length, "Out of bounds when setting the price feed");
         checkContract(_newPriceFeed);
         priceFeeds[_index] = IExternalPriceFeed(_newPriceFeed);
+        (, bool success) = priceFeeds[_index].latestAnswer();
+        require(success, "PriceFeed: Price feed must be working");
         emit PriceFeedUpdated(_index, _newPriceFeed);
     }
 
