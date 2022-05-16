@@ -114,7 +114,10 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
             emit TotalZEROStakedUpdated(totalZEROStaked);
 
             // Transfer unstaked ZERO to user
-            require(zeroToken.transfer(msg.sender, ZEROToWithdraw), "Coudn't execute ZUSD transfer");
+            require(
+                zeroToken.transfer(msg.sender, ZEROToWithdraw),
+                "Couldn't execute ZUSD transfer"
+            );
 
             emit StakeChanged(msg.sender, newStake);
         }
@@ -122,7 +125,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         emit StakingGainsWithdrawn(msg.sender, ZUSDGain, ETHGain);
 
         // Send accumulated ZUSD and ETH gains to the caller
-        require(zusdToken.transfer(msg.sender, ZUSDGain), "Coudn't execute ZUSD transfer");
+        require(zusdToken.transfer(msg.sender, ZUSDGain), "Couldn't execute ZUSD transfer");
         _sendETHGainToUser(ETHGain);
     }
 

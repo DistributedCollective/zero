@@ -169,7 +169,7 @@ contract BorrowerOperations is
         require(address(masset) != address(0), "Masset address not set");
 
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, address(this));
-        require(zusdToken.transfer(address(masset), _ZUSDAmount), "Coudn't execute ZUSD transfer");
+        require(zusdToken.transfer(address(masset), _ZUSDAmount), "Couldn't execute ZUSD transfer");
         masset.onTokensMinted(_ZUSDAmount, address(zusdToken), abi.encode(msg.sender));
     }
 
@@ -352,7 +352,10 @@ contract BorrowerOperations is
             address(this)
         );
         if (_isDebtIncrease && _ZUSDChange > 0) {
-            require(zusdToken.transfer(address(masset), _ZUSDChange), "Coudn't execute ZUSD transfer");
+            require(
+                zusdToken.transfer(address(masset), _ZUSDChange),
+                "Couldn't execute ZUSD transfer"
+            );
             masset.onTokensMinted(_ZUSDChange, address(zusdToken), abi.encode(msg.sender));
         }
     }
