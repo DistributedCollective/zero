@@ -91,9 +91,10 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
 
         // Send fee to ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
-        zusdToken.transfer(address(zeroStaking), feeToZeroStaking);
-        zeroStaking.increaseF_ZUSD(feeToZeroStaking);
-
+        if (feeToZeroStaking != 0) {
+            zusdToken.transfer(address(zeroStaking), feeToZeroStaking);
+            zeroStaking.increaseF_ZUSD(feeToZeroStaking);
+        }
         emit ZUSDDistributed(toDistribute);
     }
 
