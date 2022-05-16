@@ -349,8 +349,6 @@ contract BorrowerOperations is
             _upperHint,
             _lowerHint,
             _maxFeePercentage,
-            msg.sender,
-            msg.value,
             address(this)
         );
         if (_isDebtIncrease && _ZUSDChange > 0) {
@@ -376,8 +374,6 @@ contract BorrowerOperations is
             _upperHint,
             _lowerHint,
             _maxFeePercentage,
-            msg.sender,
-            msg.value,
             msg.sender
         );
     }
@@ -397,8 +393,6 @@ contract BorrowerOperations is
         address _upperHint,
         address _lowerHint,
         uint256 _maxFeePercentage,
-        address _sender,
-        uint256 _value,
         address _tokensRecipient
     ) internal {
         ContractsCache memory contractsCache = ContractsCache(troveManager, activePool, zusdToken);
@@ -417,14 +411,14 @@ contract BorrowerOperations is
 
         // Confirm the operation is either a borrower adjusting their own trove, or a pure ETH transfer from the Stability Pool to a trove
         assert(
-            _sender == _borrower ||
-                (_sender == stabilityPoolAddress && _value > 0 && _ZUSDChange == 0)
+            msg.sender == _borrower ||
+                (msg.sender == stabilityPoolAddress && msg.value > 0 && _ZUSDChange == 0)
         );
 
         contractsCache.troveManager.applyPendingRewards(_borrower);
 
         // Get the collChange based on whether or not ETH was sent in the transaction
-        (vars.collChange, vars.isCollIncrease) = _getCollChange(_value, _collWithdrawal);
+        (vars.collChange, vars.isCollIncrease) = _getCollChange(msg.value, _collWithdrawal);
 
         vars.netDebtChange = _ZUSDChange;
 
@@ -498,13 +492,13 @@ contract BorrowerOperations is
             vars.stake,
             BorrowerOperation.adjustTrove
         );
-        emit ZUSDBorrowingFeePaid(_sender, vars.ZUSDFee);
+        emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
 
         // Use the unmodified _ZUSDChange here, as we don't send the fee to the user
         _moveTokensAndETHfromAdjustment(
             contractsCache.activePool,
             contractsCache.zusdToken,
-            _sender,
+            msg.sender,
             vars.collChange,
             vars.isCollIncrease,
             _ZUSDChange,
