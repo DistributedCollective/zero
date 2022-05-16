@@ -109,10 +109,11 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
 
         // Send the ETH fee to the ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
-        (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
-        require(success, "FeeDistributor: sending ETH failed");
-        zeroStaking.increaseF_ETH(feeToZeroStaking);
-
+        if (feeToZeroStaking != 0) {
+            (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
+            require(success, "FeeDistributor: sending ETH failed");
+            zeroStaking.increaseF_ETH(feeToZeroStaking);
+        }
         emit RBTCistributed(toDistribute);
     }
 
