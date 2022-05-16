@@ -36,6 +36,14 @@ const MockBalanceRedirectPresale = artifacts.require("./MockBalanceRedirectPresa
 // FIXME: this one should be removed after liquidity mining is correctly deployed
 const NonPayable = artifacts.require("./NonPayable.sol")
 
+// Proxy scripts
+const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript')
+const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript')
+const TroveManagerScript = artifacts.require('TroveManagerScript')
+const StabilityPoolScript = artifacts.require('StabilityPoolScript')
+const TokenScript = artifacts.require('TokenScript')
+const ZEROStakingScript = artifacts.require('ZEROStakingScript')
+
 const {
   buildUserProxies,
   BorrowerOperationsProxy,
