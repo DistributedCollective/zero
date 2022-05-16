@@ -8,9 +8,10 @@ const whitelistClient = axios.create({
   baseURL: "https://whitelist.test.sovryn.app/"
 });
 
-export const registerEmail = (email: string): Promise<AxiosResponse<any>> =>
+export const registerEmail = (email: string, ref: string): Promise<AxiosResponse<any>> =>
   whitelistClient.post("register/" + WhitelistType.ZERO, {
-    email
+    email,
+    ref
   });
 
 export const checkAccountAccess = (account: string): Promise<AxiosResponse<any>> =>

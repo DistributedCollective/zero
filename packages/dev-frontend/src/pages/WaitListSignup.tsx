@@ -6,12 +6,15 @@ import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
+import { useLocation } from "react-router-dom";
 
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
+
+  const location = useLocation();
 
   const isValidEmail = useMemo(() => validateEmail(email), [email]);
 
@@ -32,13 +35,16 @@ export const WaitListSignup: React.FC = ({ children }) => {
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      const params = new URLSearchParams(location.search);
+
+      const ref = params.get("r") || "";
       resetStatus();
       if (!isValidEmail) {
         return;
       }
       try {
         setIsLoading(true);
-        await registerEmail(email);
+        await registerEmail(email, ref);
 
         setEmail("");
         setErrorMessage("");
@@ -53,7 +59,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         setIsLoading(false);
       }
     },
-    [email, isValidEmail, resetStatus]
+    [email, isValidEmail, location.search, resetStatus]
   );
 
   return (

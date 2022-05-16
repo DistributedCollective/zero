@@ -48,7 +48,11 @@ export const Convert: React.FC = () => {
           <Text sx={{ fontSize: 2, fontWeight: 700, mt: 2 }}>
             {parseBalance(data ?? 0, decimals)} XUSD
           </Text>
-          <Button onClick={() => redeem(data.toString())} disabled={isZero(data.toString())} sx={{ mt: 3 }}>
+          <Button
+            onClick={() => redeem((data || "")?.toString())}
+            disabled={isZero((data || "")?.toString())}
+            sx={{ mt: 3 }}
+          >
             Convert All
           </Button>
         </Flex>
