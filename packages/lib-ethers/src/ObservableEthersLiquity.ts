@@ -7,7 +7,7 @@ import {
   StabilityDeposit,
   Trove,
   TroveWithPendingRedistribution
-} from "@liquity/lib-base";
+} from "@sovryn-zero/lib-base";
 
 import { _getContracts, _requireAddress } from "./EthersLiquityConnection";
 import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
@@ -213,7 +213,7 @@ export class ObservableEthersLiquity implements ObservableLiquity {
     const { nueToken } = _getContracts(this._readable.connection);
 
     if (!nueToken) {
-      throw "nue token address not set"
+      throw "nue token address not set";
     }
 
     const { Transfer } = nueToken.filters;

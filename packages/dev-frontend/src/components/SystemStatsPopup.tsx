@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Container, Flex, Button } from "theme-ui";
 
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { Icon } from "./Icon";
 import { SystemStats } from "./SystemStats";

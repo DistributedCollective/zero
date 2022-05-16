@@ -1,5 +1,5 @@
 {
-  "name": "@liquity/lib-ethers",
+  "name": "@sovryn-zero/lib-ethers",
   "version": "0.0.0-semantic-release",
   "description": "Liquity SDK Ethers-based implementation",
   "keywords": [
@@ -34,7 +34,7 @@
     "test-live:run": "cross-env USE_LIVE_VERSION=true hardhat test"
   },
   "peerDependencies": {
-    "@liquity/lib-base": "^3.0.0",
+    "@sovryn-zero/lib-base": "^3.0.0",
     "ethers": "^5.0.0"
   },
   "devDependencies": {

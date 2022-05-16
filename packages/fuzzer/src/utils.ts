@@ -11,9 +11,9 @@ import {
   TroveWithPendingRedistribution,
   ReadableLiquity,
   ZUSD_LIQUIDATION_RESERVE
-} from "@liquity/lib-base";
-import { EthersLiquity, ReadableEthersLiquity } from "@liquity/lib-ethers";
-import { SubgraphLiquity } from "@liquity/lib-subgraph";
+} from "@sovryn-zero/lib-base";
+import { EthersLiquity, ReadableEthersLiquity } from "@sovryn-zero/lib-ethers";
+// import { SubgraphLiquity } from "@sovryn-zero/lib-subgraph";
 
 export const objToString = (o: Record<string, unknown>) =>
   "{ " +
@@ -240,7 +240,7 @@ const checks = [
   new EqualityCheck("tokensInStabilityPool", l => l.getZUSDInStabilityPool(), decimalsEqual)
 ];
 
-export const checkSubgraph = async (subgraph: SubgraphLiquity, l1Liquity: ReadableLiquity) => {
+/* export const checkSubgraph = async (subgraph: SubgraphLiquity, l1Liquity: ReadableLiquity) => {
   await Promise.all(checks.map(check => check.allEqual([subgraph, l1Liquity])));
 
   const l1ListOfTroves = await getListOfTrovesBeforeRedistribution(l1Liquity);
@@ -256,7 +256,7 @@ export const checkSubgraph = async (subgraph: SubgraphLiquity, l1Liquity: Readab
     dumpTroves(subgraphListOfTroves, totalRedistributed, price);
     throw new Error("subgraph sorting broken");
   }
-};
+}; */
 
 export const shortenAddress = (address: string) => address.substr(0, 6) + "..." + address.substr(-4);
 

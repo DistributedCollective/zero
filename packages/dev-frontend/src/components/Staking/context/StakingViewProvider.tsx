@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-import { LiquityStoreState, ZEROStake } from "@liquity/lib-base";
-import { LiquityStoreUpdate, useLiquityReducer } from "@liquity/lib-react";
+import { LiquityStoreState, ZEROStake } from "@sovryn-zero/lib-base";
+import { LiquityStoreUpdate, useLiquityReducer } from "@sovryn-zero/lib-react";
 
 import { useMyTransactionState } from "../../Transaction";
 

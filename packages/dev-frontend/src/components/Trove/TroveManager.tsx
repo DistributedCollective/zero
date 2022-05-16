@@ -1,9 +1,15 @@
 import { useCallback, useEffect } from "react";
 import { Flex, Button } from "theme-ui";
 
-import { LiquityStoreState, Decimal, Trove, Decimalish, ZUSD_MINIMUM_DEBT } from "@liquity/lib-base";
+import {
+  LiquityStoreState,
+  Decimal,
+  Trove,
+  Decimalish,
+  ZUSD_MINIMUM_DEBT
+} from "@sovryn-zero/lib-base";
 
-import { LiquityStoreUpdate, useLiquityReducer, useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreUpdate, useLiquityReducer, useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
