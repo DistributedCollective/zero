@@ -16,11 +16,10 @@ contract PriceFeed is PriceFeedStorage, IPriceFeed {
     // --- Dependency setters ---
 
     function setAddresses(address _mainPriceFeed, address _backupPriceFeed) external onlyOwner {
-        setAddress(0, _mainPriceFeed);
+        uint256 latestPrice = setAddress(0, _mainPriceFeed);
         setAddress(1, _backupPriceFeed);
 
-        (uint256 price, ) = priceFeeds[0].latestAnswer();
-        _storePrice(price);
+        _storePrice(latestPrice);
     }
 
     // --- Functions ---
@@ -46,13 +45,15 @@ contract PriceFeed is PriceFeedStorage, IPriceFeed {
     /// @notice Allows users to setup the main and the backup price feeds
     /// @param _index the oracle to be configured
     /// @param _newPriceFeed address where an IExternalPriceFeed implementation is located
-    function setAddress(uint8 _index, address _newPriceFeed) public onlyOwner {
+    /// @return price the latest price of the inserted price feed
+    function setAddress(uint8 _index, address _newPriceFeed) public onlyOwner returns (uint256) {
         require(_index < priceFeeds.length, "Out of bounds when setting the price feed");
         checkContract(_newPriceFeed);
         priceFeeds[_index] = IExternalPriceFeed(_newPriceFeed);
-        (, bool success) = priceFeeds[_index].latestAnswer();
+        (uint256 price, bool success) = priceFeeds[_index].latestAnswer();
         require(success, "PriceFeed: Price feed must be working");
         emit PriceFeedUpdated(_index, _newPriceFeed);
+        return price;
     }
 
     // --- Helper functions ---
