@@ -38,31 +38,40 @@ describe("Borrower Library Operations", () => {
 
   describe("Borrowing ZUSD", async () => {
     it("should call withdraw function with correct parameters", async () => {
-      await testIntegration.testWithdrawZUSD(
+      await testIntegration.testOpenCreditLine(
+        1,
+        100
+      );
+      expect(borrower.openTrove).to.have.been.calledOnceWith(
         1,
         100,
         signers[0].address,
-        signers[2].address
+        signers[0].address
+      );
+    });
+  });
+
+  describe("Withdrawing ZUSD", async () => {
+    it("should call withdraw function with correct parameters", async () => {
+      await testIntegration.testWithdrawZUSD(
+        1,
+        100
       );
       expect(borrower.withdrawZUSD).to.have.been.calledOnceWith(
         1,
         100,
         signers[0].address,
-        signers[2].address
+        signers[0].address
       );
     });
   });
   describe("Repaying ZUSD", async () => {
     it("should call repay function with correct parameters", async () => {
-      await testIntegration.testRepayZUSD(
-        100,
-        signers[0].address,
-        signers[2].address
-      );
+      await testIntegration.testRepayZUSD(100);
       expect(borrower.repayZUSD).to.have.been.calledOnceWith(
         100,
         signers[0].address,
-        signers[2].address
+        signers[0].address
       );
     });
   });
