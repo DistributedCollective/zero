@@ -32,7 +32,7 @@ export const Convert: React.FC = () => {
     >
       <Flex sx={{ alignItems: "center", justifyContent: "space-around", py: 4 }}>
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300 }}>
-          <Text> ZUSD Balane</Text>
+          <Text> ZUSD Balance</Text>
           <Text sx={{ fontSize: 2, fontWeight: 700, mt: 2 }}>{zusdBalance.prettify()} ZUSD</Text>
           <Button
             onClick={() => mint(zusdBalance.toString())}
@@ -44,7 +44,7 @@ export const Convert: React.FC = () => {
         </Flex>
 
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300 }}>
-          <Text> XUSD Balane</Text>
+          <Text> XUSD Balance</Text>
           <Text sx={{ fontSize: 2, fontWeight: 700, mt: 2 }}>
             {parseBalance(data ?? 0, decimals)} XUSD
           </Text>

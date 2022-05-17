@@ -16,7 +16,7 @@ const select = ({ accountBalance, zusdBalance, zeroBalance, nueBalance }: Liquit
 });
 
 export const UserAccount: React.FC = () => {
-  const { accountBalance, zusdBalance, nueBalance } = useLiquitySelector(select);
+  const { accountBalance, zusdBalance } = useLiquitySelector(select);
 
   return (
     <Box sx={{ display: ["none", "flex"] }}>
@@ -25,8 +25,7 @@ export const UserAccount: React.FC = () => {
 
         {([
           ["RBTC", accountBalance],
-          [COIN, zusdBalance],
-          [COIN2, nueBalance]
+          [COIN, zusdBalance]
           // [GT, zeroBalance]
         ] as const).map(([currency, balance], i) => (
           <Flex key={i} sx={{ ml: 3, flexDirection: "column", fontWeight: 600 }}>
