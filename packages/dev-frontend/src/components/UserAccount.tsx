@@ -1,8 +1,8 @@
 import React from "react";
 import { Text, Flex, Box, Heading } from "theme-ui";
 
-import { LiquityStoreState } from "@sovryn-zero/lib-base";
-import { useLiquitySelector } from "@sovryn-zero/lib-react";
+import { LiquityStoreState } from "@liquity/lib-base";
+import { useLiquitySelector } from "@liquity/lib-react";
 
 import { COIN, COIN2, GT } from "../strings";
 import { useLiquity } from "../hooks/LiquityContext";

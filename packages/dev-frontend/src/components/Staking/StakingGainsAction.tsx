@@ -1,7 +1,7 @@
 import { Button } from "theme-ui";
 
-import { LiquityStoreState } from "@sovryn-zero/lib-base";
-import { useLiquitySelector } from "@sovryn-zero/lib-react";
+import { LiquityStoreState } from "@liquity/lib-base";
+import { useLiquitySelector } from "@liquity/lib-react";
 
 import { useLiquity } from "../../hooks/LiquityContext";
 import { useTransactionFunction } from "../Transaction";

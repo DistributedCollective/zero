@@ -31,7 +31,7 @@ import {
   _normalizeTroveCreation,
   _pendingReceipt,
   _successfulReceipt
-} from "@sovryn-zero/lib-base";
+} from "@liquity/lib-base";
 
 import {
   EthersPopulatedTransaction,
@@ -120,7 +120,7 @@ function* generateTrials(totalNumberOfTrials: number) {
  */
 export class SentEthersLiquityTransaction<T = unknown>
   implements
-    SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
+  SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
   /** Ethers' representation of a sent transaction. */
   readonly rawSentTransaction: EthersTransactionResponse;
 
@@ -142,20 +142,20 @@ export class SentEthersLiquityTransaction<T = unknown>
     return rawReceipt
       ? rawReceipt.status
         ? _successfulReceipt(rawReceipt, this._parse(rawReceipt), () =>
-            logsToString(rawReceipt, _getContracts(this._connection))
-          )
+          logsToString(rawReceipt, _getContracts(this._connection))
+        )
         : _failedReceipt(rawReceipt)
       : _pendingReceipt;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SentLiquityTransaction.getReceipt} */
+  /** {@inheritDoc @liquity/lib-base#SentLiquityTransaction.getReceipt} */
   async getReceipt(): Promise<LiquityReceipt<EthersTransactionReceipt, T>> {
     return this._receiptFrom(
       await _getProvider(this._connection).getTransactionReceipt(this.rawSentTransaction.hash)
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SentLiquityTransaction.waitForReceipt} */
+  /** {@inheritDoc @liquity/lib-base#SentLiquityTransaction.waitForReceipt} */
   async waitForReceipt(): Promise<MinedReceipt<EthersTransactionReceipt, T>> {
     const receipt = this._receiptFrom(
       await _getProvider(this._connection).waitForTransaction(this.rawSentTransaction.hash)
@@ -176,7 +176,7 @@ export class SentEthersLiquityTransaction<T = unknown>
  */
 export class PopulatedEthersLiquityTransaction<T = unknown>
   implements
-    PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
+  PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
   /** Unsigned transaction object populated by Ethers. */
   readonly rawPopulatedTransaction: EthersPopulatedTransaction;
 
@@ -194,7 +194,7 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
     this._parse = parse;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedLiquityTransaction.send} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedLiquityTransaction.send} */
   async send(): Promise<SentEthersLiquityTransaction<T>> {
     return new SentEthersLiquityTransaction(
       await _requireSigner(this._connection).sendTransaction(this.rawPopulatedTransaction),
@@ -205,25 +205,25 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
 }
 
 /**
- * {@inheritDoc @sovryn-zero/lib-base#PopulatedRedemption}
+ * {@inheritDoc @liquity/lib-base#PopulatedRedemption}
  *
  * @public
  */
 export class PopulatedEthersRedemption
   extends PopulatedEthersLiquityTransaction<RedemptionDetails>
   implements
-    PopulatedRedemption<
-      EthersPopulatedTransaction,
-      EthersTransactionResponse,
-      EthersTransactionReceipt
-    > {
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedRedemption.attemptedZUSDAmount} */
+  PopulatedRedemption<
+  EthersPopulatedTransaction,
+  EthersTransactionResponse,
+  EthersTransactionReceipt
+  > {
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.attemptedZUSDAmount} */
   readonly attemptedZUSDAmount: Decimal;
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedRedemption.redeemableZUSDAmount} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.redeemableZUSDAmount} */
   readonly redeemableZUSDAmount: Decimal;
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedRedemption.isTruncated} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.isTruncated} */
   readonly isTruncated: boolean;
 
   private readonly _increaseAmountByMinimumNetDebt?: (
@@ -263,14 +263,14 @@ export class PopulatedEthersRedemption
     this._increaseAmountByMinimumNetDebt = increaseAmountByMinimumNetDebt;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt} */
+  /** {@inheritDoc @liquity/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt} */
   increaseAmountByMinimumNetDebt(
     maxRedemptionRate?: Decimalish
   ): Promise<PopulatedEthersRedemption> {
     if (!this._increaseAmountByMinimumNetDebt) {
       throw new Error(
         "PopulatedEthersRedemption: increaseAmountByMinimumNetDebt() can " +
-          "only be called when amount is truncated"
+        "only be called when amount is truncated"
       );
     }
 
@@ -286,17 +286,17 @@ export interface _TroveChangeWithFees<T> {
 }
 
 /**
- * Ethers-based implementation of {@link @sovryn-zero/lib-base#PopulatableLiquity}.
+ * Ethers-based implementation of {@link @liquity/lib-base#PopulatableLiquity}.
  *
  * @public
  */
 export class PopulatableEthersLiquity
   implements
-    PopulatableLiquity<
-      EthersTransactionReceipt,
-      EthersTransactionResponse,
-      EthersPopulatedTransaction
-    > {
+  PopulatableLiquity<
+  EthersTransactionReceipt,
+  EthersTransactionResponse,
+  EthersPopulatedTransaction
+  > {
   private readonly _readable: ReadableEthersLiquity;
 
   constructor(readable: ReadableEthersLiquity) {
@@ -575,8 +575,8 @@ export class PopulatableEthersLiquity
       partialRedemptionUpperHint,
       partialRedemptionLowerHint
     ] = partialRedemptionHintNICR.isZero()
-      ? [AddressZero, AddressZero]
-      : await this._findHintsForNominalCollateralRatio(decimalify(partialRedemptionHintNICR));
+        ? [AddressZero, AddressZero]
+        : await this._findHintsForNominalCollateralRatio(decimalify(partialRedemptionHintNICR));
 
     return [
       decimalify(truncatedZUSDamount),
@@ -587,7 +587,7 @@ export class PopulatableEthersLiquity
     ];
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.openTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.openTrove} */
   async openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
@@ -619,7 +619,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.openNueTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.openNueTrove} */
   async openNueTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
@@ -651,7 +651,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.closeTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.closeTrove} */
   async closeTrove(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
@@ -662,20 +662,18 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.closeNueTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.closeNueTrove} */
   async closeNueTrove(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapTroveClosure(
-      await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, gas =>
-        gas.mul(125).div(100)
-      )
+      await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, (gas) => gas.mul(125).div(100))
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.depositCollateral} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.depositCollateral} */
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -683,7 +681,7 @@ export class PopulatableEthersLiquity
     return this.adjustTrove({ depositCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawCollateral} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -691,7 +689,7 @@ export class PopulatableEthersLiquity
     return this.adjustTrove({ withdrawCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.borrowZUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
@@ -700,7 +698,7 @@ export class PopulatableEthersLiquity
     return this.adjustTrove({ borrowZUSD: amount }, maxBorrowingRate, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.repayZUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.repayZUSD} */
   repayZUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -708,7 +706,7 @@ export class PopulatableEthersLiquity
     return this.adjustTrove({ repayZUSD: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.adjustTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.adjustTrove} */
   async adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
@@ -750,7 +748,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.adjustNueTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.adjustNueTrove} */
   async adjustNueTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
@@ -792,7 +790,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.claimCollateralSurplus} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.claimCollateralSurplus} */
   async claimCollateralSurplus(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<void>> {
@@ -819,7 +817,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.liquidate} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.liquidate} */
   async liquidate(
     address: string | string[],
     overrides?: EthersTransactionOverrides
@@ -845,7 +843,7 @@ export class PopulatableEthersLiquity
     }
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.liquidateUpTo} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.liquidateUpTo} */
   async liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number,
     overrides?: EthersTransactionOverrides
@@ -861,7 +859,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.depositZUSDInStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.depositZUSDInStabilityPool} */
   async depositZUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
@@ -881,7 +879,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawZUSDFromStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawZUSDFromStabilityPool} */
   async withdrawZUSDFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -897,7 +895,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawGainsFromStabilityPool} */
   async withdrawGainsFromStabilityPool(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails>> {
@@ -912,7 +910,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.transferCollateralGainToTrove} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.transferCollateralGainToTrove} */
   async transferCollateralGainToTrove(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<CollateralGainTransferDetails>> {
@@ -935,7 +933,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.sendZUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.sendZUSD} */
   async sendZUSD(
     toAddress: string,
     amount: Decimalish,
@@ -953,7 +951,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.sendZERO} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.sendZERO} */
   async sendZERO(
     toAddress: string,
     amount: Decimalish,
@@ -971,7 +969,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.redeemZUSD} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.redeemZUSD} */
   async redeemZUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
@@ -1030,10 +1028,10 @@ export class PopulatableEthersLiquity
 
         truncatedAmount.lt(attemptedZUSDAmount)
           ? newMaxRedemptionRate =>
-              populateRedemption(
-                truncatedAmount.add(ZUSD_MINIMUM_NET_DEBT),
-                newMaxRedemptionRate ?? maxRedemptionRate
-              )
+            populateRedemption(
+              truncatedAmount.add(ZUSD_MINIMUM_NET_DEBT),
+              newMaxRedemptionRate ?? maxRedemptionRate
+            )
           : undefined
       );
     };
@@ -1041,7 +1039,7 @@ export class PopulatableEthersLiquity
     return populateRedemption(attemptedZUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.stakeZERO} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.stakeZERO} */
   async stakeZERO(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1053,7 +1051,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.unstakeZERO} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.unstakeZERO} */
   async unstakeZERO(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1065,14 +1063,14 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawGainsFromStaking} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.withdrawGainsFromStaking} */
   withdrawGainsFromStaking(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<void>> {
     return this.unstakeZERO(Decimal.ZERO, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.registerFrontend} */
+  /** {@inheritDoc @liquity/lib-base#PopulatableLiquity.registerFrontend} */
   async registerFrontend(
     kickbackRate: Decimalish,
     overrides?: EthersTransactionOverrides
@@ -1087,4 +1085,5 @@ export class PopulatableEthersLiquity
       )
     );
   }
+
 }

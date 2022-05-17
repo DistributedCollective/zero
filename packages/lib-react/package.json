@@ -1,5 +1,5 @@
 {
-  "name": "@sovryn-zero/lib-react",
+  "name": "@liquity/lib-react",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     "prepare:tsc": "tsc --project tsconfig.dist.json"
   },
   "peerDependencies": {
-    "@sovryn-zero/lib-base": "^3.0.0",
+    "@liquity/lib-base": "^3.0.0",
     "react": "^16.13.1"
   },
   "devDependencies": {

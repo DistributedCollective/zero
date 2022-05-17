@@ -1,4 +1,4 @@
-import { Decimal } from "@sovryn-zero/lib-base";
+import { Decimal } from "@liquity/lib-base";
 
 type UniswapResponse = {
   data?: {

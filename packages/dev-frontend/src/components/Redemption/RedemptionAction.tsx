@@ -1,6 +1,6 @@
 import { Button } from "theme-ui";
 
-import { Decimal } from "@sovryn-zero/lib-base";
+import { Decimal } from "@liquity/lib-base";
 
 import { useLiquity } from "../../hooks/LiquityContext";
 import { useTransactionFunction } from "../Transaction";

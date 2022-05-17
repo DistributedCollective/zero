@@ -2,7 +2,7 @@
 // import { Web3ReactProvider } from "@web3-react/core";
 import { ThemeProvider } from "theme-ui";
 
-// import { BatchedWebSocketAugmentedWeb3Provider } from "@sovryn-zero/providers";
+// import { BatchedWebSocketAugmentedWeb3Provider } from "@liquity/providers";
 // import { LiquityProvider } from "./hooks/LiquityContext";
 // import { WalletConnector } from "./components/WalletConnector";
 // import { TransactionProvider } from "./components/Transaction";

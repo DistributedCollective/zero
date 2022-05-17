@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useLiquitySelector } from "@sovryn-zero/lib-react";
-import { LiquityStoreState, StabilityDeposit } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreState, StabilityDeposit } from "@liquity/lib-base";
 import { StabilityViewContext } from "./StabilityViewContext";
 import type { StabilityView, StabilityEvent } from "./types";
 

@@ -18,6 +18,3 @@ node_modules
 
 # Don't track NPM lockfile (we use Yarn)
 package-lock.json
-
-*.code-workspace
-types/

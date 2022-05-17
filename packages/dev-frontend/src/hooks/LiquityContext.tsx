@@ -4,13 +4,13 @@ import { getNetwork } from "@ethersproject/networks";
 import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 
-import { isBatchedProvider, isWebSocketAugmentedProvider } from "@sovryn-zero/providers";
+import { isBatchedProvider, isWebSocketAugmentedProvider } from "@liquity/providers";
 import {
   BlockPolledLiquityStore,
   EthersLiquity,
   EthersLiquityWithStore,
   _connectByChainId
-} from "@sovryn-zero/lib-ethers";
+} from "@liquity/lib-ethers";
 
 import { LiquityFrontendConfig, getConfig } from "../config";
 
@@ -54,7 +54,7 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
           useStore: "blockPolled"
         });
       } catch (e) {
-        console.log(e);
+        console.log(e)
       }
     }
   }, [config, provider, account, chainId]);

@@ -1,5 +1,5 @@
 {
-  "name": "@sovryn-zero/fuzzer",
+  "name": "@liquity/fuzzer",
   "version": "0.0.1",
   "private": true,
   "scripts": {

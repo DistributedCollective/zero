@@ -161,7 +161,7 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
  * The functions return the details of the transaction (if any), or throw an implementation-specific
  * subclass of {@link TransactionFailedError} in case of transaction failure.
  *
- * Implemented by {@link @sovryn-zero/lib-ethers#EthersLiquity}.
+ * Implemented by {@link @liquity/lib-ethers#EthersLiquity}.
  *
  * @public
  */
@@ -171,7 +171,7 @@ export interface TransactableLiquity {
    *
    * @param params - How much to deposit and borrow.
    * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @sovryn-zero/lib-base#Fees.borrowingRate | borrowing rate}.
+   *                           {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -198,7 +198,7 @@ export interface TransactableLiquity {
    *
    * @param params - Parameters of the adjustment.
    * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @sovryn-zero/lib-base#Fees.borrowingRate | borrowing rate} if
+   *                           {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate} if
    *                           `params` includes `borrowZUSD`.
    *
    * @throws
@@ -206,7 +206,7 @@ export interface TransactableLiquity {
    *
    * @remarks
    * The transaction will fail if the Trove's debt would fall below
-   * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT}.
+   * {@link @liquity/lib-base#ZUSD_MINIMUM_DEBT}.
    *
    * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
@@ -255,7 +255,7 @@ export interface TransactableLiquity {
    *
    * @param amount - The amount of ZUSD to borrow.
    * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @sovryn-zero/lib-base#Fees.borrowingRate | borrowing rate}.
+   *                           {@link @liquity/lib-base#Fees.borrowingRate | borrowing rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -322,8 +322,8 @@ export interface TransactableLiquity {
    * The `frontendTag` parameter is only effective when making a new deposit.
    *
    * As a side-effect, the transaction will also pay out an existing Stability Deposit's
-   * {@link @sovryn-zero/lib-base#StabilityDeposit.collateralGain | collateral gain} and
-   * {@link @sovryn-zero/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
+   * {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
    */
   depositZUSDInStabilityPool(
     amount: Decimalish,
@@ -340,14 +340,14 @@ export interface TransactableLiquity {
    *
    * @remarks
    * As a side-effect, the transaction will also pay out the Stability Deposit's
-   * {@link @sovryn-zero/lib-base#StabilityDeposit.collateralGain | collateral gain} and
-   * {@link @sovryn-zero/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
+   * {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
    */
   withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
 
   /**
-   * Withdraw {@link @sovryn-zero/lib-base#StabilityDeposit.collateralGain | collateral gain} and
-   * {@link @sovryn-zero/lib-base#StabilityDeposit.zeroReward | ZERO reward} from Stability Deposit.
+   * Withdraw {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#StabilityDeposit.zeroReward | ZERO reward} from Stability Deposit.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -355,7 +355,7 @@ export interface TransactableLiquity {
   withdrawGainsFromStabilityPool(): Promise<StabilityPoolGainsWithdrawalDetails>;
 
   /**
-   * Transfer {@link @sovryn-zero/lib-base#StabilityDeposit.collateralGain | collateral gain} from
+   * Transfer {@link @liquity/lib-base#StabilityDeposit.collateralGain | collateral gain} from
    * Stability Deposit to Trove.
    *
    * @throws
@@ -365,7 +365,7 @@ export interface TransactableLiquity {
    * The collateral gain is transfered to the Trove as additional collateral.
    *
    * As a side-effect, the transaction will also pay out the Stability Deposit's
-   * {@link @sovryn-zero/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
+   * {@link @liquity/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
    */
   transferCollateralGainToTrove(): Promise<CollateralGainTransferDetails>;
 
@@ -396,7 +396,7 @@ export interface TransactableLiquity {
    *
    * @param amount - Amount of ZUSD to be redeemed.
    * @param maxRedemptionRate - Maximum acceptable
-   *                            {@link @sovryn-zero/lib-base#Fees.redemptionRate | redemption rate}.
+   *                            {@link @liquity/lib-base#Fees.redemptionRate | redemption rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -411,7 +411,7 @@ export interface TransactableLiquity {
    * Claim leftover collateral after a liquidation or redemption.
    *
    * @remarks
-   * Use {@link @sovryn-zero/lib-base#ReadableLiquity.getCollateralSurplusBalance | getCollateralSurplusBalance()}
+   * Use {@link @liquity/lib-base#ReadableLiquity.getCollateralSurplusBalance | getCollateralSurplusBalance()}
    * to check the amount of collateral available for withdrawal.
    *
    * @throws
@@ -429,8 +429,8 @@ export interface TransactableLiquity {
    *
    * @remarks
    * As a side-effect, the transaction will also pay out an existing ZERO stake's
-   * {@link @sovryn-zero/lib-base#ZEROStake.collateralGain | collateral gain} and
-   * {@link @sovryn-zero/lib-base#ZEROStake.zusdGain | ZUSD gain}.
+   * {@link @liquity/lib-base#ZEROStake.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#ZEROStake.zusdGain | ZUSD gain}.
    */
   stakeZERO(amount: Decimalish): Promise<void>;
 
@@ -444,14 +444,14 @@ export interface TransactableLiquity {
    *
    * @remarks
    * As a side-effect, the transaction will also pay out the ZERO stake's
-   * {@link @sovryn-zero/lib-base#ZEROStake.collateralGain | collateral gain} and
-   * {@link @sovryn-zero/lib-base#ZEROStake.zusdGain | ZUSD gain}.
+   * {@link @liquity/lib-base#ZEROStake.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#ZEROStake.zusdGain | ZUSD gain}.
    */
   unstakeZERO(amount: Decimalish): Promise<void>;
 
   /**
-   * Withdraw {@link @sovryn-zero/lib-base#ZEROStake.collateralGain | collateral gain} and
-   * {@link @sovryn-zero/lib-base#ZEROStake.zusdGain | ZUSD gain} from ZERO stake.
+   * Withdraw {@link @liquity/lib-base#ZEROStake.collateralGain | collateral gain} and
+   * {@link @liquity/lib-base#ZEROStake.zusdGain | ZUSD gain} from ZERO stake.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
