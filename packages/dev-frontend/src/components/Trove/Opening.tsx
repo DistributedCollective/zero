@@ -7,8 +7,8 @@ import {
   ZUSD_LIQUIDATION_RESERVE,
   ZUSD_MINIMUM_NET_DEBT,
   Percent
-} from "@sovryn-zero/lib-base";
-import { useLiquitySelector } from "@sovryn-zero/lib-react";
+} from "@liquity/lib-base";
+import { useLiquitySelector } from "@liquity/lib-react";
 import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 import { TroveAction } from "./TroveAction";
@@ -134,9 +134,9 @@ export const Opening: React.FC = () => {
             <InfoIcon
               tooltip={
                 <Card variant="tooltip" sx={{ width: "200px" }}>
-                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit
-                  needs to be liquidated. The amount increases your debt and is refunded if you close
-                  your Line of Credit by fully paying off its net debt.
+                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit needs to be
+                  liquidated. The amount increases your debt and is refunded if you close your Line of Credit
+                  by fully paying off its net debt.
                 </Card>
               }
             />
@@ -174,8 +174,8 @@ export const Opening: React.FC = () => {
                   {isDirty && (
                     <>
                       You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
-                      {borrowedToken} to reclaim your collateral (
-                      {ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD Liquidation Reserve excluded).
+                      {borrowedToken} to reclaim your collateral ({ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD
+                      Liquidation Reserve excluded).
                     </>
                   )}
                 </Card>

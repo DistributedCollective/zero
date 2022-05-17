@@ -2,7 +2,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Block, BlockTag } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 
-import { Decimal } from "@sovryn-zero/lib-base";
+import { Decimal } from "@liquity/lib-base";
 
 import devOrNull from "../deployments/dev.json";
 import mainnet from "../deployments/mainnet.json";
@@ -90,7 +90,10 @@ const connectionFrom = (
   signer: EthersSigner | undefined,
   _contracts: _LiquityContracts,
   _multicall: _Multicall | undefined,
-  { deploymentDate, ...deployment }: _LiquityDeploymentJSON,
+  {
+    deploymentDate,
+    ...deployment
+  }: _LiquityDeploymentJSON,
   optionalParams?: EthersLiquityConnectionOptionalParams
 ): _InternalEthersLiquityConnection => {
   if (
@@ -254,7 +257,7 @@ export interface EthersLiquityConnectionOptionalParams {
   readonly frontendTag?: string;
 
   /**
-   * Create a {@link @sovryn-zero/lib-base#LiquityStore} and expose it as the `store` property.
+   * Create a {@link @liquity/lib-base#LiquityStore} and expose it as the `store` property.
    *
    * @remarks
    * When set to one of the available {@link EthersLiquityStoreOption | options},
@@ -264,7 +267,7 @@ export interface EthersLiquityConnectionOptionalParams {
    * {@link EthersLiquityWithStore}.
    *
    * Note that the store won't start monitoring the blockchain until its
-   * {@link @sovryn-zero/lib-base#LiquityStore.start | start()} function is called.
+   * {@link @liquity/lib-base#LiquityStore.start | start()} function is called.
    */
   readonly useStore?: EthersLiquityStoreOption;
 }
@@ -293,7 +296,7 @@ export function _connectByChainId(
   optionalParams?: EthersLiquityConnectionOptionalParams
 ): EthersLiquityConnection {
   const deployment: _LiquityDeploymentJSON =
-    (deployments[chainId] as _LiquityDeploymentJSON) ?? panic(new UnsupportedNetworkError(chainId));
+    (deployments[chainId]) as _LiquityDeploymentJSON ?? panic(new UnsupportedNetworkError(chainId));
 
   return connectionFrom(
     provider,

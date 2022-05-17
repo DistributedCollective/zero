@@ -1,8 +1,8 @@
-# @sovryn-zero/lib-base
+# @liquity/lib-base
 
 Shared interfaces and classes of the Liquity SDK.
 
-Needs to be installed in order to use other Liquity SDK packages, for example [@sovryn-zero/lib-ethers](https://www.npmjs.com/package/@sovryn-zero/lib-ethers).
+Needs to be installed in order to use other Liquity SDK packages, for example [@liquity/lib-ethers](https://www.npmjs.com/package/@liquity/lib-ethers).
 
 ## API Reference
 

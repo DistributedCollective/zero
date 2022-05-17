@@ -17,7 +17,7 @@ import {
  * A transaction that has been prepared for sending.
  *
  * @remarks
- * Implemented by {@link @sovryn-zero/lib-ethers#PopulatedEthersLiquityTransaction}.
+ * Implemented by {@link @liquity/lib-ethers#PopulatedEthersLiquityTransaction}.
  *
  * @public
  */
@@ -31,7 +31,7 @@ export interface PopulatedLiquityTransaction<
   /**
    * Send the transaction.
    *
-   * @returns An object that implements {@link @sovryn-zero/lib-base#SentLiquityTransaction}.
+   * @returns An object that implements {@link @liquity/lib-base#SentLiquityTransaction}.
    */
   send(): Promise<T>;
 }
@@ -42,16 +42,16 @@ export interface PopulatedLiquityTransaction<
  * @remarks
  * The Liquity protocol fulfills redemptions by repaying the debt of Troves in ascending order of
  * their collateralization ratio, and taking a portion of their collateral in exchange. Due to the
- * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
+ * {@link @liquity/lib-base#ZUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
  * some ZUSD amounts are not possible to redeem exactly.
  *
- * When {@link @sovryn-zero/lib-base#PopulatableLiquity.redeemZUSD | redeemZUSD()} is called with an
+ * When {@link @liquity/lib-base#PopulatableLiquity.redeemZUSD | redeemZUSD()} is called with an
  * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableZUSDAmount`
  * property). When this happens, the redeemer can either redeem the truncated amount by sending the
  * transaction unchanged, or prepare a new transaction by
- * {@link @sovryn-zero/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
+ * {@link @liquity/lib-base#PopulatedRedemption.increaseAmountByMinimumNetDebt | increasing the amount}
  * to the next lowest possible value, which is the sum of the truncated amount and
- * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_NET_DEBT}.
+ * {@link @liquity/lib-base#ZUSD_MINIMUM_NET_DEBT}.
  *
  * @public
  */
@@ -74,7 +74,7 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
    * value.
    *
    * @param maxRedemptionRate - Maximum acceptable
-   *                            {@link @sovryn-zero/lib-base#Fees.redemptionRate | redemption rate} to
+   *                            {@link @liquity/lib-base#Fees.redemptionRate | redemption rate} to
    *                            use in the new transaction.
    *
    * @remarks
@@ -103,7 +103,7 @@ export type _PopulatableFrom<T, P> = {
  * The functions return an object implementing {@link PopulatedLiquityTransaction}, which can be
  * used to send the transaction and get a {@link SentLiquityTransaction}.
  *
- * Implemented by {@link @sovryn-zero/lib-ethers#PopulatableEthersLiquity}.
+ * Implemented by {@link @liquity/lib-ethers#PopulatableEthersLiquity}.
  *
  * @public
  */

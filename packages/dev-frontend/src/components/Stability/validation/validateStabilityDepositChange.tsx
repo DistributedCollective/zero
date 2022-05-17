@@ -3,7 +3,7 @@ import {
   LiquityStoreState,
   StabilityDeposit,
   StabilityDepositChange
-} from "@sovryn-zero/lib-base";
+} from "@liquity/lib-base";
 
 import { COIN } from "../../../strings";
 import { Amount } from "../../ActionDescription";

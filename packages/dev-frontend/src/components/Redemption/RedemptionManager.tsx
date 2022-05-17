@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Box, Flex, Card, Heading } from "theme-ui";
 
-import {
-  Decimal,
-  Percent,
-  LiquityStoreState,
-  MINIMUM_COLLATERAL_RATIO
-} from "@sovryn-zero/lib-base";
-import { useLiquitySelector } from "@sovryn-zero/lib-react";
+import { Decimal, Percent, LiquityStoreState, MINIMUM_COLLATERAL_RATIO } from "@liquity/lib-base";
+import { useLiquitySelector } from "@liquity/lib-react";
 
 import { COIN } from "../../strings";
 

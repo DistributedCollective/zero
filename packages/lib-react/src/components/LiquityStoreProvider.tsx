@@ -1,4 +1,4 @@
-import { LiquityStore } from "@sovryn-zero/lib-base";
+import { LiquityStore } from "@liquity/lib-base";
 import React, { createContext, useEffect, useState } from "react";
 
 export const LiquityStoreContext = createContext<LiquityStore | undefined>(undefined);

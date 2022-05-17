@@ -1,5 +1,5 @@
-import { BlockPolledLiquityStoreState } from "@sovryn-zero/lib-ethers";
-import { useLiquitySelector } from "@sovryn-zero/lib-react";
+import { BlockPolledLiquityStoreState } from "@liquity/lib-ethers";
+import { useLiquitySelector } from "@liquity/lib-react";
 
 import { useLiquity } from "../../hooks/LiquityContext";
 import { DisabledRedemption } from "./DisabledRedemption";

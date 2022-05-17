@@ -21,7 +21,7 @@ import {
   MINIMUM_BORROWING_RATE,
   ZUSD_MINIMUM_DEBT,
   ZUSD_MINIMUM_NET_DEBT
-} from "@sovryn-zero/lib-base";
+} from "@liquity/lib-base";
 
 import { HintHelpers } from "../types";
 
@@ -398,12 +398,8 @@ describe("EthersLiquity", () => {
       const otherLiquity = await connectToDeployment(deployment, otherUsers[0], frontendTag);
       await otherLiquity.openTrove({ depositCollateral: 20, borrowZUSD: ZUSD_MINIMUM_DEBT });
 
-      if (deployment.presaleAddress) {
-        const presale = new ethers.Contract(
-          deployment.presaleAddress,
-          mockBalanceRedirectPresaleAbi,
-          provider
-        );
+      if(deployment.presaleAddress) {
+        const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
         await presale.connect(deployer).closePresale();
       }
       await otherLiquity.depositZUSDInStabilityPool(ZUSD_MINIMUM_DEBT);
@@ -437,20 +433,17 @@ describe("EthersLiquity", () => {
     const smallStabilityDeposit = Decimal.from(10);
 
     it("should fail if Zero presale is open", async () => {
-      await expect(liquity.depositZUSDInStabilityPool(smallStabilityDeposit)).to.eventually.be
-        .rejected;
+      await expect(liquity.depositZUSDInStabilityPool(smallStabilityDeposit)).to.eventually.be.rejected;
+
     });
 
     it("should make a small stability deposit", async () => {
       const { newTrove } = await liquity.openTrove(Trove.recreate(initialTroveOfDepositor));
       expect(newTrove).to.deep.equal(initialTroveOfDepositor);
 
-      if (deployment.presaleAddress) {
-        const presale = new ethers.Contract(
-          deployment.presaleAddress,
-          mockBalanceRedirectPresaleAbi,
-          provider
-        );
+
+      if(deployment.presaleAddress) {
+        const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
         await presale.connect(deployer).closePresale();
       }
 
@@ -594,13 +587,9 @@ describe("EthersLiquity", () => {
           user,
           ...otherUsersSubset
         ]);
-
-        if (deployment.presaleAddress) {
-          const presale = new ethers.Contract(
-            deployment.presaleAddress,
-            mockBalanceRedirectPresaleAbi,
-            provider
-          );
+        
+        if(deployment.presaleAddress) {
+          const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
           await presale.connect(deployer).closePresale();
         }
         await sendToEach(otherUsersSubset, 21.1);
@@ -916,11 +905,11 @@ describe("EthersLiquity", () => {
 
   describe("Gas estimation", () => {
     const troveWithICRBetween = (a: Trove, b: Trove) => a.add(b).multiply(0.5);
-
+    
     let rudeUser: Signer;
     let fiveOtherUsers: Signer[];
     let rudeLiquity: EthersLiquity;
-
+    
     before(async function () {
       this.timeout("10m");
       if (network.name !== "hardhat") {
@@ -1048,12 +1037,8 @@ describe("EthersLiquity", () => {
     it("should include enough gas for issuing ZERO", async function () {
       this.timeout("2m");
 
-      if (deployment.presaleAddress) {
-        const presale = new ethers.Contract(
-          deployment.presaleAddress,
-          mockBalanceRedirectPresaleAbi,
-          provider
-        );
+      if(deployment.presaleAddress) {
+        const presale = new ethers.Contract(deployment.presaleAddress,mockBalanceRedirectPresaleAbi,provider);
         await presale.connect(deployer).closePresale();
       }
 
