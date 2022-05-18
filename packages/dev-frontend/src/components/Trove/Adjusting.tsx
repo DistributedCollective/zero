@@ -23,7 +23,6 @@ import {
   validateTroveChange
 } from "./validation/validateTroveChange";
 import { useNueTokenSelection } from "../../hooks/useNueTokenSelection";
-import { NueCheckbox } from "./NueCheckbox";
 
 const selector = (state: LiquityStoreState) => {
   const { trove, fees, price, accountBalance } = state;
@@ -86,7 +85,7 @@ export const Adjusting: React.FC = () => {
   const previousTrove = useRef<Trove>(trove);
   const [collateral, setCollateral] = useState<Decimal>(trove.collateral);
   const [netDebt, setNetDebt] = useState<Decimal>(trove.netDebt);
-  const { borrowedToken, handleSetNueToken, useNueToken } = useNueTokenSelection();
+  const { borrowedToken, useNueToken } = useNueTokenSelection();
 
   const transactionState = useMyTransactionState(TRANSACTION_ID);
   const borrowingRate = fees.borrowingRate();
@@ -189,7 +188,7 @@ export const Adjusting: React.FC = () => {
               editedAmount={netDebt.toString(2)}
               setEditedAmount={(amount: string) => setNetDebt(Decimal.from(amount))}
             />
-            <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
+            {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}
           </Flex>
         </Flex>
 

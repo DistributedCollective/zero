@@ -19,7 +19,9 @@ export default function useZusdAggregator(account: string | undefined | null) {
         setTransactionState({
           type: "waitingForApproval",
           id,
-          disableCheck
+          title: "Confirm Approval",
+          disableCheck,
+          description: "Please approve ZUSD to be spent by Sovryn smart contracts in your RSK wallet"
         });
         const _amount = parseUnits(amount, 18).toString();
         let tx = await zusd?.approve(addresses.babelfish, _amount);
@@ -27,7 +29,8 @@ export default function useZusdAggregator(account: string | undefined | null) {
           type: "waitingForConfirmation",
           id,
           disableCheck,
-          tx
+          tx,
+          description: "ZUSD approval is processing..."
         });
 
         await tx.wait();

@@ -4,7 +4,7 @@ import { Text, Flex, Box, Heading } from "theme-ui";
 import { LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
 
-import { COIN, COIN2 } from "../strings";
+import { COIN } from "../strings";
 
 import { Icon } from "./Icon";
 

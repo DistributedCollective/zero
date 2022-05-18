@@ -16,7 +16,6 @@ import { StaticRow } from "./Editor";
 import { LoadingOverlay } from "../LoadingOverlay";
 import { CollateralRatio } from "./CollateralRatio";
 import { InfoIcon } from "../InfoIcon";
-import { NueCheckbox } from "./NueCheckbox";
 
 type TroveEditorProps = {
   borrowedToken: string;
@@ -71,7 +70,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
             amount={edited.collateral.prettify(4)}
             unit="RBTC"
           />
-          <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
+          {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}
 
           <StaticRow
             label="Debt"

@@ -19,6 +19,8 @@ import { Web3Provider } from "@ethersproject/providers";
 type TransactionIdle = {
   type: "idle";
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionFailed = {
@@ -27,12 +29,16 @@ type TransactionFailed = {
   error: Error;
   send?: TransactionFunction;
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionWaitingForApproval = {
   type: "waitingForApproval";
   id: string;
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionCancelled = {
@@ -40,6 +46,8 @@ type TransactionCancelled = {
   id: string;
   send?: TransactionFunction;
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionWaitingForConfirmations = {
@@ -47,18 +55,24 @@ type TransactionWaitingForConfirmations = {
   id: string;
   tx: SentTransaction;
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionConfirmed = {
   type: "confirmed";
   id: string;
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionConfirmedOneShot = {
   type: "confirmedOneShot";
   id: string;
   disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionState =
@@ -237,8 +251,9 @@ const tryToGetRevertReason = async (provider: Provider, hash: string) => {
   }
 };
 
-const getTransactionTitle = (type: string) => {
-  switch (type) {
+const getTransactionTitle = (tx: TransactionState) => {
+  if (tx.title) return tx.title;
+  switch (tx.type) {
     case "idle":
       return "";
     case "failed":
@@ -253,6 +268,26 @@ const getTransactionTitle = (type: string) => {
       return "Transaction Succeeded";
     case "cancelled":
       return "Confirm Rejected";
+  }
+};
+
+const getTransactionDescription = (tx: TransactionState) => {
+  if (tx.description) return tx.description;
+  switch (tx.type) {
+    case "idle":
+      return "";
+    case "waitingForConfirmation":
+      return "Transaction processing...";
+    case "cancelled":
+      return "You have chosen to reject the transaction Please cancel or retry your transaction";
+    case "waitingForApproval":
+      return "Please confirm the transaction in your RSK wallet";
+    case "failed":
+      return tx.error.message + " Please cancel or retry your transaction";
+    case "confirmed":
+      return "Transaction is Successful";
+    case "confirmedOneShot":
+      return "Transaction is Successful";
   }
 };
 
@@ -456,7 +491,7 @@ export const TransactionMonitor: React.FC = () => {
         }}
       >
         <Text sx={{ fontSize: 22, fontWeight: 600, mb: 50, minHeight: 33 }}>
-          {getTransactionTitle(transactionState.type)}
+          {getTransactionTitle(transactionState)}
         </Text>
         {getTransactionImage(transactionState.type)}
 
@@ -473,19 +508,7 @@ export const TransactionMonitor: React.FC = () => {
             wordBreak: "keep-all"
           }}
         >
-          {transactionState.type === "waitingForConfirmation" ? (
-            "Transaction processing..."
-          ) : transactionState.type === "cancelled" ? (
-            "You have chosen to reject the transaction Please cancel or retry your transaction"
-          ) : transactionState.type === "waitingForApproval" ? (
-            <>
-              Please confirm the transaction <br /> in your RSK wallet
-            </>
-          ) : transactionState.type === "failed" ? (
-            transactionState.error.message + " Please cancel or retry your transaction"
-          ) : (
-            "Transaction is Successful"
-          )}
+          {getTransactionDescription(transactionState)}
           <br />
           <br />
         </Text>

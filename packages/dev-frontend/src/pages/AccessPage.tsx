@@ -11,7 +11,6 @@ export const AccessPage: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [showRefresh, setShowRefresh] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [address, setAddress] = useState("");
 
@@ -51,7 +50,6 @@ export const AccessPage: React.FC = () => {
     async (e: React.FormEvent<HTMLFormElement>) => {
       const params = new URLSearchParams(location.search);
       setErrorMessage("");
-      setShowRefresh(false);
       setIsLoading(false);
       e.preventDefault();
 
@@ -78,13 +76,12 @@ export const AccessPage: React.FC = () => {
           setSuccess(true);
         }
       } catch (error: any) {
-        if (error?.response?.status === 409) {
-          setShowRefresh(true);
-        }
         if (error?.response?.data?.message) {
           setErrorMessage(error?.response?.data?.message);
         } else {
-          setErrorMessage("An error has occurred");
+          setErrorMessage(
+            "Unable to process request. Please try again later and contact the Sovryn Help Desk if you continue receiving this error message."
+          );
         }
       } finally {
         setIsLoading(false);
@@ -94,6 +91,32 @@ export const AccessPage: React.FC = () => {
   );
 
   if (!loaded) return null;
+
+  const getError = (error: string) => {
+    switch (error) {
+      case "emailNotFound":
+        return (
+          <div>
+            Email address not on waitlist.{" "}
+            <span style={{ cursor: "pointer" }} onClick={refresh}>
+              Click here to sign up.
+            </span>
+          </div>
+        );
+      case "expired":
+        return (
+          <div>
+            Invitation code expired. Connect your wallet or sign up for the waitlist
+            <span style={{ cursor: "pointer" }} onClick={refresh}>
+              {" "}
+              here.
+            </span>
+          </div>
+        );
+      default:
+        return error;
+    }
+  };
 
   return (
     <Box
@@ -177,23 +200,22 @@ export const AccessPage: React.FC = () => {
               visibility: errorMessage ? "visible" : "hidden"
             }}
           >
-            {errorMessage}
+            {getError(errorMessage)}
           </Paragraph>
 
-          {showRefresh && (
-            <Button
+          {/* <Button
               sx={{
                 fontSize: 2,
                 display: "flex",
                 alignItems: "center",
                 mx: "auto",
-                height: 32
+                height: 32,
+                mt: 2
               }}
               onClick={refresh}
             >
               Go to landing page
-            </Button>
-          )}
+            </Button> */}
         </form>
       </Box>
       <Dialog hideCloseIcon disableClose open={success} onClose={() => setSuccess(false)}>
