@@ -13,6 +13,10 @@ library LiquidationLib {
         _;
     }
 
+    /// @notice Liquidates credit line of the borrower
+    /// @dev Closes the trove if its ICR is lower than the minimum collateral ratio.
+    /// @param borrowerAddress address of the borrower to be liquidated
+    /// @param troveManagerContractAddress address of TroveManager contract
     function liquidateBorrower(address borrowerAddress, address troveManagerContractAddress)
         internal
         isContractAddress(troveManagerContractAddress)
@@ -21,11 +25,15 @@ library LiquidationLib {
         troveManager.liquidate(borrowerAddress);
     }
 
-    function liquidateBadPositions(
-        address borrowerAddress,
-        address troveManagerContractAddress,
-        uint256 maxLiquidations
-    ) internal isContractAddress(troveManagerContractAddress) {
+    /// @notice Liquidates bad credit lines in the protocol
+    /// @dev Closes a maximum number of n under-collateralized Troves,
+    /// starting from the one with the lowest collateral ratio in the system, and moving upwards
+    /// @param maxLiquidations address of the borrower to be liquidated
+    /// @param troveManagerContractAddress address of TroveManager contract
+    function liquidateBadPositions(address troveManagerContractAddress, uint256 maxLiquidations)
+        internal
+        isContractAddress(troveManagerContractAddress)
+    {
         ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
         troveManager.liquidateTroves(maxLiquidations);
     }

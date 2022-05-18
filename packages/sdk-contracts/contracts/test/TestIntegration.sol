@@ -18,8 +18,16 @@ contract TestIntegration {
         BorrowerLib.withdrawZUSD(_maxFee, _amount, borrowerContractAddress);
     }
 
+    function testWithdrawCollateral(uint256 _amount) external {
+        BorrowerLib.withdrawCollateral(_amount, borrowerContractAddress);
+    }
+
     function testRepayZUSD(uint256 _amount) external {
         BorrowerLib.repayZUSD(_amount, borrowerContractAddress);
+    }
+
+    function testAddCollateral() external payable {
+        BorrowerLib.addCollateral(borrowerContractAddress);
     }
 
     function testCloseCreditLineAndWithdrawCollateral() external {

@@ -38,10 +38,7 @@ describe("Borrower Library Operations", () => {
 
   describe("Borrowing ZUSD", async () => {
     it("should call withdraw function with correct parameters", async () => {
-      await testIntegration.testOpenCreditLine(
-        1,
-        100
-      );
+      await testIntegration.testOpenCreditLine(1, 100);
       expect(borrower.openTrove).to.have.been.calledOnceWith(
         1,
         100,
@@ -53,13 +50,20 @@ describe("Borrower Library Operations", () => {
 
   describe("Withdrawing ZUSD", async () => {
     it("should call withdraw function with correct parameters", async () => {
-      await testIntegration.testWithdrawZUSD(
-        1,
-        100
-      );
+      await testIntegration.testWithdrawZUSD(1, 100);
       expect(borrower.withdrawZUSD).to.have.been.calledOnceWith(
         1,
         100,
+        signers[0].address,
+        signers[0].address
+      );
+    });
+  });
+  describe("Withdrawing collateral", async () => {
+    it("should call withdraw collateral function with correct parameters", async () => {
+      await testIntegration.testWithdrawCollateral(1);
+      expect(borrower.withdrawColl).to.have.been.calledOnceWith(
+        1,
         signers[0].address,
         signers[0].address
       );
@@ -70,6 +74,17 @@ describe("Borrower Library Operations", () => {
       await testIntegration.testRepayZUSD(100);
       expect(borrower.repayZUSD).to.have.been.calledOnceWith(
         100,
+        signers[0].address,
+        signers[0].address
+      );
+    });
+  });
+  describe("Adding collateral", async () => {
+    it("should call add collateral function with correct parameters", async () => {
+      await testIntegration.testAddCollateral({
+        value: ethers.utils.parseEther("1.0"),
+      });
+      expect(borrower.addColl).to.have.been.calledOnceWith(
         signers[0].address,
         signers[0].address
       );

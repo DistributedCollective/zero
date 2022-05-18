@@ -10,6 +10,17 @@
 
 ## Methods
 
+### testAddCollateral
+
+```solidity
+function testAddCollateral() external payable
+```
+
+
+
+
+
+
 ### testCloseCreditLineAndWithdrawCollateral
 
 ```solidity
@@ -42,6 +53,22 @@ function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) exte
 
 ```solidity
 function testRepayZUSD(uint256 _amount) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _amount | uint256 | undefined |
+
+### testWithdrawCollateral
+
+```solidity
+function testWithdrawCollateral(uint256 _amount) external nonpayable
 ```
 
 
