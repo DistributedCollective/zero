@@ -10,7 +10,7 @@ contract TestIntegration {
         borrowerContractAddress = _borrowerContractAddress;
     }
 
-    function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) external {
+    function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) external payable {
         BorrowerLib.openCreditLineInZusd(_maxFeePercentage, _ZUSDAmount, borrowerContractAddress);
     }
 

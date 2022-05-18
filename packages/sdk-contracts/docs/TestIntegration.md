@@ -35,7 +35,7 @@ function testCloseCreditLineAndWithdrawCollateral() external nonpayable
 ### testOpenCreditLine
 
 ```solidity
-function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) external nonpayable
+function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) external payable
 ```
 
 

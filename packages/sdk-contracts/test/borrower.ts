@@ -38,7 +38,9 @@ describe("Borrower Library Operations", () => {
 
   describe("Borrowing ZUSD", async () => {
     it("should call withdraw function with correct parameters", async () => {
-      await testIntegration.testOpenCreditLine(1, 100);
+      await testIntegration.testOpenCreditLine(1, 100, {
+        value: ethers.utils.parseEther("1.0"),
+      });
       expect(borrower.openTrove).to.have.been.calledOnceWith(
         1,
         100,

@@ -29,7 +29,7 @@ library BorrowerLib {
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
         address borrowerContract
-    ) internal isContractAddress(borrowerContract) {
+    ) internal isValueSent isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, msg.sender, msg.sender);
     }
