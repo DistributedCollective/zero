@@ -47,10 +47,10 @@ describe("Liquidation Library Operations", () => {
 
   describe("Liquidate N positions", async () => {
     it("should call liquidate trove function with correct number of max troves to liquadte", async () => {
-      const getRandomNumber = (maxNumber: number) => {
-        return Math.floor(Math.random() * maxNumber);
+      const getRandomNumber = (min: number, max: number) => {
+        return Math.floor(Math.random() * (max - min)) + min;
       };
-      const maxLiquidations = getRandomNumber(100);
+      const maxLiquidations = getRandomNumber(1, 100);
       await testIntegration.testNPositionsLiquidation(maxLiquidations);
       expect(troveManager.liquidateTroves).to.have.been.calledOnceWith(maxLiquidations);
     });
