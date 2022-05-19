@@ -2,35 +2,44 @@
 
 pragma solidity 0.6.11;
 import "../libraries/BorrowerLib.sol";
+import "../libraries/LiquidationLib.sol";
 
 contract TestIntegration {
-    address private borrowerContractAddress;
+    address private libraryContractAddress;
 
-    constructor(address _borrowerContractAddress) public {
-        borrowerContractAddress = _borrowerContractAddress;
+    constructor(address _libraryContractAddress) public {
+        libraryContractAddress = _libraryContractAddress;
     }
 
     function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) external payable {
-        BorrowerLib.openCreditLineInZusd(_maxFeePercentage, _ZUSDAmount, borrowerContractAddress);
+        BorrowerLib.openCreditLineInZusd(_maxFeePercentage, _ZUSDAmount, libraryContractAddress);
     }
 
     function testWithdrawZUSD(uint256 _maxFee, uint256 _amount) external {
-        BorrowerLib.withdrawZUSD(_maxFee, _amount, borrowerContractAddress);
+        BorrowerLib.withdrawZUSD(_maxFee, _amount, libraryContractAddress);
     }
 
     function testWithdrawCollateral(uint256 _amount) external {
-        BorrowerLib.withdrawCollateral(_amount, borrowerContractAddress);
+        BorrowerLib.withdrawCollateral(_amount, libraryContractAddress);
     }
 
     function testRepayZUSD(uint256 _amount) external {
-        BorrowerLib.repayZUSD(_amount, borrowerContractAddress);
+        BorrowerLib.repayZUSD(_amount, libraryContractAddress);
     }
 
     function testAddCollateral() external payable {
-        BorrowerLib.addCollateral(borrowerContractAddress);
+        BorrowerLib.addCollateral(libraryContractAddress);
     }
 
     function testCloseCreditLineAndWithdrawCollateral() external {
-        BorrowerLib.closeCreditLineAndWithdrawCollateral(borrowerContractAddress);
+        BorrowerLib.closeCreditLineAndWithdrawCollateral(libraryContractAddress);
+    }
+
+    function testBorrowerLiquidation(address borrower) external {
+        LiquidationLib.liquidateBorrower(borrower, libraryContractAddress);
+    }
+
+    function testNPositionsLiquidation(uint256 maxLiquidations) external {
+        LiquidationLib.liquidateBadPositions(libraryContractAddress, maxLiquidations);
     }
 }

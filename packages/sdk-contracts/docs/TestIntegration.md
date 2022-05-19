@@ -21,6 +21,22 @@ function testAddCollateral() external payable
 
 
 
+### testBorrowerLiquidation
+
+```solidity
+function testBorrowerLiquidation(address borrower) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| borrower | address | undefined |
+
 ### testCloseCreditLineAndWithdrawCollateral
 
 ```solidity
@@ -31,6 +47,22 @@ function testCloseCreditLineAndWithdrawCollateral() external nonpayable
 
 
 
+
+### testNPositionsLiquidation
+
+```solidity
+function testNPositionsLiquidation(uint256 maxLiquidations) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| maxLiquidations | uint256 | undefined |
 
 ### testOpenCreditLine
 
