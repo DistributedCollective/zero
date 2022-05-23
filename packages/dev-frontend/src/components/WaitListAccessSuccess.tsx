@@ -1,12 +1,13 @@
 import React from "react";
 import { Box, Button, Image, Paragraph } from "theme-ui";
+import successMark from "../assets/success-mark.png";
 
 interface Props {
   refresh: () => void;
 }
 export const WaitListAccessSuccess: React.FC<Props> = ({ refresh }) => (
   <>
-    <Image src="/success-mark.png" />
+    <Image src={successMark} />
     <Box
       sx={{
         textAlign: "center",

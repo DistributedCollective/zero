@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Image, Paragraph } from "theme-ui";
+import successMark from "../assets/success-mark.png";
 
 type WaitlistSuccessProps = {
   onClose: () => void;
@@ -8,7 +9,7 @@ type WaitlistSuccessProps = {
 export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => {
   return (
     <>
-      <Image src="/success-mark.png" />
+      <Image src={successMark} />
       <Box
         sx={{
           textAlign: "center",
