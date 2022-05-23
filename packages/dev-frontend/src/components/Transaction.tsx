@@ -16,11 +16,6 @@ import { Dialog } from "./Dialog";
 import { useWeb3React } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 
-import failedTx from "../assets/failed-tx.svg";
-import pendingTx from "../assets/pending-tx.svg";
-import confirmTx from "../assets/confirm-tx.svg";
-import rskLogo from "../assets/rsk.svg";
-
 type TransactionIdle = {
   type: "idle";
   disableCheck?: boolean;
@@ -305,7 +300,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src={failedTx}
+          src="/images/failed-tx.svg"
         />
       );
     case "cancelled":
@@ -315,7 +310,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src={failedTx}
+          src="/images/failed-tx.svg"
         />
       );
 
@@ -327,7 +322,7 @@ const getTransactionImage = (type: string) => {
             width: 85
           }}
           className="spiner"
-          src={pendingTx}
+          src="/images/pending-tx.svg"
         />
       );
 
@@ -338,7 +333,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src={confirmTx}
+          src="/images/confirm-tx.svg"
         />
       );
     case "confirmedOneShot":
@@ -348,7 +343,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src={confirmTx}
+          src="/images/confirm-tx.svg"
         />
       );
 
@@ -360,7 +355,7 @@ const getTransactionImage = (type: string) => {
             ml: 22,
             width: 85
           }}
-          src={rskLogo}
+          src="/images/rsk.svg"
         />
       );
   }

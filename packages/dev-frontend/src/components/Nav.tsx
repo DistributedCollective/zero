@@ -1,6 +1,5 @@
 import { Flex, NavLink, Image, Container } from "theme-ui";
 import { Link } from "./Link";
-import zeroLogo from "../assets/zerologo.svg";
 
 export const Nav: React.FC = () => {
   return (
@@ -15,7 +14,7 @@ export const Nav: React.FC = () => {
       }}
     >
       <Flex sx={{ alignItems: "center", flexDirection: ["column", "row"] }}>
-        <Image sx={{ height: 40, pr: 20 }} src={zeroLogo} alt="Zero" />
+        <Image sx={{ height: 40, pr: 20 }} src="/images/zerologo.svg" alt="Zero" />
         <Link to="/">Dashboard</Link>
         <Link to="/liquidation">Liquidation</Link>
         <Link to="/redemption">Redemption</Link>

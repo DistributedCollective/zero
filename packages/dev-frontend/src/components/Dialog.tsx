@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 import { Box, Card, ThemeUIStyleObject, Image } from "theme-ui";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
-import xMark from "../assets/x.svg";
 
 interface Props {
   className?: string;
@@ -94,7 +93,7 @@ export const Dialog: React.FC<Props> = ({
               }}
               onClick={onClose}
             >
-              <Image src={xMark} alt="x" sx={{ width: 18 }} />
+              <Image src="/images/x.svg" alt="x" sx={{ width: 18 }} />
             </Box>
           )}
           {children}

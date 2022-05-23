@@ -15,8 +15,6 @@ import { LiquityFrontend } from "./LiquityFrontend";
 import { BrowserRouter } from "react-router-dom";
 import { Header } from "./components/Header";
 
-import logo from "./assets/zero-logo.svg";
-
 if (window.ethereum) {
   // Silence MetaMask warning in console
   Object.assign(window.ethereum, { autoRefreshOnNetworkChange: false });
@@ -55,7 +53,7 @@ const UnsupportedLayout: React.FC = ({ children }) => (
         mx: "auto",
         mt: 58
       }}
-      src={logo}
+      src="/zero-logo.svg"
     />
     <Flex
       sx={{
