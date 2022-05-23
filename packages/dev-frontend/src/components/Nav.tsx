@@ -19,9 +19,9 @@ export const Nav: React.FC = () => {
           src={process.env.PUBLIC_URL + "/images/zerologo.svg"}
           alt="Zero"
         />
-        <Link to="/">Dashboard</Link>
-        <Link to="/liquidation">Liquidation</Link>
-        <Link to="/redemption">Redemption</Link>
+        <Link to="/zero">Dashboard</Link>
+        <Link to="/zero/liquidation">Liquidation</Link>
+        <Link to="/zero/redemption">Redemption</Link>
       </Flex>
       <Flex sx={{ alignItems: "center", flexDirection: ["column", "row"] }}>
         <NavLink

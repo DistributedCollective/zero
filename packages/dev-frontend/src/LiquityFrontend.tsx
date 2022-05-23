@@ -56,13 +56,13 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
                   alignItems: "center"
                 }}
               >
-                <Route path="/" exact>
+                <Route path="/zero" exact>
                   <Dashboard />
                 </Route>
-                <Route path="/liquidation">
+                <Route path="/zero/liquidation">
                   <RiskyTrovesPage />
                 </Route>
-                <Route path="/redemption">
+                <Route path="/zero/redemption">
                   <RedemptionPage />
                 </Route>
               </Container>
