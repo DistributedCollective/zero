@@ -300,7 +300,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src="/images/failed-tx.svg"
+          src={process.env.PUBLIC_URL + "/images/failed-tx.svg"}
         />
       );
     case "cancelled":
@@ -310,7 +310,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src="/images/failed-tx.svg"
+          src={process.env.PUBLIC_URL + "/images/failed-tx.svg"}
         />
       );
 
@@ -322,7 +322,7 @@ const getTransactionImage = (type: string) => {
             width: 85
           }}
           className="spiner"
-          src="/images/pending-tx.svg"
+          src={process.env.PUBLIC_URL + "/images/pending-tx.svg"}
         />
       );
 
@@ -333,7 +333,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src="/images/confirm-tx.svg"
+          src={process.env.PUBLIC_URL + "/images/confirm-tx.svg"}
         />
       );
     case "confirmedOneShot":
@@ -343,7 +343,7 @@ const getTransactionImage = (type: string) => {
             mb: 20,
             width: 85
           }}
-          src="/images/confirm-tx.svg"
+          src={process.env.PUBLIC_URL + "/images/confirm-tx.svg"}
         />
       );
 
@@ -355,7 +355,7 @@ const getTransactionImage = (type: string) => {
             ml: 22,
             width: 85
           }}
-          src="/images/rsk.svg"
+          src={process.env.PUBLIC_URL + "/images/rsk.svg"}
         />
       );
   }

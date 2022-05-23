@@ -8,7 +8,7 @@ type WaitlistSuccessProps = {
 export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => {
   return (
     <>
-      <Image src="/success-mark.png" />
+      <Image src={process.env.PUBLIC_URL + "/success-mark.png"} />
       <Box
         sx={{
           textAlign: "center",

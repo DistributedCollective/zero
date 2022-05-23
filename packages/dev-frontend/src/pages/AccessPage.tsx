@@ -139,7 +139,7 @@ export const AccessPage: React.FC = () => {
           sx={{
             mb: 60
           }}
-          src="/zero-logo.svg"
+          src={process.env.PUBLIC_URL + "/zero-logo.svg"}
         />
       </NavLink>
       <Heading

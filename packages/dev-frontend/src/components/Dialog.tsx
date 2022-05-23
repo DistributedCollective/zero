@@ -93,7 +93,7 @@ export const Dialog: React.FC<Props> = ({
               }}
               onClick={onClose}
             >
-              <Image src="/images/x.svg" alt="x" sx={{ width: 18 }} />
+              <Image src={process.env.PUBLIC_URL + "/images/x.svg"} alt="x" sx={{ width: 18 }} />
             </Box>
           )}
           {children}

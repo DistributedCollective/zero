@@ -53,7 +53,7 @@ const UnsupportedLayout: React.FC = ({ children }) => (
         mx: "auto",
         mt: 58
       }}
-      src="/zero-logo.svg"
+      src={process.env.PUBLIC_URL + "/zero-logo.svg"}
     />
     <Flex
       sx={{

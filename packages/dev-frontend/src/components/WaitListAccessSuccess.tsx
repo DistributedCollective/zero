@@ -6,7 +6,7 @@ interface Props {
 }
 export const WaitListAccessSuccess: React.FC<Props> = ({ refresh }) => (
   <>
-    <Image src="/success-mark.png" />
+    <Image src={process.env.PUBLIC_URL + "/success-mark.png"} />
     <Box
       sx={{
         textAlign: "center",
