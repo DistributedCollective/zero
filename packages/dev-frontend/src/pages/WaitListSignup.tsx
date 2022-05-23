@@ -82,7 +82,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         sx={{
           mb: 60
         }}
-        src="/zero-logo.svg"
+        src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
       <Heading
         sx={{
