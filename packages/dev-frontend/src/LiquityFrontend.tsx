@@ -39,7 +39,7 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
   return (
     <LiquityStoreProvider {...{ loader }} store={liquity.store}>
       <Switch>
-        <Route path="/access" exact>
+        <Route path="/zero/access" exact>
           <AccessPage />
         </Route>
         <TroveViewProvider>

@@ -141,7 +141,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
     return <>{loader}</>;
   }
 
-  if (location && location.pathname === "/access") {
+  if (location && location.pathname === "/zero/access") {
     return <AccessPage />;
   }
 
