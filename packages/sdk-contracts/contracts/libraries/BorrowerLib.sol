@@ -29,7 +29,7 @@ library BorrowerLib {
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
         address borrowerContract
-    ) external isValueSent isContractAddress(borrowerContract) {
+    ) internal isValueSent isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, msg.sender, msg.sender);
     }
@@ -44,7 +44,7 @@ library BorrowerLib {
         uint256 _maxFeePercentage,
         uint256 _amount,
         address borrowerContract
-    ) external isContractAddress(borrowerContract) {
+    ) internal isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
         borrowerOperations.withdrawZUSD(_maxFeePercentage, _amount, msg.sender, msg.sender);
     }
@@ -55,7 +55,7 @@ library BorrowerLib {
     /// @param _amount collateral amount to withdraw
     /// @param borrowerContract address of BorrowerOperations contract
     function withdrawCollateral(uint256 _amount, address borrowerContract)
-        external
+        internal
         isContractAddress(borrowerContract)
     {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
@@ -66,7 +66,7 @@ library BorrowerLib {
     /// @param _amount amount of ZUSD to be repayed
     /// @param borrowerContract address of BorrowerOperations contract
     function repayZUSD(uint256 _amount, address borrowerContract)
-        external
+        internal
         isContractAddress(borrowerContract)
     {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
@@ -76,7 +76,7 @@ library BorrowerLib {
     /// @notice adds the received rBTC to the caller's active Trove.
     /// @param borrowerContract address of BorrowerOperations contract
     function addCollateral(address borrowerContract)
-        external
+        internal
         isValueSent
         isContractAddress(borrowerContract)
     {
@@ -87,7 +87,7 @@ library BorrowerLib {
     /// @notice Closes the credit line and withdraws the collateral
     /// @param borrowerContract address of BorrowerOperations contract
     function closeCreditLineAndWithdrawCollateral(address borrowerContract)
-        external
+        internal
         isContractAddress(borrowerContract)
     {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
