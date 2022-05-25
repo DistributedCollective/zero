@@ -19,7 +19,7 @@ library TroveStatisticsLib {
     /// @return collateralRatio the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
     /// @param troveManagerContractAddress address of TroveManager contract
     function getNominalICR(address troveManagerContractAddress, address _borrower)
-        internal
+        external
         view
         isContractAddress(troveManagerContractAddress)
         returns (uint256 collateralRatio)
@@ -35,7 +35,7 @@ library TroveStatisticsLib {
     /// @return pendingZUSDDebtReward sum of all ZUSD pending rewards from redistributions
     /// @return pendingRBTCReward sum of all RBTC pending rewards from redistributions
     function getEntireDebtAndColl(address troveManagerContractAddress, address _borrower)
-        internal
+        external
         view
         isContractAddress(troveManagerContractAddress)
         returns (
@@ -53,7 +53,7 @@ library TroveStatisticsLib {
     /// @param _ZUSDDebt debt parameter for which a fee will be calculated against
     /// @return borrowingFee calculated borrowing fee for the corresponding debt
     function calculateBorrowingFee(address troveManagerContractAddress, uint256 _ZUSDDebt)
-        internal
+        external
         view
         isContractAddress(troveManagerContractAddress)
         returns (uint256 borrowingFee)

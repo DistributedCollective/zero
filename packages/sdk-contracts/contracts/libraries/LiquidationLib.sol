@@ -29,7 +29,7 @@ library LiquidationLib {
     /// @param borrowerAddress address of the borrower to be liquidated
     /// @param troveManagerContractAddress address of TroveManager contract
     function liquidateBorrower(address borrowerAddress, address troveManagerContractAddress)
-        internal
+        external
         isContractAddress(troveManagerContractAddress)
     {
         ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
@@ -42,7 +42,7 @@ library LiquidationLib {
     /// @param maxLiquidations address of the borrower to be liquidated
     /// @param troveManagerContractAddress address of TroveManager contract
     function liquidateBadPositions(address troveManagerContractAddress, uint256 maxLiquidations)
-        internal
+        external
         isContractAddress(troveManagerContractAddress)
     {
         ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
@@ -61,7 +61,7 @@ library LiquidationLib {
         address _priceFeedAddress,
         uint256 _ZUSDAmount,
         uint256 _maxFeePercentage
-    ) internal isContractAddress(_troveManagerContractAddress) {
+    ) external isContractAddress(_troveManagerContractAddress) {
         RedemptionHints memory redemptionHints;
         ITroveManager troveManager = ITroveManager(_troveManagerContractAddress);
         HintHelpers hintHelpers = HintHelpers(_hintHelpersAddress);

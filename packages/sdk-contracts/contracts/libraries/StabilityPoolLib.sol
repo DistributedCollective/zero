@@ -20,7 +20,7 @@ library StabilityPoolLib {
     /// @param _amount amount of ZUSD to be deposited
     /// @param _stabilityPoolAddress address of Stability Pool Contract
     function provideToSP(uint256 _amount, address _stabilityPoolAddress)
-        internal
+        external
         isContractAddress(_stabilityPoolAddress)
     {
         IStabilityPool stabilityPool = IStabilityPool(_stabilityPoolAddress);
@@ -31,7 +31,7 @@ library StabilityPoolLib {
     /// @param _amount amount of ZUSD to be withdrawn
     /// @param _stabilityPoolAddress address of Stability Pool Contract
     function withdrawFromSP(uint256 _amount, address _stabilityPoolAddress)
-        internal
+        external
         isContractAddress(_stabilityPoolAddress)
     {
         IStabilityPool stabilityPool = IStabilityPool(_stabilityPoolAddress);
@@ -41,7 +41,7 @@ library StabilityPoolLib {
     /// @notice Withdraws all gains from the stability pool and adds them as a collateral to the credit line
     /// @param _stabilityPoolAddress address of Stability Pool Contract
     function withdrawRBTCGainToTrove(address _stabilityPoolAddress)
-        internal
+        external
         isContractAddress(_stabilityPoolAddress)
     {
         IStabilityPool stabilityPool = IStabilityPool(_stabilityPoolAddress);
