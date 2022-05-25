@@ -3,6 +3,8 @@
 pragma solidity 0.6.11;
 import "../libraries/BorrowerLib.sol";
 import "../libraries/LiquidationLib.sol";
+import "../libraries/StabilityPoolLib.sol";
+import "../libraries/TroveStatisticsLib.sol";
 
 contract TestIntegration {
     address private libraryContractAddress;
@@ -56,5 +58,42 @@ contract TestIntegration {
             _ZUSDAmount,
             _maxFeePercentage
         );
+    }
+
+    function testProvideToSP(uint256 _amount) external {
+        StabilityPoolLib.provideToSP(_amount, libraryContractAddress);
+    }
+
+    function testWithdrawFromSP(uint256 _amount) external {
+        StabilityPoolLib.withdrawFromSP(_amount, libraryContractAddress);
+    }
+
+    function testWithdrawRBTCGainToTrove() external {
+        StabilityPoolLib.withdrawRBTCGainToTrove(libraryContractAddress);
+    }
+
+    function testGetNominalICR(address _borrower) external view returns (uint256 collateralRatio) {
+        return TroveStatisticsLib.getNominalICR(libraryContractAddress, _borrower);
+    }
+
+    function testGetEntireDebtAndColl(address _borrower)
+        external
+        view
+        returns (
+            uint256 debt,
+            uint256 coll,
+            uint256 pendingZUSDDebtReward,
+            uint256 pendingRBTCReward
+        )
+    {
+        return TroveStatisticsLib.getEntireDebtAndColl(libraryContractAddress, _borrower);
+    }
+
+    function testCalculateBorrowingFee(uint256 _ZUSDDebt)
+        external
+        view
+        returns (uint256 borrowingFee)
+    {
+        return TroveStatisticsLib.calculateBorrowingFee(libraryContractAddress, _ZUSDDebt);
     }
 }
