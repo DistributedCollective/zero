@@ -5,6 +5,9 @@ import "@sovryn-zero/contracts/contracts/Interfaces/ITroveManager.sol";
 import "@sovryn-zero/contracts/contracts/HintHelpers.sol";
 import "@sovryn-zero/contracts/contracts/PriceFeed.sol";
 
+/// @title ZERO-SDK Liquidation Lib
+/// @author 0xLucian
+/// @notice Library containing basic Liquidation and redemption operations
 library LiquidationLib {
     struct RedemptionHints {
         address firstRedemptionHint;

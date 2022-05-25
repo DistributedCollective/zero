@@ -3,6 +3,9 @@
 pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/Interfaces/ITroveManager.sol";
 
+/// @title ZERO-SDK Liquidation Lib
+/// @author 0xLucian
+/// @notice Library containing view functions regarding troves
 library TroveStatisticsLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;
