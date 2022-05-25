@@ -9,6 +9,8 @@ export const fromWei = (value: BigNumberish | undefined, decimals = 2) => {
   return n.toFixed(decimals);
 };
 
+export const isMainnet = process.env.REACT_APP_NETWORK === "mainnet";
+
 export const isZero = (value: string) => new BigNumber(value).isZero();
 
 export const parseBalance = (

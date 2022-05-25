@@ -1,11 +1,12 @@
 import axios, { AxiosResponse } from "axios";
+import { isMainnet } from ".";
 
 enum WhitelistType {
   ZERO = "ZERO"
 }
 
 const whitelistClient = axios.create({
-  baseURL: "https://whitelist.sovryn.app/"
+  baseURL: isMainnet ? "https://whitelist.sovryn.app/" : "https://whitelist.test.sovryn.app/"
 });
 
 export const registerEmail = (email: string, ref: string): Promise<AxiosResponse<any>> =>
