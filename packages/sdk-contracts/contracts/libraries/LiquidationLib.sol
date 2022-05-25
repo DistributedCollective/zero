@@ -2,8 +2,16 @@
 
 pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/Interfaces/ITroveManager.sol";
+import "@sovryn-zero/contracts/contracts/HintHelpers.sol";
+import "@sovryn-zero/contracts/contracts/PriceFeed.sol";
 
 library LiquidationLib {
+    struct RedemptionHints {
+        address firstRedemptionHint;
+        uint256 partialRedemptionHintNICR;
+        uint256 truncatedZUSDamount;
+    }
+
     modifier isContractAddress(address contractAddress) {
         uint256 size;
         assembly {
@@ -36,5 +44,34 @@ library LiquidationLib {
     {
         ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
         troveManager.liquidateTroves(maxLiquidations);
+    }
+
+    function redeemCollateral(
+        address _troveManagerContractAddress,
+        address _hintHelpersAddress,
+        address _priceFeedAddress,
+        uint256 _ZUSDAmount,
+        uint256 _maxFeePercentage
+    ) internal isContractAddress(_troveManagerContractAddress) {
+        RedemptionHints memory redemptionHints;
+        ITroveManager troveManager = ITroveManager(_troveManagerContractAddress);
+        HintHelpers hintHelpers = HintHelpers(_hintHelpersAddress);
+        PriceFeed priceFeed = PriceFeed(_priceFeedAddress);
+        uint256 latestPrice = priceFeed.fetchPrice();
+        (
+            redemptionHints.firstRedemptionHint,
+            redemptionHints.partialRedemptionHintNICR,
+            redemptionHints.truncatedZUSDamount
+        ) = hintHelpers.getRedemptionHints(_ZUSDAmount, latestPrice, 0);
+
+        troveManager.redeemCollateral(
+            redemptionHints.truncatedZUSDamount,
+            redemptionHints.firstRedemptionHint,
+            msg.sender,
+            msg.sender,
+            redemptionHints.partialRedemptionHintNICR,
+            0,
+            _maxFeePercentage
+        );
     }
 }

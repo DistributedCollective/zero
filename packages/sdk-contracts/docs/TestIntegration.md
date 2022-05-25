@@ -81,6 +81,25 @@ function testOpenCreditLine(uint256 _maxFeePercentage, uint256 _ZUSDAmount) exte
 | _maxFeePercentage | uint256 | undefined |
 | _ZUSDAmount | uint256 | undefined |
 
+### testRedeemCollateral
+
+```solidity
+function testRedeemCollateral(address _hintHelpersAddress, address _priceFeedAddress, uint256 _ZUSDAmount, uint256 _maxFeePercentage) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _hintHelpersAddress | address | undefined |
+| _priceFeedAddress | address | undefined |
+| _ZUSDAmount | uint256 | undefined |
+| _maxFeePercentage | uint256 | undefined |
+
 ### testRepayZUSD
 
 ```solidity

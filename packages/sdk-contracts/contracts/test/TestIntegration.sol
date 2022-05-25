@@ -42,4 +42,19 @@ contract TestIntegration {
     function testNPositionsLiquidation(uint256 maxLiquidations) external {
         LiquidationLib.liquidateBadPositions(libraryContractAddress, maxLiquidations);
     }
+
+    function testRedeemCollateral(
+        address _hintHelpersAddress,
+        address _priceFeedAddress,
+        uint256 _ZUSDAmount,
+        uint256 _maxFeePercentage
+    ) external {
+        LiquidationLib.redeemCollateral(
+            libraryContractAddress,
+            _hintHelpersAddress,
+            _priceFeedAddress,
+            _ZUSDAmount,
+            _maxFeePercentage
+        );
+    }
 }
