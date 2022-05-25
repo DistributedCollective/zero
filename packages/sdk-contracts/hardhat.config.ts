@@ -72,8 +72,8 @@ export default {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
   dodoc: {
-    runOnCompile: true, // if false then run `npx hardhat dodoc` in console to generate docs
-    include: [], // [] == everything; input paths to limit dics to the domain contracts only
+    runOnCompile: false, // if false then run `npx hardhat dodoc` in console to generate docs
+    include: ["contracts/libraries/"], // [] == everything; input paths to limit dics to the domain contracts only
     outputDir: "docs",
     keepFileStructure: false,
     freshOutput: true,
