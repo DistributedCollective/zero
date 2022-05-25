@@ -46,6 +46,12 @@ library LiquidationLib {
         troveManager.liquidateTroves(maxLiquidations);
     }
 
+    /// @notice Redeems the corresponding ZUSD amount into rBTC
+    /// @param _troveManagerContractAddress address of TroveManager contract
+    /// @param _hintHelpersAddress address of the HintHelpers contract
+    /// @param _priceFeedAddress address of PriceFeed contract
+    /// @param _ZUSDAmount amount of ZUSD to be redeemed
+    /// @param _maxFeePercentage max fee percentage of the ZUSD amount. If above this percentage, transaction will revert
     function redeemCollateral(
         address _troveManagerContractAddress,
         address _hintHelpersAddress,
