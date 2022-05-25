@@ -133,7 +133,7 @@ export const AccessPage: React.FC = () => {
         textAlign: "center"
       }}
     >
-      <NavLink href="/">
+      <NavLink href="/zero">
         <Image
           sx={{
             mb: 60
