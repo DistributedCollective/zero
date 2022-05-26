@@ -63,7 +63,7 @@ export const AccessPage: React.FC = () => {
         return;
       }
 
-      if (!isAddress(address)) {
+      if (!isAddress((address || "").toLowerCase())) {
         setErrorMessage("Please enter a valid RSK address.");
         return;
       }
