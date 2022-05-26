@@ -16,5 +16,5 @@ export const isZero = (value: string) => new BigNumber(value).isZero();
 export const parseBalance = (
   value: BigNumberish | undefined,
   decimals = 18,
-  decimalsToDisplay = 1
+  decimalsToDisplay = 2
 ) => parseFloat(formatUnits(value || 0, decimals)).toFixed(decimalsToDisplay);
