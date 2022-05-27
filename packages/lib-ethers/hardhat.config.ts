@@ -15,7 +15,7 @@ import "@nomiclabs/hardhat-ethers";
 import { Decimal } from "@liquity/lib-base";
 
 import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/deploy";
-import {  _LiquityDeploymentJSON } from "./src/contracts";
+import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
 import { BorrowerOperations, CommunityIssuance, ZEROToken } from "./types";
@@ -54,13 +54,13 @@ const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eef
 
 const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x4D1A9fD1E1e67E83Ffe72Bdd769088d689993E4B",
+  rsktestnet: "0xaC0784a1a3eB5AE6b39F6264C94CD490c6D225D7",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const sovFeeCollectorAddresses = {
   mainnet: "",
-  rsktestnet: "0x85B19DD6E3c6cCC54D40c1bAEC15058962B8245b",
+  rsktestnet: "0xedD92fb7C556E4A4faf8c4f5A90f471aDCD018f4",
   dev: ""
 };
 
@@ -82,13 +82,13 @@ const presaleAddresses = {
   dev: ""
 };
 
-const oracleAddresses : Record<string, OracleAddresses> = {
+const oracleAddresses: Record<string, OracleAddresses> = {
   mainnet: {
     mocOracleAddress: "",
     rskOracleAddress: ""
   },
   rsktestnet: {
-    mocOracleAddress: "0x26a00aF444928d689DDEC7b4D17c0E4a8c9D407d",
+    mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
     rskOracleAddress: "0xE00243Bc6912BF148302e8478996c98c22fE8739"
   },
   dev: {
@@ -144,19 +144,18 @@ const config: HardhatUserConfig = {
       accounts: [deployerAccount]
     },
     rsksovryntestnet: {
-			url: "https://testnet.sovryn.app/rpc",
-			accounts: { mnemonic: "brownie", count: 10 },
-			chainId: 31,
-			gasMultiplier: 1.25,
-			//timeout: 20000, // increase if needed; 20000 is the default value
-			//allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
-		},
-		rsksovrynmainnet: {
-			url: "https://mainnet.sovryn.app/rpc",
-			chainId: 30,
-			//timeout: 20000, // increase if needed; 20000 is the default value
-		}
-    
+      url: "https://testnet.sovryn.app/rpc",
+      accounts: { mnemonic: "brownie", count: 10 },
+      chainId: 31,
+      gasMultiplier: 1.25
+      //timeout: 20000, // increase if needed; 20000 is the default value
+      //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
+    },
+    rsksovrynmainnet: {
+      url: "https://mainnet.sovryn.app/rpc",
+      chainId: 30
+      //timeout: 20000, // increase if needed; 20000 is the default value
+    }
   },
   paths: {
     artifacts,
@@ -186,12 +185,10 @@ const getLiveArtifact = (name: string): { abi: JsonFragment[]; bytecode: string 
   require(`./live/${name}.json`);
 
 const getDeploymentData = (network: string, channel: string): _LiquityDeploymentJSON => {
-  const addresses = fs.readFileSync(
-    path.join("deployments", channel, `${network}.json`)
-  );
+  const addresses = fs.readFileSync(path.join("deployments", channel, `${network}.json`));
 
-  return JSON.parse(String(addresses))
-}
+  return JSON.parse(String(addresses));
+};
 
 const getContractFactory: (
   env: HardhatRuntimeEnvironment
@@ -234,7 +231,7 @@ type SetAddressParams = {
   address: string;
   nuetokenaddress: string;
   channel: string;
-}
+};
 
 const defaultChannel = process.env.CHANNEL || "default";
 
@@ -242,70 +239,83 @@ task("setMassetAddress", "Sets address of masset contract in order to support NU
   .addParam("address", "address of deployed MassetProxy contract")
   .addParam("nuetokenaddress", "address of NUE token")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
-  .setAction(async (
-    {
-      address,
-      channel,
-      nuetokenaddress,
-    }: SetAddressParams,
-    hre
-  ) => {
+  .setAction(async ({ address, channel, nuetokenaddress }: SetAddressParams, hre) => {
     const [deployer] = await hre.ethers.getSigners();
-    const deployment = getDeploymentData(hre.network.name, channel)
-    const { borrowerOperations: borrowerOperationsAddress } = deployment.addresses
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const { borrowerOperations: borrowerOperationsAddress } = deployment.addresses;
 
-    const borrowerOperations = await hre.ethers.getContractAt("BorrowerOperations", borrowerOperationsAddress, deployer) as unknown as  BorrowerOperations
+    const borrowerOperations = ((await hre.ethers.getContractAt(
+      "BorrowerOperations",
+      borrowerOperationsAddress,
+      deployer
+    )) as unknown) as BorrowerOperations;
 
-    const currentMassetAddress = await borrowerOperations.masset()
-    console.log("Current masset address: ", currentMassetAddress)
+    const currentMassetAddress = await borrowerOperations.masset();
+    console.log("Current masset address: ", currentMassetAddress);
 
-    const tx = await borrowerOperations.setMassetAddress(address) 
-    await tx.wait()
+    const tx = await borrowerOperations.setMassetAddress(address);
+    await tx.wait();
 
-    const newMassetAddress = await borrowerOperations.masset()
-    console.log("New masset address: ", newMassetAddress)
+    const newMassetAddress = await borrowerOperations.masset();
+    console.log("New masset address: ", newMassetAddress);
 
-    deployment.addresses.nueToken = nuetokenaddress
+    deployment.addresses.nueToken = nuetokenaddress;
 
     fs.writeFileSync(
       path.join("deployments", channel, `${hre.network.name}.json`),
       JSON.stringify(deployment, undefined, 2)
     );
-  })
+  });
 
 type FundCommunityIssuance = {
   channel: string;
   amount: string;
-}
+};
 
-task("fundCommunityIssuance", "Sends funds to the community issuance contract so users can get rewards")
+task(
+  "fundCommunityIssuance",
+  "Sends funds to the community issuance contract so users can get rewards"
+)
   .addParam("amount", "Amount to send", undefined, types.string)
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ channel, amount }: FundCommunityIssuance, hre) => {
     const [deployer] = await hre.ethers.getSigners();
-    const deployment = getDeploymentData(hre.network.name, channel)
-    const { zeroToken: zeroTokenAddress, communityIssuance: communityIssuanceAddress } = deployment.addresses
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const {
+      zeroToken: zeroTokenAddress,
+      communityIssuance: communityIssuanceAddress
+    } = deployment.addresses;
 
-    const zeroToken = await hre.ethers.getContractAt("ZEROToken", zeroTokenAddress, deployer) as unknown as  ZEROToken
-    const communityIssuance = await hre.ethers.getContractAt("CommunityIssuance", communityIssuanceAddress, deployer) as unknown as  CommunityIssuance
+    const zeroToken = ((await hre.ethers.getContractAt(
+      "ZEROToken",
+      zeroTokenAddress,
+      deployer
+    )) as unknown) as ZEROToken;
+    const communityIssuance = ((await hre.ethers.getContractAt(
+      "CommunityIssuance",
+      communityIssuanceAddress,
+      deployer
+    )) as unknown) as CommunityIssuance;
 
-    const fundingWalletAddress = await communityIssuance.fundingWalletAddress()
-    console.log(`Funding wallet address is ${fundingWalletAddress} and sender is ${deployer.address}`)
+    const fundingWalletAddress = await communityIssuance.fundingWalletAddress();
+    console.log(
+      `Funding wallet address is ${fundingWalletAddress} and sender is ${deployer.address}`
+    );
 
-    const senderZeroBalance = await zeroToken.balanceOf(deployer.address)
-    console.log(`Sender zero balance: ${senderZeroBalance}`)
+    const senderZeroBalance = await zeroToken.balanceOf(deployer.address);
+    console.log(`Sender zero balance: ${senderZeroBalance}`);
 
-    const communityIssuanceBalanceBefore = await zeroToken.balanceOf(communityIssuanceAddress)
-    console.log(`Community issuance balance before: ${communityIssuanceBalanceBefore}`)
+    const communityIssuanceBalanceBefore = await zeroToken.balanceOf(communityIssuanceAddress);
+    console.log(`Community issuance balance before: ${communityIssuanceBalanceBefore}`);
 
-    console.log("Setting allowance")
+    console.log("Setting allowance");
     const allowance = await zeroToken.allowance(deployer.address, communityIssuanceAddress);
-    console.log(`Current allowance: ${allowance}`)
-    await (await zeroToken.increaseAllowance(communityIssuanceAddress, amount)).wait()
-    console.log("Transferring zero")
-    await (await communityIssuance.receiveZero(deployer.address, amount)).wait()
-    const communityIssuanceBalanceAfter = await zeroToken.balanceOf(communityIssuanceAddress)
-    console.log(`Community issuance balance after: ${communityIssuanceBalanceAfter}`)
+    console.log(`Current allowance: ${allowance}`);
+    await (await zeroToken.increaseAllowance(communityIssuanceAddress, amount)).wait();
+    console.log("Transferring zero");
+    await (await communityIssuance.receiveZero(deployer.address, amount)).wait();
+    const communityIssuanceBalanceAfter = await zeroToken.balanceOf(communityIssuanceAddress);
+    console.log(`Community issuance balance after: ${communityIssuanceBalanceAfter}`);
   });
 
 type DeployParams = {
@@ -350,7 +360,7 @@ task("deploy", "Deploys the contracts to the network")
         sovFeeCollectorAddress,
         wrbtcAddress,
         presaleAddress,
-        marketMakerAddress,
+        marketMakerAddress
       }: DeployParams,
       env
     ) => {
@@ -370,9 +380,7 @@ task("deploy", "Deploys the contracts to the network")
       sovFeeCollectorAddress ??= hasSovFeeCollector(env.network.name)
         ? sovFeeCollectorAddresses[env.network.name]
         : undefined;
-        wrbtcAddress ??= hasWrbtc(env.network.name)
-        ? wrbtcAddresses[env.network.name]
-        : undefined;
+      wrbtcAddress ??= hasWrbtc(env.network.name) ? wrbtcAddresses[env.network.name] : undefined;
       presaleAddress ??= hasPresale(env.network.name)
         ? presaleAddresses[env.network.name]
         : undefined;
