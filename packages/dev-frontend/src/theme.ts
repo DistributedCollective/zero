@@ -466,7 +466,7 @@ const theme: Theme = {
       width: "100vw",
       maxWidth: "1248px",
       mx: "auto",
-      paddingBottom: 80
+      paddingBottom: 20
     },
 
     columns: {
