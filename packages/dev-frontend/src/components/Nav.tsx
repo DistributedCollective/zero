@@ -10,6 +10,7 @@ export const Nav: React.FC = () => {
         alignItems: "center",
         justifyContent: "space-between",
         mt: 3,
+        pb: 0,
         flexDirection: ["column", "column", "row"]
       }}
     >
