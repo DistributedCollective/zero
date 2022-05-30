@@ -5,7 +5,6 @@ import "@sovryn-zero/contracts/contracts/Interfaces/IBorrowerOperations.sol";
 
 /// @title ZERO-SDK Borrower Lib
 /// @notice Library containing basic Borrowing Operations from ZERO protocol
-/// @dev //TODO: add description for devs how to use
 library BorrowerLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;

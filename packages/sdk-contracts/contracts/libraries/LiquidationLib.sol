@@ -7,7 +7,6 @@ import "@sovryn-zero/contracts/contracts/PriceFeed.sol";
 
 /// @title ZERO-SDK Liquidation Lib
 /// @notice Library containing basic Liquidation and redemption operations
-/// @dev //TODO: add description for devs how to use
 library LiquidationLib {
     /// @dev Three hints returned from a helper contract function, aim to ease
     ///     the traversal of the troves, resulting in more eficient operaitons and less gas cost

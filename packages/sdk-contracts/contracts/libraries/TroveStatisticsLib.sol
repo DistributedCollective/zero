@@ -5,7 +5,6 @@ import "@sovryn-zero/contracts/contracts/Interfaces/ITroveManager.sol";
 
 /// @title ZERO-SDK Liquidation Lib
 /// @notice Library containing view functions regarding troves
-/// @dev //TODO: add description for devs how to use
 library TroveStatisticsLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;
