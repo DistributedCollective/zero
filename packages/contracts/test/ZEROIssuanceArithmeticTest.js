@@ -34,7 +34,6 @@ const repeatedlyIssueZERO = async (stabilityPool, timeBetweenIssuances, duration
   }
 }
 
-
 contract('ZERO community issuance arithmetic tests', async accounts => {
   let contracts
   let borrowerOperations
