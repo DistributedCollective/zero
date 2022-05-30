@@ -107,7 +107,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
       setHasAccess(false);
       try {
         const { data } = await checkAccountAccess(account);
-        setHasAccess(!!data.access);
+        setHasAccess(!data.access);
       } catch (error) {
         console.log("error:", error);
       } finally {

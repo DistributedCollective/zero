@@ -85,7 +85,7 @@ contract('TroveManager', async accounts => {
     await zeroToken.unprotectedMint(multisig,toBN(dec(20,24)))
     await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
     await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
-    await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
+    // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
     
   })
@@ -1009,8 +1009,8 @@ contract('TroveManager', async accounts => {
 
     const G_After = await stabilityPool.epochToScaleToG(0, 0)
 
-    // Expect G has increased from the ZERO reward event triggered
-    assert.isTrue(G_After.gt(G_Before))
+    // Expect G hasn't increased from the ZERO reward event triggered
+    assert.isTrue(G_After.eq(G_Before))
   })
 
   it("liquidate(): when SP is empty, doesn't update G", async () => {
@@ -1034,9 +1034,9 @@ contract('TroveManager', async accounts => {
     // Check SP is empty
     assert.equal((await stabilityPool.getTotalZUSDDeposits()), '0')
 
-    // Check G is non-zero
+    // Check G is zero
     const G_Before = await stabilityPool.epochToScaleToG(0, 0)
-    assert.isTrue(G_Before.gt(toBN('0')))
+    assert.isTrue(G_Before.eq(toBN('0')))
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
@@ -1746,8 +1746,8 @@ contract('TroveManager', async accounts => {
 
     const G_After = await stabilityPool.epochToScaleToG(0, 0)
 
-    // Expect G has increased from the ZERO reward event triggered
-    assert.isTrue(G_After.gt(G_Before))
+    // Expect G hasn't increased from the ZERO reward event triggered
+    assert.isTrue(G_After.eq(G_Before))
   })
 
   it("liquidateTroves(): when SP is empty, doesn't update G", async () => {
@@ -1772,9 +1772,9 @@ contract('TroveManager', async accounts => {
     // Check SP is empty
     assert.equal((await stabilityPool.getTotalZUSDDeposits()), '0')
 
-    // Check G is non-zero
+    // Check G is zero
     const G_Before = await stabilityPool.epochToScaleToG(0, 0)
-    assert.isTrue(G_Before.gt(toBN('0')))
+    assert.isTrue(G_Before.eq(toBN('0')))
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
@@ -2251,8 +2251,8 @@ contract('TroveManager', async accounts => {
 
     const G_After = await stabilityPool.epochToScaleToG(0, 0)
 
-    // Expect G has increased from the ZERO reward event triggered
-    assert.isTrue(G_After.gt(G_Before))
+    // Expect G hasn't increased from the ZERO reward event triggered
+    assert.isTrue(G_After.eq(G_Before))
   })
 
   it("batchLiquidateTroves(): when SP is empty, doesn't update G", async () => {
@@ -2279,7 +2279,7 @@ contract('TroveManager', async accounts => {
 
     // Check G is non-zero
     const G_Before = await stabilityPool.epochToScaleToG(0, 0)
-    assert.isTrue(G_Before.gt(toBN('0')))
+    assert.isTrue(G_Before.eq(toBN('0')))
 
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
 
@@ -3881,9 +3881,9 @@ contract('TroveManager', async accounts => {
     const baseRate_1 = await troveManager.baseRate()
     assert.isTrue(baseRate_1.gt(toBN('0')))
 
-    // Check ZERO Staking contract balance after is non-zero
+    // Check ZERO Staking contract balance after is zero
     const zeroStakingBalance_After = toBN(await web3.eth.getBalance(zeroStaking.address))
-    assert.isTrue(zeroStakingBalance_After.gt(toBN('0')))
+    assert.isTrue(zeroStakingBalance_After.eq(toBN('0')))
   })
 
   it("redeemCollateral(): a redemption made at zero base increases the ETH-fees-per-ZERO-staked in ZERO Staking contract", async () => {
@@ -3960,8 +3960,8 @@ contract('TroveManager', async accounts => {
 
     const zeroStakingBalance_After = toBN(await web3.eth.getBalance(zeroStaking.address))
 
-    // check ZERO Staking balance has increased
-    assert.isTrue(zeroStakingBalance_After.gt(zeroStakingBalance_Before))
+    // check ZERO Staking balance hasn't increased
+    assert.isTrue(zeroStakingBalance_After.eq(zeroStakingBalance_Before))
   })
 
   it("redeemCollateral(): a redemption made at a non-zero base rate increases ETH-per-ZERO-staked in the staking contract", async () => {
@@ -4003,8 +4003,8 @@ contract('TroveManager', async accounts => {
 
     const F_ETH_After = await zeroStaking.F_ETH()
 
-    // check ZERO Staking balance has increased
-    assert.isTrue(F_ETH_After.gt(F_ETH_Before))
+    // check ZERO Staking balance hasn't increased
+    assert.isTrue(F_ETH_After.eq(F_ETH_Before))
   })
 
   it("redeemCollateral(): a redemption sends the ETH remainder (ETHDrawn - ETHFee) to the redeemer", async () => {
