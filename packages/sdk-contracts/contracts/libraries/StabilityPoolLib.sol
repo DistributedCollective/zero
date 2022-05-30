@@ -4,8 +4,8 @@ pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/Interfaces/IStabilityPool.sol";
 
 /// @title ZERO-SDK Liquidation Lib
-/// @author 0xLucian
 /// @notice Library containing basic operations regarding ZERO Stability Pool
+/// @dev //TODO: add description for devs how to use
 library StabilityPoolLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;

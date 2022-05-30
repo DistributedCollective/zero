@@ -4,8 +4,8 @@ pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/Interfaces/IBorrowerOperations.sol";
 
 /// @title ZERO-SDK Borrower Lib
-/// @author 0xLucian
 /// @notice Library containing basic Borrowing Operations from ZERO protocol
+/// @dev //TODO: add description for devs how to use
 library BorrowerLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;
