@@ -65,33 +65,29 @@ describe("Liquidation Library Operations", () => {
   describe("Redeem Collateral", async () => {
     it("should call fetch price and redemption hints and redeemCollateral with expected params", async () => {
       priceFeed.fetchPrice.returns(5);
-      hintHelpers.getRedemptionHints.returns({
-        firstRedemptionHint: signers[0].address,
-        partialRedemptionHintNICR: 1,
-        truncatedZUSDamount: 100,
-      });
+      hintHelpers.getRedemptionHints.returns([signers[0].address, 1, 100]);
 
-      // await testIntegration.testRedeemCollateral(
-      //   hintHelpers.address,
-      //   priceFeed.address,
-      //   100,
-      //   1
-      // );
-      // expect(priceFeed.fetchPrice).to.have.been.calledOnce;
-      // expect(hintHelpers.getRedemptionHints).to.have.been.calledOnceWith(
-      //   100,
-      //   5,
-      //   0
-      // );
-      // expect(troveManager.redeemCollateral).to.have.been.calledOnceWith(
-      //   100,
-      //   signers[0].address,
-      //   signers[0].address,
-      //   signers[0].address,
-      //   1,
-      //   0,
-      //   1
-      // );
+      await testIntegration.testRedeemCollateral(
+        hintHelpers.address,
+        priceFeed.address,
+        100,
+        1
+      );
+      expect(priceFeed.fetchPrice).to.have.been.calledOnce;
+      expect(hintHelpers.getRedemptionHints).to.have.been.calledOnceWith(
+        100,
+        5,
+        0
+      );
+      expect(troveManager.redeemCollateral).to.have.been.calledOnceWith(
+        100,
+        signers[0].address,
+        signers[0].address,
+        signers[0].address,
+        1,
+        0,
+        1
+      );
     });
   });
 });

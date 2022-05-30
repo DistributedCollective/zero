@@ -9,6 +9,14 @@ import "@sovryn-zero/contracts/contracts/PriceFeed.sol";
 /// @notice Library containing basic Liquidation and redemption operations
 /// @dev //TODO: add description for devs how to use
 library LiquidationLib {
+    /// @dev Three hints returned from a helper contract function, aim to ease
+    ///     the traversal of the troves, resulting in more eficient operaitons and less gas cost
+    /// - `firstRedemptionHint` is the address of the first Trove with ICR >= MCR (i.e. the first Trove that will be redeemed).
+    /// - `partialRedemptionHintNICR` is the final nominal ICR of the last Trove of the sequence after being hit
+    ///      by partial redemption or zero in case of no partial redemption.
+    /// - `truncatedZUSDamount` is the maximum amount that can be redeemed out of the the provided `_ZUSDamount`.
+    ///     This can be lower than `_ZUSDamount` when redeeming the full amount would leave the last Trove of the redemption
+    ///     sequence with less net debt than the minimum allowed value (i.e. MIN_NET_DEBT).
     struct RedemptionHints {
         address firstRedemptionHint;
         uint256 partialRedemptionHintNICR;
