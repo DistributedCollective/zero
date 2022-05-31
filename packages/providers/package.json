@@ -1,5 +1,5 @@
 {
-  "name": "@liquity/providers",
+  "name": "@sovryn-zero/providers",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",

@@ -8,9 +8,9 @@ import {
   TransactableLiquity,
   Trove,
   TroveAdjustmentParams
-} from "@liquity/lib-base";
+} from "@sovryn-zero/lib-base";
 
-import { EthersLiquity as Liquity } from "@liquity/lib-ethers";
+import { EthersLiquity as Liquity } from "@sovryn-zero/lib-ethers";
 
 import {
   createRandomTrove,

@@ -6,8 +6,8 @@
 
 ## Packages
 
-|  Package | Description |
-|  --- | --- |
-|  [@liquity/lib-base](./lib-base.md) |  |
-|  [@liquity/lib-ethers](./lib-ethers.md) |  |
+| Package                                    | Description |
+| ------------------------------------------ | ----------- |
+| [@sovryn-zero/lib-base](./lib-base.md)     |             |
+| [@sovryn-zero/lib-ethers](./lib-ethers.md) |             |
 

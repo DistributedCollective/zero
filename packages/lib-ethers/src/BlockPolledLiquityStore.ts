@@ -9,7 +9,7 @@ import {
   StabilityDeposit,
   ZEROStake,
   LiquityStore
-} from "@liquity/lib-base";
+} from "@sovryn-zero/lib-base";
 
 import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
 import {
@@ -20,7 +20,7 @@ import {
 import { EthersCallOverrides, EthersProvider } from "./types";
 
 /**
- * Extra state added to {@link @liquity/lib-base#LiquityStoreState} by
+ * Extra state added to {@link @sovryn-zero/lib-base#LiquityStoreState} by
  * {@link BlockPolledLiquityStore}.
  *
  * @public
@@ -42,7 +42,7 @@ export interface BlockPolledLiquityStoreExtraState {
 
 /**
  * The type of {@link BlockPolledLiquityStore}'s
- * {@link @liquity/lib-base#LiquityStore.state | state}.
+ * {@link @sovryn-zero/lib-base#LiquityStore.state | state}.
  *
  * @public
  */
@@ -62,7 +62,7 @@ const promiseAllValues = <T>(object: T) => {
 const decimalify = (bigNumber: BigNumber) => Decimal.fromBigNumberString(bigNumber.toHexString());
 
 /**
- * Ethers-based {@link @liquity/lib-base#LiquityStore} that updates state whenever there's a new
+ * Ethers-based {@link @sovryn-zero/lib-base#LiquityStore} that updates state whenever there's a new
  * block.
  *
  * @public
@@ -101,11 +101,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
   ): Promise<[baseState: LiquityStoreBaseState, extraState: BlockPolledLiquityStoreExtraState]> {
     const { userAddress, frontendTag } = this.connection;
 
-    const {
-      blockTimestamp,
-      createFees,
-      ...baseState
-    } = await promiseAllValues({
+    const { blockTimestamp, createFees, ...baseState } = await promiseAllValues({
       blockTimestamp: _getBlockTimestamp(this.connection, blockTag),
       createFees: this._readable._getFeesFactory({ blockTag }),
 
@@ -169,7 +165,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
     return [
       {
         ...baseState,
-        _feesInNormalMode: createFees(blockTimestamp, false),
+        _feesInNormalMode: createFees(blockTimestamp, false)
       },
       {
         blockTag,
