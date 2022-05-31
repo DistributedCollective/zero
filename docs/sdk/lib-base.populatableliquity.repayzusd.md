@@ -14,9 +14,9 @@ repayZUSD(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquit
 
 ## Parameters
 
-| Parameter | Type                                   | Description                  |
-| --------- | -------------------------------------- | ---------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md) | The amount of ZUSD to repay. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of ZUSD to repay. |
 
 <b>Returns:</b>
 

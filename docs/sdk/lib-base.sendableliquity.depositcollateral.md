@@ -14,9 +14,9 @@ depositCollateral(amount: Decimalish): Promise<SentLiquityTransaction<S, Liquity
 
 ## Parameters
 
-| Parameter | Type                                   | Description                                                         |
-| --------- | -------------------------------------- | ------------------------------------------------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md) | The amount of collateral to add to the Trove's existing collateral. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of collateral to add to the Trove's existing collateral. |
 
 <b>Returns:</b>
 

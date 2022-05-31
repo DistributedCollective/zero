@@ -14,9 +14,9 @@ liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<SentLiquityTran
 
 ## Parameters
 
-| Parameter                        | Type   | Description                              |
-| -------------------------------- | ------ | ---------------------------------------- |
-| maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
 
 <b>Returns:</b>
 

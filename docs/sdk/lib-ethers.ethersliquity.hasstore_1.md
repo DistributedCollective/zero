@@ -14,9 +14,9 @@ hasStore(store: "blockPolled"): this is EthersLiquityWithStore<BlockPolledLiquit
 
 ## Parameters
 
-| Parameter | Type          | Description |
-| --------- | ------------- | ----------- |
-| store     | "blockPolled" |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  store | "blockPolled" |  |
 
 <b>Returns:</b>
 

@@ -14,10 +14,10 @@ getZEROStake(address?: string, overrides?: EthersCallOverrides): Promise<ZEROSta
 
 ## Parameters
 
-| Parameter | Type                                                       | Description                       |
-| --------- | ---------------------------------------------------------- | --------------------------------- |
-| address   | string                                                     | Address that owns the ZERO Stake. |
-| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                   |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address that owns the ZERO Stake. |
+|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
 
 <b>Returns:</b>
 

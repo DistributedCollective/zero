@@ -12,9 +12,9 @@ mul(multiplier: Decimalish): Decimal;
 
 ## Parameters
 
-| Parameter  | Type                                   | Description |
-| ---------- | -------------------------------------- | ----------- |
-| multiplier | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  multiplier | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

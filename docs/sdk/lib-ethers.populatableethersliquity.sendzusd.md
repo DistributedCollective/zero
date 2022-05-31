@@ -14,11 +14,11 @@ sendZUSD(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOve
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description             |
-| --------- | ------------------------------------------------------------------------ | ----------------------- |
-| toAddress | string                                                                   | Address of receipient.  |
-| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of ZUSD to send. |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                         |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  toAddress | string | Address of receipient. |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to send. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

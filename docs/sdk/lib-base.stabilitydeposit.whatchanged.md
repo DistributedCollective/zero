@@ -14,9 +14,9 @@ whatChanged(thatZUSD: Decimalish): StabilityDepositChange<Decimal> | undefined;
 
 ## Parameters
 
-| Parameter | Type                                   | Description |
-| --------- | -------------------------------------- | ----------- |
-| thatZUSD  | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  thatZUSD | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

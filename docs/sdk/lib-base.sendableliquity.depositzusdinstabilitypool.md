@@ -14,10 +14,10 @@ depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<Se
 
 ## Parameters
 
-| Parameter   | Type                                   | Description                                                         |
-| ----------- | -------------------------------------- | ------------------------------------------------------------------- |
-| amount      | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to add to new or existing deposit.                   |
-| frontendTag | string                                 | Address that should receive a share of this deposit's ZERO rewards. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to add to new or existing deposit. |
+|  frontendTag | string | Address that should receive a share of this deposit's ZERO rewards. |
 
 <b>Returns:</b>
 

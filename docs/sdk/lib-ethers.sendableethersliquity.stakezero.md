@@ -14,10 +14,10 @@ stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<S
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description                                     |
-| --------- | ------------------------------------------------------------------------ | ----------------------------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of ZERO to add to new or existing stake. |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                 |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to add to new or existing stake. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

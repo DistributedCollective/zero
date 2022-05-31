@@ -14,10 +14,10 @@ getTroveBeforeRedistribution(address?: string, overrides?: EthersCallOverrides):
 
 ## Parameters
 
-| Parameter | Type                                                       | Description                  |
-| --------- | ---------------------------------------------------------- | ---------------------------- |
-| address   | string                                                     | Address that owns the Trove. |
-| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                              |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address that owns the Trove. |
+|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
 
 <b>Returns:</b>
 

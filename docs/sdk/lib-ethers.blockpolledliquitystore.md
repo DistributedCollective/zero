@@ -15,13 +15,13 @@ export declare class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiq
 
 ## Constructors
 
-| Constructor                                                                      | Modifiers | Description                                                                 |
-| -------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------- |
-| [(constructor)(readable)](./lib-ethers.blockpolledliquitystore._constructor_.md) |           | Constructs a new instance of the <code>BlockPolledLiquityStore</code> class |
+|  Constructor | Modifiers | Description |
+|  --- | --- | --- |
+|  [(constructor)(readable)](./lib-ethers.blockpolledliquitystore._constructor_.md) |  | Constructs a new instance of the <code>BlockPolledLiquityStore</code> class |
 
 ## Properties
 
-| Property                                                         | Modifiers | Type                                                               | Description |
-| ---------------------------------------------------------------- | --------- | ------------------------------------------------------------------ | ----------- |
-| [connection](./lib-ethers.blockpolledliquitystore.connection.md) |           | [EthersLiquityConnection](./lib-ethers.ethersliquityconnection.md) |             |
+|  Property | Modifiers | Type | Description |
+|  --- | --- | --- | --- |
+|  [connection](./lib-ethers.blockpolledliquitystore.connection.md) |  | [EthersLiquityConnection](./lib-ethers.ethersliquityconnection.md) |  |
 

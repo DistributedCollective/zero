@@ -12,9 +12,9 @@ add(addend: Decimalish): Decimal;
 
 ## Parameters
 
-| Parameter | Type                                   | Description |
-| --------- | -------------------------------------- | ----------- |
-| addend    | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  addend | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

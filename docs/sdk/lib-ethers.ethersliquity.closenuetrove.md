@@ -12,9 +12,9 @@ closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetai
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description |
-| --------- | ------------------------------------------------------------------------ | ----------- |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

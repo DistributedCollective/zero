@@ -14,9 +14,9 @@ withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<SentLiquityTransactio
 
 ## Parameters
 
-| Parameter | Type                                   | Description                 |
-| --------- | -------------------------------------- | --------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to withdraw. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to withdraw. |
 
 <b>Returns:</b>
 

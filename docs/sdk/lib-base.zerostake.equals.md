@@ -14,9 +14,9 @@ equals(that: ZEROStake): boolean;
 
 ## Parameters
 
-| Parameter | Type                                 | Description |
-| --------- | ------------------------------------ | ----------- |
-| that      | [ZEROStake](./lib-base.zerostake.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  that | [ZEROStake](./lib-base.zerostake.md) |  |
 
 <b>Returns:</b>
 

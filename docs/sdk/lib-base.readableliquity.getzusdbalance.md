@@ -14,9 +14,9 @@ getZUSDBalance(address?: string): Promise<Decimal>;
 
 ## Parameters
 
-| Parameter | Type   | Description                                |
-| --------- | ------ | ------------------------------------------ |
-| address   | string | Address whose balance should be retrieved. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address whose balance should be retrieved. |
 
 <b>Returns:</b>
 

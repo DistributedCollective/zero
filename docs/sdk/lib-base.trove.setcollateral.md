@@ -12,9 +12,9 @@ setCollateral(collateral: Decimalish): Trove;
 
 ## Parameters
 
-| Parameter  | Type                                   | Description |
-| ---------- | -------------------------------------- | ----------- |
-| collateral | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  collateral | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

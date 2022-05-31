@@ -14,9 +14,9 @@ subscribe(listener: (params: LiquityStoreListenerParams<T>) => void): () => void
 
 ## Parameters
 
-| Parameter | Type                                                                                                         | Description                                          |
-| --------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| listener  | (params: [LiquityStoreListenerParams](./lib-base.liquitystorelistenerparams.md)<!-- -->&lt;T&gt;) =&gt; void | Function that will be called whenever state changes. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  listener | (params: [LiquityStoreListenerParams](./lib-base.liquitystorelistenerparams.md)<!-- -->&lt;T&gt;) =&gt; void | Function that will be called whenever state changes. |
 
 <b>Returns:</b>
 

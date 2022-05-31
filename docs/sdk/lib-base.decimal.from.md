@@ -12,9 +12,9 @@ static from(decimalish: Decimalish): Decimal;
 
 ## Parameters
 
-| Parameter  | Type                                   | Description |
-| ---------- | -------------------------------------- | ----------- |
-| decimalish | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  decimalish | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

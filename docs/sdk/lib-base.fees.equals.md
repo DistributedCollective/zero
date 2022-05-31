@@ -14,9 +14,9 @@ equals(that: Fees): boolean;
 
 ## Parameters
 
-| Parameter | Type                       | Description |
-| --------- | -------------------------- | ----------- |
-| that      | [Fees](./lib-base.fees.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  that | [Fees](./lib-base.fees.md) |  |
 
 <b>Returns:</b>
 

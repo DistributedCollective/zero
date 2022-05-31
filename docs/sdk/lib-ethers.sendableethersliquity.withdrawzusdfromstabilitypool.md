@@ -14,10 +14,10 @@ withdrawZUSDFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionO
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description                 |
-| --------- | ------------------------------------------------------------------------ | --------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of ZUSD to withdraw. |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to withdraw. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

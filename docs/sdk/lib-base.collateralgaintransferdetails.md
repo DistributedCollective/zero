@@ -15,7 +15,7 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
 
 ## Properties
 
-| Property                                                         | Type                         | Description                                                        |
-| ---------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ |
-| [newTrove](./lib-base.collateralgaintransferdetails.newtrove.md) | [Trove](./lib-base.trove.md) | New state of the depositor's Trove directly after the transaction. |
+|  Property | Type | Description |
+|  --- | --- | --- |
+|  [newTrove](./lib-base.collateralgaintransferdetails.newtrove.md) | [Trove](./lib-base.trove.md) | New state of the depositor's Trove directly after the transaction. |
 

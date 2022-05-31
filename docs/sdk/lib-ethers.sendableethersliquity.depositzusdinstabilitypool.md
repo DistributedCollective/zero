@@ -14,11 +14,11 @@ depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?:
 
 ## Parameters
 
-| Parameter   | Type                                                                     | Description                                                         |
-| ----------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| amount      | [Decimalish](./lib-base.decimalish.md)                                   | Amount of ZUSD to add to new or existing deposit.                   |
-| frontendTag | string                                                                   | Address that should receive a share of this deposit's ZERO rewards. |
-| overrides   | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                                     |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to add to new or existing deposit. |
+|  frontendTag | string | Address that should receive a share of this deposit's ZERO rewards. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

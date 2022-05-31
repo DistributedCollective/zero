@@ -14,10 +14,10 @@ sendZUSD(toAddress: string, amount: Decimalish): Promise<void>;
 
 ## Parameters
 
-| Parameter | Type                                   | Description             |
-| --------- | -------------------------------------- | ----------------------- |
-| toAddress | string                                 | Address of receipient.  |
-| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to send. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  toAddress | string | Address of receipient. |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to send. |
 
 <b>Returns:</b>
 

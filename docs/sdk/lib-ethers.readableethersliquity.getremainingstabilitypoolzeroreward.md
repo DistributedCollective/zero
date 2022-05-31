@@ -14,9 +14,9 @@ getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<De
 
 ## Parameters
 
-| Parameter | Type                                                       | Description |
-| --------- | ---------------------------------------------------------- | ----------- |
-| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
 
 <b>Returns:</b>
 

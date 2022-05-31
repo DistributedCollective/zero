@@ -14,9 +14,9 @@ unstakeZERO(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiqu
 
 ## Parameters
 
-| Parameter | Type                                   | Description                 |
-| --------- | -------------------------------------- | --------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to withdraw. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to withdraw. |
 
 <b>Returns:</b>
 

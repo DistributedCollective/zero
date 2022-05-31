@@ -14,10 +14,10 @@ sendZERO(toAddress: string, amount: Decimalish): Promise<PopulatedLiquityTransac
 
 ## Parameters
 
-| Parameter | Type                                   | Description             |
-| --------- | -------------------------------------- | ----------------------- |
-| toAddress | string                                 | Address of receipient.  |
-| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to send. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  toAddress | string | Address of receipient. |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to send. |
 
 <b>Returns:</b>
 

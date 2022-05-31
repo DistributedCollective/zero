@@ -14,11 +14,11 @@ borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: Ethers
 
 ## Parameters
 
-| Parameter        | Type                                                                     | Description                                                                    |
-| ---------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| amount           | [Decimalish](./lib-base.decimalish.md)                                   | The amount of ZUSD to borrow.                                                  |
-| maxBorrowingRate | [Decimalish](./lib-base.decimalish.md)                                   | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
-| overrides        | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                                                |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of ZUSD to borrow. |
+|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

@@ -14,10 +14,10 @@ repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<T
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description                  |
-| --------- | ------------------------------------------------------------------------ | ---------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md)                                   | The amount of ZUSD to repay. |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                              |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of ZUSD to repay. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

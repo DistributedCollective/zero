@@ -14,9 +14,9 @@ getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistri
 
 ## Parameters
 
-| Parameter | Type   | Description                  |
-| --------- | ------ | ---------------------------- |
-| address   | string | Address that owns the Trove. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address that owns the Trove. |
 
 <b>Returns:</b>
 

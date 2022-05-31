@@ -18,13 +18,13 @@ Implemented by [PopulatedEthersLiquityTransaction](./lib-ethers.populatedethersl
 
 ## Properties
 
-| Property                                                                                     | Type | Description                                           |
-| -------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [rawPopulatedTransaction](./lib-base.populatedliquitytransaction.rawpopulatedtransaction.md) | P    | Implementation-specific populated transaction object. |
+|  Property | Type | Description |
+|  --- | --- | --- |
+|  [rawPopulatedTransaction](./lib-base.populatedliquitytransaction.rawpopulatedtransaction.md) | P | Implementation-specific populated transaction object. |
 
 ## Methods
 
-| Method                                                   | Description           |
-| -------------------------------------------------------- | --------------------- |
-| [send()](./lib-base.populatedliquitytransaction.send.md) | Send the transaction. |
+|  Method | Description |
+|  --- | --- |
+|  [send()](./lib-base.populatedliquitytransaction.send.md) | Send the transaction. |
 

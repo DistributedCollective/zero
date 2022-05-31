@@ -14,9 +14,9 @@ registerFrontend(kickbackRate: Decimalish): Promise<void>;
 
 ## Parameters
 
-| Parameter    | Type                                   | Description                                                                       |
-| ------------ | -------------------------------------- | --------------------------------------------------------------------------------- |
-| kickbackRate | [Decimalish](./lib-base.decimalish.md) | The portion of ZERO rewards to pass onto users of the frontend (between 0 and 1). |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  kickbackRate | [Decimalish](./lib-base.decimalish.md) | The portion of ZERO rewards to pass onto users of the frontend (between 0 and 1). |
 
 <b>Returns:</b>
 

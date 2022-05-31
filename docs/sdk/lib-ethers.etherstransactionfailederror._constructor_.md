@@ -14,8 +14,8 @@ constructor(message: string, failedReceipt: FailedReceipt<EthersTransactionRecei
 
 ## Parameters
 
-| Parameter     | Type                                                                                                                                     | Description |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| message       | string                                                                                                                                   |             |
-| failedReceipt | [FailedReceipt](./lib-base.failedreceipt.md)<!-- -->&lt;[EthersTransactionReceipt](./lib-ethers.etherstransactionreceipt.md)<!-- -->&gt; |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  message | string |  |
+|  failedReceipt | [FailedReceipt](./lib-base.failedreceipt.md)<!-- -->&lt;[EthersTransactionReceipt](./lib-ethers.etherstransactionreceipt.md)<!-- -->&gt; |  |
 

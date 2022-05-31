@@ -12,9 +12,9 @@ equals(that: TroveWithPendingRedistribution): boolean;
 
 ## Parameters
 
-| Parameter | Type                                                                           | Description |
-| --------- | ------------------------------------------------------------------------------ | ----------- |
-| that      | [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  that | [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md) |  |
 
 <b>Returns:</b>
 

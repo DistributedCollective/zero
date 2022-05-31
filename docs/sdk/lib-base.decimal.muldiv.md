@@ -12,10 +12,10 @@ mulDiv(multiplier: Decimalish, divider: Decimalish): Decimal;
 
 ## Parameters
 
-| Parameter  | Type                                   | Description |
-| ---------- | -------------------------------------- | ----------- |
-| multiplier | [Decimalish](./lib-base.decimalish.md) |             |
-| divider    | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  multiplier | [Decimalish](./lib-base.decimalish.md) |  |
+|  divider | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

@@ -19,7 +19,7 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-| Property                                                            | Modifiers | Type | Description |
-| ------------------------------------------------------------------- | --------- | ---- | ----------- |
-| [failedReceipt](./lib-base.transactionfailederror.failedreceipt.md) |           | T    |             |
+|  Property | Modifiers | Type | Description |
+|  --- | --- | --- | --- |
+|  [failedReceipt](./lib-base.transactionfailederror.failedreceipt.md) |  | T |  |
 

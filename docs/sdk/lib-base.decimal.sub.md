@@ -12,9 +12,9 @@ sub(subtrahend: Decimalish): Decimal;
 
 ## Parameters
 
-| Parameter  | Type                                   | Description |
-| ---------- | -------------------------------------- | ----------- |
-| subtrahend | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  subtrahend | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

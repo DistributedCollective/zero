@@ -21,8 +21,8 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Methods
 
-| Method                                                                                                      | Modifiers | Description |
-| ----------------------------------------------------------------------------------------------------------- | --------- | ----------- |
-| [applyRedistribution(totalRedistributed)](./lib-base.trovewithpendingredistribution.applyredistribution.md) |           |             |
-| [equals(that)](./lib-base.trovewithpendingredistribution.equals.md)                                         |           |             |
+|  Method | Modifiers | Description |
+|  --- | --- | --- |
+|  [applyRedistribution(totalRedistributed)](./lib-base.trovewithpendingredistribution.applyredistribution.md) |  |  |
+|  [equals(that)](./lib-base.trovewithpendingredistribution.equals.md) |  |  |
 

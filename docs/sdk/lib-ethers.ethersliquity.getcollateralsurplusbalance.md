@@ -14,10 +14,10 @@ getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): 
 
 ## Parameters
 
-| Parameter | Type                                                       | Description |
-| --------- | ---------------------------------------------------------- | ----------- |
-| address   | string                                                     |             |
-| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string |  |
+|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
 
 <b>Returns:</b>
 

@@ -20,18 +20,18 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-| Property                                                 | Modifiers | Type                             | Description                            |
-| -------------------------------------------------------- | --------- | -------------------------------- | -------------------------------------- |
-| [collateralGain](./lib-base.zerostake.collateralgain.md) |           | [Decimal](./lib-base.decimal.md) | Collateral gain available to withdraw. |
-| [isEmpty](./lib-base.zerostake.isempty.md)               |           | boolean                          |                                        |
-| [stakedZERO](./lib-base.zerostake.stakedzero.md)         |           | [Decimal](./lib-base.decimal.md) | The amount of ZERO that's staked.      |
-| [zusdGain](./lib-base.zerostake.zusdgain.md)             |           | [Decimal](./lib-base.decimal.md) | ZUSD gain available to withdraw.       |
+|  Property | Modifiers | Type | Description |
+|  --- | --- | --- | --- |
+|  [collateralGain](./lib-base.zerostake.collateralgain.md) |  | [Decimal](./lib-base.decimal.md) | Collateral gain available to withdraw. |
+|  [isEmpty](./lib-base.zerostake.isempty.md) |  | boolean |  |
+|  [stakedZERO](./lib-base.zerostake.stakedzero.md) |  | [Decimal](./lib-base.decimal.md) | The amount of ZERO that's staked. |
+|  [zusdGain](./lib-base.zerostake.zusdgain.md) |  | [Decimal](./lib-base.decimal.md) | ZUSD gain available to withdraw. |
 
 ## Methods
 
-| Method                                                             | Modifiers | Description                                                                                   |
-| ------------------------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------- |
-| [apply(change)](./lib-base.zerostake.apply.md)                     |           | Apply a [ZEROStakeChange](./lib-base.zerostakechange.md) to this <code>ZEROStake</code>.      |
-| [equals(that)](./lib-base.zerostake.equals.md)                     |           | Compare to another instance of <code>ZEROStake</code>.                                        |
-| [whatChanged(thatStakedZERO)](./lib-base.zerostake.whatchanged.md) |           | Calculate the difference between this <code>ZEROStake</code> and <code>thatStakedZERO</code>. |
+|  Method | Modifiers | Description |
+|  --- | --- | --- |
+|  [apply(change)](./lib-base.zerostake.apply.md) |  | Apply a [ZEROStakeChange](./lib-base.zerostakechange.md) to this <code>ZEROStake</code>. |
+|  [equals(that)](./lib-base.zerostake.equals.md) |  | Compare to another instance of <code>ZEROStake</code>. |
+|  [whatChanged(thatStakedZERO)](./lib-base.zerostake.whatchanged.md) |  | Calculate the difference between this <code>ZEROStake</code> and <code>thatStakedZERO</code>. |
 

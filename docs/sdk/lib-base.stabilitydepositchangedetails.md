@@ -15,7 +15,7 @@ export interface StabilityDepositChangeDetails extends StabilityPoolGainsWithdra
 
 ## Properties
 
-| Property                                                     | Type                                                                                                                   | Description                                              |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| [change](./lib-base.stabilitydepositchangedetails.change.md) | [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt; | Change that was made to the deposit by this transaction. |
+|  Property | Type | Description |
+|  --- | --- | --- |
+|  [change](./lib-base.stabilitydepositchangedetails.change.md) | [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt; | Change that was made to the deposit by this transaction. |
 

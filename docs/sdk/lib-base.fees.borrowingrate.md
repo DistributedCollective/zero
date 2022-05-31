@@ -14,9 +14,9 @@ borrowingRate(when?: Date): Decimal;
 
 ## Parameters
 
-| Parameter | Type | Description                                                                                                               |
-| --------- | ---- | ------------------------------------------------------------------------------------------------------------------------- |
-| when      | Date | Optional timestamp that can be used to calculate what the borrowing rate would decay to at a point of time in the future. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  when | Date | Optional timestamp that can be used to calculate what the borrowing rate would decay to at a point of time in the future. |
 
 <b>Returns:</b>
 

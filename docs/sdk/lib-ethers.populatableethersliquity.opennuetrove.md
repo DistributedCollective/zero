@@ -13,11 +13,11 @@ openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimal
 
 ## Parameters
 
-| Parameter        | Type                                                                                                                   | Description |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------- |
-| params           | [TroveCreationParams](./lib-base.trovecreationparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; |             |
-| maxBorrowingRate | [Decimalish](./lib-base.decimalish.md)                                                                                 |             |
-| overrides        | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md)                                               |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  params | [TroveCreationParams](./lib-base.trovecreationparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; |  |
+|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) |  |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

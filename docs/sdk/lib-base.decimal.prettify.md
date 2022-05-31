@@ -12,9 +12,9 @@ prettify(precision?: number): string;
 
 ## Parameters
 
-| Parameter | Type   | Description |
-| --------- | ------ | ----------- |
-| precision | number |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  precision | number |  |
 
 <b>Returns:</b>
 

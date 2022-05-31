@@ -14,9 +14,9 @@ apply(change: ZEROStakeChange<Decimalish> | undefined): Decimal;
 
 ## Parameters
 
-| Parameter | Type                                                                                                                        | Description |
-| --------- | --------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| change    | [ZEROStakeChange](./lib-base.zerostakechange.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; \| undefined |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  change | [ZEROStakeChange](./lib-base.zerostakechange.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; \| undefined |  |
 
 <b>Returns:</b>
 

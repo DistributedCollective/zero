@@ -14,11 +14,11 @@ openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish
 
 ## Parameters
 
-| Parameter        | Type                                                                                                                   | Description                                                                    |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| params           | [TroveCreationParams](./lib-base.trovecreationparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; | How much to deposit and borrow.                                                |
-| maxBorrowingRate | [Decimalish](./lib-base.decimalish.md)                                                                                 | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
-| overrides        | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md)                                               |                                                                                |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  params | [TroveCreationParams](./lib-base.trovecreationparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; | How much to deposit and borrow. |
+|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

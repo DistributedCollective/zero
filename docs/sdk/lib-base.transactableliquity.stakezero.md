@@ -14,9 +14,9 @@ stakeZERO(amount: Decimalish): Promise<void>;
 
 ## Parameters
 
-| Parameter | Type                                   | Description                                     |
-| --------- | -------------------------------------- | ----------------------------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to add to new or existing stake. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to add to new or existing stake. |
 
 <b>Returns:</b>
 

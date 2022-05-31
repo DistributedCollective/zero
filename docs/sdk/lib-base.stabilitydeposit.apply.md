@@ -14,9 +14,9 @@ apply(change: StabilityDepositChange<Decimalish> | undefined): Decimal;
 
 ## Parameters
 
-| Parameter | Type                                                                                                                                      | Description |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| change    | [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; \| undefined |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  change | [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; \| undefined |  |
 
 <b>Returns:</b>
 

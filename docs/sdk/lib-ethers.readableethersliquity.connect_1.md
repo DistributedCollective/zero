@@ -12,10 +12,10 @@ static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams?:
 
 ## Parameters
 
-| Parameter        | Type                                                                                             | Description |
-| ---------------- | ------------------------------------------------------------------------------------------------ | ----------- |
-| signerOrProvider | [EthersSigner](./lib-ethers.etherssigner.md) \| [EthersProvider](./lib-ethers.ethersprovider.md) |             |
-| optionalParams   | [EthersLiquityConnectionOptionalParams](./lib-ethers.ethersliquityconnectionoptionalparams.md)   |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  signerOrProvider | [EthersSigner](./lib-ethers.etherssigner.md) \| [EthersProvider](./lib-ethers.ethersprovider.md) |  |
+|  optionalParams | [EthersLiquityConnectionOptionalParams](./lib-ethers.ethersliquityconnectionoptionalparams.md) |  |
 
 <b>Returns:</b>
 

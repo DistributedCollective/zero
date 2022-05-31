@@ -14,7 +14,7 @@ export interface EthersCallOverrides
 
 ## Properties
 
-| Property                                                  | Type     | Description       |
-| --------------------------------------------------------- | -------- | ----------------- |
-| [blockTag?](./lib-ethers.etherscalloverrides.blocktag.md) | BlockTag | <i>(Optional)</i> |
+|  Property | Type | Description |
+|  --- | --- | --- |
+|  [blockTag?](./lib-ethers.etherscalloverrides.blocktag.md) | BlockTag | <i>(Optional)</i> |
 

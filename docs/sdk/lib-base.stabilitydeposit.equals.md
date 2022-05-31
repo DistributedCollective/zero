@@ -14,9 +14,9 @@ equals(that: StabilityDeposit): boolean;
 
 ## Parameters
 
-| Parameter | Type                                               | Description |
-| --------- | -------------------------------------------------- | ----------- |
-| that      | [StabilityDeposit](./lib-base.stabilitydeposit.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  that | [StabilityDeposit](./lib-base.stabilitydeposit.md) |  |
 
 <b>Returns:</b>
 

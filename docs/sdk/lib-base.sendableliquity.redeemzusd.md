@@ -14,10 +14,10 @@ redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentLiqu
 
 ## Parameters
 
-| Parameter         | Type                                   | Description                                                                      |
-| ----------------- | -------------------------------------- | -------------------------------------------------------------------------------- |
-| amount            | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to be redeemed.                                                   |
-| maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md)<!-- -->. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZUSD to be redeemed. |
+|  maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md)<!-- -->. |
 
 <b>Returns:</b>
 

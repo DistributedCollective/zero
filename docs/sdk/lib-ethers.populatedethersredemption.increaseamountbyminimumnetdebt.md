@@ -14,9 +14,9 @@ increaseAmountByMinimumNetDebt(maxRedemptionRate?: Decimalish): Promise<Populate
 
 ## Parameters
 
-| Parameter         | Type                                   | Description                                                                                            |
-| ----------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md) to use in the new transaction. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md) to use in the new transaction. |
 
 <b>Returns:</b>
 

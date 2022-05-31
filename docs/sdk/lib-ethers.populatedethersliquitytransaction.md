@@ -21,13 +21,13 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-| Property                                                                                             | Modifiers | Type                                                                     | Description                                      |
-| ---------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------ | ------------------------------------------------ |
-| [rawPopulatedTransaction](./lib-ethers.populatedethersliquitytransaction.rawpopulatedtransaction.md) |           | [EthersPopulatedTransaction](./lib-ethers.etherspopulatedtransaction.md) | Unsigned transaction object populated by Ethers. |
+|  Property | Modifiers | Type | Description |
+|  --- | --- | --- | --- |
+|  [rawPopulatedTransaction](./lib-ethers.populatedethersliquitytransaction.rawpopulatedtransaction.md) |  | [EthersPopulatedTransaction](./lib-ethers.etherspopulatedtransaction.md) | Unsigned transaction object populated by Ethers. |
 
 ## Methods
 
-| Method                                                           | Modifiers | Description           |
-| ---------------------------------------------------------------- | --------- | --------------------- |
-| [send()](./lib-ethers.populatedethersliquitytransaction.send.md) |           | Send the transaction. |
+|  Method | Modifiers | Description |
+|  --- | --- | --- |
+|  [send()](./lib-ethers.populatedethersliquitytransaction.send.md) |  | Send the transaction. |
 

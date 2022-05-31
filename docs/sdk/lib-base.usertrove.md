@@ -23,14 +23,14 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-| Property                                             | Modifiers | Type                                             | Description                                            |
-| ---------------------------------------------------- | --------- | ------------------------------------------------ | ------------------------------------------------------ |
-| [ownerAddress](./lib-base.usertrove.owneraddress.md) |           | string                                           | Address that owns this Trove.                          |
-| [status](./lib-base.usertrove.status.md)             |           | [UserTroveStatus](./lib-base.usertrovestatus.md) | Provides more information when the UserTrove is empty. |
+|  Property | Modifiers | Type | Description |
+|  --- | --- | --- | --- |
+|  [ownerAddress](./lib-base.usertrove.owneraddress.md) |  | string | Address that owns this Trove. |
+|  [status](./lib-base.usertrove.status.md) |  | [UserTroveStatus](./lib-base.usertrovestatus.md) | Provides more information when the UserTrove is empty. |
 
 ## Methods
 
-| Method                                         | Modifiers | Description |
-| ---------------------------------------------- | --------- | ----------- |
-| [equals(that)](./lib-base.usertrove.equals.md) |           |             |
+|  Method | Modifiers | Description |
+|  --- | --- | --- |
+|  [equals(that)](./lib-base.usertrove.equals.md) |  |  |
 

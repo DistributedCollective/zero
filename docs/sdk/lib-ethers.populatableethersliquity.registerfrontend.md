@@ -14,10 +14,10 @@ registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverride
 
 ## Parameters
 
-| Parameter    | Type                                                                     | Description                                                                       |
-| ------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| kickbackRate | [Decimalish](./lib-base.decimalish.md)                                   | The portion of ZERO rewards to pass onto users of the frontend (between 0 and 1). |
-| overrides    | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                                                   |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  kickbackRate | [Decimalish](./lib-base.decimalish.md) | The portion of ZERO rewards to pass onto users of the frontend (between 0 and 1). |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

@@ -14,10 +14,10 @@ liquidate(address: string | string[], overrides?: EthersTransactionOverrides): P
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description                                              |
-| --------- | ------------------------------------------------------------------------ | -------------------------------------------------------- |
-| address   | string \| string\[\]                                                     | Address or array of addresses whose Troves to liquidate. |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                          |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string \| string\[\] | Address or array of addresses whose Troves to liquidate. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 

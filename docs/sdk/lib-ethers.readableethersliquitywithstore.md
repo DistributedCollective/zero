@@ -15,7 +15,7 @@ export interface ReadableEthersLiquityWithStore<T extends LiquityStore = Liquity
 
 ## Properties
 
-| Property                                                      | Type | Description                             |
-| ------------------------------------------------------------- | ---- | --------------------------------------- |
-| [store](./lib-ethers.readableethersliquitywithstore.store.md) | T    | An object that implements LiquityStore. |
+|  Property | Type | Description |
+|  --- | --- | --- |
+|  [store](./lib-ethers.readableethersliquitywithstore.store.md) | T | An object that implements LiquityStore. |
 

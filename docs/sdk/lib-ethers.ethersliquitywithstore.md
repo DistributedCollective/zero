@@ -15,7 +15,7 @@ export interface EthersLiquityWithStore<T extends LiquityStore = LiquityStore> e
 
 ## Properties
 
-| Property                                              | Type | Description                             |
-| ----------------------------------------------------- | ---- | --------------------------------------- |
-| [store](./lib-ethers.ethersliquitywithstore.store.md) | T    | An object that implements LiquityStore. |
+|  Property | Type | Description |
+|  --- | --- | --- |
+|  [store](./lib-ethers.ethersliquitywithstore.store.md) | T | An object that implements LiquityStore. |
 

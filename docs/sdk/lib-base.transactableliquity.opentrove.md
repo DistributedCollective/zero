@@ -14,10 +14,10 @@ openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish
 
 ## Parameters
 
-| Parameter        | Type                                                                                                                   | Description                                                                    |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| params           | [TroveCreationParams](./lib-base.trovecreationparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; | How much to deposit and borrow.                                                |
-| maxBorrowingRate | [Decimalish](./lib-base.decimalish.md)                                                                                 | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  params | [TroveCreationParams](./lib-base.trovecreationparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; | How much to deposit and borrow. |
+|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
 
 <b>Returns:</b>
 

@@ -14,10 +14,10 @@ getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decima
 
 ## Parameters
 
-| Parameter | Type                                                       | Description                                |
-| --------- | ---------------------------------------------------------- | ------------------------------------------ |
-| address   | string                                                     | Address whose balance should be retrieved. |
-| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                            |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address whose balance should be retrieved. |
+|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
 
 <b>Returns:</b>
 

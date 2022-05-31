@@ -14,9 +14,9 @@ getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
 
 ## Parameters
 
-| Parameter | Type   | Description                              |
-| --------- | ------ | ---------------------------------------- |
-| address   | string | Address that owns the Stability Deposit. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address that owns the Stability Deposit. |
 
 <b>Returns:</b>
 

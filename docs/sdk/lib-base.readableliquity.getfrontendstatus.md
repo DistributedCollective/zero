@@ -14,9 +14,9 @@ getFrontendStatus(address?: string): Promise<FrontendStatus>;
 
 ## Parameters
 
-| Parameter | Type   | Description       |
-| --------- | ------ | ----------------- |
-| address   | string | Address to check. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address to check. |
 
 <b>Returns:</b>
 

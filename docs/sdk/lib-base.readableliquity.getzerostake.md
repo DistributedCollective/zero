@@ -14,9 +14,9 @@ getZEROStake(address?: string): Promise<ZEROStake>;
 
 ## Parameters
 
-| Parameter | Type   | Description                       |
-| --------- | ------ | --------------------------------- |
-| address   | string | Address that owns the ZERO Stake. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  address | string | Address that owns the ZERO Stake. |
 
 <b>Returns:</b>
 

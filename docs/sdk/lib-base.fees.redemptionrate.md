@@ -14,10 +14,10 @@ redemptionRate(redeemedFractionOfSupply?: Decimalish, when?: Date): Decimal;
 
 ## Parameters
 
-| Parameter                | Type                                   | Description                                                                                                                |
-| ------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| redeemedFractionOfSupply | [Decimalish](./lib-base.decimalish.md) | The amount of ZUSD being redeemed divided by the total supply.                                                             |
-| when                     | Date                                   | Optional timestamp that can be used to calculate what the redemption rate would decay to at a point of time in the future. |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  redeemedFractionOfSupply | [Decimalish](./lib-base.decimalish.md) | The amount of ZUSD being redeemed divided by the total supply. |
+|  when | Date | Optional timestamp that can be used to calculate what the redemption rate would decay to at a point of time in the future. |
 
 <b>Returns:</b>
 

@@ -15,7 +15,7 @@ export declare class EthersTransactionFailedError extends TransactionFailedError
 
 ## Constructors
 
-| Constructor                                                                                         | Modifiers | Description                                                                      |
-| --------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------- |
-| [(constructor)(message, failedReceipt)](./lib-ethers.etherstransactionfailederror._constructor_.md) |           | Constructs a new instance of the <code>EthersTransactionFailedError</code> class |
+|  Constructor | Modifiers | Description |
+|  --- | --- | --- |
+|  [(constructor)(message, failedReceipt)](./lib-ethers.etherstransactionfailederror._constructor_.md) |  | Constructs a new instance of the <code>EthersTransactionFailedError</code> class |
 

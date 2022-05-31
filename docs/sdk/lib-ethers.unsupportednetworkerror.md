@@ -21,7 +21,7 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-| Property                                                   | Modifiers | Type   | Description                          |
-| ---------------------------------------------------------- | --------- | ------ | ------------------------------------ |
-| [chainId](./lib-ethers.unsupportednetworkerror.chainid.md) |           | number | Chain ID of the unsupported network. |
+|  Property | Modifiers | Type | Description |
+|  --- | --- | --- | --- |
+|  [chainId](./lib-ethers.unsupportednetworkerror.chainid.md) |  | number | Chain ID of the unsupported network. |
 

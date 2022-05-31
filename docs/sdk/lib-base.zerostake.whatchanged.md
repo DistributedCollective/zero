@@ -14,9 +14,9 @@ whatChanged(thatStakedZERO: Decimalish): ZEROStakeChange<Decimal> | undefined;
 
 ## Parameters
 
-| Parameter      | Type                                   | Description |
-| -------------- | -------------------------------------- | ----------- |
-| thatStakedZERO | [Decimalish](./lib-base.decimalish.md) |             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  thatStakedZERO | [Decimalish](./lib-base.decimalish.md) |  |
 
 <b>Returns:</b>
 

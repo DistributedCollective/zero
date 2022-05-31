@@ -14,10 +14,10 @@ unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise
 
 ## Parameters
 
-| Parameter | Type                                                                     | Description                 |
-| --------- | ------------------------------------------------------------------------ | --------------------------- |
-| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of ZERO to withdraw. |
-| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                             |
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of ZERO to withdraw. |
+|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>
 
