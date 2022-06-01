@@ -35,8 +35,8 @@ To calculate the redemption fee in ZUSD, multiply the redeemed ZUSD amount with 
 
 
 ```typescript
-const fees = await liquity.getFees();
-const total = await liquity.getTotal();
+const fees = await zero.getFees();
+const total = await zero.getTotal();
 
 const redeemedZUSDAmount = Decimal.from(100);
 const redeemedFractionOfSupply = redeemedZUSDAmount.div(total.debt);

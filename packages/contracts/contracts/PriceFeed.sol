@@ -24,7 +24,7 @@ contract PriceFeed is PriceFeedStorage, IPriceFeed {
 
     // --- Functions ---
 
-    /// @notice Returns the latest price obtained from the Oracle. Called by Liquity functions that require a current price.
+    /// @notice Returns the latest price obtained from the Oracle. Called by Zero functions that require a current price.
     ///         It uses the main price feed and fallback to the backup one in case of an error. If both fail return the last
     ///         good price seen.
     /// @dev It's also callable by anyone externally

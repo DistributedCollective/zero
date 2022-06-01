@@ -4,7 +4,7 @@
 
 ## EthersLiquityConnection.version property
 
-Version of the Liquity contracts (Git commit hash).
+Version of the Zero contracts (Git commit hash).
 
 <b>Signature:</b>
 

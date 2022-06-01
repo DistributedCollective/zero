@@ -1,6 +1,6 @@
 # @sovryn-zero/lib-ethers
 
-[Ethers](https://www.npmjs.com/package/ethers)-based library for reading Liquity protocol state and sending transactions.
+[Ethers](https://www.npmjs.com/package/ethers)-based library for reading Zero protocol state and sending transactions.
 
 ## Quickstart
 
@@ -19,24 +19,24 @@ const { EthersLiquity } = require("@sovryn-zero/lib-ethers");
 async function example() {
   const provider = new providers.JsonRpcProvider("http://localhost:8545");
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
-  const liquity = await EthersLiquity.connect(wallet);
+  const zero = await EthersLiquity.connect(wallet);
 
-  const { newTrove } = await liquity.openTrove({
+  const { newTrove } = await zero.openTrove({
     depositCollateral: 5, // ETH
     borrowZUSD: 2000
   });
 
-  console.log(`Successfully opened a Liquity Trove (${newTrove})!`);
+  console.log(`Successfully opened a Zero Trove (${newTrove})!`);
 }
 ```
 
 ## More examples
 
-See [packages/examples](https://github.com/liquity/liquity/tree/master/packages/examples) in the repo.
+See [packages/examples](https://github.com/DistributedCollective/zero/tree/master/packages/examples) in the repo.
 
 Liquity's [Dev UI](https://github.com/liquity/liquity/tree/master/packages/dev-frontend) itself contains many examples of `@sovryn-zero/lib-ethers` use.
 
 ## API Reference
 
-For now, it can be found in the public Liquity [repo](https://github.com/liquity/liquity/blob/master/docs/sdk/lib-ethers.md).
+For now, it can be found in the public Liquity [repo](https://github.com/distributedcollective/zero/blob/master/docs/sdk/lib-ethers.md).
 

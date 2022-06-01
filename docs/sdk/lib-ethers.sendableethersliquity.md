@@ -36,7 +36,7 @@ export declare class SendableEthersLiquity implements SendableLiquity<EthersTran
 |  [openNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.sendableethersliquity.opennuetrove.md) |  |  |
 |  [openTrove(params, maxBorrowingRate, overrides)](./lib-ethers.sendableethersliquity.opentrove.md) |  | Open a new Trove by depositing collateral and borrowing ZUSD. |
 |  [redeemZUSD(amount, maxRedemptionRate, overrides)](./lib-ethers.sendableethersliquity.redeemzusd.md) |  | Redeem ZUSD to native currency (e.g. Ether) at face value. |
-|  [registerFrontend(kickbackRate, overrides)](./lib-ethers.sendableethersliquity.registerfrontend.md) |  | Register current wallet address as a Liquity frontend. |
+|  [registerFrontend(kickbackRate, overrides)](./lib-ethers.sendableethersliquity.registerfrontend.md) |  | Register current wallet address as a Zero frontend. |
 |  [repayZUSD(amount, overrides)](./lib-ethers.sendableethersliquity.repayzusd.md) |  | Adjust existing Trove by repaying some of its debt. |
 |  [sendZERO(toAddress, amount, overrides)](./lib-ethers.sendableethersliquity.sendzero.md) |  | Send ZERO tokens to an address. |
 |  [sendZUSD(toAddress, amount, overrides)](./lib-ethers.sendableethersliquity.sendzusd.md) |  | Send ZUSD tokens to an address. |

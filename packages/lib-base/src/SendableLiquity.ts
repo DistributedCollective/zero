@@ -83,7 +83,7 @@ export const _failedReceipt = <R>(rawReceipt: R): FailedReceipt<R> => ({
  *
  * The `details` property may contain more information about the transaction.
  * See the return types of {@link TransactableLiquity} functions for the exact contents of `details`
- * for each type of Liquity transaction.
+ * for each type of Zero transaction.
  *
  * Returned by {@link SentLiquityTransaction.getReceipt} and
  * {@link SentLiquityTransaction.waitForReceipt}.
@@ -130,7 +130,7 @@ export type _SendableFrom<T, R, S> = {
 };
 
 /**
- * Send Liquity transactions.
+ * Send Zero transactions.
  *
  * @remarks
  * The functions return an object implementing {@link SentLiquityTransaction}, which can be used

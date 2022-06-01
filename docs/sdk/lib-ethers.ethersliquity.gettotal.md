@@ -4,7 +4,7 @@
 
 ## EthersLiquity.getTotal() method
 
-Get the total amount of collateral and debt in the Liquity system.
+Get the total amount of collateral and debt in the Zero system.
 
 <b>Signature:</b>
 

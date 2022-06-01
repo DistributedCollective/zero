@@ -20,11 +20,11 @@ import "./ZUSDTokenStorage.sol";
  *
  * --- Functionality added specific to the ZUSDToken ---
  *
- * 1) Transfer protection: blacklist of addresses that are invalid recipients (i.e. core Liquity contracts) in external
- * transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending ZUSD directly to a Liquity
+ * 1) Transfer protection: blacklist of addresses that are invalid recipients (i.e. core Zero contracts) in external
+ * transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending ZUSD directly to a Zero
  * core contract, when they should rather call the right function.
  *
- * 2) sendToPool() and returnFromPool(): functions callable only Liquity core contracts, which move ZUSD tokens between Liquity <-> user.
+ * 2) sendToPool() and returnFromPool(): functions callable only Zero core contracts, which move ZUSD tokens between Zero <-> user.
  */
 
 contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
@@ -61,7 +61,7 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
     }
 
-    // --- Functions for intra-Liquity calls ---
+    // --- Functions for intra-Zero calls ---
 
     function mint(address _account, uint256 _amount) external override {
         _requireCallerIsBorrowerOperations();

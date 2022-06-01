@@ -16,21 +16,21 @@ async function main() {
   // Replace URL if not using a local node
   const provider = new providers.JsonRpcProvider("http://localhost:8545");
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
-  const liquity = await EthersLiquity.connect(wallet, { useStore: "blockPolled" });
+  const zero = await EthersLiquity.connect(wallet, { useStore: "blockPolled" });
 
-  liquity.store.onLoaded = () => {
+  zero.store.onLoaded = () => {
     info("Waiting for price drops...");
-    tryToLiquidate(liquity);
+    tryToLiquidate(zero);
   };
 
-  liquity.store.subscribe(({ newState, oldState }) => {
+  zero.store.subscribe(({ newState, oldState }) => {
     // Try to liquidate whenever the price drops
     if (newState.price.lt(oldState.price)) {
-      tryToLiquidate(liquity);
+      tryToLiquidate(zero);
     }
   });
 
-  liquity.store.start();
+  zero.store.start();
 }
 
 /**
@@ -47,17 +47,15 @@ const byDescendingCollateral = ({ collateral: a }, { collateral: b }) =>
   b.gt(a) ? 1 : b.lt(a) ? -1 : 0;
 
 /**
- * @param {EthersLiquityWithStore} [liquity]
+ * @param {EthersLiquityWithStore} [zero]
  */
-async function tryToLiquidate(liquity) {
-  const { store } = liquity;
+async function tryToLiquidate(zero) {
+  const { store } = zero;
 
   const [gasPrice, riskiestTroves] = await Promise.all([
-    liquity.connection.provider
-      .getGasPrice()
-      .then(bn => Decimal.fromBigNumberString(bn.toHexString())),
+    zero.connection.provider.getGasPrice().then(bn => Decimal.fromBigNumberString(bn.toHexString())),
 
-    liquity.getTroves({
+    zero.getTroves({
       first: 1000,
       sortedBy: "ascendingCollateralRatio"
     })
@@ -76,7 +74,7 @@ async function tryToLiquidate(liquity) {
   const addresses = troves.map(trove => trove.ownerAddress);
 
   try {
-    const liquidation = await liquity.populate.liquidate(addresses, { gasPrice: gasPrice.hex });
+    const liquidation = await zero.populate.liquidate(addresses, { gasPrice: gasPrice.hex });
     const gasLimit = liquidation.rawPopulatedTransaction.gasLimit.toNumber();
     const expectedCost = gasPrice.mul(gasLimit).mul(store.state.price);
 

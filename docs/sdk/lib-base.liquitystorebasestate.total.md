@@ -4,7 +4,7 @@
 
 ## LiquityStoreBaseState.total property
 
-Total collateral and debt in the Liquity system.
+Total collateral and debt in the Zero system.
 
 <b>Signature:</b>
 

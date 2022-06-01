@@ -811,7 +811,7 @@ export class PopulatableEthersLiquity
     const { priceFeed } = _getContracts(this._readable.connection);
 
     if (!_priceFeedIsTestnet(priceFeed)) {
-      throw new Error("setPrice() unavailable on this deployment of Liquity");
+      throw new Error("setPrice() unavailable on this deployment of Zero");
     }
 
     return this._wrapSimpleTransaction(
