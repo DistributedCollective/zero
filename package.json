@@ -82,7 +82,7 @@
     "test-deprecated:dev-frontend:run": "yarn workspace @sovryn-zero/dev-frontend test --watchAll=false --forceExit --detectOpenHandles",
     "test-deprecated:dev-frontend:stop-dev-chain": "yarn stop-dev-chain",
     "test-contracts": "yarn workspace @sovryn-zero/contracts test",
-    "test-sdk-contracts": "yarn workspace @soryn/sdk-zero-contracts test",
+    "test-sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts test",
     "format-lint-sdk-contracts": "yarn workspace @soryn/sdk-zero-contracts lint && yarn workspace @soryn/sdk-zero-contracts prettier",
     "test-live": "run-s test-live:*",
     "test-live:lib-ethers": "yarn workspace @sovryn-zero/lib-ethers test-live",
