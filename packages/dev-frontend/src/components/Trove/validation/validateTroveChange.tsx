@@ -10,7 +10,7 @@ import {
   LiquityStoreState,
   TroveClosureParams,
   TroveCreationParams
-} from "@liquity/lib-base";
+} from "@sovryn-zero/lib-base";
 
 import { COIN, COIN2 } from "../../../strings";
 
@@ -22,10 +22,13 @@ const ccrPercent = new Percent(CRITICAL_COLLATERAL_RATIO).toString(0);
 
 type TroveAdjustmentDescriptionParams = {
   params: TroveAdjustmentParams<Decimal>;
-  useNueBalance: Boolean
+  useNueBalance: Boolean;
 };
 
-const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({ params, useNueBalance }) => (
+const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({
+  params,
+  useNueBalance
+}) => (
   <ActionDescription>
     {params.depositCollateral && params.borrowZUSD ? (
       <>
@@ -189,8 +192,9 @@ const validateTroveCreation = (
     if (!resultingTrove.isOpenableInRecoveryMode(price)) {
       return (
         <ErrorDescription>
-          You're not allowed to open a Line of Credit with less than <Amount>{ccrPercent}</Amount> Collateral
-          Ratio during recovery mode. Please increase your Line of Credit's Collateral Ratio.
+          You're not allowed to open a Line of Credit with less than <Amount>{ccrPercent}</Amount>{" "}
+          Collateral Ratio during recovery mode. Please increase your Line of Credit's Collateral
+          Ratio.
         </ErrorDescription>
       );
     }
@@ -206,8 +210,9 @@ const validateTroveCreation = (
     if (wouldTriggerRecoveryMode) {
       return (
         <ErrorDescription>
-          You're not allowed to open a Line of Credit that would cause the Total Collateral Ratio to fall
-          below <Amount>{ccrPercent}</Amount>. Please increase your Line of Credit's Collateral Ratio.
+          You're not allowed to open a Line of Credit that would cause the Total Collateral Ratio to
+          fall below <Amount>{ccrPercent}</Amount>. Please increase your Line of Credit's Collateral
+          Ratio.
         </ErrorDescription>
       );
     }
@@ -226,7 +231,7 @@ const validateTroveCreation = (
 };
 
 const validateTroveAdjustment = (
-  useNueBalance : Boolean,
+  useNueBalance: Boolean,
   { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD }: TroveAdjustmentParams<Decimal>,
   {
     originalTrove,
@@ -304,7 +309,7 @@ const validateTroveAdjustment = (
         <ErrorDescription>
           The amount you're trying to repay exceeds your balance by{" "}
           <Amount>
-            {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2: COIN}
+            {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2 : COIN}
           </Amount>
           .
         </ErrorDescription>
@@ -338,7 +343,8 @@ const validateTroveClosure = (
   if (numberOfTroves === 1) {
     return (
       <ErrorDescription>
-        You're not allowed to close your Line of Credit when there are no other Lines of Credit in the system.
+        You're not allowed to close your Line of Credit when there are no other Lines of Credit in
+        the system.
       </ErrorDescription>
     );
   }
@@ -351,7 +357,7 @@ const validateTroveClosure = (
     );
   }
 
-  const repayBalance = useNueBalance ? nueBalance : zusdBalance
+  const repayBalance = useNueBalance ? nueBalance : zusdBalance;
   if (repayZUSD?.gt(repayBalance)) {
     return (
       <ErrorDescription>
@@ -367,9 +373,9 @@ const validateTroveClosure = (
   if (wouldTriggerRecoveryMode) {
     return (
       <ErrorDescription>
-        You're not allowed to close a Line of Credit if it would cause the Total Collateralization Ratio to
-        fall below <Amount>{ccrPercent}</Amount>. Please wait until the Total Collateral Ratio
-        increases.
+        You're not allowed to close a Line of Credit if it would cause the Total Collateralization
+        Ratio to fall below <Amount>{ccrPercent}</Amount>. Please wait until the Total Collateral
+        Ratio increases.
       </ErrorDescription>
     );
   }

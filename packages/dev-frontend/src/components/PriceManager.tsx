@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Box, Heading, Flex, Button, Label, Input } from "theme-ui";
 
-import { Decimal, LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { Decimal, LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { useLiquity } from "../hooks/LiquityContext";
 
@@ -34,7 +34,9 @@ export const PriceManager: React.FC = () => {
         <Flex sx={{ alignItems: "stretch" }}>
           <Label>RBTC</Label>
 
-          <Label variant="unit" color="primary" backgroundColor="background">$</Label>
+          <Label variant="unit" color="primary" backgroundColor="background">
+            $
+          </Label>
 
           <Input
             type={canSetPrice ? "number" : "text"}

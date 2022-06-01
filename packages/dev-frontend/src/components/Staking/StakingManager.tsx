@@ -7,9 +7,9 @@ import {
   LiquityStoreState,
   ZEROStake,
   ZEROStakeChange
-} from "@liquity/lib-base";
+} from "@sovryn-zero/lib-base";
 
-import { LiquityStoreUpdate, useLiquityReducer, useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreUpdate, useLiquityReducer, useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { GT, COIN } from "../../strings";
 

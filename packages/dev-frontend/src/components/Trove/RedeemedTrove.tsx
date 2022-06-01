@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { Card, Heading, Box, Button, Flex } from "theme-ui";
 import { CollateralSurplusAction } from "../CollateralSurplusAction";
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { useTroveView } from "./context/TroveViewContext";
 import { InfoMessage } from "../InfoMessage";
 

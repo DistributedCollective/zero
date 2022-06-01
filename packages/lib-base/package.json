@@ -1,5 +1,5 @@
 {
-  "name": "@liquity/lib-base",
+  "name": "@sovryn-zero/lib-base",
   "version": "0.0.0-semantic-release",
   "description": "Liquity SDK shared interfaces",
   "keywords": [
@@ -10,7 +10,7 @@
   ],
   "homepage": "https://github.com/liquity/liquity#readme",
   "license": "MIT",
-  "author": "Daniel Simon <dani@liquity.org>",
+  "author": "Daniel Simon <dani@sovryn-zero.org>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/liquity/dev",

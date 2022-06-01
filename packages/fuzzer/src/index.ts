@@ -12,9 +12,9 @@ import {
   ZUSD_LIQUIDATION_RESERVE,
   Trove,
   TroveWithPendingRedistribution
-} from "@liquity/lib-base";
+} from "@sovryn-zero/lib-base";
 
-import { EthersLiquity as Liquity } from "@liquity/lib-ethers";
+import { EthersLiquity as Liquity } from "@sovryn-zero/lib-ethers";
 
 import {
   checkPoolBalances,
