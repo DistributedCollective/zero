@@ -1,19 +1,19 @@
 {
   "name": "@sovryn-zero/lib-ethers",
   "version": "0.0.0-semantic-release",
-  "description": "Liquity SDK Ethers-based implementation",
+  "description": "Sovryn SDK Ethers-based implementation",
   "keywords": [
-    "Liquity",
+    "Zero",
     "protocol",
     "DeFi",
-    "Ethereum"
+    "RSK"
   ],
-  "homepage": "https://github.com/liquity/liquity#readme",
+  "homepage": "https://github.com/DistributedCollective/zero/blob/main/README.md",
   "license": "MIT",
   "author": "Daniel Simon <dani@liquity.org>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/liquity/dev",
+  "repository": "https://github.com/DistributedCollective/zero",
   "scripts": {
     "hardhat": "hardhat",
     "check-live-version": "ts-node scripts/check-live-version.ts",
