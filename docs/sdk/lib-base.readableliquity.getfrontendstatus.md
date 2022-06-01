@@ -4,7 +4,7 @@
 
 ## ReadableLiquity.getFrontendStatus() method
 
-Check whether an address is registered as a Liquity frontend, and what its kickback rate is.
+Check whether an address is registered as a Zero frontend, and what its kickback rate is.
 
 <b>Signature:</b>
 

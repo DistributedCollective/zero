@@ -155,7 +155,7 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
 }
 
 /**
- * Send Liquity transactions and wait for them to succeed.
+ * Send Zero transactions and wait for them to succeed.
  *
  * @remarks
  * The functions return the details of the transaction (if any), or throw an implementation-specific
@@ -459,7 +459,7 @@ export interface TransactableLiquity {
   withdrawGainsFromStaking(): Promise<void>;
 
   /**
-   * Register current wallet address as a Liquity frontend.
+   * Register current wallet address as a Zero frontend.
    *
    * @param kickbackRate - The portion of ZERO rewards to pass onto users of the frontend
    *                       (between 0 and 1).

@@ -4,7 +4,7 @@
 
 ## EthersLiquity.connect() method
 
-Connect to the Liquity protocol and create an `EthersLiquity` object.
+Connect to the Zero protocol and create an `EthersLiquity` object.
 
 <b>Signature:</b>
 

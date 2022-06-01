@@ -1,5 +1,5 @@
 {
-  "name": "liquity",
+  "name": "sovryn-zero",
   "private": true,
   "workspaces": {
     "packages": ["packages/*"],

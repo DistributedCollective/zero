@@ -4,8 +4,7 @@ pragma solidity 0.6.11;
 
 /// Common interface for Fee Distributor.
 interface IFeeDistributor {
-
-     // --- Events ---
+    // --- Events ---
 
     event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
@@ -15,14 +14,13 @@ interface IFeeDistributor {
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
 
-
     event ZUSDDistributed(uint256 _zusdDistributedAmount);
     event RBTCistributed(uint256 _rbtcDistributedAmount);
 
     // --- Functions ---
-    
+
     /**
-     * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
+     * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
      * @param _sovFeeCollectorAddress SOVFeeCollector address
      * @param _zeroStakingAddress ZEROStaking contract address
@@ -43,5 +41,4 @@ interface IFeeDistributor {
     ) external;
 
     function distributeFees() external;
-
 }

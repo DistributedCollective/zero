@@ -124,7 +124,7 @@ const emptyBatch = (): BatchedCalls => ({ calls: [], callbacks: [] });
 //
 // Currently, `@sovryn-zero/lib-ethers` makes many of its read calls through Signers, which populates
 // `from`. Instead these calls should be made through a Provider, and `from` should be omitted
-// (since none of the read calls in Liquity care about `msg.sender`).
+// (since none of the read calls in Zero care about `msg.sender`).
 //
 // Then we'll be able to properly exclude calls that have `from` addresses from batching.
 const batchableCall = (request: ResolvedTransactionRequest) =>

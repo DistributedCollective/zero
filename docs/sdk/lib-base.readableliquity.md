@@ -4,7 +4,7 @@
 
 ## ReadableLiquity interface
 
-Read the state of the Liquity protocol.
+Read the state of the Zero protocol.
 
 <b>Signature:</b>
 
@@ -22,13 +22,13 @@ Implemented by [EthersLiquity](./lib-ethers.ethersliquity.md)<!-- -->.
 |  --- | --- |
 |  [getCollateralSurplusBalance(address)](./lib-base.readableliquity.getcollateralsurplusbalance.md) | Get the amount of leftover collateral available for withdrawal by an address. |
 |  [getFees()](./lib-base.readableliquity.getfees.md) | Get a calculator for current fees. |
-|  [getFrontendStatus(address)](./lib-base.readableliquity.getfrontendstatus.md) | Check whether an address is registered as a Liquity frontend, and what its kickback rate is. |
+|  [getFrontendStatus(address)](./lib-base.readableliquity.getfrontendstatus.md) | Check whether an address is registered as a Zero frontend, and what its kickback rate is. |
 |  [getNUEBalance(address)](./lib-base.readableliquity.getnuebalance.md) | Get the amount of ZUSD held by an address. |
 |  [getNumberOfTroves()](./lib-base.readableliquity.getnumberoftroves.md) | Get number of Troves that are currently open. |
 |  [getPrice()](./lib-base.readableliquity.getprice.md) | Get the current price of the native currency (e.g. Ether) in USD. |
 |  [getRemainingStabilityPoolZEROReward()](./lib-base.readableliquity.getremainingstabilitypoolzeroreward.md) | Get the remaining ZERO that will be collectively rewarded to stability depositors. |
 |  [getStabilityDeposit(address)](./lib-base.readableliquity.getstabilitydeposit.md) | Get the current state of a Stability Deposit. |
-|  [getTotal()](./lib-base.readableliquity.gettotal.md) | Get the total amount of collateral and debt in the Liquity system. |
+|  [getTotal()](./lib-base.readableliquity.gettotal.md) | Get the total amount of collateral and debt in the Zero system. |
 |  [getTotalRedistributed()](./lib-base.readableliquity.gettotalredistributed.md) | Get the total collateral and debt per stake that has been liquidated through redistribution. |
 |  [getTotalStakedZERO()](./lib-base.readableliquity.gettotalstakedzero.md) | Get the total amount of ZERO currently staked. |
 |  [getTrove(address)](./lib-base.readableliquity.gettrove.md) | Get the current state of a Trove. |

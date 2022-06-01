@@ -34,7 +34,7 @@ declare const brand: unique symbol;
 const branded = <T>(t: Omit<T, typeof brand>): T => t as T;
 
 /**
- * Information about a connection to the Liquity protocol.
+ * Information about a connection to the Zero protocol.
  *
  * @remarks
  * Provided for debugging / informational purposes.
@@ -53,19 +53,19 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
   /** Chain ID of the connected network. */
   readonly chainId: number;
 
-  /** Version of the Liquity contracts (Git commit hash). */
+  /** Version of the Zero contracts (Git commit hash). */
   readonly version: string;
 
-  /** Date when the Liquity contracts were deployed. */
+  /** Date when the Zero contracts were deployed. */
   readonly deploymentDate: Date;
 
-  /** Number of block in which the first Liquity contract was deployed. */
+  /** Number of block in which the first Zero contract was deployed. */
   readonly startBlock: number;
 
   /** Time period (in seconds) after `deploymentDate` during which redemptions are disabled. */
   readonly bootstrapPeriod: number;
 
-  /** A mapping of Liquity contracts' names to their addresses. */
+  /** A mapping of Zero contracts' names to their addresses. */
   readonly addresses: Record<string, string>;
 
   /** @internal */
@@ -163,7 +163,7 @@ export const _usingStore = (
   connection.useStore !== undefined;
 
 /**
- * Thrown when trying to connect to a network where Liquity is not deployed.
+ * Thrown when trying to connect to a network where Zero is not deployed.
  *
  * @remarks
  * Thrown by {@link ReadableEthersLiquity.(connect:2)} and {@link EthersLiquity.(connect:2)}.

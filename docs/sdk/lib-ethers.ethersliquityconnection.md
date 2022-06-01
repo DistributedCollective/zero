@@ -4,7 +4,7 @@
 
 ## EthersLiquityConnection interface
 
-Information about a connection to the Liquity protocol.
+Information about a connection to the Zero protocol.
 
 <b>Signature:</b>
 
@@ -23,12 +23,12 @@ Exposed through [ReadableEthersLiquity.connection](./lib-ethers.readableethersli
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [addresses](./lib-ethers.ethersliquityconnection.addresses.md) | Record&lt;string, string&gt; | A mapping of Liquity contracts' names to their addresses. |
+|  [addresses](./lib-ethers.ethersliquityconnection.addresses.md) | Record&lt;string, string&gt; | A mapping of Zero contracts' names to their addresses. |
 |  [bootstrapPeriod](./lib-ethers.ethersliquityconnection.bootstrapperiod.md) | number | Time period (in seconds) after <code>deploymentDate</code> during which redemptions are disabled. |
 |  [chainId](./lib-ethers.ethersliquityconnection.chainid.md) | number | Chain ID of the connected network. |
-|  [deploymentDate](./lib-ethers.ethersliquityconnection.deploymentdate.md) | Date | Date when the Liquity contracts were deployed. |
+|  [deploymentDate](./lib-ethers.ethersliquityconnection.deploymentdate.md) | Date | Date when the Zero contracts were deployed. |
 |  [provider](./lib-ethers.ethersliquityconnection.provider.md) | [EthersProvider](./lib-ethers.ethersprovider.md) | Ethers <code>Provider</code> used for connecting to the network. |
 |  [signer?](./lib-ethers.ethersliquityconnection.signer.md) | [EthersSigner](./lib-ethers.etherssigner.md) | <i>(Optional)</i> Ethers <code>Signer</code> used for sending transactions. |
-|  [startBlock](./lib-ethers.ethersliquityconnection.startblock.md) | number | Number of block in which the first Liquity contract was deployed. |
-|  [version](./lib-ethers.ethersliquityconnection.version.md) | string | Version of the Liquity contracts (Git commit hash). |
+|  [startBlock](./lib-ethers.ethersliquityconnection.startblock.md) | number | Number of block in which the first Zero contract was deployed. |
+|  [version](./lib-ethers.ethersliquityconnection.version.md) | string | Version of the Zero contracts (Git commit hash). |
 

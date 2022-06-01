@@ -6,7 +6,7 @@
 
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
 
-Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "Trove", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
+Zero is a decentralized protocol based on [Zero](https://github.com/DistributedCollective/zero) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "Trove", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
 
 An unprecedented liquidation mechanism based on incentivized stability pool deposits and a redistribution cycle from riskier to safer Lines of Credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
 
@@ -43,8 +43,8 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Testnet PriceFeed and PriceFeed tests](#testnet-pricefeed-and-pricefeed-tests)
     - [PriceFeed limitations and known issues](#pricefeed-limitations-and-known-issues)
     - [Keeping a sorted list of lines of credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
-    - [Flow of RBTC in Zero](#flow-of-rbtc-in-liquity)
-    - [Flow of ZUSD tokens in Zero](#flow-of-zusd-tokens-in-liquity)
+    - [Flow of RBTC in Zero](#flow-of-rbtc-in-zero)
+    - [Flow of ZUSD tokens in Zero](#flow-of-zusd-tokens-in-zero)
   - [Expected User Behaviors](#expected-user-behaviors)
   - [Contract Ownership and Function Permissions](#contract-ownership-and-function-permissions)
   - [Deployment to a Development Blockchain](#deployment-to-a-development-blockchain)
@@ -164,23 +164,23 @@ Here is the liquidation logic for a single Line of Credit in Normal Mode and Rec
 
 #### Liquidations in Normal Mode: TCR >= 150%
 
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                      | Liquidation behavior                                                                                                                                                                                                                                                                                                |
-|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR < MCR & SP.ZUSD >= Line of Credit.debt | ZUSD in the StabilityPool equal to the Line of Credit's debt is offset with the Line of Credit's debt. The Line of Credit's RBTC collateral is shared between depositors.                                                                                                                                                                       |
-| ICR < MCR & SP.ZUSD < Line of Credit.debt | The total StabilityPool ZUSD is offset with an equal amount of debt from the Line of Credit. A fraction of the Line of Credit's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus RBTC gas compensation) is redistributed to active Lines of Credit |
-| ICR < MCR & SP.ZUSD = 0          | Redistribute all debt and collateral (minus RBTC gas compensation) to activate the Line of Credit.
-                                                                                                                                                                                                                             |
-| ICR  >= MCR                      | Do nothing.                                                                                                                                                                                                                                                                                                         |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition | Liquidation behavior                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ICR < MCR & SP.ZUSD >= Line of Credit.debt                                                                                                                                                                                                                                                                                                                                        | ZUSD in the StabilityPool equal to the Line of Credit's debt is offset with the Line of Credit's debt. The Line of Credit's RBTC collateral is shared between depositors.                                                                                                                                                                      |
+| ICR < MCR & SP.ZUSD < Line of Credit.debt                                                                                                                                                                                                                                                                                                                                         | The total StabilityPool ZUSD is offset with an equal amount of debt from the Line of Credit. A fraction of the Line of Credit's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus RBTC gas compensation) is redistributed to active Lines of Credit |
+| ICR < MCR & SP.ZUSD = 0                                                                                                                                                                                                                                                                                                                                                           | Redistribute all debt and collateral (minus RBTC gas compensation) to activate the Line of Credit.                                                                                                                                                                                                                                             |
+|                                                                                                                                                                                                                                                                                                                                                                                   |
+| ICR  >= MCR                                                                                                                                                                                                                                                                                                                                                                       | Do nothing.                                                                                                                                                                                                                                                                                                                                    |
 #### Liquidations in Recovery Mode: TCR < 150%
 
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition                                | Liquidation behavior                                                                                                                                                                                                                                                                                                                                                                                         |
-|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ICR <=100%                               | Redistribute all debt and collateral (minus RBTC gas compensation) to active the Line of Credit.                                                                                                                                                                                                                                                                                                                          |
-| 100% < ICR < MCR & SP.ZUSD > Line of Credit.debt  | ZUSD in the StabilityPool equal to the Line of Credit's debt is offset with the Line of Credit's debt. The Line of Credit's RBTC collateral (minus RBTC gas compensation) is shared between depositors.                                                                                                                                                                                                                                    |
-| 100% < ICR < MCR & SP.ZUSD < Line of Credit.debt  | The total StabilityPool ZUSD is offset with an equal amount of debt from the Line of Credit. A fraction of the Line of Credit's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus RBTC gas compensation) is redistributed to active lines of credit                                                                                          |
-| MCR <= ICR < TCR & SP.ZUSD >= Line of Credit.debt  |  The StabilityPool ZUSD is offset with an equal amount of debt from the Line of Credit. A fraction of RBTC collateral with a dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to another active Line of Credit. Since its ICR was > 1.1, the Line of Credit has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The Line of Credit is closed. |
-| MCR <= ICR < TCR & SP.ZUSD  < Line of Credit .debt | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ICR >= TCR                               | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Condition | Liquidation behavior                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ICR <=100%                                                                                                                                                                                                                                                                                                                                                                        | Redistribute all debt and collateral (minus RBTC gas compensation) to active the Line of Credit.                                                                                                                                                                                                                                                                                                                                       |
+| 100% < ICR < MCR & SP.ZUSD > Line of Credit.debt                                                                                                                                                                                                                                                                                                                                  | ZUSD in the StabilityPool equal to the Line of Credit's debt is offset with the Line of Credit's debt. The Line of Credit's RBTC collateral (minus RBTC gas compensation) is shared between depositors.                                                                                                                                                                                                                                |
+| 100% < ICR < MCR & SP.ZUSD < Line of Credit.debt                                                                                                                                                                                                                                                                                                                                  | The total StabilityPool ZUSD is offset with an equal amount of debt from the Line of Credit. A fraction of the Line of Credit's collateral (equal to the ratio of its offset debt to its entire debt) is shared between depositors. The remaining debt and collateral (minus RBTC gas compensation) is redistributed to active lines of credit                                                                                         |
+| MCR <= ICR < TCR & SP.ZUSD >= Line of Credit.debt                                                                                                                                                                                                                                                                                                                                 | The StabilityPool ZUSD is offset with an equal amount of debt from the Line of Credit. A fraction of RBTC collateral with a dollar value equal to `1.1 * debt` is shared between depositors. Nothing is redistributed to another active Line of Credit. Since its ICR was > 1.1, the Line of Credit has a collateral remainder, which is sent to the `CollSurplusPool` and is claimable by the borrower. The Line of Credit is closed. |
+| MCR <= ICR < TCR & SP.ZUSD  < Line of Credit .debt                                                                                                                                                                                                                                                                                                                                | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ICR >= TCR                                                                                                                                                                                                                                                                                                                                                                        | Do nothing.                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ## Gains From Liquidations
 
@@ -339,7 +339,7 @@ ICRs are computed dynamically at runtime and not stored on the node. This is bec
 
 The list relies on the fact that a collateral and debt redistribution due to a liquidation preserves the ordering of all active lines of credit (though it does decrease the ICR of each active Line of Credit above the MCR).
 
-The fact that ordering is maintained as redistributions occur is not immediately obvious: please see the [mathematical proof](https://github.com/liquity/dev/blob/main/papers) which shows that this holds in Liquity.
+The fact that ordering is maintained as redistributions occur is not immediately obvious: please see the [mathematical proof](https://github.com/DistributedCollective/zero/blob/main/papers) which shows that this holds in Zero.
 
 A node inserted based on current ICR will maintain the correct position relative to its peers as liquidation gains accumulate, as long as its raw collateral and debt balances have not changed.
 
@@ -347,7 +347,7 @@ Nodes also remain sorted as the RBTC:USD price varies, since price fluctuations 
 
 Thus, nodes need only be re-inserted to the sorted list upon a Line of Credit operation - when the owner adds/removes collateral or debt to/from their Line of Credit.
 
-### Flow of RBTC in Liquity
+### Flow of RBTC in Zero
 
 RBTC in the system lives in three Pools: the ActivePool, the DefaultPool, and the StabilityPool. When an operation is made, RBTC is transferred in one of three ways:
 
@@ -361,39 +361,39 @@ Likewise, the StabilityPool holds the total accumulated RBTC gains from liquidat
 
 **Borrower Operations**
 
-| Function                     | RBTC quantity                       | Path                                       |
-|------------------------------|-------------------------------------|--------------------------------------------|
-| openTrove                    | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
-| addColl                      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
-| withdrawColl                 | _collWithdrawal parameter           | ActivePool->msg.sender                     |
+| Function                      | RBTC quantity                       | Path                                       |
+| ----------------------------- | ----------------------------------- | ------------------------------------------ |
+| openTrove                     | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
+| addColl                       | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
+| withdrawColl                  | _collWithdrawal parameter           | ActivePool->msg.sender                     |
 | adjustTrove: adding RBTC      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
 | adjustTrove: withdrawing RBTC | _collWithdrawal parameter           | ActivePool->msg.sender                     |
-| closeTrove                   | All remaining                       | ActivePool->msg.sender                     |
-| claimCollateral              | CollSurplusPool.balance[msg.sender] | CollSurplusPool->msg.sender                |
+| closeTrove                    | All remaining                       | ActivePool->msg.sender                     |
+| claimCollateral               | CollSurplusPool.balance[msg.sender] | CollSurplusPool->msg.sender                |
 
 **Trove Manager**
 
-| Function                                | RBTC quantity                          | Path                          |
-|-----------------------------------------|----------------------------------------|-------------------------------|
-| liquidate (offset)                      | collateral to be offset                | ActivePool->StabilityPool     |
-| liquidate (redistribution)              | collateral to be redistributed         | ActivePool->DefaultPool       |
-| liquidateTroves (offset)                | collateral to be offset                | ActivePool->StabilityPool     |
-| liquidateTroves (redistribution)        | collateral to be redistributed         | ActivePool->DefaultPool       |
-| batchLiquidateTroves (offset)           | collateral to be offset                | ActivePool->StabilityPool     |
-| batchLiquidateTroves (redistribution).  | collateral to be redistributed         | ActivePool->DefaultPool       |
-| redeemCollateral                        | collateral to be swapped with redeemer | ActivePool->msg.sender        |
-| redeemCollateral                        | redemption fee                         | ActivePool->sovFeeCollector   |
-| redeemCollateral                        | Line of Credit's collateral surplus    | ActivePool->CollSurplusPool   |
+| Function                               | RBTC quantity                          | Path                        |
+| -------------------------------------- | -------------------------------------- | --------------------------- |
+| liquidate (offset)                     | collateral to be offset                | ActivePool->StabilityPool   |
+| liquidate (redistribution)             | collateral to be redistributed         | ActivePool->DefaultPool     |
+| liquidateTroves (offset)               | collateral to be offset                | ActivePool->StabilityPool   |
+| liquidateTroves (redistribution)       | collateral to be redistributed         | ActivePool->DefaultPool     |
+| batchLiquidateTroves (offset)          | collateral to be offset                | ActivePool->StabilityPool   |
+| batchLiquidateTroves (redistribution). | collateral to be redistributed         | ActivePool->DefaultPool     |
+| redeemCollateral                       | collateral to be swapped with redeemer | ActivePool->msg.sender      |
+| redeemCollateral                       | redemption fee                         | ActivePool->sovFeeCollector |
+| redeemCollateral                       | Line of Credit's collateral surplus    | ActivePool->CollSurplusPool |
 
 **Stability Pool**
 
 | Function                | RBTC quantity                     | Path                                              |
-|-------------------------|-----------------------------------|---------------------------------------------------|
+| ----------------------- | --------------------------------- | ------------------------------------------------- |
 | provideToSP             | depositor's accumulated RBTC gain | StabilityPool -> msg.sender                       |
 | withdrawFromSP          | depositor's accumulated RBTC gain | StabilityPool -> msg.sender                       |
 | withdrawRBTCGainToTrove | depositor's accumulated RBTC gain | StabilityPool -> BorrowerOperations -> ActivePool |
 
-### Flow of ZUSD tokens in Liquity
+### Flow of ZUSD tokens in Zero
 
 When a user borrows from their Line of Credit, ZUSD tokens are minted to their own address, and a debt is recorded on the Line of Credit. Conversely, when they repay their Line of Credit’s ZUSD debt, ZUSD is burned from their address, and the debt on their Line of Credit is reduced.
 
@@ -406,32 +406,32 @@ The only time ZUSD is transferred to/from a Zero contract, is when a user deposi
 **Borrower Operations**
 
 | Function                      | ZUSD Quantity | ERC20 Operation                      |
-|-------------------------------|---------------|--------------------------------------|
+| ----------------------------- | ------------- | ------------------------------------ |
 | openTrove                     | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee  | ZUSD._mint(FeeDistributor,  ZUSDFee)    |
+|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | withdrawZUSD                  | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee  | ZUSD._mint(FeeDistributor,  ZUSDFee)    |
+|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | repayZUSD                     | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
 | adjustTrove: withdrawing ZUSD | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee  | ZUSD._mint(FeeDistributor,  ZUSDFee)    |
+|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | adjustTrove: repaying ZUSD    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
-| closeTrove                    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount) |
+| closeTrove                    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
 
 **Trove Manager**
 
-| Function                 | ZUSD Quantity            | ERC20 Operation                                  |
-|--------------------------|--------------------------|--------------------------------------------------|
-| liquidate (offset)       | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
-| liquidateTroves (offset)   | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| Function                      | ZUSD Quantity            | ERC20 Operation                                  |
+| ----------------------------- | ------------------------ | ------------------------------------------------ |
+| liquidate (offset)            | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| liquidateTroves (offset)      | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
 | batchLiquidateTroves (offset) | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
-| redeemCollateral         | ZUSD to redeem           | ZUSD._burn(msg.sender, _ZUSD)                    |
+| redeemCollateral              | ZUSD to redeem           | ZUSD._burn(msg.sender, _ZUSD)                    |
 
 **Stability Pool**
 
-| Function       | ZUSD Quantity    | ERC20 Operation                                             |
-|----------------|------------------|-------------------------------------------------------------|
-| provideToSP    | deposit / top-up | ZUSD._transfer(msg.sender, stabilityPoolAddress, _amount);  |
-| withdrawFromSP | withdrawal       | ZUSD._transfer(stabilityPoolAddress, msg.sender, _amount);  |
+| Function       | ZUSD Quantity    | ERC20 Operation                                            |
+| -------------- | ---------------- | ---------------------------------------------------------- |
+| provideToSP    | deposit / top-up | ZUSD._transfer(msg.sender, stabilityPoolAddress, _amount); |
+| withdrawFromSP | withdrawal       | ZUSD._transfer(stabilityPoolAddress, msg.sender, _amount); |
 
 ## Expected User Behaviors
 
@@ -870,15 +870,15 @@ Here’s an example of the Stability Pool absorbing liquidations. The Stability 
 
 There are two Lines of Credit to be liquidated, T1 and T2:
 
-|   | Line of Credit  | Collateral (RBTC) | Debt (ZUSD) | ICR         | $(RBTC) ($) | Collateral surplus ($) |
-|---|-----------------|-------------------|-------------|-------------|-------------|------------------------|
-|   | T1              | 1.6               | 150         | 1.066666667 | 160         | 10                     |
-|   | T2              | 2.45              | 225         | 1.088888889 | 245         | 20                     |
+|     | Line of Credit | Collateral (RBTC) | Debt (ZUSD) | ICR         | $(RBTC) ($) | Collateral surplus ($) |
+| --- | -------------- | ----------------- | ----------- | ----------- | ----------- | ---------------------- |
+|     | T1             | 1.6               | 150         | 1.066666667 | 160         | 10                     |
+|     | T2             | 2.45              | 225         | 1.088888889 | 245         | 20                     |
 
 Here are the deposits, before any liquidations occur:
 
 | Depositor | Deposit | Share  |
-|-----------|---------|--------|
+| --------- | ------- | ------ |
 | A         | 100     | 0.1667 |
 | B         | 200     | 0.3333 |
 | C         | 300     | 0.5    |
@@ -887,20 +887,20 @@ Here are the deposits, before any liquidations occur:
 Now, the first liquidation T1 is absorbed by the Pool: 150 debt is cancelled with 150 Pool ZUSD, and its 1.6 RBTC is split between depositors. We see the gains earned by A, B, C, are in proportion to their share of the total ZUSD in the Stability Pool:
 
 | Deposit | Debt absorbed from T1 | Deposit after | Total RBTC gained | $(deposit + RBTC gain) ($) | Current ROI   |
-|---------|-----------------------|---------------|------------------|---------------------------|---------------|
-| A       | 25                    | 75            | 0.2666666667     | 101.6666667               | 0.01666666667 |
-| B       | 50                    | 150           | 0.5333333333     | 203.3333333               | 0.01666666667 |
-| C       | 75                    | 225           | 0.8              | 305                       | 0.01666666667 |
-| Total   | 150                   | 450           | 1.6              | 610                       | 0.01666666667 |
+| ------- | --------------------- | ------------- | ----------------- | -------------------------- | ------------- |
+| A       | 25                    | 75            | 0.2666666667      | 101.6666667                | 0.01666666667 |
+| B       | 50                    | 150           | 0.5333333333      | 203.3333333                | 0.01666666667 |
+| C       | 75                    | 225           | 0.8               | 305                        | 0.01666666667 |
+| Total   | 150                   | 450           | 1.6               | 610                        | 0.01666666667 |
 
 And now the second liquidation, T2, occurs: 225 debt is cancelled with 225 Pool ZUSD, and 2.45 RBTC is split between depositors. The accumulated RBTC gain includes all RBTC gain from T1 and T2.
 
 | Depositor | Debt absorbed from T2 | Deposit after | Accumulated RBTC | $(deposit + RBTC gain) ($) | Current ROI |
-|-----------|-----------------------|---------------|-----------------|---------------------------|-------------|
-| A         | 37.5                  | 37.5          | 0.675           | 105                       | 0.05        |
-| B         | 75                    | 75            | 1.35            | 210                       | 0.05        |
-| C         | 112.5                 | 112.5         | 2.025           | 315                       | 0.05        |
-| Total     | 225                   | 225           | 4.05            | 630                       | 0.05        |
+| --------- | --------------------- | ------------- | ---------------- | -------------------------- | ----------- |
+| A         | 37.5                  | 37.5          | 0.675            | 105                        | 0.05        |
+| B         | 75                    | 75            | 1.35             | 210                        | 0.05        |
+| C         | 112.5                 | 112.5         | 2.025            | 315                        | 0.05        |
+| Total     | 225                   | 225           | 4.05             | 630                        | 0.05        |
 
 It’s clear that:
 
@@ -925,7 +925,7 @@ A mathematical manipulation allows us to factor out the initial deposit, and acc
 
 The formula for a depositor’s accumulated RBTC gain is derived here:
 
-[Scalable reward distribution for compounding, decreasing stake](https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf)
+[Scalable reward distribution for compounding, decreasing stake](https://github.com/DistributedCollective/zero/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf)
 
 Each liquidation updates `P` and `S`. After a series of liquidations, a compounded deposit and corresponding RBTC gain can be calculated using the initial deposit, the depositor’s snapshots, and the current values of `P` and `S`.
 
@@ -1002,7 +1002,7 @@ When a liquidation occurs and the Stability Pool is empty or smaller than the li
 
 For two Lines of Credit A and B with collateral `A.coll > B.coll`, Line of Credit A should earn a bigger share of the liquidated collateral and debt.
 
-In Zero it is important that all active Lines of Credit remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Lines of Credit collateral preserves the ordering of active Lines of Credit by ICR as liquidations occur over time. Please see the [proofs section](https://github.com/liquity/dev/tree/main/packages/contracts/mathProofs).
+In Zero it is important that all active Lines of Credit remain ordered by their ICR. We have proven that redistribution of the liquidated debt and collateral proportional to active Lines of Credit collateral preserves the ordering of active Lines of Credit by ICR as liquidations occur over time. Please see the [proofs section](https://github.com/DistributedCollective/zero/tree/main/packages/contracts/mathProofs).
 
 However, when it comes to implementation, RSK gas costs make it too expensive to loop over all Lines of Credit and write new data to storage for each one. When a Line of Credit receives redistribution rewards, the system does not update the Line of Credit's collateral and debt properties - instead, the Line of Credit’s rewards remain "pending" until the borrower's next operation.
 
@@ -1016,7 +1016,7 @@ Consider the case where new Line of Credit is created after all active Lines of 
 
 The fresh Line of Credit would earn rewards based on its **entire** collateral, whereas old lines of credit would earn rewards based only on **some portion** of their collateral - since a part of their collateral is pending, and not included in the Line of Credit’s `coll` property.
 
-This can break the ordering of Lines of Credit by ICR - see the [proofs section](https://github.com/liquity/dev/tree/main/packages/contracts/mathProofs).
+This can break the ordering of Lines of Credit by ICR - see the [proofs section](https://github.com/DistributedCollective/zero/tree/main/packages/contracts/mathProofs).
 
 ### Corrected Stake Solution
 
@@ -1034,7 +1034,7 @@ It then earns redistribution rewards based on this corrected stake. A newly open
 
 Whenever a borrower adjusts their Line of Credit’s collateral, their pending rewards are applied, and a fresh corrected stake is computed.
 
-To convince yourself this corrected stake preserves ordering of active Lines of Credit by ICR, please see the [proofs section](https://github.com/liquity/dev/blob/main/papers).
+To convince yourself this corrected stake preserves ordering of active Lines of Credit by ICR, please see the [proofs section](https://github.com/DistributedCollective/zero/blob/main/papers).
 
 ## Math Proofs
 
@@ -1045,7 +1045,7 @@ In particular, we have:
 - Proofs that Line of Credit ordering is maintained throughout a series of liquidations and new Line of Credit openings
 - A derivation of a formula and implementation for a highly scalable (O(1) complexity) reward distribution in the Stability Pool, involving compounding and decreasing stakes.
 
-PDFs of these can be found in https://github.com/liquity/dev/blob/main/papers
+PDFs of these can be found in https://github.com/DistributedCollective/zero/blob/main/papers
 
 ## Definitions
 
@@ -1137,8 +1137,8 @@ Note: you can skip the manual installation of node-gyp itself (`npm install -g n
 ### Clone & Install
 
 ```
-git clone https://github.com/liquity/dev.git liquity
-cd liquity
+git clone https://github.com/DistributedCollective/zero.git zero
+cd zero
 yarn
 ```
 
@@ -1176,8 +1176,8 @@ After a successful deployment, the addresses of the newly deployed contracts wil
 
 To publish a new deployment, you must execute the above command for all of the following combinations:
 
-| Network | Channel  |
-| ------- | -------- |
+| Network    | Channel  |
+| ---------- | -------- |
 | rsktestnet | default  |
 | rsktestnet | internal |
 | rskmainnet | default  |

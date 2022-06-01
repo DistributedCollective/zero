@@ -49,7 +49,7 @@ export interface LiquityStoreBaseState {
   /** Total amount of ZUSD currently deposited in the Stability Pool. */
   zusdInStabilityPool: Decimal;
 
-  /** Total collateral and debt in the Liquity system. */
+  /** Total collateral and debt in the Zero system. */
   total: Trove;
 
   /**
@@ -183,7 +183,7 @@ const difference = <T>(a: T, b: T) =>
   ) as Partial<T>;
 
 /**
- * Abstract base class of Liquity data store implementations.
+ * Abstract base class of Zero data store implementations.
  *
  * @remarks
  * The type parameter `T` may be used to type extra state added to {@link LiquityStoreState} by the
@@ -232,7 +232,7 @@ export abstract class LiquityStore<T = unknown> {
   protected abstract _doStart(): () => void;
 
   /**
-   * Start monitoring the blockchain for Liquity state changes.
+   * Start monitoring the blockchain for Zero state changes.
    *
    * @remarks
    * The {@link LiquityStore.onLoaded | onLoaded} callback will be called after the state is fetched

@@ -4,7 +4,7 @@
 
 ## UnsupportedNetworkError class
 
-Thrown when trying to connect to a network where Liquity is not deployed.
+Thrown when trying to connect to a network where Zero is not deployed.
 
 <b>Signature:</b>
 

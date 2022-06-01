@@ -4,7 +4,7 @@
 
 ## EthersLiquity.connection property
 
-Information about the connection to the Liquity protocol.
+Information about the connection to the Zero protocol.
 
 <b>Signature:</b>
 

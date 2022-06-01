@@ -32,7 +32,7 @@ To calculate the borrowing fee in ZUSD, multiply the borrowed ZUSD amount by the
 
 
 ```typescript
-const fees = await liquity.getFees();
+const fees = await zero.getFees();
 
 const borrowedZUSDAmount = 100;
 const borrowingRate = fees.borrowingRate();
