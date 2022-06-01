@@ -4,7 +4,7 @@
 
 ## TransactableLiquity interface
 
-Send Liquity transactions and wait for them to succeed.
+Send Zero transactions and wait for them to succeed.
 
 <b>Signature:</b>
 
@@ -32,7 +32,7 @@ Implemented by [EthersLiquity](./lib-ethers.ethersliquity.md)<!-- -->.
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate)](./lib-base.transactableliquity.liquidateupto.md) | Liquidate the least collateralized Troves up to a maximum number. |
 |  [openTrove(params, maxBorrowingRate)](./lib-base.transactableliquity.opentrove.md) | Open a new Trove by depositing collateral and borrowing ZUSD. |
 |  [redeemZUSD(amount, maxRedemptionRate)](./lib-base.transactableliquity.redeemzusd.md) | Redeem ZUSD to native currency (e.g. Ether) at face value. |
-|  [registerFrontend(kickbackRate)](./lib-base.transactableliquity.registerfrontend.md) | Register current wallet address as a Liquity frontend. |
+|  [registerFrontend(kickbackRate)](./lib-base.transactableliquity.registerfrontend.md) | Register current wallet address as a Zero frontend. |
 |  [repayZUSD(amount)](./lib-base.transactableliquity.repayzusd.md) | Adjust existing Trove by repaying some of its debt. |
 |  [sendZERO(toAddress, amount)](./lib-base.transactableliquity.sendzero.md) | Send ZERO tokens to an address. |
 |  [sendZUSD(toAddress, amount)](./lib-base.transactableliquity.sendzusd.md) | Send ZUSD tokens to an address. |

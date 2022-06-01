@@ -5,7 +5,7 @@ import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
 
 /**
- * Represents whether an address has been registered as a Liquity frontend.
+ * Represents whether an address has been registered as a Zero frontend.
  *
  * @remarks
  * Returned by the {@link ReadableLiquity.getFrontendStatus | getFrontendStatus()} function.
@@ -45,7 +45,7 @@ export interface TroveListingParams {
 }
 
 /**
- * Read the state of the Liquity protocol.
+ * Read the state of the Zero protocol.
  *
  * @remarks
  * Implemented by {@link @sovryn-zero/lib-ethers#EthersLiquity}.
@@ -90,7 +90,7 @@ export interface ReadableLiquity {
   getPrice(): Promise<Decimal>;
 
   /**
-   * Get the total amount of collateral and debt in the Liquity system.
+   * Get the total amount of collateral and debt in the Zero system.
    */
   getTotal(): Promise<Trove>;
 
@@ -174,7 +174,7 @@ export interface ReadableLiquity {
   getTotalStakedZERO(): Promise<Decimal>;
 
   /**
-   * Check whether an address is registered as a Liquity frontend, and what its kickback rate is.
+   * Check whether an address is registered as a Zero frontend, and what its kickback rate is.
    *
    * @param address - Address to check.
    */

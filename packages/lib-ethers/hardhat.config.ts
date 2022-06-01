@@ -54,13 +54,13 @@ const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eef
 
 const governanceAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x4D1A9fD1E1e67E83Ffe72Bdd769088d689993E4B",
+  rsktestnet: "0xaC0784a1a3eB5AE6b39F6264C94CD490c6D225D7",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const sovFeeCollectorAddresses = {
   mainnet: "",
-  rsktestnet: "0x85B19DD6E3c6cCC54D40c1bAEC15058962B8245b",
+  rsktestnet: "0xedD92fb7C556E4A4faf8c4f5A90f471aDCD018f4",
   dev: ""
 };
 
@@ -88,7 +88,7 @@ const oracleAddresses: Record<string, OracleAddresses> = {
     rskOracleAddress: ""
   },
   rsktestnet: {
-    mocOracleAddress: "0x26a00aF444928d689DDEC7b4D17c0E4a8c9D407d",
+    mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
     rskOracleAddress: "0xE00243Bc6912BF148302e8478996c98c22fE8739"
   },
   dev: {

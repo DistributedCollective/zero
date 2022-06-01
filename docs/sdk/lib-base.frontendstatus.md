@@ -4,7 +4,7 @@
 
 ## FrontendStatus type
 
-Represents whether an address has been registered as a Liquity frontend.
+Represents whether an address has been registered as a Zero frontend.
 
 <b>Signature:</b>
 

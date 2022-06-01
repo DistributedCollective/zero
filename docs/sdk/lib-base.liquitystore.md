@@ -4,7 +4,7 @@
 
 ## LiquityStore class
 
-Abstract base class of Liquity data store implementations.
+Abstract base class of Zero data store implementations.
 
 <b>Signature:</b>
 
@@ -30,6 +30,6 @@ Implemented by [BlockPolledLiquityStore](./lib-ethers.blockpolledliquitystore.md
 
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
-|  [start()](./lib-base.liquitystore.start.md) |  | Start monitoring the blockchain for Liquity state changes. |
+|  [start()](./lib-base.liquitystore.start.md) |  | Start monitoring the blockchain for Zero state changes. |
 |  [subscribe(listener)](./lib-base.liquitystore.subscribe.md) |  | Register a state change listener. |
 

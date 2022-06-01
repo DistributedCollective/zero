@@ -40,7 +40,7 @@ export interface PopulatedLiquityTransaction<
  * A redemption transaction that has been prepared for sending.
  *
  * @remarks
- * The Liquity protocol fulfills redemptions by repaying the debt of Troves in ascending order of
+ * The Zero protocol fulfills redemptions by repaying the debt of Troves in ascending order of
  * their collateralization ratio, and taking a portion of their collateral in exchange. Due to the
  * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
  * some ZUSD amounts are not possible to redeem exactly.
@@ -97,7 +97,7 @@ export type _PopulatableFrom<T, P> = {
 };
 
 /**
- * Prepare Liquity transactions for sending.
+ * Prepare Zero transactions for sending.
  *
  * @remarks
  * The functions return an object implementing {@link PopulatedLiquityTransaction}, which can be

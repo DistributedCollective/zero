@@ -75,7 +75,7 @@ const waitForSuccess = async <T>(tx: SentEthersLiquityTransaction<T>) => {
  * @public
  */
 export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity {
-  /** Information about the connection to the Liquity protocol. */
+  /** Information about the connection to the Zero protocol. */
   readonly connection: EthersLiquityConnection;
 
   /** Can be used to create populated (unsigned) transactions. */
@@ -118,7 +118,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   ): Promise<EthersLiquityWithStore<BlockPolledLiquityStore>>;
 
   /**
-   * Connect to the Liquity protocol and create an `EthersLiquity` object.
+   * Connect to the Zero protocol and create an `EthersLiquity` object.
    *
    * @param signerOrProvider - Ethers `Signer` or `Provider` to use for connecting to the Ethereum
    *                           network.

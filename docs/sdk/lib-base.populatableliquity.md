@@ -4,7 +4,7 @@
 
 ## PopulatableLiquity interface
 
-Prepare Liquity transactions for sending.
+Prepare Zero transactions for sending.
 
 <b>Signature:</b>
 
@@ -33,7 +33,7 @@ Implemented by [PopulatableEthersLiquity](./lib-ethers.populatableethersliquity.
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate)](./lib-base.populatableliquity.liquidateupto.md) | Liquidate the least collateralized Troves up to a maximum number. |
 |  [openTrove(params, maxBorrowingRate)](./lib-base.populatableliquity.opentrove.md) | Open a new Trove by depositing collateral and borrowing ZUSD. |
 |  [redeemZUSD(amount, maxRedemptionRate)](./lib-base.populatableliquity.redeemzusd.md) | Redeem ZUSD to native currency (e.g. Ether) at face value. |
-|  [registerFrontend(kickbackRate)](./lib-base.populatableliquity.registerfrontend.md) | Register current wallet address as a Liquity frontend. |
+|  [registerFrontend(kickbackRate)](./lib-base.populatableliquity.registerfrontend.md) | Register current wallet address as a Zero frontend. |
 |  [repayZUSD(amount)](./lib-base.populatableliquity.repayzusd.md) | Adjust existing Trove by repaying some of its debt. |
 |  [sendZERO(toAddress, amount)](./lib-base.populatableliquity.sendzero.md) | Send ZERO tokens to an address. |
 |  [sendZUSD(toAddress, amount)](./lib-base.populatableliquity.sendzusd.md) | Send ZUSD tokens to an address. |

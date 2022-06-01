@@ -4,24 +4,27 @@ pragma solidity 0.6.11;
 
 // Common interface for the SortedTroves Doubly Linked List.
 interface ISortedTroves {
-
     // --- Events ---
-    
+
     event SortedTrovesAddressChanged(address _sortedDoublyLLAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event NodeAdded(address _id, uint _NICR);
+    event NodeAdded(address _id, uint256 _NICR);
     event NodeRemoved(address _id);
 
     // --- Functions ---
-    
+
     /**
-     * @notice Called only once on init, to set addresses of other Liquity contracts and size. Callable only by owner
+     * @notice Called only once on init, to set addresses of other Zero contracts and size. Callable only by owner
      * @dev initializer function, checks addresses are contracts
      * @param _size max size of troves list
      * @param _TroveManagerAddress TroveManager contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
      */
-    function setParams(uint256 _size, address _TroveManagerAddress, address _borrowerOperationsAddress) external;
+    function setParams(
+        uint256 _size,
+        address _TroveManagerAddress,
+        address _borrowerOperationsAddress
+    ) external;
 
     /**
      * @dev Add a node to the list
@@ -30,7 +33,12 @@ interface ISortedTroves {
      * @param _prevId Id of previous node for the insert position
      * @param _nextId Id of next node for the insert position
      */
-    function insert(address _id, uint256 _ICR, address _prevId, address _nextId) external;
+    function insert(
+        address _id,
+        uint256 _ICR,
+        address _prevId,
+        address _nextId
+    ) external;
 
     /**
      * @dev Remove a node from the list
@@ -45,7 +53,12 @@ interface ISortedTroves {
      * @param _prevId Id of previous node for the new insert position
      * @param _nextId Id of next node for the new insert position
      */
-    function reInsert(address _id, uint256 _newICR, address _prevId, address _nextId) external;
+    function reInsert(
+        address _id,
+        uint256 _newICR,
+        address _prevId,
+        address _nextId
+    ) external;
 
     /**
      * @dev Checks if the list contains a node
@@ -104,7 +117,11 @@ interface ISortedTroves {
      * @param _prevId Id of previous node for the insert position
      * @param _nextId Id of next node for the insert position
      */
-    function validInsertPosition(uint256 _ICR, address _prevId, address _nextId) external view returns (bool);
+    function validInsertPosition(
+        uint256 _ICR,
+        address _prevId,
+        address _nextId
+    ) external view returns (bool);
 
     /**
      * @notice Find the insert position for a new node with the given NICR
@@ -112,5 +129,9 @@ interface ISortedTroves {
      * @param _prevId Id of previous node for the insert position
      * @param _nextId Id of next node for the insert position
      */
-    function findInsertPosition(uint256 _ICR, address _prevId, address _nextId) external view returns (address, address);
+    function findInsertPosition(
+        uint256 _ICR,
+        address _prevId,
+        address _nextId
+    ) external view returns (address, address);
 }

@@ -4,7 +4,7 @@
 
 ## SendableEthersLiquity.registerFrontend() method
 
-Register current wallet address as a Liquity frontend.
+Register current wallet address as a Zero frontend.
 
 <b>Signature:</b>
 

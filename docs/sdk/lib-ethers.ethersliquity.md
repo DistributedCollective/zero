@@ -21,7 +21,7 @@ The constructor for this class is marked as internal. Third-party code should no
 
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
-|  [connection](./lib-ethers.ethersliquity.connection.md) |  | [EthersLiquityConnection](./lib-ethers.ethersliquityconnection.md) | Information about the connection to the Liquity protocol. |
+|  [connection](./lib-ethers.ethersliquity.connection.md) |  | [EthersLiquityConnection](./lib-ethers.ethersliquityconnection.md) | Information about the connection to the Zero protocol. |
 |  [populate](./lib-ethers.ethersliquity.populate.md) |  | [PopulatableEthersLiquity](./lib-ethers.populatableethersliquity.md) | Can be used to create populated (unsigned) transactions. |
 |  [send](./lib-ethers.ethersliquity.send.md) |  | [SendableEthersLiquity](./lib-ethers.sendableethersliquity.md) | Can be used to send transactions without waiting for them to be mined. |
 
@@ -35,18 +35,18 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [claimCollateralSurplus(overrides)](./lib-ethers.ethersliquity.claimcollateralsurplus.md) |  | Claim leftover collateral after a liquidation or redemption. |
 |  [closeNueTrove(overrides)](./lib-ethers.ethersliquity.closenuetrove.md) |  |  |
 |  [closeTrove(overrides)](./lib-ethers.ethersliquity.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
-|  [connect(signerOrProvider, optionalParams)](./lib-ethers.ethersliquity.connect_1.md) | <code>static</code> | Connect to the Liquity protocol and create an <code>EthersLiquity</code> object. |
+|  [connect(signerOrProvider, optionalParams)](./lib-ethers.ethersliquity.connect_1.md) | <code>static</code> | Connect to the Zero protocol and create an <code>EthersLiquity</code> object. |
 |  [depositCollateral(amount, overrides)](./lib-ethers.ethersliquity.depositcollateral.md) |  | Adjust existing Trove by depositing more collateral. |
 |  [depositZUSDInStabilityPool(amount, frontendTag, overrides)](./lib-ethers.ethersliquity.depositzusdinstabilitypool.md) |  | Make a new Stability Deposit, or top up existing one. |
 |  [getCollateralSurplusBalance(address, overrides)](./lib-ethers.ethersliquity.getcollateralsurplusbalance.md) |  | Get the amount of leftover collateral available for withdrawal by an address. |
 |  [getFees(overrides)](./lib-ethers.ethersliquity.getfees.md) |  | Get a calculator for current fees. |
-|  [getFrontendStatus(address, overrides)](./lib-ethers.ethersliquity.getfrontendstatus.md) |  | Check whether an address is registered as a Liquity frontend, and what its kickback rate is. |
+|  [getFrontendStatus(address, overrides)](./lib-ethers.ethersliquity.getfrontendstatus.md) |  | Check whether an address is registered as a Zero frontend, and what its kickback rate is. |
 |  [getNUEBalance(address, overrides)](./lib-ethers.ethersliquity.getnuebalance.md) |  | Get the amount of ZUSD held by an address. |
 |  [getNumberOfTroves(overrides)](./lib-ethers.ethersliquity.getnumberoftroves.md) |  | Get number of Troves that are currently open. |
 |  [getPrice(overrides)](./lib-ethers.ethersliquity.getprice.md) |  | Get the current price of the native currency (e.g. Ether) in USD. |
 |  [getRemainingStabilityPoolZEROReward(overrides)](./lib-ethers.ethersliquity.getremainingstabilitypoolzeroreward.md) |  | Get the remaining ZERO that will be collectively rewarded to stability depositors. |
 |  [getStabilityDeposit(address, overrides)](./lib-ethers.ethersliquity.getstabilitydeposit.md) |  | Get the current state of a Stability Deposit. |
-|  [getTotal(overrides)](./lib-ethers.ethersliquity.gettotal.md) |  | Get the total amount of collateral and debt in the Liquity system. |
+|  [getTotal(overrides)](./lib-ethers.ethersliquity.gettotal.md) |  | Get the total amount of collateral and debt in the Zero system. |
 |  [getTotalRedistributed(overrides)](./lib-ethers.ethersliquity.gettotalredistributed.md) |  | Get the total collateral and debt per stake that has been liquidated through redistribution. |
 |  [getTotalStakedZERO(overrides)](./lib-ethers.ethersliquity.gettotalstakedzero.md) |  | Get the total amount of ZERO currently staked. |
 |  [getTrove(address, overrides)](./lib-ethers.ethersliquity.gettrove.md) |  | Get the current state of a Trove. |
@@ -63,7 +63,7 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [openNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.ethersliquity.opennuetrove.md) |  | Open a new Trove by depositing collateral and borrowing ZUSD. |
 |  [openTrove(params, maxBorrowingRate, overrides)](./lib-ethers.ethersliquity.opentrove.md) |  | Open a new Trove by depositing collateral and borrowing ZUSD. |
 |  [redeemZUSD(amount, maxRedemptionRate, overrides)](./lib-ethers.ethersliquity.redeemzusd.md) |  | Redeem ZUSD to native currency (e.g. Ether) at face value. |
-|  [registerFrontend(kickbackRate, overrides)](./lib-ethers.ethersliquity.registerfrontend.md) |  | Register current wallet address as a Liquity frontend. |
+|  [registerFrontend(kickbackRate, overrides)](./lib-ethers.ethersliquity.registerfrontend.md) |  | Register current wallet address as a Zero frontend. |
 |  [repayZUSD(amount, overrides)](./lib-ethers.ethersliquity.repayzusd.md) |  | Adjust existing Trove by repaying some of its debt. |
 |  [sendZERO(toAddress, amount, overrides)](./lib-ethers.ethersliquity.sendzero.md) |  | Send ZERO tokens to an address. |
 |  [sendZUSD(toAddress, amount, overrides)](./lib-ethers.ethersliquity.sendzusd.md) |  | Send ZUSD tokens to an address. |

@@ -4,7 +4,7 @@
 
 ## EthersLiquityConnection.startBlock property
 
-Number of block in which the first Liquity contract was deployed.
+Number of block in which the first Zero contract was deployed.
 
 <b>Signature:</b>
 

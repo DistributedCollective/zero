@@ -4,7 +4,7 @@
 
 ## LiquityStore.start() method
 
-Start monitoring the blockchain for Liquity state changes.
+Start monitoring the blockchain for Zero state changes.
 
 <b>Signature:</b>
 

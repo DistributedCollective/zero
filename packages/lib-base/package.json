@@ -10,7 +10,7 @@
   ],
   "homepage": "https://github.com/DistributedCollective/zero/blob/main/README.md",
   "license": "MIT",
-  "author": "Daniel Simon <dani@liquity.org>",
+  "author": "Daniel Simon <dani@sovryn-zero.org>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/DistributedCollective/zero",
