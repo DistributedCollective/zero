@@ -53,19 +53,19 @@ const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom(
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
 
 const governanceAddresses = {
-  mainnet: "0x0000000000000000000000000000000000000001",
+  mainnet: "0x967c84b731679E36A344002b8E3CE50620A7F69f",
   rsktestnet: "0xaC0784a1a3eB5AE6b39F6264C94CD490c6D225D7",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const sovFeeCollectorAddresses = {
-  mainnet: "",
+  mainnet: "0x115cAF168c51eD15ec535727F64684D33B7b08D1",
   rsktestnet: "0xedD92fb7C556E4A4faf8c4f5A90f471aDCD018f4",
   dev: ""
 };
 
 const wrbtcAddresses = {
-  mainnet: "",
+  mainnet: "0x542fda317318ebf1d3deaf76e0b632741a7e677d",
   rsktestnet: "0x69FE5cEC81D5eF92600c1A0dB1F11986AB3758Ab",
   dev: ""
 };
@@ -84,8 +84,8 @@ const presaleAddresses = {
 
 const oracleAddresses: Record<string, OracleAddresses> = {
   mainnet: {
-    mocOracleAddress: "",
-    rskOracleAddress: ""
+    mocOracleAddress: "0x972a21C61B436354C0F35836195D7B67f54E482C",
+    rskOracleAddress: "0x99eD262dbd8842442cd22d4c6885936DB38245E6"
   },
   rsktestnet: {
     mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
