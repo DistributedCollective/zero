@@ -170,8 +170,6 @@ export const Adjusting: React.FC = () => {
             label="Collateral"
             inputId="trove-collateral"
             amount={collateral.prettify(4)}
-            maxAmount={maxCollateral.toString()}
-            maxedOut={collateralMaxedOut}
             editingState={editingState}
             unit="RBTC"
             editedAmount={collateral.toString(4)}
