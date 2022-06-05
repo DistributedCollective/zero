@@ -498,6 +498,11 @@ const transferOwnership = async (
     log(`Transferring ownership ${transactionsIndex}`);
     const tx = await transactions[transactionsIndex](txCount + transactionsIndex);
     await tx.wait().then(() => log(`Transferred ownership ${transactionsIndex}`));
+    const receipt = await tx.wait();
+    log({
+      blockNumber: tx.blockNumber,
+      gasUsed: receipt.gasUsed.toNumber()
+    });
   }
 };
 
