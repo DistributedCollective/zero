@@ -35,8 +35,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         address _marketMakerAddress,
         address _presaleAddress
     ) public initializer {
-        checkContract(_marketMakerAddress);
-        checkContract(_presaleAddress);
+        // checkContract(_marketMakerAddress);
+        // checkContract(_presaleAddress);
 
         deploymentStartTime = block.timestamp;
 
