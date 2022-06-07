@@ -117,7 +117,7 @@ const buildEstimatedFunctions = <T>(
 
           overrides = {
             ...overrides,
-            gasLimit: adjustEstimate(estimatedGas)
+            gasLimit: adjustEstimate(estimatedGas).add(10000),
           };
         }
 
