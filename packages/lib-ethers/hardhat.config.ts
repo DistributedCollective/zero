@@ -466,7 +466,6 @@ task(
       "TroveManagerRedeemOps"
     );
 
-    //?? Will hh deploy this contract to the correct network?
     const troveManagerRedeemOps = await troveManagerRedeemOpsFactory.deploy();
     await troveManagerRedeemOps.deployed();
 
