@@ -1,3 +1,5 @@
+import { ethers } from "hardhat";
+import { TroveManager } from "./types/index";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
@@ -19,6 +21,7 @@ import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
 import { BorrowerOperations, CommunityIssuance, ZEROToken } from "./types";
+import { env } from "process";
 
 dotenv.config();
 
@@ -432,5 +435,65 @@ task("deploy", "Deploys the contracts to the network")
       console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toNumber() });
     }
   );
+
+task(
+  "redeployTroveManagerRedeemOps",
+  "Redeploys TroveManagerRedeemOps contract and sets the already deployed contracts as dependencies"
+)
+  .addOptionalParam("channel", "Deployment channel to redeploy into", defaultChannel, types.string)
+  .setAction(async (channel, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const {
+      troveManager: troveManagerAddress,
+      feeDistributor: feeDistributorAddress,
+      liquityBaseParams: liquityBaseParamsAddress,
+      borrowerOperations: borrowerOperationsAddress,
+      activePool: activePoolAddress,
+      defaultPool: defaultPoolAddress,
+      stabilityPool: stabilityPoolAddress,
+      gasPool: gasPoolAddress,
+      collSurplusPool: collSurplusPoolAddress,
+      priceFeed: priceFeedAddress,
+      zusdToken: zusdTokenAddress,
+      sortedTroves: sortedTrovesAddress,
+      zeroToken: zeroTokenAddress,
+      zeroStaking: zeroStakingAddress
+    } = deployment.addresses;
+
+    //Deploy trove manager redeemOps
+    const troveManagerRedeemOpsFactory = await hre.ethers.getContractFactory(
+      "TroveManagerRedeemOps"
+    );
+
+    //?? Will hh deploy this contract to the correct network?
+    const troveManagerRedeemOps = await troveManagerRedeemOpsFactory.deploy();
+    await troveManagerRedeemOps.deployed();
+
+    // Load existing Trove Manager
+    const troveManager = ((await hre.ethers.getContractAt(
+      "TroveManager",
+      troveManagerAddress,
+      deployer
+    )) as unknown) as TroveManager;
+
+    // Set the new TroveManagerRedeemOps along with all other old addresses
+    troveManager.setAddresses(
+      feeDistributorAddress,
+      troveManagerRedeemOps.address,
+      liquityBaseParamsAddress,
+      borrowerOperationsAddress,
+      activePoolAddress,
+      defaultPoolAddress,
+      stabilityPoolAddress,
+      gasPoolAddress,
+      collSurplusPoolAddress,
+      priceFeedAddress,
+      zusdTokenAddress,
+      sortedTrovesAddress,
+      zeroTokenAddress,
+      zeroStakingAddress
+    );
+  });
 
 export default config;

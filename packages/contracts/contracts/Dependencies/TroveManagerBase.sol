@@ -17,8 +17,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
 
     /// During bootsrap period redemptions are not allowed
-    uint256 public constant BOOTSTRAP_PERIOD = 14 days;
-
+    uint256 public constant BOOTSTRAP_PERIOD = 1 minutes;
     /**
       BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
       Corresponds to (1 / ALPHA) in the white paper.
