@@ -436,12 +436,16 @@ task("deploy", "Deploys the contracts to the network")
     }
   );
 
+type RedeployTroveManagerOpsParams = {
+  channel: string;
+};
+
 task(
   "redeployTroveManagerRedeemOps",
   "Redeploys TroveManagerRedeemOps contract and sets the already deployed contracts as dependencies"
 )
   .addOptionalParam("channel", "Deployment channel to redeploy into", defaultChannel, types.string)
-  .setAction(async (channel, hre) => {
+  .setAction(async ({ channel }: RedeployTroveManagerOpsParams, hre) => {
     const [deployer] = await hre.ethers.getSigners();
     const deployment = getDeploymentData(hre.network.name, channel);
     const {
@@ -468,6 +472,9 @@ task(
 
     const troveManagerRedeemOps = await troveManagerRedeemOpsFactory.deploy();
     await troveManagerRedeemOps.deployed();
+    const troveManagerRedeemOpsAddress = troveManagerRedeemOps.address;
+    console.log("Redeployed TroveManagerRedeemOps with address " + troveManagerRedeemOpsAddress);
+    deployment.addresses.troveManagerRedeemOps = troveManagerRedeemOpsAddress;
 
     // Load existing Trove Manager
     const troveManager = ((await hre.ethers.getContractAt(
@@ -477,7 +484,7 @@ task(
     )) as unknown) as TroveManager;
 
     // Set the new TroveManagerRedeemOps along with all other old addresses
-    troveManager.setAddresses(
+    await troveManager.setAddresses(
       feeDistributorAddress,
       troveManagerRedeemOps.address,
       liquityBaseParamsAddress,
@@ -492,6 +499,11 @@ task(
       sortedTrovesAddress,
       zeroTokenAddress,
       zeroStakingAddress
+    );
+
+    fs.writeFileSync(
+      path.join("deployments", channel, `${hre.network.name}.json`),
+      JSON.stringify(deployment, undefined, 2)
     );
   });
 
