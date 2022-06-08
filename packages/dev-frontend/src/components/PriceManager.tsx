@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, Heading, Flex, Label, Input } from "theme-ui";
 import { Card } from "./Card";
 
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { useLiquity } from "../hooks/LiquityContext";
 

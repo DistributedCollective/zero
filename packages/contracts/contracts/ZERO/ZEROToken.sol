@@ -8,37 +8,37 @@ import "../Interfaces/IZEROToken.sol";
 import "./ZEROTokenStorage.sol";
 
 /**
-* Based upon OpenZeppelin's ERC20 contract:
-* https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol
-*  
-* and their EIP2612 (ERC20Permit / ERC712) functionality:
-* https://github.com/OpenZeppelin/openzeppelin-contracts/blob/53516bc555a454862470e7860a9b5254db4d00f5/contracts/token/ERC20/ERC20Permit.sol
-* 
-*
-*  --- Functionality added specific to the ZEROToken ---
-* 
-* 1) Transfer protection: blacklist of addresses that are invalid recipients (i.e. core Liquity contracts) in external 
-* transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending ZERO directly to a Liquity
-* core contract, when they should rather call the right function.
-*
-* 2) sendToZEROStaking(): callable only by Liquity core contracts, which move ZERO tokens from user -> ZEROStaking contract.
-*
-*/
+ * Based upon OpenZeppelin's ERC20 contract:
+ * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol
+ *
+ * and their EIP2612 (ERC20Permit / ERC712) functionality:
+ * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/53516bc555a454862470e7860a9b5254db4d00f5/contracts/token/ERC20/ERC20Permit.sol
+ *
+ *
+ *  --- Functionality added specific to the ZEROToken ---
+ *
+ * 1) Transfer protection: blacklist of addresses that are invalid recipients (i.e. core Zero contracts) in external
+ * transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending ZERO directly to a Zero
+ * core contract, when they should rather call the right function.
+ *
+ * 2) sendToZEROStaking(): callable only by Zero core contracts, which move ZERO tokens from user -> ZEROStaking contract.
+ *
+ */
 
 contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     using SafeMath for uint256;
 
     // --- Functions ---
 
-    function initialize (
+    function initialize(
         address _zeroStakingAddress,
         address _marketMakerAddress,
         address _presaleAddress
-    ) initializer public {
-        checkContract(_marketMakerAddress);
-        checkContract(_presaleAddress);
+    ) public initializer {
+        // checkContract(_marketMakerAddress);
+        // checkContract(_presaleAddress);
 
-        deploymentStartTime  = block.timestamp;
+        deploymentStartTime = block.timestamp;
 
         zeroStakingAddress = _zeroStakingAddress;
         marketMakerAddress = _marketMakerAddress;
@@ -51,7 +51,6 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         _HASHED_VERSION = hashedVersion;
         _CACHED_CHAIN_ID = _chainID();
         _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
-        
     }
 
     // --- External functions ---
@@ -59,16 +58,19 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     /// @notice Generates `amount` tokens that are assigned to `account`
     /// @param account The address that will be assigned the new tokens
     /// @param amount The quantity of tokens generated
-    function mint (address account, uint amount) external {
-        require(msg.sender == marketMakerAddress || msg.sender == address(presale), 'Invalid caller');
-        _mint(account,amount);
+    function mint(address account, uint256 amount) external {
+        require(
+            msg.sender == marketMakerAddress || msg.sender == address(presale),
+            "Invalid caller"
+        );
+        _mint(account, amount);
     }
 
     /// @notice Burns `amount` tokens from `account`
     /// @param account The address that will lose the tokens
     /// @param amount The quantity of tokens to burn
-    function burn (address account, uint amount) external {
-        require(msg.sender == marketMakerAddress , 'Invalid caller');
+    function burn(address account, uint256 amount) external {
+        require(msg.sender == marketMakerAddress, "Invalid caller");
         _burn(account, amount);
     }
 
@@ -101,21 +103,44 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         return true;
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external override returns (bool) {
         _requireValidRecipient(recipient);
 
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(
+            sender,
+            msg.sender,
+            _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance")
+        );
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) external override returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue)
+        external
+        override
+        returns (bool)
+    {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
         return true;
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        external
+        override
+        returns (bool)
+    {
+        _approve(
+            msg.sender,
+            spender,
+            _allowances[msg.sender][spender].sub(
+                subtractedValue,
+                "ERC20: decreased allowance below zero"
+            )
+        );
         return true;
     }
 
@@ -126,7 +151,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
 
     // --- EIP 2612 functionality ---
 
-    function domainSeparator() public view override returns (bytes32) {    
+    function domainSeparator() public view override returns (bytes32) {
         if (_chainID() == _CACHED_CHAIN_ID) {
             return _CACHED_DOMAIN_SEPARATOR;
         } else {
@@ -134,30 +159,32 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         }
     }
 
-    function permit
-    (
-        address owner, 
-        address spender, 
-        uint amount, 
-        uint deadline, 
-        uint8 v, 
-        bytes32 r, 
+    function permit(
+        address owner,
+        address spender,
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
         bytes32 s
-    ) 
-        external 
-        override 
-    {            
-        require(deadline >= now, 'ZERO: expired deadline');
-        bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
-                         domainSeparator(), keccak256(abi.encode(
-                         _PERMIT_TYPEHASH, owner, spender, amount, 
-                         _nonces[owner]++, deadline))));
+    ) external override {
+        require(deadline >= now, "ZERO: expired deadline");
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                domainSeparator(),
+                keccak256(
+                    abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner]++, deadline)
+                )
+            )
+        );
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == owner, 'ZERO: invalid signature');
+        require(recoveredAddress == owner, "ZERO: invalid signature");
         _approve(owner, spender, amount);
     }
 
-    function nonces(address owner) external view override returns (uint256) { // FOR EIP 2612
+    function nonces(address owner) external view override returns (uint256) {
+        // FOR EIP 2612
         return _nonces[owner];
     }
 
@@ -169,11 +196,19 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         }
     }
 
-    function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {
+    function _buildDomainSeparator(
+        bytes32 typeHash,
+        bytes32 name,
+        bytes32 version
+    ) private view returns (bytes32) {
         return keccak256(abi.encode(typeHash, name, version, _chainID(), address(this)));
     }
 
-    function _transfer(address sender, address recipient, uint256 amount) internal {
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(presale.isClosed(), "Presale is not over yet");
@@ -201,28 +236,34 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         emit Transfer(account, address(0), amount);
     }
 
-    function _approve(address owner, address spender, uint256 amount) internal {
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
     }
-    
+
     // --- Helper functions ---
 
     // --- 'require' functions ---
-    
+
     function _requireValidRecipient(address _recipient) internal view {
         require(
-            _recipient != address(0) && 
-            _recipient != address(this),
+            _recipient != address(0) && _recipient != address(this),
             "ZERO: Cannot transfer tokens directly to the ZERO token contract or the zero address"
         );
     }
 
     function _requireCallerIsZEROStaking() internal view {
-         require(msg.sender == zeroStakingAddress, "ZEROToken: caller must be the ZEROStaking contract");
+        require(
+            msg.sender == zeroStakingAddress,
+            "ZEROToken: caller must be the ZEROStaking contract"
+        );
     }
 
     // --- Optional functions ---

@@ -17,7 +17,7 @@ import {
  * A transaction that has already been sent.
  *
  * @remarks
- * Implemented by {@link @liquity/lib-ethers#SentEthersLiquityTransaction}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#SentEthersLiquityTransaction}.
  *
  * @public
  */
@@ -29,7 +29,7 @@ export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = 
    * Check whether the transaction has been mined, and whether it was successful.
    *
    * @remarks
-   * Unlike {@link @liquity/lib-base#SentLiquityTransaction.waitForReceipt | waitForReceipt()},
+   * Unlike {@link @sovryn-zero/lib-base#SentLiquityTransaction.waitForReceipt | waitForReceipt()},
    * this function doesn't wait for the transaction to be mined.
    */
   getReceipt(): Promise<T>;
@@ -37,8 +37,8 @@ export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = 
   /**
    * Wait for the transaction to be mined, and check whether it was successful.
    *
-   * @returns Either a {@link @liquity/lib-base#FailedReceipt} or a
-   *          {@link @liquity/lib-base#SuccessfulReceipt}.
+   * @returns Either a {@link @sovryn-zero/lib-base#FailedReceipt} or a
+   *          {@link @sovryn-zero/lib-base#SuccessfulReceipt}.
    */
   waitForReceipt(): Promise<Extract<T, MinedReceipt>>;
 }
@@ -83,7 +83,7 @@ export const _failedReceipt = <R>(rawReceipt: R): FailedReceipt<R> => ({
  *
  * The `details` property may contain more information about the transaction.
  * See the return types of {@link TransactableLiquity} functions for the exact contents of `details`
- * for each type of Liquity transaction.
+ * for each type of Zero transaction.
  *
  * Returned by {@link SentLiquityTransaction.getReceipt} and
  * {@link SentLiquityTransaction.waitForReceipt}.
@@ -130,13 +130,13 @@ export type _SendableFrom<T, R, S> = {
 };
 
 /**
- * Send Liquity transactions.
+ * Send Zero transactions.
  *
  * @remarks
  * The functions return an object implementing {@link SentLiquityTransaction}, which can be used
  * to monitor the transaction and get its details when it succeeds.
  *
- * Implemented by {@link @liquity/lib-ethers#SendableEthersLiquity}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#SendableEthersLiquity}.
  *
  * @public
  */

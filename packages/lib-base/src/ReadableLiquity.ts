@@ -5,7 +5,7 @@ import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
 
 /**
- * Represents whether an address has been registered as a Liquity frontend.
+ * Represents whether an address has been registered as a Zero frontend.
  *
  * @remarks
  * Returned by the {@link ReadableLiquity.getFrontendStatus | getFrontendStatus()} function.
@@ -45,10 +45,10 @@ export interface TroveListingParams {
 }
 
 /**
- * Read the state of the Liquity protocol.
+ * Read the state of the Zero protocol.
  *
  * @remarks
- * Implemented by {@link @liquity/lib-ethers#EthersLiquity}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#EthersLiquity}.
  *
  * @public
  */
@@ -57,7 +57,7 @@ export interface ReadableLiquity {
    * Get the total collateral and debt per stake that has been liquidated through redistribution.
    *
    * @remarks
-   * Needed when dealing with instances of {@link @liquity/lib-base#TroveWithPendingRedistribution}.
+   * Needed when dealing with instances of {@link @sovryn-zero/lib-base#TroveWithPendingRedistribution}.
    */
   getTotalRedistributed(): Promise<Trove>;
 
@@ -68,7 +68,7 @@ export interface ReadableLiquity {
    *
    * @remarks
    * The current state of a Trove can be fetched using
-   * {@link @liquity/lib-base#ReadableLiquity.getTrove | getTrove()}.
+   * {@link @sovryn-zero/lib-base#ReadableLiquity.getTrove | getTrove()}.
    */
   getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistribution>;
 
@@ -90,7 +90,7 @@ export interface ReadableLiquity {
   getPrice(): Promise<Decimal>;
 
   /**
-   * Get the total amount of collateral and debt in the Liquity system.
+   * Get the total amount of collateral and debt in the Zero system.
    */
   getTotal(): Promise<Trove>;
 
@@ -139,7 +139,7 @@ export interface ReadableLiquity {
    * When a Trove gets liquidated or redeemed, any collateral it has above 110% (in case of
    * liquidation) or 100% collateralization (in case of redemption) gets sent to a pool, where it
    * can be withdrawn from using
-   * {@link @liquity/lib-base#TransactableLiquity.claimCollateralSurplus | claimCollateralSurplus()}.
+   * {@link @sovryn-zero/lib-base#TransactableLiquity.claimCollateralSurplus | claimCollateralSurplus()}.
    */
   getCollateralSurplusBalance(address?: string): Promise<Decimal>;
 
@@ -174,7 +174,7 @@ export interface ReadableLiquity {
   getTotalStakedZERO(): Promise<Decimal>;
 
   /**
-   * Check whether an address is registered as a Liquity frontend, and what its kickback rate is.
+   * Check whether an address is registered as a Zero frontend, and what its kickback rate is.
    *
    * @param address - Address to check.
    */

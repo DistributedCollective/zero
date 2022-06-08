@@ -105,7 +105,7 @@ export class Fees {
    *
    * @example
    * ```typescript
-   * const fees = await liquity.getFees();
+   * const fees = await zero.getFees();
    *
    * const borrowedZUSDAmount = 100;
    * const borrowingRate = fees.borrowingRate();
@@ -138,8 +138,8 @@ export class Fees {
    *
    * @example
    * ```typescript
-   * const fees = await liquity.getFees();
-   * const total = await liquity.getTotal();
+   * const fees = await zero.getFees();
+   * const total = await zero.getTotal();
    *
    * const redeemedZUSDAmount = Decimal.from(100);
    * const redeemedFractionOfSupply = redeemedZUSDAmount.div(total.debt);

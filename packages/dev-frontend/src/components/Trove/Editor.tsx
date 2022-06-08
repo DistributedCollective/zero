@@ -1,4 +1,4 @@
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@sovryn-zero/lib-base";
 import React, { useMemo, useState } from "react";
 import { Text, Flex, Label, Input, SxProp, Button, ThemeUICSSProperties } from "theme-ui";
 

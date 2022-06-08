@@ -9,8 +9,8 @@ import {
   Trove,
   LiquityStoreState,
   ZUSD_LIQUIDATION_RESERVE
-} from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+} from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { StaticRow } from "./Editor";
 import { LoadingOverlay } from "../LoadingOverlay";

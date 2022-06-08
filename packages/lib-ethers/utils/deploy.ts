@@ -2,10 +2,11 @@ import assert from "assert";
 import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
 import { Wallet } from "@ethersproject/wallet";
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@sovryn-zero/lib-base";
 import { Contract } from "ethers";
 import {
-  _connectToContracts, _LiquityContractAddresses,
+  _connectToContracts,
+  _LiquityContractAddresses,
   _LiquityContracts,
   _LiquityDeploymentJSON,
   _priceFeedIsTestnet as checkPriceFeedIsTestnet
@@ -14,10 +15,12 @@ import { PriceFeed } from "../types";
 
 let silent = true;
 
-export type OracleAddresses = {
-  mocOracleAddress: string;
-  rskOracleAddress: string;
-} | undefined;
+export type OracleAddresses =
+  | {
+      mocOracleAddress: string;
+      rskOracleAddress: string;
+    }
+  | undefined;
 
 export const log = (...args: unknown[]): void => {
   if (!silent) {
@@ -90,38 +93,61 @@ const deployContracts = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
   overrides?: Overrides
-): Promise<{addresses: Omit<_LiquityContractAddresses, 'nueToken'>, startBlock: number}> => {
-
-  const [gasPool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, "GasPool", {
-    ...overrides
-  })
+): Promise<{ addresses: Omit<_LiquityContractAddresses, "nueToken">; startBlock: number }> => {
+  const [gasPool, startBlock] = await deployContractAndGetBlockNumber(
+    deployer,
+    getContractFactory,
+    "GasPool",
+    {
+      ...overrides
+    }
+  );
 
   const addresses = {
     activePool: await deployContractWithProxy(deployer, getContractFactory, "ActivePool", {
       ...overrides
     }),
-    borrowerOperations: await deployContractWithProxy(deployer, getContractFactory, "BorrowerOperations", {
-      ...overrides
-    }),
+    borrowerOperations: await deployContractWithProxy(
+      deployer,
+      getContractFactory,
+      "BorrowerOperations",
+      {
+        ...overrides
+      }
+    ),
     troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
       ...overrides
     }),
 
-    troveManagerRedeemOps: await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides }),
+    troveManagerRedeemOps: await deployContract(
+      deployer,
+      getContractFactory,
+      "TroveManagerRedeemOps",
+      { ...overrides }
+    ),
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),
-    communityIssuance: await deployContractWithProxy(deployer, getContractFactory, "CommunityIssuance", {
-      ...overrides
-    }),
+    communityIssuance: await deployContractWithProxy(
+      deployer,
+      getContractFactory,
+      "CommunityIssuance",
+      {
+        ...overrides
+      }
+    ),
     defaultPool: await deployContractWithProxy(deployer, getContractFactory, "DefaultPool", {
       ...overrides
     }),
-    hintHelpers: await deployContractWithProxy(deployer, getContractFactory, "HintHelpers", { ...overrides }),
-    zeroStaking: await deployContractWithProxy(deployer, getContractFactory, "ZEROStaking", { ...overrides }),
-    priceFeed: priceFeedIsTestnet ? 
-      await deployContract(deployer, getContractFactory, "PriceFeedTestnet", { ...overrides }) :
-      await deployContractWithProxy(deployer, getContractFactory, "PriceFeed", { ...overrides }),
+    hintHelpers: await deployContractWithProxy(deployer, getContractFactory, "HintHelpers", {
+      ...overrides
+    }),
+    zeroStaking: await deployContractWithProxy(deployer, getContractFactory, "ZEROStaking", {
+      ...overrides
+    }),
+    priceFeed: priceFeedIsTestnet
+      ? await deployContract(deployer, getContractFactory, "PriceFeedTestnet", { ...overrides })
+      : await deployContractWithProxy(deployer, getContractFactory, "PriceFeed", { ...overrides }),
     sortedTroves: await deployContractWithProxy(deployer, getContractFactory, "SortedTroves", {
       ...overrides
     }),
@@ -129,24 +155,38 @@ const deployContracts = async (
       ...overrides
     }),
     gasPool: gasPool.address,
-    liquityBaseParams: await deployContractWithProxy(deployer, getContractFactory, "LiquityBaseParams", {
-      ...overrides
-    }),
+    liquityBaseParams: await deployContractWithProxy(
+      deployer,
+      getContractFactory,
+      "LiquityBaseParams",
+      {
+        ...overrides
+      }
+    ),
     feeDistributor: await deployContractWithProxy(deployer, getContractFactory, "FeeDistributor", {
       ...overrides
-    }),
+    })
   };
 
   return {
     addresses: {
       ...addresses,
-      zusdToken: await deployContractWithProxy(deployer, getContractFactory, "ZUSDToken", { ...overrides }),
-
-      zeroToken: await deployContractWithProxy(deployer, getContractFactory, "ZEROToken", { ...overrides }),
-
-      multiTroveGetter: await deployContractWithProxy(deployer, getContractFactory, "MultiTroveGetter", {
+      zusdToken: await deployContractWithProxy(deployer, getContractFactory, "ZUSDToken", {
         ...overrides
-      })
+      }),
+
+      zeroToken: await deployContractWithProxy(deployer, getContractFactory, "ZEROToken", {
+        ...overrides
+      }),
+
+      multiTroveGetter: await deployContractWithProxy(
+        deployer,
+        getContractFactory,
+        "MultiTroveGetter",
+        {
+          ...overrides
+        }
+      )
     },
 
     startBlock
@@ -172,7 +212,7 @@ const connectContracts = async (
     stabilityPool,
     gasPool,
     liquityBaseParams,
-    feeDistributor,
+    feeDistributor
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
@@ -189,12 +229,12 @@ const connectContracts = async (
   const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
 
   const connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
-    nonce => 
+    nonce =>
       zusdToken.initialize(troveManager.address, stabilityPool.address, borrowerOperations.address, {
         ...overrides,
         nonce
       }),
-    
+
     nonce =>
       liquityBaseParams.initialize({
         ...overrides,
@@ -204,19 +244,19 @@ const connectContracts = async (
     nonce =>
       zeroToken.initialize(
         zeroStaking.address,
-        marketMakerAddress?marketMakerAddress:gasPool.address,
+        marketMakerAddress ? marketMakerAddress : gasPool.address,
         presaleAddress,
         {
           ...overrides,
           nonce
         }
       ),
-    
+
     nonce =>
-        sortedTroves.setParams(1e6, troveManager.address, borrowerOperations.address, {
-          ...overrides,
-          nonce
-        }),
+      sortedTroves.setParams(1e6, troveManager.address, borrowerOperations.address, {
+        ...overrides,
+        nonce
+      }),
 
     nonce =>
       troveManager.setAddresses(
@@ -291,10 +331,15 @@ const connectContracts = async (
       ),
 
     nonce =>
-      hintHelpers.setAddresses(liquityBaseParams.address, sortedTroves.address, troveManager.address, {
-        ...overrides,
-        nonce
-      }),
+      hintHelpers.setAddresses(
+        liquityBaseParams.address,
+        sortedTroves.address,
+        troveManager.address,
+        {
+          ...overrides,
+          nonce
+        }
+      ),
 
     nonce =>
       zeroStaking.setAddresses(
@@ -317,7 +362,7 @@ const connectContracts = async (
         nonce
       }),
 
-      nonce => 
+    nonce =>
       feeDistributor.setAddresses(
         sovFeeCollectorAddress,
         zeroStaking.address,
@@ -327,8 +372,7 @@ const connectContracts = async (
         zusdToken.address,
         activePool.address,
         { ...overrides, nonce }
-      ),
-    
+      )
   ];
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
@@ -356,7 +400,7 @@ const transferOwnership = async (
     sortedTroves,
     stabilityPool,
     liquityBaseParams,
-    feeDistributor,
+    feeDistributor
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
@@ -371,81 +415,82 @@ const transferOwnership = async (
 
   let transactions: ((nonce: number) => Promise<ContractTransaction>)[] = [
     nonce =>
-    activePool.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      activePool.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    borrowerOperations.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      borrowerOperations.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    feeDistributor.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      feeDistributor.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    troveManager.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      troveManager.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    collSurplusPool.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      collSurplusPool.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    communityIssuance.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      communityIssuance.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    defaultPool.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      defaultPool.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    hintHelpers.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      hintHelpers.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    zeroStaking.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      zeroStaking.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    multiTroveGetter.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      multiTroveGetter.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    stabilityPool.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      stabilityPool.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    sortedTroves.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
+      sortedTroves.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
     nonce =>
-    liquityBaseParams.setOwner(governanceAddress, {
-      ...overrides,
-      nonce
-    }),
-  ];
-  if (!priceFeedIsTestnet) {
-    transactions = [...transactions, 
-      nonce =>
-      (priceFeed as PriceFeed).setOwner(governanceAddress, {
+      liquityBaseParams.setOwner(governanceAddress, {
         ...overrides,
         nonce
       })
+  ];
+  if (!priceFeedIsTestnet) {
+    transactions = [
+      ...transactions,
+      nonce =>
+        (priceFeed as PriceFeed).setOwner(governanceAddress, {
+          ...overrides,
+          nonce
+        })
     ];
-}
-  
+  }
+
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
   // connections in parallel
   log(`Transferring ownership to ${transactions.length} contracts`);
@@ -453,8 +498,13 @@ const transferOwnership = async (
     log(`Transferring ownership ${transactionsIndex}`);
     const tx = await transactions[transactionsIndex](txCount + transactionsIndex);
     await tx.wait().then(() => log(`Transferred ownership ${transactionsIndex}`));
+    const receipt = await tx.wait();
+    log({
+      blockNumber: tx.blockNumber,
+      gasUsed: receipt.gasUsed.toNumber()
+    });
   }
-}
+};
 
 export const deployAndSetupContracts = async (
   deployer: Signer,
@@ -469,16 +519,32 @@ export const deployAndSetupContracts = async (
   marketMakerAddress?: string,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
-
   if (!deployer.provider) {
     throw new Error("Signer must have a provider.");
   }
 
   governanceAddress ??= await deployer.getAddress();
-  sovFeeCollectorAddress ??= await deployContract(deployer, getContractFactory, "MockFeeSharingProxy", { ...overrides });
-  wrbtcAddress ??=  await deployContract(deployer, getContractFactory, "WRBTCTokenTester", { ...overrides });
-  presaleAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
-  marketMakerAddress ??= await deployContract(deployer, getContractFactory, "MockBalanceRedirectPresale", { ...overrides });
+  sovFeeCollectorAddress ??= await deployContract(
+    deployer,
+    getContractFactory,
+    "MockFeeSharingProxy",
+    { ...overrides }
+  );
+  wrbtcAddress ??= await deployContract(deployer, getContractFactory, "WRBTCTokenTester", {
+    ...overrides
+  });
+  presaleAddress ??= await deployContract(
+    deployer,
+    getContractFactory,
+    "MockBalanceRedirectPresale",
+    { ...overrides }
+  );
+  marketMakerAddress ??= await deployContract(
+    deployer,
+    getContractFactory,
+    "MockBalanceRedirectPresale",
+    { ...overrides }
+  );
 
   log("Deploying contracts...");
   log();
@@ -498,23 +564,48 @@ export const deployAndSetupContracts = async (
     _priceFeedIsTestnet,
     _isDev,
 
-    ...await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides)
+    ...(await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides))
   } as _LiquityDeploymentJSON;
 
   const contracts = _connectToContracts(deployer, deployment);
 
   log("Connecting contracts...");
-  await connectContracts(contracts, deployer, governanceAddress, sovFeeCollectorAddress,wrbtcAddress, presaleAddress, marketMakerAddress, overrides);
+  await connectContracts(
+    contracts,
+    deployer,
+    governanceAddress,
+    sovFeeCollectorAddress,
+    wrbtcAddress,
+    presaleAddress,
+    marketMakerAddress,
+    overrides
+  );
 
   if (externalPriceFeeds !== undefined) {
     assert(!checkPriceFeedIsTestnet(contracts.priceFeed));
 
     console.log("Deploying external price feeds");
-    const mocMedianizerAddress = await deployContract(deployer, getContractFactory, "MoCMedianizer", externalPriceFeeds.mocOracleAddress, {...overrides});
-    const rskPriceFeedAddress = await deployContract(deployer, getContractFactory, "RskOracle", externalPriceFeeds.rskOracleAddress, {...overrides});
+    const mocMedianizerAddress = await deployContract(
+      deployer,
+      getContractFactory,
+      "MoCMedianizer",
+      externalPriceFeeds.mocOracleAddress,
+      { ...overrides }
+    );
+    const rskPriceFeedAddress = await deployContract(
+      deployer,
+      getContractFactory,
+      "RskOracle",
+      externalPriceFeeds.rskOracleAddress,
+      { ...overrides }
+    );
 
-    console.log(`Hooking up PriceFeed with oracles: MocMedianizer => ${mocMedianizerAddress}, RskPriceFeed => ${rskPriceFeedAddress}`);
-    const tx = await contracts.priceFeed.setAddresses(mocMedianizerAddress, rskPriceFeedAddress, {...overrides});
+    console.log(
+      `Hooking up PriceFeed with oracles: MocMedianizer => ${mocMedianizerAddress}, RskPriceFeed => ${rskPriceFeedAddress}`
+    );
+    const tx = await contracts.priceFeed.setAddresses(mocMedianizerAddress, rskPriceFeedAddress, {
+      ...overrides
+    });
     await tx.wait();
   }
 
@@ -527,6 +618,6 @@ export const deployAndSetupContracts = async (
   return {
     ...deployment,
     deploymentDate: zeroTokenDeploymentTime.toNumber() * 1000,
-    bootstrapPeriod: bootstrapPeriod.toNumber(),
+    bootstrapPeriod: bootstrapPeriod.toNumber()
   };
 };

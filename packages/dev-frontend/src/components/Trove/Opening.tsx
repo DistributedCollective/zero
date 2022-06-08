@@ -7,8 +7,8 @@ import {
   ZUSD_LIQUIDATION_RESERVE,
   ZUSD_MINIMUM_NET_DEBT,
   Percent
-} from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+} from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 import { TroveAction } from "./TroveAction";

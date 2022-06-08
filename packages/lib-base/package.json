@@ -1,19 +1,19 @@
 {
-  "name": "@liquity/lib-base",
+  "name": "@sovryn-zero/lib-base",
   "version": "0.0.0-semantic-release",
-  "description": "Liquity SDK shared interfaces",
+  "description": "Zero SDK shared interfaces",
   "keywords": [
-    "Liquity",
+    "Zero",
     "protocol",
     "DeFi",
     "Ethereum"
   ],
-  "homepage": "https://github.com/liquity/liquity#readme",
+  "homepage": "https://github.com/DistributedCollective/zero#readme",
   "license": "MIT",
-  "author": "Daniel Simon <dani@liquity.org>",
+  "author": "Daniel Simon <dani@sovryn-zero.org>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/liquity/dev",
+  "repository": "https://github.com/DistributedCollective/zero",
   "scripts": {
     "prepare": "run-s prepare:*",
     "prepare:eslint": "eslint src",

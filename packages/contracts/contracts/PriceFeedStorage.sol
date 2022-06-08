@@ -12,6 +12,6 @@ contract PriceFeedStorage is Ownable, CheckContract {
 
     IExternalPriceFeed[2] priceFeeds;
 
-    // The last good price seen from an oracle by Liquity
+    // The last good price seen from an oracle by Zero
     uint256 public lastGoodPrice;
 }

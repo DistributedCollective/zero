@@ -7,8 +7,8 @@ import {
   ZUSD_LIQUIDATION_RESERVE,
   Percent,
   Difference
-} from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+} from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 import { TroveAction } from "./TroveAction";
@@ -80,7 +80,9 @@ const applyUnsavedNetDebtChanges = (unsavedChanges: Difference, trove: Trove) =>
 
 export const Adjusting: React.FC = () => {
   const { dispatchEvent } = useTroveView();
-  const { trove, fees, price, /* accountBalance, */ validationContext } = useLiquitySelector(selector);
+  const { trove, fees, price, /* accountBalance, */ validationContext } = useLiquitySelector(
+    selector
+  );
   const editingState = useState<string>();
   const previousTrove = useRef<Trove>(trove);
   const [collateral, setCollateral] = useState<Decimal>(trove.collateral);

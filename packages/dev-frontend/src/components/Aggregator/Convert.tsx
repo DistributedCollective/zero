@@ -1,5 +1,5 @@
-import { Decimal, LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { Decimal, LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { useWeb3React } from "@web3-react/core";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

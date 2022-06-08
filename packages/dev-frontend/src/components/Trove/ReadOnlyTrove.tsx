@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { Box, Flex, Button } from "theme-ui";
-import { useLiquitySelector } from "@liquity/lib-react";
-import { LiquityStoreState } from "@liquity/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
+import { LiquityStoreState } from "@sovryn-zero/lib-base";
 import { DisabledEditableRow } from "./Editor";
 import { useTroveView } from "./context/TroveViewContext";
 import { COIN } from "../../strings";

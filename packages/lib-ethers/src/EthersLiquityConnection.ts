@@ -2,7 +2,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Block, BlockTag } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@sovryn-zero/lib-base";
 
 import devOrNull from "../deployments/dev.json";
 import mainnet from "../deployments/mainnet.json";
@@ -34,7 +34,7 @@ declare const brand: unique symbol;
 const branded = <T>(t: Omit<T, typeof brand>): T => t as T;
 
 /**
- * Information about a connection to the Liquity protocol.
+ * Information about a connection to the Zero protocol.
  *
  * @remarks
  * Provided for debugging / informational purposes.
@@ -53,19 +53,19 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
   /** Chain ID of the connected network. */
   readonly chainId: number;
 
-  /** Version of the Liquity contracts (Git commit hash). */
+  /** Version of the Zero contracts (Git commit hash). */
   readonly version: string;
 
-  /** Date when the Liquity contracts were deployed. */
+  /** Date when the Zero contracts were deployed. */
   readonly deploymentDate: Date;
 
-  /** Number of block in which the first Liquity contract was deployed. */
+  /** Number of block in which the first Zero contract was deployed. */
   readonly startBlock: number;
 
   /** Time period (in seconds) after `deploymentDate` during which redemptions are disabled. */
   readonly bootstrapPeriod: number;
 
-  /** A mapping of Liquity contracts' names to their addresses. */
+  /** A mapping of Zero contracts' names to their addresses. */
   readonly addresses: Record<string, string>;
 
   /** @internal */
@@ -90,10 +90,7 @@ const connectionFrom = (
   signer: EthersSigner | undefined,
   _contracts: _LiquityContracts,
   _multicall: _Multicall | undefined,
-  {
-    deploymentDate,
-    ...deployment
-  }: _LiquityDeploymentJSON,
+  { deploymentDate, ...deployment }: _LiquityDeploymentJSON,
   optionalParams?: EthersLiquityConnectionOptionalParams
 ): _InternalEthersLiquityConnection => {
   if (
@@ -166,7 +163,7 @@ export const _usingStore = (
   connection.useStore !== undefined;
 
 /**
- * Thrown when trying to connect to a network where Liquity is not deployed.
+ * Thrown when trying to connect to a network where Zero is not deployed.
  *
  * @remarks
  * Thrown by {@link ReadableEthersLiquity.(connect:2)} and {@link EthersLiquity.(connect:2)}.
@@ -257,7 +254,7 @@ export interface EthersLiquityConnectionOptionalParams {
   readonly frontendTag?: string;
 
   /**
-   * Create a {@link @liquity/lib-base#LiquityStore} and expose it as the `store` property.
+   * Create a {@link @sovryn-zero/lib-base#LiquityStore} and expose it as the `store` property.
    *
    * @remarks
    * When set to one of the available {@link EthersLiquityStoreOption | options},
@@ -267,7 +264,7 @@ export interface EthersLiquityConnectionOptionalParams {
    * {@link EthersLiquityWithStore}.
    *
    * Note that the store won't start monitoring the blockchain until its
-   * {@link @liquity/lib-base#LiquityStore.start | start()} function is called.
+   * {@link @sovryn-zero/lib-base#LiquityStore.start | start()} function is called.
    */
   readonly useStore?: EthersLiquityStoreOption;
 }
@@ -296,7 +293,7 @@ export function _connectByChainId(
   optionalParams?: EthersLiquityConnectionOptionalParams
 ): EthersLiquityConnection {
   const deployment: _LiquityDeploymentJSON =
-    (deployments[chainId]) as _LiquityDeploymentJSON ?? panic(new UnsupportedNetworkError(chainId));
+    (deployments[chainId] as _LiquityDeploymentJSON) ?? panic(new UnsupportedNetworkError(chainId));
 
   return connectionFrom(
     provider,

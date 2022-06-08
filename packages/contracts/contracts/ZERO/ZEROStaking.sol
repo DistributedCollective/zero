@@ -129,7 +129,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         _sendETHGainToUser(ETHGain);
     }
 
-    // --- Reward-per-unit-staked increase functions. Called by Liquity core contracts ---
+    // --- Reward-per-unit-staked increase functions. Called by Zero core contracts ---
 
     function increaseF_ETH(uint256 _ETHFee) external override {
         _requireCallerIsFeeDistributor();

@@ -1,5 +1,5 @@
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { Container } from "theme-ui";
 import { useWeb3React } from "@web3-react/core";
 

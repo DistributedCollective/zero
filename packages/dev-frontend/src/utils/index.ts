@@ -2,7 +2,7 @@ import type { BigNumberish } from "@ethersproject/bignumber";
 import BigNumber from "bignumber.js";
 import { formatUnits } from "@ethersproject/units";
 import { ethers } from "ethers";
-import { Decimal } from "@liquity/lib-base";
+import { Decimal } from "@sovryn-zero/lib-base";
 
 export const fromWei = (value: BigNumberish | undefined, decimals = 2) => {
   const n = new BigNumber(ethers.utils.formatEther((value || "0").toString()));

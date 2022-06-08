@@ -1,7 +1,7 @@
 import { Heading, Box, Card, Flex, Button } from "theme-ui";
 
-import { LiquityStoreState } from "@liquity/lib-base";
-import { useLiquitySelector } from "@liquity/lib-react";
+import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
 import { COIN, GT } from "../../strings";
 
