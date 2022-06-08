@@ -129,8 +129,6 @@ export const RedemptionManager: React.FC = () => {
             label="Redeem"
             inputId="redeem-zusd"
             amount={zusdAmount.prettify()}
-            maxAmount={zusdBalance.toString()}
-            maxedOut={zusdAmount.eq(zusdBalance)}
             unit={COIN}
             {...{ editingState }}
             editedAmount={zusdAmount.toString(2)}

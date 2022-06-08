@@ -36,7 +36,7 @@ const selector = (state: LiquityStoreState) => {
 };
 
 const TRANSACTION_ID = "trove-adjustment";
-const GAS_ROOM_ETH = Decimal.from(0.1);
+// const GAS_ROOM_ETH = Decimal.from(0.1);
 
 const feeFrom = (original: Trove, edited: Trove, borrowingRate: Decimal): Decimal => {
   const change = original.whatChanged(edited, borrowingRate);
@@ -80,7 +80,7 @@ const applyUnsavedNetDebtChanges = (unsavedChanges: Difference, trove: Trove) =>
 
 export const Adjusting: React.FC = () => {
   const { dispatchEvent } = useTroveView();
-  const { trove, fees, price, accountBalance, validationContext } = useLiquitySelector(selector);
+  const { trove, fees, price, /* accountBalance, */ validationContext } = useLiquitySelector(selector);
   const editingState = useState<string>();
   const previousTrove = useRef<Trove>(trove);
   const [collateral, setCollateral] = useState<Decimal>(trove.collateral);
@@ -134,9 +134,9 @@ export const Adjusting: React.FC = () => {
   const maxBorrowingRate = borrowingRate.add(0.005);
   const updatedTrove = isDirty ? new Trove(collateral, totalDebt) : trove;
   const feePct = new Percent(borrowingRate);
-  const maxEth = accountBalance.gt(GAS_ROOM_ETH) ? accountBalance.sub(GAS_ROOM_ETH) : Decimal.ZERO;
-  const maxCollateral = collateral.add(maxEth);
-  const collateralMaxedOut = collateral.eq(maxCollateral);
+  // const maxEth = accountBalance.gt(GAS_ROOM_ETH) ? accountBalance.sub(GAS_ROOM_ETH) : Decimal.ZERO;
+  // const maxCollateral = collateral.add(maxEth);
+  // const collateralMaxedOut = collateral.eq(maxCollateral);
   const collateralRatio =
     !collateral.isZero && !netDebt.isZero ? updatedTrove.collateralRatio(price) : undefined;
   const collateralRatioChange = Difference.between(collateralRatio, trove.collateralRatio(price));
@@ -170,8 +170,6 @@ export const Adjusting: React.FC = () => {
             label="Collateral"
             inputId="trove-collateral"
             amount={collateral.prettify(4)}
-            maxAmount={maxCollateral.toString()}
-            maxedOut={collateralMaxedOut}
             editingState={editingState}
             unit="RBTC"
             editedAmount={collateral.toString(4)}
