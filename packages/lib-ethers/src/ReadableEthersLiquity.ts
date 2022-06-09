@@ -66,7 +66,6 @@ const userTroveStatusFrom = (backendStatus: BackendTroveStatus): UserTroveStatus
     : panic(new Error(`invalid backendStatus ${backendStatus}`));
 
 const decimalify = (bigNumber: BigNumber) => Decimal.fromBigNumberString(bigNumber.toHexString());
-const numberify = (bigNumber: BigNumber) => bigNumber.toNumber();
 const convertToDate = (timestamp: number) => new Date(timestamp * 1000);
 
 const validSortingOptions = ["ascendingCollateralRatio", "descendingCollateralRatio"];
@@ -310,18 +309,6 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     const { zusdToken } = _getContracts(this.connection);
 
     return zusdToken.balanceOf(address, { ...overrides }).then(decimalify);
-  }
-
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getNUEBalance} */
-  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
-    address ??= _requireAddress(this.connection);
-    const { nueToken } = _getContracts(this.connection);
-
-    if (!nueToken) {
-      throw "nue token address not set";
-    }
-
-    return nueToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZEROBalance} */
@@ -577,12 +564,6 @@ class BlockPolledLiquityStoreBasedCache
   getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Decimal | undefined {
     if (this._userHit(address, overrides)) {
       return this._store.state.zusdBalance;
-    }
-  }
-
-  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Decimal | undefined {
-    if (this._userHit(address, overrides)) {
-      return this._store.state.nueBalance;
     }
   }
 

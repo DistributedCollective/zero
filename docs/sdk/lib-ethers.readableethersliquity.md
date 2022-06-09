@@ -31,7 +31,6 @@ The constructor for this class is marked as internal. Third-party code should no
 |  [getCollateralSurplusBalance(address, overrides)](./lib-ethers.readableethersliquity.getcollateralsurplusbalance.md) |  | Get the amount of leftover collateral available for withdrawal by an address. |
 |  [getFees(overrides)](./lib-ethers.readableethersliquity.getfees.md) |  | Get a calculator for current fees. |
 |  [getFrontendStatus(address, overrides)](./lib-ethers.readableethersliquity.getfrontendstatus.md) |  | Check whether an address is registered as a Zero frontend, and what its kickback rate is. |
-|  [getNUEBalance(address, overrides)](./lib-ethers.readableethersliquity.getnuebalance.md) |  | Get the amount of ZUSD held by an address. |
 |  [getNumberOfTroves(overrides)](./lib-ethers.readableethersliquity.getnumberoftroves.md) |  | Get number of Troves that are currently open. |
 |  [getPrice(overrides)](./lib-ethers.readableethersliquity.getprice.md) |  | Get the current price of the native currency (e.g. Ether) in USD. |
 |  [getRemainingStabilityPoolZEROReward(overrides)](./lib-ethers.readableethersliquity.getremainingstabilitypoolzeroreward.md) |  | Get the remaining ZERO that will be collectively rewarded to stability depositors. |

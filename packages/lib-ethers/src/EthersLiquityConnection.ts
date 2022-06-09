@@ -2,10 +2,8 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Block, BlockTag } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 
-import { Decimal } from "@sovryn-zero/lib-base";
 
 import devOrNull from "../deployments/dev.json";
-import mainnet from "../deployments/mainnet.json";
 import rsktestnet from "../deployments/rsktestnet.json";
 import rskdev from "../deployments/rskdev.json";
 
