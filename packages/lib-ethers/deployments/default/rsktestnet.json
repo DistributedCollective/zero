@@ -11,11 +11,10 @@
   "_priceFeedIsTestnet": true,
   "_isDev": false,
   "addresses": {
-    "nueToken": "0xbae0e3c499BB2c01A431Be40e9DF7c99FE5aEC3E",
     "activePool": "0x73e3F55ec4A19135ef28a452E3016baBa428FC71",
     "borrowerOperations": "0xa60B98db32BE50EEe3A63dC24C8642093C7c27eA",
     "troveManager": "0xC53b5257B8a75bEbD0d3EA753fc9AB469d53f5D7",
-    "troveManagerRedeemOps": "0xA97278b74b980e3B23D9531907a18629baDB81ea",
+    "troveManagerRedeemOps": "0xF59D2c6f5cdFB46F3543C459A7a987A11c3e9685",
     "collSurplusPool": "0xa8274Dc6aCA6d73F81746c7F3d4899e748c3cA0e",
     "communityIssuance": "0x8b039932Fde30FC765b4e30D49dF33A097996975",
     "defaultPool": "0xEbEec236b4eF2F19Edc6cF217534C361FEFFDf2F",
