@@ -21,12 +21,24 @@ export const Convert: React.FC = () => {
   const { account } = useWeb3React();
   const { zusdBalance } = useLiquitySelector(select);
   const { data: xusd, decimals: decimalsXUSD } = useTokenBalance(account!, addresses.xusd);
-  const { data: zusd, decimals: decimalsZUSD } = useTokenBalance(addresses.babelfish, addresses.zusd);
+  const { data: zusd, decimals: decimalsZUSD } = useTokenBalance(
+    addresses.babelfish,
+    addresses.zusd
+  );
   const { mint, redeem } = useZusdAggregator(account);
 
-  const xusdBalance = useMemo(() => Decimal.from(parseBalance(xusd || 0, decimalsXUSD)), [xusd, decimalsXUSD]);
-  const zusdAggregatorBalance = useMemo(() => Decimal.from(parseBalance(zusd || 0, decimalsZUSD)), [decimalsZUSD, zusd]);
-  const maxXusdBalance = useMemo(() => Decimal.min(xusdBalance, zusdAggregatorBalance), [xusdBalance, zusdAggregatorBalance]);
+  const xusdBalance = useMemo(() => Decimal.from(parseBalance(xusd || 0, decimalsXUSD)), [
+    xusd,
+    decimalsXUSD
+  ]);
+  const zusdAggregatorBalance = useMemo(() => Decimal.from(parseBalance(zusd || 0, decimalsZUSD)), [
+    decimalsZUSD,
+    zusd
+  ]);
+  const maxXusdBalance = useMemo(() => Decimal.min(xusdBalance, zusdAggregatorBalance), [
+    xusdBalance,
+    zusdAggregatorBalance
+  ]);
 
   const [zusdAmount, setZUSDAmount] = useState(zusdBalance);
   const [xusdAmount, setXUSDAmount] = useState(maxXusdBalance);
@@ -34,7 +46,7 @@ export const Convert: React.FC = () => {
   const editingStateXUSD = useState<string>();
   const xusdEdited = useRef(false);
 
-  const handleXusdAmount = useCallback((amount) => {
+  const handleXusdAmount = useCallback(amount => {
     setXUSDAmount(Decimal.from(amount));
     xusdEdited.current = true;
   }, []);
@@ -58,7 +70,7 @@ export const Convert: React.FC = () => {
     >
       <Flex sx={{ alignItems: "start", justifyContent: "space-around", py: 4 }}>
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300, flex: 1 }}>
-        <Text sx={{ fontWeight: 600, px: 2 }}>Convert ZUSD</Text>
+          <Text sx={{ fontWeight: 600, px: 2 }}>Convert ZUSD</Text>
           <EditableRow
             label="&nbsp;"
             inputId="convert-from-zusd"
@@ -78,7 +90,7 @@ export const Convert: React.FC = () => {
           <Button
             onClick={() => mint(toWei(zusdAmount))}
             disabled={zusdAmount.isZero}
-            sx={{ mt: zusdAmount.gt(zusdBalance) ? 1 : 3, ml: 2, alignSelf: 'self-start' }}
+            sx={{ mt: zusdAmount.gt(zusdBalance) ? 1 : 3, ml: 2, alignSelf: "self-start" }}
           >
             Convert
           </Button>
@@ -110,7 +122,11 @@ export const Convert: React.FC = () => {
           <Button
             onClick={() => redeem(toWei(xusdAmount))}
             disabled={isZero(xusdAmount.toString())}
-            sx={{ mt: xusdAmount.gt(xusdBalance) || xusdAmount.gt(zusdAggregatorBalance) ? 1 : 3, ml: 2, alignSelf: 'self-start' }}
+            sx={{
+              mt: xusdAmount.gt(xusdBalance) || xusdAmount.gt(zusdAggregatorBalance) ? 1 : 3,
+              ml: 2,
+              alignSelf: "self-start"
+            }}
           >
             Convert
           </Button>
