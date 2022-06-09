@@ -234,7 +234,7 @@ Economically, Recovery Mode is designed to encourage collateral top-ups and debt
 
 ### Directories
 
-- `packages/dev-frontend/` - Zero Developer UI: a fully functional React app used for interfacing with the smart contracts during development
+- `packages/dev-frontend/` - Zero Beta: a fully functional React app used for interfacing with the smart contracts during development
 - `packages/fuzzer/` - A very simple, purpose-built tool based on Zero middleware for randomly interacting with the system
 - `packages/lib-base/` - Common interfaces and classes shared by the other `lib-` packages
 - `packages/lib-ethers/` - [ethers](https://github.com/ethers-io/ethers.js)-based middleware that can read Zero state and send transactions
