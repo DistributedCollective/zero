@@ -101,19 +101,27 @@ export const StaticAmounts: React.FC<StaticAmountsProps & SxProp> = ({
         ...sx
       }}
     >
-      <Flex sx={{ alignItems: "center", width: '100%', pr: 2 }}>
-        {showTilde && (
-          <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0 }}>~&nbsp;</Text>
-        )}
-        <Text sx={{ color, fontWeight: "medium", textOverflow: 'ellipsis', overflow: 'hidden' }}>{amount}</Text>
+      <Flex sx={{ alignItems: "center", width: "100%", pr: 2 }}>
+        {showTilde && <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0 }}>~&nbsp;</Text>}
+        <Text sx={{ color, fontWeight: "medium", textOverflow: "ellipsis", overflow: "hidden" }}>
+          {amount}
+        </Text>
         {unit && (
-          <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0, flexGrow: 0 }}>&nbsp;{unit}</Text>
+          <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0, flexGrow: 0 }}>
+            &nbsp;{unit}
+          </Text>
         )}
 
         {pendingAmount && (
           <PendingAmount
-            sx={{ color: pendingColor, opacity: 0.8, fontSize: "0.666em", flexShrink: 0, flexGrow: 0 }}
-            value={`&nbsp;${pendingAmount}`}
+            sx={{
+              color: pendingColor,
+              opacity: 0.8,
+              fontSize: "0.666em",
+              flexShrink: 0,
+              flexGrow: 0
+            }}
+            value={pendingAmount}
           />
         )}
       </Flex>
@@ -211,7 +219,10 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
 
-  const showTilde = useMemo(() => !Decimal.from(editedAmount).eq(amount.replaceAll(',', '')), [amount, editedAmount]);
+  const showTilde = useMemo(() => !Decimal.from(editedAmount).eq(amount.replaceAll(",", "")), [
+    amount,
+    editedAmount
+  ]);
 
   return editing === inputId ? (
     <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2, maxWidth: 355 }}>
@@ -252,7 +263,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
       {...{ label, labelFor: inputId, unit }}
       sx={{ flex: 1, px: 2, maxWidth: 355 }}
     >
-      <Flex sx={{ alignItems: "center", justifyContent: 'space-around', mt: "4px" }}>
+      <Flex sx={{ alignItems: "center", justifyContent: "space-around", mt: "4px" }}>
         <StaticAmounts
           sx={{
             ...editableStyle,
@@ -260,7 +271,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
             bg: invalid ? "invalid" : "transparent",
             flex: 1,
             flexShrink: 1,
-            flexGrow: 1,
+            flexGrow: 1
           }}
           labelledBy={`${inputId}-label`}
           onClick={() => setEditing(inputId)}
