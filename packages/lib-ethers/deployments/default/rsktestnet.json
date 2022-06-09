@@ -11,7 +11,6 @@
   "_priceFeedIsTestnet": true,
   "_isDev": false,
   "addresses": {
-    "nueToken": "0xbae0e3c499BB2c01A431Be40e9DF7c99FE5aEC3E",
     "activePool": "0x73e3F55ec4A19135ef28a452E3016baBa428FC71",
     "borrowerOperations": "0xa60B98db32BE50EEe3A63dC24C8642093C7c27eA",
     "troveManager": "0xC53b5257B8a75bEbD0d3EA753fc9AB469d53f5D7",
