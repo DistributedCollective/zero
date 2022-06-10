@@ -410,7 +410,8 @@ task("deploy", "Deploys the contracts to the network")
       useRealPriceFeed ??= mainnets.indexOf(env.network.name) !== -1;
 
       const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
-
+      useRealPriceFeed ??= isMainnet;
+      
       if (useRealPriceFeed && !hasOracles(env.network.name)) {
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
       }
