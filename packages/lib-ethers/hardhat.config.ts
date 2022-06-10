@@ -89,6 +89,14 @@ const presaleAddresses = {
   dev: "0x0000000000000000000000000000000000000003"
 };
 
+const zusdTokenAddresses = {
+  mainnet: "",
+  hardhat: "",
+  rsksovrynmainnet: "",
+  rsktestnet: "0x6b41566353d6C7B8C2a7931d498F11489DacAc29",
+  dev: ""
+};
+
 const oracleAddresses: Record<string, OracleAddresses> = {
   mainnet: {
     mocOracleAddress: "",
@@ -124,6 +132,9 @@ const hasPresale = (network: string): network is keyof typeof presaleAddresses =
 
 const hasMarketMaker = (network: string): network is keyof typeof marketMakerAddresses =>
   network in marketMakerAddresses;
+
+const hasZusdToken = (network: string): network is keyof typeof zusdTokenAddresses =>
+  network in zusdTokenAddresses;
 
 const config: HardhatUserConfig = {
   networks: {
@@ -188,6 +199,7 @@ declare module "hardhat/types/runtime" {
       externalPriceFeeds?: OracleAddresses,
       presaleAddress?: string,
       marketMakerAddress?: string,
+      zusdTokenAddress?: string,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -220,6 +232,7 @@ extendEnvironment(env => {
     externalPriceFeeds,
     presaleAddress,
     marketMakerAddress,
+    zusdTokenAddress,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
@@ -232,6 +245,7 @@ extendEnvironment(env => {
       wrbtcAddress,
       presaleAddress,
       marketMakerAddress,
+      zusdTokenAddress,
       overrides
     );
 
@@ -339,6 +353,7 @@ type DeployParams = {
   wrbtcAddress?: string;
   presaleAddress?: string;
   marketMakerAddress?: string;
+  zusdTokenAddress?: string;
 };
 
 task("deploy", "Deploys the contracts to the network")
@@ -372,7 +387,8 @@ task("deploy", "Deploys the contracts to the network")
         sovFeeCollectorAddress,
         wrbtcAddress,
         presaleAddress,
-        marketMakerAddress
+        marketMakerAddress,
+        zusdTokenAddress
       }: DeployParams,
       env
     ) => {
@@ -407,7 +423,9 @@ task("deploy", "Deploys the contracts to the network")
       marketMakerAddress ??= hasMarketMaker(env.network.name)
         ? marketMakerAddresses[env.network.name]
         : undefined;
-
+      zusdTokenAddress ??= hasZusdToken(env.network.name)
+        ? zusdTokenAddresses[env.network.name]
+        : undefined;
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
@@ -416,6 +434,7 @@ task("deploy", "Deploys the contracts to the network")
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
         presaleAddress,
         marketMakerAddress,
+        zusdTokenAddress,
         overrides
       );
 
