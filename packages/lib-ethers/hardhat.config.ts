@@ -1,3 +1,4 @@
+import { ZUSDToken, UpgradableProxy } from "./types/index";
 import { ethers } from "hardhat";
 import fs from "fs";
 import path from "path";
@@ -454,5 +455,61 @@ task("deploy", "Deploys the contracts to the network")
       console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toString() });
     }
   );
+
+type DeployZUSDToken = {
+  channel: string;
+};
+
+task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous deployment")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const {
+      zusdToken: zusdTokenAddress,
+      troveManager: troveManagerAddress,
+      stabilityPool: stabilityPoolAddress,
+      borrowerOperations: borrowerOperationsAddress
+    } = deployment.addresses;
+
+    console.log("Deploying new ZUSD token logic for testnet");
+    // NOTE this script should only be executed on testnet
+    const zusdTokenFactory = await hre.ethers.getContractFactory("ZUSDTokenTestnet");
+    const zusdTokenContract = await zusdTokenFactory.deploy();
+    await zusdTokenContract.deployed();
+
+    console.log("Initializing new ZUSD token with the correct dependencies");
+    const zusdToken = (zusdTokenContract as unknown) as ZUSDToken;
+    zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+
+    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+      "UpgradableProxy",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as UpgradableProxy;
+
+    const oldZUSDAddress = await zusdTokenProxy.getImplementation();
+    console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdToken.address);
+    await zusdTokenProxy.setImplementation(zusdToken.address);
+    const newZUSDAddress = await zusdTokenProxy.getImplementation();
+    console.log("Implelentation address changed to " + newZUSDAddress);
+  });
+
+task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to previous deployment")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const { zusdToken: zusdTokenAddress } = deployment.addresses;
+
+    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+      "UpgradableProxy",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as UpgradableProxy;
+
+    const zusdImplementationAddress = await zusdTokenProxy.getImplementation();
+    console.log("Current implelentation address is: " + zusdImplementationAddress);
+  });
 
 export default config;
