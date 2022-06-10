@@ -12,7 +12,7 @@ export const ErrorDescription: React.FC = ({ children }) => (
 
         mb: [2, 3],
         py: 2,
-        px: 4,
+        px: 3,
 
         border: 1,
         borderRadius: "8px",
