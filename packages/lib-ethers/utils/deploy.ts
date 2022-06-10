@@ -93,6 +93,7 @@ const deployContracts = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
   zusdTokenAddress?: string,
+  isMainnet?: boolean,
   overrides?: Overrides
 ): Promise<{ addresses: Omit<_LiquityContractAddresses, "nueToken">; startBlock: number }> => {
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(
@@ -120,12 +121,11 @@ const deployContracts = async (
       ...overrides
     }),
 
-    troveManagerRedeemOps: await deployContract(
-      deployer,
-      getContractFactory,
-      "TroveManagerRedeemOps",
-      { ...overrides }
-    ),
+    troveManagerRedeemOps: isMainnet
+      ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
+      : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
+          ...overrides
+        }),
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),
@@ -535,6 +535,7 @@ export const deployAndSetupContracts = async (
   presaleAddress?: string,
   marketMakerAddress?: string,
   zusdTokenAddress?: string,
+  isMainnet?: boolean,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
   if (!deployer.provider) {
@@ -587,6 +588,7 @@ export const deployAndSetupContracts = async (
       getContractFactory,
       _priceFeedIsTestnet,
       zusdTokenAddress,
+      isMainnet,
       overrides
     ))
   } as _LiquityDeploymentJSON;

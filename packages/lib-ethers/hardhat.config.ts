@@ -1,3 +1,4 @@
+import { ethers } from "hardhat";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
@@ -200,6 +201,7 @@ declare module "hardhat/types/runtime" {
       presaleAddress?: string,
       marketMakerAddress?: string,
       zusdTokenAddress?: string,
+      isMainnet?: boolean,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -233,6 +235,7 @@ extendEnvironment(env => {
     presaleAddress,
     marketMakerAddress,
     zusdTokenAddress,
+    isMainnet,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
@@ -246,6 +249,7 @@ extendEnvironment(env => {
       presaleAddress,
       marketMakerAddress,
       zusdTokenAddress,
+      isMainnet,
       overrides
     );
 
@@ -405,6 +409,8 @@ task("deploy", "Deploys the contracts to the network")
 
       useRealPriceFeed ??= mainnets.indexOf(env.network.name) !== -1;
 
+      const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
+
       if (useRealPriceFeed && !hasOracles(env.network.name)) {
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
       }
@@ -435,6 +441,7 @@ task("deploy", "Deploys the contracts to the network")
         presaleAddress,
         marketMakerAddress,
         zusdTokenAddress,
+        isMainnet,
         overrides
       );
 
