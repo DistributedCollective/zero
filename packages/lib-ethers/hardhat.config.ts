@@ -407,7 +407,6 @@ task("deploy", "Deploys the contracts to the network")
 
       const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet"];
 
-      useRealPriceFeed ??= mainnets.indexOf(env.network.name) !== -1;
 
       const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
       useRealPriceFeed ??= isMainnet;
