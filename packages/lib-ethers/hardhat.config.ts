@@ -405,7 +405,7 @@ task("deploy", "Deploys the contracts to the network")
         balanceBefore: balBefore.toString()
       });
 
-      const mainnets = ["mainnet", "rsksovrynmainnet"];
+      const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet"];
 
       useRealPriceFeed ??= mainnets.indexOf(env.network.name) !== -1;
 
