@@ -8,7 +8,7 @@ import { addresses } from "../../contracts/config";
 import useTokenBalance from "../../hooks/useTokenBalance";
 import useZusdAggregator from "../../hooks/useZusdAggregator";
 import { COIN, XUSD } from "../../strings";
-import { isZero, parseBalance, toWei } from "../../utils";
+import { isZero, parseBalance } from "../../utils";
 import { Card } from "../Card";
 import { ErrorDescription } from "../ErrorDescription";
 import { EditableRow } from "../Trove/Editor";
@@ -27,11 +27,12 @@ export const Convert: React.FC = () => {
   );
   const { mint, redeem } = useZusdAggregator(account);
 
-  const xusdBalance = useMemo(() => Decimal.from(parseBalance(xusd || 0, decimalsXUSD)), [
+  const xusdBalance = useMemo(() => Decimal.from(parseBalance(xusd || 0, decimalsXUSD, decimalsXUSD)), [
     xusd,
     decimalsXUSD
   ]);
-  const zusdAggregatorBalance = useMemo(() => Decimal.from(parseBalance(zusd || 0, decimalsZUSD)), [
+
+  const zusdAggregatorBalance = useMemo(() => Decimal.from(parseBalance(zusd || 0, decimalsZUSD, decimalsZUSD)), [
     decimalsZUSD,
     zusd
   ]);
