@@ -91,9 +91,6 @@ const presaleAddresses = {
 };
 
 const zusdTokenAddresses = {
-  mainnet: "",
-  hardhat: "",
-  rsksovrynmainnet: "",
   rsktestnet: "0x6b41566353d6C7B8C2a7931d498F11489DacAc29",
   dev: ""
 };
@@ -407,10 +404,9 @@ task("deploy", "Deploys the contracts to the network")
 
       const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet"];
 
-
       const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
       useRealPriceFeed ??= isMainnet;
-      
+
       if (useRealPriceFeed && !hasOracles(env.network.name)) {
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
       }
@@ -455,7 +451,7 @@ task("deploy", "Deploys the contracts to the network")
       console.log();
       console.log(deployment);
       console.log();
-      console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toNumber() });
+      console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toString() });
     }
   );
 
