@@ -88,7 +88,7 @@ export const Convert: React.FC = () => {
             </Flex>
           )}
           <Button
-            onClick={() => mint(toWei(zusdAmount))}
+            onClick={() => mint(zusdAmount.toString())}
             disabled={zusdAmount.isZero}
             sx={{ mt: zusdAmount.gt(zusdBalance) ? 1 : 3, ml: 2, alignSelf: "self-start" }}
           >
@@ -120,7 +120,7 @@ export const Convert: React.FC = () => {
             </Flex>
           )}
           <Button
-            onClick={() => redeem(toWei(xusdAmount))}
+            onClick={() => redeem(xusdAmount.toString())}
             disabled={isZero(xusdAmount.toString())}
             sx={{
               mt: xusdAmount.gt(xusdBalance) || xusdAmount.gt(zusdAggregatorBalance) ? 1 : 3,
