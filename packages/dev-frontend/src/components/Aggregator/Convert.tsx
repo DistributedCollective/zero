@@ -8,7 +8,7 @@ import { addresses } from "../../contracts/config";
 import useTokenBalance from "../../hooks/useTokenBalance";
 import useZusdAggregator from "../../hooks/useZusdAggregator";
 import { COIN, XUSD } from "../../strings";
-import { isZero, parseBalance, toWei } from "../../utils";
+import { parseBalance } from "../../utils";
 import { Card } from "../Card";
 import { ErrorDescription } from "../ErrorDescription";
 import { EditableRow } from "../Trove/Editor";
@@ -57,6 +57,14 @@ export const Convert: React.FC = () => {
     }
   }, [maxXusdBalance]);
 
+  const isRedeemDisabled = useMemo(
+    () =>
+      xusdAmount.lte(0) ||
+      xusdAmount.gt(xusdBalance) ||
+      (xusdAmount.lte(xusdBalance) && xusdAmount.gt(zusdAggregatorBalance)),
+    [xusdAmount, xusdBalance, zusdAggregatorBalance]
+  );
+
   return (
     <Card
       heading={
@@ -89,8 +97,12 @@ export const Convert: React.FC = () => {
           )}
           <Button
             onClick={() => mint(zusdAmount.toString())}
-            disabled={zusdAmount.isZero}
-            sx={{ mt: zusdAmount.gt(zusdBalance) ? 1 : 3, ml: 2, alignSelf: "self-start" }}
+            disabled={zusdAmount.isZero || zusdAmount.gt(zusdBalance)}
+            sx={{
+              mt: zusdAmount.isZero || zusdAmount.gt(zusdBalance) ? 1 : 3,
+              ml: 2,
+              alignSelf: "self-start"
+            }}
           >
             Convert
           </Button>
@@ -121,9 +133,9 @@ export const Convert: React.FC = () => {
           )}
           <Button
             onClick={() => redeem(xusdAmount.toString())}
-            disabled={isZero(xusdAmount.toString())}
+            disabled={isRedeemDisabled}
             sx={{
-              mt: xusdAmount.gt(xusdBalance) || xusdAmount.gt(zusdAggregatorBalance) ? 1 : 3,
+              mt: isRedeemDisabled ? 1 : 3,
               ml: 2,
               alignSelf: "self-start"
             }}
