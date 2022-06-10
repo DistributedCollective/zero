@@ -18,7 +18,7 @@ export const RedemptionPage: React.FC = () => {
                 emerge.
               </Paragraph>
               <Paragraph sx={{ mt: 2 }}>
-                Most of the time you will get a better rate for converting NUE to RBTC on{" "}
+                Most of the time you will get a better rate for converting ZUSD to RBTC on{" "}
                 <Link href="https://live.sovryn.app/swap" target="_blank">
                   Sovryn <Icon name="external-link-alt" size="xs" />
                 </Link>{" "}
