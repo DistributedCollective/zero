@@ -4,14 +4,13 @@ import { Card, Box, Flex, Button } from "theme-ui";
 import { LiquityStoreState } from "@sovryn-zero/lib-base";
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
-import { COIN, GT } from "../../strings";
+import { COIN } from "../../strings";
 import { LoadingOverlay } from "../LoadingOverlay";
 import { useMyTransactionState } from "../Transaction";
 import { DisabledEditableRow, StaticRow } from "../Trove/Editor";
 import { ClaimAndMove } from "./actions/ClaimAndMove";
 import { ClaimRewards } from "./actions/ClaimRewards";
 import { useStabilityView } from "./context/StabilityViewContext";
-import { RemainingZERO } from "./RemainingZERO";
 import { Yield } from "./Yield";
 import { InfoIcon } from "../InfoIcon";
 
@@ -50,11 +49,11 @@ export const ActiveDeposit: React.FC = () => {
   return (
     <>
       <Box sx={{ p: [2, 3], position: "relative" }}>
-        {!isWaitingForTransaction && (
+        {/* {!isWaitingForTransaction && (
           <Flex sx={{ justifyContent: "flex-end", position: "absolute", right: 0, top: 0 }}>
             <RemainingZERO />
           </Flex>
-        )}
+        )} */}
         <Flex sx={{ alignItems: "flex-end", mt: 3 }}>
           <DisabledEditableRow
             label="Deposit"
@@ -79,24 +78,6 @@ export const ActiveDeposit: React.FC = () => {
           />
 
           <Flex sx={{ alignItems: "center" }}>
-            <StaticRow
-              label="Reward"
-              inputId="deposit-reward"
-              amount={stabilityDeposit.zeroReward.prettify()}
-              color={stabilityDeposit.zeroReward.nonZero && "success"}
-              unit={GT}
-              infoIcon={
-                <InfoIcon
-                  tooltip={
-                    <Card variant="tooltip" sx={{ width: "240px" }}>
-                      Although the ZERO rewards accrue every minute, the value on the UI only updates
-                      when a user transacts with the Stability Pool. Therefore you may receive more
-                      rewards than is displayed when you claim or adjust your deposit.
-                    </Card>
-                  }
-                />
-              }
-            />
             <Flex sx={{ justifyContent: "flex-end", flex: 1 }}>
               <Yield />
             </Flex>

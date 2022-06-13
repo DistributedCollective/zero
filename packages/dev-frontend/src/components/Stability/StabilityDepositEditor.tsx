@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Box, Flex, Button } from "theme-ui";
-import { Card } from "../Card";
 import { ActionDescription } from "../ActionDescription";
 
 import {
@@ -13,12 +12,11 @@ import {
 
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
-import { COIN, GT } from "../../strings";
+import { COIN } from "../../strings";
 
 import { Icon } from "../Icon";
 import { EditableRow, StaticRow } from "../Trove/Editor";
 import { LoadingOverlay } from "../LoadingOverlay";
-import { InfoIcon } from "../InfoIcon";
 
 const select = ({ zusdBalance, zusdInStabilityPool }: LiquityStoreState) => ({
   zusdBalance,
@@ -129,25 +127,6 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
               amount={originalDeposit.collateralGain.prettify(4)}
               color={originalDeposit.collateralGain.nonZero && "success"}
               unit="RBTC"
-            />
-
-            <StaticRow
-              label="Reward"
-              inputId="deposit-reward"
-              amount={originalDeposit.zeroReward.prettify()}
-              color={originalDeposit.zeroReward.nonZero && "success"}
-              unit={GT}
-              infoIcon={
-                <InfoIcon
-                  tooltip={
-                    <Card>
-                      Although the ZERO rewards accrue every minute, the value on the UI only updates
-                      when a user transacts with the Stability Pool. Therefore you may receive more
-                      rewards than is displayed when you claim or adjust your deposit.
-                    </Card>
-                  }
-                />
-              }
             />
           </Flex>
         )}
