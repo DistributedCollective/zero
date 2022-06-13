@@ -489,7 +489,7 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     console.log("Initializing new ZUSD token with the correct dependencies");
     const zusdToken = (zusdTokenAddress as unknown) as ZUSDToken;
     //call initialize on the new zusdToken by calling proxy
-    zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+    await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
 
     const oldZUSDAddress = await zusdTokenProxy.getImplementation();
     console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
