@@ -478,19 +478,22 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     const zusdTokenContract = await zusdTokenFactory.deploy();
     await zusdTokenContract.deployed();
 
-    console.log("Initializing new ZUSD token with the correct dependencies");
-    const zusdToken = (zusdTokenContract as unknown) as ZUSDToken;
-    zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
-
     const zusdTokenProxy = ((await hre.ethers.getContractAt(
       "UpgradableProxy",
       zusdTokenAddress,
       deployer
     )) as unknown) as UpgradableProxy;
 
+    //set new implementation
+    await zusdTokenProxy.setImplementation(zusdTokenContract.address);
+    console.log("Initializing new ZUSD token with the correct dependencies");
+    const zusdToken = (zusdTokenAddress as unknown) as ZUSDToken;
+    //call initialize on the new zusdToken by calling proxy
+    zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+
     const oldZUSDAddress = await zusdTokenProxy.getImplementation();
-    console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdToken.address);
-    await zusdTokenProxy.setImplementation(zusdToken.address);
+    console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
+
     const newZUSDAddress = await zusdTokenProxy.getImplementation();
     console.log("Implementation address changed to " + newZUSDAddress);
   });
