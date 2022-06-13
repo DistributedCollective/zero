@@ -492,7 +492,7 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdToken.address);
     await zusdTokenProxy.setImplementation(zusdToken.address);
     const newZUSDAddress = await zusdTokenProxy.getImplementation();
-    console.log("Implelentation address changed to " + newZUSDAddress);
+    console.log("Implementation address changed to " + newZUSDAddress);
   });
 
 task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to previous deployment")
@@ -500,7 +500,7 @@ task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to pre
   .setAction(async ({ channel }: DeployZUSDToken, hre) => {
     const [deployer] = await hre.ethers.getSigners();
     const deployment = getDeploymentData(hre.network.name, channel);
-    const { zusdToken: zusdTokenAddress } = deployment.addresses;
+    const { zusdToken: zusdTokenAddress, zeroToken: zeroTokenAddress } = deployment.addresses;
 
     const zusdTokenProxy = ((await hre.ethers.getContractAt(
       "UpgradableProxy",
@@ -510,6 +510,24 @@ task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to pre
 
     const zusdImplementationAddress = await zusdTokenProxy.getImplementation();
     console.log("Current implelentation address is: " + zusdImplementationAddress);
+
+    const zusdToken = ((await hre.ethers.getContractAt(
+      "ZUSDToken",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as ZUSDToken;
+
+    const zeroToken = ((await hre.ethers.getContractAt(
+      "ZEROToken",
+      zeroTokenAddress,
+      deployer
+    )) as unknown) as ZEROToken;
+
+    const address = await zusdToken.address;
+    console.log("Address ZUSD: " + address);
+    await zeroToken.mint("0x0", 100);
+    await zeroToken.mint(deployer.address, 100);
+    console.log("Try mint ZERO");
   });
 
 export default config;
