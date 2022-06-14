@@ -18,7 +18,7 @@ import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/dep
 import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
-import { BorrowerOperations, CommunityIssuance, ZEROToken } from "./types";
+import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy } from "./types";
 
 dotenv.config();
 
@@ -89,6 +89,11 @@ const presaleAddresses = {
   dev: "0x0000000000000000000000000000000000000003"
 };
 
+const zusdTokenAddresses = {
+  rsktestnet: "0x6b41566353d6C7B8C2a7931d498F11489DacAc29",
+  dev: ""
+};
+
 const oracleAddresses: Record<string, OracleAddresses> = {
   mainnet: {
     mocOracleAddress: "",
@@ -124,6 +129,9 @@ const hasPresale = (network: string): network is keyof typeof presaleAddresses =
 
 const hasMarketMaker = (network: string): network is keyof typeof marketMakerAddresses =>
   network in marketMakerAddresses;
+
+const hasZusdToken = (network: string): network is keyof typeof zusdTokenAddresses =>
+  network in zusdTokenAddresses;
 
 const config: HardhatUserConfig = {
   networks: {
@@ -188,6 +196,8 @@ declare module "hardhat/types/runtime" {
       externalPriceFeeds?: OracleAddresses,
       presaleAddress?: string,
       marketMakerAddress?: string,
+      zusdTokenAddress?: string,
+      isMainnet?: boolean,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -220,6 +230,8 @@ extendEnvironment(env => {
     externalPriceFeeds,
     presaleAddress,
     marketMakerAddress,
+    zusdTokenAddress,
+    isMainnet,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
@@ -232,6 +244,8 @@ extendEnvironment(env => {
       wrbtcAddress,
       presaleAddress,
       marketMakerAddress,
+      zusdTokenAddress,
+      isMainnet,
       overrides
     );
 
@@ -339,6 +353,7 @@ type DeployParams = {
   wrbtcAddress?: string;
   presaleAddress?: string;
   marketMakerAddress?: string;
+  zusdTokenAddress?: string;
 };
 
 task("deploy", "Deploys the contracts to the network")
@@ -372,7 +387,8 @@ task("deploy", "Deploys the contracts to the network")
         sovFeeCollectorAddress,
         wrbtcAddress,
         presaleAddress,
-        marketMakerAddress
+        marketMakerAddress,
+        zusdTokenAddress
       }: DeployParams,
       env
     ) => {
@@ -385,9 +401,10 @@ task("deploy", "Deploys the contracts to the network")
         balanceBefore: balBefore.toString()
       });
 
-      const mainnets = ["mainnet", "rsksovrynmainnet"];
+      const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet"];
 
-      useRealPriceFeed ??= mainnets.indexOf(env.network.name) !== -1;
+      const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
+      useRealPriceFeed ??= isMainnet;
 
       if (useRealPriceFeed && !hasOracles(env.network.name)) {
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
@@ -407,7 +424,9 @@ task("deploy", "Deploys the contracts to the network")
       marketMakerAddress ??= hasMarketMaker(env.network.name)
         ? marketMakerAddresses[env.network.name]
         : undefined;
-
+      zusdTokenAddress ??= hasZusdToken(env.network.name)
+        ? zusdTokenAddresses[env.network.name]
+        : undefined;
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
@@ -416,6 +435,8 @@ task("deploy", "Deploys the contracts to the network")
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
         presaleAddress,
         marketMakerAddress,
+        zusdTokenAddress,
+        isMainnet,
         overrides
       );
 
@@ -429,8 +450,89 @@ task("deploy", "Deploys the contracts to the network")
       console.log();
       console.log(deployment);
       console.log();
-      console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toNumber() });
+      console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toString() });
     }
   );
+
+type DeployZUSDToken = {
+  channel: string;
+};
+
+task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous deployment")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const {
+      zusdToken: zusdTokenAddress,
+      troveManager: troveManagerAddress,
+      stabilityPool: stabilityPoolAddress,
+      borrowerOperations: borrowerOperationsAddress
+    } = deployment.addresses;
+
+    console.log("Deploying new ZUSD token logic for testnet");
+    // NOTE this script should only be executed on testnet
+    const zusdTokenFactory = await hre.ethers.getContractFactory("ZUSDTokenTestnet");
+    const zusdTokenContract = await(await zusdTokenFactory.deploy()).deployed();
+
+    const zusdTokenProxy = (await hre.ethers.getContractAt(
+      "UpgradableProxy",
+      zusdTokenAddress,
+      deployer
+    ) as unknown) as UpgradableProxy;
+
+    //set new implementation
+    await zusdTokenProxy.setImplementation(zusdTokenContract.address);
+    console.log("Initializing new ZUSD token with the correct dependencies");
+
+    const zusdToken = ((await hre.ethers.getContractAt(
+      "ZUSDTokenTestnet",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as ZUSDToken;
+    //call initialize on the new zusdToken by calling proxy
+    await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+
+    const oldZUSDAddress = await zusdTokenProxy.getImplementation();
+    console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
+
+    const newZUSDAddress = await zusdTokenProxy.getImplementation();
+    console.log("Implementation address changed to " + newZUSDAddress);
+  });
+
+task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to previous deployment")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const { zusdToken: zusdTokenAddress, zeroToken: zeroTokenAddress } = deployment.addresses;
+
+    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+      "UpgradableProxy",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as UpgradableProxy;
+
+    const zusdImplementationAddress = await zusdTokenProxy.getImplementation();
+    console.log("Current implelentation address is: " + zusdImplementationAddress);
+
+    const zusdToken = ((await hre.ethers.getContractAt(
+      "ZUSDToken",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as ZUSDToken;
+
+    const zeroToken = ((await hre.ethers.getContractAt(
+      "ZEROToken",
+      zeroTokenAddress,
+      deployer
+    )) as unknown) as ZEROToken;
+
+    const address = await zusdToken.address;
+    console.log("Address ZUSD: " + address);
+    await zeroToken.mint("0x0", 100);
+    await zeroToken.mint(deployer.address, 100);
+    console.log("Try mint ZERO");
+  });
 
 export default config;

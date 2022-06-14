@@ -92,6 +92,8 @@ const deployContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
+  zusdTokenAddress?: string,
+  isMainnet?: boolean,
   overrides?: Overrides
 ): Promise<{ addresses: Omit<_LiquityContractAddresses, "nueToken">; startBlock: number }> => {
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(
@@ -119,12 +121,11 @@ const deployContracts = async (
       ...overrides
     }),
 
-    troveManagerRedeemOps: await deployContract(
-      deployer,
-      getContractFactory,
-      "TroveManagerRedeemOps",
-      { ...overrides }
-    ),
+    troveManagerRedeemOps: isMainnet
+      ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
+      : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
+          ...overrides
+        }),
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),
@@ -171,9 +172,14 @@ const deployContracts = async (
   return {
     addresses: {
       ...addresses,
-      zusdToken: await deployContractWithProxy(deployer, getContractFactory, "ZUSDToken", {
-        ...overrides
-      }),
+      zusdToken: (zusdTokenAddress ??= await deployContractWithProxy(
+        deployer,
+        getContractFactory,
+        "ZUSDToken",
+        {
+          ...overrides
+        }
+      )),
 
       zeroToken: await deployContractWithProxy(deployer, getContractFactory, "ZEROToken", {
         ...overrides
@@ -220,6 +226,7 @@ const connectContracts = async (
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
+  zusdTokenAddress?: string,
   overrides?: Overrides
 ) => {
   if (!deployer.provider) {
@@ -228,13 +235,7 @@ const connectContracts = async (
 
   const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
 
-  const connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
-    nonce =>
-      zusdToken.initialize(troveManager.address, stabilityPool.address, borrowerOperations.address, {
-        ...overrides,
-        nonce
-      }),
-
+  let connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
     nonce =>
       liquityBaseParams.initialize({
         ...overrides,
@@ -374,6 +375,22 @@ const connectContracts = async (
         { ...overrides, nonce }
       )
   ];
+  // Initialize zero token if no address in config file for this network context
+  if (!zusdTokenAddress) {
+    connections = [
+      nonce =>
+        zusdToken.initialize(
+          troveManager.address,
+          stabilityPool.address,
+          borrowerOperations.address,
+          {
+            ...overrides,
+            nonce
+          }
+        ),
+      ...connections
+    ];
+  }
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
   // connections in parallel
@@ -517,6 +534,8 @@ export const deployAndSetupContracts = async (
   wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
+  zusdTokenAddress?: string,
+  isMainnet?: boolean,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
   if (!deployer.provider) {
@@ -564,7 +583,14 @@ export const deployAndSetupContracts = async (
     _priceFeedIsTestnet,
     _isDev,
 
-    ...(await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides))
+    ...(await deployContracts(
+      deployer,
+      getContractFactory,
+      _priceFeedIsTestnet,
+      zusdTokenAddress,
+      isMainnet,
+      overrides
+    ))
   } as _LiquityDeploymentJSON;
 
   const contracts = _connectToContracts(deployer, deployment);
@@ -578,6 +604,7 @@ export const deployAndSetupContracts = async (
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
+    zusdTokenAddress,
     overrides
   );
 
