@@ -23,11 +23,11 @@ export default function useZusdAggregator(account: string | undefined | null) {
           disableCheck,
           description: "Please approve ZUSD to be spent by Sovryn smart contracts in your RSK wallet"
         });
-        const _amount = parseUnits(amount, 18).toString();
+
         const _allowance = await zusd?.allowance(account, addresses.babelfish);
         let tx;
-        if (_allowance.lt(_amount)) {
-          tx = await zusd?.approve(addresses.babelfish, _amount);
+        if (_allowance.lt(amount)) {
+          tx = await zusd?.approve(addresses.babelfish, amount);
           setTransactionState({
             type: "waitingForConfirmation",
             id,
@@ -41,7 +41,7 @@ export default function useZusdAggregator(account: string | undefined | null) {
           setTransactionState({ type: "waitingForApproval", id, disableCheck });
         }
 
-        tx = await babelfish?.mintTo(addresses.zusd, _amount, account);
+        tx = await babelfish?.mintTo(addresses.zusd, amount, account);
 
         setTransactionState({
           type: "waitingForConfirmation",
@@ -75,10 +75,9 @@ export default function useZusdAggregator(account: string | undefined | null) {
       const id = "redeem-zusd";
       const disableCheck = true;
 
-      const _amount = parseUnits(amount, 18).toString();
       try {
         setTransactionState({ type: "waitingForApproval", id, disableCheck });
-        const tx = await babelfish?.redeemTo(addresses.zusd, _amount, account);
+        const tx = await babelfish?.redeemTo(addresses.zusd, amount, account);
         setTransactionState({
           type: "waitingForConfirmation",
           id,

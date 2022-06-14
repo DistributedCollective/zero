@@ -1,6 +1,7 @@
 import { Decimal, LiquityStoreState } from "@sovryn-zero/lib-base";
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { useWeb3React } from "@web3-react/core";
+import { parseUnits } from "ethers/lib/utils";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button, Flex, Heading, Text } from "theme-ui";
@@ -66,6 +67,18 @@ export const Convert: React.FC = () => {
     [xusdAmount, xusdBalance, zusdAggregatorBalance]
   );
 
+  const handleMintClick = useCallback(() => {
+    const amount = parseUnits(zusdAmount.toString());
+    const balance = parseUnits(zusdBalance.toString());
+    mint((balance.lte(amount) ? balance : amount).toString());
+  }, [mint, zusdBalance, zusdAmount]);
+
+  const handleRedeemClick = useCallback(() => {
+    const amount = parseUnits(xusdAmount.toString(), 18);
+    const balance = parseUnits(maxXusdBalance.toString());
+    redeem((balance.lte(amount) ? balance : amount).toString());
+  }, [redeem, maxXusdBalance, xusdAmount]);
+
   return (
     <Card
       heading={
@@ -97,7 +110,7 @@ export const Convert: React.FC = () => {
             </Flex>
           )}
           <Button
-            onClick={() => mint(zusdAmount.toString())}
+            onClick={handleMintClick}
             disabled={zusdAmount.isZero || zusdAmount.gt(zusdBalance)}
             sx={{
               mt: zusdAmount.isZero || zusdAmount.gt(zusdBalance) ? 1 : 3,
@@ -133,7 +146,7 @@ export const Convert: React.FC = () => {
             </Flex>
           )}
           <Button
-            onClick={() => redeem(xusdAmount.toString())}
+            onClick={handleRedeemClick}
             disabled={isRedeemDisabled}
             sx={{
               mt: isRedeemDisabled ? 1 : 3,
