@@ -1,5 +1,3 @@
-import { ZUSDToken, UpgradableProxy } from "./types/index";
-import { ethers } from "hardhat";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
@@ -20,7 +18,7 @@ import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/dep
 import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
-import { BorrowerOperations, CommunityIssuance, ZEROToken } from "./types";
+import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy } from "./types";
 
 dotenv.config();
 
@@ -475,14 +473,13 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     console.log("Deploying new ZUSD token logic for testnet");
     // NOTE this script should only be executed on testnet
     const zusdTokenFactory = await hre.ethers.getContractFactory("ZUSDTokenTestnet");
-    const zusdTokenContract = await zusdTokenFactory.deploy();
-    await zusdTokenContract.deployed();
+    const zusdTokenContract = await(await zusdTokenFactory.deploy()).deployed();
 
-    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+    const zusdTokenProxy = (await hre.ethers.getContractAt(
       "UpgradableProxy",
       zusdTokenAddress,
       deployer
-    )) as unknown) as UpgradableProxy;
+    ) as unknown) as UpgradableProxy;
 
     //set new implementation
     await zusdTokenProxy.setImplementation(zusdTokenContract.address);
