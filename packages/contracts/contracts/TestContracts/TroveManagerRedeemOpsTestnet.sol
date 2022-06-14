@@ -3,7 +3,9 @@
 pragma solidity 0.6.11;
 
 import "./TroveManagerBase1MinuteBootstrap.sol";
-
+/** Testnet version of TroveManagerRedeemOps with Bootstrap Period set to 1 minute
+*   NOTE: Bootstrap Period variable is set in the inherited Base contract 
+*/
 contract TroveManagerRedeemOpsTestnet is TroveManagerBase1MinuteBootstrap {
     /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
       request.  Applies pending rewards to a Trove before reducing its debt and coll.

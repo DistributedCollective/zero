@@ -11,6 +11,8 @@ import "../Interfaces/ICollSurplusPool.sol";
 import "../TroveManagerStorage.sol";
 import "../Dependencies/LiquityBase.sol";
 
+/** NOTE: This is testnet only contract which sets the BOOTSTRAP_PERIOD to 1 minute
+ */
 contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 

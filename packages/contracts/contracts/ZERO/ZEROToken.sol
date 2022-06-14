@@ -23,8 +23,8 @@ import "./ZEROTokenStorage.sol";
  *
  * 2) sendToZEROStaking(): callable only by Zero core contracts, which move ZERO tokens from user -> ZEROStaking contract.
  *
+ * NOTE: This is a muted version of ZERO token which will be used in mainnet deployment for Zero Beta
  */
-
 contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     using SafeMath for uint256;
 

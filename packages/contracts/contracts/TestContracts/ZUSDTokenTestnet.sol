@@ -25,6 +25,7 @@ import "./ZUSDTokenStorageTestnet.sol";
  * core contract, when they should rather call the right function.
  *
  * 2) sendToPool() and returnFromPool(): functions callable only Zero core contracts, which move ZUSD tokens between Zero <-> user.
+ * NOTE: This is testnet version of ZUSDToken which doesn't enforce initializing the contract only once
  */
 
 contract ZUSDTokenTestnet is ZUSDTokenStorageTestnet, CheckContract, IZUSDToken, Ownable {
