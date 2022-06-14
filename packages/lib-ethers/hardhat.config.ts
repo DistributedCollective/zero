@@ -487,7 +487,12 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     //set new implementation
     await zusdTokenProxy.setImplementation(zusdTokenContract.address);
     console.log("Initializing new ZUSD token with the correct dependencies");
-    const zusdToken = (zusdTokenAddress as unknown) as ZUSDToken;
+
+    const zusdToken = ((await hre.ethers.getContractAt(
+      "ZUSDTokenTestnet",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as ZUSDToken;
     //call initialize on the new zusdToken by calling proxy
     await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
 
