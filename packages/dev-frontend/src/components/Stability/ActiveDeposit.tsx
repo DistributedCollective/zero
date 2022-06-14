@@ -93,7 +93,7 @@ export const ActiveDeposit: React.FC = () => {
               <InfoIcon
                 tooltip={
                   <Card variant="tooltip" sx={{ width: "240px" }}>
-                    Claim ZERO and move RBTC to Line of Credit
+                    Claim and move RBTC to Line of Credit
                   </Card>
                 }
                 size="xs"
