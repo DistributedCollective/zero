@@ -4,16 +4,15 @@ import { Box, Container, NavLink } from "theme-ui";
 import { UserAddress } from "./UserAddress";
 import { UserAccount } from "./UserAccount";
 import { Icon } from "./Icon";
-import { useWeb3React } from "@web3-react/core";
 import { ReactComponent as SovLogo } from "../assets/logo.svg";
 import { getConfig, LiquityFrontendConfig } from "../config";
+import { isMainnet } from "../utils";
 
 interface Props {
   hideDetails?: boolean;
 }
 export const Header: React.FC<Props> = ({ hideDetails }) => {
-  const { chainId } = useWeb3React();
-  const [config, setConfig] = useState<LiquityFrontendConfig>();
+  const [, setConfig] = useState<LiquityFrontendConfig>();
 
   useEffect(() => {
     getConfig().then(setConfig);
@@ -22,9 +21,7 @@ export const Header: React.FC<Props> = ({ hideDetails }) => {
   return (
     <Container variant="header">
       <Box sx={{ flex: [null, null, null, null, 1] }}>
-        <NavLink
-          href={`https://${config?.testnetOnly || chainId === 31 ? "test" : "live"}.sovryn.app/`}
-        >
+        <NavLink href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}>
           <Icon name="chevron-left" />
         </NavLink>
       </Box>
