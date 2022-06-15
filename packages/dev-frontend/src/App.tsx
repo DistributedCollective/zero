@@ -14,6 +14,7 @@ import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
 import { LiquityFrontend } from "./LiquityFrontend";
 import { BrowserRouter } from "react-router-dom";
 import { Header } from "./components/Header";
+import { isMainnet } from "./utils";
 
 if (window.ethereum) {
   // Silence MetaMask warning in console
@@ -75,12 +76,12 @@ const UnsupportedMainnetFallback: React.FC = () => (
   <UnsupportedLayout>
     <Paragraph sx={{ mt: 3 }}>
       Please switch your wallet network to
-      <br /> RSK Testnet.
+      <br /> RSK {isMainnet ? "Mainnet" : "Testnet"}.
     </Paragraph>
 
     <Paragraph>
-      If you'd like to use Zero on mainnet, please go{" "}
-      <Link href="https://live.sovryn.app/zero">
+      If you'd like to use Zero on {isMainnet ? "testnet" : "mainnet"}, please go{" "}
+      <Link href={`https://${isMainnet ? "test" : "live"}.sovryn.app/zero`}>
         here <Icon name="external-link-alt" size="xs" />
       </Link>
       .
@@ -98,10 +99,8 @@ const App = () => {
 
   const unsupportedNetworkFallback = (chainId: number) => (
     <UnsupportedLayout>
-      <Paragraph sx={{ mt: 3, mb: 1 }}>
-        Zero is not yet deployed to {chainId === 30 ? "RSK Mainnet" : "this network"}.
-      </Paragraph>
-      Please switch to RSK Testnet.
+      <Paragraph sx={{ mt: 3, mb: 1 }}>Zero is not yet deployed to this network.</Paragraph>
+      Please switch to RSK {isMainnet ? "Mainnet" : "Testnet"}.
     </UnsupportedLayout>
   );
 

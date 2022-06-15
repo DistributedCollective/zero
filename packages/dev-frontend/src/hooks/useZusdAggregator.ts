@@ -1,4 +1,3 @@
-import { parseUnits } from "ethers/lib/utils";
 import { useCallback } from "react";
 import BabelfishAggregator_ABI from "../contracts/BabelfishAggregator.json";
 import ERC20_ABI from "../contracts/ERC20.json";
@@ -35,9 +34,9 @@ export default function useZusdAggregator(account: string | undefined | null) {
             tx,
             description: "ZUSD approval is processing..."
           });
-  
+
           await tx.wait();
-  
+
           setTransactionState({ type: "waitingForApproval", id, disableCheck });
         }
 

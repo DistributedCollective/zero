@@ -13,6 +13,7 @@ import {
 } from "@sovryn-zero/lib-ethers";
 
 import { LiquityFrontendConfig, getConfig } from "../config";
+import { isMainnet } from "../utils";
 
 type LiquityContextValue = {
   config: LiquityFrontendConfig;
@@ -91,7 +92,11 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
     return <>{loader}</>;
   }
 
-  if (config.testnetOnly && chainId === 30) {
+  if (isMainnet && chainId === 31) {
+    return <>{unsupportedMainnetFallback}</>;
+  }
+
+  if (!isMainnet && chainId === 30) {
     return <>{unsupportedMainnetFallback}</>;
   }
 
