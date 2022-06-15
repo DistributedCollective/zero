@@ -16,12 +16,7 @@ export const ClaimAndMove: React.FC<ClaimAndMoveProps> = ({ disabled, children }
   );
 
   return (
-    <Button
-      variant="outline"
-      sx={{ mt: 3, width: "100%" }}
-      onClick={sendTransaction}
-      disabled={disabled}
-    >
+    <Button variant="cancel" onClick={sendTransaction} disabled={disabled}>
       {children}
     </Button>
   );

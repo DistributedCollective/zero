@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { Decimal } from "@sovryn-zero/lib-base";
+import React, { useMemo, useState } from "react";
 import { Text, Flex, Label, Input, SxProp, Button, ThemeUICSSProperties } from "theme-ui";
 
 import { Icon } from "../Icon";
@@ -12,16 +13,13 @@ type RowProps = SxProp & {
 
 export const Row: React.FC<RowProps> = ({ sx, label, labelId, labelFor, children, infoIcon }) => {
   return (
-    <Flex sx={{ alignItems: "stretch", ...sx }}>
+    <Flex sx={{ flexDirection: "column", ...sx }}>
       <Label
         id={labelId}
         htmlFor={labelFor}
         sx={{
           p: 0,
-          pl: 3,
-          pt: "12px",
-          position: "absolute",
-
+          pt: 1,
           fontSize: 1,
           border: 1,
           borderColor: "transparent"
@@ -71,6 +69,7 @@ type StaticAmountsProps = {
   color?: string;
   pendingAmount?: string;
   pendingColor?: string;
+  showTilde?: boolean;
   onClick?: () => void;
 };
 
@@ -83,6 +82,7 @@ export const StaticAmounts: React.FC<StaticAmountsProps & SxProp> = ({
   color,
   pendingAmount,
   pendingColor,
+  showTilde,
   onClick,
   children
 }) => {
@@ -101,24 +101,28 @@ export const StaticAmounts: React.FC<StaticAmountsProps & SxProp> = ({
         ...sx
       }}
     >
-      <Flex sx={{ alignItems: "center" }}>
-        <Text sx={{ color, fontWeight: "medium" }}>{amount}</Text>
-
+      <Flex sx={{ alignItems: "center", width: "100%", pr: 2 }}>
+        {showTilde && <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0 }}>~&nbsp;</Text>}
+        <Text sx={{ color, fontWeight: "medium", textOverflow: "ellipsis", overflow: "hidden" }}>
+          {amount}
+        </Text>
         {unit && (
-          <>
-            &nbsp;
-            <Text sx={{ fontWeight: "light", opacity: 0.8 }}>{unit}</Text>
-          </>
+          <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0, flexGrow: 0 }}>
+            &nbsp;{unit}
+          </Text>
         )}
 
         {pendingAmount && (
-          <>
-            &nbsp;
-            <PendingAmount
-              sx={{ color: pendingColor, opacity: 0.8, fontSize: "0.666em" }}
-              value={pendingAmount}
-            />
-          </>
+          <PendingAmount
+            sx={{
+              color: pendingColor,
+              opacity: 0.8,
+              fontSize: "0.666em",
+              flexShrink: 0,
+              flexGrow: 0
+            }}
+            value={pendingAmount}
+          />
         )}
       </Flex>
 
@@ -131,10 +135,7 @@ const staticStyle: ThemeUICSSProperties = {
   flexGrow: 1,
 
   mb: 0,
-  pl: 3,
-  pr: "11px",
-  pb: 0,
-  pt: "28px",
+  px: "8px",
 
   fontSize: 3,
 
@@ -143,13 +144,7 @@ const staticStyle: ThemeUICSSProperties = {
 };
 
 const editableStyle: ThemeUICSSProperties = {
-  flexGrow: 1,
-
-  mb: [2, 3],
-  pl: 3,
-  pr: "11px",
-  pb: 2,
-  pt: "28px",
+  py: 2,
 
   fontSize: 4,
 
@@ -185,12 +180,17 @@ export const DisabledEditableRow: React.FC<DisabledEditableRowProps> = ({
   pendingAmount,
   pendingColor
 }) => (
-  <Row labelId={`${inputId}-label`} {...{ label, unit }}>
-    <StaticAmounts
-      sx={{ ...editableStyle, boxShadow: 0 }}
-      labelledBy={`${inputId}-label`}
-      {...{ inputId, amount, unit, color, pendingAmount, pendingColor }}
-    />
+  <Row labelId={`${inputId}-label`} {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2 }}>
+    <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
+      <StaticAmounts
+        sx={{
+          ...editableStyle,
+          borderRadius: 8
+        }}
+        labelledBy={`${inputId}-label`}
+        {...{ inputId, amount, unit, color, pendingAmount, pendingColor }}
+      />
+    </Flex>
   </Row>
 );
 
@@ -219,59 +219,78 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
 
+  const showTilde = useMemo(() => !Decimal.from(editedAmount).eq(amount.replaceAll(",", "")), [
+    amount,
+    editedAmount
+  ]);
+
   return editing === inputId ? (
-    <Row {...{ label, labelFor: inputId, unit }}>
-      <Input
-        autoFocus
-        id={inputId}
-        type="number"
-        step="any"
-        defaultValue={editedAmount}
-        {...{ invalid }}
-        onChange={e => {
-          try {
-            setEditedAmount(e.target.value);
+    <Row {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2, maxWidth: 355 }}>
+      <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
+        <Input
+          autoFocus
+          id={inputId}
+          type="number"
+          step="any"
+          defaultValue={editedAmount}
+          {...{ invalid }}
+          onChange={e => {
+            try {
+              setEditedAmount(e.target.value);
+              setInvalid(false);
+            } catch {
+              setInvalid(true);
+            }
+          }}
+          onBlur={() => {
+            setEditing(undefined);
             setInvalid(false);
-          } catch {
-            setInvalid(true);
-          }
-        }}
-        onBlur={() => {
-          setEditing(undefined);
-          setInvalid(false);
-        }}
-        variant="editor"
-        sx={{
-          ...editableStyle,
-          fontWeight: "medium",
-          bg: invalid ? "danger" : "background"
-        }}
-      />
+          }}
+          variant="editor"
+          sx={{
+            ...editableStyle,
+            borderRadius: 8,
+            fontWeight: "medium",
+            bg: invalid ? "danger" : "transparent",
+            outline: "none"
+          }}
+        />
+      </Flex>
     </Row>
   ) : (
-    <Row labelId={`${inputId}-label`} {...{ label, unit }}>
-      <StaticAmounts
-        sx={{
-          ...editableStyle,
-          bg: invalid ? "invalid" : "background"
-        }}
-        labelledBy={`${inputId}-label`}
-        onClick={() => setEditing(inputId)}
-        {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid }}
-      >
-        {maxAmount && (
-          <Button
-            sx={{ fontSize: 1, p: 1, px: 3 }}
-            onClick={event => {
-              setEditedAmount(maxAmount);
-              event.stopPropagation();
-            }}
-            disabled={maxedOut}
-          >
-            max
-          </Button>
-        )}
-      </StaticAmounts>
+    <Row
+      labelId={`${inputId}-label`}
+      {...{ label, labelFor: inputId, unit }}
+      sx={{ flex: 1, px: 2, maxWidth: 355 }}
+    >
+      <Flex sx={{ alignItems: "center", justifyContent: "space-around", mt: "4px" }}>
+        <StaticAmounts
+          sx={{
+            ...editableStyle,
+            borderRadius: 8,
+            bg: invalid ? "invalid" : "transparent",
+            flex: 1,
+            flexShrink: 1,
+            flexGrow: 1
+          }}
+          labelledBy={`${inputId}-label`}
+          onClick={() => setEditing(inputId)}
+          {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid, showTilde }}
+        >
+          {maxAmount && (
+            <Button
+              sx={{ fontSize: 1, p: 1, px: 3, flexShrink: 0, flexGrow: 0 }}
+              onClick={event => {
+                setEditedAmount(maxAmount);
+                event.stopPropagation();
+              }}
+              disabled={maxedOut}
+            >
+              max
+            </Button>
+          )}
+        </StaticAmounts>
+      </Flex>
     </Row>
   );
 };

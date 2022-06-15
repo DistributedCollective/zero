@@ -75,18 +75,14 @@ const wrbtcAddresses = {
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  hardhat: "0x0000000000000000000000000000000000000001",
-  rsksovrynmainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0x572b8990067785d1c601aDE6359c05C296deC718",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  hardhat: "0x0000000000000000000000000000000000000002",
-  rsksovrynmainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x0000000000000000000000000000000000000001",
-  dev: "0x0000000000000000000000000000000000000003"
+  rsktestnet: "0x25E79f651e85da501706514358640b96d8b07Db6",
+  dev: ""
 };
 
 const zusdTokenAddresses = {
@@ -368,12 +364,6 @@ task("deploy", "Deploys the contracts to the network")
   .addOptionalParam(
     "governanceAddress",
     "Governance contract address to be the owner",
-    undefined,
-    types.string
-  )
-  .addOptionalParam(
-    "sovCommunityPotAddress",
-    "SOV Stakers pool contract address",
     undefined,
     types.string
   )

@@ -3,14 +3,18 @@ import { useCallback } from "react";
 import { useState } from "react";
 import { Box, Heading, Image, Paragraph, Button, Input, Spinner } from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
+import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
+import { useLocation } from "react-router-dom";
 
-export const WaitListSignup: React.FC = () => {
+export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
+
+  const location = useLocation();
 
   const isValidEmail = useMemo(() => validateEmail(email), [email]);
 
@@ -31,13 +35,16 @@ export const WaitListSignup: React.FC = () => {
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      const params = new URLSearchParams(location.search);
+
+      const ref = params.get("r") || "";
       resetStatus();
       if (!isValidEmail) {
         return;
       }
       try {
         setIsLoading(true);
-        await registerEmail(email);
+        await registerEmail(email, ref);
 
         setEmail("");
         setErrorMessage("");
@@ -52,7 +59,7 @@ export const WaitListSignup: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [email, isValidEmail, resetStatus]
+    [email, isValidEmail, location.search, resetStatus]
   );
 
   return (
@@ -75,7 +82,7 @@ export const WaitListSignup: React.FC = () => {
         sx={{
           mb: 60
         }}
-        src="/zero-logo.svg"
+        src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
       <Heading
         sx={{
@@ -110,11 +117,10 @@ export const WaitListSignup: React.FC = () => {
               width: 285,
               height: "40px",
               mt: 20,
-              bg: "primary",
-              color: "cardBackground",
               display: "flex",
               alignItems: "center"
             }}
+            variant="secondary"
             disabled={!isValidEmail || isLoading}
           >
             Sign Up
@@ -150,8 +156,7 @@ export const WaitListSignup: React.FC = () => {
           justifyContent: "center",
           alignItems: "center",
           width: "377px",
-          maxWidth: "100%",
-          opacity: "50%"
+          maxWidth: "100%"
         }}
       >
         <Paragraph
@@ -166,18 +171,11 @@ export const WaitListSignup: React.FC = () => {
         >
           Or connect wallet if you have been invited to the Zero private beta.
         </Paragraph>
-        <Button
-          sx={{
-            width: "174px",
-            height: "40px",
-            p: 0
-          }}
-          disabled
-        >
-          Connect Wallet
-        </Button>
+        {children}
       </Box>
-      <WaitlistSuccess isOpen={success} onClose={() => setSuccess(false)} />
+      <Dialog hideCloseIcon open={success} onClose={() => setSuccess(false)}>
+        <WaitlistSuccess onClose={() => setSuccess(false)} />
+      </Dialog>
     </Box>
   );
 };

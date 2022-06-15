@@ -1,71 +1,43 @@
-import React, { useRef } from "react";
-import { Box, Card, Image, Paragraph } from "theme-ui";
-import { CSSTransition } from "react-transition-group";
+import React from "react";
+import { Box, Image, Paragraph } from "theme-ui";
 
 type WaitlistSuccessProps = {
   onClose: () => void;
-  isOpen: boolean;
 };
 
-export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose, isOpen }) => {
-  const nodeRef = useRef(null);
-
+export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => {
   return (
-    <CSSTransition
-      unmountOnExit
-      classNames="dialog"
-      nodeRef={nodeRef}
-      in={isOpen}
-      timeout={{ enter: 500, exit: 300 }}
-    >
+    <>
+      <Image src={process.env.PUBLIC_URL + "/success-mark.png"} />
       <Box
-        ref={nodeRef}
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          position: "fixed",
-          width: "100vw",
-          height: "100vh",
-          bg: "rgba(22,22,22,0.85)",
-          top: 0,
-          left: 0,
-          zIndex: 99
+          textAlign: "center",
+          maxWidth: 435,
+          mt: 20,
+          mb: 30
         }}
       >
-        <Card variant="info">
-          <Image src="/success-mark.png" />
-          <Box
-            sx={{
-              textAlign: "center",
-              maxWidth: 435,
-              mt: 20,
-              mb: 30
-            }}
-          >
-            <Paragraph sx={{ fontSize: 4, px: 4, fontWeight: "medium" }}>
-              Thank you for signing up for the Zero private beta waitlist!
-            </Paragraph>
-            <br />
-            <Paragraph sx={{ fontSize: 4, fontWeight: "medium" }}>
-              You will receive an email soon with details about what happens next.
-            </Paragraph>
-          </Box>
-          <Paragraph
-            sx={{
-              fontSize: 4,
-              color: "primary",
-              cursor: "pointer",
-              textDecoration: "underline",
-              fontWeight: "medium"
-            }}
-            onClick={onClose}
-          >
-            Back to Sovryn
-          </Paragraph>
-        </Card>
+        <Paragraph sx={{ fontSize: 4, px: 4, fontWeight: "medium", wordBreak: "keep-all" }}>
+          Check your email!
+        </Paragraph>
+        <br />
+        <Paragraph sx={{ fontSize: 4, fontWeight: "medium", wordBreak: "keep-all" }}>
+          We received your email address, now click the confirmation link we just emailed you to
+          finish adding yourself to the waitlist.
+        </Paragraph>
       </Box>
-    </CSSTransition>
+      <Paragraph
+        sx={{
+          fontSize: 4,
+          color: "primary",
+          cursor: "pointer",
+          textDecoration: "underline",
+          fontWeight: "medium"
+        }}
+        onClick={onClose}
+      >
+        Back to Sovryn
+      </Paragraph>
+    </>
   );
 };

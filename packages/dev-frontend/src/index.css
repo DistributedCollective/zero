@@ -4,6 +4,31 @@ html {
   height: 100%;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+td {
+  background: #2b2b2b;
+}
+td:first-child,
+th:first-child {
+  border-radius: 4px 0 0 4px;
+  padding-left: 20px;
+}
+td:last-child,
+th:last-child {
+  padding-right: 20px;
+  border-radius: 0 4px 4px 0;
+}
+th {
+  font-weight: normal;
+}
+
 .dialog-enter {
   opacity: 0.01;
 }
@@ -17,4 +42,26 @@ html {
 .dialog-exit.dialog-exit-active {
   opacity: 0.01;
   transition: opacity 120ms ease-in;
+}
+
+.spiner {
+  -webkit-animation: spin 1s linear infinite;
+  -moz-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+}
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(-360deg);
+  }
+}
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(-360deg);
+  }
+}
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
 }

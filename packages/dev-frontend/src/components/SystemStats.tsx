@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, Heading, Link, Box, Text } from "theme-ui";
-import { AddressZero } from "@ethersproject/constants";
+import { Heading, Link, Box, Text, Flex } from "theme-ui";
+import { Card } from "./Card";
 import { Decimal, Percent, LiquityStoreState } from "@sovryn-zero/lib-base";
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
 
@@ -64,33 +64,25 @@ const select = ({
 export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", showBalances }) => {
   const {
     liquity: {
-      connection: { version: contractsVersion, deploymentDate, frontendTag }
+      connection: { version: contractsVersion, deploymentDate }
     }
   } = useLiquity();
 
-  const {
-    numberOfTroves,
-    price,
-    zusdInStabilityPool,
-    total,
-    borrowingRate,
-    totalStakedZERO,
-    kickbackRate
-  } = useLiquitySelector(select);
+  const { numberOfTroves, price, zusdInStabilityPool, total, borrowingRate } = useLiquitySelector(
+    select
+  );
 
   const zusdInStabilityPoolPct =
     total.debt.nonZero && new Percent(zusdInStabilityPool.div(total.debt));
   const totalCollateralRatioPct = new Percent(total.collateralRatio(price));
   const borrowingFeePct = new Percent(borrowingRate);
-  const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
+  // const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
 
   return (
     <Card {...{ variant }}>
       {showBalances && <Balances />}
-
-      <Heading>Zero statistics</Heading>
-
-      <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
+      <Heading className="heading">Zero statistics</Heading>
+      <Heading as="h2" sx={{ my: 2, fontWeight: "body", fontSize: 16 }}>
         Protocol
       </Heading>
 
@@ -130,12 +122,6 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
         </Statistic>
       )}
       <Statistic
-        name="Staked ZERO"
-        tooltip="The total amount of ZERO that is staked for earning fee revenue."
-      >
-        {totalStakedZERO.shorten()}
-      </Statistic>
-      <Statistic
         name="Total Collateral Ratio"
         tooltip="The ratio of the USD value of the entire system collateral at the current RBTC:USD price, to the entire system debt."
       >
@@ -149,23 +135,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
       {}
 
-      <Heading as="h2" sx={{ mt: 3, fontWeight: "body" }}>
-        Frontend
-      </Heading>
-      {kickbackRatePct && (
-        <Statistic
-          name="Kickback Rate"
-          tooltip="A rate between 0 and 100% set by the Frontend Operator that determines the fraction of ZERO that will be paid out as a kickback to the Stability Providers using the frontend."
-        >
-          {kickbackRatePct}%
-        </Statistic>
-      )}
-
-      <Box sx={{ mt: 3, opacity: 0.66 }}>
-        <Box sx={{ fontSize: 0 }}>
-          Contracts version: <GitHubCommit>{contractsVersion}</GitHubCommit>
-        </Box>
-        <Box sx={{ fontSize: 0 }}>Deployed: {deploymentDate.toLocaleString()}</Box>
+      <Box sx={{ mt: 4, opacity: 0.3 }}>
         <Box sx={{ fontSize: 0 }}>
           Frontend version:{" "}
           {process.env.NODE_ENV === "development" ? (
@@ -174,6 +144,12 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
             <GitHubCommit>{process.env.REACT_APP_VERSION}</GitHubCommit>
           )}
         </Box>
+        <Flex sx={{ flexDirection: "row" }}>
+          <Box sx={{ fontSize: 0 }}>
+            Contracts version: <GitHubCommit>{contractsVersion}</GitHubCommit>
+          </Box>
+          <Box sx={{ fontSize: 0, mx: 2 }}>Deployed: {deploymentDate.toLocaleString()}</Box>
+        </Flex>
       </Box>
     </Card>
   );

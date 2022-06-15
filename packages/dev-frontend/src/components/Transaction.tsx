@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import { Flex, Text, Box } from "theme-ui";
+import React, { useState, useContext, useEffect, useCallback, useMemo } from "react";
+import { Flex, Text, Image, Button } from "theme-ui";
 import { Provider, TransactionResponse, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { hexDataSlice, hexDataLength } from "@ethersproject/bytes";
 import { defaultAbiCoder } from "@ethersproject/abi";
 
-import { buildStyles, CircularProgressbarWithChildren } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 import { EthersTransactionOverrides } from "@sovryn-zero/lib-ethers";
@@ -12,67 +11,68 @@ import { SentLiquityTransaction, LiquityReceipt } from "@sovryn-zero/lib-base";
 
 import { useLiquity } from "../hooks/LiquityContext";
 
-import { Icon } from "./Icon";
 import { Tooltip, TooltipProps, Hoverable } from "./Tooltip";
-
-const strokeWidth = 10;
-
-const circularProgressbarStyle = {
-  strokeLinecap: "butt",
-  pathColor: "white",
-  trailColor: "rgba(255, 255, 255, 0.33)"
-};
-
-const slowProgress = {
-  strokeWidth,
-  styles: buildStyles({
-    ...circularProgressbarStyle,
-    pathTransitionDuration: 30
-  })
-};
-
-const fastProgress = {
-  strokeWidth,
-  styles: buildStyles({
-    ...circularProgressbarStyle,
-    pathTransitionDuration: 0.75
-  })
-};
+import { Dialog } from "./Dialog";
+import { useWeb3React } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
 
 type TransactionIdle = {
   type: "idle";
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionFailed = {
   type: "failed";
   id: string;
   error: Error;
+  send?: TransactionFunction;
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionWaitingForApproval = {
   type: "waitingForApproval";
   id: string;
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionCancelled = {
   type: "cancelled";
   id: string;
+  send?: TransactionFunction;
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionWaitingForConfirmations = {
   type: "waitingForConfirmation";
   id: string;
   tx: SentTransaction;
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionConfirmed = {
   type: "confirmed";
   id: string;
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionConfirmedOneShot = {
   type: "confirmedOneShot";
   id: string;
+  disableCheck?: boolean;
+  title?: string;
+  description?: string;
 };
 
 type TransactionState =
@@ -95,7 +95,7 @@ export const TransactionProvider: React.FC = ({ children }) => {
   );
 };
 
-const useTransactionState = () => {
+export const useTransactionState = () => {
   const transactionState = useContext(TransactionContext);
 
   if (!transactionState) {
@@ -164,14 +164,15 @@ export const useTransactionFunction = (
       });
     } catch (error) {
       if (hasMessage(error) && error.message.includes("User denied transaction signature")) {
-        setTransactionState({ type: "cancelled", id });
+        setTransactionState({ type: "cancelled", id, send });
       } else {
         console.error(error);
 
         setTransactionState({
           type: "failed",
           id,
-          error: new Error("Failed to send transaction (try again)")
+          error: new Error("Failed to send transaction (try again)"),
+          send
         });
       }
     }
@@ -250,51 +251,143 @@ const tryToGetRevertReason = async (provider: Provider, hash: string) => {
   }
 };
 
-const Donut = React.memo(
-  CircularProgressbarWithChildren,
-  ({ value: prev }, { value: next }) => prev === next
-);
-
-type TransactionProgressDonutProps = {
-  state: TransactionState["type"];
+const getTransactionTitle = (tx: TransactionState) => {
+  if (tx.title) return tx.title;
+  switch (tx.type) {
+    case "idle":
+      return "";
+    case "failed":
+      return "Confirm Failed";
+    case "waitingForApproval":
+      return "Confirm Transaction";
+    case "waitingForConfirmation":
+      return "Transaction Processing";
+    case "confirmed":
+      return "Transaction Succeeded";
+    case "confirmedOneShot":
+      return "Transaction Succeeded";
+    case "cancelled":
+      return "Confirm Rejected";
+  }
 };
 
-const TransactionProgressDonut: React.FC<TransactionProgressDonutProps> = ({ state }) => {
-  const [value, setValue] = useState(0);
-  const maxValue = 1;
+const getTransactionDescription = (tx: TransactionState) => {
+  if (tx.description) return tx.description;
+  switch (tx.type) {
+    case "idle":
+      return "";
+    case "waitingForConfirmation":
+      return "Transaction processing...";
+    case "cancelled":
+      return "You have chosen to reject the transaction Please cancel or retry your transaction";
+    case "waitingForApproval":
+      return "Please confirm the transaction in your RSK wallet";
+    case "failed":
+      return tx.error.message + " Please cancel or retry your transaction";
+    case "confirmed":
+      return "Transaction is Successful";
+    case "confirmedOneShot":
+      return "Transaction is Successful";
+  }
+};
 
-  useEffect(() => {
-    if (state === "confirmed") {
-      setTimeout(() => setValue(maxValue), 40);
-    } else {
-      setTimeout(() => setValue(maxValue * 0.67), 20);
-    }
-  }, [state]);
+const getTransactionImage = (type: string) => {
+  switch (type) {
+    case "failed":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src={process.env.PUBLIC_URL + "/images/failed-tx.svg"}
+        />
+      );
+    case "cancelled":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src={process.env.PUBLIC_URL + "/images/failed-tx.svg"}
+        />
+      );
 
-  return state === "confirmed" ? (
-    <Donut {...{ value, maxValue, ...fastProgress }}>
-      <Icon name="check" color="white" size="lg" />
-    </Donut>
-  ) : state === "failed" || state === "cancelled" ? (
-    <Donut value={0} {...{ maxValue, ...fastProgress }}>
-      <Icon name="times" color="white" size="lg" />
-    </Donut>
-  ) : (
-    <Donut {...{ value, maxValue, ...slowProgress }}>
-      <Icon name="cog" color="white" size="lg" spin />
-    </Donut>
+    case "waitingForConfirmation":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          className="spiner"
+          src={process.env.PUBLIC_URL + "/images/pending-tx.svg"}
+        />
+      );
+
+    case "confirmed":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src={process.env.PUBLIC_URL + "/images/confirm-tx.svg"}
+        />
+      );
+    case "confirmedOneShot":
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            width: 85
+          }}
+          src={process.env.PUBLIC_URL + "/images/confirm-tx.svg"}
+        />
+      );
+
+    default:
+      return (
+        <Image
+          sx={{
+            mb: 20,
+            ml: 22,
+            width: 85
+          }}
+          src={process.env.PUBLIC_URL + "/images/rsk.svg"}
+        />
+      );
+  }
+};
+
+type RetryTransactionProps = {
+  id: string;
+  send: TransactionFunction;
+};
+
+export const RetryTransaction: React.FC<RetryTransactionProps> = ({ id, send }) => {
+  const [sendTransaction] = useTransactionFunction(id, send);
+
+  return (
+    <Button sx={{ width: "100%", maxWidth: 320, height: 50 }} onClick={sendTransaction}>
+      Retry
+    </Button>
   );
 };
 
 export const TransactionMonitor: React.FC = () => {
   const { provider } = useLiquity();
   const [transactionState, setTransactionState] = useTransactionState();
+  const { chainId } = useWeb3React<Web3Provider>();
+  const [open, setOpen] = useState(false);
 
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;
   const tx = transactionState.type === "waitingForConfirmation" ? transactionState.tx : undefined;
+  const disableCheck = !!transactionState.disableCheck;
 
   useEffect(() => {
-    if (id && tx) {
+    if (id && tx && !disableCheck) {
       let cancelled = false;
       let finished = false;
 
@@ -366,68 +459,65 @@ export const TransactionMonitor: React.FC = () => {
         }
       };
     }
-  }, [provider, id, tx, setTransactionState]);
+  }, [provider, id, tx, setTransactionState, disableCheck]);
 
   useEffect(() => {
     if (transactionState.type === "confirmedOneShot" && id) {
       // hack: the txn confirmed state lasts 5 seconds which blocks other states, review with Dani
       setTransactionState({ type: "confirmed", id });
-    } else if (
-      transactionState.type === "confirmed" ||
-      transactionState.type === "failed" ||
-      transactionState.type === "cancelled"
-    ) {
-      let cancelled = false;
-
-      setTimeout(() => {
-        if (!cancelled) {
-          setTransactionState({ type: "idle" });
-        }
-      }, 5000);
-
-      return () => {
-        cancelled = true;
-      };
     }
   }, [transactionState.type, setTransactionState, id]);
 
-  if (transactionState.type === "idle" || transactionState.type === "waitingForApproval") {
-    return null;
-  }
+  const isIdle = useMemo(() => transactionState.type === "idle", [transactionState.type]);
+
+  useEffect(() => {
+    setOpen(!isIdle);
+  }, [isIdle]);
 
   return (
-    <Flex
-      sx={{
-        alignItems: "center",
-        bg:
-          transactionState.type === "confirmed"
-            ? "success"
-            : transactionState.type === "cancelled"
-            ? "warning"
-            : transactionState.type === "failed"
-            ? "danger"
-            : "primary",
-        p: 3,
-        pl: 4,
-        position: "fixed",
-        width: "100vw",
-        bottom: 0,
-        overflow: "hidden"
-      }}
+    <Dialog
+      disableClose
+      sx={{ width: 468, bg: "#000000" }}
+      open={open}
+      onExited={() => setTransactionState({ type: "idle" })}
+      onClose={() => setOpen(false)}
     >
-      <Box sx={{ mr: 3, width: "40px", height: "40px" }}>
-        <TransactionProgressDonut state={transactionState.type} />
-      </Box>
+      <Flex
+        sx={{
+          alignItems: "center",
+          flexDirection: "column",
+          p: 3,
+          pl: 4
+        }}
+      >
+        <Text sx={{ fontSize: 22, fontWeight: 600, mb: 50, minHeight: 33 }}>
+          {getTransactionTitle(transactionState)}
+        </Text>
+        {getTransactionImage(transactionState.type)}
 
-      <Text sx={{ fontSize: 3, color: "white" }}>
-        {transactionState.type === "waitingForConfirmation"
-          ? "Waiting for confirmation"
-          : transactionState.type === "cancelled"
-          ? "Cancelled"
-          : transactionState.type === "failed"
-          ? transactionState.error.message
-          : "Confirmed"}
-      </Text>
-    </Flex>
+        {["idle", "waitingForApproval"].includes(transactionState.type) && (
+          <Text>RSK {chainId === 30 ? "Mainnet" : "Testnet"}</Text>
+        )}
+
+        <Text
+          sx={{
+            fontSize: 3,
+            color: ["cancelled", "failed"].includes(transactionState.type) ? "danger" : "white",
+            textAlign: "center",
+            mt: 40,
+            wordBreak: "keep-all"
+          }}
+        >
+          {getTransactionDescription(transactionState)}
+          <br />
+          <br />
+        </Text>
+
+        {(transactionState.type === "cancelled" || transactionState.type === "failed") &&
+          transactionState.send && (
+            <RetryTransaction send={transactionState.send} id={transactionState.id} />
+          )}
+      </Flex>
+    </Dialog>
   );
 };

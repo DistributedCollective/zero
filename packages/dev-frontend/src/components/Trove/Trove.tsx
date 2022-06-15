@@ -7,9 +7,28 @@ import { Adjusting } from "./Adjusting";
 import { RedeemedTrove } from "./RedeemedTrove";
 import { useTroveView } from "./context/TroveViewContext";
 import { LiquidatedTrove } from "./LiquidatedTrove";
+import { Heading } from "theme-ui";
+import { Card } from "../Card";
 import { Decimal } from "@sovryn-zero/lib-base";
 
 export const Trove: React.FC = props => {
+  return (
+    <Card
+      heading={
+        <>
+          <Heading className="heading">Line of Credit</Heading>
+          <Heading as="h3" className="subheading">
+            You can borrow ZUSD by opening a Line of Credit.
+          </Heading>
+        </>
+      }
+    >
+      <TroveContent {...props} />
+    </Card>
+  );
+};
+
+export const TroveContent: React.FC = props => {
   const { view } = useTroveView();
 
   switch (view) {

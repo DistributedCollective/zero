@@ -7,7 +7,7 @@ const baseColors = {
   primary: "#fec004",
   "primary-75": "#fec004C0",
   "primary-50": "#fec00480",
-  "primary-25": "#fec00440",
+  "primary-25": "#fec00426",
   "primary-10": "#fec0041a",
 
   secondary: "#2274a5",
@@ -23,10 +23,11 @@ const baseColors = {
   "gray-4": "#343434",
   "gray-5": "#484848",
   "gray-6": "#5c5c5c",
-  "gray-7": "#8e8e8e",
+  "gray-7": "#909090",
   "gray-8": "#a2a2a2",
   "gray-9": "#c4c4c4",
   "sov-white": "#e8e8e8",
+  "sov-white2": "#EAEAEA",
   white: "#ffffff",
 
   "trade-long": "#17C3B2",
@@ -45,7 +46,7 @@ const baseColors = {
   "success-50": "#27A52280",
   "success-25": "#27A52240",
   "success-10": "#27A5221a",
-  warning: "#A52222",
+  warning: "#FF3131",
   "warning-75": "#A52222C0",
   "warning-50": "#A5222280",
   "warning-25": "#A5222240",
@@ -65,11 +66,16 @@ const baseColors = {
   "pink-2": "#A264A7"
 };
 
+const zeroCardColors = {
+  heading: "#2D2D2D",
+  content: "#222222"
+};
+
 const colors = {
   primary: baseColors.primary,
   secondary: baseColors.secondary,
   accent: baseColors.primary,
-  success: baseColors["blue-1"],
+  success: baseColors.success,
   warning: baseColors.primary,
   danger: baseColors.warning,
   dangerHover: baseColors["orange-2"],
@@ -80,7 +86,11 @@ const colors = {
   cardBackground: baseColors["gray-4"],
   muted: baseColors["sov-white"],
   bonded: baseColors["gray-6"],
-  highlight: baseColors["gray-6"]
+  highlight: baseColors["gray-6"],
+  darkGray: baseColors["gray-8"],
+  darkGray2: baseColors["gray-7"],
+  zeroCardHeading: zeroCardColors.heading,
+  zeroCardContent: zeroCardColors.content
 };
 
 const buttonBase: ThemeUIStyleObject = {
@@ -98,7 +108,7 @@ const button: ThemeUIStyleObject = {
   py: "0.375rem",
 
   color: colors.primary,
-  border: 2,
+  border: 1,
   borderColor: colors.primary,
   backgroundColor: "transparent",
 
@@ -135,25 +145,25 @@ const iconButton: ThemeUIStyleObject = {
   }
 };
 
-const cardHeadingFontSize = 18.7167;
-
 const cardGapX = [0, 3, 4];
 const cardGapY = [3, 3, 4];
 
 const card: ThemeUIStyleObject = {
   position: "relative",
+  mt: cardGapY,
+  boxShadow: [1, null, 2],
   borderRadius: 10
 };
 
 const infoCard: ThemeUIStyleObject = {
   ...card,
 
-  padding: 4,
+  padding: 3,
   background: colors.cardBackground,
 
   h2: {
     mb: 2,
-    fontSize: cardHeadingFontSize
+    fontSize: 18.7167
   }
 };
 
@@ -168,16 +178,16 @@ const formBase: ThemeUIStyleObject = {
 const formCell: ThemeUIStyleObject = {
   ...formBase,
 
-  bg: "background",
-  border: 1,
+  bg: zeroCardColors.heading,
+  border: 0,
+  outline: 0,
   borderColor: "muted",
-  borderRadius: 0,
+  borderRadius: 10,
   boxShadow: [1, 2]
 };
 
 const overlay: ThemeUIStyleObject = {
   position: "absolute",
-
   left: 0,
   top: 0,
   width: "100%",
@@ -198,7 +208,7 @@ const headerGradient: ThemeUIStyleObject = {
 };
 
 const theme: Theme = {
-  breakpoints: ["48em", "52em", "64em"],
+  breakpoints: ["576px", "768px", "992px", "1200px", "1536px", "1854px"],
 
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
 
@@ -277,6 +287,16 @@ const theme: Theme = {
       ...button,
 
       ":enabled:hover": {
+        opacity: 0.75,
+        backgroundColor: baseColors["primary-25"]
+      }
+    },
+
+    secondary: {
+      ...button,
+      bg: "primary",
+      color: "cardBackground",
+      ":enabled:hover": {
         opacity: 0.75
       }
     },
@@ -333,23 +353,29 @@ const theme: Theme = {
       ...card,
 
       padding: 0,
-      bg: colors.cardBackground,
+      bg: zeroCardColors.content,
 
-      "> h2": {
+      ".subheading": {
+        fontSize: 16,
+        fontWeight: "light",
+        color: "text",
+        opacity: 0.75,
+        mt: 2
+      },
+
+      ".heading": {
+        color: "text",
+        fontSize: 18.7167
+      },
+
+      "> .heading-wrapper": {
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+        borderRadius: "10px 10px 0px 0px",
+        flexDirection: "column",
+        px: 20,
+        py: 20,
 
-        borderRadius: 13,
-        height: "56px",
-
-        pl: 3,
-        py: 2,
-        pr: 2,
-
-        bg: colors.cardBackground,
-
-        fontSize: cardHeadingFontSize
+        bg: zeroCardColors.heading
       }
     },
 
@@ -410,18 +436,18 @@ const theme: Theme = {
     header: {
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "stretch",
+      alignItems: "center",
 
       position: ["fixed", "relative"],
       width: "100vw",
       top: 0,
       zIndex: 1,
 
-      px: [2, "12px", "12px", 5],
-      py: [2, "12px", "12px"],
+      px: ["10px", "20px", "20px", "30px"],
+      py: "12px",
 
-      ...headerGradient,
-      boxShadow: [1, "none"]
+      background: baseColors["sov-white2"],
+      color: baseColors.black
     },
 
     footer: {
@@ -437,12 +463,10 @@ const theme: Theme = {
     },
 
     main: {
-      width: "100%",
-      maxWidth: "912px",
+      width: "100vw",
+      maxWidth: "1248px",
       mx: "auto",
-      mt: ["40px", 0],
-      mb: ["40px", "40px"],
-      px: cardGapX
+      paddingBottom: 20
     },
 
     columns: {
@@ -453,17 +477,24 @@ const theme: Theme = {
 
     left: {
       pr: cardGapX,
-      width: ["100%", "58%"]
+      width: ["100%", "64%"]
     },
 
     right: {
-      width: ["100%", "42%"]
+      width: ["100%", "36%"]
     },
 
     actions: {
-      justifyContent: "flex-end",
-      mt: 2,
+      justifyContent: "space-between",
+      mt: 50,
+      button: {
+        ml: 2
+      }
+    },
 
+    cta: {
+      justifyContent: "flex-end",
+      mt: 50,
       button: {
         ml: 2
       }
@@ -472,7 +503,7 @@ const theme: Theme = {
     disabledOverlay: {
       ...overlay,
 
-      bg: "rgba(255, 255, 255, 0.5)"
+      bg: "rgba(34, 34, 34, 0.83)"
     },
 
     modalOverlay: {
@@ -543,10 +574,9 @@ const theme: Theme = {
     },
 
     a: {
-      color: "primary",
-      ":hover": { color: "accent" },
-      textDecoration: "none",
-      fontWeight: "bold"
+      color: "text",
+      ":hover": { fontWeight: "bold", cursor: "pointer" },
+      textDecoration: "none"
     }
   },
 
@@ -558,8 +588,14 @@ const theme: Theme = {
       fontSize: 2,
       textTransform: "uppercase",
       letterSpacing: "2px",
-      width: ["100%", "auto"],
-      mt: [3, "auto"]
+      width: ["100%", "auto"]
+    },
+
+    redemption: {
+      color: "primary",
+      ":hover": { cursor: "pointer" },
+      textDecoration: "underline",
+      fontWeight: "bold"
     }
   }
 };

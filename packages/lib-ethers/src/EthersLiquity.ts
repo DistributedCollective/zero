@@ -214,11 +214,6 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable.getZUSDBalance(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getNUEBalance} */
-  getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
-    return this._readable.getNUEBalance(address, overrides);
-  }
-
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZEROBalance} */
   getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZEROBalance(address, overrides);
