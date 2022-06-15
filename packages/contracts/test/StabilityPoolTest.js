@@ -1251,9 +1251,12 @@ contract('StabilityPool', async accounts => {
       const C_ZEROBalance_AfterReceiving = await zeroToken.balanceOf(C)
 
       // Gains should be sent
+      /* disabled as zero token is not used in beta 
+      close presale right after the deployment
       assert.isTrue(A_ZEROBalance_AfterReceiving.gt(A_ZEROBalance_Before))
       assert.isTrue(B_ZEROBalance_AfterReceiving.gt(B_ZEROBalance_Before))
       assert.isTrue(C_ZEROBalance_AfterReceiving.gt(C_ZEROBalance_Before))
+      */
 
     })
 
@@ -1287,10 +1290,12 @@ contract('StabilityPool', async accounts => {
       const F2_ZEROBalance_After = await zeroToken.balanceOf(B)
       const F3_ZEROBalance_After = await zeroToken.balanceOf(C)
 
+      /* disabled as zero token is not used in beta 
       // Check ZERO Balance of front ends hasn't increased
       assert.isTrue(F1_ZEROBalance_After.eq(F1_ZEROBalance_Before))
       assert.isTrue(F2_ZEROBalance_After.eq(F2_ZEROBalance_Before))
       assert.isTrue(F3_ZEROBalance_After.eq(F3_ZEROBalance_Before))
+      */
     })
 
     it("provideToSP(), topup: tagged front end's stake increases", async () => {
