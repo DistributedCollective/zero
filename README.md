@@ -1,7 +1,3 @@
-## ⚠️WARNING⚠️
-
-**THE VERSION OF ZERO CONTAINED IN THIS REPO HAS NOT BEEN FINALIZED OR FULLY REVIEWED AND SHOULD NOT BE CONSIDERED "MAINNET-READY". DO NOT USE ZERO IN PRODUCTION UNTIL THIS WARNING MESSAGE HAS BEEN REMOVED. THIS REPO HAS BEEN MADE PUBLIC FOR REVIEW PURPOSES ONLY.**
-
 # Zero: Decentralized Borrowing Protocol
 
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
@@ -81,7 +77,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [How deposits and RBTC gains are tracked](#how-deposits-and-rbtc-gains-are-tracked)
   - [Zero System Fees](#zero-system-fees)
     - [Redemption Fee](#redemption-fee)
-    - [Issuance fee](#issuance-fee)
+    - [Borrowing fee](#borrowing-fee)
     - [Fee Schedule](#fee-schedule)
     - [Intuition behind fees](#intuition-behind-fees)
     - [Fee decay Implementation](#fee-decay-implementation)
