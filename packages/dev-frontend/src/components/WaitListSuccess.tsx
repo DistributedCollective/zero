@@ -36,7 +36,7 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = () => {
           textDecoration: "underline",
           fontWeight: "medium"
         }}
-        href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/zero`}
+        href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}
       >
         Back to Sovryn
       </Link>

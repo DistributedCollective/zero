@@ -85,7 +85,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
-      <Link href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/zero`}>
+      <Link href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}>
         <Image
           sx={{
             position: "absolute",
