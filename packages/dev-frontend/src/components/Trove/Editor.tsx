@@ -200,6 +200,7 @@ type EditableRowProps = DisabledEditableRowProps & {
   setEditedAmount: (editedAmount: string) => void;
   maxAmount?: string;
   maxedOut?: boolean;
+  hideMaxBtn?: boolean;
 };
 
 export const EditableRow: React.FC<EditableRowProps> = ({
@@ -214,7 +215,8 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   editedAmount,
   setEditedAmount,
   maxAmount,
-  maxedOut
+  maxedOut,
+  hideMaxBtn = false
 }) => {
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
@@ -277,7 +279,7 @@ export const EditableRow: React.FC<EditableRowProps> = ({
           onClick={() => setEditing(inputId)}
           {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid, showTilde }}
         >
-          {maxAmount && (
+          {maxAmount && !hideMaxBtn && (
             <Button
               sx={{ fontSize: 1, p: 1, px: 3, flexShrink: 0, flexGrow: 0 }}
               onClick={event => {

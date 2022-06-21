@@ -119,6 +119,7 @@ export const Opening: React.FC = () => {
             unit="RBTC"
             editedAmount={collateral.toString(4)}
             setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
+            hideMaxBtn
           />
           <Flex sx={{ flexDirection: "column", flex: 1 }}>
             <EditableRow
@@ -129,6 +130,7 @@ export const Opening: React.FC = () => {
               editingState={editingState}
               editedAmount={borrowAmount.toString(2)}
               setEditedAmount={(amount: string) => setBorrowAmount(Decimal.from(amount))}
+              hideMaxBtn
             />
             {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}
           </Flex>
