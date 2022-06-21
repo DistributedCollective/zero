@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
-import { Box, Heading, Image, Paragraph, Button, Input, Spinner } from "theme-ui";
+import { Box, Heading, Image, Paragraph, Button, Input, Spinner, Link } from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
+import { isMainnet } from "../utils";
 
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -84,17 +85,42 @@ export const WaitListSignup: React.FC = ({ children }) => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
+      <Link href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/zero`}>
+        <Image
+          sx={{
+            position: "absolute",
+            top: 54,
+            left: 54
+          }}
+          src={process.env.PUBLIC_URL + "/images/sovryn.svg"}
+        />
+      </Link>
       <Heading
         sx={{
-          mb: 60,
           fontSize: 36,
           fontWeight: 300
         }}
       >
         Join the Zero waitlist
       </Heading>
-      <Paragraph sx={{ fontSize: 2, mb: 40 }}>
-        Sign up and get notified when it's your turn to access the Zero private beta.
+      <Paragraph sx={{ fontSize: 3, mt: 12, mb: 40 }}>
+        Get a 0% interest loan, backed by bitcoin.
+      </Paragraph>
+      <Paragraph sx={{ fontSize: 3, mb: 28 }}>
+        Sign up and get notified when it's your turn to access the Zero private beta.{" "}
+        <Link
+          sx={{
+            fontSize: 3,
+            color: "primary",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: "medium"
+          }}
+          target="_blank"
+          href="https://www.sovryn.app/blog/join-the-waitlist-for-zero"
+        >
+          Learn more.
+        </Link>
       </Paragraph>
       <Box sx={{ position: "relative", mb: 70 }}>
         <form onSubmit={onSubmit}>
@@ -107,7 +133,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
               bg: "#C4C4C4",
               width: 285
             }}
-            placeholder="satoshin@gmx.com"
+            placeholder="satoshi@sovryn.app"
             variant="primary"
             value={email}
             onChange={handleEmailChange}

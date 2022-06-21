@@ -1,11 +1,12 @@
 import React from "react";
-import { Box, Image, Paragraph } from "theme-ui";
+import { Box, Image, Link, Paragraph } from "theme-ui";
+import { isMainnet } from "../utils";
 
 type WaitlistSuccessProps = {
   onClose: () => void;
 };
 
-export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => {
+export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = () => {
   return (
     <>
       <Image src={process.env.PUBLIC_URL + "/success-mark.png"} />
@@ -26,7 +27,8 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => 
           finish adding yourself to the waitlist.
         </Paragraph>
       </Box>
-      <Paragraph
+
+      <Link
         sx={{
           fontSize: 4,
           color: "primary",
@@ -34,10 +36,10 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = ({ onClose }) => 
           textDecoration: "underline",
           fontWeight: "medium"
         }}
-        onClick={onClose}
+        href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/zero`}
       >
         Back to Sovryn
-      </Paragraph>
+      </Link>
     </>
   );
 };

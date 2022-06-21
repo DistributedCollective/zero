@@ -80,7 +80,7 @@ const UnsupportedMainnetFallback: React.FC = () => (
     </Paragraph>
 
     <Paragraph>
-      If you'd like to use Zero on {isMainnet ? "testnet" : "mainnet"}, please go{" "}
+      If you'd like to use Zero on {!isMainnet ? "testnet" : "mainnet"}, please go{" "}
       <Link href={`https://${isMainnet ? "test" : "live"}.sovryn.app/zero`}>
         here <Icon name="external-link-alt" size="xs" />
       </Link>

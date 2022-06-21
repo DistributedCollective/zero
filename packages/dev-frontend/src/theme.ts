@@ -575,7 +575,7 @@ const theme: Theme = {
 
     a: {
       color: "text",
-      ":hover": { fontWeight: "bold", cursor: "pointer" },
+      ":hover": { cursor: "pointer" },
       textDecoration: "none"
     }
   },
