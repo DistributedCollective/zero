@@ -1,7 +1,18 @@
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
-import { Box, Heading, Image, Paragraph, Button, Input, Spinner, Link } from "theme-ui";
+import {
+  Box,
+  Heading,
+  Image,
+  Paragraph,
+  Button,
+  Input,
+  Spinner,
+  Link,
+  Checkbox,
+  Label
+} from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
@@ -12,6 +23,7 @@ import { isMainnet } from "../utils";
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [sovrynMail, setSovrylMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
 
@@ -45,7 +57,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
       }
       try {
         setIsLoading(true);
-        await registerEmail(email, ref);
+        await registerEmail(email, ref, sovrynMail);
 
         setEmail("");
         setErrorMessage("");
@@ -60,7 +72,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         setIsLoading(false);
       }
     },
-    [email, isValidEmail, location.search, resetStatus]
+    [email, isValidEmail, location.search, resetStatus, sovrynMail]
   );
 
   return (
@@ -89,8 +101,8 @@ export const WaitListSignup: React.FC = ({ children }) => {
         <Image
           sx={{
             position: "absolute",
-            top: 54,
-            left: 54
+            top: [20, 54],
+            left: [20, 54]
           }}
           src={process.env.PUBLIC_URL + "/images/sovryn.svg"}
         />
@@ -131,18 +143,35 @@ export const WaitListSignup: React.FC = ({ children }) => {
               color: "cardBackground",
               borderColor: "#ededed",
               bg: "#C4C4C4",
-              width: 285
+              width: 285,
+              mb: 20
             }}
             placeholder="satoshi@sovryn.app"
             variant="primary"
             value={email}
             onChange={handleEmailChange}
           />
+          <Label
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              userSelect: "none",
+              fontSize: 1,
+              mb: 1
+            }}
+          >
+            <Checkbox
+              className="checkbox"
+              checked={sovrynMail}
+              onChange={e => setSovrylMail(e.target.checked)}
+            />
+            Add me to the general Sovryn mailing list
+          </Label>
           <Button
             sx={{
               width: 285,
               height: "40px",
-              mt: 20,
               display: "flex",
               alignItems: "center"
             }}

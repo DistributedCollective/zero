@@ -43,7 +43,10 @@ th {
   opacity: 0.01;
   transition: opacity 120ms ease-in;
 }
-
+input ~ .checkbox {
+  background: none !important;
+  color: #D9D9D9 !important;
+}
 .spiner {
   -webkit-animation: spin 1s linear infinite;
   -moz-animation: spin 1s linear infinite;

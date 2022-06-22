@@ -18,6 +18,7 @@ import { StabilityViewProvider } from "./components/Stability/context/StabilityV
 import { Nav } from "./components/Nav";
 import { AccessPage } from "./pages/AccessPage";
 import { Dashboard } from "./pages/Dashboard";
+import { ConfirmPage } from './pages/ConfirmPage';
 
 type LiquityFrontendProps = {
   loader?: React.ReactNode;
@@ -39,6 +40,9 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
   return (
     <LiquityStoreProvider {...{ loader }} store={liquity.store}>
       <Switch>
+        <Route path="/zero/confirm" exact>
+          <ConfirmPage />
+        </Route>
         <Route path="/zero/access" exact>
           <AccessPage />
         </Route>
