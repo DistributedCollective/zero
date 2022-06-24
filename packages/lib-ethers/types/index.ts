@@ -1052,3 +1052,20 @@ export interface FeeDistributor
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _zusdTokenAddress: string }>[];
   extractEvents(logs: Log[], name: "ZeroStakingAddressChanged"): _TypedLogDescription<{ _zeroStakingAddress: string }>[];
 }
+
+interface OwnableCalls {
+  getOwner(_overrides?: CallOverrides): Promise<string>;
+}
+
+interface OwnableTransactions {
+  setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
+}
+
+export interface Ownable
+  extends _TypedLiquityContract<OwnableCalls, OwnableTransactions> {
+  readonly address: string;
+  readonly filters: {
+    OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
+  };
+  extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
+}
