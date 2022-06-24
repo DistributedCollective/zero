@@ -84,7 +84,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         alignItems: "center",
         color: "white",
         height: "100%",
-        width: "384px",
+        width: "445px",
         maxWidth: "100vw",
         px: 2,
         margin: "auto",
@@ -115,11 +115,8 @@ export const WaitListSignup: React.FC = ({ children }) => {
       >
         Join the Zero waitlist
       </Heading>
-      <Paragraph sx={{ fontSize: 3, mt: 12, mb: 40 }}>
-        Get a 0% interest loan, backed by bitcoin.
-      </Paragraph>
-      <Paragraph sx={{ fontSize: 3, mb: 28 }}>
-        Sign up and get notified when it's your turn to access the Zero private beta.{" "}
+      <Paragraph sx={{ fontSize: 3, mt: 16, mb: 24 }}>
+        Get a 0% interest loan, backed by bitcoin.{" "}
         <Link
           sx={{
             fontSize: 3,
@@ -133,6 +130,10 @@ export const WaitListSignup: React.FC = ({ children }) => {
         >
           Learn more.
         </Link>
+      </Paragraph>
+      <Paragraph sx={{ fontSize: 3, mb: 28 }}>
+        Sign up and get notified when it’s <br />
+        your turn to get early access to Zero.
       </Paragraph>
       <Box sx={{ position: "relative", mb: 70 }}>
         <form onSubmit={onSubmit}>
@@ -224,7 +225,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
             width: "280px"
           }}
         >
-          Or connect wallet if you have been invited to the Zero private beta.
+          Or connect wallet if you have been invited to get early access to Zero
         </Paragraph>
         {children}
       </Box>

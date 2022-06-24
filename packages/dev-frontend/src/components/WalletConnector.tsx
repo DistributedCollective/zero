@@ -168,7 +168,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
           fontSize: 2,
           fontWeight: 600,
           color: "danger",
-          mt: 2,
+          mt: 12,
           visibility: !loading ? "visible" : "hidden"
         }}
       >
