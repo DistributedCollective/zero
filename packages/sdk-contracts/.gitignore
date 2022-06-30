@@ -11,3 +11,5 @@ artifacts
 ignore/
 tmp/
 test/docs/
+docs/
+types/
