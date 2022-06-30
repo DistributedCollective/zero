@@ -19,7 +19,7 @@ export const AccessPage: React.FC = () => {
   const isValidAddress = useMemo(() => !!address, [address]);
 
   const refresh = useCallback(() => {
-    window.location.href = process.env.PUBLIC_URL;
+    window.location.href = window.origin + "/zero";
   }, []);
 
   const checkParams = useCallback(async () => {

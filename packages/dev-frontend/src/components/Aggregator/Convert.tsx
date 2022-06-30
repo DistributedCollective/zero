@@ -28,15 +28,15 @@ export const Convert: React.FC = () => {
   );
   const { mint, redeem } = useZusdAggregator(account);
 
-  const xusdBalance = useMemo(() => Decimal.from(parseBalance(xusd || 0, decimalsXUSD, decimalsXUSD)), [
-    xusd,
-    decimalsXUSD
-  ]);
+  const xusdBalance = useMemo(
+    () => Decimal.from(parseBalance(xusd || 0, decimalsXUSD, decimalsXUSD)),
+    [xusd, decimalsXUSD]
+  );
 
-  const zusdAggregatorBalance = useMemo(() => Decimal.from(parseBalance(zusd || 0, decimalsZUSD, decimalsZUSD)), [
-    decimalsZUSD,
-    zusd
-  ]);
+  const zusdAggregatorBalance = useMemo(
+    () => Decimal.from(parseBalance(zusd || 0, decimalsZUSD, decimalsZUSD)),
+    [decimalsZUSD, zusd]
+  );
   const maxXusdBalance = useMemo(() => Decimal.min(xusdBalance, zusdAggregatorBalance), [
     xusdBalance,
     zusdAggregatorBalance
@@ -113,7 +113,7 @@ export const Convert: React.FC = () => {
             onClick={handleMintClick}
             disabled={zusdAmount.isZero || zusdAmount.gt(zusdBalance)}
             sx={{
-              mt: zusdAmount.isZero || zusdAmount.gt(zusdBalance) ? 1 : 3,
+              mt: 3,
               ml: 2,
               alignSelf: "self-start"
             }}
@@ -149,7 +149,7 @@ export const Convert: React.FC = () => {
             onClick={handleRedeemClick}
             disabled={isRedeemDisabled}
             sx={{
-              mt: isRedeemDisabled ? 1 : 3,
+              mt: 3,
               ml: 2,
               alignSelf: "self-start"
             }}

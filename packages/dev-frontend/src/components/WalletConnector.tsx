@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { AbstractConnector } from "@web3-react/abstract-connector";
-import { Button, Text } from "theme-ui";
+import { Button, Link, Text } from "theme-ui";
 
 import { injectedConnector } from "../connectors/injectedConnector";
 import { useAuthorizedConnection } from "../hooks/useAuthorizedConnection";
@@ -10,8 +10,6 @@ import { WaitListSignup } from "../pages/WaitListSignup";
 import { shortenAddress } from "../utils/shortenAddress";
 import { checkAccountAccess } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
-import { AccessPage } from "../pages/AccessPage";
-
 interface MaybeHasMetaMask {
   ethereum?: {
     isMetaMask?: boolean;
@@ -115,7 +113,6 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
       }
     };
     if (account) {
-      console.log("account:", account);
       checkAccess(account);
     }
   }, [active, account]);
@@ -141,11 +138,9 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
     return <>{loader}</>;
   }
 
-  if (location && location.pathname === "/zero/access") {
-    return <AccessPage />;
-  }
+  const isPublic = location && ["/zero/confirm", "/zero/access"].includes(location.pathname);
 
-  if (connectionState.type === "active" && hasAccess) {
+  if ((connectionState.type === "active" && hasAccess) || isPublic) {
     return <>{children}</>;
   }
 
@@ -173,11 +168,28 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
           fontSize: 2,
           fontWeight: 600,
           color: "danger",
-          mt: 2,
-          visibility: account && !hasAccess && !loading ? "visible" : "hidden"
+          mt: 12,
+          visibility: !loading ? "visible" : "hidden"
         }}
       >
-        Sign up above to get added to the waitlist.
+        {!hasAccess && account && "Sign up above to get added to the waitlist."}
+        {!account && (
+          <>
+            Install or unlock an{" "}
+            <Link
+              sx={{
+                fontSize: 2,
+                fontWeight: 600,
+                textDecoration: "underline",
+                color: "danger"
+              }}
+              target="_blank"
+              href="https://wiki.sovryn.app/en/getting-started/wallet-setup"
+            >
+              RSK-compatible Web3 wallet.
+            </Link>
+          </>
+        )}
       </Text>
     </WaitListSignup>
   );

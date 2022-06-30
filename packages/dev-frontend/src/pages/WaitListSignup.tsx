@@ -1,16 +1,29 @@
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
-import { Box, Heading, Image, Paragraph, Button, Input, Spinner } from "theme-ui";
+import {
+  Box,
+  Heading,
+  Image,
+  Paragraph,
+  Button,
+  Input,
+  Spinner,
+  Link,
+  Checkbox,
+  Label
+} from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
 import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
+import { isMainnet } from "../utils";
 
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [sovrynMail, setSovrylMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
 
@@ -44,7 +57,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
       }
       try {
         setIsLoading(true);
-        await registerEmail(email, ref);
+        await registerEmail(email, ref, sovrynMail);
 
         setEmail("");
         setErrorMessage("");
@@ -59,7 +72,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         setIsLoading(false);
       }
     },
-    [email, isValidEmail, location.search, resetStatus]
+    [email, isValidEmail, location.search, resetStatus, sovrynMail]
   );
 
   return (
@@ -71,7 +84,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         alignItems: "center",
         color: "white",
         height: "100%",
-        width: "384px",
+        width: "445px",
         maxWidth: "100vw",
         px: 2,
         margin: "auto",
@@ -84,17 +97,43 @@ export const WaitListSignup: React.FC = ({ children }) => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
+      <Link href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}>
+        <Image
+          sx={{
+            position: "absolute",
+            top: [20, 54],
+            left: [20, 54]
+          }}
+          src={process.env.PUBLIC_URL + "/images/sovryn.svg"}
+        />
+      </Link>
       <Heading
         sx={{
-          mb: 60,
           fontSize: 36,
           fontWeight: 300
         }}
       >
         Join the Zero waitlist
       </Heading>
-      <Paragraph sx={{ fontSize: 2, mb: 40 }}>
-        Sign up and get notified when it's your turn to access the Zero private beta.
+      <Paragraph sx={{ fontSize: 3, mt: 16, mb: 24 }}>
+        Get a 0% interest loan, backed by bitcoin.{" "}
+        <Link
+          sx={{
+            fontSize: 3,
+            color: "primary",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: "medium"
+          }}
+          target="_blank"
+          href="https://www.sovryn.app/blog/join-the-waitlist-for-zero"
+        >
+          Learn more.
+        </Link>
+      </Paragraph>
+      <Paragraph sx={{ fontSize: 3, mb: 28 }}>
+        Sign up and get notified when it’s <br />
+        your turn to get early access to Zero.
       </Paragraph>
       <Box sx={{ position: "relative", mb: 70 }}>
         <form onSubmit={onSubmit}>
@@ -105,18 +144,35 @@ export const WaitListSignup: React.FC = ({ children }) => {
               color: "cardBackground",
               borderColor: "#ededed",
               bg: "#C4C4C4",
-              width: 285
+              width: 285,
+              mb: 20
             }}
-            placeholder="satoshin@gmx.com"
+            placeholder="satoshi@sovryn.app"
             variant="primary"
             value={email}
             onChange={handleEmailChange}
           />
+          <Label
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              userSelect: "none",
+              fontSize: 1,
+              mb: 1
+            }}
+          >
+            <Checkbox
+              className="checkbox"
+              checked={sovrynMail}
+              onChange={e => setSovrylMail(e.target.checked)}
+            />
+            Add me to the general Sovryn mailing list
+          </Label>
           <Button
             sx={{
               width: 285,
               height: "40px",
-              mt: 20,
               display: "flex",
               alignItems: "center"
             }}
@@ -169,7 +225,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
             width: "280px"
           }}
         >
-          Or connect wallet if you have been invited to the Zero private beta.
+          Or connect wallet if you have been invited to get early access to Zero
         </Paragraph>
         {children}
       </Box>
