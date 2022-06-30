@@ -2,6 +2,7 @@
 
 pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/Interfaces/ITroveManager.sol";
+import "@sovryn-zero/contracts/contracts/Interfaces/IPriceFeed.sol";
 
 /// @title ZERO-SDK Liquidation Lib
 /// @notice Library containing view functions regarding troves
@@ -59,5 +60,16 @@ library TroveStatisticsLib {
     {
         ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
         return troveManager.getBorrowingFee(_ZUSDDebt);
+    }
+
+    /// @param priceFeedAddress address of PriceFeed contract
+    /// @return btcPrice the current price of BTC
+    function getBtcPrice(address priceFeedAddress)
+        internal
+        isContractAddress(priceFeedAddress)
+        returns (uint256 btcPrice)
+    {
+        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
+        return priceFeed.fetchPrice();
     }
 }

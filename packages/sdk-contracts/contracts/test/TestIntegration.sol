@@ -96,4 +96,8 @@ contract TestIntegration {
     {
         return TroveStatisticsLib.calculateBorrowingFee(libraryContractAddress, _ZUSDDebt);
     }
+
+    function testGetBtcPrice(address priceFeedAddress) external returns (uint256 btcPrice) {
+        return TroveStatisticsLib.getBtcPrice(priceFeedAddress);
+    }
 }
