@@ -1,10 +1,10 @@
 # TroveStatisticsLib
 
-*0xLucian*
+
 
 > ZERO-SDK Liquidation Lib
 
-Library containing view functions regarding troves
+library containing view functions regarding troves
 
 
 
@@ -24,7 +24,7 @@ function calculateBorrowingFee(address troveManagerContractAddress, uint256 _ZUS
 
 | Name | Type | Description |
 |---|---|---|
-| troveManagerContractAddress | address | address of TroveManager contract |
+| troveManagerContractAddress | address | address of TroveManager library |
 | _ZUSDDebt | uint256 | debt parameter for which a fee will be calculated against |
 
 #### Returns
@@ -47,7 +47,7 @@ function getEntireDebtAndColl(address troveManagerContractAddress, address _borr
 
 | Name | Type | Description |
 |---|---|---|
-| troveManagerContractAddress | address | address of TroveManager contract |
+| troveManagerContractAddress | address | address of TroveManager library |
 | _borrower | address | address of the borrower |
 
 #### Returns
@@ -73,7 +73,7 @@ function getNominalICR(address troveManagerContractAddress, address _borrower) e
 
 | Name | Type | Description |
 |---|---|---|
-| troveManagerContractAddress | address | address of TroveManager contract |
+| troveManagerContractAddress | address | address of TroveManager library |
 | _borrower | address | undefined |
 
 #### Returns
