@@ -73,10 +73,10 @@ export default {
   },
   dodoc: {
     runOnCompile: false, // if false then run `npx hardhat dodoc` in console to generate docs
-    include: ["contracts/libraries/"], // [] == everything; input paths to limit dics to the domain contracts only
+    include: ["contracts/4docs"], // [] == everything; input paths to limit dics to the domain contracts only
     outputDir: "docs",
     keepFileStructure: false,
-    freshOutput: true,
+    freshOutput: false,
   },
   external: {
     contracts: [
