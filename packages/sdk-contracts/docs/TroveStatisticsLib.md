@@ -13,7 +13,7 @@ library containing view functions regarding troves
 ### calculateBorrowingFee
 
 ```solidity
-function calculateBorrowingFee(address troveManagerContractAddress, uint256 _ZUSDDebt) external view returns (uint256 borrowingFee)
+function calculateBorrowingFee(address troveManagerContractAddress, uint256 _ZUSDDebt) internal view returns (uint256 borrowingFee)
 ```
 
 
@@ -36,7 +36,7 @@ function calculateBorrowingFee(address troveManagerContractAddress, uint256 _ZUS
 ### getEntireDebtAndColl
 
 ```solidity
-function getEntireDebtAndColl(address troveManagerContractAddress, address _borrower) external view returns (uint256 debt, uint256 coll, uint256 pendingZUSDDebtReward, uint256 pendingRBTCReward)
+function getEntireDebtAndColl(address troveManagerContractAddress, address _borrower) internal view returns (uint256 debt, uint256 coll, uint256 pendingZUSDDebtReward, uint256 pendingRBTCReward)
 ```
 
 
@@ -62,7 +62,7 @@ function getEntireDebtAndColl(address troveManagerContractAddress, address _borr
 ### getNominalICR
 
 ```solidity
-function getNominalICR(address troveManagerContractAddress, address _borrower) external view returns (uint256 collateralRatio)
+function getNominalICR(address troveManagerContractAddress, address _borrower) internal view returns (uint256 collateralRatio)
 ```
 
 
