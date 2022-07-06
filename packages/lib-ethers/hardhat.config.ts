@@ -18,7 +18,8 @@ import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/dep
 import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
-import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy } from "./types";
+import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy, Ownable } from "./types";
+
 
 dotenv.config();
 
@@ -490,9 +491,32 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     console.log("Implementation address changed to " + newZUSDAddress);
   });
 
-task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to previous deployment")
+task("getDeployedContractsOwners", "Prints the deployed contracts owner address")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }, hre) => {
+    const liveNets = ["mainnet", "rsksovrynmainnet", "rskmainnet", "testnet", "rsktestnet", "rsksovryntestnet"];
+    if (liveNets.indexOf(hre.network.name) === -1)
+    {
+      console.log("===========================================================");
+      console.log("ALERT! Make sure the script is running on a proper network!");
+      console.log("===========================================================");
+    }
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const obj = Object.entries(deployment.addresses);
+    for await (const item of obj) {
+      try {
+          const owned = (await hre.ethers.getContractAt("Ownable", item[1]) as unknown) as Ownable;
+          console.log(`${await owned.getOwner()} is owner of ${item[0]} (${item[1]})`);
+      } catch(e) {
+        console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
+      }
+    }
+  });
+
+task("getCurrentZUSDImplementation", "Logs to console current ZUSD implementation address")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+
     const [deployer] = await hre.ethers.getSigners();
     const deployment = getDeploymentData(hre.network.name, channel);
     const { zusdToken: zusdTokenAddress, zeroToken: zeroTokenAddress } = deployment.addresses;
@@ -520,9 +544,9 @@ task("getCurrentZUSDImplementation", "Deploys new ZUSD token and links it to pre
 
     const address = await zusdToken.address;
     console.log("Address ZUSD: " + address);
-    await zeroToken.mint("0x0", 100);
+    /*await zeroToken.mint("0x0", 100);
     await zeroToken.mint(deployer.address, 100);
-    console.log("Try mint ZERO");
+    console.log("Try mint ZERO");*/
   });
 
 export default config;

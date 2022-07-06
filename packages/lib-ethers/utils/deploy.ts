@@ -1,9 +1,7 @@
 import assert from "assert";
 import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
-import { Wallet } from "@ethersproject/wallet";
-import { Decimal } from "@sovryn-zero/lib-base";
-import { Contract } from "ethers";
+import { Contract, ethers } from "ethers";
 import {
   _connectToContracts,
   _LiquityContractAddresses,
@@ -12,6 +10,8 @@ import {
   _priceFeedIsTestnet as checkPriceFeedIsTestnet
 } from "../src/contracts";
 import { PriceFeed } from "../types";
+import upgradeableProxy from "../abi/TroveManagerRedeemOps.json";
+import { Ownable } from "../types";
 
 let silent = true;
 
@@ -120,7 +120,7 @@ const deployContracts = async (
     troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
       ...overrides
     }),
-
+//TODO: why troveManagerRedeemOps is not upgradeable?
     troveManagerRedeemOps: isMainnet
       ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
       : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
@@ -407,6 +407,9 @@ const transferOwnership = async (
     activePool,
     borrowerOperations,
     troveManager,
+    troveManagerRedeemOps,
+    zusdToken,
+    zeroToken,
     collSurplusPool,
     communityIssuance,
     defaultPool,
@@ -448,6 +451,23 @@ const transferOwnership = async (
       }),
     nonce =>
       troveManager.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
+    nonce =>
+      troveManagerRedeemOps.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
+    nonce =>
+      zusdToken.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
+    nonce  => //zeroToken is not ownable and can't add due to the contract size limit (EIP-170) - requires optimization first
+    /*(hardhat.ethers.getContractAt(upgradeableProxy, zeroToken.address, deployer) as unknown as Ownable)*/
+      (new ethers.Contract(zeroToken.address, upgradeableProxy, deployer) as unknown as Ownable)
+      .setOwner(governanceAddress, {
         ...overrides,
         nonce
       }),

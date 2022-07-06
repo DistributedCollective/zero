@@ -1,5 +1,5 @@
 # Buidler contract JSONs
-/artifacts
+artifacts
 
 # Truffle contract JSONs
 /build/contracts
