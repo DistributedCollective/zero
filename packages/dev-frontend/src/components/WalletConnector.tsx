@@ -10,6 +10,8 @@ import { WaitListSignup } from "../pages/WaitListSignup";
 import { shortenAddress } from "../utils/shortenAddress";
 import { checkAccountAccess } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
+import { ConfirmPage } from "../pages/ConfirmPage";
+import { AccessPage } from "../pages/AccessPage";
 interface MaybeHasMetaMask {
   ethereum?: {
     isMetaMask?: boolean;
@@ -138,9 +140,10 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
     return <>{loader}</>;
   }
 
-  const isPublic = location && ["/zero/confirm", "/zero/access"].includes(location.pathname);
+  if (location.pathname === "/zero/confirm") return <ConfirmPage />;
+  if (location.pathname === "/zero/access") return <AccessPage />;
 
-  if ((connectionState.type === "active" && hasAccess) || isPublic) {
+  if (connectionState.type === "active" && hasAccess) {
     return <>{children}</>;
   }
 
