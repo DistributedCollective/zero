@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Heading, Link, Box, Text, Flex } from "theme-ui";
 import { Card } from "./Card";
 import { Decimal, Percent, LiquityStoreState } from "@sovryn-zero/lib-base";
@@ -7,6 +7,9 @@ import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { useLiquity } from "../hooks/LiquityContext";
 import { COIN, GT } from "../strings";
 import { Statistic } from "./Statistic";
+import { addresses } from "../contracts/config";
+import useTokenBalance from "../hooks/useTokenBalance";
+import { parseBalance } from "../utils";
 
 const selectBalances = ({ accountBalance, zusdBalance, zeroBalance }: LiquityStoreState) => ({
   accountBalance,
@@ -71,6 +74,15 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
   const { numberOfTroves, price, zusdInStabilityPool, total, borrowingRate } = useLiquitySelector(
     select
   );
+  const { data: zusd, decimals: decimalsZUSD } = useTokenBalance(
+    addresses.babelfish,
+    addresses.zusd
+  );
+
+  const zusdAggregatorBalance = useMemo(
+    () => Decimal.from(parseBalance(zusd || 0, decimalsZUSD, decimalsZUSD)),
+    [decimalsZUSD, zusd]
+  );
 
   const zusdInStabilityPoolPct =
     total.debt.nonZero && new Percent(zusdInStabilityPool.div(total.debt));
@@ -121,6 +133,15 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
           <Text sx={{ fontSize: 1 }}>&nbsp;({zusdInStabilityPoolPct.toString(1)})</Text>
         </Statistic>
       )}
+      {zusdAggregatorBalance && (
+        <Statistic
+          name="ZUSD Aggregator Balance"
+          tooltip="The total amount of ZUSD currently held in the XUSD Aggregator."
+        >
+          {zusdAggregatorBalance.prettify()}
+        </Statistic>
+      )}
+
       <Statistic
         name="Total Collateral Ratio"
         tooltip="The ratio of the USD value of the entire system collateral at the current RBTC:USD price, to the entire system debt."
