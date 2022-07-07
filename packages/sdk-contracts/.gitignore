@@ -1,0 +1,14 @@
+node_modules
+.DS_Store
+.env
+coverage
+coverage.json
+typechain
+.vscode/
+cache
+artifacts
+*.code-workspace
+ignore/
+tmp/
+test/docs/
+types/
