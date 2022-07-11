@@ -85,7 +85,7 @@ export const RedemptionManager: React.FC = () => {
     : [
         true,
         <ActionDescription>
-          You will receive <Amount>{ethAmount.sub(ethFee).prettify(4)} RBTC</Amount> in exchange for{" "}
+          You will receive <Amount>{ethAmount.sub(ethFee).prettify(8)} RBTC</Amount> in exchange for{" "}
           <Amount>
             {zusdAmount.prettify()} {COIN}
           </Amount>
@@ -143,7 +143,7 @@ export const RedemptionManager: React.FC = () => {
             <StaticRow
               label="Redemption Fee"
               inputId="redeem-fee"
-              amount={ethFee.toString(4)}
+              amount={ethFee.toString(6)}
               pendingAmount={feePct.toString(2)}
               unit="RBTC"
               infoIcon={
