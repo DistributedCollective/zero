@@ -10,7 +10,8 @@ export const fromWei = (value: BigNumberish | undefined, decimals = 2) => {
   return n.toFixed(decimals);
 };
 
-export const toWei = (value: Decimal | BigNumberish | undefined) => ethers.utils.parseEther((value || "0").toString()).toString();
+export const toWei = (value: Decimal | BigNumberish | undefined) =>
+  ethers.utils.parseEther((value || "0").toString()).toString();
 
 export const isMainnet = process.env.REACT_APP_NETWORK === "mainnet";
 
@@ -20,4 +21,4 @@ export const parseBalance = (
   value: BigNumberish | undefined,
   decimals = 18,
   decimalsToDisplay = 2
-) => parseFloat(formatUnits(value || 0, decimals)).toFixed(decimalsToDisplay);
+) => new BigNumber(formatUnits(value || 0, decimals)).toFixed(decimalsToDisplay);
