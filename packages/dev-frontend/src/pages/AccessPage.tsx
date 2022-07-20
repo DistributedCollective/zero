@@ -52,7 +52,7 @@ export const AccessPage: React.FC = () => {
       setIsLoading(false);
       e.preventDefault();
 
-      const email = params.get("email") || "";
+      const email = (params.get("email") || "").replaceAll(" ", "+");
       const code = params.get("code") || "";
 
       if (!isValidAddress || !code) {
