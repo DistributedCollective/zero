@@ -55,6 +55,7 @@ export const AccessPage: React.FC = () => {
       const email = (params.get("email") || "").replaceAll(" ", "+");
       const code = params.get("code") || "";
 
+      
       if (!isValidAddress || !code) {
         return;
       }
