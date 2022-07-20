@@ -4,6 +4,7 @@ import { AbstractConnector } from "@web3-react/abstract-connector";
 import { Button, Link, Text } from "theme-ui";
 
 import { injectedConnector } from "../connectors/injectedConnector";
+import { ledgerConnector } from "../connectors/ledgerConnector";
 import { useAuthorizedConnection } from "../hooks/useAuthorizedConnection";
 
 import { WaitListSignup } from "../pages/WaitListSignup";
@@ -131,8 +132,10 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
     if (active) {
       deactivate();
     } else {
-      dispatch({ type: "startActivating", connector: injectedConnector });
-      activate(injectedConnector);
+      // dispatch({ type: "startActivating", connector: injectedConnector });
+      // activate(injectedConnector);
+      dispatch({ type: "startActivating", connector: ledgerConnector });
+      activate(ledgerConnector);
     }
   }, [activate, active, deactivate]);
 
