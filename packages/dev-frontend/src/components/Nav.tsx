@@ -9,7 +9,8 @@ export const Nav: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        mt: 3,
+        textAlign: "center",
+        mt: [80, 80, 3],
         pb: 0,
         flexDirection: ["column", "column", "row"]
       }}

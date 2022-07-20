@@ -52,7 +52,7 @@ export const AccessPage: React.FC = () => {
       setIsLoading(false);
       e.preventDefault();
 
-      const email = params.get("email") || "";
+      const email = (params.get("email") || "").replaceAll(" ", "+");
       const code = params.get("code") || "";
 
       if (!isValidAddress || !code) {
@@ -149,7 +149,8 @@ export const AccessPage: React.FC = () => {
           width: 370
         }}
       >
-        Welcome to the Zero private beta
+        It's your turn <br />
+        to #GetOnZero
       </Heading>
       <Paragraph sx={{ fontSize: 3, mb: 20 }}>
         Confirm the RSK address you want to use with Zero:

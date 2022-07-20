@@ -25,7 +25,9 @@ export const Header: React.FC<Props> = ({ hideDetails }) => {
           <Icon name="chevron-left" />
         </NavLink>
       </Box>
-      <SovLogo />
+      <Box sx={{ display: "flex", width: [150, 150, "auto"] }}>
+        <SovLogo />
+      </Box>
       {!hideDetails && (
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "end", flex: 1 }}>
           <Box sx={{ mr: 24 }}>
