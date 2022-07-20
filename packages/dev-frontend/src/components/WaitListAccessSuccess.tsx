@@ -17,7 +17,7 @@ export const WaitListAccessSuccess: React.FC<Props> = ({ refresh }) => (
     >
       <Paragraph sx={{ mb: 20, mt: 0, fontSize: 6 }}>Success!</Paragraph>
       <Paragraph sx={{ fontSize: 3, px: 2, fontWeight: "light" }}>
-        Your RSK address has been added to the Zero private beta.
+        Your address has been added to the Zero early access list.
       </Paragraph>
       <br />
       <Box
