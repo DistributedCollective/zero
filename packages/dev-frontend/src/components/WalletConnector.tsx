@@ -91,6 +91,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
   const triedAuthorizedConnection = useAuthorizedConnection();
   const [connectionState, dispatch] = useReducer(connectionReducer, { type: "inactive" });
   const [hasAccess, setHasAccess] = useState(false);
+  const [hasClicked, setHasClicked] = useState(false);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
@@ -130,9 +131,11 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
   const onClick = useCallback(() => {
     if (active) {
       deactivate();
+      setHasClicked(false);
     } else {
       dispatch({ type: "startActivating", connector: injectedConnector });
       activate(injectedConnector);
+      setHasClicked(true);
     }
   }, [activate, active, deactivate]);
 
@@ -176,7 +179,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
         }}
       >
         {!hasAccess && account && "Sign up above to get added to the waitlist."}
-        {!account && (
+        {!account && hasClicked && (
           <>
             Install or unlock an{" "}
             <Link
