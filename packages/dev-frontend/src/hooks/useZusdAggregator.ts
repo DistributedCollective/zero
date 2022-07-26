@@ -3,7 +3,7 @@ import BabelfishAggregator_ABI from "../contracts/BabelfishAggregator.json";
 import ERC20_ABI from "../contracts/ERC20.json";
 import { addresses } from "../contracts/config";
 import useContract from "./useContract";
-import { useTransactionState } from "../components/Transaction";
+import { catchTx, thenTx, useTransactionState } from "../components/Transaction";
 
 export default function useZusdAggregator(account: string | undefined | null) {
   const [, setTransactionState] = useTransactionState();
@@ -26,7 +26,8 @@ export default function useZusdAggregator(account: string | undefined | null) {
         const _allowance = await zusd?.allowance(account, addresses.babelfish);
         let tx;
         if (_allowance.lt(amount)) {
-          tx = await zusd?.approve(addresses.babelfish, amount);
+          tx = await zusd?.approve(addresses.babelfish, amount).catch(catchTx).then(thenTx);
+
           setTransactionState({
             type: "waitingForConfirmation",
             id,
@@ -35,12 +36,12 @@ export default function useZusdAggregator(account: string | undefined | null) {
             description: "ZUSD approval is processing..."
           });
 
-          await tx.wait();
+          await tx?.wait();
 
           setTransactionState({ type: "waitingForApproval", id, disableCheck });
         }
 
-        tx = await babelfish?.mintTo(addresses.zusd, amount, account);
+        tx = await babelfish?.mintTo(addresses.zusd, amount, account).catch(catchTx).then(thenTx);
 
         setTransactionState({
           type: "waitingForConfirmation",
@@ -49,7 +50,7 @@ export default function useZusdAggregator(account: string | undefined | null) {
           tx
         });
 
-        await tx.wait();
+        await tx?.wait();
 
         setTransactionState({
           type: "confirmedOneShot",
@@ -76,14 +77,17 @@ export default function useZusdAggregator(account: string | undefined | null) {
 
       try {
         setTransactionState({ type: "waitingForApproval", id, disableCheck });
-        const tx = await babelfish?.redeemTo(addresses.zusd, amount, account);
+        const tx = await babelfish
+          ?.redeemTo(addresses.zusd, amount, account)
+          .catch(catchTx)
+          .then(thenTx);
         setTransactionState({
           type: "waitingForConfirmation",
           id,
           disableCheck,
           tx
         });
-        await tx.wait();
+        await tx?.wait();
 
         setTransactionState({
           type: "confirmedOneShot",
