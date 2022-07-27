@@ -21,7 +21,7 @@ export const Header: React.FC<Props> = ({ hideDetails }) => {
   return (
     <Container variant="header">
       <Box sx={{ flex: [null, null, null, null, 1] }}>
-        <NavLink href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}>
+        <NavLink href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
           <Icon name="chevron-left" />
         </NavLink>
       </Box>
