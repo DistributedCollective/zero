@@ -59,7 +59,7 @@ export const ConfirmPage: React.FC = () => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
-      <Link href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}>
+      <Link href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
         <Image
           sx={{
             position: "absolute",
@@ -91,7 +91,7 @@ export const ConfirmPage: React.FC = () => {
           fontWeight: "medium",
           mt: 2
         }}
-        href={`https://${!isMainnet ? "test" : "live"}.sovryn.app/`}
+        href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}
       >
         Back to Sovryn
       </Link>
