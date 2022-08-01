@@ -12,6 +12,7 @@ import { checkAccountAccess } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
 import { ConfirmPage } from "../pages/ConfirmPage";
 import { AccessPage } from "../pages/AccessPage";
+import { useConnectorContext } from "./Connector";
 interface MaybeHasMetaMask {
   ethereum?: {
     isMetaMask?: boolean;
@@ -88,6 +89,7 @@ type WalletConnectorProps = {
 
 export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, loader }) => {
   const { activate, deactivate, active, error, account } = useWeb3React<unknown>();
+  const { walletAddress, connectWallet } = useConnectorContext();
   const triedAuthorizedConnection = useAuthorizedConnection();
   const [connectionState, dispatch] = useReducer(connectionReducer, { type: "inactive" });
   const [hasAccess, setHasAccess] = useState(false);
@@ -152,6 +154,23 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
 
   return (
     <WaitListSignup>
+      <Button
+        onClick={connectWallet}
+        sx={{
+          width: "174px",
+          height: "40px",
+          p: 0
+        }}
+      >
+        {!walletAddress ? (
+          "Web3 Connect Wallet"
+        ) : (
+          <Text as="span" sx={{ fontSize: 2, fontWeight: 600 }}>
+            {shortenAddress(walletAddress!, 4)}
+          </Text>
+        )}
+      </Button>
+
       <Button
         onClick={onClick}
         sx={{

@@ -15,6 +15,7 @@ import { LiquityFrontend } from "./LiquityFrontend";
 import { BrowserRouter } from "react-router-dom";
 import { Header } from "./components/Header";
 import { isMainnet } from "./utils";
+import { ConnectorContextProvider } from "./components/Connector";
 
 if (window.ethereum) {
   // Silence MetaMask warning in console
@@ -108,17 +109,19 @@ const App = () => {
     <EthersWeb3ReactProvider>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <WalletConnector loader={loader}>
-            <LiquityProvider
-              loader={loader}
-              unsupportedNetworkFallback={unsupportedNetworkFallback}
-              unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
-            >
-              <TransactionProvider>
-                <LiquityFrontend loader={loader} />
-              </TransactionProvider>
-            </LiquityProvider>
-          </WalletConnector>
+          <ConnectorContextProvider>
+            <WalletConnector loader={loader}>
+              <LiquityProvider
+                loader={loader}
+                unsupportedNetworkFallback={unsupportedNetworkFallback}
+                unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
+              >
+                <TransactionProvider>
+                  <LiquityFrontend loader={loader} />
+                </TransactionProvider>
+              </LiquityProvider>
+            </WalletConnector>
+          </ConnectorContextProvider>
         </BrowserRouter>
       </ThemeProvider>
     </EthersWeb3ReactProvider>
