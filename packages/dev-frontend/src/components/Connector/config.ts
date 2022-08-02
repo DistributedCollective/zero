@@ -2,7 +2,7 @@ import Onboard from "@web3-onboard/core";
 import injectedModule from "@web3-onboard/injected-wallets";
 // import ledgerModule from "@web3-onboard/ledger";
 
-import hidFraming from "@ledgerhq/devices/hid-framing";
+import hidFraming from "@ledgerhq/devices/lib/hid-framing";
 
 const injected = injectedModule();
 // const ledger = ledgerModule();
