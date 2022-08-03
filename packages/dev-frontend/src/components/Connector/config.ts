@@ -1,11 +1,11 @@
 import Onboard from "@web3-onboard/core";
 import injectedModule from "@web3-onboard/injected-wallets";
-// import ledgerModule from "@web3-onboard/ledger";
+import ledgerModule from "@web3-onboard/ledger";
 import trezorModule from "@web3-onboard/trezor";
 import walletConnectModule from "@web3-onboard/walletconnect";
 
 const injected = injectedModule();
-// const ledger = ledgerModule();
+const ledger = ledgerModule();
 const trezor = trezorModule({
   email: "support@sovryn.com",
   appUrl: "https://test.sovryn.app/zero"
@@ -26,7 +26,7 @@ export const onboard = Onboard({
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
   //@ts-ignore
-  wallets: [injected, trezor, walletConnect],
+  wallets: [injected, ledger, trezor, walletConnect],
   chains: [
     {
       id: `0x${(31).toString(16)}`,
