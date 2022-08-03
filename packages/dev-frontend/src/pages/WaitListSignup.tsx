@@ -18,7 +18,7 @@ import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
-import { isMainnet } from "../utils";
+import { sovrynLink } from "src/contracts/config";
 
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -97,7 +97,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
-      <Link href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
+      <Link href={sovrynLink}>
         <Image
           sx={{
             position: "absolute",

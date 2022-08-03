@@ -13,6 +13,7 @@ import {
 import { LiquityFrontendConfig, getConfig } from "../config";
 import { isMainnet } from "../utils";
 import { useConnectorContext } from "src/components/Connector";
+import { currentChainId } from "src/contracts/config";
 
 type LiquityContextValue = {
   config: LiquityFrontendConfig;
@@ -48,7 +49,7 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
   const connection = useMemo(() => {
     if (config && provider && walletAddress && chainId) {
       try {
-        return _connectByChainId(provider, provider.getSigner(walletAddress), chainId, {
+        return _connectByChainId(provider, provider.getSigner(walletAddress), currentChainId, {
           userAddress: walletAddress,
           frontendTag: config.frontendTag,
           useStore: "blockPolled"
@@ -87,16 +88,16 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
     }
   }, [config, connection]);
 
+  if (isMainnet && chainId !== 30) {
+    return <>{unsupportedMainnetFallback}</>;
+  }
+
+  if (!isMainnet && chainId !== 31) {
+    return <>{unsupportedMainnetFallback}</>;
+  }
+
   if (!config || !provider || !walletAddress || !chainId) {
     return <>{loader}</>;
-  }
-
-  if (isMainnet && chainId === 31) {
-    return <>{unsupportedMainnetFallback}</>;
-  }
-
-  if (!isMainnet && chainId === 30) {
-    return <>{unsupportedMainnetFallback}</>;
   }
 
   if (!connection) {

@@ -150,7 +150,6 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
           </Text>
         )}
       </Button>
-      {walletAddress}
 
       <Text
         as="p"

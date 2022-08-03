@@ -19,7 +19,6 @@ type ConnectorContextType = {
   walletWatched: string | null;
   walletType: string | null;
   onboard: OnboardAPI | null;
-
   ensName: string | null;
   ensAvatar: string | null;
   connectWallet: () => Promise<void>;
@@ -61,12 +60,18 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
         const { id } = update.wallets[0].chains[0];
         const networkId = getNetworkIdFromHex(id);
 
+        dispatch({
+          type: AppEvents.UPDATE_WALLET,
+          payload: {
+            chainId: networkId,
+            address: wallet.address
+          }
+        });
+
         const isSupported = networkId === currentChainId;
 
         if (!isSupported) {
-          // Switch to mainnet ethereum by default
           (async () => {
-            // Only switch chains if the user has tab open
             await onboard?.setChain({ chainId: getChainIdHex(currentChainId) });
           })();
         } else {
@@ -91,8 +96,7 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
               provider,
               signer,
               ensName: wallet?.ens?.name || null,
-              ensAvatar: wallet?.ens?.avatar?.url || null,
-              chainId: networkId
+              ensAvatar: wallet?.ens?.avatar?.url || null
             }
           });
 
@@ -158,7 +162,9 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
     try {
       if (onboard) {
         const [primaryWallet] = onboard.state.get().wallets;
-        onboard.disconnectWallet({ label: primaryWallet?.label });
+        if (primaryWallet) {
+          onboard.disconnectWallet({ label: primaryWallet?.label });
+        }
         localStorage.removeItem(LOCAL_STORAGE_KEYS.SELECTED_WALLET);
       }
     } catch (e) {
@@ -202,7 +208,7 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
         walletWatched,
         onboard,
         walletType,
-        isWalletConnected: !!walletAddress,
+        isWalletConnected: !!chainId,
         chainId
       }}
     >

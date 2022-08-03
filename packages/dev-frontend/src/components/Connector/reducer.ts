@@ -21,7 +21,8 @@ export enum AppEvents {
   WATCH_WALLET = "WATCH_WALLET",
   SET_ENS = "SET_ENS",
   UPDATE_PROVIDER = "UPDATE_PROVIDER",
-  WALLET_DISCONNECTED = "WALLET_DISCONNECTED"
+  WALLET_DISCONNECTED = "WALLET_DISCONNECTED",
+  UPDATE_WALLET = "UPDATE_WALLET"
 }
 
 export const initialState: ConnectorState = {
@@ -45,7 +46,6 @@ export type ConnectionUpdate = {
   provider: ethers.providers.Web3Provider;
   ensName: string | null;
   ensAvatar: string | null;
-  chainId: number | null;
 };
 
 export type EnsUpdate = {
@@ -59,6 +59,11 @@ export type WatchWallet = {
   walletWatched: string | null;
 };
 
+export type UpdateState = {
+  chainId: number | null;
+  address: string | null;
+};
+
 export type ProviderUpdate = {
   provider: ethers.providers.Web3Provider;
 };
@@ -69,6 +74,7 @@ export type Actions =
   | { type: AppEvents.WATCH_WALLET; payload: WatchWallet }
   | { type: AppEvents.SET_ENS; payload: EnsUpdate }
   | { type: AppEvents.UPDATE_PROVIDER; payload: ProviderUpdate }
+  | { type: AppEvents.UPDATE_WALLET; payload: UpdateState }
   | { type: AppEvents.WALLET_DISCONNECTED };
 
 export function reducer(state: ConnectorState, action: Actions) {
@@ -85,8 +91,14 @@ export function reducer(state: ConnectorState, action: Actions) {
         signer: action.payload.signer,
         provider: action.payload.provider,
         ensName: action.payload.ensName,
-        ensAvatar: action.payload.ensAvatar,
-        chainId: action.payload.chainId
+        ensAvatar: action.payload.ensAvatar
+      };
+
+    case AppEvents.UPDATE_WALLET:
+      return {
+        ...state,
+        chainId: action.payload.chainId,
+        walletAddress: action.payload.address
       };
 
     case AppEvents.WATCH_WALLET:
@@ -110,7 +122,8 @@ export function reducer(state: ConnectorState, action: Actions) {
         watchedWallet: null,
         walletType: null,
         ensName: null,
-        ensAvatar: null
+        ensAvatar: null,
+        chainId: null
       };
 
     case AppEvents.UPDATE_PROVIDER:

@@ -3,6 +3,7 @@ import injectedModule from "@web3-onboard/injected-wallets";
 import ledgerModule from "@web3-onboard/ledger";
 import trezorModule from "@web3-onboard/trezor";
 import walletConnectModule from "@web3-onboard/walletconnect";
+import { RPC_URL } from "src/contracts/config";
 
 const injected = injectedModule();
 const ledger = ledgerModule();
@@ -17,6 +18,14 @@ const walletConnect = walletConnectModule({
   }
 });
 
+export const getChainIdHex = (networkId: number) => {
+  return `0x${networkId.toString(16)}`;
+};
+
+export const getNetworkIdFromHex = (chainId: string) => {
+  return parseInt(chainId, 16);
+};
+
 export const onboard = Onboard({
   appMetadata: {
     name: "ZERO",
@@ -29,10 +38,16 @@ export const onboard = Onboard({
   wallets: [injected, ledger, trezor, walletConnect],
   chains: [
     {
-      id: `0x${(31).toString(16)}`,
-      token: "Rbtc",
+      id: getChainIdHex(30),
+      token: "rBtc",
+      label: "RSK Mainnet",
+      rpcUrl: RPC_URL[30]
+    },
+    {
+      id: getChainIdHex(31),
+      token: "rBtc",
       label: "RSK Testnet",
-      rpcUrl: "https://public-node.testnet.rsk.co"
+      rpcUrl: RPC_URL[31]
     }
   ],
   accountCenter: {
@@ -49,11 +64,3 @@ export const onboard = Onboard({
     enabled: false
   }
 });
-
-export const getChainIdHex = (networkId: number) => {
-  return `0x${networkId.toString(16)}`;
-};
-
-export const getNetworkIdFromHex = (chainId: string) => {
-  return parseInt(chainId, 16);
-};

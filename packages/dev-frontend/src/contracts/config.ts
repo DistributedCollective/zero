@@ -14,4 +14,13 @@ const rskTestnet = {
 
 export const addresses = isMainnet ? rskMainnet : rskTestnet;
 
+export const RPC_URL = {
+  30: "https://public-node.rsk.co",
+  31: "https://public-node.testnet.rsk.co"
+};
+
 export const currentChainId = isMainnet ? 30 : 31;
+
+export const chainLabel = isMainnet ? "RSK Mainnet" : "RSK Testnet";
+
+export const sovrynLink = `https://${isMainnet ? "live" : "test"}.sovryn.app/`;
