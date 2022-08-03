@@ -114,11 +114,22 @@ export const useMyTransactionState = (myId: string | RegExp): TransactionState =
     : { type: "idle" };
 };
 
-const hasMessage = (error: unknown): error is { message: string } =>
+export const hasMessage = (error: unknown): error is { message: string } =>
   typeof error === "object" &&
   error !== null &&
   "message" in error &&
   typeof (error as { message: unknown }).message === "string";
+
+export const catchTx = (error: any) => {
+  if (!hasMessage(error) || !error.message.includes("invalid hash")) throw error;
+};
+
+export const thenTx = (tx: any) => {
+  if (tx) return tx;
+  return {
+    wait: () => new Promise(res => setTimeout(res, 45000))
+  };
+};
 
 type ButtonlikeProps = {
   disabled?: boolean;
@@ -155,13 +166,22 @@ export const useTransactionFunction = (
     setTransactionState({ type: "waitingForApproval", id });
 
     try {
-      const tx = await send();
+      const tx = await send().catch(catchTx).then(thenTx);
 
       setTransactionState({
         type: "waitingForConfirmation",
         id,
         tx
       });
+
+      if (!tx.rawSentTransaction) {
+        await tx?.wait();
+
+        setTransactionState({
+          type: "confirmedOneShot",
+          id
+        });
+      }
     } catch (error) {
       if (hasMessage(error) && error.message.includes("User denied transaction signature")) {
         setTransactionState({ type: "cancelled", id, send });
@@ -387,7 +407,7 @@ export const TransactionMonitor: React.FC = () => {
   const disableCheck = !!transactionState.disableCheck;
 
   useEffect(() => {
-    if (id && tx && !disableCheck) {
+    if (id && tx && !disableCheck && tx?.rawSentTransaction) {
       let cancelled = false;
       let finished = false;
 
@@ -395,7 +415,7 @@ export const TransactionMonitor: React.FC = () => {
 
       const waitForConfirmation = async () => {
         try {
-          const receipt = await tx.waitForReceipt();
+          const receipt = await tx?.waitForReceipt();
 
           if (cancelled) {
             return;
