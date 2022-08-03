@@ -4,6 +4,7 @@ import { getChainIdHex, getNetworkIdFromHex, onboard as Web3Onboard } from "./co
 import { AppEvents, initialState, reducer } from "./reducer";
 
 import { AppState, OnboardAPI } from "@web3-onboard/core";
+import { currentChainId } from "src/contracts/config";
 
 export const LOCAL_STORAGE_KEYS = {
   SELECTED_WALLET: "selectedWallet",
@@ -26,6 +27,7 @@ type ConnectorContextType = {
   switchAccounts: () => Promise<void>;
   isHardwareWallet: boolean;
   isWalletConnected: boolean;
+  chainId: number;
 };
 
 const ConnectorContext = createContext<unknown>(null);
@@ -46,7 +48,8 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
     ensName,
     ensAvatar,
     onboard,
-    walletType
+    walletType,
+    chainId
   } = state;
 
   const updateState = useCallback(
@@ -58,20 +61,18 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
         const { id } = update.wallets[0].chains[0];
         const networkId = getNetworkIdFromHex(id);
 
-        const isSupported = networkId === 31;
+        const isSupported = networkId === currentChainId;
 
         if (!isSupported) {
           // Switch to mainnet ethereum by default
           (async () => {
             // Only switch chains if the user has tab open
-            if (document.hasFocus()) {
-              await onboard?.setChain({ chainId: getChainIdHex(31) });
-            }
+            await onboard?.setChain({ chainId: getChainIdHex(currentChainId) });
           })();
         } else {
           const network = {
             id: networkId,
-            name: "RSK Mainnet"
+            name: "RSK " + (networkId === 30 ? "Mainnet" : "Testnet")
           };
 
           const provider = new ethers.providers.Web3Provider(update.wallets[0].provider, {
@@ -90,7 +91,8 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
               provider,
               signer,
               ensName: wallet?.ens?.name || null,
-              ensAvatar: wallet?.ens?.avatar?.url || null
+              ensAvatar: wallet?.ens?.avatar?.url || null,
+              chainId: networkId
             }
           });
 
@@ -200,7 +202,8 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
         walletWatched,
         onboard,
         walletType,
-        isWalletConnected: !!walletAddress
+        isWalletConnected: !!walletAddress,
+        chainId
       }}
     >
       {children}

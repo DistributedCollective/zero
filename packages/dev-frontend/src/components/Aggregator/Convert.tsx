@@ -1,6 +1,5 @@
 import { Decimal, LiquityStoreState } from "@sovryn-zero/lib-base";
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
-import { useWeb3React } from "@web3-react/core";
 import { parseUnits } from "ethers/lib/utils";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -11,6 +10,7 @@ import useZusdAggregator from "../../hooks/useZusdAggregator";
 import { COIN, XUSD } from "../../strings";
 import { parseBalance } from "../../utils";
 import { Card } from "../Card";
+import { useConnectorContext } from "../Connector";
 import { ErrorDescription } from "../ErrorDescription";
 import { EditableRow } from "../Trove/Editor";
 
@@ -19,14 +19,14 @@ const select = ({ zusdBalance }: LiquityStoreState) => ({
 });
 
 export const Convert: React.FC = () => {
-  const { account } = useWeb3React();
+  const { walletAddress } = useConnectorContext();
   const { zusdBalance } = useLiquitySelector(select);
-  const { data: xusd, decimals: decimalsXUSD } = useTokenBalance(account!, addresses.xusd);
+  const { data: xusd, decimals: decimalsXUSD } = useTokenBalance(walletAddress!, addresses.xusd);
   const { data: zusd, decimals: decimalsZUSD } = useTokenBalance(
     addresses.babelfish,
     addresses.zusd
   );
-  const { mint, redeem } = useZusdAggregator(account);
+  const { mint, redeem } = useZusdAggregator(walletAddress);
 
   const xusdBalance = useMemo(
     () => Decimal.from(parseBalance(xusd || 0, decimalsXUSD, decimalsXUSD)),

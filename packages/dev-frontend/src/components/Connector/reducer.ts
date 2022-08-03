@@ -12,6 +12,7 @@ type ConnectorState = {
   ensName: string | null;
   ensAvatar: string | null;
   onboard: OnboardAPI | null;
+  chainId: number | null;
 };
 
 export enum AppEvents {
@@ -32,7 +33,8 @@ export const initialState: ConnectorState = {
   walletType: null,
   ensName: null,
   ensAvatar: null,
-  onboard: onboard
+  onboard: onboard,
+  chainId: null
 };
 
 export type ConnectionUpdate = {
@@ -43,6 +45,7 @@ export type ConnectionUpdate = {
   provider: ethers.providers.Web3Provider;
   ensName: string | null;
   ensAvatar: string | null;
+  chainId: number | null;
 };
 
 export type EnsUpdate = {
@@ -82,7 +85,8 @@ export function reducer(state: ConnectorState, action: Actions) {
         signer: action.payload.signer,
         provider: action.payload.provider,
         ensName: action.payload.ensName,
-        ensAvatar: action.payload.ensAvatar
+        ensAvatar: action.payload.ensAvatar,
+        chainId: action.payload.chainId
       };
 
     case AppEvents.WATCH_WALLET:

@@ -1,8 +1,6 @@
 import React from "react";
-import { Web3ReactProvider } from "@web3-react/core";
 import { Flex, Spinner, Heading, ThemeProvider, Paragraph, Link, Image } from "theme-ui";
 
-import { BatchedWebSocketAugmentedWeb3Provider } from "@sovryn-zero//providers";
 import { LiquityProvider } from "./hooks/LiquityContext";
 import { WalletConnector } from "./components/WalletConnector";
 import { TransactionProvider } from "./components/Transaction";
@@ -37,14 +35,6 @@ getConfig().then(config => {
   // console.log(config);
   Object.assign(window, { config });
 });
-
-const EthersWeb3ReactProvider: React.FC = ({ children }) => {
-  return (
-    <Web3ReactProvider getLibrary={provider => new BatchedWebSocketAugmentedWeb3Provider(provider)}>
-      {children}
-    </Web3ReactProvider>
-  );
-};
 
 const UnsupportedLayout: React.FC = ({ children }) => (
   <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
@@ -106,25 +96,23 @@ const App = () => {
   );
 
   return (
-    <EthersWeb3ReactProvider>
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <ConnectorContextProvider>
-            <WalletConnector loader={loader}>
-              <LiquityProvider
-                loader={loader}
-                unsupportedNetworkFallback={unsupportedNetworkFallback}
-                unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
-              >
-                <TransactionProvider>
-                  <LiquityFrontend loader={loader} />
-                </TransactionProvider>
-              </LiquityProvider>
-            </WalletConnector>
-          </ConnectorContextProvider>
-        </BrowserRouter>
-      </ThemeProvider>
-    </EthersWeb3ReactProvider>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <ConnectorContextProvider>
+          <WalletConnector loader={loader}>
+            <LiquityProvider
+              loader={loader}
+              unsupportedNetworkFallback={unsupportedNetworkFallback}
+              unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
+            >
+              <TransactionProvider>
+                <LiquityFrontend loader={loader} />
+              </TransactionProvider>
+            </LiquityProvider>
+          </WalletConnector>
+        </ConnectorContextProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
