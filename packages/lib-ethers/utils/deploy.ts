@@ -120,7 +120,7 @@ const deployContracts = async (
     troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
       ...overrides
     }),
-//TODO: why troveManagerRedeemOps is not upgradeable?
+
     troveManagerRedeemOps: isMainnet
       ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
       : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
