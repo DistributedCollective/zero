@@ -21,9 +21,6 @@ const DEFAULT_BASE_PATHS = [
 const assets = [
     {
         label: 'RBTC'
-    },
-    {
-        label: 'ETH'
     }
 ];
 const supportsWebUSB = () => Promise.resolve(!!navigator &&

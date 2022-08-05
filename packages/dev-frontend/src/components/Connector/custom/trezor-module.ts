@@ -6,9 +6,6 @@ const TREZOR_DEFAULT_PATH = "m/44'/60'/0'/0";
 const assets = [
     {
         label: 'RBTC'
-    },
-    {
-        label: 'ETH'
     }
 ];
 const DEFAULT_BASE_PATHS = [

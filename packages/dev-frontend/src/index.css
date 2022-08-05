@@ -71,4 +71,5 @@ input ~ .checkbox {
 
 :root {
   --onboard-gray-100: #c4a853;
+  --onboard-danger-500: #7b0000;
 }
