@@ -208,7 +208,7 @@ function ledger({ customNetwork } = {}) {
                         transactionObject = { ...transactionObject, from };
                         const chainId = currentChain.hasOwnProperty('id')
                             ? Number.parseInt(currentChain.id)
-                            : 1;
+                            : process.env.REACT_APP_NETWORK === 'mainnet' ? 30 : 31;
                         const common = await getCommon({ customNetwork, chainId });
                         transactionObject.gasLimit =
                             transactionObject.gas || transactionObject.gasLimit;
