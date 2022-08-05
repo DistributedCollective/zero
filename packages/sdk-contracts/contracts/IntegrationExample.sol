@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-import "./libraries/BorrowerLib.sol";
-import "./libraries/TroveStatisticsLib.sol";
+import "@sovryn-zero/sdk-contracts/contracts/libraries/BorrowerLib.sol";
+import "@sovryn-zero/sdk-contracts/contracts/libraries/TroveStatisticsLib.sol";
 
 contract IntegrationExample {
     uint8 constant percentScale = 90;
