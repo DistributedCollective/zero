@@ -244,7 +244,7 @@ function trezor(options: any) {
                     const transactionData = createTrezorTransactionObject(updateBigNumberFields);
                     const chainId = currentChain.hasOwnProperty('id')
                         ? Number(currentChain.id)
-                        : 1;
+                        : process.env.REACT_APP_NETWORK === 'mainnet' ? 30 : 31;
                     const common = await getCommon({ customNetwork, chainId });
                     const trezorResult = await trezorSignTransaction(derivationPath, transactionData);
                     if (!trezorResult.success) {
