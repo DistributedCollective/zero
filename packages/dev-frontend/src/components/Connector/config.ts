@@ -6,6 +6,7 @@ import walletConnectModule from "@web3-onboard/walletconnect";
 import portisModule from "@web3-onboard/portis";
 import coinbaseWalletModule from "@web3-onboard/coinbase";
 import { RPC_URL } from "src/contracts/config";
+import { isMainnet } from "src/utils";
 
 const injected = injectedModule();
 const ledger = ledgerModule();
@@ -37,7 +38,13 @@ export const onboard = Onboard({
     description: "0% interest loans backed by bitcoin | Sovryn",
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
-  wallets: [injected, ledger, trezor, walletConnect as any, portis, coinbaseWalletSdk],
+  wallets: [
+    injected,
+    ...(isMainnet ? [ledger, trezor] : []),
+    walletConnect as any,
+    portis,
+    coinbaseWalletSdk
+  ],
   chains: [
     {
       id: getChainIdHex(30),
