@@ -3,6 +3,8 @@ import injectedModule from "@web3-onboard/injected-wallets";
 import ledgerModule from "./custom/ledger-module";
 import trezorModule from "./custom/trezor-module";
 import walletConnectModule from "@web3-onboard/walletconnect";
+import portisModule from "@web3-onboard/portis";
+import coinbaseWalletModule from "@web3-onboard/coinbase";
 import { RPC_URL } from "src/contracts/config";
 
 const injected = injectedModule();
@@ -11,12 +13,13 @@ const trezor = trezorModule({
   email: "support@sovryn.com",
   appUrl: "https://test.sovryn.app/zero"
 });
-
 const walletConnect = walletConnectModule({
   qrcodeModalOptions: {
-    mobileLinks: ["rainbow", "metamask", "argent", "trust", "imtoken", "pillar"]
+    mobileLinks: ["metamask", "trust", "rainbow", "argent", "imtoken", "pillar"]
   }
 });
+const portis = portisModule({ apiKey: process.env.REACT_APP_PORTIS_KEY || "" });
+const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 
 export const getChainIdHex = (networkId: number) => {
   return `0x${networkId.toString(16)}`;
@@ -34,8 +37,7 @@ export const onboard = Onboard({
     description: "0% interest loans backed by bitcoin | Sovryn",
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
-  //@ts-ignore
-  wallets: [injected, ledger, trezor, walletConnect],
+  wallets: [injected, ledger, trezor, walletConnect as any, portis, coinbaseWalletSdk],
   chains: [
     {
       id: getChainIdHex(30),
