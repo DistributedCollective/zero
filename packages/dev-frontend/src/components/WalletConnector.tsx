@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
-import { Button, Link, Text } from "theme-ui";
+import { Button, Text } from "theme-ui";
 
 import { WaitListSignup } from "../pages/WaitListSignup";
 import { shortenAddress } from "../utils/shortenAddress";
@@ -81,7 +81,6 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
   } = useConnectorContext();
   const [connectionState, dispatch] = useReducer(connectionReducer, { type: "inactive" });
   const [hasAccess, setHasAccess] = useState(false);
-  const [hasClicked, setHasClicked] = useState(false);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
@@ -114,10 +113,8 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
   const onClick = useCallback(() => {
     if (isWalletConnected) {
       disconnectWallet();
-      setHasClicked(false);
     } else {
       connectWallet();
-      setHasClicked(true);
     }
   }, [isWalletConnected, disconnectWallet, connectWallet]);
 
@@ -162,7 +159,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
         }}
       >
         {!hasAccess && walletAddress && "Sign up above to get added to the waitlist."}
-        {!walletAddress && hasClicked && (
+        {/* {!walletAddress && hasClicked && (
           <>
             Install or unlock an{" "}
             <Link
@@ -178,7 +175,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
               RSK-compatible Web3 wallet.
             </Link>
           </>
-        )}
+        )} */}
       </Text>
     </WaitListSignup>
   );
