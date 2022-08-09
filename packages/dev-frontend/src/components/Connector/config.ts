@@ -4,7 +4,6 @@ import ledgerModule from "./custom/ledger-module";
 import trezorModule from "./custom/trezor-module";
 import walletConnectModule from "@web3-onboard/walletconnect";
 import portisModule from "@web3-onboard/portis";
-import coinbaseWalletModule from "@web3-onboard/coinbase";
 import { RPC_URL } from "src/contracts/config";
 import { isMainnet } from "src/utils";
 
@@ -20,7 +19,6 @@ const walletConnect = walletConnectModule({
   }
 });
 const portis = portisModule({ apiKey: process.env.REACT_APP_PORTIS_KEY || "" });
-const coinbaseWalletSdk = coinbaseWalletModule({ darkMode: true });
 
 export const getChainIdHex = (networkId: number) => {
   return `0x${networkId.toString(16)}`;
@@ -36,15 +34,11 @@ export const onboard = Onboard({
     icon: process.env.PUBLIC_URL + "/images/zerologo.svg",
     logo: process.env.PUBLIC_URL + "/images/zerologo.svg",
     description: "0% interest loans backed by bitcoin | Sovryn",
+    explore: "https://wiki.sovryn.app/en/getting-started/wallet-setup",
+    gettingStartedGuide: "https://wiki.sovryn.app/en/getting-started/wallet-setup",
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
-  wallets: [
-    injected,
-    ...(isMainnet ? [ledger, trezor] : []),
-    walletConnect as any,
-    portis,
-    coinbaseWalletSdk
-  ],
+  wallets: [injected, ...(isMainnet ? [ledger, trezor] : []), walletConnect as any, portis],
   chains: [
     {
       id: getChainIdHex(30),
