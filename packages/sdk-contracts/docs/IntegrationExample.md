@@ -1,28 +1,18 @@
-TODO: add intro
-```javascript
-// SPDX-License-Identifier: MIT
+# Integration Example
+Contract that is dedicated for integration example.
 
-pragma solidity 0.6.11;
-import "@sovryn-zero/sdk-contracts/contracts/libraries/BorrowerLib.sol";
-import "@sovryn-zero/sdk-contracts/contracts/libraries/TroveStatisticsLib.sol";
+## Methods
 
-contract IntegrationExample {
-    uint8 constant percentScale = 90;
-    uint8 constant divider = 100;
-    uint8 constant maxFeePercentage = 1;
-
-    /// @notice Example integration function. This function opens a credit line with amount equal to 90% of the collateral value
-    /// and withdraws the credit line to callers wallet
-    /// @dev This function could be converted into a receive function once the SC SDK handles addresses of dependencies by itself
-    /// NOTE: maxFeePercentage is hardoc
-    function openCreditLine(address priceFeedAddress, address borrowerContractAddress)
-        external
-        payable
-    {
-        uint256 btcPrice = TroveStatisticsLib.getBtcPrice(priceFeedAddress);
-        uint256 zusdAmount = ((btcPrice * msg.value) * percentScale) / divider;
-        BorrowerLib.openCreditLineInZusd(maxFeePercentage, zusdAmount, borrowerContractAddress);
-        BorrowerLib.withdrawZUSD(maxFeePercentage, zusdAmount, borrowerContractAddress);
-    }
-}
+## openCreditLine
+```solidity
+function openCreditLine(address priceFeedAddress address borrowerContractAddress) external payable
 ```
+
+Opens a credit line with amount equal to 90% of the collateral value.
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| priceFeedAddress | address | address of PriceFeeds to query the BTC Price |
+| borrowerContractAddress | address | address of Borrower |
