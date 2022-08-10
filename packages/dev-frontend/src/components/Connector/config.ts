@@ -1,4 +1,4 @@
-import Onboard from "@web3-onboard/core";
+import Onboard, { InitOptions } from "@web3-onboard/core";
 import injectedModule from "@web3-onboard/injected-wallets";
 import ledgerModule from "./custom/ledger-module";
 import trezorModule from "./custom/trezor-module";
@@ -28,7 +28,19 @@ export const getNetworkIdFromHex = (chainId: string) => {
   return parseInt(chainId, 16);
 };
 
-export const onboard = Onboard({
+const i18n = {
+  en: {
+    connect: {
+      selectingWallet: {
+        sidebar: {
+          paragraph:
+            "Install a Rootstock Web3 wallet if you do not have one yet, then select your wallet from the options to get started."
+        }
+      }
+    }
+  }
+};
+export const onboard = Onboard(({
   appMetadata: {
     name: "ZERO",
     icon: process.env.PUBLIC_URL + "/images/zerologo.svg",
@@ -38,6 +50,7 @@ export const onboard = Onboard({
     gettingStartedGuide: "https://wiki.sovryn.app/en/getting-started/wallet-setup",
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
+  i18n,
   wallets: [injected, ...(isMainnet ? [ledger, trezor] : []), walletConnect as any, portis],
   chains: [
     {
@@ -66,4 +79,4 @@ export const onboard = Onboard({
   notify: {
     enabled: false
   }
-});
+} as unknown) as InitOptions);
