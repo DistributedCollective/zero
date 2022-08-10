@@ -1,5 +1,5 @@
-import { Box, Card, Heading, Paragraph, Text } from "theme-ui";
-
+import { Box, Heading, Paragraph, Text } from "theme-ui";
+import { Card } from "../Card";
 import { InfoMessage } from "../InfoMessage";
 import { Icon } from "../Icon";
 
@@ -12,9 +12,13 @@ export const DisabledRedemption: React.FC<DisabledRedemptionProps> = ({
   disabledDays,
   unlockDate
 }) => (
-  <Card>
-    <Heading>Redeem</Heading>
-
+  <Card
+    heading={
+      <>
+        <Heading className="heading">Redeem</Heading>
+      </>
+    }
+  >
     <Box sx={{ p: [2, 3] }}>
       <InfoMessage
         title="Redemption is not enabled yet."

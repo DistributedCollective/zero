@@ -124,7 +124,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
         ? {
             accountBalance: this._provider.getBalance(userAddress, blockTag).then(decimalify),
             zusdBalance: this._readable.getZUSDBalance(userAddress, { blockTag }),
-            nueBalance: this._readable.getNUEBalance(userAddress, { blockTag }),
+            nueBalance: Decimal.ZERO,
             zeroBalance: this._readable.getZEROBalance(userAddress, { blockTag }),
             collateralSurplusBalance: this._readable.getCollateralSurplusBalance(userAddress, {
               blockTag

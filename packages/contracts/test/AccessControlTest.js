@@ -446,6 +446,7 @@ contract(
     });
 
     describe("ZEROToken", async accounts => {
+      /* disabled as zero token is not used in beta 
       it("sendToZEROStaking(): reverts when caller is not the ZEROSstaking", async () => {
         // Check multisig has some ZERO
         assert.isTrue((await zeroToken.balanceOf(multisig)).gt(toBN("0")));
@@ -470,7 +471,7 @@ contract(
         } catch (err) {
           assert.include(err.message, "revert");
         }
-      });
+      }); */
     });
 
     describe("CommunityIssuance", async accounts => {

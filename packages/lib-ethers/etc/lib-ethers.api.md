@@ -127,8 +127,6 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     // (undocumented)
     getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<FrontendStatus>;
     // (undocumented)
-    getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
-    // (undocumented)
     getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)
     getPrice(overrides?: EthersCallOverrides): Promise<Decimal>;
@@ -269,8 +267,6 @@ export type EthersTransactionResponse = TransactionResponse;
 export class ObservableEthersLiquity implements ObservableLiquity {
     constructor(readable: ReadableEthersLiquity);
     // (undocumented)
-    watchNUEBalance(onNUEBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
-    // (undocumented)
     watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
     // (undocumented)
     watchPrice(onPriceChanged: (price: Decimal) => void): () => void;
@@ -396,8 +392,6 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     _getFeesFactory(overrides?: EthersCallOverrides): Promise<(blockTimestamp: number, recoveryMode: boolean) => Fees>;
     // (undocumented)
     getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<FrontendStatus>;
-    // (undocumented)
-    getNUEBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
     getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)

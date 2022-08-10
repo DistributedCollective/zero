@@ -1,7 +1,3 @@
-## ⚠️WARNING⚠️
-
-**THE VERSION OF ZERO CONTAINED IN THIS REPO HAS NOT BEEN FINALIZED OR FULLY REVIEWED AND SHOULD NOT BE CONSIDERED "MAINNET-READY". DO NOT USE ZERO IN PRODUCTION UNTIL THIS WARNING MESSAGE HAS BEEN REMOVED. THIS REPO HAS BEEN MADE PUBLIC FOR REVIEW PURPOSES ONLY.**
-
 # Zero: Decentralized Borrowing Protocol
 
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
@@ -81,7 +77,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [How deposits and RBTC gains are tracked](#how-deposits-and-rbtc-gains-are-tracked)
   - [Zero System Fees](#zero-system-fees)
     - [Redemption Fee](#redemption-fee)
-    - [Issuance fee](#issuance-fee)
+    - [Borrowing fee](#borrowing-fee)
     - [Fee Schedule](#fee-schedule)
     - [Intuition behind fees](#intuition-behind-fees)
     - [Fee decay Implementation](#fee-decay-implementation)
@@ -234,7 +230,7 @@ Economically, Recovery Mode is designed to encourage collateral top-ups and debt
 
 ### Directories
 
-- `packages/dev-frontend/` - Zero Developer UI: a fully functional React app used for interfacing with the smart contracts during development
+- `packages/dev-frontend/` - Zero Beta: a fully functional React app used for interfacing with the smart contracts during development
 - `packages/fuzzer/` - A very simple, purpose-built tool based on Zero middleware for randomly interacting with the system
 - `packages/lib-base/` - Common interfaces and classes shared by the other `lib-` packages
 - `packages/lib-ethers/` - [ethers](https://github.com/ethers-io/ethers.js)-based middleware that can read Zero state and send transactions

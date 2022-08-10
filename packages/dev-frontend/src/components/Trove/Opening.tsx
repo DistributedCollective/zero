@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Flex, Button, Box, Card, Heading } from "theme-ui";
+import { Flex, Button, Box, Card } from "theme-ui";
 import {
   LiquityStoreState,
   Decimal,
@@ -22,7 +22,6 @@ import {
   selectForTroveChangeValidation,
   validateTroveChange
 } from "./validation/validateTroveChange";
-import { NueCheckbox } from "./NueCheckbox";
 import { useNueTokenSelection } from "../../hooks/useNueTokenSelection";
 
 const selector = (state: LiquityStoreState) => {
@@ -44,7 +43,7 @@ export const Opening: React.FC = () => {
   const { fees, price, accountBalance, validationContext } = useLiquitySelector(selector);
   const borrowingRate = fees.borrowingRate();
   const editingState = useState<string>();
-  const { borrowedToken, handleSetNueToken, useNueToken } = useNueTokenSelection();
+  const { borrowedToken, useNueToken } = useNueTokenSelection();
 
   const [collateral, setCollateral] = useState<Decimal>(Decimal.ZERO);
   const [borrowAmount, setBorrowAmount] = useState<Decimal>(Decimal.ZERO);
@@ -91,127 +90,134 @@ export const Opening: React.FC = () => {
   }, [collateral, borrowAmount]);
 
   return (
-    <Card>
-      <Heading>
-        Line of Credit
-        {isDirty && !isTransactionPending && (
-          <Button variant="titleIcon" sx={{ ":enabled:hover": { color: "danger" } }} onClick={reset}>
-            <Icon name="history" size="lg" />
-          </Button>
-        )}
-      </Heading>
-
-      <Box sx={{ p: [2, 3] }}>
-        <EditableRow
-          label="Collateral"
-          inputId="trove-collateral"
-          amount={collateral.prettify(4)}
-          maxAmount={maxCollateral.toString()}
-          maxedOut={collateralMaxedOut}
-          editingState={editingState}
-          unit="RBTC"
-          editedAmount={collateral.toString(4)}
-          setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
-        />
-        <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} />
-
-        <EditableRow
-          label="Borrow"
-          inputId="trove-borrow-amount"
-          amount={borrowAmount.prettify()}
-          unit={borrowedToken}
-          editingState={editingState}
-          editedAmount={borrowAmount.toString(2)}
-          setEditedAmount={(amount: string) => setBorrowAmount(Decimal.from(amount))}
-        />
-
-        <StaticRow
-          label="Liquidation Reserve"
-          inputId="trove-liquidation-reserve"
-          amount={`${ZUSD_LIQUIDATION_RESERVE}`}
-          unit={borrowedToken}
-          infoIcon={
-            <InfoIcon
-              tooltip={
-                <Card variant="tooltip" sx={{ width: "200px" }}>
-                  An amount set aside to cover the liquidator’s gas costs if your Line of Credit
-                  needs to be liquidated. The amount increases your debt and is refunded if you close
-                  your Line of Credit by fully paying off its net debt.
-                </Card>
-              }
-            />
-          }
-        />
-
-        <StaticRow
-          label="Borrowing Fee"
-          inputId="trove-borrowing-fee"
-          amount={fee.prettify(2)}
-          pendingAmount={feePct.toString(2)}
-          unit={borrowedToken}
-          infoIcon={
-            <InfoIcon
-              tooltip={
-                <Card variant="tooltip" sx={{ width: "240px" }}>
-                  This amount is deducted from the borrowed amount as a one-time fee. There are no
-                  recurring fees for borrowing, which is thus interest-free.
-                </Card>
-              }
-            />
-          }
-        />
-
-        <StaticRow
-          label="Total debt"
-          inputId="trove-total-debt"
-          amount={totalDebt.prettify(2)}
-          unit={borrowedToken}
-          infoIcon={
-            <InfoIcon
-              tooltip={
-                <Card variant="tooltip" sx={{ width: "240px" }}>
-                  The total amount of {borrowedToken} your Line of Credit will hold.{" "}
-                  {isDirty && (
-                    <>
-                      You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
-                      {borrowedToken} to reclaim your collateral (
-                      {ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD Liquidation Reserve excluded).
-                    </>
-                  )}
-                </Card>
-              }
-            />
-          }
-        />
-
-        <CollateralRatio value={collateralRatio} />
-
-        {description ?? (
+    <>
+      {description ?? (
+        <Flex sx={{ justifyContent: "center" }}>
           <ActionDescription>
             Start by entering the amount of RBTC you'd like to deposit as collateral.
           </ActionDescription>
-        )}
-
-        <Flex variant="layout.actions">
-          <Button variant="cancel" onClick={handleCancelPressed}>
-            Cancel
+        </Flex>
+      )}
+      <Box sx={{ p: [2, 3], position: "relative" }}>
+        {isDirty && !isTransactionPending && (
+          <Button
+            variant="titleIcon"
+            sx={{ position: "absolute", top: -2, left: -2, ":enabled:hover": { color: "danger" } }}
+            onClick={reset}
+          >
+            <Icon name="history" size="sm" />
           </Button>
+        )}
+        <Flex sx={{ flexDirection: ["column", "column", "column", "row"] }}>
+          <EditableRow
+            label="Collateral"
+            inputId="trove-collateral"
+            amount={collateral.prettify(4)}
+            maxAmount={maxCollateral.toString()}
+            maxedOut={collateralMaxedOut}
+            editingState={editingState}
+            unit="RBTC"
+            editedAmount={collateral.toString(4)}
+            setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
+            hideMaxBtn
+          />
+          <Flex sx={{ flexDirection: "column", flex: 1 }}>
+            <EditableRow
+              label="Borrow"
+              inputId="trove-borrow-amount"
+              amount={borrowAmount.prettify()}
+              unit={borrowedToken}
+              editingState={editingState}
+              editedAmount={borrowAmount.toString(2)}
+              setEditedAmount={(amount: string) => setBorrowAmount(Decimal.from(amount))}
+              hideMaxBtn
+            />
+            {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}
+          </Flex>
+        </Flex>
+        <Flex
+          sx={{ mt: 30, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}
+        >
+          <StaticRow
+            label="Liquidation Reserve"
+            inputId="trove-liquidation-reserve"
+            amount={`${ZUSD_LIQUIDATION_RESERVE}`}
+            unit={borrowedToken}
+            infoIcon={
+              <InfoIcon
+                tooltip={
+                  <Card variant="tooltip" sx={{ width: "200px" }}>
+                    An amount set aside to cover the liquidator’s gas costs if your Line of Credit
+                    needs to be liquidated. The amount increases your debt and is refunded if you
+                    close your Line of Credit by fully paying off its net debt.
+                  </Card>
+                }
+              />
+            }
+          />
 
-          {troveChange ? (
-            <TroveAction
-              transactionId={TRANSACTION_ID}
-              change={troveChange}
-              useNueToken={useNueToken}
-              maxBorrowingRate={maxBorrowingRate}
-            >
-              Confirm
-            </TroveAction>
-          ) : (
-            <Button disabled>Confirm</Button>
-          )}
+          <StaticRow
+            label="Borrowing Fee"
+            inputId="trove-borrowing-fee"
+            amount={fee.prettify(2)}
+            pendingAmount={feePct.toString(2)}
+            unit={borrowedToken}
+            infoIcon={
+              <InfoIcon
+                tooltip={
+                  <Card variant="tooltip" sx={{ width: "240px" }}>
+                    This amount is deducted from the borrowed amount as a one-time fee. There are no
+                    recurring fees for borrowing, which is thus interest-free.
+                  </Card>
+                }
+              />
+            }
+          />
+
+          <StaticRow
+            label="Total debt"
+            inputId="trove-total-debt"
+            amount={totalDebt.prettify(2)}
+            unit={borrowedToken}
+            infoIcon={
+              <InfoIcon
+                tooltip={
+                  <Card variant="tooltip" sx={{ width: "240px" }}>
+                    The total amount of {borrowedToken} your Line of Credit will hold.{" "}
+                    {isDirty && (
+                      <>
+                        You will need to repay {totalDebt.sub(ZUSD_LIQUIDATION_RESERVE).prettify(2)}{" "}
+                        {borrowedToken} to reclaim your collateral (
+                        {ZUSD_LIQUIDATION_RESERVE.toString()} ZUSD Liquidation Reserve excluded).
+                      </>
+                    )}
+                  </Card>
+                }
+              />
+            }
+          />
+          <CollateralRatio value={collateralRatio} />
         </Flex>
       </Box>
+      <Flex variant="layout.cta">
+        <Button variant="cancel" onClick={handleCancelPressed}>
+          Cancel
+        </Button>
+
+        {troveChange ? (
+          <TroveAction
+            transactionId={TRANSACTION_ID}
+            change={troveChange}
+            useNueToken={useNueToken}
+            maxBorrowingRate={maxBorrowingRate}
+          >
+            Confirm
+          </TroveAction>
+        ) : (
+          <Button disabled>Confirm</Button>
+        )}
+      </Flex>
       {isTransactionPending && <LoadingOverlay />}
-    </Card>
+    </>
   );
 };

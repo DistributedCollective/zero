@@ -172,7 +172,7 @@ export class Decimal {
   }
 
   prettify(precision = 2): string {
-    const [characteristic, mantissa] = this.toString(precision).split(".");
+    const [characteristic, mantissa] = parseFloat(this.toString(precision)).toString().split(".");
     const prettyCharacteristic = characteristic.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 
     return mantissa !== undefined ? prettyCharacteristic + "." + mantissa : prettyCharacteristic;

@@ -1,9 +1,7 @@
 import assert from "assert";
 import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
-import { Wallet } from "@ethersproject/wallet";
-import { Decimal } from "@sovryn-zero/lib-base";
-import { Contract } from "ethers";
+import { Contract, ethers } from "ethers";
 import {
   _connectToContracts,
   _LiquityContractAddresses,
@@ -12,6 +10,8 @@ import {
   _priceFeedIsTestnet as checkPriceFeedIsTestnet
 } from "../src/contracts";
 import { PriceFeed } from "../types";
+import upgradeableProxy from "../abi/TroveManagerRedeemOps.json";
+import { Ownable } from "../types";
 
 let silent = true;
 
@@ -92,6 +92,8 @@ const deployContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
+  zusdTokenAddress?: string,
+  isMainnet?: boolean,
   overrides?: Overrides
 ): Promise<{ addresses: Omit<_LiquityContractAddresses, "nueToken">; startBlock: number }> => {
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(
@@ -119,12 +121,11 @@ const deployContracts = async (
       ...overrides
     }),
 
-    troveManagerRedeemOps: await deployContract(
-      deployer,
-      getContractFactory,
-      "TroveManagerRedeemOps",
-      { ...overrides }
-    ),
+    troveManagerRedeemOps: isMainnet
+      ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
+      : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
+          ...overrides
+        }),
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),
@@ -171,9 +172,14 @@ const deployContracts = async (
   return {
     addresses: {
       ...addresses,
-      zusdToken: await deployContractWithProxy(deployer, getContractFactory, "ZUSDToken", {
-        ...overrides
-      }),
+      zusdToken: (zusdTokenAddress ??= await deployContractWithProxy(
+        deployer,
+        getContractFactory,
+        "ZUSDToken",
+        {
+          ...overrides
+        }
+      )),
 
       zeroToken: await deployContractWithProxy(deployer, getContractFactory, "ZEROToken", {
         ...overrides
@@ -220,6 +226,7 @@ const connectContracts = async (
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
+  zusdTokenAddress?: string,
   overrides?: Overrides
 ) => {
   if (!deployer.provider) {
@@ -228,13 +235,7 @@ const connectContracts = async (
 
   const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
 
-  const connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
-    nonce =>
-      zusdToken.initialize(troveManager.address, stabilityPool.address, borrowerOperations.address, {
-        ...overrides,
-        nonce
-      }),
-
+  let connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
     nonce =>
       liquityBaseParams.initialize({
         ...overrides,
@@ -374,6 +375,22 @@ const connectContracts = async (
         { ...overrides, nonce }
       )
   ];
+  // Initialize zero token if no address in config file for this network context
+  if (!zusdTokenAddress) {
+    connections = [
+      nonce =>
+        zusdToken.initialize(
+          troveManager.address,
+          stabilityPool.address,
+          borrowerOperations.address,
+          {
+            ...overrides,
+            nonce
+          }
+        ),
+      ...connections
+    ];
+  }
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
   // connections in parallel
@@ -390,6 +407,9 @@ const transferOwnership = async (
     activePool,
     borrowerOperations,
     troveManager,
+    troveManagerRedeemOps,
+    zusdToken,
+    zeroToken,
     collSurplusPool,
     communityIssuance,
     defaultPool,
@@ -431,6 +451,23 @@ const transferOwnership = async (
       }),
     nonce =>
       troveManager.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
+    nonce =>
+      troveManagerRedeemOps.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
+    nonce =>
+      zusdToken.setOwner(governanceAddress, {
+        ...overrides,
+        nonce
+      }),
+    nonce  => //zeroToken is not ownable and can't add due to the contract size limit (EIP-170) - requires optimization first
+    /*(hardhat.ethers.getContractAt(upgradeableProxy, zeroToken.address, deployer) as unknown as Ownable)*/
+      (new ethers.Contract(zeroToken.address, upgradeableProxy, deployer) as unknown as Ownable)
+      .setOwner(governanceAddress, {
         ...overrides,
         nonce
       }),
@@ -498,6 +535,11 @@ const transferOwnership = async (
     log(`Transferring ownership ${transactionsIndex}`);
     const tx = await transactions[transactionsIndex](txCount + transactionsIndex);
     await tx.wait().then(() => log(`Transferred ownership ${transactionsIndex}`));
+    const receipt = await tx.wait();
+    log({
+      blockNumber: tx.blockNumber,
+      gasUsed: receipt.gasUsed.toNumber()
+    });
   }
 };
 
@@ -512,6 +554,8 @@ export const deployAndSetupContracts = async (
   wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
+  zusdTokenAddress?: string,
+  isMainnet?: boolean,
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
   if (!deployer.provider) {
@@ -559,7 +603,14 @@ export const deployAndSetupContracts = async (
     _priceFeedIsTestnet,
     _isDev,
 
-    ...(await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides))
+    ...(await deployContracts(
+      deployer,
+      getContractFactory,
+      _priceFeedIsTestnet,
+      zusdTokenAddress,
+      isMainnet,
+      overrides
+    ))
   } as _LiquityDeploymentJSON;
 
   const contracts = _connectToContracts(deployer, deployment);
@@ -573,6 +624,7 @@ export const deployAndSetupContracts = async (
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
+    zusdTokenAddress,
     overrides
   );
 

@@ -361,7 +361,8 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(zeroBalanceAfter, zeroBalanceBefore)
 
     // ZERO staking
-    th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
+    // disabled as zero token is not used in beta 
+    // th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)

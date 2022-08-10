@@ -4,9 +4,6 @@ import { Button, Flex } from "theme-ui";
 import { Decimal, Decimalish, LiquityStoreState } from "@sovryn-zero/lib-base";
 import { LiquityStoreUpdate, useLiquityReducer, useLiquitySelector } from "@sovryn-zero/lib-react";
 
-import { COIN } from "../../strings";
-
-import { ActionDescription } from "../ActionDescription";
 import { useMyTransactionState } from "../Transaction";
 
 import { StabilityDepositEditor } from "./StabilityDepositEditor";
@@ -128,16 +125,11 @@ export const StabilityDepositManager: React.FC = () => {
       originalDeposit={originalDeposit}
       editedZUSD={editedZUSD}
       changePending={changePending}
+      description={description}
       dispatch={dispatch}
+      makingNewDeposit={makingNewDeposit}
     >
-      {description ??
-        (makingNewDeposit ? (
-          <ActionDescription>Enter the amount of {COIN} you'd like to deposit.</ActionDescription>
-        ) : (
-          <ActionDescription>Adjust the {COIN} amount to deposit or withdraw.</ActionDescription>
-        ))}
-
-      <Flex variant="layout.actions">
+      <Flex variant="layout.cta">
         <Button variant="cancel" onClick={handleCancel}>
           Cancel
         </Button>

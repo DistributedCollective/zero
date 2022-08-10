@@ -122,13 +122,6 @@ export class _CachedReadableLiquity<T extends unknown[]>
     );
   }
 
-  async getNUEBalance(address?: string, ...extraParams: T): Promise<Decimal> {
-    return (
-      this._cache.getNUEBalance(address, ...extraParams) ??
-      this._readable.getNUEBalance(address, ...extraParams)
-    );
-  }
-
   async getZEROBalance(address?: string, ...extraParams: T): Promise<Decimal> {
     return (
       this._cache.getZEROBalance(address, ...extraParams) ??

@@ -119,13 +119,6 @@ export interface ReadableLiquity {
   getZUSDBalance(address?: string): Promise<Decimal>;
 
   /**
-   * Get the amount of ZUSD held by an address.
-   *
-   * @param address - Address whose balance should be retrieved.
-   */
-  getNUEBalance(address?: string): Promise<Decimal>;
-
-  /**
    * Get the amount of ZERO held by an address.
    *
    * @param address - Address whose balance should be retrieved.

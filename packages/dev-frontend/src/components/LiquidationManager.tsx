@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Box, Heading, Flex, Button, Label, Input } from "theme-ui";
+import { Card, Box, Flex, Button, Label, Input } from "theme-ui";
 
 import { useLiquity } from "../hooks/LiquityContext";
 
@@ -10,25 +10,25 @@ export const LiquidationManager: React.FC = () => {
   const {
     liquity: { send: liquity }
   } = useLiquity();
-  const [numberOfTrovesToLiquidate, setNumberOfTrovesToLiquidate] = useState("90");
+  const [numberOfTrovesToLiquidate, setNumberOfTrovesToLiquidate] = useState("");
 
   return (
     <Card>
-      <Heading>Liquidate</Heading>
-
       <Box sx={{ p: [2, 3] }}>
-        <Flex sx={{ alignItems: "stretch" }}>
-          <Label>Up to</Label>
+        <Flex sx={{ alignItems: "center" }}>
+          <Label sx={{ pr: "18px" }}>Liquidate up to</Label>
 
           <Input
             type="number"
             min="1"
             step="1"
             value={numberOfTrovesToLiquidate}
+            placeholder="90"
             onChange={e => setNumberOfTrovesToLiquidate(e.target.value)}
+            sx={{ border: "solid", maxWidth: "70px", color: "text", textAlign: "center" }}
           />
 
-          <Label>Lines of Credit</Label>
+          <Label sx={{ pl: "18px" }}>Lines of Credit</Label>
 
           <Flex sx={{ ml: 2, alignItems: "center" }}>
             <Transaction
@@ -42,8 +42,8 @@ export const LiquidationManager: React.FC = () => {
                 return liquity.liquidateUpTo(parseInt(numberOfTrovesToLiquidate, 10), overrides);
               }}
             >
-              <Button variant="dangerIcon">
-                <Icon name="trash" size="lg" />
+              <Button variant="dangerIcon" sx={{ pl: "23px", pr: "66px" }}>
+                <Icon name="trash" size="1x" />
               </Button>
             </Transaction>
           </Flex>

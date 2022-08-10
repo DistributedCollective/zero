@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Box, Flex, Card, Heading } from "theme-ui";
+import { Button, Box, Flex, Heading } from "theme-ui";
+import { Card } from "../Card";
 
 import {
   Decimal,
@@ -66,7 +67,7 @@ export const RedemptionManager: React.FC = () => {
         false,
         <ErrorDescription>
           You can't redeem ZUSD when the total collateral ratio is less than{" "}
-          <Amount>{mcrPercent}</Amount>. Please try again later.
+          <Amount> {mcrPercent}</Amount>. Please try again later.
         </ErrorDescription>
       ]
     : zusdAmount.gt(zusdBalance)
@@ -75,6 +76,7 @@ export const RedemptionManager: React.FC = () => {
         <ErrorDescription>
           The amount you're trying to redeem exceeds your balance by{" "}
           <Amount>
+            {" "}
             {zusdAmount.sub(zusdBalance).prettify()} {COIN}
           </Amount>
           .
@@ -83,7 +85,7 @@ export const RedemptionManager: React.FC = () => {
     : [
         true,
         <ActionDescription>
-          You will receive <Amount>{ethAmount.sub(ethFee).prettify(4)} RBTC</Amount> in exchange for{" "}
+          You will receive <Amount>{ethAmount.sub(ethFee).prettify(8)} RBTC</Amount> in exchange for{" "}
           <Amount>
             {zusdAmount.prettify()} {COIN}
           </Amount>
@@ -92,56 +94,81 @@ export const RedemptionManager: React.FC = () => {
       ];
 
   return (
-    <Card>
-      <Heading>
-        Redeem
-        {dirty && !changePending && (
-          <Button
-            variant="titleIcon"
-            sx={{ ":enabled:hover": { color: "danger" } }}
-            onClick={() => setZUSDAmount(Decimal.ZERO)}
+    <Card
+      heading={
+        <>
+          <Heading
+            className="heading"
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              alignItems: "center"
+            }}
           >
-            <Icon name="history" size="lg" />
-          </Button>
-        )}
-      </Heading>
-
-      <Box sx={{ p: [2, 3] }}>
-        <EditableRow
-          label="Redeem"
-          inputId="redeem-zusd"
-          amount={zusdAmount.prettify()}
-          maxAmount={zusdBalance.toString()}
-          maxedOut={zusdAmount.eq(zusdBalance)}
-          unit={COIN}
-          {...{ editingState }}
-          editedAmount={zusdAmount.toString(2)}
-          setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
-        />
-
-        <StaticRow
-          label="Redemption Fee"
-          inputId="redeem-fee"
-          amount={ethFee.toString(4)}
-          pendingAmount={feePct.toString(2)}
-          unit="ETH"
-          infoIcon={
-            <InfoIcon
-              tooltip={
-                <Card variant="tooltip" sx={{ minWidth: "240px" }}>
-                  The Redemption Fee is charged as a percentage of the redeemed RBTC. The Redemption
-                  Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
-                </Card>
-              }
-            />
-          }
-        />
-
+            Redeem
+            {dirty && !changePending && (
+              <Button
+                variant="titleIcon"
+                sx={{ position: "absolute", right: 20, ":enabled:hover": { color: "danger" } }}
+                onClick={() => setZUSDAmount(Decimal.ZERO)}
+              >
+                <Icon name="history" size="sm" />
+              </Button>
+            )}
+          </Heading>
+        </>
+      }
+    >
+      <Box
+        sx={{
+          pt: 36,
+          mx: "auto"
+        }}
+      >
         {((dirty || !canRedeem) && description) || (
           <ActionDescription>Enter the amount of {COIN} you'd like to redeem.</ActionDescription>
         )}
+        <Flex sx={{ px: 36, flexDirection: ["column", "column", "column", "row"] }}>
+          <EditableRow
+            label="Redeem"
+            inputId="redeem-zusd"
+            amount={zusdAmount.prettify()}
+            unit={COIN}
+            {...{ editingState }}
+            editedAmount={zusdAmount.toString(2)}
+            setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
+          />
+          <Box sx={{ mt: 40, pl: "8px" }}>
+            <StaticRow
+              label="Redemption Fee"
+              inputId="redeem-fee"
+              amount={ethFee.toString(6)}
+              pendingAmount={feePct.toString(2)}
+              unit="RBTC"
+              infoIcon={
+                <InfoIcon
+                  tooltip={
+                    <Card>
+                      The Redemption Fee is charged as a percentage of the redeemed RBTC. The
+                      Redemption Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
+                    </Card>
+                  }
+                />
+              }
+            />
+          </Box>
+        </Flex>
 
-        <Flex variant="layout.actions">
+        <Flex
+          sx={{
+            justifyContent: "flex-end",
+            mt: 50,
+            button: {
+              ml: 2
+            }
+          }}
+        >
           <RedemptionAction
             transactionId={transactionId}
             disabled={!dirty || !canRedeem}
@@ -149,9 +176,9 @@ export const RedemptionManager: React.FC = () => {
             maxRedemptionRate={maxRedemptionRate}
           />
         </Flex>
-      </Box>
 
-      {changePending && <LoadingOverlay />}
+        {changePending && <LoadingOverlay />}
+      </Box>
     </Card>
   );
 };

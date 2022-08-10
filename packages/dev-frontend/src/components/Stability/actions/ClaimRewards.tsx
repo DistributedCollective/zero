@@ -17,7 +17,7 @@ export const ClaimRewards: React.FC<ClaimRewardsProps> = ({ disabled, children }
   );
 
   return (
-    <Button onClick={sendTransaction} disabled={disabled}>
+    <Button variant="cancel" onClick={sendTransaction} disabled={disabled}>
       {children}
     </Button>
   );

@@ -18,7 +18,8 @@ import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/dep
 import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
-import { BorrowerOperations, CommunityIssuance, ZEROToken } from "./types";
+import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy, Ownable } from "./types";
+
 
 dotenv.config();
 
@@ -53,32 +54,40 @@ const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom(
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
 
 const governanceAddresses = {
-  mainnet: "0x0000000000000000000000000000000000000001",
+  mainnet: "",
+  rsksovrynmainnet: "0x967c84b731679E36A344002b8E3CE50620A7F69f",
   rsktestnet: "0xaC0784a1a3eB5AE6b39F6264C94CD490c6D225D7",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const sovFeeCollectorAddresses = {
   mainnet: "",
+  rsksovrynmainnet: "0x115cAF168c51eD15ec535727F64684D33B7b08D1",
   rsktestnet: "0xedD92fb7C556E4A4faf8c4f5A90f471aDCD018f4",
   dev: ""
 };
 
 const wrbtcAddresses = {
   mainnet: "",
+  rsksovrynmainnet: "0x542fda317318ebf1d3deaf76e0b632741a7e677d",
   rsktestnet: "0x69FE5cEC81D5eF92600c1A0dB1F11986AB3758Ab",
   dev: ""
 };
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d",
+  rsktestnet: "0x572b8990067785d1c601aDE6359c05C296deC718",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0xC4C82fE6d6D531cf7bE8DaC7F9F0Ba63FED4c8d0",
+  rsktestnet: "0x25E79f651e85da501706514358640b96d8b07Db6",
+  dev: ""
+};
+
+const zusdTokenAddresses = {
+  rsktestnet: "0x6b41566353d6C7B8C2a7931d498F11489DacAc29",
   dev: ""
 };
 
@@ -86,6 +95,10 @@ const oracleAddresses: Record<string, OracleAddresses> = {
   mainnet: {
     mocOracleAddress: "",
     rskOracleAddress: ""
+  },
+  rsksovrynmainnet: {
+    mocOracleAddress: "0x972a21C61B436354C0F35836195D7B67f54E482C",
+    rskOracleAddress: "0x99eD262dbd8842442cd22d4c6885936DB38245E6"
   },
   rsktestnet: {
     mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
@@ -113,6 +126,9 @@ const hasPresale = (network: string): network is keyof typeof presaleAddresses =
 
 const hasMarketMaker = (network: string): network is keyof typeof marketMakerAddresses =>
   network in marketMakerAddresses;
+
+const hasZusdToken = (network: string): network is keyof typeof zusdTokenAddresses =>
+  network in zusdTokenAddresses;
 
 const config: HardhatUserConfig = {
   networks: {
@@ -153,7 +169,8 @@ const config: HardhatUserConfig = {
     },
     rsksovrynmainnet: {
       url: "https://mainnet.sovryn.app/rpc",
-      chainId: 30
+      chainId: 30,
+      accounts: [deployerAccount]
       //timeout: 20000, // increase if needed; 20000 is the default value
     }
   },
@@ -176,6 +193,8 @@ declare module "hardhat/types/runtime" {
       externalPriceFeeds?: OracleAddresses,
       presaleAddress?: string,
       marketMakerAddress?: string,
+      zusdTokenAddress?: string,
+      isMainnet?: boolean,
       overrides?: Overrides
     ) => Promise<_LiquityDeploymentJSON>;
   }
@@ -208,6 +227,8 @@ extendEnvironment(env => {
     externalPriceFeeds,
     presaleAddress,
     marketMakerAddress,
+    zusdTokenAddress,
+    isMainnet,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
@@ -220,6 +241,8 @@ extendEnvironment(env => {
       wrbtcAddress,
       presaleAddress,
       marketMakerAddress,
+      zusdTokenAddress,
+      isMainnet,
       overrides
     );
 
@@ -327,6 +350,7 @@ type DeployParams = {
   wrbtcAddress?: string;
   presaleAddress?: string;
   marketMakerAddress?: string;
+  zusdTokenAddress?: string;
 };
 
 task("deploy", "Deploys the contracts to the network")
@@ -344,12 +368,6 @@ task("deploy", "Deploys the contracts to the network")
     undefined,
     types.string
   )
-  .addOptionalParam(
-    "sovCommunityPotAddress",
-    "SOV Stakers pool contract address",
-    undefined,
-    types.string
-  )
   .setAction(
     async (
       {
@@ -360,14 +378,24 @@ task("deploy", "Deploys the contracts to the network")
         sovFeeCollectorAddress,
         wrbtcAddress,
         presaleAddress,
-        marketMakerAddress
+        marketMakerAddress,
+        zusdTokenAddress
       }: DeployParams,
       env
     ) => {
       const overrides = { gasPrice: gasPrice && Decimal.from(gasPrice).div(1000000000).hex };
       const [deployer] = await env.ethers.getSigners();
 
-      useRealPriceFeed ??= env.network.name === "mainnet";
+      const balBefore = await deployer.getBalance();
+
+      console.log({
+        balanceBefore: balBefore.toString()
+      });
+
+      const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet"];
+
+      const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
+      useRealPriceFeed ??= isMainnet;
 
       if (useRealPriceFeed && !hasOracles(env.network.name)) {
         throw new Error(`PriceFeed not supported on ${env.network.name}`);
@@ -387,7 +415,9 @@ task("deploy", "Deploys the contracts to the network")
       marketMakerAddress ??= hasMarketMaker(env.network.name)
         ? marketMakerAddresses[env.network.name]
         : undefined;
-
+      zusdTokenAddress ??= hasZusdToken(env.network.name)
+        ? zusdTokenAddresses[env.network.name]
+        : undefined;
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
@@ -396,6 +426,8 @@ task("deploy", "Deploys the contracts to the network")
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
         presaleAddress,
         marketMakerAddress,
+        zusdTokenAddress,
+        isMainnet,
         overrides
       );
 
@@ -409,7 +441,112 @@ task("deploy", "Deploys the contracts to the network")
       console.log();
       console.log(deployment);
       console.log();
+      console.log({ balanceSpent: balBefore.sub(await deployer.getBalance()).toString() });
     }
   );
+
+type DeployZUSDToken = {
+  channel: string;
+};
+
+task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous deployment")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const {
+      zusdToken: zusdTokenAddress,
+      troveManager: troveManagerAddress,
+      stabilityPool: stabilityPoolAddress,
+      borrowerOperations: borrowerOperationsAddress
+    } = deployment.addresses;
+
+    console.log("Deploying new ZUSD token logic for testnet");
+    // NOTE this script should only be executed on testnet
+    const zusdTokenFactory = await hre.ethers.getContractFactory("ZUSDTokenTestnet");
+    const zusdTokenContract = await(await zusdTokenFactory.deploy()).deployed();
+
+    const zusdTokenProxy = (await hre.ethers.getContractAt(
+      "UpgradableProxy",
+      zusdTokenAddress,
+      deployer
+    ) as unknown) as UpgradableProxy;
+
+    //set new implementation
+    await zusdTokenProxy.setImplementation(zusdTokenContract.address);
+    console.log("Initializing new ZUSD token with the correct dependencies");
+
+    const zusdToken = ((await hre.ethers.getContractAt(
+      "ZUSDTokenTestnet",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as ZUSDToken;
+    //call initialize on the new zusdToken by calling proxy
+    await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+
+    const oldZUSDAddress = await zusdTokenProxy.getImplementation();
+    console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
+
+    const newZUSDAddress = await zusdTokenProxy.getImplementation();
+    console.log("Implementation address changed to " + newZUSDAddress);
+  });
+
+task("getDeployedContractsOwners", "Prints the deployed contracts owner address")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }, hre) => {
+    const liveNets = ["mainnet", "rsksovrynmainnet", "rskmainnet", "testnet", "rsktestnet", "rsksovryntestnet"];
+    if (liveNets.indexOf(hre.network.name) === -1)
+    {
+      console.log("===========================================================");
+      console.log("ALERT! Make sure the script is running on a proper network!");
+      console.log("===========================================================");
+    }
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const obj = Object.entries(deployment.addresses);
+    for await (const item of obj) {
+      try {
+          const owned = (await hre.ethers.getContractAt("Ownable", item[1]) as unknown) as Ownable;
+          console.log(`${await owned.getOwner()} is owner of ${item[0]} (${item[1]})`);
+      } catch(e) {
+        console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
+      }
+    }
+  });
+
+task("getCurrentZUSDImplementation", "Logs to console current ZUSD implementation address")
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+
+    const [deployer] = await hre.ethers.getSigners();
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const { zusdToken: zusdTokenAddress, zeroToken: zeroTokenAddress } = deployment.addresses;
+
+    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+      "UpgradableProxy",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as UpgradableProxy;
+
+    const zusdImplementationAddress = await zusdTokenProxy.getImplementation();
+    console.log("Current implelentation address is: " + zusdImplementationAddress);
+
+    const zusdToken = ((await hre.ethers.getContractAt(
+      "ZUSDToken",
+      zusdTokenAddress,
+      deployer
+    )) as unknown) as ZUSDToken;
+
+    const zeroToken = ((await hre.ethers.getContractAt(
+      "ZEROToken",
+      zeroTokenAddress,
+      deployer
+    )) as unknown) as ZEROToken;
+
+    const address = await zusdToken.address;
+    console.log("Address ZUSD: " + address);
+    /*await zeroToken.mint("0x0", 100);
+    await zeroToken.mint(deployer.address, 100);
+    console.log("Try mint ZERO");*/
+  });
 
 export default config;

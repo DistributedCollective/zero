@@ -35,8 +35,8 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         address _marketMakerAddress,
         address _presaleAddress
     ) public initializer {
-        checkContract(_marketMakerAddress);
-        checkContract(_presaleAddress);
+        // checkContract(_marketMakerAddress);
+        // checkContract(_presaleAddress);
 
         deploymentStartTime = block.timestamp;
 
@@ -209,6 +209,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
         address recipient,
         uint256 amount
     ) internal {
+        return; // disable the func call - ZEROToken is not used in beta
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(presale.isClosed(), "Presale is not over yet");
@@ -220,6 +221,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     }
 
     function _mint(address account, uint256 amount) internal {
+        return; // disable the func call - ZEROToken is not used in beta
         require(account != address(0), "ERC20: mint to the zero address");
 
         _totalSupply = _totalSupply.add(amount);
@@ -228,6 +230,7 @@ contract ZEROToken is ZEROTokenStorage, CheckContract, IZEROToken {
     }
 
     function _burn(address account, uint256 amount) internal {
+        return; // disable the func call - ZEROToken is not used in beta
         require(account != address(0), "ERC20: mint to the zero address");
         require(amount <= _balances[account], "balance too low");
 

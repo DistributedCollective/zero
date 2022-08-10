@@ -14,8 +14,6 @@ export class _CachedReadableLiquity<T extends unknown[]> implements _ReadableLiq
     // (undocumented)
     getFrontendStatus(address?: string, ...extraParams: T): Promise<FrontendStatus>;
     // (undocumented)
-    getNUEBalance(address?: string, ...extraParams: T): Promise<Decimal>;
-    // (undocumented)
     getNumberOfTroves(...extraParams: T): Promise<number>;
     // (undocumented)
     getPrice(...extraParams: T): Promise<Decimal>;
@@ -332,8 +330,6 @@ export type _NoZUSDRepayment = Partial<_ZUSDRepayment<undefined>>;
 // @alpha (undocumented)
 export interface ObservableLiquity {
     // (undocumented)
-    watchNUEBalance(onNUEBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
-    // (undocumented)
     watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
     // (undocumented)
     watchPrice(onPriceChanged: (price: Decimal) => void): () => void;
@@ -430,7 +426,6 @@ export interface ReadableLiquity {
     getCollateralSurplusBalance(address?: string): Promise<Decimal>;
     getFees(): Promise<Fees>;
     getFrontendStatus(address?: string): Promise<FrontendStatus>;
-    getNUEBalance(address?: string): Promise<Decimal>;
     getNumberOfTroves(): Promise<number>;
     getPrice(): Promise<Decimal>;
     getRemainingStabilityPoolZEROReward(): Promise<Decimal>;

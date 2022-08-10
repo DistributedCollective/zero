@@ -1,16 +1,33 @@
 import { useMemo } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
-import { Box, Heading, Image, Paragraph, Button, Input, Spinner } from "theme-ui";
+import {
+  Box,
+  Heading,
+  Image,
+  Paragraph,
+  Button,
+  Input,
+  Spinner,
+  Link,
+  Checkbox,
+  Label
+} from "theme-ui";
 import { WaitlistSuccess } from "../components/WaitListSuccess";
+import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
+import { useLocation } from "react-router-dom";
+import { isMainnet } from "../utils";
 
-export const WaitListSignup: React.FC = () => {
+export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [sovrynMail, setSovrylMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [email, setEmail] = useState("");
+
+  const location = useLocation();
 
   const isValidEmail = useMemo(() => validateEmail(email), [email]);
 
@@ -31,13 +48,16 @@ export const WaitListSignup: React.FC = () => {
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      const params = new URLSearchParams(location.search);
+
+      const ref = params.get("r") || "";
       resetStatus();
       if (!isValidEmail) {
         return;
       }
       try {
         setIsLoading(true);
-        await registerEmail(email);
+        await registerEmail(email, ref, sovrynMail);
 
         setEmail("");
         setErrorMessage("");
@@ -52,7 +72,7 @@ export const WaitListSignup: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [email, isValidEmail, resetStatus]
+    [email, isValidEmail, location.search, resetStatus, sovrynMail]
   );
 
   return (
@@ -64,7 +84,7 @@ export const WaitListSignup: React.FC = () => {
         alignItems: "center",
         color: "white",
         height: "100%",
-        width: "384px",
+        width: "445px",
         maxWidth: "100vw",
         px: 2,
         margin: "auto",
@@ -75,19 +95,45 @@ export const WaitListSignup: React.FC = () => {
         sx={{
           mb: 60
         }}
-        src="/zero-logo.svg"
+        src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
+      <Link href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
+        <Image
+          sx={{
+            position: "absolute",
+            top: [20, 54],
+            left: [20, 54]
+          }}
+          src={process.env.PUBLIC_URL + "/images/sovryn.svg"}
+        />
+      </Link>
       <Heading
         sx={{
-          mb: 60,
           fontSize: 36,
           fontWeight: 300
         }}
       >
         Join the Zero waitlist
       </Heading>
-      <Paragraph sx={{ fontSize: 2, mb: 40 }}>
-        Sign up and get notified when it's your turn to access the Zero private beta.
+      <Paragraph sx={{ fontSize: 3, mt: 16, mb: 24 }}>
+        Get a 0% interest loan, backed by bitcoin.{" "}
+        <Link
+          sx={{
+            fontSize: 3,
+            color: "primary",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: "medium"
+          }}
+          target="_blank"
+          href="https://www.sovryn.app/blog/join-the-waitlist-for-zero"
+        >
+          Learn more.
+        </Link>
+      </Paragraph>
+      <Paragraph sx={{ fontSize: 3, mb: 28 }}>
+        Sign up and get notified when it’s <br />
+        your turn to get early access to Zero.
       </Paragraph>
       <Box sx={{ position: "relative", mb: 70 }}>
         <form onSubmit={onSubmit}>
@@ -98,23 +144,39 @@ export const WaitListSignup: React.FC = () => {
               color: "cardBackground",
               borderColor: "#ededed",
               bg: "#C4C4C4",
-              width: 285
+              width: 285,
+              mb: 20
             }}
-            placeholder="satoshin@gmx.com"
+            placeholder="satoshi@sovryn.app"
             variant="primary"
             value={email}
             onChange={handleEmailChange}
           />
+          <Label
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              userSelect: "none",
+              fontSize: 1,
+              mb: 1
+            }}
+          >
+            <Checkbox
+              className="checkbox"
+              checked={sovrynMail}
+              onChange={e => setSovrylMail(e.target.checked)}
+            />
+            Add me to the general Sovryn mailing list
+          </Label>
           <Button
             sx={{
               width: 285,
               height: "40px",
-              mt: 20,
-              bg: "primary",
-              color: "cardBackground",
               display: "flex",
               alignItems: "center"
             }}
+            variant="secondary"
             disabled={!isValidEmail || isLoading}
           >
             Sign Up
@@ -150,8 +212,7 @@ export const WaitListSignup: React.FC = () => {
           justifyContent: "center",
           alignItems: "center",
           width: "377px",
-          maxWidth: "100%",
-          opacity: "50%"
+          maxWidth: "100%"
         }}
       >
         <Paragraph
@@ -164,20 +225,13 @@ export const WaitListSignup: React.FC = () => {
             width: "280px"
           }}
         >
-          Or connect wallet if you have been invited to the Zero private beta.
+          Or connect wallet if you have been invited to get early access to Zero
         </Paragraph>
-        <Button
-          sx={{
-            width: "174px",
-            height: "40px",
-            p: 0
-          }}
-          disabled
-        >
-          Connect Wallet
-        </Button>
+        {children}
       </Box>
-      <WaitlistSuccess isOpen={success} onClose={() => setSuccess(false)} />
+      <Dialog hideCloseIcon open={success} onClose={() => setSuccess(false)}>
+        <WaitlistSuccess onClose={() => setSuccess(false)} />
+      </Dialog>
     </Box>
   );
 };

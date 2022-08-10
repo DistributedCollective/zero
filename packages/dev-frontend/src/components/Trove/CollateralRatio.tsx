@@ -1,9 +1,7 @@
 import React from "react";
-import { Flex, Box, Card } from "theme-ui";
+import { Flex, Card } from "theme-ui";
 
 import { CRITICAL_COLLATERAL_RATIO, Decimal, Difference, Percent } from "@sovryn-zero/lib-base";
-
-import { Icon } from "../Icon";
 
 import { StaticRow } from "./Editor";
 import { InfoIcon } from "../InfoIcon";
@@ -20,10 +18,6 @@ export const CollateralRatio: React.FC<CollateralRatioProps> = ({ value, change 
   return (
     <>
       <Flex>
-        <Box sx={{ mt: [2, 0], ml: 3, mr: -2, fontSize: "24px" }}>
-          <Icon name="heartbeat" />
-        </Box>
-
         <StaticRow
           label="Collateral ratio"
           inputId="trove-collateral-ratio"

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Flex, Spinner } from "theme-ui";
 
-import { Dialog } from "./Dialog";
+import { Dialog } from "./StatusDialog";
 
 type WaitingDialogProps = {
   title: string;
