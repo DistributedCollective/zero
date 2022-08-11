@@ -138,6 +138,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
           height: "40px",
           p: 0
         }}
+        data-action-id="zero-landing-connectWallet"
       >
         {!walletAddress ? (
           "Connect Wallet"

@@ -178,6 +178,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
             }}
             variant="secondary"
             disabled={!isValidEmail || isLoading}
+            data-action-id="zero-landing-signUp"
           >
             Sign Up
             {isLoading && <Spinner sx={{ ml: 1 }} color={"cardBackground"} size={24} />}
@@ -232,6 +233,24 @@ export const WaitListSignup: React.FC = ({ children }) => {
       <Dialog hideCloseIcon open={success} onClose={() => setSuccess(false)}>
         <WaitlistSuccess onClose={() => setSuccess(false)} />
       </Dialog>
+
+      <Link
+        sx={{
+          fontSize: 3,
+          color: "primary",
+          cursor: "pointer",
+          fontWeight: "medium",
+          ":hover": {
+            textDecoration: "underline"
+          }
+        }}
+        href="https://tools.google.com/dlpage/gaoptout"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-action-id="footer-analytics-optout"
+      >
+        Opt-out from Google Analytics
+      </Link>
     </Box>
   );
 };
