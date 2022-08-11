@@ -2,9 +2,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Block, BlockTag } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 
-import devOrNull from "../deployments/dev.json";
 import rsktestnet from "../deployments/rsktestnet.json";
-import rskdev from "../deployments/rskdev.json";
 import rskMainnet from "../deployments/rsksovrynmainnet.json";
 
 import { EthersProvider, EthersSigner } from "./types";
@@ -18,14 +16,9 @@ import {
 
 import { _connectToMulticall, _Multicall } from "./_Multicall";
 
-const dev = devOrNull as _LiquityDeploymentJSON | null;
-
 const deployments = {
   [rsktestnet.chainId]: rsktestnet,
   [rskMainnet.chainId]: rskMainnet,
-  ...(rskdev ? { [rskdev.chainId]: rskdev } : {}),
-
-  ...(dev !== null ? { [dev.chainId]: dev } : {})
 };
 
 declare const brand: unique symbol;
