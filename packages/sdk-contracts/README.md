@@ -1,40 +1,21 @@
-# SOVRYN SOLIDITY SDK
+# @sovryn-zero/sdk-contracts
+  SDK contract (Library) consisting of utilities for the Sovryn Zero Protocol
 
-## PROJECT DESCRIPTION
-  SDK consisting of utilities for the Sovryn Protocol
-## CONTRACTS ARCHITECTURE
-  All contracts are in the form of libraries, each one containing set of functionalities related to one product of the Sovryn ecosystem.
+## Quickstart
+  Installation:
 
-## STATE-MACHINE/INTERACTION/FLOW DIAGRAMS (where applicable)
+  ```shell 
+  npm install --save @sovryn-zero/sdk-contracts
+  ```
 
-## DEVELOPMENT INFORMATION
+  An alternative to npm is to use the GitHub Repository ( `DistributedCollective/zero` ) to retrieve the library. When doing this, make sure to specify the tag for a release such as `v1.0.0`, instead of using the `main` branch.
 
-### **Setup**
-<!-- How to setup and initialize the project's data from the repo using npm -->
+## Overview
+  All contracts are in the form of libraries, each one containing set of functionalities related to utilities of the Sovryn Zero ecosystem.
 
-```shell
-  yarn
-```
+  The library cover several major utilities such as:
 
-### **Test**
-<!-- How to run all the tests, e.g. local, testnet, forked mainnet; as well as solidity contracts coverage reportn - use package.json scripts and hardhat tasks for that -->
-
-```shell
-  npx hardhat test
-```
-
-#### __**Test with gas report**__
-
-```shell
-  REPORT_GAS=true npx hardhat test
-```
-
-#### __**Performance optimization**__
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
-
-### **Deployment**
-<!-- How to deploy and initialize the project's contracts (use hardhat_deploy plugin) and offchain data as needed (.env secrets etc.) -->
-
-### **Hardhat Tasks**
-<!-- How to setup and initialize the project's data - use hardhat_deploy plugin -->
+  1. **BorrowerLib.sol** - Borrower operations (Opening, Adjusting line of credit)
+  2. **LiquidationLib.sol** - Liquidation & Redemption operations.
+  3. **StabilityPoolLib.sol** - Pool Stability operations.
+  4. **TroveStatiscticsLib.sol** - View function related to the troves (get nominal collateral ratio, borrowing fee calculation, get borrower's debt of the troves).
