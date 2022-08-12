@@ -106,8 +106,8 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
 
       <Statistic
-        name="TVL"
-        tooltip="The Total Value Locked (TVL) is the total value of RBTC locked as collateral in the system, given in RBTC and USD."
+        name="RBTC in Lines of Credit"
+        tooltip="The total amount of RBTC locked as collateral in the protocol, given in RBTC and USD value."
       >
         {total.collateral.shorten()} <Text sx={{ fontSize: 1 }}>&nbsp;RBTC</Text>
         <Text sx={{ fontSize: 1 }}>
