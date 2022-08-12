@@ -242,7 +242,10 @@ export const WaitListSignup: React.FC = ({ children }) => {
           fontWeight: "medium",
           ":hover": {
             textDecoration: "underline"
-          }
+          },
+          position: "absolute",
+          bottom: 4,
+          left: 4
         }}
         href="https://tools.google.com/dlpage/gaoptout"
         target="_blank"
