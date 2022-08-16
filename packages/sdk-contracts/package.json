@@ -1,10 +1,10 @@
 {
   "name": "@sovryn-zero/sdk-contracts",
-  "version": "0.0.1",
-  "description": "Sovryn ZERO solidity contracts SDK",
-  "private": "true",
+  "version": "0.0.0-semantic-release",
+  "description": "Sovryn ZERO SDK solidity contracts",
+  "private": "false",
   "files": [
-    "contracts"
+    "contracts/**/*.sol", "docs/*.*"
   ],
   "directories": {
     "test": "test"

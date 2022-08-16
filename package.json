@@ -62,6 +62,7 @@
     "release:delete-dev-deployments": "yarn workspace @sovryn-zero/lib-ethers delete-dev-deployments",
     "release:lib-base": "yarn workspace @sovryn-zero/lib-base semantic-release",
     "release:lib-ethers": "yarn workspace @sovryn-zero/lib-ethers semantic-release",
+    "release:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts semantic-release",
     "save-live-version": "yarn workspace @sovryn-zero/lib-ethers save-live-version",
     "set-masset": "yarn workspace @sovryn-zero/lib-ethers hardhat setMassetAddress",
     "start-dev-chain": "run-s start-dev-chain:*",

@@ -5,10 +5,15 @@
   Installation:
 
   ```shell 
-  npm install --save @sovryn-zero/sdk-contracts
+  npm install @sovryn-zero/contracts @sovryn-zero/sdk-contracts
   ```
+=======
+## PROJECT DESCRIPTION
+  Sovryn ZERO Solidity Contracts SDK is a set of solidity libraries that users can import and use in their contracts.
+>>>>>>> Stashed changes
 
-  An alternative to npm is to use the GitHub Repository ( `DistributedCollective/zero` ) to retrieve the library. When doing this, make sure to specify the tag for a release such as `v1.0.0`, instead of using the `main` branch.
+### **Test**
+<!-- How to run all the tests, e.g. local, testnet, forked mainnet; as well as solidity contracts coverage reportn - use package.json scripts and hardhat tasks for that -->
 
 ## Overview
   All contracts are in the form of libraries, each one containing set of functionalities related to utilities of the Sovryn Zero ecosystem.
