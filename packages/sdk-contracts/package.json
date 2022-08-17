@@ -1,10 +1,10 @@
 {
   "name": "@sovryn-zero/sdk-contracts",
-  "version": "0.0.0-semantic-release",
+  "version": "1.0.0-early.access",
   "description": "Sovryn ZERO SDK solidity contracts",
-  "private": "false",
   "files": [
-    "contracts/**/*.sol", "docs/*.*"
+    "contracts/**/*.sol",
+    "docs/*.*"
   ],
   "directories": {
     "test": "test"
@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/DistributedCollective/zero"
   },
-  "homepage": "https://github.com/DistributedCollective/solidity-hardhat-boilerplate#readme",
+  "homepage": "https://github.com/DistributedCollective/zero#readme",
   "nohoist": [
     "**/web3-eth-abi/@ethersproject/abi",
     "**/@graphprotocol/*",
