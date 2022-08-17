@@ -52,6 +52,7 @@
     "fuzzer": "yarn workspace @sovryn-zero/fuzzer fuzzer",
     "prepare": "run-s prepare:*",
     "prepare:contracts": "yarn workspace @sovryn-zero/contracts prepare",
+    "prepare:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts prepare",
     "prepare:lib-base": "yarn workspace @sovryn-zero/lib-base prepare",
     "prepare:lib-ethers": "yarn workspace @sovryn-zero/lib-ethers prepare",
     "prepare:lib-react": "yarn workspace @sovryn-zero/lib-react prepare",

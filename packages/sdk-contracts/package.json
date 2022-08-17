@@ -48,6 +48,7 @@
     "@typechain/*"
   ],
   "scripts": {
+    "prepare": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
     "test": "hardhat test",
     "doc": "yarn hardhat docgen",
     "lint": "yarn lint-sol && yarn lint-js",
