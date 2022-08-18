@@ -21,6 +21,8 @@
   2. **[LiquidationLib.sol](docs/LiquidationLib.md)** - Liquidation & Redemption operations.
   3. **[StabilityPoolLib.sol](docs/StabilityPoolLib.md)** - Pool Stability operations.
   4. **[TroveStatiscticsLib.sol](docs/TroveStatisticsLib.md)** - View function related to the troves (get nominal collateral ratio, borrowing fee calculation, get borrower's debt of the troves).
+   
+  **[ZERO Contracts Addresses](docs/Addresses.md)**
 
 ## Demo
   **[TestIntegration.sol](docs/IntegrationExample.md)** provides a sample integration
