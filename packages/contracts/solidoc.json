@@ -1,0 +1,24 @@
+{
+    "pathToRoot": "./",
+    "outputPath": "docs",
+    "buildFolder": "build/contracts",
+    "noCompilation": true,
+    "compiler": "truffle compile",
+    "language": "en",
+    "ignoreFiles": [
+        "**/*test*.json",
+        "**/*[T|t]est*.json",
+        "**/*[M|m]ock*.json",
+        "**/*ZERO*.json",
+        "**/*Community*.json",
+        "**/*Echidna*.json",
+        "**/Destructible.json",
+        "**/ZUSDTokenCaller.json",
+        "**/NonPayable.json",
+        "**/FunctionCaller.json"
+    ],
+    "contractsListBeginKeyword": "## Contracts",
+    "replaceContractsListBeginKeyword": "### Contracts",
+    "freshOutput": true,
+    "readMe": "README.md"
+}
