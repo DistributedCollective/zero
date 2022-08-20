@@ -1,0 +1,21 @@
+{
+  "name": "@sovryn-zero/contracts",
+  "version": "1.0.0-early.access",
+  "description": "Sovryn ZERO solidity contracts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DistributedCollective/zero.git"
+  },
+  "keywords": [
+    "sovryn",
+    "zero",
+    "solidity contracts",
+    "zero contracts"
+  ],
+  "author": "Sovryn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DistributedCollective/zero"
+  },
+  "homepage": "https://github.com/DistributedCollective/zero#readme"
+}
