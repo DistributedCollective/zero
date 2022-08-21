@@ -49,7 +49,6 @@
   ],
   "scripts": {
     "prepare:dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
-    "prepare:doc": "yarn hardhat dodoc",
     "test": "hardhat test",
     "lint": "yarn lint-sol && yarn lint-js",
     "lint-sol": "solhint contracts/{*,**/*,**/**/*,**/**/**/*,**/**/**/**/*}.sol",
