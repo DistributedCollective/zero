@@ -2,7 +2,7 @@
   ZERO solidity contracts
 
 ## **Quickstart**
-___  
+
 ### Installation:
 
   ```shell 
@@ -10,13 +10,13 @@ ___
   ```
 
 ## **Project Description**  
-___
+
   Sovryn ZERO Solidity Contracts is a full set of ZERO solidity contracts.
   For interaction and integration with ZERO it is recommended to use @sovryn-zero/sdk-contracts package.  
    
 
 ## **Docs**  
-___  
+
 [comment]: #solidoc (Start)
 ### Contracts
 
