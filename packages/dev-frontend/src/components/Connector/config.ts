@@ -42,7 +42,7 @@ const i18n = {
 };
 export const onboard = Onboard(({
   appMetadata: {
-    name: "ZERO",
+    name: "Zero",
     icon: process.env.PUBLIC_URL + "/images/zerologo.svg",
     logo: process.env.PUBLIC_URL + "/images/zerologo.svg",
     description: "0% interest loans backed by bitcoin | Sovryn",
