@@ -5,6 +5,8 @@ import useContract from "./useContract";
 import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
 import { Contract } from "@ethersproject/contracts";
 import ERC20_ABI from "../contracts/ERC20.json";
+import { Decimal } from "@sovryn-zero/lib-base";
+import { parseBalance } from "src/utils";
 
 function getTokenBalance(contract: Contract) {
   return async (_: string, address: string) => {
@@ -38,5 +40,9 @@ export default function useTokenBalance(address: string, tokenAddress: string, s
 
   useKeepSWRDataLiveAsBlocksArrive(result.mutate);
 
-  return { ...result, decimals };
+  return {
+    ...result,
+    balance: Decimal.from(parseBalance(result.data ?? 0, decimals, decimals)),
+    decimals
+  };
 }
