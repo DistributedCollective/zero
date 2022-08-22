@@ -8,7 +8,7 @@
     "DeFi",
     "RSK"
   ],
-  "homepage": "https://github.com/DistributedCollective/zero/blob/main/README.md",
+  "homepage": "https://github.com/DistributedCollective/zero#readme",
   "license": "MIT",
   "author": "Sovryn",
   "main": "dist/index.js",
