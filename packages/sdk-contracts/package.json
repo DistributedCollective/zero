@@ -48,9 +48,10 @@
     "@typechain/*"
   ],
   "scripts": {
+    "pack": "yarn --cwd ./dist pack --filename './pack-contracts.tgz'",
+    "publish": "yarn --cwd ./dist publish",
     "prepare": "echo stub: run-s prepare:*",
     "dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
-    "prepublishOnly": "yarn hardhat compile && yarn dist",
     "prepack": "yarn hardhat compile && yarn dist",
     "test": "hardhat test",
     "lint": "yarn lint-sol && yarn lint-js",

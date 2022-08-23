@@ -7,20 +7,17 @@
     "test": "test"
   },
   "scripts": {
+    "pack": "yarn --cwd ./dist pack --filename './pack-contracts.tgz'",
+    "publish": "yarn --cwd ./dist publish",
     "hardhat": "hardhat",
     "docgen": "truffle compile && solidoc2 ./ ./docs",
     "prepare": "run-s prepare:*",
     "prepack": "run-s prepack:*",
-    "publish": "yarn --cwd ./dist publish",
-    "prepublishOnly": "run-s prepublishOnly:*",
     "prepare-dist": "rm -rf ./dist && mkdir -p dist/contracts && rsync -a -m --exclude 'ZERO' --exclude 'TestContracts' --exclude '*/*ZERO*.sol' --exclude '*/*Community*' --include '*/' --include '*.sol' --exclude '*' 'contracts/' 'dist/contracts' && cp -R README.md LICENSE docs ./dist && cp ./package.dist.json ./dist/package.json",
     "prepare:compile": "hardhat compile",
     "prepare:set-version": "node scripts/set-version.js",
-    "prepublishOnly:docgen": "yarn docgen",
-    "prepublishOnly:prepare-dist": "yarn prepare-dist",
     "prepack:docgen": "yarn docgen",
     "prepack:prepare-dist": "yarn prepare-dist",
-    "build:pack": "yarn --cwd ./dist pack --filename './pack-contracts.tgz'",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "coveralls": "cat coverage/lcov.info | coveralls"
