@@ -16,7 +16,9 @@ export const NoDeposit: React.FC = props => {
       <Flex sx={{ justifyContent: "flex-start", flex: 1, alignItems: "center" }}>
         <Yield />
       </Flex>
-      <Button onClick={handleOpenTrove}>Deposit</Button>
+      <Button onClick={handleOpenTrove} data-action-id="zero-dashboard-depositStability">
+        Deposit
+      </Button>
     </Flex>
   );
 };

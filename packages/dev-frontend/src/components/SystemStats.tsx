@@ -106,8 +106,8 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Statistic>
 
       <Statistic
-        name="TVL"
-        tooltip="The Total Value Locked (TVL) is the total value of RBTC locked as collateral in the system, given in RBTC and USD."
+        name="RBTC in Lines of Credit"
+        tooltip="The total amount of RBTC locked as collateral in the protocol, given in RBTC and USD value."
       >
         {total.collateral.shorten()} <Text sx={{ fontSize: 1 }}>&nbsp;RBTC</Text>
         <Text sx={{ fontSize: 1 }}>
@@ -121,7 +121,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
         {Decimal.from(numberOfTroves).prettify(0)}
       </Statistic>
       <Statistic name="ZUSD supply" tooltip="The total ZUSD minted by the Zero Protocol.">
-        {total.debt.shorten()}
+        {total.debt.prettify()}
       </Statistic>
       {zusdInStabilityPoolPct && (
         <Statistic
@@ -129,7 +129,7 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
           tooltip="The total ZUSD currently held in the Stability Pool, expressed as an amount and a fraction of the ZUSD supply.
         "
         >
-          {zusdInStabilityPool.shorten()}
+          {zusdInStabilityPool.prettify()}
           <Text sx={{ fontSize: 1 }}>&nbsp;({zusdInStabilityPoolPct.toString(1)})</Text>
         </Statistic>
       )}

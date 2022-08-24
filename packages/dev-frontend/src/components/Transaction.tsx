@@ -13,8 +13,7 @@ import { useLiquity } from "../hooks/LiquityContext";
 
 import { Tooltip, TooltipProps, Hoverable } from "./Tooltip";
 import { Dialog } from "./Dialog";
-import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
+import { useConnectorContext } from "./Connector";
 
 type TransactionIdle = {
   type: "idle";
@@ -399,7 +398,7 @@ export const RetryTransaction: React.FC<RetryTransactionProps> = ({ id, send }) 
 export const TransactionMonitor: React.FC = () => {
   const { provider } = useLiquity();
   const [transactionState, setTransactionState] = useTransactionState();
-  const { chainId } = useWeb3React<Web3Provider>();
+  const { chainId } = useConnectorContext();
   const [open, setOpen] = useState(false);
 
   const id = transactionState.type !== "idle" ? transactionState.id : undefined;

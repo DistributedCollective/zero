@@ -18,7 +18,7 @@ import { Dialog } from "../components/Dialog";
 import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
-import { isMainnet } from "../utils";
+import { sovrynLink } from "src/contracts/config";
 
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -97,7 +97,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
-      <Link href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
+      <Link href={sovrynLink}>
         <Image
           sx={{
             position: "absolute",
@@ -178,6 +178,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
             }}
             variant="secondary"
             disabled={!isValidEmail || isLoading}
+            data-action-id="zero-landing-signUp"
           >
             Sign Up
             {isLoading && <Spinner sx={{ ml: 1 }} color={"cardBackground"} size={24} />}
@@ -232,6 +233,27 @@ export const WaitListSignup: React.FC = ({ children }) => {
       <Dialog hideCloseIcon open={success} onClose={() => setSuccess(false)}>
         <WaitlistSuccess onClose={() => setSuccess(false)} />
       </Dialog>
+
+      <Link
+        sx={{
+          fontSize: 3,
+          color: "primary",
+          cursor: "pointer",
+          fontWeight: "medium",
+          ":hover": {
+            textDecoration: "underline"
+          },
+          position: "absolute",
+          bottom: 4,
+          left: 4
+        }}
+        href="https://tools.google.com/dlpage/gaoptout"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-action-id="footer-analytics-optout"
+      >
+        Opt-out from Google Analytics
+      </Link>
     </Box>
   );
 };

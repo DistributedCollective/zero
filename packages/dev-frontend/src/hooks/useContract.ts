@@ -1,25 +1,25 @@
 import { Contract } from "@ethersproject/contracts";
-import { useWeb3React } from "@web3-react/core";
 import { useMemo } from "react";
+import { useConnectorContext } from "src/components/Connector";
 import { AbiItem } from "web3-utils";
 
 export default function useContract<T extends Contract = Contract>(
   address: string,
   ABI: AbiItem | AbiItem[] | any
 ): T | null {
-  const { library, account, chainId } = useWeb3React();
+  const { provider, walletAddress, chainId } = useConnectorContext();
 
   return useMemo(() => {
-    if (!address || !ABI || !library || !chainId) {
+    if (!address || !ABI || !provider || !chainId) {
       return null;
     }
 
     try {
-      return new Contract(address, ABI, library?.getSigner(account));
+      return new Contract(address, ABI, provider?.getSigner(walletAddress || undefined));
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Failed To Get Contract", error);
       return null;
     }
-  }, [address, ABI, library, chainId, account]) as T;
+  }, [address, ABI, provider, chainId, walletAddress]) as T;
 }

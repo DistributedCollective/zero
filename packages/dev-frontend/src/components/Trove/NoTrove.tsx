@@ -12,7 +12,9 @@ export const NoTrove: React.FC = props => {
   return (
     <Flex sx={{ px: 20 }} variant="layout.actions">
       <Text sx={{ fontStyle: "italic" }}>You haven't borrowed any ZUSD yet. </Text>
-      <Button onClick={handleOpenTrove}>Open Line of Credit</Button>
+      <Button data-action-id="zero-dashboard-openLOC" onClick={handleOpenTrove}>
+        Open Line of Credit
+      </Button>
     </Flex>
   );
 };

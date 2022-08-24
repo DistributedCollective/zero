@@ -77,7 +77,7 @@ export const StakingEditor: React.FC<StakingEditorProps> = ({
           maxedOut={maxedOut}
           unit={GT}
           {...{ editingState }}
-          editedAmount={editedZERO.toString(2)}
+          editedAmount={editedZERO.toString(18)}
           setEditedAmount={newValue => dispatch({ type: "setStake", newValue })}
         />
 

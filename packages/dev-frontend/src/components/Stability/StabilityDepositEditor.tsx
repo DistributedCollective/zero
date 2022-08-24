@@ -99,7 +99,7 @@ export const StabilityDepositEditor: React.FC<StabilityDepositEditorProps> = ({
             maxedOut={maxedOut}
             unit={COIN}
             {...{ editingState }}
-            editedAmount={editedZUSD.toString(2)}
+            editedAmount={editedZUSD.toString(18)}
             setEditedAmount={newValue => dispatch({ type: "setDeposit", newValue })}
           />
 

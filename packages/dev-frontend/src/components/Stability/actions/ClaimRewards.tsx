@@ -6,9 +6,10 @@ import { useTransactionFunction } from "../../Transaction";
 
 type ClaimRewardsProps = {
   disabled?: boolean;
+  actionId: string;
 };
 
-export const ClaimRewards: React.FC<ClaimRewardsProps> = ({ disabled, children }) => {
+export const ClaimRewards: React.FC<ClaimRewardsProps> = ({ disabled, children, actionId }) => {
   const { liquity } = useLiquity();
 
   const [sendTransaction] = useTransactionFunction(
@@ -17,7 +18,7 @@ export const ClaimRewards: React.FC<ClaimRewardsProps> = ({ disabled, children }
   );
 
   return (
-    <Button variant="cancel" onClick={sendTransaction} disabled={disabled}>
+    <Button data-action-id={actionId} variant="cancel" onClick={sendTransaction} disabled={disabled}>
       {children}
     </Button>
   );

@@ -129,7 +129,7 @@ export const StakingManager: React.FC = () => {
         undefined,
         <ErrorDescription>
           The amount you're trying to stake exceeds your balance by{" "}
-          <Amount>
+          <Amount value={change.stakeZERO.sub(zeroBalance)}>
             {change.stakeZERO.sub(zeroBalance).prettify()} {GT}
           </Amount>
           .

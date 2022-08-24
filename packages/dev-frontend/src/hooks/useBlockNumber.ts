@@ -1,5 +1,5 @@
 import type { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
+import { useConnectorContext } from "src/components/Connector";
 import useSWR from "swr";
 
 function getBlockNumber(library: Web3Provider) {
@@ -9,10 +9,10 @@ function getBlockNumber(library: Web3Provider) {
 }
 
 export default function useBlockNumber() {
-  const { library } = useWeb3React<Web3Provider>();
-  const shouldFetch = !!library;
+  const { provider } = useConnectorContext();
+  const shouldFetch = !!provider;
 
-  return useSWR(shouldFetch ? ["BlockNumber"] : null, getBlockNumber(library as Web3Provider), {
+  return useSWR(shouldFetch ? ["BlockNumber"] : null, getBlockNumber(provider as Web3Provider), {
     refreshInterval: 10 * 1000
   });
 }
