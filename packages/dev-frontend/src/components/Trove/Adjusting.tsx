@@ -263,7 +263,7 @@ export const Adjusting: React.FC = () => {
         )}
       </Box>
       <Flex variant="layout.cta">
-        <Button variant="cancel" onClick={handleCancelPressed}>
+        <Button data-action-id="zero-LOC-cancel" variant="cancel" onClick={handleCancelPressed}>
           Cancel
         </Button>
 
@@ -273,11 +273,14 @@ export const Adjusting: React.FC = () => {
             change={troveChange}
             useNueToken={useNueToken}
             maxBorrowingRate={maxBorrowingRate}
+            data-action-id="zero-LOC-confirm"
           >
             Confirm
           </TroveAction>
         ) : (
-          <Button disabled>Confirm</Button>
+          <Button data-action-id="zero-LOC-confirm" disabled>
+            Confirm
+          </Button>
         )}
       </Flex>
       {isTransactionPending && <LoadingOverlay />}

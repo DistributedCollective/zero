@@ -117,6 +117,7 @@ export const Convert: React.FC = () => {
               ml: 2,
               alignSelf: "self-start"
             }}
+            data-action-id="zero-convert-ZUSD"
           >
             Convert
           </Button>
@@ -153,6 +154,7 @@ export const Convert: React.FC = () => {
               ml: 2,
               alignSelf: "self-start"
             }}
+            data-action-id="zero-convert-XUSD"
           >
             Convert
           </Button>

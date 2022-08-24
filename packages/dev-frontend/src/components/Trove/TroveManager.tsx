@@ -238,7 +238,7 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
         ))}
 
       <Flex variant="layout.cta">
-        <Button variant="cancel" onClick={handleCancel}>
+        <Button data-action-id="zero-LOC-cancel" variant="cancel" onClick={handleCancel}>
           Cancel
         </Button>
 
@@ -248,11 +248,14 @@ export const TroveManager: React.FC<TroveManagerProps> = ({ collateral, debt }) 
             change={validChange}
             useNueToken={useNueToken}
             maxBorrowingRate={maxBorrowingRate}
+            data-action-id="zero-LOC-confirm"
           >
             Confirm
           </TroveAction>
         ) : (
-          <Button disabled>Confirm</Button>
+          <Button data-action-id="zero-LOC-confirm" disabled>
+            Confirm
+          </Button>
         )}
       </Flex>
     </TroveEditor>

@@ -8,6 +8,7 @@ import { useTransactionFunction } from "../Transaction";
 type StabilityDepositActionProps = {
   transactionId: string;
   change: StabilityDepositChange<Decimal>;
+  actionId: string;
 };
 
 const selectFrontendRegistered = ({ frontend }: LiquityStoreState) =>
@@ -16,7 +17,8 @@ const selectFrontendRegistered = ({ frontend }: LiquityStoreState) =>
 export const StabilityDepositAction: React.FC<StabilityDepositActionProps> = ({
   children,
   transactionId,
-  change
+  change,
+  actionId
 }) => {
   const { config, liquity } = useLiquity();
   const frontendRegistered = useLiquitySelector(selectFrontendRegistered);
@@ -30,5 +32,9 @@ export const StabilityDepositAction: React.FC<StabilityDepositActionProps> = ({
       : liquity.send.withdrawZUSDFromStabilityPool.bind(liquity.send, change.withdrawZUSD)
   );
 
-  return <Button onClick={sendTransaction}>{children}</Button>;
+  return (
+    <Button data-action-id={actionId} onClick={sendTransaction}>
+      {children}
+    </Button>
+  );
 };

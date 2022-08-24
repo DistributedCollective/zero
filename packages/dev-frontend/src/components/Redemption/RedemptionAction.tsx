@@ -28,7 +28,7 @@ export const RedemptionAction: React.FC<RedemptionActionProps> = ({
   );
 
   return (
-    <Button disabled={disabled} onClick={sendTransaction}>
+    <Button data-action-id="zero-redeem-confirm" disabled={disabled} onClick={sendTransaction}>
       Confirm
     </Button>
   );

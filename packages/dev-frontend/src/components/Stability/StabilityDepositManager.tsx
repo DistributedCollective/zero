@@ -130,16 +130,26 @@ export const StabilityDepositManager: React.FC = () => {
       makingNewDeposit={makingNewDeposit}
     >
       <Flex variant="layout.cta">
-        <Button variant="cancel" onClick={handleCancel}>
+        <Button
+          data-action-id="zero-stabilityPool-deposit-cancel"
+          variant="cancel"
+          onClick={handleCancel}
+        >
           Cancel
         </Button>
 
         {validChange ? (
-          <StabilityDepositAction transactionId={transactionId} change={validChange}>
+          <StabilityDepositAction
+            actionId="zero-stabilityPool-deposit-confirm"
+            transactionId={transactionId}
+            change={validChange}
+          >
             Confirm
           </StabilityDepositAction>
         ) : (
-          <Button disabled>Confirm</Button>
+          <Button data-action-id="zero-stabilityPool-deposit-confirm" disabled>
+            Confirm
+          </Button>
         )}
       </Flex>
     </StabilityDepositEditor>
