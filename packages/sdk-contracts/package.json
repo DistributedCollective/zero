@@ -3,8 +3,8 @@
   "version": "1.0.0-early.access",
   "description": "Sovryn ZERO SDK solidity contracts",
   "files": [
-    "contracts/**/*.sol",
-    "docs/*.*"
+    "dist/**/*.*",
+    "dist/*.*"
   ],
   "directories": {
     "test": "test"
@@ -48,11 +48,13 @@
     "@typechain/*"
   ],
   "scripts": {
-    "pack": "yarn --cwd ./dist pack --filename './pack-contracts.tgz'",
-    "publish": "yarn --cwd ./dist publish",
+    "do-pack": "yarn prepublishOnly && yarn dist-pack",
+    "do-publish": "yarn publish dist",
     "prepare": "echo stub: run-s prepare:*",
     "dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
-    "prepack": "yarn hardhat compile && yarn dist",
+    "prepublishOnly": "run-s prepack:*",
+    "prepack:dist": "hardhat compile && yarn dist",
+    "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-sdk-contracts-package.tgz",
     "test": "hardhat test",
     "lint": "yarn lint-sol && yarn lint-js",
     "lint-sol": "solhint contracts/{*,**/*,**/**/*,**/**/**/*,**/**/**/**/*}.sol",

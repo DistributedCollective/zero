@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/DistributedCollective/zero"
   },
-  "homepage": "https://github.com/DistributedCollective/zero#readme"
+  "homepage": "https://github.com/DistributedCollective/zero#readme",
+  "peerDependencies": {
+    "@sovryn-zero/contracts": "^1.0.0-early.access"
+  }
 }
