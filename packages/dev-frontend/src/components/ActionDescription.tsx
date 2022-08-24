@@ -1,4 +1,7 @@
-import { Box, Flex, Text } from "theme-ui";
+import { Decimal } from "@sovryn-zero/lib-base";
+import Tippy from "@tippyjs/react";
+import { useMemo } from "react";
+import { Box, Card, Flex, Text, ThemeUIStyleObject } from "theme-ui";
 
 import { Icon } from "./Icon";
 
@@ -34,6 +37,26 @@ export const ActionDescription: React.FC = ({ children }) => (
   </Box>
 );
 
-export const Amount: React.FC = ({ children }) => (
-  <Text sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>{children}</Text>
-);
+interface AmountProps {
+  value?: Decimal;
+  sx?: ThemeUIStyleObject;
+}
+export const Amount: React.FC<AmountProps> = ({
+  children,
+  value,
+  sx = { fontWeight: "bold", whiteSpace: "nowrap" }
+}) => {
+  const showTilde = useMemo(() => value && !Decimal.from(value.toString(2)).eq(value), [value]);
+  return (
+    <Tippy
+      interactive={true}
+      disabled={!showTilde}
+      content={<Card variant="tooltip">{value?.toString()}</Card>}
+    >
+      <Text sx={sx}>
+        {showTilde && <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0 }}>~&nbsp;</Text>}
+        {children}
+      </Text>
+    </Tippy>
+  );
+};

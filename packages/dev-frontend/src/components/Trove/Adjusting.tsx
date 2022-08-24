@@ -174,7 +174,7 @@ export const Adjusting: React.FC = () => {
             amount={collateral.prettify(4)}
             editingState={editingState}
             unit="RBTC"
-            editedAmount={collateral.toString(4)}
+            editedAmount={collateral.toString(18)}
             setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
           />
 
@@ -185,7 +185,7 @@ export const Adjusting: React.FC = () => {
               amount={netDebt.prettify()}
               unit={borrowedToken}
               editingState={editingState}
-              editedAmount={netDebt.toString(2)}
+              editedAmount={netDebt.toString(18)}
               setEditedAmount={(amount: string) => setNetDebt(Decimal.from(amount))}
             />
             {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}

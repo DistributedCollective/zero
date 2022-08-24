@@ -117,7 +117,7 @@ export const Opening: React.FC = () => {
             maxedOut={collateralMaxedOut}
             editingState={editingState}
             unit="RBTC"
-            editedAmount={collateral.toString(4)}
+            editedAmount={collateral.toString(18)}
             setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
             hideMaxBtn
           />
@@ -128,7 +128,7 @@ export const Opening: React.FC = () => {
               amount={borrowAmount.prettify()}
               unit={borrowedToken}
               editingState={editingState}
-              editedAmount={borrowAmount.toString(2)}
+              editedAmount={borrowAmount.toString(18)}
               setEditedAmount={(amount: string) => setBorrowAmount(Decimal.from(amount))}
               hideMaxBtn
             />
