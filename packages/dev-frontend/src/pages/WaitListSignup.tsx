@@ -233,27 +233,6 @@ export const WaitListSignup: React.FC = ({ children }) => {
       <Dialog hideCloseIcon open={success} onClose={() => setSuccess(false)}>
         <WaitlistSuccess onClose={() => setSuccess(false)} />
       </Dialog>
-
-      <Link
-        sx={{
-          fontSize: 3,
-          color: "primary",
-          cursor: "pointer",
-          fontWeight: "medium",
-          ":hover": {
-            textDecoration: "underline"
-          },
-          position: "absolute",
-          bottom: 4,
-          left: 4
-        }}
-        href="https://tools.google.com/dlpage/gaoptout"
-        target="_blank"
-        rel="noopener noreferrer"
-        data-action-id="footer-analytics-optout"
-      >
-        Opt-out from Google Analytics
-      </Link>
     </Box>
   );
 };
