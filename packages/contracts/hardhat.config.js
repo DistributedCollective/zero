@@ -4,28 +4,29 @@ require("@nomiclabs/hardhat-ethers");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
 require('hardhat-contract-sizer');
+require("@primitivefi/hardhat-dodoc");
 
 const accounts = require("./hardhatAccountsList2k.js");
-const accountsList = accounts.accountsList
+const accountsList = accounts.accountsList;
 
-const fs = require('fs')
+const fs = require('fs');
 const getSecret = (secretKey, defaultValue = '') => {
-    const SECRETS_FILE = "./secrets.js"
-    let secret = defaultValue
+    const SECRETS_FILE = "./secrets.js";
+    let secret = defaultValue;
     if (fs.existsSync(SECRETS_FILE)) {
-        const { secrets } = require(SECRETS_FILE)
-        if (secrets[secretKey]) { secret = secrets[secretKey] }
+        const { secrets } = require(SECRETS_FILE);
+        if (secrets[secretKey]) { secret = secrets[secretKey]; }
     }
 
-    return secret
-}
+    return secret;
+};
 const alchemyUrl = () => {
-    return `https://eth-mainnet.alchemyapi.io/v2/${getSecret('alchemyAPIKey')}`
-}
+    return `https://eth-mainnet.alchemyapi.io/v2/${getSecret('alchemyAPIKey')}`;
+};
 
 const alchemyUrlRinkeby = () => {
-    return `https://eth-rinkeby.alchemyapi.io/v2/${getSecret('alchemyAPIKeyRinkeby')}`
-}
+    return `https://eth-rinkeby.alchemyapi.io/v2/${getSecret('alchemyAPIKeyRinkeby')}`;
+};
 
 module.exports = {
     paths: {
@@ -100,5 +101,13 @@ module.exports = {
     },
     gasReporter: {
         enabled: (process.env.REPORT_GAS) ? true : false
-    }
+    },
+    dodoc: {
+        runOnCompile: false, // if false then run `npx hardhat dodoc` in console to generate docs
+        include: ["contracts"], // [] == everything; input paths to limit dics to the domain contracts only
+        exclude: ["contracts/.vscode", "contracts/artifacts", "contracts/TestContracts", "contracts/ZERO", "contracts/Proxy/ZEROStakingScript.sol", "contracts/Interfaces/ICommunityIssuance.sol"], // [] == everything; input paths to limit dics to the domain contracts only
+        outputDir: "docs",
+        keepFileStructure: false,
+        freshOutput: true,
+    },
 };

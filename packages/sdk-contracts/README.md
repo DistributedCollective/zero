@@ -1,40 +1,28 @@
-# SOVRYN SOLIDITY SDK
+# @sovryn-zero/sdk-contracts
+  SDK contract (Library) consisting of utilities for the Sovryn Zero Protocol
 
-## PROJECT DESCRIPTION
-  SDK consisting of utilities for the Sovryn Protocol
-## CONTRACTS ARCHITECTURE
-  All contracts are in the form of libraries, each one containing set of functionalities related to one product of the Sovryn ecosystem.
+## Quickstart
+### Installation:
 
-## STATE-MACHINE/INTERACTION/FLOW DIAGRAMS (where applicable)
+  ```shell 
+  npm install @sovryn-zero/contracts @sovryn-zero/sdk-contracts
+  ```
 
-## DEVELOPMENT INFORMATION
+## Project Description
+  Sovryn ZERO Solidity Contracts SDK is a set of solidity libraries that users can import and use in their contracts.
+  Stashed changes
 
-### **Setup**
-<!-- How to setup and initialize the project's data from the repo using npm -->
+## Overview
+  All contracts are libraries, each containing set of functionalities related to utilities of the Sovryn Zero ecosystem.
 
-```shell
-  yarn
-```
+  The library cover several major utilities such as:
 
-### **Test**
-<!-- How to run all the tests, e.g. local, testnet, forked mainnet; as well as solidity contracts coverage reportn - use package.json scripts and hardhat tasks for that -->
+  1. **[BorrowerLib.sol](docs/BorrowerLib.md)** - Borrower operations (Opening, Adjusting line of credit)
+  2. **[LiquidationLib.sol](docs/LiquidationLib.md)** - Liquidation & Redemption operations.
+  3. **[StabilityPoolLib.sol](docs/StabilityPoolLib.md)** - Pool Stability operations.
+  4. **[TroveStatiscticsLib.sol](docs/TroveStatisticsLib.md)** - View function related to the troves (get nominal collateral ratio, borrowing fee calculation, get borrower's debt of the troves).
+   
+  **[ZERO Contracts Addresses](docs/Addresses.md)**
 
-```shell
-  npx hardhat test
-```
-
-#### __**Test with gas report**__
-
-```shell
-  REPORT_GAS=true npx hardhat test
-```
-
-#### __**Performance optimization**__
-
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
-
-### **Deployment**
-<!-- How to deploy and initialize the project's contracts (use hardhat_deploy plugin) and offchain data as needed (.env secrets etc.) -->
-
-### **Hardhat Tasks**
-<!-- How to setup and initialize the project's data - use hardhat_deploy plugin -->
+## Demo
+  **[TestIntegration.sol](docs/IntegrationExample.md)** provides a sample integration

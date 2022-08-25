@@ -3,9 +3,9 @@ import { Block, BlockTag } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 
 import devOrNull from "../deployments/dev.json";
-import rsktestnet from "../deployments/rsktestnet.json";
+import rsktestnet from "../deployments/default/rsktestnet.json";
 import rskdev from "../deployments/rskdev.json";
-import rskMainnet from "../deployments/rsksovrynmainnet.json";
+import rskMainnet from "../deployments/default/rsksovrynmainnet.json";
 
 import { EthersProvider, EthersSigner } from "./types";
 

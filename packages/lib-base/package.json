@@ -1,16 +1,16 @@
 {
   "name": "@sovryn-zero/lib-base",
   "version": "0.0.0-semantic-release",
-  "description": "Zero SDK shared interfaces",
+  "description": "Sovryn Zero SDK shared interfaces",
   "keywords": [
     "Zero",
     "protocol",
     "DeFi",
-    "Ethereum"
+    "RSK"
   ],
   "homepage": "https://github.com/DistributedCollective/zero#readme",
   "license": "MIT",
-  "author": "Daniel Simon <dani@sovryn-zero.org>",
+  "author": "Sovryn",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/DistributedCollective/zero",

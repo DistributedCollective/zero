@@ -1,21 +1,35 @@
 {
   "name": "@sovryn-zero/contracts",
-  "version": "1.0.0",
+  "version": "1.0.0-early.access",
   "description": "",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "do-publish": "yarn publish dist",
+    "do-pack": "yarn prepublishOnly && yarn dist-pack",
+    "publish": "cd ./dist && yarn publish",
     "hardhat": "hardhat",
+    "docgen": "truffle compile && solidoc2 ./ ./docs",
     "prepare": "run-s prepare:*",
     "prepare:compile": "hardhat compile",
     "prepare:set-version": "node scripts/set-version.js",
+    "prepublishOnly": "run-s prepack:*",
+    "prepare-dist": "rm -rf ./dist && mkdir -p dist/contracts && rsync -a -m --exclude 'ZERO' --exclude 'TestContracts' --exclude '*/*ZERO*.sol' --exclude '*/*Community*' --include '*/' --include '*.sol' --exclude '*' 'contracts/' 'dist/contracts' && cp -R README.md LICENSE docs ./dist && cp ./package.dist.json ./dist/package.json",
+    "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-contracts-package.tgz",
+    "prepack:docgen": "yarn docgen",
+    "prepack:prepare-dist": "yarn prepare-dist",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "coveralls": "cat coverage/lcov.info | coveralls"
   },
-  "keywords": [],
+  "keywords": [
+    "sovryn",
+    "zero",
+    "solidity contracts",
+    "zero contracts"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -33,6 +47,7 @@
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/contracts": "^3.3.0",
     "@openzeppelin/test-helpers": "^0.5.10",
+    "@primitivefi/hardhat-dodoc": "^0.2.3",
     "chai-bn": "0.2.2",
     "eth-gas-reporter": "^0.2.22",
     "ganache-time-traveler": "1.0.15",

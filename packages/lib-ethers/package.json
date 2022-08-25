@@ -1,14 +1,14 @@
 {
   "name": "@sovryn-zero/lib-ethers",
   "version": "0.0.0-semantic-release",
-  "description": "Zero SDK Ethers-based implementation",
+  "description": "Sovryn SDK Ethers-based implementation",
   "keywords": [
     "Zero",
     "protocol",
     "DeFi",
-    "Ethereum"
+    "RSK"
   ],
-  "homepage": "https://github.com/DistributedCollective/zero#readme",
+  "homepage": "https://github.com/DistributedCollective/zero/blob/main/README.md",
   "license": "MIT",
   "author": "Daniel Simon <dani@sovryn-zero.org>",
   "main": "dist/index.js",

@@ -1,10 +1,10 @@
 {
   "name": "@sovryn-zero/sdk-contracts",
-  "version": "0.0.1",
-  "description": "Sovryn ZERO solidity contracts SDK",
-  "private": "true",
+  "version": "1.0.0-early.access",
+  "description": "Sovryn ZERO SDK solidity contracts",
   "files": [
-    "contracts"
+    "dist/**/*.*",
+    "dist/*.*"
   ],
   "directories": {
     "test": "test"
@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/DistributedCollective/zero"
   },
-  "homepage": "https://github.com/DistributedCollective/solidity-hardhat-boilerplate#readme",
+  "homepage": "https://github.com/DistributedCollective/zero#readme",
   "nohoist": [
     "**/web3-eth-abi/@ethersproject/abi",
     "**/@graphprotocol/*",
@@ -48,13 +48,22 @@
     "@typechain/*"
   ],
   "scripts": {
+    "do-pack": "yarn prepublishOnly && yarn dist-pack",
+    "do-publish": "yarn publish dist",
+    "prepare": "echo stub: run-s prepare:*",
+    "dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
+    "prepublishOnly": "run-s prepack:*",
+    "prepack:dist": "hardhat compile && yarn dist",
+    "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-sdk-contracts-package.tgz",
     "test": "hardhat test",
-    "doc": "yarn hardhat docgen",
     "lint": "yarn lint-sol && yarn lint-js",
     "lint-sol": "solhint contracts/{*,**/*,**/**/*,**/**/**/*,**/**/**/**/*}.sol",
     "lint-js": "eslint . --ext .js --no-error-on-unmatched-pattern",
     "prettier": "prettier --write .",
     "prettier-check": "prettier --check ."
+  },
+  "peerDependencies": {
+    "@sovryn-zero/contracts": "^1.0.0-early.access"
   },
   "devDependencies": {
     "@defi-wonderland/smock": "^2.0.7",

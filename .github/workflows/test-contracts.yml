@@ -36,7 +36,7 @@ jobs:
       - run: yarn install --frozen-lockfile
 
       - name: Test contracts
-        run: yarn test-contracts
+        run: yarn test:contracts
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 

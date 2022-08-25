@@ -24,4 +24,4 @@ test-contracts:
   stage: test
   script:
     - *install-deps
-    - yarn test-contracts 
+    - yarn test:contracts 

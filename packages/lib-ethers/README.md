@@ -7,7 +7,7 @@
 Install in your project:
 
 ```
-npm install --save @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
+npm install @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
 ```
 
 Connecting to an Ethereum node and sending a transaction:
@@ -34,9 +34,9 @@ async function example() {
 
 See [packages/examples](https://github.com/DistributedCollective/zero/tree/master/packages/examples) in the repo.
 
-Liquity's [Dev UI](https://github.com/liquity/liquity/tree/master/packages/dev-frontend) itself contains many examples of `@sovryn-zero/lib-ethers` use.
+@sovryn-zero's [UI](https://github.com/DistributedCollective/zero/tree/master/packages/dev-frontend) itself contains many examples of `@sovryn-zero/lib-ethers` use.
 
 ## API Reference
 
-For now, it can be found in the public Liquity [repo](https://github.com/distributedcollective/zero/blob/master/docs/sdk/lib-ethers.md).
+For now, it can be found in the public Sovryn [zero repo](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
 
