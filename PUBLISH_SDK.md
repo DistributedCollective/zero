@@ -1,4 +1,4 @@
-# PUBLISH SDK PACKAGES  
+# PUBLISH SDK PACKAGES GUIDELINES
 ## **Typescript SDK** 
 Currently semantic-versioning is used for publishing automation for `lib-ethers` (typescript SDK).  
 
