@@ -1,7 +1,7 @@
 import Onboard, { InitOptions } from "@web3-onboard/core";
 import injectedModule from "@web3-onboard/injected-wallets";
 import ledgerModule from "./custom/ledger-module";
-// import trezorModule from "./custom/trezor-module";
+import trezorModule from "./custom/trezor-module";
 import walletConnectModule from "@web3-onboard/walletconnect";
 import portisModule from "@web3-onboard/portis";
 import { RPC_URL } from "src/contracts/config";
@@ -9,10 +9,10 @@ import { isMainnet } from "src/utils";
 
 const injected = injectedModule();
 const ledger = ledgerModule();
-// const trezor = trezorModule({
-//   email: "support@sovryn.com",
-//   appUrl: "https://test.sovryn.app/zero"
-// });
+const trezor = trezorModule({
+  email: "support@sovryn.com",
+  appUrl: "https://live.sovryn.app/zero"
+});
 const walletConnect = walletConnectModule({
   qrcodeModalOptions: {
     mobileLinks: ["metamask", "trust", "rainbow", "argent", "imtoken", "pillar"]
@@ -51,7 +51,7 @@ export const onboard = Onboard(({
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
   i18n,
-  wallets: [injected, ...(isMainnet ? [ledger] : []), walletConnect as any, portis],
+  wallets: [injected, ...(isMainnet ? [ledger, trezor] : []), walletConnect as any, portis],
   chains: [
     {
       id: getChainIdHex(30),
