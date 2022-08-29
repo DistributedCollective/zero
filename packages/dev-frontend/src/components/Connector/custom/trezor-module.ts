@@ -72,14 +72,15 @@ function trezor(options: any) {
             getInterface: async ({ EventEmitter, chains }) => {
                 const { default: Trezor } = await import('trezor-connect');
                 const { Transaction } = await import('@ethereumjs/tx');
-                const { accountSelect, bigNumberFieldsToStrings, createEIP1193Provider, ProviderRpcError, getCommon, getHardwareWalletProvider } = await import('@web3-onboard/common');
+                const { accountSelect, bigNumberFieldsToStrings, createEIP1193Provider, ProviderRpcError, getHardwareWalletProvider } = await import('@web3-onboard/common');
                 const ethUtil = await import('ethereumjs-util');
+                const Common = (await import('@ethereumjs/common')).default;
                 const { compress } = (await import('eth-crypto')).publicKey;
                 const { StaticJsonRpcProvider } = await import('@ethersproject/providers');
                 if (!options || !options.email || !options.appUrl) {
                     throw new Error('Email and AppUrl required in Trezor options for Trezor Wallet Connection');
                 }
-                const { email, appUrl, customNetwork } = options;
+                const { email, appUrl } = options;
                 // @ts-ignore
                 const TrezorConnect = Trezor.default || Trezor;
                 TrezorConnect.manifest({
@@ -239,10 +240,16 @@ function trezor(options: any) {
                     const updateBigNumberFields = bigNumberFieldsToStrings(populatedTransaction);
                     // Set the `from` field to the currently selected account
                     const transactionData = createTrezorTransactionObject(updateBigNumberFields);
-                    const chainId = currentChain.hasOwnProperty('id')
-                        ? Number(currentChain.id)
-                        : process.env.REACT_APP_NETWORK === 'mainnet' ? 30 : 31;
-                    const common = await getCommon({ customNetwork, chainId });
+                    const customCommon = Common.forCustomChain(
+                        'mainnet',
+                        {
+                          name: 'RSK',
+                          chainId: transactionData.chainId,
+                        },
+                        'petersburg',
+                        ['petersburg'],
+                      );;
+                    const common = new Common(customCommon._chainParams, 'petersburg', ['petersburg']);
                     const trezorResult = await trezorSignTransaction(derivationPath, transactionData);
                     if (!trezorResult.success) {
                         const message = trezorResult.payload.error === 'Unknown message'
