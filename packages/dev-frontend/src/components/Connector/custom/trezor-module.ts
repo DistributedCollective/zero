@@ -70,6 +70,7 @@ function trezor(options: any) {
             label: 'Trezor',
             getIcon,
             getInterface: async ({ EventEmitter, chains }) => {
+                const { utils } = await import('ethers');
                 const { default: Trezor } = await import('trezor-connect');
                 const { Transaction } = await import('@ethereumjs/tx');
                 const { accountSelect, bigNumberFieldsToStrings, createEIP1193Provider, ProviderRpcError, getHardwareWalletProvider } = await import('@web3-onboard/common');
@@ -227,6 +228,7 @@ function trezor(options: any) {
                     // 'gas' is an invalid property for the TransactionRequest type
                     delete transactionObject.gas;
                     const signer = ethersProvider.getSigner(address);
+
                     const populatedTransaction = await signer.populateTransaction(transactionObject);
                     if (populatedTransaction.hasOwnProperty('nonce') &&
                         typeof populatedTransaction.nonce === 'number') {
@@ -240,16 +242,15 @@ function trezor(options: any) {
                     const updateBigNumberFields = bigNumberFieldsToStrings(populatedTransaction);
                     // Set the `from` field to the currently selected account
                     const transactionData = createTrezorTransactionObject(updateBigNumberFields);
-                    const customCommon = Common.forCustomChain(
-                        'mainnet',
+                    const common = Common.custom(
                         {
                           name: 'RSK',
                           chainId: transactionData.chainId,
+                          networkId: transactionData.chainId,
+                          defaultHardfork: 'petersburg',
                         },
-                        'petersburg',
-                        ['petersburg'],
-                      );;
-                    const common = new Common(customCommon._chainParams, 'petersburg', ['petersburg']);
+                        30
+                      );
                     const trezorResult = await trezorSignTransaction(derivationPath, transactionData);
                     if (!trezorResult.success) {
                         const message = trezorResult.payload.error === 'Unknown message'
@@ -258,20 +259,44 @@ function trezor(options: any) {
                         throw new Error(message);
                     }
                     const { r, s } = trezorResult.payload;
+
                     let v = trezorResult.payload.v;
-                    // EIP155 support. check/recalc signature v value.
-                    const rv = parseInt(v, 16);
-                    let cv = Number(currentChain.id) * 2 + 35;
-                    if (rv !== cv && (rv & cv) !== rv) {
+                    if (transactionData.chainId && transactionData.chainId > 0) {
+                      // EIP155 support. check/recalc signature v value.
+                      // Please see https://github.com/LedgerHQ/blue-app-eth/commit/8260268b0214810872dabd154b476f5bb859aac0
+                      // currently, ledger returns only 1-byte truncated signatur_v
+                      const rv = parseInt(v, 16);
+                      let cv = transactionData.chainId * 2 + 35; // calculated signature v, without signature bit.
+                      /* tslint:disable no-bitwise */
+                      if (rv !== cv && (rv & cv) !== rv) {
+                        // (rv !== cv) : for v is truncated byte case
+                        // (rv & cv): make cv to truncated byte
+                        // (rv & cv) !== rv: signature v bit needed
                         cv += 1; // add signature v bit.
+                      }
+                      v = `0x${cv.toString(16)}`;
                     }
-                    v = cv.toString(16);
-                    const signedTx = Transaction.fromTxData({
+
+                    const hexed = {
                         ...populatedTransaction,
-                        v: `0x${v}`,
+                        gasPrice: utils.hexValue(populatedTransaction.gasPrice),
+                    };
+
+                    const signedTx = new Transaction({
+                        ...hexed,
+                        v: v,
                         r: r,
-                        s: s
+                        s: s,
                     }, { common });
+
+                    const sigV = ethUtil.bufferToInt(signedTx.v);
+                    let signedChainId = Math.floor((sigV - 35) / 2);
+                    if (signedChainId < 0) signedChainId = 0;
+
+                    if (signedChainId !== transactionData.chainId) {
+                        throw new Error('Invalid signature v value');
+                    }
+
                     return signedTx ? `0x${signedTx.serialize().toString('hex')}` : '';
                 }
                 async function signMessage(address, message) {
@@ -331,6 +356,7 @@ function trezor(options: any) {
                             method: 'eth_signTransaction',
                             params
                         });
+
                         const transactionHash = await baseRequest({
                             method: 'eth_sendRawTransaction',
                             params: [signedTx]
