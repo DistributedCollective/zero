@@ -11,6 +11,7 @@ type TroveActionProps = {
   useNueToken: boolean;
   change: Exclude<TroveChange<Decimal>, { type: "invalidCreation" }>;
   maxBorrowingRate: Decimal;
+  dataActionId?: string;
 };
 
 export const TroveAction: React.FC<TroveActionProps> = ({
@@ -18,7 +19,8 @@ export const TroveAction: React.FC<TroveActionProps> = ({
   transactionId,
   change,
   useNueToken,
-  maxBorrowingRate
+  maxBorrowingRate,
+  dataActionId
 }) => {
   const { liquity } = useLiquity();
 
@@ -53,5 +55,9 @@ export const TroveAction: React.FC<TroveActionProps> = ({
 
   const [sendTransaction] = useTransactionFunction(transactionId, troveAction);
 
-  return <Button onClick={sendTransaction}>{children}</Button>;
+  return (
+    <Button onClick={sendTransaction} data-action-id={dataActionId}>
+      {children}
+    </Button>
+  );
 };

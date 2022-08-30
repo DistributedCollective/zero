@@ -273,7 +273,7 @@ export const Adjusting: React.FC = () => {
             change={troveChange}
             useNueToken={useNueToken}
             maxBorrowingRate={maxBorrowingRate}
-            data-action-id="zero-LOC-confirm"
+            dataActionId="zero-LOC-confirm"
           >
             Confirm
           </TroveAction>
