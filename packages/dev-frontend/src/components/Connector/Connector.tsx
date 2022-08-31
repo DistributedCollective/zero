@@ -120,7 +120,11 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
       ? JSON.parse(previousWalletsSerialised)
       : null;
 
+    console.log(previousWallets);
     if (onboard && previousWallets) {
+      if (["Trezor", "Ledger"].includes(previousWallets[0])) {
+        return;
+      }
       (async () => {
         try {
           await onboard.connectWallet({
