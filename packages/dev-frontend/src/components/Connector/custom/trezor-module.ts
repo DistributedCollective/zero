@@ -180,7 +180,7 @@ function trezor(options: any) {
                         transactionData.maxPriorityFeePerGas) {
                         return {
                             to: transactionData.to,
-                            value: transactionData.value,
+                            value: transactionData.value || '0x0',
                             gasLimit: gasLimit,
                             maxFeePerGas: transactionData.maxFeePerGas,
                             maxPriorityFeePerGas: transactionData.maxPriorityFeePerGas,
@@ -193,7 +193,7 @@ function trezor(options: any) {
                     }
                     return {
                         to: transactionData.to,
-                        value: transactionData.value,
+                        value: transactionData.value || '0x0',
                         gasPrice: transactionData.gasPrice,
                         gasLimit: gasLimit,
                         nonce: transactionData.nonce,
