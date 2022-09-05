@@ -100,8 +100,15 @@ export const ConnectorContextProvider: React.FC = ({ children }) => {
             }
           });
 
-          const connectedWallets = update.wallets.map(({ label }) => label);
-          localStorage.setItem(LOCAL_STORAGE_KEYS.SELECTED_WALLET, JSON.stringify(connectedWallets));
+          const connectedWallets = update.wallets
+            .map(({ label }) => label)
+            .filter(k => k !== "Ledger" && k !== "Trezor");
+          if (connectedWallets.length) {
+            localStorage.setItem(
+              LOCAL_STORAGE_KEYS.SELECTED_WALLET,
+              JSON.stringify(connectedWallets)
+            );
+          }
         }
       } else {
         dispatch({ type: AppEvents.WALLET_DISCONNECTED });
