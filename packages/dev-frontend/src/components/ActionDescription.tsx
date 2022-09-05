@@ -40,13 +40,18 @@ export const ActionDescription: React.FC = ({ children }) => (
 interface AmountProps {
   value?: Decimal;
   sx?: ThemeUIStyleObject;
+  hideTilde?: boolean;
 }
 export const Amount: React.FC<AmountProps> = ({
   children,
   value,
-  sx = { fontWeight: "bold", whiteSpace: "nowrap" }
+  sx = { fontWeight: "bold", whiteSpace: "nowrap" },
+  hideTilde
 }) => {
-  const showTilde = useMemo(() => value && !Decimal.from(value.toString(2)).eq(value), [value]);
+  const showTilde = useMemo(
+    () => value && !Decimal.from(value.toString(2)).eq(value) && !hideTilde,
+    [value, hideTilde]
+  );
   return (
     <Tippy
       interactive={true}

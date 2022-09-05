@@ -68,6 +68,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
             label="Collateral"
             inputId="trove-collateral"
             amount={edited.collateral.prettify(4)}
+            value={edited.collateral}
             unit="RBTC"
           />
           {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}
@@ -76,6 +77,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
             label="Debt"
             inputId="trove-debt"
             amount={edited.debt.prettify()}
+            value={edited.debt}
             unit={borrowedToken}
           />
 
@@ -84,6 +86,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
               label="Liquidation Reserve"
               inputId="trove-liquidation-reserve"
               amount={`${ZUSD_LIQUIDATION_RESERVE}`}
+              value={ZUSD_LIQUIDATION_RESERVE}
               unit={borrowedToken}
               infoIcon={
                 <InfoIcon
@@ -103,6 +106,7 @@ export const TroveEditor: React.FC<TroveEditorProps> = ({
             label="Borrowing Fee"
             inputId="trove-borrowing-fee"
             amount={fee.toString(2)}
+            value={fee}
             pendingAmount={feePct.toString(2)}
             unit={borrowedToken}
             infoIcon={

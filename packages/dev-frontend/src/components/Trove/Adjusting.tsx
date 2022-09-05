@@ -172,6 +172,7 @@ export const Adjusting: React.FC = () => {
             label="Collateral"
             inputId="trove-collateral"
             amount={collateral.prettify(4)}
+            value={collateral}
             editingState={editingState}
             unit="RBTC"
             editedAmount={collateral.toString(18)}
@@ -183,6 +184,7 @@ export const Adjusting: React.FC = () => {
               label="Net debt"
               inputId="trove-net-debt-amount"
               amount={netDebt.prettify()}
+              value={netDebt}
               unit={borrowedToken}
               editingState={editingState}
               editedAmount={netDebt.toString(18)}
@@ -199,6 +201,7 @@ export const Adjusting: React.FC = () => {
             label="Liquidation Reserve"
             inputId="trove-liquidation-reserve"
             amount={`${ZUSD_LIQUIDATION_RESERVE}`}
+            value={ZUSD_LIQUIDATION_RESERVE}
             unit={borrowedToken}
             infoIcon={
               <InfoIcon
@@ -217,6 +220,7 @@ export const Adjusting: React.FC = () => {
             label="Borrowing Fee"
             inputId="trove-borrowing-fee"
             amount={fee.prettify(2)}
+            value={fee}
             pendingAmount={feePct.toString(2)}
             unit={borrowedToken}
             infoIcon={
@@ -235,6 +239,7 @@ export const Adjusting: React.FC = () => {
             label="Total debt"
             inputId="trove-total-debt"
             amount={totalDebt.prettify(2)}
+            value={totalDebt}
             unit={borrowedToken}
             infoIcon={
               <InfoIcon
