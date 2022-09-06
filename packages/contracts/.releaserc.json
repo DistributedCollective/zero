@@ -3,7 +3,7 @@
     "branches": [
         "main",
         {
-            "name": "sdk-zea-release",
+            "name": "sdk-early-access",
             "prerelease": "zero.early.access"
         }
     ],
