@@ -20,7 +20,11 @@
   "release": {
     "extends": "semantic-release-monorepo",
     "branches": [
-      "master"
+      "main",
+      {
+        "name": "sdk-zea-release",
+        "prerelease": "zero.early.access"
+      }
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
@@ -65,10 +69,8 @@
     "release:delete-dev-deployments": "yarn workspace @sovryn-zero/lib-ethers delete-dev-deployments",
     "release:lib-base": "yarn workspace @sovryn-zero/lib-base semantic-release",
     "release:lib-ethers": "yarn workspace @sovryn-zero/lib-ethers semantic-release",
-    "release:contracts": "echo currently manual publishing: do-release:contracts; TODO: yarn workspace @sovryn-zero/contracts semantic-release",
-    "release:sdk-contracts": "echo currently manual publishing: do-release:sdk-contracts; TODO: yarn workspace @sovryn-zero/sdk-contracts semantic-release",
-    "do-release:contracts": "yarn workspace @sovryn-zero/contracts do-publish",
-    "do-release:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts do-publish",
+    "release:contracts": "yarn workspace @sovryn-zero/contracts semantic-release",
+    "release:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts semantic-release",
     "do-pack:contracts": "yarn workspace @sovryn-zero/contracts do-pack",
     "do-pack:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts do-pack",
     "save-live-version": "yarn workspace @sovryn-zero/lib-ethers save-live-version",

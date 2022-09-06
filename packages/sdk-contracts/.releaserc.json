@@ -1,0 +1,40 @@
+{
+    "extends": "semantic-release-monorepo",
+    "branches": [
+        "main",
+        {
+            "name": "sdk-zea-release",
+            "prerelease": "zero.early.access"
+        }
+    ],
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        [
+            "@semantic-release/release-notes-generator",
+            {
+                "preset": "angular",
+                "parserOpts": {
+                    "headerPattern": "^(\\w*)(?:\\((.*)\\))?!?: (.*)$"
+                }
+            }
+        ],
+        [
+            "@semantic-release/npm",
+            {
+                "pkgRoot": "dist",
+                "npmPublish": false,
+                "tarballDir": "dist"
+            }
+        ],
+        [
+            "@semantic-release/github",
+            {
+                "assets": [
+                    {
+                        "path": "dist"
+                    }
+                ]
+            }
+        ]
+    ]
+}

@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/DistributedCollective/zero#readme",
   "peerDependencies": {
-    "@sovryn-zero/contracts": "^1.0.0-early.access"
+    "@sovryn-zero/contracts": ">=1.0.0-early.access <1.0.0-early.access.1000"
   }
 }

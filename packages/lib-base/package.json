@@ -1,7 +1,7 @@
 {
   "name": "@sovryn-zero/lib-base",
   "version": "0.0.0-semantic-release",
-  "description": "Sovryn Zero SDK shared interfaces",
+  "description": "Sovryn ZERO SDK shared interfaces",
   "keywords": [
     "Zero",
     "protocol",

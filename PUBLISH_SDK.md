@@ -1,6 +1,9 @@
 # PUBLISH SDK PACKAGES GUIDELINES
 ## **Typescript SDK** 
 Currently semantic-versioning is used for publishing automation for `lib-ethers` (typescript SDK).  
+Git Actions CI runs `semantic-release` to publish `lib-base`, `lib-ethers`, `contracts` and `sdk-contracts`  packages.  
+
+
 
 ## **Solidity contracts (libraries)**  
 To publish solidity contracts (libraries) SDK, from the project root run   
@@ -23,4 +26,4 @@ Import SDK libraries in contracts like this
 import "@sovryn-zero/contracts/libraries/BorrowerLib.sol";
 ```  
 #TODO:  
-[ ] Add detailed explanation of semantic-versioning publishing process
+[ ] Add detailed explanation of semantic-release publishing process
