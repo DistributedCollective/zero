@@ -1,9 +1,23 @@
-# @sovryn-zero/lib-base
+# @sovryn-zero/lib-base  
 
-Shared interfaces and classes of the Zero SDK.
+[![GitHub license](https://img.shields.io/github/license/DistributedCollective/zero)](/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/DistributedCollective/zero)](https://github.com/DistributedCollective/zero/stargazers)
+[![ZERO README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
 
-Needs to be installed in order to use other Zero SDK packages, for example [@sovryn-zero/lib-ethers](https://www.npmjs.com/package/@sovryn-zero/lib-ethers).
+Shared interfaces and classes of ZERO SDK.
 
-## API Reference
+## Quickstart
 
-For now, it can be found in the public Zero [repo](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-base.md).
+### Installation:
+
+  ```shell 
+  npm install @sovryn-zero/lib-base
+  ```
+
+This packiage is a dependency for other Zero SDK packages like [@sovryn-zero/lib-ethers](https://www.npmjs.com/package/@sovryn-zero/lib-ethers).
+
+## API
+
+[API Reference](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-base.md)  
+
+

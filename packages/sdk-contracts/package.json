@@ -48,13 +48,12 @@
     "@typechain/*"
   ],
   "scripts": {
-    "do-pack": "yarn prepublishOnly && yarn dist-pack",
-    "do-publish": "yarn publish dist",
+    "do-pack": "yarn prepare && yarn dist-pack",
+    "do-publish": "cd ./dist && yarn publish",
     "compile": "hardhat compile",
     "prepare-dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
     "prepare": "run-s prepare:*",
     "prepare:dist": "yarn compile && yarn prepare-dist",
-    "publish": "cd ./dist && yarn publish",
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-sdk-contracts-package.tgz",
     "test": "hardhat test",
     "lint": "yarn lint-sol && yarn lint-js",

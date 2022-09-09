@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/lib-ethers",
-  "version": "0.0.0-semantic-release",
+  "version": "1.0.0-early.access",
   "description": "Sovryn ZERO SDK Ethers-based implementation",
   "keywords": [
     "Zero",
@@ -31,7 +31,9 @@
     "test": "hardhat test",
     "test-live": "run-s test-live:*",
     "test-live:check-version": "run-s check-live-version",
-    "test-live:run": "cross-env USE_LIVE_VERSION=true hardhat test"
+    "test-live:run": "cross-env USE_LIVE_VERSION=true hardhat test",
+    "do-pack": "yarn prepare && yarn pack",
+    "do-publish": "yarn prepare && yarn publish"
   },
   "peerDependencies": {
     "@sovryn-zero/lib-base": "^3.0.0",

@@ -1,14 +1,14 @@
 {
   "name": "@sovryn-zero/contracts",
-  "version": "0.0.0-semantic-release",
-  "description": "",
+  "version": "1.0.0-early.access",
+  "description": "Sovryn ZERO solidity contracts",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "do-pack": "yarn prepublishOnly && yarn dist-pack",
-    "publish": "cd ./dist && yarn publish",
+    "do-pack": "yarn prepare && yarn dist-pack",
+    "do-publish": "cd ./dist && yarn publish",
     "hardhat": "hardhat",
     "docgen": "truffle compile && solidoc2 ./ ./docs",
     "prepare": "run-s prepare:*",

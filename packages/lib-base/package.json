@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/lib-base",
-  "version": "0.0.0-semantic-release",
+  "version": "1.0.0-early.access",
   "description": "Sovryn ZERO SDK shared interfaces",
   "keywords": [
     "Zero",
@@ -19,7 +19,9 @@
     "prepare:eslint": "eslint src",
     "prepare:tsc": "tsc --project tsconfig.dist.json",
     "prepare:api": "api-extractor run --local",
-    "test": "mocha --require ts-node/register"
+    "test": "mocha --require ts-node/register",
+    "do-pack": "yarn prepare && yarn pack",
+    "do-publish": "yarn prepare && yarn publish"
   },
   "dependencies": {
     "@ethersproject/bignumber": "5.0.15"
