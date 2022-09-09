@@ -6,7 +6,7 @@ import { UserAccount } from "./UserAccount";
 import { Icon } from "./Icon";
 import { ReactComponent as SovLogo } from "../assets/logo.svg";
 import { getConfig, LiquityFrontendConfig } from "../config";
-import { isMainnet } from "../utils";
+import { sovrynLink } from "src/contracts/config";
 
 interface Props {
   hideDetails?: boolean;
@@ -21,7 +21,7 @@ export const Header: React.FC<Props> = ({ hideDetails }) => {
   return (
     <Container variant="header">
       <Box sx={{ flex: [null, null, null, null, 1] }}>
-        <NavLink href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
+        <NavLink href={sovrynLink}>
           <Icon name="chevron-left" />
         </NavLink>
       </Box>

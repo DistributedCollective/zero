@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Provider } from "@ethersproject/abstract-provider";
 import { getNetwork } from "@ethersproject/networks";
-import { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
 
 import { isBatchedProvider, isWebSocketAugmentedProvider } from "@sovryn-zero/providers";
 import {
@@ -14,6 +12,8 @@ import {
 
 import { LiquityFrontendConfig, getConfig } from "../config";
 import { isMainnet } from "../utils";
+import { useConnectorContext } from "src/components/Connector";
+import { currentChainId } from "src/contracts/config";
 
 type LiquityContextValue = {
   config: LiquityFrontendConfig;
@@ -43,14 +43,14 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
   unsupportedNetworkFallback,
   unsupportedMainnetFallback
 }) => {
-  const { library: provider, account, chainId } = useWeb3React<Web3Provider>();
+  const { provider, chainId, walletAddress } = useConnectorContext();
   const [config, setConfig] = useState<LiquityFrontendConfig>();
 
   const connection = useMemo(() => {
-    if (config && provider && account && chainId) {
+    if (config && provider && walletAddress && chainId) {
       try {
-        return _connectByChainId(provider, provider.getSigner(account), chainId, {
-          userAddress: account,
+        return _connectByChainId(provider, provider.getSigner(walletAddress), currentChainId, {
+          userAddress: walletAddress,
           frontendTag: config.frontendTag,
           useStore: "blockPolled"
         });
@@ -58,7 +58,7 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
         console.log(e);
       }
     }
-  }, [config, provider, account, chainId]);
+  }, [config, provider, walletAddress, chainId]);
 
   useEffect(() => {
     getConfig().then(setConfig);
@@ -88,16 +88,16 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
     }
   }, [config, connection]);
 
-  if (!config || !provider || !account || !chainId) {
+  if (isMainnet && chainId !== 30) {
+    return <>{unsupportedMainnetFallback}</>;
+  }
+
+  if (!isMainnet && chainId !== 31) {
+    return <>{unsupportedMainnetFallback}</>;
+  }
+
+  if (!config || !provider || !walletAddress || !chainId) {
     return <>{loader}</>;
-  }
-
-  if (isMainnet && chainId === 31) {
-    return <>{unsupportedMainnetFallback}</>;
-  }
-
-  if (!isMainnet && chainId === 30) {
-    return <>{unsupportedMainnetFallback}</>;
   }
 
   if (!connection) {
@@ -108,7 +108,7 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
   liquity.store.logging = true;
 
   return (
-    <LiquityContext.Provider value={{ config, account, provider, liquity }}>
+    <LiquityContext.Provider value={{ config, account: walletAddress, provider, liquity }}>
       {children}
     </LiquityContext.Provider>
   );

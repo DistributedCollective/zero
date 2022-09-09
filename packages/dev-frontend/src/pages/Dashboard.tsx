@@ -1,7 +1,6 @@
 import { LiquityStoreState } from "@sovryn-zero/lib-base";
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
 import { Container } from "theme-ui";
-import { useWeb3React } from "@web3-react/core";
 
 import { Trove } from "../components/Trove/Trove";
 import { Stability } from "../components/Stability/Stability";
@@ -11,15 +10,16 @@ import { Convert } from "../components/Aggregator/Convert";
 import useTokenBalance from "../hooks/useTokenBalance";
 import { addresses } from "../contracts/config";
 import { isZero } from "../utils";
+import { useConnectorContext } from "src/components/Connector";
 
 const select = ({ zusdBalance }: LiquityStoreState) => ({
   zusdBalance
 });
 
 export const Dashboard: React.FC = () => {
-  const { account } = useWeb3React();
+  const { walletAddress } = useConnectorContext();
   const { zusdBalance } = useLiquitySelector(select);
-  const { data } = useTokenBalance(account!, addresses.xusd);
+  const { data } = useTokenBalance(walletAddress!, addresses.xusd);
   const usdBalanceIsZero = zusdBalance.isZero && isZero((data || "")?.toString());
   return (
     <Container variant="columns">

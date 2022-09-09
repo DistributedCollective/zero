@@ -117,7 +117,7 @@ export const Opening: React.FC = () => {
             maxedOut={collateralMaxedOut}
             editingState={editingState}
             unit="RBTC"
-            editedAmount={collateral.toString(4)}
+            editedAmount={collateral.toString(18)}
             setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
             hideMaxBtn
           />
@@ -128,7 +128,7 @@ export const Opening: React.FC = () => {
               amount={borrowAmount.prettify()}
               unit={borrowedToken}
               editingState={editingState}
-              editedAmount={borrowAmount.toString(2)}
+              editedAmount={borrowAmount.toString(18)}
               setEditedAmount={(amount: string) => setBorrowAmount(Decimal.from(amount))}
               hideMaxBtn
             />
@@ -200,7 +200,7 @@ export const Opening: React.FC = () => {
         </Flex>
       </Box>
       <Flex variant="layout.cta">
-        <Button variant="cancel" onClick={handleCancelPressed}>
+        <Button data-action-id="zero-LOC-cancel" variant="cancel" onClick={handleCancelPressed}>
           Cancel
         </Button>
 
@@ -210,11 +210,14 @@ export const Opening: React.FC = () => {
             change={troveChange}
             useNueToken={useNueToken}
             maxBorrowingRate={maxBorrowingRate}
+            data-action-id="zero-LOC-confirm"
           >
             Confirm
           </TroveAction>
         ) : (
-          <Button disabled>Confirm</Button>
+          <Button data-action-id="zero-LOC-confirm" disabled>
+            Confirm
+          </Button>
         )}
       </Flex>
       {isTransactionPending && <LoadingOverlay />}

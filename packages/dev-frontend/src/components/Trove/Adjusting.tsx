@@ -174,7 +174,7 @@ export const Adjusting: React.FC = () => {
             amount={collateral.prettify(4)}
             editingState={editingState}
             unit="RBTC"
-            editedAmount={collateral.toString(4)}
+            editedAmount={collateral.toString(18)}
             setEditedAmount={(amount: string) => setCollateral(Decimal.from(amount))}
           />
 
@@ -185,7 +185,7 @@ export const Adjusting: React.FC = () => {
               amount={netDebt.prettify()}
               unit={borrowedToken}
               editingState={editingState}
-              editedAmount={netDebt.toString(2)}
+              editedAmount={netDebt.toString(18)}
               setEditedAmount={(amount: string) => setNetDebt(Decimal.from(amount))}
             />
             {/* <NueCheckbox checked={useNueToken} onChange={handleSetNueToken} /> */}
@@ -263,7 +263,7 @@ export const Adjusting: React.FC = () => {
         )}
       </Box>
       <Flex variant="layout.cta">
-        <Button variant="cancel" onClick={handleCancelPressed}>
+        <Button data-action-id="zero-LOC-cancel" variant="cancel" onClick={handleCancelPressed}>
           Cancel
         </Button>
 
@@ -273,11 +273,14 @@ export const Adjusting: React.FC = () => {
             change={troveChange}
             useNueToken={useNueToken}
             maxBorrowingRate={maxBorrowingRate}
+            dataActionId="zero-LOC-confirm"
           >
             Confirm
           </TroveAction>
         ) : (
-          <Button disabled>Confirm</Button>
+          <Button data-action-id="zero-LOC-confirm" disabled>
+            Confirm
+          </Button>
         )}
       </Flex>
       {isTransactionPending && <LoadingOverlay />}

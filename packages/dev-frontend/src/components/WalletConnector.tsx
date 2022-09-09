@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
-import { useWeb3React } from "@web3-react/core";
-import { AbstractConnector } from "@web3-react/abstract-connector";
-import { Button, Link, Text } from "theme-ui";
-
-import { injectedConnector } from "../connectors/injectedConnector";
-import { useAuthorizedConnection } from "../hooks/useAuthorizedConnection";
+import { Button, Text } from "theme-ui";
 
 import { WaitListSignup } from "../pages/WaitListSignup";
 import { shortenAddress } from "../utils/shortenAddress";
@@ -12,6 +7,7 @@ import { checkAccountAccess } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
 import { ConfirmPage } from "../pages/ConfirmPage";
 import { AccessPage } from "../pages/AccessPage";
+import { useConnectorContext } from "./Connector";
 interface MaybeHasMetaMask {
   ethereum?: {
     isMetaMask?: boolean;
@@ -22,11 +18,10 @@ type ConnectionState =
   | { type: "inactive" }
   | {
       type: "activating" | "active" | "rejectedByUser" | "alreadyPending" | "failed";
-      connector: AbstractConnector;
     };
 
 type ConnectionAction =
-  | { type: "startActivating"; connector: AbstractConnector }
+  | { type: "startActivating" }
   | { type: "fail"; error: Error }
   | { type: "finishActivating" | "retry" | "cancel" | "deactivate" };
 
@@ -34,13 +29,11 @@ const connectionReducer: React.Reducer<ConnectionState, ConnectionAction> = (sta
   switch (action.type) {
     case "startActivating":
       return {
-        type: "activating",
-        connector: action.connector
+        type: "activating"
       };
     case "finishActivating":
       return {
-        type: "active",
-        connector: state.type === "inactive" ? injectedConnector : state.connector
+        type: "active"
       };
     case "fail":
       if (state.type !== "inactive") {
@@ -49,16 +42,14 @@ const connectionReducer: React.Reducer<ConnectionState, ConnectionAction> = (sta
             ? "rejectedByUser"
             : action.error.message.match(/already pending/i)
             ? "alreadyPending"
-            : "failed",
-          connector: state.connector
+            : "failed"
         };
       }
       break;
     case "retry":
       if (state.type !== "inactive") {
         return {
-          type: "activating",
-          connector: state.connector
+          type: "activating"
         };
       }
       break;
@@ -72,11 +63,6 @@ const connectionReducer: React.Reducer<ConnectionState, ConnectionAction> = (sta
       };
   }
 
-  console.warn("Ignoring connectionReducer action:");
-  console.log(action);
-  console.log("  in state:");
-  console.log(state);
-
   return state;
 };
 
@@ -87,20 +73,16 @@ type WalletConnectorProps = {
 };
 
 export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, loader }) => {
-  const { activate, deactivate, active, error, account } = useWeb3React<unknown>();
-  const triedAuthorizedConnection = useAuthorizedConnection();
+  const {
+    walletAddress,
+    connectWallet,
+    disconnectWallet,
+    isWalletConnected
+  } = useConnectorContext();
   const [connectionState, dispatch] = useReducer(connectionReducer, { type: "inactive" });
   const [hasAccess, setHasAccess] = useState(false);
-  const [hasClicked, setHasClicked] = useState(false);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    if (error) {
-      dispatch({ type: "fail", error });
-      deactivate();
-    }
-  }, [error, deactivate]);
 
   useEffect(() => {
     const checkAccess = async (account: string) => {
@@ -115,31 +97,28 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
         setLoading(false);
       }
     };
-    if (account) {
-      checkAccess(account);
+    if (walletAddress) {
+      checkAccess(walletAddress);
     }
-  }, [active, account]);
+  }, [isWalletConnected, walletAddress]);
 
   useEffect(() => {
-    if (active) {
+    if (isWalletConnected) {
       dispatch({ type: "finishActivating" });
     } else {
       dispatch({ type: "deactivate" });
     }
-  }, [active]);
+  }, [isWalletConnected]);
 
   const onClick = useCallback(() => {
-    if (active) {
-      deactivate();
-      setHasClicked(false);
+    if (isWalletConnected) {
+      disconnectWallet();
     } else {
-      dispatch({ type: "startActivating", connector: injectedConnector });
-      activate(injectedConnector);
-      setHasClicked(true);
+      connectWallet();
     }
-  }, [activate, active, deactivate]);
+  }, [isWalletConnected, disconnectWallet, connectWallet]);
 
-  if (!triedAuthorizedConnection || loading) {
+  if (loading) {
     return <>{loader}</>;
   }
 
@@ -159,15 +138,17 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
           height: "40px",
           p: 0
         }}
+        data-action-id="zero-landing-connectWallet"
       >
-        {!account ? (
+        {!walletAddress ? (
           "Connect Wallet"
         ) : (
           <Text as="span" sx={{ fontSize: 2, fontWeight: 600 }}>
-            {shortenAddress(account!, 4)}
+            {shortenAddress(walletAddress!, 4)}
           </Text>
         )}
       </Button>
+
       <Text
         as="p"
         sx={{
@@ -178,8 +159,8 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
           visibility: !loading ? "visible" : "hidden"
         }}
       >
-        {!hasAccess && account && "Sign up above to get added to the waitlist."}
-        {!account && hasClicked && (
+        {!hasAccess && walletAddress && "Sign up above to get added to the waitlist."}
+        {/* {!walletAddress && hasClicked && (
           <>
             Install or unlock an{" "}
             <Link
@@ -195,7 +176,7 @@ export const WalletConnector: React.FC<WalletConnectorProps> = ({ children, load
               RSK-compatible Web3 wallet.
             </Link>
           </>
-        )}
+        )} */}
       </Text>
     </WaitListSignup>
   );

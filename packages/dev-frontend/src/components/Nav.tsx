@@ -21,18 +21,29 @@ export const Nav: React.FC = () => {
           src={process.env.PUBLIC_URL + "/images/zerologo.svg"}
           alt="Zero"
         />
-        <Link to="/zero">Dashboard</Link>
-        <Link to="/zero/liquidation">Liquidation</Link>
-        <Link to="/zero/redemption">Redemption</Link>
+        <Link to="/zero" data-action-id="zero-menu-dashboard">
+          Dashboard
+        </Link>
+        <Link to="/zero/liquidation" data-action-id="zero-menu-liquidation">
+          Liquidation
+        </Link>
+        <Link to="/zero/redemption" data-action-id="zero-menu-redemption">
+          Redemption
+        </Link>
       </Flex>
       <Flex sx={{ alignItems: "center", flexDirection: ["column", "row"] }}>
         <NavLink
           href="https://wiki.sovryn.app/en/sovryn-dapp/subprotocols/zero-zusd"
           target="_blank"
+          data-action-id="zero-links-docs"
         >
           DOCS
         </NavLink>
-        <NavLink href="https://live.sovryn.app/swap" target="_blank">
+        <NavLink
+          href="https://live.sovryn.app/swap"
+          target="_blank"
+          data-action-id="zero-links-trade"
+        >
           Trade
         </NavLink>
       </Flex>

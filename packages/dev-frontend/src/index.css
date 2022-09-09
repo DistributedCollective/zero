@@ -45,7 +45,7 @@ th {
 }
 input ~ .checkbox {
   background: none !important;
-  color: #D9D9D9 !important;
+  color: #d9d9d9 !important;
 }
 .spiner {
   -webkit-animation: spin 1s linear infinite;
@@ -67,4 +67,9 @@ input ~ .checkbox {
     -webkit-transform: rotate(-360deg);
     transform: rotate(-360deg);
   }
+}
+
+:root {
+  --onboard-gray-100: #c4a853;
+  --onboard-danger-500: #7b0000;
 }

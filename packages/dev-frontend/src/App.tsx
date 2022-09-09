@@ -1,8 +1,6 @@
 import React from "react";
-import { Web3ReactProvider } from "@web3-react/core";
 import { Flex, Spinner, Heading, ThemeProvider, Paragraph, Link, Image } from "theme-ui";
 
-import { BatchedWebSocketAugmentedWeb3Provider } from "@sovryn-zero//providers";
 import { LiquityProvider } from "./hooks/LiquityContext";
 import { WalletConnector } from "./components/WalletConnector";
 import { TransactionProvider } from "./components/Transaction";
@@ -15,6 +13,7 @@ import { LiquityFrontend } from "./LiquityFrontend";
 import { BrowserRouter } from "react-router-dom";
 import { Header } from "./components/Header";
 import { isMainnet } from "./utils";
+import { ConnectorContextProvider } from "./components/Connector";
 
 if (window.ethereum) {
   // Silence MetaMask warning in console
@@ -36,14 +35,6 @@ getConfig().then(config => {
   // console.log(config);
   Object.assign(window, { config });
 });
-
-const EthersWeb3ReactProvider: React.FC = ({ children }) => {
-  return (
-    <Web3ReactProvider getLibrary={provider => new BatchedWebSocketAugmentedWeb3Provider(provider)}>
-      {children}
-    </Web3ReactProvider>
-  );
-};
 
 const UnsupportedLayout: React.FC = ({ children }) => (
   <Flex sx={{ flexDirection: "column", minHeight: "100%" }}>
@@ -80,8 +71,8 @@ const UnsupportedMainnetFallback: React.FC = () => (
     </Paragraph>
 
     <Paragraph>
-      If you'd like to use Zero on {isMainnet ? "mainnet" : "testnet"}, please go{" "}
-      <Link href={`https://${isMainnet ? "live" : "test"}.sovryn.app/zero`}>
+      If you'd like to use Zero on {!isMainnet ? "mainnet" : "testnet"}, please go{" "}
+      <Link href={`https://${!isMainnet ? "live" : "test"}.sovryn.app/zero`}>
         here <Icon name="external-link-alt" size="xs" />
       </Link>
       .
@@ -105,9 +96,9 @@ const App = () => {
   );
 
   return (
-    <EthersWeb3ReactProvider>
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <ConnectorContextProvider>
           <WalletConnector loader={loader}>
             <LiquityProvider
               loader={loader}
@@ -119,9 +110,9 @@ const App = () => {
               </TransactionProvider>
             </LiquityProvider>
           </WalletConnector>
-        </BrowserRouter>
-      </ThemeProvider>
-    </EthersWeb3ReactProvider>
+        </ConnectorContextProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 

@@ -1,15 +1,14 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo } from "react";
 import { Text, Flex, Image } from "theme-ui";
 import blockies from "ethereum-blockies";
-import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
 
 import { useLiquity } from "../hooks/LiquityContext";
 import { shortenAddress } from "../utils/shortenAddress";
+import { useConnectorContext } from "./Connector";
 
 export const UserAddress: React.FC = () => {
   const { account } = useLiquity();
-  const { deactivate } = useWeb3React<Web3Provider>();
+  const { disconnectWallet } = useConnectorContext();
 
   const blockieImage = useMemo(() => {
     return blockies
@@ -25,8 +24,6 @@ export const UserAddress: React.FC = () => {
       .toDataURL();
   }, [account]);
 
-  const logout = useCallback(deactivate, [deactivate]);
-
   return (
     <Flex bg="darkGray" sx={{ borderRadius: "5px", overflow: "hidden" }}>
       <Flex sx={{ alignItems: "center" }}>
@@ -40,7 +37,7 @@ export const UserAddress: React.FC = () => {
       <Flex
         bg="darkGray2"
         sx={{ justifyItems: "center", alignItems: "center", px: 10, py: 1, cursor: "pointer" }}
-        onClick={logout}
+        onClick={disconnectWallet}
       >
         <svg fill="#fec004" data-icon="log-out" width="20" viewBox="0 0 16 16">
           <desc>log-out</desc>

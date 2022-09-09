@@ -58,7 +58,7 @@ export const validateStabilityDepositChange = (
       undefined,
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>
+        <Amount value={change.depositZUSD.sub(zusdBalance)}>
           {change.depositZUSD.sub(zusdBalance).prettify()} {COIN}
         </Amount>
         .

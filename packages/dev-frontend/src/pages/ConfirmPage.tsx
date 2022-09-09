@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { confirmUser } from "../utils/whitelist";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { isMainnet } from "../utils";
+import { sovrynLink } from "src/contracts/config";
 
 export const ConfirmPage: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
@@ -59,7 +60,7 @@ export const ConfirmPage: React.FC = () => {
         }}
         src={process.env.PUBLIC_URL + "/zero-logo.svg"}
       />
-      <Link href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}>
+      <Link href={sovrynLink}>
         <Image
           sx={{
             position: "absolute",
@@ -91,7 +92,7 @@ export const ConfirmPage: React.FC = () => {
           fontWeight: "medium",
           mt: 2
         }}
-        href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}
+        href={sovrynLink}
       >
         Back to Sovryn
       </Link>

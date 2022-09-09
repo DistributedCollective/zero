@@ -32,52 +32,67 @@ const TroveChangeDescription: React.FC<TroveAdjustmentDescriptionParams> = ({
   <ActionDescription>
     {params.depositCollateral && params.borrowZUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount> and receive{" "}
-        <Amount>
+        You will deposit{" "}
+        <Amount value={params.depositCollateral}>{params.depositCollateral.prettify()} RBTC</Amount>{" "}
+        and receive{" "}
+        <Amount value={params.borrowZUSD}>
           {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.repayZUSD && params.withdrawCollateral ? (
       <>
         You will pay{" "}
-        <Amount>
+        <Amount value={params.repayZUSD}>
           {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>{" "}
-        and receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount>
+        and receive{" "}
+        <Amount value={params.withdrawCollateral}>
+          {params.withdrawCollateral.prettify()} RBTC
+        </Amount>
       </>
     ) : params.depositCollateral && params.repayZUSD ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount> and pay{" "}
-        <Amount>
+        You will deposit{" "}
+        <Amount value={params.depositCollateral}>{params.depositCollateral.prettify()} RBTC</Amount>{" "}
+        and pay{" "}
+        <Amount value={params.repayZUSD}>
           {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.borrowZUSD && params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount> and{" "}
-        <Amount>
+        You will receive{" "}
+        <Amount value={params.withdrawCollateral}>
+          {params.withdrawCollateral.prettify()} RBTC
+        </Amount>{" "}
+        and{" "}
+        <Amount value={params.borrowZUSD}>
           {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : params.depositCollateral ? (
       <>
-        You will deposit <Amount>{params.depositCollateral.prettify()} RBTC</Amount>
+        You will deposit{" "}
+        <Amount value={params.depositCollateral}>{params.depositCollateral.prettify()} RBTC</Amount>
       </>
     ) : params.withdrawCollateral ? (
       <>
-        You will receive <Amount>{params.withdrawCollateral.prettify()} RBTC</Amount>
+        You will receive{" "}
+        <Amount value={params.withdrawCollateral}>
+          {params.withdrawCollateral.prettify()} RBTC
+        </Amount>
       </>
     ) : params.borrowZUSD ? (
       <>
         You will receive{" "}
-        <Amount>
+        <Amount value={params.borrowZUSD}>
           {params.borrowZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
     ) : (
       <>
         You will pay{" "}
-        <Amount>
+        <Amount value={params.repayZUSD}>
           {params.repayZUSD.prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>
       </>
@@ -144,7 +159,7 @@ export const validateTroveChange = (
       undefined,
       <ErrorDescription>
         Total debt must be at least{" "}
-        <Amount>
+        <Amount value={ZUSD_MINIMUM_DEBT}>
           {ZUSD_MINIMUM_DEBT.toString()} {COIN}
         </Amount>
         .
@@ -180,7 +195,7 @@ const validateTroveCreation = (
     return (
       <ErrorDescription>
         Total debt must be at least{" "}
-        <Amount>
+        <Amount value={ZUSD_MINIMUM_DEBT}>
           {ZUSD_MINIMUM_DEBT.toString()} {COIN}
         </Amount>
         .
@@ -222,7 +237,10 @@ const validateTroveCreation = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} RBTC</Amount>.
+        <Amount value={depositCollateral.sub(accountBalance)}>
+          {depositCollateral.sub(accountBalance).prettify()} RBTC
+        </Amount>
+        .
       </ErrorDescription>
     );
   }
@@ -295,7 +313,7 @@ const validateTroveAdjustment = (
       return (
         <ErrorDescription>
           Total debt must be at least{" "}
-          <Amount>
+          <Amount value={ZUSD_MINIMUM_DEBT}>
             {ZUSD_MINIMUM_DEBT.toString()} {useNueBalance ? COIN2 : COIN}
           </Amount>
           .
@@ -308,7 +326,7 @@ const validateTroveAdjustment = (
       return (
         <ErrorDescription>
           The amount you're trying to repay exceeds your balance by{" "}
-          <Amount>
+          <Amount value={repayZUSD.sub(repayBalance)}>
             {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2 : COIN}
           </Amount>
           .
@@ -321,7 +339,10 @@ const validateTroveAdjustment = (
     return (
       <ErrorDescription>
         The amount you're trying to deposit exceeds your balance by{" "}
-        <Amount>{depositCollateral.sub(accountBalance).prettify()} RBTC</Amount>.
+        <Amount value={depositCollateral.sub(accountBalance)}>
+          {depositCollateral.sub(accountBalance).prettify()} RBTC
+        </Amount>
+        .
       </ErrorDescription>
     );
   }
@@ -362,7 +383,7 @@ const validateTroveClosure = (
     return (
       <ErrorDescription>
         You need{" "}
-        <Amount>
+        <Amount value={repayZUSD.sub(repayBalance)}>
           {repayZUSD.sub(repayBalance).prettify()} {useNueBalance ? COIN2 : COIN}
         </Amount>{" "}
         more to close your Line of Credit.

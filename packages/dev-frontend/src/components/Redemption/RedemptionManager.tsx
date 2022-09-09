@@ -75,7 +75,7 @@ export const RedemptionManager: React.FC = () => {
         false,
         <ErrorDescription>
           The amount you're trying to redeem exceeds your balance by{" "}
-          <Amount>
+          <Amount value={zusdAmount.sub(zusdBalance)}>
             {" "}
             {zusdAmount.sub(zusdBalance).prettify()} {COIN}
           </Amount>
@@ -85,8 +85,10 @@ export const RedemptionManager: React.FC = () => {
     : [
         true,
         <ActionDescription>
-          You will receive <Amount>{ethAmount.sub(ethFee).prettify(8)} RBTC</Amount> in exchange for{" "}
-          <Amount>
+          You will receive{" "}
+          <Amount value={ethAmount.sub(ethFee)}>{ethAmount.sub(ethFee).prettify(8)} RBTC</Amount> in
+          exchange for{" "}
+          <Amount value={zusdAmount}>
             {zusdAmount.prettify()} {COIN}
           </Amount>
           .
@@ -136,7 +138,7 @@ export const RedemptionManager: React.FC = () => {
             amount={zusdAmount.prettify()}
             unit={COIN}
             {...{ editingState }}
-            editedAmount={zusdAmount.toString(2)}
+            editedAmount={zusdAmount.toString(18)}
             setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
           />
           <Box sx={{ mt: 40, pl: "8px" }}>

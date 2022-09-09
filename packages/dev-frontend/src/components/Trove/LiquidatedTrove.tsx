@@ -28,7 +28,11 @@ export const LiquidatedTrove: React.FC = () => {
 
       <Flex variant="layout.cta">
         {hasSurplusCollateral && <CollateralSurplusAction />}
-        {!hasSurplusCollateral && <Button onClick={handleOpenTrove}>Open Line of Credit</Button>}
+        {!hasSurplusCollateral && (
+          <Button onClick={handleOpenTrove} data-action-id="zero-dashboard-openLOC">
+            Open Line of Credit
+          </Button>
+        )}
       </Flex>
     </Box>
   );

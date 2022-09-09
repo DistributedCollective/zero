@@ -1,6 +1,6 @@
 import React from "react";
+import { sovrynLink } from "src/contracts/config";
 import { Box, Image, Link, Paragraph } from "theme-ui";
-import { isMainnet } from "../utils";
 
 type WaitlistSuccessProps = {
   onClose: () => void;
@@ -36,7 +36,7 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = () => {
           textDecoration: "underline",
           fontWeight: "medium"
         }}
-        href={`https://${isMainnet ? "live" : "test"}.sovryn.app/`}
+        href={sovrynLink}
       >
         Back to Sovryn
       </Link>
