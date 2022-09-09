@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/lib-base",
-  "version": "1.0.0-early.access",
+  "version": "1.0.0-early.access.0",
   "description": "Sovryn ZERO SDK shared interfaces",
   "keywords": [
     "Zero",
@@ -14,14 +14,18 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/DistributedCollective/zero",
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "prepare": "run-s prepare:*",
     "prepare:eslint": "eslint src",
     "prepare:tsc": "tsc --project tsconfig.dist.json",
     "prepare:api": "api-extractor run --local",
     "test": "mocha --require ts-node/register",
-    "do-pack": "yarn prepare && yarn pack",
-    "do-publish": "yarn prepare && yarn publish"
+    "do-pack": "yarn prepare && yarn pack"
   },
   "dependencies": {
     "@ethersproject/bignumber": "5.0.15"

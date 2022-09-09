@@ -47,6 +47,11 @@
     "**/@typechain/*",
     "@typechain/*"
   ],
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "do-pack": "yarn prepare && yarn dist-pack",
     "do-publish": "cd ./dist && yarn publish",
