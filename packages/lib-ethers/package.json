@@ -3,10 +3,16 @@
   "version": "1.0.0-early.access",
   "description": "Sovryn ZERO SDK Ethers-based implementation",
   "keywords": [
+    "Sovryn",
     "Zero",
-    "protocol",
+    "SDK",
     "DeFi",
-    "RSK"
+    "blockchain",
+    "finance",
+    "BTC",
+    "bitcoin",
+    "RSK",
+    "rootstock"
   ],
   "homepage": "https://github.com/DistributedCollective/zero/blob/main/README.md",
   "license": "MIT",
@@ -41,7 +47,7 @@
     "do-publish": "yarn prepare && yarn publish"
   },
   "peerDependencies": {
-    "@sovryn-zero/lib-base": "^3.0.0",
+    "@sovryn-zero/lib-base": ">=1.0.0-early.access.0 <1.0.0",
     "ethers": "^5.0.0"
   },
   "devDependencies": {

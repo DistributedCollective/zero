@@ -6,6 +6,11 @@
   "directories": {
     "test": "test"
   },
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "do-pack": "yarn prepare && yarn dist-pack",
     "do-publish": "cd ./dist && yarn publish",
@@ -23,10 +28,18 @@
     "coveralls": "cat coverage/lcov.info | coveralls"
   },
   "keywords": [
-    "sovryn",
-    "zero",
-    "solidity contracts",
-    "zero contracts"
+    "Sovryn",
+    "ZERO",
+    "DeFi",
+    "blockchain",
+    "finance",
+    "BTC",
+    "bitcoin",
+    "RSK",
+    "rootstock",
+    "solidity",
+    "contracts",
+    "SDK"
   ],
   "author": "",
   "license": "ISC",
