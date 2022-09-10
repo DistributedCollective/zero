@@ -13,7 +13,8 @@
   },
   "scripts": {
     "do-pack": "yarn prepare && yarn dist-pack",
-    "do-publish": "cd ./dist && yarn publish",
+    "do-publish": "yarn prepare && yarn publish-dist",
+    "publish-dist": "cd ./dist && yarn publish -f",
     "hardhat": "hardhat",
     "docgen": "truffle compile && solidoc2 ./ ./docs",
     "prepare": "run-s prepare:*",

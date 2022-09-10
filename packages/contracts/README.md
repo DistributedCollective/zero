@@ -14,7 +14,7 @@
   npm install @sovryn-zero/contracts
   ```
 
-  To install early access releases (pre-releases) - use a specific version to install:  
+  To install early access releases (pre-releases) - specify a version:  
   ```
   npm install @sovryn-zero/contracts@1.0.0-early.access.0
   ```  

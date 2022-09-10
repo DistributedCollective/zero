@@ -6,6 +6,11 @@
     "type": "git",
     "url": "git+https://github.com/DistributedCollective/zero.git"
   },
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "keywords": [
     "Sovryn",
     "ZERO",
