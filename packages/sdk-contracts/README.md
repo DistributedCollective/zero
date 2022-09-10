@@ -13,6 +13,13 @@
   npm install @sovryn-zero/contracts @sovryn-zero/sdk-contracts
   ```
 
+  To install early access releases (pre-releases) - use a specific version to install:  
+  ```
+  npm install @sovryn-zero/sdk-contracts@1.0.0-early.access.0
+  ```  
+
+  The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-early-access/packages/sdk-contracts/package.json#L3).  
+
 ## Project Description
   Sovryn ZERO Solidity Contracts SDK is a set of solidity libraries that users can import and use in their contracts.
   Stashed changes

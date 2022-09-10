@@ -8,13 +8,22 @@
 
 ## Quickstart
 
-Install in your project:
+### Install in your project:
 
-```
-npm install @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
-```
+  ```
+  npm install @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
+  ```  
 
-Connecting to an Ethereum node and sending a transaction:
+  To install early access releases (pre-releases) - use a specific version to install:  
+
+  ```
+  npm install @sovryn-zero/lib-ethers@1.0.0-early.access.0
+  ```  
+
+  The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-early-access/packages/lib-ethers/package.json#L3).  
+
+
+### Connecting to an Ethereum node and sending a transaction:
 
 ```javascript
 const { Wallet, providers } = require("ethers");
@@ -42,5 +51,5 @@ See [packages/examples](https://github.com/DistributedCollective/zero/tree/maste
 
 ## API Reference
 
-For now, it can be found in the public Sovryn [zero repo](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
+For now, it can be found in the public Sovryn [ZERO repository](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
 

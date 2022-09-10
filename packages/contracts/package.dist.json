@@ -7,10 +7,18 @@
     "url": "git+https://github.com/DistributedCollective/zero.git"
   },
   "keywords": [
-    "sovryn",
-    "zero",
-    "solidity contracts",
-    "zero contracts"
+    "Sovryn",
+    "ZERO",
+    "DeFi",
+    "blockchain",
+    "finance",
+    "BTC",
+    "bitcoin",
+    "RSK",
+    "rootstock",
+    "solidity",
+    "contracts",
+    "SDK"
   ],
   "author": "Sovryn",
   "license": "MIT",
