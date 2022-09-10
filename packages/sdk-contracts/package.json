@@ -61,7 +61,8 @@
   },
   "scripts": {
     "do-pack": "yarn prepare && yarn dist-pack",
-    "do-publish": "cd ./dist && yarn publish",
+    "do-publish": "yarn prepare && yarn publish-dist",
+    "publish-dist": "cd ./dist && yarn publish",
     "compile": "hardhat compile",
     "prepare-dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
     "prepare": "run-s prepare:*",
@@ -75,7 +76,7 @@
     "prettier-check": "prettier --check ."
   },
   "peerDependencies": {
-    "@sovryn-zero/contracts": ">=1.0.0-early.access <1.0.0-early.access.1000"
+    "@sovryn-zero/contracts": ">=1.0.0-early.access <1.0.0"
   },
   "devDependencies": {
     "@defi-wonderland/smock": "^2.0.7",
