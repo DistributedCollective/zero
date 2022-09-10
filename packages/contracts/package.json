@@ -41,8 +41,8 @@
     "contracts",
     "SDK"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Sovryn",
+  "license": "GPLv3",
   "dependencies": {
     "decimal.js": "^10.2.0",
     "eth-mutants": "^0.1.1",
