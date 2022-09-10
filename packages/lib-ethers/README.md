@@ -51,5 +51,5 @@ See [packages/examples](https://github.com/DistributedCollective/zero/tree/maste
 
 ## API Reference
 
-For now, it can be found in the public Sovryn [ZERO repository](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
+[API Reference](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
 
