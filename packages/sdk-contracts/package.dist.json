@@ -19,7 +19,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "author": "Sovryn",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "bugs": {
     "url": "https://github.com/DistributedCollective/zero"
   },

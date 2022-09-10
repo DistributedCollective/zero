@@ -29,6 +29,16 @@
 
 ## **Docs**  
 
+### Usage example
+
+```javascript
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.6.11;
+import "@sovryn-zero/contracts/contracts/ActivePool.sol";
+import "@sovryn-zero/contracts/contracts/BorrowerOperations.sol";
+```  
+
 [comment]: #solidoc (Start)
 ### Contracts
 

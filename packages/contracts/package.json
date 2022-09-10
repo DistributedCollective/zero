@@ -42,7 +42,7 @@
     "SDK"
   ],
   "author": "Sovryn",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "decimal.js": "^10.2.0",
     "eth-mutants": "^0.1.1",
