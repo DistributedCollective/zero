@@ -64,7 +64,7 @@
     "do-publish": "yarn prepare && yarn publish-dist",
     "publish-dist": "cd ./dist && yarn publish",
     "compile": "hardhat compile",
-    "prepare-dist": "rm -rf ./dist && mkdir ./dist && cp -R README.md LICENSE contracts ./dist && cp ./package.dist.json ./dist/package.json",
+    "prepare-dist": "rm -rf ./dist && mkdir ./dist && cp -R LICENSE contracts ./dist && cp README.dist.md ./dist/README.md && cp ./package.dist.json ./dist/package.json",
     "prepare": "run-s prepare:*",
     "prepare:dist": "yarn compile && yarn prepare-dist",
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-sdk-contracts-package.tgz",
