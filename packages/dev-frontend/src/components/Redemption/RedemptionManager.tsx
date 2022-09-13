@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Box, Flex, Heading } from "theme-ui";
+import { Button, Box, Flex, Heading, Card as UiCard } from "theme-ui";
 import { Card } from "../Card";
 
 import {
@@ -136,6 +136,7 @@ export const RedemptionManager: React.FC = () => {
             label="Redeem"
             inputId="redeem-zusd"
             amount={zusdAmount.prettify()}
+            value={zusdAmount}
             unit={COIN}
             {...{ editingState }}
             editedAmount={zusdAmount.toString(18)}
@@ -146,15 +147,16 @@ export const RedemptionManager: React.FC = () => {
               label="Redemption Fee"
               inputId="redeem-fee"
               amount={ethFee.toString(6)}
+              value={ethFee}
               pendingAmount={feePct.toString(2)}
               unit="RBTC"
               infoIcon={
                 <InfoIcon
                   tooltip={
-                    <Card>
+                    <UiCard variant="tooltip" sx={{ width: "240px" }}>
                       The Redemption Fee is charged as a percentage of the redeemed RBTC. The
                       Redemption Fee depends on ZUSD redemption volumes and is 0.5% at minimum.
-                    </Card>
+                    </UiCard>
                   }
                 />
               }

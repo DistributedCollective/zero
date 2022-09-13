@@ -32,6 +32,7 @@ export const ReadOnlyStake: React.FC = () => {
           label="Stake"
           inputId="stake-zero"
           amount={zeroStake.stakedZERO.prettify()}
+          value={zeroStake.stakedZERO}
           unit={GT}
         />
 
@@ -39,6 +40,7 @@ export const ReadOnlyStake: React.FC = () => {
           label="Pool share"
           inputId="stake-share"
           amount={poolShare.prettify(4)}
+          value={poolShare}
           unit="%"
         />
 
@@ -46,6 +48,7 @@ export const ReadOnlyStake: React.FC = () => {
           label="Redemption gain"
           inputId="stake-gain-eth"
           amount={zeroStake.collateralGain.prettify(4)}
+          value={zeroStake.collateralGain}
           color={zeroStake.collateralGain.nonZero && "success"}
           unit="RBTC"
         />
@@ -54,6 +57,7 @@ export const ReadOnlyStake: React.FC = () => {
           label="Issuance gain"
           inputId="stake-gain-zusd"
           amount={zeroStake.zusdGain.prettify()}
+          value={zeroStake.zusdGain}
           color={zeroStake.zusdGain.nonZero && "success"}
           unit={COIN}
         />

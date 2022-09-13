@@ -59,6 +59,7 @@ export const ActiveDeposit: React.FC = () => {
             label="Deposit"
             inputId="deposit-zusd"
             amount={stabilityDeposit.currentZUSD.prettify()}
+            value={stabilityDeposit.currentZUSD}
             unit={COIN}
           />
 
@@ -66,6 +67,7 @@ export const ActiveDeposit: React.FC = () => {
             label="Pool share"
             inputId="deposit-share"
             amount={poolShare.prettify(4)}
+            value={poolShare}
             unit="%"
           />
 
@@ -73,6 +75,7 @@ export const ActiveDeposit: React.FC = () => {
             label="Liquidation gain"
             inputId="deposit-gain"
             amount={stabilityDeposit.collateralGain.prettify(4)}
+            value={stabilityDeposit.collateralGain}
             color={stabilityDeposit.collateralGain.nonZero && "success"}
             unit="RBTC"
           />
