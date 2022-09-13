@@ -1,7 +1,7 @@
 {
   "name": "@sovryn-zero/lib-base",
-  "version": "1.0.0-early.access.2",
-  "description": "Sovryn ZERO SDK shared interfaces",
+  "version": "1.0.0-early.access.3",
+  "description": "Sovryn Zero SDK shared interfaces",
   "keywords": [
     "Sovryn",
     "Zero",
