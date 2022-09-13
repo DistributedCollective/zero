@@ -2,9 +2,9 @@
 
 [![GitHub license](https://img.shields.io/github/license/DistributedCollective/zero)](/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/DistributedCollective/zero)](https://github.com/DistributedCollective/zero/stargazers)
-[![ZERO README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
+[![Zero README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
 
-Shared interfaces and classes of ZERO SDK.
+Shared interfaces and classes of Zero SDK.
 
 ## Quickstart
 

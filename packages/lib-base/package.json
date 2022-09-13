@@ -3,10 +3,16 @@
   "version": "1.0.0-early.access.1",
   "description": "Sovryn ZERO SDK shared interfaces",
   "keywords": [
+    "Sovryn",
     "Zero",
-    "protocol",
+    "SDK",
     "DeFi",
-    "RSK"
+    "blockchain",
+    "finance",
+    "BTC",
+    "bitcoin",
+    "RSK",
+    "rootstock"
   ],
   "homepage": "https://github.com/DistributedCollective/zero#readme",
   "license": "MIT",
