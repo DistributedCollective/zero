@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/sdk-contracts",
-  "version": "1.0.0-early.access.0",
+  "version": "1.0.0-early.access.2",
   "description": "Sovryn Zero SDK solidity contracts",
   "files": [
     "dist/**/*.*",
