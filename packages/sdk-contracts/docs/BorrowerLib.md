@@ -2,9 +2,9 @@
 
 
 
-> ZERO-SDK Borrower Lib
+> Zero-SDK Borrower Lib
 
-library containing basic Borrowing Operations from ZERO protocol
+library containing basic Borrowing Operations from Zero protocol
 
 
 
@@ -22,8 +22,8 @@ adds the received rBTC to the caller&#39;s active Trove.
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
+| Name             | Type    | Description                           |
+| ---------------- | ------- | ------------------------------------- |
 | borrowerContract | address | address of BorrowerOperations library |
 
 ### closeCreditLineAndWithdrawCollateral
@@ -38,8 +38,8 @@ Closes the credit line and withdraws the collateral
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
+| Name             | Type    | Description                           |
+| ---------------- | ------- | ------------------------------------- |
 | borrowerContract | address | address of BorrowerOperations library |
 
 ### openCreditLineInZusd
@@ -54,11 +54,11 @@ Open a credit line by depositing amount of rBTC as a collateral
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
+| Name              | Type    | Description                                                                    |
+| ----------------- | ------- | ------------------------------------------------------------------------------ |
 | _maxFeePercentage | uint256 | maximum fee percentage that user is wishing to pay for opening the credit line |
-| _ZUSDAmount | uint256 | amount of ZUSD to be borrowed |
-| borrowerContract | address | address of BorrowerOperations library |
+| _ZUSDAmount       | uint256 | amount of ZUSD to be borrowed                                                  |
+| borrowerContract  | address | address of BorrowerOperations library                                          |
 
 ### repayZUSD
 
@@ -72,9 +72,9 @@ Repays ZUSD towards the open credit line of the borrower
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _amount | uint256 | amount of ZUSD to be repayed |
+| Name             | Type    | Description                           |
+| ---------------- | ------- | ------------------------------------- |
+| _amount          | uint256 | amount of ZUSD to be repayed          |
 | borrowerContract | address | address of BorrowerOperations library |
 
 ### withdrawCollateral
@@ -89,9 +89,9 @@ withdraws `_amount` of collateral from the caller’s Trove. Executes only if th
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _amount | uint256 | collateral amount to withdraw |
+| Name             | Type    | Description                           |
+| ---------------- | ------- | ------------------------------------- |
+| _amount          | uint256 | collateral amount to withdraw         |
 | borrowerContract | address | address of BorrowerOperations library |
 
 ### withdrawZUSD
@@ -106,11 +106,11 @@ Issues the specified amount of ZUSD to the caller Executes only if the Trove&#39
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
+| Name              | Type    | Description                                                                    |
+| ----------------- | ------- | ------------------------------------------------------------------------------ |
 | _maxFeePercentage | uint256 | maximum fee percentage that user is wishing to pay for opening the credit line |
-| _amount | uint256 | amount of ZUSD to be withdrawn |
-| borrowerContract | address | address of BorrowerOperations library |
+| _amount           | uint256 | amount of ZUSD to be withdrawn                                                 |
+| borrowerContract  | address | address of BorrowerOperations library                                          |
 
 
 

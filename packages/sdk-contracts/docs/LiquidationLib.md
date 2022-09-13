@@ -2,7 +2,7 @@
 
 
 
-> ZERO-SDK Liquidation Lib
+> Zero-SDK Liquidation Lib
 
 library containing basic Liquidation and redemption operations
 
@@ -22,10 +22,10 @@ Liquidates bad credit lines in the protocol
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| troveManagerContractAddress | address | address of TroveManager library |
-| maxLiquidations | uint256 | address of the borrower to be liquidated |
+| Name                        | Type    | Description                              |
+| --------------------------- | ------- | ---------------------------------------- |
+| troveManagerContractAddress | address | address of TroveManager library          |
+| maxLiquidations             | uint256 | address of the borrower to be liquidated |
 
 ### liquidateBorrower
 
@@ -39,10 +39,10 @@ Liquidates credit line of the borrower
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| borrowerAddress | address | address of the borrower to be liquidated |
-| troveManagerContractAddress | address | address of TroveManager library |
+| Name                        | Type    | Description                              |
+| --------------------------- | ------- | ---------------------------------------- |
+| borrowerAddress             | address | address of the borrower to be liquidated |
+| troveManagerContractAddress | address | address of TroveManager library          |
 
 ### redeemCollateral
 
@@ -56,13 +56,13 @@ Redeems the corresponding ZUSD amount into rBTC
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _troveManagerContractAddress | address | address of TroveManager library |
-| _hintHelpersAddress | address | address of the HintHelpers library |
-| _priceFeedAddress | address | address of PriceFeed library |
-| _ZUSDAmount | uint256 | amount of ZUSD to be redeemed |
-| _maxFeePercentage | uint256 | max fee percentage of the ZUSD amount. If above this percentage, transaction will revert |
+| Name                         | Type    | Description                                                                              |
+| ---------------------------- | ------- | ---------------------------------------------------------------------------------------- |
+| _troveManagerContractAddress | address | address of TroveManager library                                                          |
+| _hintHelpersAddress          | address | address of the HintHelpers library                                                       |
+| _priceFeedAddress            | address | address of PriceFeed library                                                             |
+| _ZUSDAmount                  | uint256 | amount of ZUSD to be redeemed                                                            |
+| _maxFeePercentage            | uint256 | max fee percentage of the ZUSD amount. If above this percentage, transaction will revert |
 
 
 

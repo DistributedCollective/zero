@@ -1,7 +1,7 @@
 {
   "name": "@sovryn-zero/contracts",
   "version": "1.0.0-early.access",
-  "description": "Sovryn ZERO solidity contracts",
+  "description": "Sovryn Zero solidity contracts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DistributedCollective/zero.git"
@@ -13,7 +13,7 @@
   },
   "keywords": [
     "Sovryn",
-    "ZERO",
+    "Zero",
     "DeFi",
     "blockchain",
     "finance",

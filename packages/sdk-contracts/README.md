@@ -2,7 +2,7 @@
 
 [![GitHub license](https://img.shields.io/github/license/DistributedCollective/zero)](/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/DistributedCollective/zero)](https://github.com/DistributedCollective/zero/stargazers)
-[![ZERO README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
+[![Zero README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
 
   SDK contract (Library) consisting of utilities for the Sovryn Zero Protocol
 
@@ -21,7 +21,7 @@
   The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-early-access/packages/sdk-contracts/package.json#L3).  
 
 ## Project Description
-  Sovryn ZERO Solidity Contracts SDK is a set of solidity libraries that users can import and use in their contracts.  
+  Sovryn Zero Solidity Contracts SDK is a set of solidity libraries that users can import and use in their contracts.  
 
 ## Overview
   All contracts are libraries, each containing set of functionalities related to utilities of the Sovryn Zero ecosystem.
@@ -33,7 +33,7 @@
   3. **[StabilityPoolLib.sol](./docs/StabilityPoolLib.md)** - Pool Stability operations.
   4. **[TroveStatiscticsLib.sol](./docs/TroveStatisticsLib.md)** - View function related to the troves (get nominal collateral ratio, borrowing fee calculation, get borrower's debt of the troves).
    
-  **[ZERO Contracts Addresses](./docs/Addresses.md)**
+  **[Zero Contracts Addresses](./docs/Addresses.md)**
 
 ## Demo
   **[TestIntegration.sol](./docs/IntegrationExample.md)** provides a sample integration

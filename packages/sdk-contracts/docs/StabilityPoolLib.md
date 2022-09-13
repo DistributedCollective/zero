@@ -2,9 +2,9 @@
 
 
 
-> ZERO-SDK Liquidation Lib
+> Zero-SDK Liquidation Lib
 
-library containing basic operations regarding ZERO Stability Pool
+library containing basic operations regarding Zero Stability Pool
 
 
 
@@ -22,9 +22,9 @@ Adds the corresponding amount of ZERO to stability pool
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _amount | uint256 | amount of ZUSD to be deposited |
+| Name                  | Type    | Description                        |
+| --------------------- | ------- | ---------------------------------- |
+| _amount               | uint256 | amount of ZUSD to be deposited     |
 | _stabilityPoolAddress | address | address of Stability Pool Contract |
 
 ### withdrawFromSP
@@ -39,9 +39,9 @@ Withdraws the corresponding amount of ZERO from stability pool
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
-| _amount | uint256 | amount of ZUSD to be withdrawn |
+| Name                  | Type    | Description                        |
+| --------------------- | ------- | ---------------------------------- |
+| _amount               | uint256 | amount of ZUSD to be withdrawn     |
 | _stabilityPoolAddress | address | address of Stability Pool Contract |
 
 ### withdrawRBTCGainToTrove
@@ -56,8 +56,8 @@ Withdraws all gains from the stability pool and adds them as a collateral to the
 
 #### Parameters
 
-| Name | Type | Description |
-|---|---|---|
+| Name                  | Type    | Description                        |
+| --------------------- | ------- | ---------------------------------- |
 | _stabilityPoolAddress | address | address of Stability Pool Contract |
 
 

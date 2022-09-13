@@ -1,7 +1,7 @@
 {
   "name": "@sovryn-zero/sdk-contracts",
   "version": "1.0.0-early.access",
-  "description": "Sovryn ZERO SDK solidity contracts",
+  "description": "Sovryn Zero SDK solidity contracts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DistributedCollective/zero.git"

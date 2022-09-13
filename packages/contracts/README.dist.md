@@ -2,9 +2,9 @@
 
 [![GitHub license](https://img.shields.io/github/license/DistributedCollective/zero)](/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/DistributedCollective/zero)](https://github.com/DistributedCollective/zero/stargazers)
-[![ZERO README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
+[![Zero README](https://img.shields.io/badge/readme-gray?style=flat&logo=ZeroMQ&logoColor=green&link=/README.md)](/README.md)  
 
-  ZERO solidity contracts
+  Zero solidity contracts
 
 ## **Quickstart**
 
@@ -23,8 +23,8 @@
 
 ## **Project Description**  
 
-  Sovryn ZERO Solidity Contracts is a full set of ZERO solidity contracts.
-  For interaction and integration with ZERO it is recommended to use @sovryn-zero/sdk-contracts package.  
+  Sovryn Zero Solidity Contracts is a full set of Zero solidity contracts.
+  For interaction and integration with Zero it is recommended to use @sovryn-zero/sdk-contracts package.  
    
 
 
