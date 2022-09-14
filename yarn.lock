@@ -3793,12 +3793,12 @@
     source-map "~0.6.1"
     typescript "~4.1.3"
 
-"@microsoft/tsdoc-config@0.14.0":
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/tsdoc-config/-/tsdoc-config-0.14.0.tgz#fbad7dd69edabc3623a5ee3b99c9b832aa78c5c2"
-  integrity sha512-KSj15FwyaxMCGJkC320rvNXxuJNCOVO02pNqIEdf5cbLakvHK8afoHTmcjdBEWl0cfBFZlMu/1DhL4VCzZq0rQ==
+"@microsoft/tsdoc-config@0.16.2":
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/tsdoc-config/-/tsdoc-config-0.16.2.tgz#b786bb4ead00d54f53839a458ce626c8548d3adf"
+  integrity sha512-OGiIzzoBLgWWR0UdRJX98oYO+XKGf7tiK4Zk6tQ/E4IJqGCe7dvkTvgDZV5cFJUzLGDOjeAXrnZoA6QkVySuxw==
   dependencies:
-    "@microsoft/tsdoc" "0.13.0"
+    "@microsoft/tsdoc" "0.14.2"
     ajv "~6.12.6"
     jju "~1.4.0"
     resolve "~1.19.0"
@@ -3808,10 +3808,10 @@
   resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.12.24.tgz#30728e34ebc90351dd3aff4e18d038eed2c3e098"
   integrity sha512-Mfmij13RUTmHEMi9vRUhMXD7rnGR2VvxeNYtaGtaJ4redwwjT4UXYJ+nzmVJF7hhd4pn/Fx5sncDKxMVFJSWPg==
 
-"@microsoft/tsdoc@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.13.0.tgz#f05c6315bc3dfd18cdca70f28cd40d28da643249"
-  integrity sha512-/8J+4DdvexBH1Qh1yR8VZ6bPay2DL/TDdmSIypAa3dAghJzsdaiZG8COvzpYIML6HV2UVN0g4qbuqzjG4YKgWg==
+"@microsoft/tsdoc@0.14.2":
+  version "0.14.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/tsdoc/-/tsdoc-0.14.2.tgz#c3ec604a0b54b9a9b87e9735dfc59e1a5da6a5fb"
+  integrity sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==
 
 "@noble/hashes@1.1.2", "@noble/hashes@~1.1.1":
   version "1.1.2"
@@ -10922,13 +10922,13 @@ eslint-plugin-testing-library@^3.9.2:
   dependencies:
     "@typescript-eslint/experimental-utils" "^3.10.1"
 
-eslint-plugin-tsdoc@0.2.11:
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-tsdoc/-/eslint-plugin-tsdoc-0.2.11.tgz#dda92e69d88fd7f9f0a604438dca837a3341aaee"
-  integrity sha512-vEjGANpmBfrvpKj9rwePGhA+gIe1mp+dhDZsrkxlHqPVOZvzVdFSV9fxu/o3eppmxhybI8brD88jOrLEAIB9Gw==
+eslint-plugin-tsdoc@0.2.17:
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-tsdoc/-/eslint-plugin-tsdoc-0.2.17.tgz#27789495bbd8778abbf92db1707fec2ed3dfe281"
+  integrity sha512-xRmVi7Zx44lOBuYqG8vzTXuL6IdGOeF9nHX17bjJ8+VE6fsxpdGem0/SBTmAwgYMKYB1WBkqRJVQ+n8GK041pA==
   dependencies:
-    "@microsoft/tsdoc" "0.13.0"
-    "@microsoft/tsdoc-config" "0.14.0"
+    "@microsoft/tsdoc" "0.14.2"
+    "@microsoft/tsdoc-config" "0.16.2"
 
 eslint-scope@^4.0.3:
   version "4.0.3"
