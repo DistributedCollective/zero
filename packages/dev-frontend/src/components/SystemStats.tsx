@@ -99,8 +99,8 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
       </Heading>
 
       <Statistic
-        name="Origination Fee"
-        tooltip="The Origination Fee is a one-off fee charged as a percentage of the borrowed amount (in ZUSD) and is part of a Line of Credit's debt. The fee varies between 0.5% and 5% depending on ZUSD redemption volumes."
+        name="Borrowing Fee"
+        tooltip="The Borrowing Fee is a one-off fee charged as a percentage of the borrowed amount (in ZUSD) and is part of a Line of Credit's debt. The fee varies between 0.5% and 5% depending on ZUSD redemption volumes."
       >
         {borrowingFeePct.toString(2)}
       </Statistic>
