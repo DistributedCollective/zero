@@ -1,5 +1,5 @@
-import { AddressZero } from "@ethersproject/constants";
 import { isAddress, getAddress } from "@ethersproject/address";
+import { AddressZero } from "@ethersproject/constants";
 
 export type LiquityFrontendConfig = {
   frontendTag: string;
