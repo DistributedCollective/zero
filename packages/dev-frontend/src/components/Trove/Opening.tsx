@@ -160,7 +160,7 @@ export const Opening: React.FC = () => {
           />
 
           <StaticRow
-            label="Borrowing Fee"
+            label="Origination Fee"
             inputId="trove-borrowing-fee"
             amount={fee.prettify(2)}
             value={fee}
