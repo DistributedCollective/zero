@@ -3,7 +3,7 @@ import injectedModule from "@web3-onboard/injected-wallets";
 import ledgerModule from "./custom/ledger-module";
 import trezorModule from "./custom/trezor-module";
 import walletConnectModule from "@web3-onboard/walletconnect";
-import portisModule from "@web3-onboard/portis";
+// import portisModule from "@web3-onboard/portis";
 import { RPC_URL } from "src/contracts/config";
 import { isMainnet } from "src/utils";
 
@@ -18,7 +18,7 @@ const walletConnect = walletConnectModule({
     mobileLinks: ["metamask", "trust", "rainbow", "argent", "imtoken", "pillar"]
   }
 });
-const portis = portisModule({ apiKey: process.env.REACT_APP_PORTIS_KEY || "" });
+// const portis = portisModule({ apiKey: process.env.REACT_APP_PORTIS_KEY || "" });
 
 export const getChainIdHex = (networkId: number) => {
   return `0x${networkId.toString(16)}`;
@@ -51,7 +51,7 @@ export const onboard = Onboard(({
     recommendedInjectedWallets: [{ name: "MetaMask", url: "https://metamask.io" }]
   },
   i18n,
-  wallets: [injected, ...(isMainnet ? [ledger, trezor] : []), walletConnect as any, portis],
+  wallets: [injected, ...(isMainnet ? [ledger, trezor] : []), walletConnect as any],
   chains: [
     {
       id: getChainIdHex(30),
