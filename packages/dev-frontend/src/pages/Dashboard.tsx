@@ -24,7 +24,7 @@ export const Dashboard: React.FC = () => {
   return (
     <Container variant="columns">
       <Container variant="left">
-        {!usdBalanceIsZero && false && <Convert />}
+        {!usdBalanceIsZero && <Convert />}
         <Trove />
         <Stability />
       </Container>
