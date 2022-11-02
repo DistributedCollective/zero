@@ -87,8 +87,8 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
             LiquityMath.DECIMAL_PRECISION
         );
         zusdToken.approve(address(sovFeeCollector), feeToSovCollector);
-        sovFeeCollector.transferTokens(address(zusdToken), uint96(feeToSovCollector));
 
+        sovFeeCollector.transferTokens(address(zusdToken), uint96(feeToSovCollector));
         // Send fee to ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
         if (feeToZeroStaking != 0) {
@@ -106,9 +106,8 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
             LiquityMath.DECIMAL_PRECISION
         );
-        wrbtc.deposit{value: feeToSovCollector}();
-        wrbtc.approve(address(sovFeeCollector), feeToSovCollector);
-        sovFeeCollector.transferTokens(address(wrbtc), uint96(feeToSovCollector));
+
+        sovFeeCollector.transferRBTC{value: feeToSovCollector}();
 
         // Send the ETH fee to the ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);

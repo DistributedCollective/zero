@@ -514,7 +514,7 @@ contract('BorrowerWrappers', async accounts => {
     const redeemedAmount = toBN(dec(100, 18))
     const sovFeeCollectorBalanceBefore = await wrbtcToken.balanceOf(sovFeeCollector)
     await th.redeemCollateral(whale, contracts, redeemedAmount)
-    const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
+    const sovFeeCollectorBalanceAfter = toBN(web3.utils.toBN(await web3.eth.getBalance(sovFeeCollector)));
  
     // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
@@ -707,7 +707,7 @@ contract('BorrowerWrappers', async accounts => {
     const redeemedAmount = toBN(dec(100, 18))
     const sovFeeCollectorBalanceBefore = await wrbtcToken.balanceOf(sovFeeCollector)
     await th.redeemCollateral(whale, contracts, redeemedAmount)
-    const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
+    const sovFeeCollectorBalanceAfter = toBN(web3.utils.toBN(await web3.eth.getBalance(sovFeeCollector)));
 
     // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)

@@ -14,4 +14,6 @@ interface IFeeSharingProxy {
 		uint32 _maxCheckpoints,
 		address _receiver
 	) external;
+
+	function transferRBTC() external payable;
 }
