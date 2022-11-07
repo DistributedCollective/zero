@@ -95,7 +95,7 @@ const randomInteger = () => Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 // required to get a statistically "good" hint is larger than this, the search for the hint will
 // be broken up into multiple getApproxHint() calls.
 //
-// This should be low enough to work with popular public Ethereum providers like Infura without
+// This should be low enough to work with popular public node providers like Infura without
 // triggering any fair use limits.
 const maxNumberOfTrialsAtOnce = 2500;
 
