@@ -126,7 +126,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
   /**
    * Connect to the Zero protocol and create a `ReadableEthersLiquity` object.
    *
-   * @param signerOrProvider - Ethers `Signer` or `Provider` to use for connecting to the Ethereum
+   * @param signerOrProvider - Ethers `Signer` or `Provider` to use for connecting to the blockchain
    *                           network.
    * @param optionalParams - Optional parameters that can be used to customize the connection.
    */
