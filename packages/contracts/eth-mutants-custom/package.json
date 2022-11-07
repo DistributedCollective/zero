@@ -63,7 +63,6 @@
   },
   "homepage": "https://github.com/federicobond/eth-mutants#readme",
   "keywords": [
-    "ethereum",
     "mutation",
     "testing",
     "solidity"
