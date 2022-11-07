@@ -10,7 +10,7 @@ Install in your project:
 npm install @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
 ```
 
-Connecting to an Ethereum node and sending a transaction:
+Connecting to a blockchain node and sending a transaction:
 
 ```javascript
 const { Wallet, providers } = require("ethers");
@@ -22,7 +22,7 @@ async function example() {
   const zero = await EthersLiquity.connect(wallet);
 
   const { newTrove } = await zero.openTrove({
-    depositCollateral: 5, // ETH
+    depositCollateral: 5, // BTC
     borrowZUSD: 2000
   });
 
@@ -38,5 +38,5 @@ See [packages/examples](https://github.com/DistributedCollective/zero/tree/maste
 
 ## API Reference
 
-For now, it can be found in the public Sovryn [zero repo](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
+For now, it can be found in the public Sovryn [Zero repo](https://github.com/DistributedCollective/zero/blob/master/docs/sdk/lib-ethers.md).
 
