@@ -22,7 +22,7 @@ export interface LiquityStoreBaseState {
   /** Number of Troves that are currently open. */
   numberOfTroves: number;
 
-  /** User's native currency balance (e.g. Ether). */
+  /** User's native currency balance (e.g. Bitcoin). */
   accountBalance: Decimal;
 
   /** User's ZUSD token balance. */
@@ -43,7 +43,7 @@ export interface LiquityStoreBaseState {
    */
   collateralSurplusBalance: Decimal;
 
-  /** Current price of the native currency (e.g. Ether) in USD. */
+  /** Current price of the native currency (e.g. Bitcoin) in USD. */
   price: Decimal;
 
   /** Total amount of ZUSD currently deposited in the Stability Pool. */

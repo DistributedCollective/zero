@@ -21,7 +21,7 @@ export class StabilityDeposit {
   /** Amount of ZUSD left in the Stability Deposit. */
   readonly currentZUSD: Decimal;
 
-  /** Amount of native currency (e.g. Ether) received in exchange for the used-up ZUSD. */
+  /** Amount of native currency (e.g. Bitcoin) received in exchange for the used-up ZUSD. */
   readonly collateralGain: Decimal;
 
   /** Amount of ZERO rewarded since the last modification of the Stability Deposit. */

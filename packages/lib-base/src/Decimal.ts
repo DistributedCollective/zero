@@ -27,7 +27,7 @@ export type Decimalish = Decimal | number | string;
  * Fixed-point decimal bignumber with 18 digits of precision.
  *
  * @remarks
- * Used by Zero libraries to precisely represent native currency (e.g. Ether), ZUSD and ZERO
+ * Used by Zero libraries to precisely represent native currency (e.g. Bitcoin), ZUSD and ZERO
  * amounts, as well as derived metrics like collateral ratios.
  *
  * @public

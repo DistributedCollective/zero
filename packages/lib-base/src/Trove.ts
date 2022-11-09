@@ -407,7 +407,7 @@ const NOMINAL_COLLATERAL_RATIO_PRECISION = Decimal.from(100);
  * @public
  */
 export class Trove {
-  /** Amount of native currency (e.g. Ether) collateralized. */
+  /** Amount of native currency (e.g. Bitcoin) collateralized. */
   readonly collateral: Decimal;
 
   /** Amount of ZUSD owed. */

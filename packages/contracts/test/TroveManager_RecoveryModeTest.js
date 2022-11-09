@@ -393,7 +393,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const B_reward  = th.applyLiquidationFee(D_coll).mul(B_coll).div(A_coll.add(B_coll))
 
     /*
-    Prior to Dennis liquidation, total stakes and total collateral were each 27 ether. 
+    Prior to Dennis liquidation, total stakes and total collateral were each 27 bitcoin. 
   
     Check snapshots. Dennis' liquidated collateral is distributed and remains in the system. His 
     stake is removed, leaving 24+3*0.995 bitcoin total collateral, and 24 bitcoin total stakes. */
@@ -514,7 +514,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
 
     /* Now, check redistribution to active Troves. Remainders of 1610 ZUSD and 16.82 bitcoin are distributed.
     
-    Now, only Alice and Dennis have a stake in the system - 3 bitcoin each, thus total stakes is 6 ether.
+    Now, only Alice and Dennis have a stake in the system - 3 bitcoin each, thus total stakes is 6 bitcoin.
   
     Rewards-per-unit-staked from the redistribution should be:
   
@@ -1027,11 +1027,11 @@ contract('TroveManager - in Recovery Mode', async accounts => {
 
     /*  Since Bob's debt (250 ZUSD) is larger than all ZUSD in the Stability Pool, Liquidation won’t happen
 
-    After liquidation, totalStakes snapshot should equal Alice's stake (20 bitcoin) + Dennis stake (2 bitcoin) = 22 ether.
+    After liquidation, totalStakes snapshot should equal Alice's stake (20 bitcoin) + Dennis stake (2 bitcoin) = 22 bitcoin.
 
-    Since there has been no redistribution, the totalCollateral snapshot should equal the totalStakes snapshot: 22 ether.
+    Since there has been no redistribution, the totalCollateral snapshot should equal the totalStakes snapshot: 22 bitcoin.
 
-    Bob's new coll and stake should remain the same, and the updated totalStakes should still equal 25 ether.
+    Bob's new coll and stake should remain the same, and the updated totalStakes should still equal 25 bitcoin.
     */
     const bob_Trove = await troveManager.Troves(bob)
     const bob_DebtAfter = bob_Trove[0].toString()
@@ -1076,7 +1076,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
 
     /* After liquidation, totalStakes snapshot should still equal the total stake: 25 bitcoin
 
-    Since there has been no redistribution, the totalCollateral snapshot should equal the totalStakes snapshot: 25 ether.*/
+    Since there has been no redistribution, the totalCollateral snapshot should equal the totalStakes snapshot: 25 bitcoin.*/
 
     const totalStakesSnaphot_After = (await troveManager.totalStakesSnapshot()).toString()
     const totalCollateralSnapshot_After = (await troveManager.totalCollateralSnapshot()).toString()

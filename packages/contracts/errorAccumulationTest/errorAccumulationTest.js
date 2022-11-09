@@ -1006,7 +1006,7 @@ it("100 accounts. 100x liquidate -> addColl. Random coll. Check stake and totalS
 
 // --- Applied rewards, large coll and debt ---
 
-it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 accounts do Trove operations (apply rewards)", async () => {
+it("11 accounts with random large coll, magnitude ~1e8 bitcoin. 1 liquidation. 10 accounts do Trove operations (apply rewards)", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[99], { from: accounts[99], value: dec(100, 'ether') })
   await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
@@ -1043,7 +1043,7 @@ it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 
   ZUSDDebt left in Default Pool is: 535042995
 */
 
-it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 500 accounts do a Trove operation (apply rewards)", async () => {
+it("101 accounts with random large coll, magnitude ~1e8 bitcoin. 1 liquidation. 500 accounts do a Trove operation (apply rewards)", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1000, 'ether') })
   await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 

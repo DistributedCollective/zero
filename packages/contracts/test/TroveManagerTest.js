@@ -318,7 +318,7 @@ contract('TroveManager', async accounts => {
     // Confirm system is not in Recovery Mode
     assert.isFalse(await th.checkRecoveryMode(contracts));
 
-    // close Bob's Trove.  His ether*0.995 and ZUSD should be added to the DefaultPool.
+    // close Bob's Trove.  His bitcoin*0.995 and ZUSD should be added to the DefaultPool.
     await troveManager.liquidate(bob, { from: owner });
 
     /* check snapshots after. Total stakes should be equal to the  remaining stake then the system: 
@@ -352,7 +352,7 @@ contract('TroveManager', async accounts => {
     await troveManager.liquidate(carol, { from: owner });
     assert.isFalse(await sortedTroves.contains(carol))
 
-    // Carol's ether*0.995 and ZUSD should be added to the DefaultPool.
+    // Carol's bitcoin*0.995 and ZUSD should be added to the DefaultPool.
     const L_BTC_AfterCarolLiquidated = await troveManager.L_BTC()
     const L_ZUSDDebt_AfterCarolLiquidated = await troveManager.L_ZUSDDebt()
 
@@ -376,7 +376,7 @@ contract('TroveManager', async accounts => {
     await troveManager.liquidate(bob, { from: owner });
     assert.isFalse(await sortedTroves.contains(bob))
 
-    /* Alice now has all the active stake. totalStakes in the system is now 10 ether.
+    /* Alice now has all the active stake. totalStakes in the system is now 10 bitcoin.
    
    Bob's pending collateral reward and debt reward are applied to his Trove
    before his liquidation.

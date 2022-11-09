@@ -85,7 +85,7 @@ export interface ReadableLiquity {
   getNumberOfTroves(): Promise<number>;
 
   /**
-   * Get the current price of the native currency (e.g. Ether) in USD.
+   * Get the current price of the native currency (e.g. Bitcoin) in USD.
    */
   getPrice(): Promise<Decimal>;
 

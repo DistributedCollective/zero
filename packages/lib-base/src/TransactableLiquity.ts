@@ -77,7 +77,7 @@ export interface LiquidationDetails {
   /** Amount of ZUSD paid to the liquidator as gas compensation. */
   zusdGasCompensation: Decimal;
 
-  /** Amount of native currency (e.g. Ether) paid to the liquidator as gas compensation. */
+  /** Amount of native currency (e.g. Bitcoin) paid to the liquidator as gas compensation. */
   collateralGasCompensation: Decimal;
 }
 
@@ -101,10 +101,10 @@ export interface RedemptionDetails {
    */
   actualZUSDAmount: Decimal;
 
-  /** Amount of collateral (e.g. Ether) taken from Troves by the transaction. */
+  /** Amount of collateral (e.g. Bitcoin) taken from Troves by the transaction. */
   collateralTaken: Decimal;
 
-  /** Amount of native currency (e.g. Ether) deducted as fee from collateral taken. */
+  /** Amount of native currency (e.g. Bitcoin) deducted as fee from collateral taken. */
   fee: Decimal;
 }
 
@@ -122,7 +122,7 @@ export interface StabilityPoolGainsWithdrawalDetails {
   /** Amount of ZUSD in the deposit directly after this transaction. */
   newZUSDDeposit: Decimal;
 
-  /** Amount of native currency (e.g. Ether) paid out to the depositor in this transaction. */
+  /** Amount of native currency (e.g. Bitcoin) paid out to the depositor in this transaction. */
   collateralGain: Decimal;
 
   /** Amount of ZERO rewarded to the depositor in this transaction. */
@@ -392,7 +392,7 @@ export interface TransactableLiquity {
   sendZERO(toAddress: string, amount: Decimalish): Promise<void>;
 
   /**
-   * Redeem ZUSD to native currency (e.g. Ether) at face value.
+   * Redeem ZUSD to native currency (e.g. Bitcoin) at face value.
    *
    * @param amount - Amount of ZUSD to be redeemed.
    * @param maxRedemptionRate - Maximum acceptable
