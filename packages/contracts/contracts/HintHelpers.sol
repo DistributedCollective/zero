@@ -94,10 +94,10 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
                 if (netZUSDDebt > MIN_NET_DEBT) {
                     uint maxRedeemableZUSD = LiquityMath._min(remainingZUSD, netZUSDDebt.sub(MIN_NET_DEBT));
 
-                    uint ETH = troveManager.getTroveColl(currentTroveuser)
-                        .add(troveManager.getPendingETHReward(currentTroveuser));
+                    uint BTC = troveManager.getTroveColl(currentTroveuser)
+                        .add(troveManager.getPendingBTCReward(currentTroveuser));
 
-                    uint newColl = ETH.sub(maxRedeemableZUSD.mul(DECIMAL_PRECISION).div(_price));
+                    uint newColl = BTC.sub(maxRedeemableZUSD.mul(DECIMAL_PRECISION).div(_price));
                     uint newDebt = netZUSDDebt.sub(maxRedeemableZUSD);
 
                     uint compositeDebt = _getCompositeDebt(newDebt);

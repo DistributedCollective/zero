@@ -162,23 +162,23 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("addColl(): Increases the activePool ETH and raw bitcoin balance by correct amount", async () => {
+    it("addColl(): Increases the activePool BTC and raw bitcoin balance by correct amount", async () => {
       const { collateral: aliceColl } = await openTrove({
         ICR: toBN(dec(2, 18)),
         extraParams: { from: alice }
       });
 
-      const activePool_ETH_Before = await activePool.getETH();
+      const activePool_BTC_Before = await activePool.getBTC();
       const activePool_RawBTC_Before = toBN(await web3.eth.getBalance(activePool.address));
 
-      assert.isTrue(activePool_ETH_Before.eq(aliceColl));
+      assert.isTrue(activePool_BTC_Before.eq(aliceColl));
       assert.isTrue(activePool_RawBTC_Before.eq(aliceColl));
 
       await borrowerOperations.addColl(alice, alice, { from: alice, value: dec(1, 16) });
 
-      const activePool_ETH_After = await activePool.getETH();
+      const activePool_BTC_After = await activePool.getBTC();
       const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_After.eq(aliceColl.add(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_BTC_After.eq(aliceColl.add(toBN(dec(1, 16)))));
       assert.isTrue(activePool_RawBTC_After.eq(aliceColl.add(toBN(dec(1, 16)))));
     });
 
@@ -246,7 +246,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(totalStakes_After.eq(totalStakes_Before.add(toBN(dec(2, "ether")))));
     });
 
-    it("addColl(), active Trove: applies pending rewards and updates user's L_ETH, L_ZUSDDebt snapshots", async () => {
+    it("addColl(), active Trove: applies pending rewards and updates user's L_BTC, L_ZUSDDebt snapshots", async () => {
       // --- SETUP ---
 
       const { collateral: aliceCollBefore, totalDebt: aliceDebtBefore } = await openTrove({
@@ -267,7 +267,7 @@ contract("BorrowerOperations", async accounts => {
 
       // --- TEST ---
 
-      // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
+      // price drops to 1BTC:100ZUSD, reducing Carol's ICR below MCR
       await priceFeed.setPrice("1000000000000000000");
 
       // Liquidate Carol's Trove,
@@ -275,30 +275,30 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await sortedTroves.contains(carol));
 
-      const L_ETH = await troveManager.L_ETH();
+      const L_BTC = await troveManager.L_BTC();
       const L_ZUSDDebt = await troveManager.L_ZUSDDebt();
 
       // check Alice and Bob's reward snapshots are zero before they alter their Troves
       const alice_rewardSnapshot_Before = await troveManager.rewardSnapshots(alice);
-      const alice_ETHrewardSnapshot_Before = alice_rewardSnapshot_Before[0];
+      const alice_BTCrewardSnapshot_Before = alice_rewardSnapshot_Before[0];
       const alice_ZUSDDebtRewardSnapshot_Before = alice_rewardSnapshot_Before[1];
 
       const bob_rewardSnapshot_Before = await troveManager.rewardSnapshots(bob);
-      const bob_ETHrewardSnapshot_Before = bob_rewardSnapshot_Before[0];
+      const bob_BTCrewardSnapshot_Before = bob_rewardSnapshot_Before[0];
       const bob_ZUSDDebtRewardSnapshot_Before = bob_rewardSnapshot_Before[1];
 
-      assert.equal(alice_ETHrewardSnapshot_Before, 0);
+      assert.equal(alice_BTCrewardSnapshot_Before, 0);
       assert.equal(alice_ZUSDDebtRewardSnapshot_Before, 0);
-      assert.equal(bob_ETHrewardSnapshot_Before, 0);
+      assert.equal(bob_BTCrewardSnapshot_Before, 0);
       assert.equal(bob_ZUSDDebtRewardSnapshot_Before, 0);
 
-      const alicePendingETHReward = await troveManager.getPendingETHReward(alice);
-      const bobPendingETHReward = await troveManager.getPendingETHReward(bob);
+      const alicePendingBTCReward = await troveManager.getPendingBTCReward(alice);
+      const bobPendingBTCReward = await troveManager.getPendingBTCReward(bob);
       const alicePendingZUSDDebtReward = await troveManager.getPendingZUSDDebtReward(alice);
       const bobPendingZUSDDebtReward = await troveManager.getPendingZUSDDebtReward(bob);
       for (reward of [
-        alicePendingETHReward,
-        bobPendingETHReward,
+        alicePendingBTCReward,
+        bobPendingBTCReward,
         alicePendingZUSDDebtReward,
         bobPendingZUSDDebtReward
       ]) {
@@ -318,24 +318,24 @@ contract("BorrowerOperations", async accounts => {
       const bobNewColl = await getTroveEntireColl(bob);
       const bobNewDebt = await getTroveEntireDebt(bob);
 
-      assert.isTrue(aliceNewColl.eq(aliceCollBefore.add(alicePendingETHReward).add(aliceTopUp)));
+      assert.isTrue(aliceNewColl.eq(aliceCollBefore.add(alicePendingBTCReward).add(aliceTopUp)));
       assert.isTrue(aliceNewDebt.eq(aliceDebtBefore.add(alicePendingZUSDDebtReward)));
-      assert.isTrue(bobNewColl.eq(bobCollBefore.add(bobPendingETHReward).add(bobTopUp)));
+      assert.isTrue(bobNewColl.eq(bobCollBefore.add(bobPendingBTCReward).add(bobTopUp)));
       assert.isTrue(bobNewDebt.eq(bobDebtBefore.add(bobPendingZUSDDebtReward)));
 
       /* Check that both Alice and Bob's snapshots of the rewards-per-unit-staked metrics should be updated
-       to the latest values of L_ETH and L_ZUSDDebt */
+       to the latest values of L_BTC and L_ZUSDDebt */
       const alice_rewardSnapshot_After = await troveManager.rewardSnapshots(alice);
-      const alice_ETHrewardSnapshot_After = alice_rewardSnapshot_After[0];
+      const alice_BTCrewardSnapshot_After = alice_rewardSnapshot_After[0];
       const alice_ZUSDDebtRewardSnapshot_After = alice_rewardSnapshot_After[1];
 
       const bob_rewardSnapshot_After = await troveManager.rewardSnapshots(bob);
-      const bob_ETHrewardSnapshot_After = bob_rewardSnapshot_After[0];
+      const bob_BTCrewardSnapshot_After = bob_rewardSnapshot_After[0];
       const bob_ZUSDDebtRewardSnapshot_After = bob_rewardSnapshot_After[1];
 
-      assert.isAtMost(th.getDifference(alice_ETHrewardSnapshot_After, L_ETH), 100);
+      assert.isAtMost(th.getDifference(alice_BTCrewardSnapshot_After, L_BTC), 100);
       assert.isAtMost(th.getDifference(alice_ZUSDDebtRewardSnapshot_After, L_ZUSDDebt), 100);
-      assert.isAtMost(th.getDifference(bob_ETHrewardSnapshot_After, L_ETH), 100);
+      assert.isAtMost(th.getDifference(bob_BTCrewardSnapshot_After, L_BTC), 100);
       assert.isAtMost(th.getDifference(bob_ZUSDDebtRewardSnapshot_After, L_ZUSDDebt), 100);
     });
 
@@ -343,7 +343,7 @@ contract("BorrowerOperations", async accounts => {
     //  // TODO - check stake updates for addColl/withdrawColl/adustTrove ---
 
     //   // --- SETUP ---
-    //   // A,B,C add 15/5/5 ETH, withdraw 100/100/900 ZUSD
+    //   // A,B,C add 15/5/5 BTC, withdraw 100/100/900 ZUSD
     //   await borrowerOperations.openTrove(th._100pct, dec(100, 16), alice, alice, { from: alice, value: dec(15, 'ether') })
     //   await borrowerOperations.openTrove(th._100pct, dec(100, 16), bob, bob, { from: bob, value: dec(4, 'ether') })
     //   await borrowerOperations.openTrove(th._100pct, dec(900, 18), carol, carol, { from: carol, value: dec(5, 'ether') })
@@ -351,13 +351,13 @@ contract("BorrowerOperations", async accounts => {
     //   await borrowerOperations.openTrove(th._100pct, 0, dennis, dennis, { from: dennis, value: dec(1, 16) })
     //   // --- TEST ---
 
-    //   // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
+    //   // price drops to 1BTC:100ZUSD, reducing Carol's ICR below MCR
     //   await priceFeed.setPrice('1000000000000000000');
 
     //   // close Carol's Trove, liquidating her 5 bitcoin and 900ZUSD.
     //   await troveManager.liquidate(carol, { from: owner });
 
-    //   // dennis tops up his trove by 1 ETH
+    //   // dennis tops up his trove by 1 BTC
     //   await borrowerOperations.addColl(dennis, dennis, { from: dennis, value: dec(1, 16) })
 
     //   /* Check that Dennis's recorded stake is the right corrected stake, less than his collateral. A corrected
@@ -366,12 +366,12 @@ contract("BorrowerOperations", async accounts => {
     //   s = totalStakesSnapshot / totalCollateralSnapshot
 
     //   where snapshots are the values immediately after the last liquidation.  After Carol's liquidation,
-    //   the ETH from her Trove has now become the totalPendingETHReward. So:
+    //   the BTC from her Trove has now become the totalPendingBTCReward. So:
 
-    //   totalStakes = (alice_Stake + bob_Stake + dennis_orig_stake ) = (15 + 4 + 1) =  20 ETH.
-    //   totalCollateral = (alice_Collateral + bob_Collateral + dennis_orig_coll + totalPendingETHReward) = (15 + 4 + 1 + 5)  = 25 ETH.
+    //   totalStakes = (alice_Stake + bob_Stake + dennis_orig_stake ) = (15 + 4 + 1) =  20 BTC.
+    //   totalCollateral = (alice_Collateral + bob_Collateral + dennis_orig_coll + totalPendingBTCReward) = (15 + 4 + 1 + 5)  = 25 BTC.
 
-    //   Therefore, as Dennis adds 1 bitcoin collateral, his corrected stake should be:  s = 2 * (20 / 25 ) = 1.6 ETH */
+    //   Therefore, as Dennis adds 1 bitcoin collateral, his corrected stake should be:  s = 2 * (20 / 25 ) = 1.6 BTC */
     //   const dennis_Trove = await troveManager.Troves(dennis)
 
     //   const dennis_Stake = dennis_Trove[2]
@@ -507,7 +507,7 @@ contract("BorrowerOperations", async accounts => {
       }
     });
 
-    it("withdrawColl(): reverts when requested ETH withdrawal is > the trove's collateral", async () => {
+    it("withdrawColl(): reverts when requested BTC withdrawal is > the trove's collateral", async () => {
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } });
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: bob } });
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: carol } });
@@ -558,7 +558,7 @@ contract("BorrowerOperations", async accounts => {
 
       // --- TEST ---
 
-      // price drops to 1ETH:150ZUSD, reducing TCR below 150%
+      // price drops to 1BTC:150ZUSD, reducing TCR below 150%
       await priceFeed.setPrice("150000000000000000000");
 
       //Alice tries to withdraw collateral during Recovery Mode
@@ -623,20 +623,20 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(aliceCollAfter.eq(aliceCollBefore.sub(toBN(dec(1, 16)))));
     });
 
-    it("withdrawColl(): reduces ActivePool ETH and raw bitcoin by correct amount", async () => {
+    it("withdrawColl(): reduces ActivePool BTC and raw bitcoin by correct amount", async () => {
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } });
       const aliceCollBefore = await getTroveEntireColl(alice);
 
       // check before
-      const activePool_ETH_before = await activePool.getETH();
+      const activePool_BTC_before = await activePool.getBTC();
       const activePool_RawBTC_before = toBN(await web3.eth.getBalance(activePool.address));
 
       await borrowerOperations.withdrawColl(dec(1, 16), alice, alice, { from: alice });
 
       // check after
-      const activePool_ETH_After = await activePool.getETH();
+      const activePool_BTC_After = await activePool.getBTC();
       const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_After.eq(activePool_ETH_before.sub(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_BTC_After.eq(activePool_BTC_before.sub(toBN(dec(1, 16)))));
       assert.isTrue(activePool_RawBTC_After.eq(activePool_RawBTC_before.sub(toBN(dec(1, 16)))));
     });
 
@@ -668,22 +668,22 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(totalStakes_After.eq(totalStakes_Before.sub(toBN(dec(1, 16)))));
     });
 
-    it("withdrawColl(): sends the correct amount of ETH to the user", async () => {
+    it("withdrawColl(): sends the correct amount of BTC to the user", async () => {
       await openTrove({
         ICR: toBN(dec(2, 18)),
         extraParams: { from: alice, value: dec(2, "ether") }
       });
 
-      const alice_ETHBalance_Before = toBN(web3.utils.toBN(await web3.eth.getBalance(alice)));
+      const alice_BTCBalance_Before = toBN(web3.utils.toBN(await web3.eth.getBalance(alice)));
       await borrowerOperations.withdrawColl(dec(1, 16), alice, alice, { from: alice, gasPrice: 0 });
 
-      const alice_ETHBalance_After = toBN(web3.utils.toBN(await web3.eth.getBalance(alice)));
-      const balanceDiff = alice_ETHBalance_After.sub(alice_ETHBalance_Before);
+      const alice_BTCBalance_After = toBN(web3.utils.toBN(await web3.eth.getBalance(alice)));
+      const balanceDiff = alice_BTCBalance_After.sub(alice_BTCBalance_Before);
 
       assert.isTrue(balanceDiff.eq(toBN(dec(1, 16))));
     });
 
-    it("withdrawColl(): applies pending rewards and updates user's L_ETH, L_ZUSDDebt snapshots", async () => {
+    it("withdrawColl(): applies pending rewards and updates user's L_BTC, L_ZUSDDebt snapshots", async () => {
       // --- SETUP ---
       // Alice adds 15 bitcoin, Bob adds 5 bitcoin, Carol adds 1 bitcoin
       await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
@@ -707,33 +707,33 @@ contract("BorrowerOperations", async accounts => {
 
       // --- TEST ---
 
-      // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
+      // price drops to 1BTC:100ZUSD, reducing Carol's ICR below MCR
       await priceFeed.setPrice("100000000000000000000");
 
       // close Carol's Trove, liquidating her 1 bitcoin and 180ZUSD.
       await troveManager.liquidate(carol, { from: owner });
 
-      const L_ETH = await troveManager.L_ETH();
+      const L_BTC = await troveManager.L_BTC();
       const L_ZUSDDebt = await troveManager.L_ZUSDDebt();
 
       // check Alice and Bob's reward snapshots are zero before they alter their Troves
       const alice_rewardSnapshot_Before = await troveManager.rewardSnapshots(alice);
-      const alice_ETHrewardSnapshot_Before = alice_rewardSnapshot_Before[0];
+      const alice_BTCrewardSnapshot_Before = alice_rewardSnapshot_Before[0];
       const alice_ZUSDDebtRewardSnapshot_Before = alice_rewardSnapshot_Before[1];
 
       const bob_rewardSnapshot_Before = await troveManager.rewardSnapshots(bob);
-      const bob_ETHrewardSnapshot_Before = bob_rewardSnapshot_Before[0];
+      const bob_BTCrewardSnapshot_Before = bob_rewardSnapshot_Before[0];
       const bob_ZUSDDebtRewardSnapshot_Before = bob_rewardSnapshot_Before[1];
 
-      assert.equal(alice_ETHrewardSnapshot_Before, 0);
+      assert.equal(alice_BTCrewardSnapshot_Before, 0);
       assert.equal(alice_ZUSDDebtRewardSnapshot_Before, 0);
-      assert.equal(bob_ETHrewardSnapshot_Before, 0);
+      assert.equal(bob_BTCrewardSnapshot_Before, 0);
       assert.equal(bob_ZUSDDebtRewardSnapshot_Before, 0);
 
       // Check A and B have pending rewards
-      const pendingCollReward_A = await troveManager.getPendingETHReward(alice);
+      const pendingCollReward_A = await troveManager.getPendingBTCReward(alice);
       const pendingDebtReward_A = await troveManager.getPendingZUSDDebtReward(alice);
-      const pendingCollReward_B = await troveManager.getPendingETHReward(bob);
+      const pendingCollReward_B = await troveManager.getPendingBTCReward(bob);
       const pendingDebtReward_B = await troveManager.getPendingZUSDDebtReward(bob);
       for (reward of [
         pendingCollReward_A,
@@ -772,18 +772,18 @@ contract("BorrowerOperations", async accounts => {
       th.assertIsApproximatelyEqual(bobDebtAfter, bobDebtBefore.add(pendingDebtReward_B), 10000);
 
       /* After top up, both Alice and Bob's snapshots of the rewards-per-unit-staked metrics should be updated
-       to the latest values of L_ETH and L_ZUSDDebt */
+       to the latest values of L_BTC and L_ZUSDDebt */
       const alice_rewardSnapshot_After = await troveManager.rewardSnapshots(alice);
-      const alice_ETHrewardSnapshot_After = alice_rewardSnapshot_After[0];
+      const alice_BTCrewardSnapshot_After = alice_rewardSnapshot_After[0];
       const alice_ZUSDDebtRewardSnapshot_After = alice_rewardSnapshot_After[1];
 
       const bob_rewardSnapshot_After = await troveManager.rewardSnapshots(bob);
-      const bob_ETHrewardSnapshot_After = bob_rewardSnapshot_After[0];
+      const bob_BTCrewardSnapshot_After = bob_rewardSnapshot_After[0];
       const bob_ZUSDDebtRewardSnapshot_After = bob_rewardSnapshot_After[1];
 
-      assert.isAtMost(th.getDifference(alice_ETHrewardSnapshot_After, L_ETH), 100);
+      assert.isAtMost(th.getDifference(alice_BTCrewardSnapshot_After, L_BTC), 100);
       assert.isAtMost(th.getDifference(alice_ZUSDDebtRewardSnapshot_After, L_ZUSDDebt), 100);
-      assert.isAtMost(th.getDifference(bob_ETHrewardSnapshot_After, L_ETH), 100);
+      assert.isAtMost(th.getDifference(bob_BTCrewardSnapshot_After, L_BTC), 100);
       assert.isAtMost(th.getDifference(bob_ZUSDDebtRewardSnapshot_After, L_ZUSDDebt), 100);
     });
 
@@ -1658,7 +1658,7 @@ contract("BorrowerOperations", async accounts => {
 
       // --- TEST ---
 
-      // price drops to 1ETH:150ZUSD, reducing TCR below 150%
+      // price drops to 1BTC:150ZUSD, reducing TCR below 150%
       await priceFeed.setPrice("150000000000000000000");
       assert.isTrue((await th.getTCR(contracts)).lt(toBN(dec(15, 17))));
 
@@ -2695,7 +2695,7 @@ contract("BorrowerOperations", async accounts => {
         extraParams: { from: bob }
       });
 
-      // Alice coll and debt increase(+1 ETH, +50ZUSD)
+      // Alice coll and debt increase(+1 BTC, +50ZUSD)
       await borrowerOperations.adjustTrove(th._100pct, 0, dec(50, 16), true, alice, alice, {
         from: alice,
         value: dec(1, 16)
@@ -2742,7 +2742,7 @@ contract("BorrowerOperations", async accounts => {
       );
       assert.isTrue(txAlice.receipt.status);
 
-      await priceFeed.setPrice(dec(120, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(120, 18)); // trigger drop in BTC price
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
 
@@ -2809,7 +2809,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await th.checkRecoveryMode(contracts));
 
-      await priceFeed.setPrice(dec(120, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(120, 18)); // trigger drop in BTC price
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
 
@@ -2837,7 +2837,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await th.checkRecoveryMode(contracts));
 
-      await priceFeed.setPrice(dec(120, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(120, 18)); // trigger drop in BTC price
       const price = await priceFeed.getPrice();
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
@@ -2882,7 +2882,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await th.checkRecoveryMode(contracts));
 
-      await priceFeed.setPrice(dec(105, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(105, 18)); // trigger drop in BTC price
       const price = await priceFeed.getPrice();
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
@@ -2961,7 +2961,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await th.checkRecoveryMode(contracts));
 
-      await priceFeed.setPrice(dec(100, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(100, 18)); // trigger drop in BTC price
       const price = await priceFeed.getPrice();
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
@@ -3014,7 +3014,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await th.checkRecoveryMode(contracts));
 
-      await priceFeed.setPrice(dec(105, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(105, 18)); // trigger drop in BTC price
       const price = await priceFeed.getPrice();
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
@@ -3066,7 +3066,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isFalse(await th.checkRecoveryMode(contracts));
 
-      await priceFeed.setPrice(dec(120, 18)); // trigger drop in ETH price
+      await priceFeed.setPrice(dec(120, 18)); // trigger drop in BTC price
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
 
@@ -3155,14 +3155,14 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("adjustTrove(): reverts when attempted ETH withdrawal is >= the trove's collateral", async () => {
+    it("adjustTrove(): reverts when attempted BTC withdrawal is >= the trove's collateral", async () => {
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } });
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: bob } });
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: carol } });
 
       const carolColl = await getTroveEntireColl(carol);
 
-      // Carol attempts an adjustment that would withdraw 1 wei more than her ETH
+      // Carol attempts an adjustment that would withdraw 1 wei more than her BTC
       try {
         const txCarol = await borrowerOperations.adjustTrove(
           th._100pct,
@@ -3225,7 +3225,7 @@ contract("BorrowerOperations", async accounts => {
       });
 
       const aliceCollBefore = await getTroveEntireColl(alice);
-      const activePoolCollBefore = await activePool.getETH();
+      const activePoolCollBefore = await activePool.getBTC();
 
       assert.isTrue(aliceCollBefore.gt(toBN("0")));
       assert.isTrue(aliceCollBefore.eq(activePoolCollBefore));
@@ -3237,7 +3237,7 @@ contract("BorrowerOperations", async accounts => {
       });
 
       const aliceCollAfter = await getTroveEntireColl(alice);
-      const activePoolCollAfter = await activePool.getETH();
+      const activePoolCollAfter = await activePool.getBTC();
 
       assert.isTrue(aliceCollAfter.eq(activePoolCollAfter));
       assert.isTrue(activePoolCollAfter.eq(activePoolCollAfter));
@@ -3315,7 +3315,7 @@ contract("BorrowerOperations", async accounts => {
 
       const nueBalance_Before = await nueToken.balanceOf(alice);
 
-      // Alice adjusts trove. Coll and debt increase(+1 ETH, +50ZUSD)
+      // Alice adjusts trove. Coll and debt increase(+1 BTC, +50ZUSD)
       const increaseAmount = await getNetBorrowingAmount(dec(50, 16));
       await borrowerOperations.adjustNueTrove(th._100pct, 0, increaseAmount, true, alice, alice, {
         from: alice,
@@ -3350,7 +3350,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(debtBefore.gt(toBN("0")));
       assert.isTrue(collBefore.gt(toBN("0")));
 
-      // Alice adjusts trove. Coll and debt increase(+1 ETH, +50ZUSD)
+      // Alice adjusts trove. Coll and debt increase(+1 BTC, +50ZUSD)
       await borrowerOperations.adjustTrove(
         th._100pct,
         0,
@@ -3389,7 +3389,7 @@ contract("BorrowerOperations", async accounts => {
       const nueBalance_Before = await nueToken.balanceOf(alice);
 
       const decreaseAmount = toBN(dec(50, 16));
-      // Alice adjusts trove coll and debt decrease (-0.5 ETH, -50ZUSD)
+      // Alice adjusts trove coll and debt decrease (-0.5 BTC, -50ZUSD)
       await borrowerOperations.adjustNueTrove(
         th._100pct,
         dec(500, "finney"),
@@ -3428,7 +3428,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(debtBefore.gt(toBN("0")));
       assert.isTrue(collBefore.gt(toBN("0")));
 
-      // Alice adjusts trove coll and debt decrease (-0.5 ETH, -50ZUSD)
+      // Alice adjusts trove coll and debt decrease (-0.5 BTC, -50ZUSD)
       await borrowerOperations.adjustTrove(
         th._100pct,
         dec(500, "finney"),
@@ -3464,7 +3464,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(debtBefore.gt(toBN("0")));
       assert.isTrue(collBefore.gt(toBN("0")));
 
-      // Alice adjusts trove - coll increase and debt decrease (+0.5 ETH, -50ZUSD)
+      // Alice adjusts trove - coll increase and debt decrease (+0.5 BTC, -50ZUSD)
       await borrowerOperations.adjustTrove(th._100pct, 0, dec(50, 16), false, alice, alice, {
         from: alice,
         value: dec(500, "finney")
@@ -3495,7 +3495,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(debtBefore.gt(toBN("0")));
       assert.isTrue(collBefore.gt(toBN("0")));
 
-      // Alice adjusts trove - coll decrease and debt increase (0.1 ETH, 10ZUSD)
+      // Alice adjusts trove - coll decrease and debt increase (0.1 BTC, 10ZUSD)
       await borrowerOperations.adjustTrove(
         th._100pct,
         dec(1, 17),
@@ -3531,7 +3531,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(stakeBefore.gt(toBN("0")));
       assert.isTrue(totalStakesBefore.gt(toBN("0")));
 
-      // Alice adjusts trove - coll and debt increase (+1 ETH, +50 ZUSD)
+      // Alice adjusts trove - coll and debt increase (+1 BTC, +50 ZUSD)
       await borrowerOperations.adjustTrove(th._100pct, 0, dec(50, 16), true, alice, alice, {
         from: alice,
         value: dec(1, 16)
@@ -3643,7 +3643,7 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("adjustTrove(): Changes the activePool ETH and raw bitcoin balance by the requested decrease", async () => {
+    it("adjustTrove(): Changes the activePool BTC and raw bitcoin balance by the requested decrease", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 16)),
         ICR: toBN(dec(10, 18)),
@@ -3656,9 +3656,9 @@ contract("BorrowerOperations", async accounts => {
         extraParams: { from: alice }
       });
 
-      const activePool_ETH_Before = await activePool.getETH();
+      const activePool_BTC_Before = await activePool.getBTC();
       const activePool_RawBTC_Before = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_Before.gt(toBN("0")));
+      assert.isTrue(activePool_BTC_Before.gt(toBN("0")));
       assert.isTrue(activePool_RawBTC_Before.gt(toBN("0")));
 
       // Alice adjusts trove - coll decrease and debt decrease
@@ -3672,13 +3672,13 @@ contract("BorrowerOperations", async accounts => {
         { from: alice }
       );
 
-      const activePool_ETH_After = await activePool.getETH();
+      const activePool_BTC_After = await activePool.getBTC();
       const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_After.eq(activePool_ETH_Before.sub(toBN(dec(1, 17)))));
-      assert.isTrue(activePool_RawBTC_After.eq(activePool_ETH_Before.sub(toBN(dec(1, 17)))));
+      assert.isTrue(activePool_BTC_After.eq(activePool_BTC_Before.sub(toBN(dec(1, 17)))));
+      assert.isTrue(activePool_RawBTC_After.eq(activePool_BTC_Before.sub(toBN(dec(1, 17)))));
     });
 
-    it("adjustTrove(): Changes the activePool ETH and raw bitcoin balance by the amount of ETH sent", async () => {
+    it("adjustTrove(): Changes the activePool BTC and raw bitcoin balance by the amount of BTC sent", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 16)),
         ICR: toBN(dec(10, 18)),
@@ -3691,9 +3691,9 @@ contract("BorrowerOperations", async accounts => {
         extraParams: { from: alice }
       });
 
-      const activePool_ETH_Before = await activePool.getETH();
+      const activePool_BTC_Before = await activePool.getBTC();
       const activePool_RawBTC_Before = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_Before.gt(toBN("0")));
+      assert.isTrue(activePool_BTC_Before.gt(toBN("0")));
       assert.isTrue(activePool_RawBTC_Before.gt(toBN("0")));
 
       // Alice adjusts trove - coll increase and debt increase
@@ -3702,10 +3702,10 @@ contract("BorrowerOperations", async accounts => {
         value: dec(1, 16)
       });
 
-      const activePool_ETH_After = await activePool.getETH();
+      const activePool_BTC_After = await activePool.getBTC();
       const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_After.eq(activePool_ETH_Before.add(toBN(dec(1, 16)))));
-      assert.isTrue(activePool_RawBTC_After.eq(activePool_ETH_Before.add(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_BTC_After.eq(activePool_BTC_Before.add(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_RawBTC_After.eq(activePool_BTC_Before.add(toBN(dec(1, 16)))));
     });
 
     it("adjustTrove(): Changes the ZUSD debt in ActivePool by requested decrease", async () => {
@@ -4235,9 +4235,9 @@ contract("BorrowerOperations", async accounts => {
       await priceFeed.setPrice(dec(100, 18));
 
       // Get Alice's pending reward snapshots
-      const L_ETH_A_Snapshot = (await troveManager.rewardSnapshots(alice))[0];
+      const L_BTC_A_Snapshot = (await troveManager.rewardSnapshots(alice))[0];
       const L_ZUSDDebt_A_Snapshot = (await troveManager.rewardSnapshots(alice))[1];
-      assert.isTrue(L_ETH_A_Snapshot.gt(toBN("0")));
+      assert.isTrue(L_BTC_A_Snapshot.gt(toBN("0")));
       assert.isTrue(L_ZUSDDebt_A_Snapshot.gt(toBN("0")));
 
       // Liquidate Carol
@@ -4245,10 +4245,10 @@ contract("BorrowerOperations", async accounts => {
       assert.isFalse(await sortedTroves.contains(carol));
 
       // Get Alice's pending reward snapshots after Carol's liquidation. Check above 0
-      const L_ETH_Snapshot_A_AfterLiquidation = (await troveManager.rewardSnapshots(alice))[0];
+      const L_BTC_Snapshot_A_AfterLiquidation = (await troveManager.rewardSnapshots(alice))[0];
       const L_ZUSDDebt_Snapshot_A_AfterLiquidation = (await troveManager.rewardSnapshots(alice))[1];
 
-      assert.isTrue(L_ETH_Snapshot_A_AfterLiquidation.gt(toBN("0")));
+      assert.isTrue(L_BTC_Snapshot_A_AfterLiquidation.gt(toBN("0")));
       assert.isTrue(L_ZUSDDebt_Snapshot_A_AfterLiquidation.gt(toBN("0")));
 
       // to compensate borrowing fees
@@ -4260,10 +4260,10 @@ contract("BorrowerOperations", async accounts => {
       await borrowerOperations.closeTrove({ from: alice });
 
       // Check Alice's pending reward snapshots are zero
-      const L_ETH_Snapshot_A_afterAliceCloses = (await troveManager.rewardSnapshots(alice))[0];
+      const L_BTC_Snapshot_A_afterAliceCloses = (await troveManager.rewardSnapshots(alice))[0];
       const L_ZUSDDebt_Snapshot_A_afterAliceCloses = (await troveManager.rewardSnapshots(alice))[1];
 
-      assert.equal(L_ETH_Snapshot_A_afterAliceCloses, "0");
+      assert.equal(L_BTC_Snapshot_A_afterAliceCloses, "0");
       assert.equal(L_ZUSDDebt_Snapshot_A_afterAliceCloses, "0");
     });
 
@@ -4300,7 +4300,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isFalse(await sortedTroves.contains(alice));
     });
 
-    it("closeTrove(): reduces ActivePool ETH and raw bitcoin by correct amount", async () => {
+    it("closeTrove(): reduces ActivePool BTC and raw bitcoin by correct amount", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 18)),
         ICR: toBN(dec(2, 18)),
@@ -4317,12 +4317,12 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(dennisColl.gt("0"));
       assert.isTrue(aliceColl.gt("0"));
 
-      // Check active Pool ETH before
-      const activePool_ETH_before = await activePool.getETH();
+      // Check active Pool BTC before
+      const activePool_BTC_before = await activePool.getBTC();
       const activePool_RawBTC_before = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_before.eq(aliceColl.add(dennisColl)));
-      assert.isTrue(activePool_ETH_before.gt(toBN("0")));
-      assert.isTrue(activePool_RawBTC_before.eq(activePool_ETH_before));
+      assert.isTrue(activePool_BTC_before.eq(aliceColl.add(dennisColl)));
+      assert.isTrue(activePool_BTC_before.gt(toBN("0")));
+      assert.isTrue(activePool_RawBTC_before.eq(activePool_BTC_before));
 
       // to compensate borrowing fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
@@ -4331,9 +4331,9 @@ contract("BorrowerOperations", async accounts => {
       await borrowerOperations.closeTrove({ from: alice });
 
       // Check after
-      const activePool_ETH_After = await activePool.getETH();
+      const activePool_BTC_After = await activePool.getBTC();
       const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_After.eq(dennisColl));
+      assert.isTrue(activePool_BTC_After.eq(dennisColl));
       assert.isTrue(activePool_RawBTC_After.eq(dennisColl));
     });
 
@@ -4417,7 +4417,7 @@ contract("BorrowerOperations", async accounts => {
 
     if (!withProxy) {
       // TODO: wrap web3.eth.getBalance to be able to go through proxies
-      it("closeTrove(): sends the correct amount of ETH to the user", async () => {
+      it("closeTrove(): sends the correct amount of BTC to the user", async () => {
         await openTrove({
           extraZUSDAmount: toBN(dec(10000, 18)),
           ICR: toBN(dec(2, 18)),
@@ -4432,15 +4432,15 @@ contract("BorrowerOperations", async accounts => {
         const aliceColl = await getTroveEntireColl(alice);
         assert.isTrue(aliceColl.gt(toBN("0")));
 
-        const alice_ETHBalance_Before = web3.utils.toBN(await web3.eth.getBalance(alice));
+        const alice_BTCBalance_Before = web3.utils.toBN(await web3.eth.getBalance(alice));
 
         // to compensate borrowing fees
         await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
         await borrowerOperations.closeTrove({ from: alice, gasPrice: 0 });
 
-        const alice_ETHBalance_After = web3.utils.toBN(await web3.eth.getBalance(alice));
-        const balanceDiff = alice_ETHBalance_After.sub(alice_ETHBalance_Before);
+        const alice_BTCBalance_After = web3.utils.toBN(await web3.eth.getBalance(alice));
+        const balanceDiff = alice_BTCBalance_After.sub(alice_BTCBalance_Before);
 
         assert.isTrue(balanceDiff.eq(aliceColl));
       });
@@ -4513,7 +4513,7 @@ contract("BorrowerOperations", async accounts => {
 
       // --- TEST ---
 
-      // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
+      // price drops to 1BTC:100ZUSD, reducing Carol's ICR below MCR
       await priceFeed.setPrice(dec(100, 18));
       const price = await priceFeed.getPrice();
 
@@ -4532,26 +4532,26 @@ contract("BorrowerOperations", async accounts => {
 
       // check Alice and Bob's reward snapshots are zero before they alter their Troves
       const alice_rewardSnapshot_Before = await troveManager.rewardSnapshots(alice);
-      const alice_ETHrewardSnapshot_Before = alice_rewardSnapshot_Before[0];
+      const alice_BTCrewardSnapshot_Before = alice_rewardSnapshot_Before[0];
       const alice_ZUSDDebtRewardSnapshot_Before = alice_rewardSnapshot_Before[1];
 
       const bob_rewardSnapshot_Before = await troveManager.rewardSnapshots(bob);
-      const bob_ETHrewardSnapshot_Before = bob_rewardSnapshot_Before[0];
+      const bob_BTCrewardSnapshot_Before = bob_rewardSnapshot_Before[0];
       const bob_ZUSDDebtRewardSnapshot_Before = bob_rewardSnapshot_Before[1];
 
-      assert.equal(alice_ETHrewardSnapshot_Before, 0);
+      assert.equal(alice_BTCrewardSnapshot_Before, 0);
       assert.equal(alice_ZUSDDebtRewardSnapshot_Before, 0);
-      assert.equal(bob_ETHrewardSnapshot_Before, 0);
+      assert.equal(bob_BTCrewardSnapshot_Before, 0);
       assert.equal(bob_ZUSDDebtRewardSnapshot_Before, 0);
 
-      const defaultPool_ETH = await defaultPool.getETH();
+      const defaultPool_BTC = await defaultPool.getBTC();
       const defaultPool_ZUSDDebt = await defaultPool.getZUSDDebt();
 
-      // Carol's liquidated coll (1 ETH) and drawn debt should have entered the Default Pool
-      assert.isAtMost(th.getDifference(defaultPool_ETH, liquidatedColl_C), 100);
+      // Carol's liquidated coll (1 BTC) and drawn debt should have entered the Default Pool
+      assert.isAtMost(th.getDifference(defaultPool_BTC, liquidatedColl_C), 100);
       assert.isAtMost(th.getDifference(defaultPool_ZUSDDebt, liquidatedDebt_C), 100);
 
-      const pendingCollReward_A = await troveManager.getPendingETHReward(alice);
+      const pendingCollReward_A = await troveManager.getPendingBTCReward(alice);
       const pendingDebtReward_A = await troveManager.getPendingZUSDDebtReward(alice);
       assert.isTrue(pendingCollReward_A.gt("0"));
       assert.isTrue(pendingDebtReward_A.gt("0"));
@@ -4559,11 +4559,11 @@ contract("BorrowerOperations", async accounts => {
       // Close Alice's trove. Alice's pending rewards should be removed from the DefaultPool when she close.
       await borrowerOperations.closeTrove({ from: alice });
 
-      const defaultPool_ETH_afterAliceCloses = await defaultPool.getETH();
+      const defaultPool_BTC_afterAliceCloses = await defaultPool.getBTC();
       const defaultPool_ZUSDDebt_afterAliceCloses = await defaultPool.getZUSDDebt();
 
       assert.isAtMost(
-        th.getDifference(defaultPool_ETH_afterAliceCloses, defaultPool_ETH.sub(pendingCollReward_A)),
+        th.getDifference(defaultPool_BTC_afterAliceCloses, defaultPool_BTC.sub(pendingCollReward_A)),
         1000
       );
       assert.isAtMost(
@@ -4582,10 +4582,10 @@ contract("BorrowerOperations", async accounts => {
       // Close Bob's trove. Expect DefaultPool coll and debt to drop to 0, since closing pulls his rewards out.
       await borrowerOperations.closeTrove({ from: bob });
 
-      const defaultPool_ETH_afterBobCloses = await defaultPool.getETH();
+      const defaultPool_BTC_afterBobCloses = await defaultPool.getBTC();
       const defaultPool_ZUSDDebt_afterBobCloses = await defaultPool.getZUSDDebt();
 
-      assert.isAtMost(th.getDifference(defaultPool_ETH_afterBobCloses, 0), 100000);
+      assert.isAtMost(th.getDifference(defaultPool_BTC_afterBobCloses, 0), 100000);
       assert.isAtMost(th.getDifference(defaultPool_ZUSDDebt_afterBobCloses, 0), 100000);
     });
 
@@ -5680,7 +5680,7 @@ contract("BorrowerOperations", async accounts => {
       const TCR = (await th.getTCR(contracts)).toString();
       assert.equal(TCR, "1500000000000000000");
 
-      // price drops to 1ETH:100ZUSD, reducing TCR below 150%
+      // price drops to 1BTC:100ZUSD, reducing TCR below 150%
       await priceFeed.setPrice("1000000000000000000");
       const price = await priceFeed.getPrice();
 
@@ -5721,7 +5721,7 @@ contract("BorrowerOperations", async accounts => {
       const TCR = (await th.getTCR(contracts)).toString();
       assert.equal(TCR, "1500000000000000000");
 
-      // price drops to 1ETH:100ZUSD, reducing TCR below 150%
+      // price drops to 1BTC:100ZUSD, reducing TCR below 150%
       await priceFeed.setPrice("1000000000000000000");
 
       assert.isTrue(await th.checkRecoveryMode(contracts));
@@ -5873,10 +5873,10 @@ contract("BorrowerOperations", async accounts => {
       assert.equal(listIsEmpty_After, false);
     });
 
-    it("openTrove(): Increases the activePool ETH and raw bitcoin balance by correct amount", async () => {
-      const activePool_ETH_Before = await activePool.getETH();
+    it("openTrove(): Increases the activePool BTC and raw bitcoin balance by correct amount", async () => {
+      const activePool_BTC_Before = await activePool.getBTC();
       const activePool_RawBTC_Before = await web3.eth.getBalance(activePool.address);
-      assert.equal(activePool_ETH_Before, 0);
+      assert.equal(activePool_BTC_Before, 0);
       assert.equal(activePool_RawBTC_Before, 0);
 
       await openTrove({
@@ -5886,13 +5886,13 @@ contract("BorrowerOperations", async accounts => {
       });
       const aliceCollAfter = await getTroveEntireColl(alice);
 
-      const activePool_ETH_After = await activePool.getETH();
+      const activePool_BTC_After = await activePool.getBTC();
       const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
-      assert.isTrue(activePool_ETH_After.eq(aliceCollAfter));
+      assert.isTrue(activePool_BTC_After.eq(aliceCollAfter));
       assert.isTrue(activePool_RawBTC_After.eq(aliceCollAfter));
     });
 
-    it("openTrove(): records up-to-date initial snapshots of L_ETH and L_ZUSDDebt", async () => {
+    it("openTrove(): records up-to-date initial snapshots of L_BTC and L_ZUSDDebt", async () => {
       // --- SETUP ---
 
       await openTrove({
@@ -5908,7 +5908,7 @@ contract("BorrowerOperations", async accounts => {
 
       // --- TEST ---
 
-      // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
+      // price drops to 1BTC:100ZUSD, reducing Carol's ICR below MCR
       await priceFeed.setPrice(dec(100, 18));
 
       // close Carol's Trove, liquidating her 1 bitcoin and 180ZUSD.
@@ -5917,13 +5917,13 @@ contract("BorrowerOperations", async accounts => {
         liquidationTx
       );
 
-      /* with total stakes = 10 bitcoin, after liquidation, L_ETH should equal 1/10 bitcoin per-bitcoin-staked,
+      /* with total stakes = 10 bitcoin, after liquidation, L_BTC should equal 1/10 bitcoin per-bitcoin-staked,
        and L_ZUSD should equal 18 ZUSD per-bitcoin-staked. */
 
-      const L_ETH = await troveManager.L_ETH();
+      const L_BTC = await troveManager.L_BTC();
       const L_ZUSD = await troveManager.L_ZUSDDebt();
 
-      assert.isTrue(L_ETH.gt(toBN("0")));
+      assert.isTrue(L_BTC.gt(toBN("0")));
       assert.isTrue(L_ZUSD.gt(toBN("0")));
 
       // Bob opens trove
@@ -5933,12 +5933,12 @@ contract("BorrowerOperations", async accounts => {
         extraParams: { from: bob }
       });
 
-      // Check Bob's snapshots of L_ETH and L_ZUSD equal the respective current values
+      // Check Bob's snapshots of L_BTC and L_ZUSD equal the respective current values
       const bob_rewardSnapshot = await troveManager.rewardSnapshots(bob);
-      const bob_ETHrewardSnapshot = bob_rewardSnapshot[0];
+      const bob_BTCrewardSnapshot = bob_rewardSnapshot[0];
       const bob_ZUSDDebtRewardSnapshot = bob_rewardSnapshot[1];
 
-      assert.isAtMost(th.getDifference(bob_ETHrewardSnapshot, L_ETH), 1000);
+      assert.isAtMost(th.getDifference(bob_BTCrewardSnapshot, L_BTC), 1000);
       assert.isAtMost(th.getDifference(bob_ZUSDDebtRewardSnapshot, L_ZUSD), 1000);
     });
 
@@ -6721,7 +6721,7 @@ contract("BorrowerOperations", async accounts => {
         const closeTroveData = th.getTransactionData("closeTrove()", []);
         await th.assertRevert(
           nonPayable.forward(borrowerOperations.address, closeTroveData),
-          "ActivePool: sending ETH failed"
+          "ActivePool: sending BTC failed"
         );
       });
     }

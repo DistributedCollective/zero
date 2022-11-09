@@ -171,9 +171,9 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const B_pendingZEROGain = await stabilityPool.getDepositorZEROGain(B)
       assert.equal(B_pendingZEROGain, '0')
 
-      // Check depositor B has a pending ETH gain
-      const B_pendingETHGain = await stabilityPool.getDepositorETHGain(B)
-      assert.isTrue(B_pendingETHGain.gt(toBN('0')))
+      // Check depositor B has a pending BTC gain
+      const B_pendingBTCGain = await stabilityPool.getDepositorBTCGain(B)
+      assert.isTrue(B_pendingBTCGain.gt(toBN('0')))
     })
 
 
@@ -187,7 +187,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       // defaulter opens trove
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
-      // ETH drops
+      // BTC drops
       await priceFeed.setPrice(dec(100, 18))
 
       await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider)
@@ -226,7 +226,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(1, 22), A, A, { from: A, value: dec(100, 'ether') })
@@ -307,7 +307,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
@@ -407,7 +407,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
@@ -546,7 +546,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       const allDepositors = [A, B, C, D, E, F, G, H]
@@ -753,22 +753,22 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
     /* Serial scale changes
 
     A make deposit 10k ZUSD
-    1 month passes. L1 decreases P: P = 1e-5 P. L1:   9999.9 ZUSD, 100 ETH
+    1 month passes. L1 decreases P: P = 1e-5 P. L1:   9999.9 ZUSD, 100 BTC
     B makes deposit 9999.9
-    1 month passes. L2 decreases P: P =  1e-5 P. L2:  9999.9 ZUSD, 100 ETH
+    1 month passes. L2 decreases P: P =  1e-5 P. L2:  9999.9 ZUSD, 100 BTC
     C makes deposit  9999.9
-    1 month passes. L3 decreases P: P = 1e-5 P. L3:  9999.9 ZUSD, 100 ETH
+    1 month passes. L3 decreases P: P = 1e-5 P. L3:  9999.9 ZUSD, 100 BTC
     D makes deposit  9999.9
-    1 month passes. L4 decreases P: P = 1e-5 P. L4:  9999.9 ZUSD, 100 ETH
+    1 month passes. L4 decreases P: P = 1e-5 P. L4:  9999.9 ZUSD, 100 BTC
     E makes deposit  9999.9
-    1 month passes. L5 decreases P: P = 1e-5 P. L5:  9999.9 ZUSD, 100 ETH
+    1 month passes. L5 decreases P: P = 1e-5 P. L5:  9999.9 ZUSD, 100 BTC
     =========
     F makes deposit 100
-    1 month passes. L6 empties the Pool. L6:  10000 ZUSD, 100 ETH
+    1 month passes. L6 empties the Pool. L6:  10000 ZUSD, 100 BTC
 
     expect A, B, C, D each withdraw ~1 month's worth of ZERO */
     it("withdrawFromSP(): Several deposits of 100 ZUSD span one scale factor change. Depositors withdraw correct ZERO gains", async () => {
-      // Whale opens Trove with 100 ETH
+      // Whale opens Trove with 100 BTC
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(100, 'ether') })
 
       const fiveDefaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4, defaulter_5]
@@ -940,7 +940,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(100, 'ether') })
@@ -1084,7 +1084,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
@@ -1456,13 +1456,13 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
     F1 kickbackRate: 80%
 
     A, B make deposit 5000 ZUSD via F1
-    1 month passes. L1 depletes P: P = 1e-5*P L1:  9999.9 ZUSD, 1 ETH.  scale = 0
+    1 month passes. L1 depletes P: P = 1e-5*P L1:  9999.9 ZUSD, 1 BTC.  scale = 0
     C makes deposit 10000  via F1
-    1 month passes. L2 depletes P: P = 1e-5*P L2:  9999.9 ZUSD, 1 ETH  scale = 1
+    1 month passes. L2 depletes P: P = 1e-5*P L2:  9999.9 ZUSD, 1 BTC  scale = 1
     D makes deposit 10000 via F1
-    1 month passes. L3 depletes P: P = 1e-5*P L3:  9999.9 ZUSD, 1 ETH scale = 1
+    1 month passes. L3 depletes P: P = 1e-5*P L3:  9999.9 ZUSD, 1 BTC scale = 1
     E makes deposit 10000 via F1
-    1 month passes. L3 depletes P: P = 1e-5*P L4:  9999.9 ZUSD, 1 ETH scale = 2
+    1 month passes. L3 depletes P: P = 1e-5*P L4:  9999.9 ZUSD, 1 BTC scale = 2
     A, B, C, D, E withdraw
 
     =========
@@ -1472,7 +1472,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const kickbackRate = toBN(dec(80, 16)) // F1 kicks 80% back to depositor
       await stabilityPool.registerFrontEnd(kickbackRate, { from: frontEnd_1 })
 
-      // Whale opens Trove with 10k ETH
+      // Whale opens Trove with 10k BTC
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       const _4_Defaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4]

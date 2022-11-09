@@ -120,7 +120,7 @@ const ABDKOperations = async () => {
   // returns 10979513.468051490981687838
   // accurate to 17 digits
 
-  /* TODO: will L_ETH, L_ZUSD overflow if stored as 64.64? Possibly need to store as uint, divide by 1e18, then use
+  /* TODO: will L_BTC, L_ZUSD overflow if stored as 64.64? Possibly need to store as uint, divide by 1e18, then use
     the resulting 64.64  */
 
   // // --- Ratio Multiplication ---
@@ -165,7 +165,7 @@ const ABDKOperations = async () => {
     
     ABDK.mulu is for: (64.64dec * uint)  -> uint.  i.e. for rewardPerUnitStaked  * stake -> reward
     
-    ABDK.divu is for: (uint / uint)  -> 64.64dec.  i.e. for liquidatedETH / totalStakes 
+    ABDK.divu is for: (uint / uint)  -> 64.64dec.  i.e. for liquidatedBTC / totalStakes 
     
     */
 };

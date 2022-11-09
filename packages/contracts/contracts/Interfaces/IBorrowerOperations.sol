@@ -101,11 +101,11 @@ interface IBorrowerOperations {
     /// @param _lowerHint lower trove id hint
     function addColl(address _upperHint, address _lowerHint) external payable;
 
-    /// @notice send ETH as collateral to a trove. Called by only the Stability Pool.
+    /// @notice send BTC as collateral to a trove. Called by only the Stability Pool.
     /// @param _user user trove address
     /// @param _upperHint upper trove id hint
     /// @param _lowerHint lower trove id hint
-    function moveETHGainToTrove(
+    function moveBTCGainToTrove(
         address _user,
         address _upperHint,
         address _lowerHint
@@ -209,7 +209,7 @@ interface IBorrowerOperations {
 
     /**
      * @notice when a borrower’s Trove has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%,
-     * this function allows the borrower to claim their ETH collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation).
+     * this function allows the borrower to claim their BTC collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation).
      */
     function claimCollateral() external;
 

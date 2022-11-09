@@ -9,7 +9,7 @@ pragma solidity 0.6.11;
  * ZUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of ZUSD tokens in the Stability Pool is burned.
  *
  * Thus, a liquidation causes each depositor to receive a ZUSD loss, in proportion to their deposit as a share of total deposits.
- * They also receive an ETH gain, as the ETH collateral of the liquidated trove is distributed among Stability depositors,
+ * They also receive an BTC gain, as the BTC collateral of the liquidated trove is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
@@ -18,7 +18,7 @@ pragma solidity 0.6.11;
  * A deposit that has experienced a series of liquidations is termed a "compounded deposit": each liquidation depletes the deposit,
  * multiplying it by some factor in range ]0,1[
  *
- * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / ETH gain derivations:
+ * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / BTC gain derivations:
  * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  * --- ZERO ISSUANCE TO STABILITY POOL DEPOSITORS ---
@@ -37,7 +37,7 @@ interface IStabilityPool {
 
     // --- Events ---
     
-    event StabilityPoolETHBalanceUpdated(uint _newBalance);
+    event StabilityPoolBTCBalanceUpdated(uint _newBalance);
     event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
@@ -63,7 +63,7 @@ interface IStabilityPool {
     event UserDepositChanged(address indexed _depositor, uint _newDeposit);
     event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
 
-    event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
+    event BTCGainWithdrawn(address indexed _depositor, uint _BTC, uint _ZUSDLoss);
     event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
     event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
     event BTCSent(address _to, uint _amount);
@@ -101,7 +101,7 @@ interface IStabilityPool {
      *  ---
      *  - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *  - Tags the deposit with the provided front end tag param, if it's a new deposit
-     *  - Sends depositor's accumulated gains (ZERO, ETH) to depositor
+     *  - Sends depositor's accumulated gains (ZERO, BTC) to depositor
      *  - Sends the tagged front end's accumulated ZERO gains to the tagged front end
      *  - Increases deposit and tagged front end's stake, and takes new snapshots for each.
      * @param _amount amount to provide
@@ -116,7 +116,7 @@ interface IStabilityPool {
      *    ---
      *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *    - Removes the deposit's front end tag if it is a full withdrawal
-     *    - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
+     *    - Sends all depositor's accumulated gains (ZERO, BTC) to depositor
      *    - Sends the tagged front end's accumulated ZERO gains to the tagged front end
      *    - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
      * 
@@ -129,18 +129,18 @@ interface IStabilityPool {
      * @notice Initial checks:
      *    - User has a non zero deposit
      *    - User has an open trove
-     *    - User has some ETH gain
+     *    - User has some BTC gain
      *    ---
      *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *    - Sends all depositor's ZERO gain to  depositor
      *    - Sends all tagged front end's ZERO gain to the tagged front end
-     *    - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
+     *    - Transfers the depositor's entire BTC gain from the Stability Pool to the caller's trove
      *    - Leaves their compounded deposit in the Stability Pool
      *    - Updates snapshots for deposit and tagged front end stake
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function withdrawETHGainToTrove(address _upperHint, address _lowerHint) external;
+    function withdrawBTCGainToTrove(address _upperHint, address _lowerHint) external;
 
     /**
      * @notice Initial checks:
@@ -158,7 +158,7 @@ interface IStabilityPool {
      *    - Caller is TroveManager
      *    ---
      *    Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
-     *    and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
+     *    and transfers the Trove's BTC collateral from ActivePool to StabilityPool.
      *    Only called by liquidation functions in the TroveManager.
      * @param _debt debt to cancel
      * @param _coll collateral to transfer
@@ -166,10 +166,10 @@ interface IStabilityPool {
     function offset(uint _debt, uint _coll) external;
 
     /**
-     * @return the total amount of ETH held by the pool, accounted in an internal variable instead of `balance`,
-     * to exclude edge cases like ETH received from a self-destruct.
+     * @return the total amount of BTC held by the pool, accounted in an internal variable instead of `balance`,
+     * to exclude edge cases like BTC received from a self-destruct.
      */
-    function getETH() external view returns (uint);
+    function getBTC() external view returns (uint);
 
     /**
      * @return ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
@@ -177,18 +177,18 @@ interface IStabilityPool {
     function getTotalZUSDDeposits() external view returns (uint);
 
     /**
-     * @notice Calculates the ETH gain earned by the deposit since its last snapshots were taken.
-     * @param _depositor address to calculate ETH gain
-     * @return ETH gain from given depositor
+     * @notice Calculates the BTC gain earned by the deposit since its last snapshots were taken.
+     * @param _depositor address to calculate BTC gain
+     * @return BTC gain from given depositor
      */
-    function getDepositorETHGain(address _depositor) external view returns (uint);
+    function getDepositorBTCGain(address _depositor) external view returns (uint);
 
     /**
      * @notice Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
      *    If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
      *    Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
      *    which they made their deposit.
-     * @param _depositor address to calculate ETH gain
+     * @param _depositor address to calculate BTC gain
      * @return ZERO gain from given depositor
      */
     function getDepositorZEROGain(address _depositor) external view returns (uint);
@@ -214,7 +214,7 @@ interface IStabilityPool {
 
     /**
      * Fallback function
-     * Only callable by Active Pool, it just accounts for ETH received
+     * Only callable by Active Pool, it just accounts for BTC received
      * receive() external payable;
      */
 }

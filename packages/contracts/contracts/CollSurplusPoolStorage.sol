@@ -12,7 +12,7 @@ contract CollSurplusPoolStorage is Ownable {
     address public activePoolAddress;
 
     // deposited bitcoin tracker
-    uint256 internal ETH;
+    uint256 internal BTC;
     // Collateral surplus claimable by trove owners
     mapping(address => uint256) internal balances;
 }

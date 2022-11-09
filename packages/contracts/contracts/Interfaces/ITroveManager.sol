@@ -36,8 +36,8 @@ interface ITroveManager is ILiquityBase {
     event Redemption(
         uint256 _attemptedZUSDAmount,
         uint256 _actualZUSDAmount,
-        uint256 _ETHSent,
-        uint256 _ETHFee
+        uint256 _BTCSent,
+        uint256 _BTCFee
     );
     event TroveUpdated(
         address indexed _borrower,
@@ -51,8 +51,8 @@ interface ITroveManager is ILiquityBase {
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event TotalStakesUpdated(uint256 _newTotalStakes);
     event SystemSnapshotsUpdated(uint256 _totalStakesSnapshot, uint256 _totalCollateralSnapshot);
-    event LTermsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
-    event TroveSnapshotsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
+    event LTermsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
+    event TroveSnapshotsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
     event TroveIndexUpdated(address _borrower, uint256 _newIndex);
 
     // --- Functions ---
@@ -104,7 +104,7 @@ interface ITroveManager is ILiquityBase {
 
     /// @notice computes the user’s individual collateralization ratio (ICR) based on their total collateral and total ZUSD debt. Returns 2^256 -1 if they have 0 debt.
     /// @param _borrower borrower address
-    /// @param _price ETH price
+    /// @param _price BTC price
     /// @return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
     function getCurrentICR(address _borrower, uint256 _price) external view returns (uint256);
 
@@ -166,7 +166,7 @@ interface ITroveManager is ILiquityBase {
     /// @param _borrower borrower address
     function updateStakeAndTotalStakes(address _borrower) external returns (uint256);
 
-    /// @notice Update borrower's snapshots of L_ETH and L_ZUSDDebt to reflect the current values
+    /// @notice Update borrower's snapshots of L_BTC and L_ZUSDDebt to reflect the current values
     /// @param _borrower borrower address
     function updateTroveRewardSnapshots(address _borrower) external;
 
@@ -180,8 +180,8 @@ interface ITroveManager is ILiquityBase {
     function applyPendingRewards(address _borrower) external;
 
     /// @param _borrower borrower address
-    /// @return the borrower's pending accumulated ETH reward, earned by their stake
-    function getPendingETHReward(address _borrower) external view returns (uint256);
+    /// @return the borrower's pending accumulated BTC reward, earned by their stake
+    function getPendingBTCReward(address _borrower) external view returns (uint256);
 
     /// @param _borrower borrower address
     /// @return the borrower's pending accumulated ZUSD reward, earned by their stake
@@ -206,7 +206,7 @@ interface ITroveManager is ILiquityBase {
             uint256 debt,
             uint256 coll,
             uint256 pendingZUSDDebtReward,
-            uint256 pendingETHReward
+            uint256 pendingBTCReward
         );
 
     /// @notice Close given trove. Called by BorrowerOperations.
@@ -223,9 +223,9 @@ interface ITroveManager is ILiquityBase {
     /// @return calculated redemption rate using calculated decayed as base rate
     function getRedemptionRateWithDecay() external view returns (uint256);
 
-    /// @notice The redemption fee is taken as a cut of the total ETH drawn from the system in a redemption. It is based on the current redemption rate.
-    /// @param _ETHDrawn ETH drawn
-    function getRedemptionFeeWithDecay(uint256 _ETHDrawn) external view returns (uint256);
+    /// @notice The redemption fee is taken as a cut of the total BTC drawn from the system in a redemption. It is based on the current redemption rate.
+    /// @param _BTCDrawn BTC drawn
+    function getRedemptionFeeWithDecay(uint256 _BTCDrawn) external view returns (uint256);
 
     /// @return borrowing rate
     function getBorrowingRate() external view returns (uint256);
@@ -285,7 +285,7 @@ interface ITroveManager is ILiquityBase {
     function decreaseTroveDebt(address _borrower, uint256 _debtDecrease) external returns (uint256);
 
     /**
-     * @param _price ETH price
+     * @param _price BTC price
      * @return the total collateralization ratio (TCR) of the system.
      * The TCR is based on the the entire system debt and collateral (including pending rewards).
      */

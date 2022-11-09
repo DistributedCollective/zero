@@ -303,8 +303,8 @@ describe("EthersLiquity", () => {
           .adjust(repayAndWithdraw)
       );
 
-      const ethBalance = Decimal.fromBigNumberString(`${await user.getBalance()}`);
-      expect(`${ethBalance}`).to.equal("100.5");
+      const btcBalance = Decimal.fromBigNumberString(`${await user.getBalance()}`);
+      expect(`${btcBalance}`).to.equal("100.5");
     });
 
     const borrowAndDeposit = { borrowZUSD: 60, depositCollateral: 0.5 };
@@ -325,8 +325,8 @@ describe("EthersLiquity", () => {
 
       expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowAndDeposit.borrowZUSD)}`);
 
-      const ethBalance = Decimal.fromBigNumberString(`${await user.getBalance()}`);
-      expect(`${ethBalance}`).to.equal("99.5");
+      const btcBalance = Decimal.fromBigNumberString(`${await user.getBalance()}`);
+      expect(`${btcBalance}`).to.equal("99.5");
     });
 
     it("should close the Trove with some ZUSD from another user", async () => {

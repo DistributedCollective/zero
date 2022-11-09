@@ -11,12 +11,12 @@ interface IZEROStaking {
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint256 newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint256 ZUSDGain, uint256 ETHGain);
-    event F_ETHUpdated(uint256 _F_ETH);
+    event StakingGainsWithdrawn(address indexed staker, uint256 ZUSDGain, uint256 BTCGain);
+    event F_BTCUpdated(uint256 _F_BTC);
     event F_ZUSDUpdated(uint256 _F_ZUSD);
     event TotalZEROStakedUpdated(uint256 _totalZEROStaked);
     event BTCSent(address _account, uint256 _amount);
-    event StakerSnapshotsUpdated(address _staker, uint256 _F_ETH, uint256 _F_ZUSD);
+    event StakerSnapshotsUpdated(address _staker, uint256 _F_BTC, uint256 _F_ZUSD);
 
     // --- Functions ---
 
@@ -35,28 +35,28 @@ interface IZEROStaking {
         address _activePoolAddress
     ) external;
 
-    /// @notice If caller has a pre-existing stake, send any accumulated ETH and ZUSD gains to them.
+    /// @notice If caller has a pre-existing stake, send any accumulated BTC and ZUSD gains to them.
     /// @param _ZEROamount ZERO tokens to stake
     function stake(uint256 _ZEROamount) external;
 
     /**
-     * @notice Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & ETH gains.
+     * @notice Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & BTC gains.
      * If requested amount > stake, send their entire stake.
      * @param _ZEROamount ZERO tokens to unstake
      */
     function unstake(uint256 _ZEROamount) external;
 
-    /// @param _ETHFee ETH fee
-    /// @notice increase ETH fee
-    function increaseF_ETH(uint256 _ETHFee) external;
+    /// @param _BTCFee BTC fee
+    /// @notice increase BTC fee
+    function increaseF_BTC(uint256 _BTCFee) external;
 
     /// @param _ZEROFee ZUSD fee
     /// @notice increase ZUSD fee
     function increaseF_ZUSD(uint256 _ZEROFee) external;
 
     /// @param _user user address
-    /// @return pending ETH gain of given user
-    function getPendingETHGain(address _user) external view returns (uint256);
+    /// @return pending BTC gain of given user
+    function getPendingBTCGain(address _user) external view returns (uint256);
 
     /// @param _user user address
     /// @return pending ZUSD gain of given user

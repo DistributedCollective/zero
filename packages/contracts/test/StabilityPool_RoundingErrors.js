@@ -60,13 +60,13 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
     }
 
     const SP_TotalDeposits = await stabilityPool.getTotalZUSDDeposits()
-    const SP_ETH = await stabilityPool.getETH()
+    const SP_BTC = await stabilityPool.getBTC()
     const compoundedDeposit = await stabilityPool.getCompoundedZUSDDeposit(depositors[0])
-    const ETH_Gain = await stabilityPool.getCurrentETHGain(depositors[0])
+    const BTC_Gain = await stabilityPool.getCurrentBTCGain(depositors[0])
 
     // Check depostiors receive their share without too much error
     assert.isAtMost(th.getDifference(SP_TotalDeposits.div(th.toBN(depositors.length)), compoundedDeposit), 100000)
-    assert.isAtMost(th.getDifference(SP_ETH.div(th.toBN(depositors.length)), ETH_Gain), 100000)
+    assert.isAtMost(th.getDifference(SP_BTC.div(th.toBN(depositors.length)), BTC_Gain), 100000)
   })
 })
 

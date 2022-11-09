@@ -50,7 +50,7 @@
           "type": "uint256"
         }
       ],
-      "name": "ETHBalanceUpdated",
+      "name": "BTCBalanceUpdated",
       "type": "event"
     },
     {
@@ -131,7 +131,7 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "getETH",
+      "name": "getBTC",
       "outputs": [
         {
           "internalType": "uint256",
@@ -146,7 +146,7 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "getRawETHBalance",
+      "name": "getRawBTCBalance",
       "outputs": [
         {
           "internalType": "uint256",
@@ -187,7 +187,7 @@
           "type": "uint256"
         }
       ],
-      "name": "sendETH",
+      "name": "sendBTC",
       "outputs": [
         {
           "internalType": "bool",

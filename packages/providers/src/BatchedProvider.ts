@@ -58,7 +58,7 @@ const multicallAbi = [
 
   {
     type: "function",
-    name: "getEthBalance",
+    name: "getBTCBalance",
     stateMutability: "view",
     constant: true,
     payable: false,
@@ -95,7 +95,7 @@ interface Multicall extends Contract {
   };
 
   readonly functions: {
-    getEthBalance(addr: string, overrides?: BatchableOverrides): Promise<[BigNumber]>;
+    getBTCBalance(addr: string, overrides?: BatchableOverrides): Promise<[BigNumber]>;
   };
 }
 
@@ -272,7 +272,7 @@ export const Batched = <T extends new (...args: any[]) => BaseProvider>(Base: T)
         return super.getBalance(resolvedAddressOrName, blockTag);
       }
 
-      const [balance] = await this._multicall.functions.getEthBalance(resolvedAddressOrName, {
+      const [balance] = await this._multicall.functions.getBTCBalance(resolvedAddressOrName, {
         blockTag: resolvedBlockTag
       });
 

@@ -141,11 +141,11 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_S_ETH",
+          "name": "_S_BTC",
           "type": "uint256"
         }
       ],
-      "name": "S_ETHUpdated",
+      "name": "S_BTCUpdated",
       "type": "event"
     },
     {
@@ -192,7 +192,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_ETH",
+          "name": "_BTC",
           "type": "uint256"
         }
       ],
@@ -222,7 +222,7 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "S_ETH",
+      "name": "S_BTC",
       "outputs": [
         {
           "internalType": "uint256",
@@ -289,7 +289,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_ETH",
+          "name": "_BTC",
           "type": "uint256"
         }
       ],
@@ -516,7 +516,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_ETH",
+          "name": "_BTC",
           "type": "uint256"
         }
       ],
@@ -624,7 +624,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_ETH",
+          "name": "_BTC",
           "type": "uint256"
         }
       ],
@@ -778,7 +778,7 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "ETH",
+          "name": "BTC",
           "type": "uint256"
         },
         {
@@ -872,7 +872,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_ETH",
+          "name": "_BTC",
           "type": "uint256"
         }
       ],

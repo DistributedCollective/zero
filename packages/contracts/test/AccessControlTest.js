@@ -76,10 +76,10 @@ contract(
     });
 
     describe("BorrowerOperations", async accounts => {
-      it("moveETHGainToTrove(): reverts when called by an account that is not StabilityPool", async () => {
+      it("moveBTCGainToTrove(): reverts when called by an account that is not StabilityPool", async () => {
         // Attempt call from alice
         try {
-          const tx1 = await borrowerOperations.moveETHGainToTrove(bob, bob, bob, { from: bob });
+          const tx1 = await borrowerOperations.moveBTCGainToTrove(bob, bob, bob, { from: bob });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "BorrowerOps: Caller is not Stability Pool")
@@ -211,11 +211,11 @@ contract(
     });
 
     describe("ActivePool", async accounts => {
-      // sendETH
-      it("sendETH(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
+      // sendBTC
+      it("sendBTC(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await activePool.sendETH(alice, 100, { from: alice });
+          const txAlice = await activePool.sendBTC(alice, 100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           assert.include(
@@ -267,11 +267,11 @@ contract(
     });
 
     describe("DefaultPool", async accounts => {
-      // sendETHToActivePool
-      it("sendETHToActivePool(): reverts when called by an account that is not TroveManager", async () => {
+      // sendBTCToActivePool
+      it("sendBTCToActivePool(): reverts when called by an account that is not TroveManager", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await defaultPool.sendETHToActivePool(100, { from: alice });
+          const txAlice = await defaultPool.sendBTCToActivePool(100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           assert.include(err.message, "Caller is not the TroveManager");

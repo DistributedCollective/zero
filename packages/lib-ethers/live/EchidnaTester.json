@@ -297,7 +297,7 @@
     },
     {
       "inputs": [],
-      "name": "echidna_ETH_balances",
+      "name": "echidna_BTC_balances",
       "outputs": [
         {
           "internalType": "bool",

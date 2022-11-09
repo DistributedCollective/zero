@@ -43,7 +43,7 @@
 * [DSProxyCache](docs/DSProxyCache.md)
 * [DSProxyFactory](docs/DSProxyFactory.md)
 * [ERC20](docs/ERC20.md)
-* [ETHTransferScript](docs/ETHTransferScript.md)
+* [BTCTransferScript](docs/BTCTransferScript.md)
 * [FeeDistributor](docs/FeeDistributor.md)
 * [FeeDistributorStorage](docs/FeeDistributorStorage.md)
 * [GasPool](docs/GasPool.md)

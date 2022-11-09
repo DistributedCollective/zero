@@ -265,13 +265,13 @@ contract BorrowerOperations is
         emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
     }
 
-    /// Send ETH as collateral to a trove
+    /// Send BTC as collateral to a trove
     function addColl(address _upperHint, address _lowerHint) external payable override {
         _adjustTrove(msg.sender, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    /// Send ETH as collateral to a trove. Called by only the Stability Pool.
-    function moveETHGainToTrove(
+    /// Send BTC as collateral to a trove. Called by only the Stability Pool.
+    function moveBTCGainToTrove(
         address _borrower,
         address _upperHint,
         address _lowerHint
@@ -280,7 +280,7 @@ contract BorrowerOperations is
         _adjustTrove(_borrower, 0, 0, false, _upperHint, _lowerHint, 0);
     }
 
-    /// Withdraw ETH collateral from a trove
+    /// Withdraw BTC collateral from a trove
     function withdrawColl(
         uint256 _collWithdrawal,
         address _upperHint,
@@ -412,7 +412,7 @@ contract BorrowerOperations is
         _requireNonZeroAdjustment(_collWithdrawal, _ZUSDChange);
         _requireTroveisActive(contractsCache.troveManager, _borrower);
 
-        // Confirm the operation is either a borrower adjusting their own trove, or a pure ETH transfer from the Stability Pool to a trove
+        // Confirm the operation is either a borrower adjusting their own trove, or a pure BTC transfer from the Stability Pool to a trove
         assert(
             msg.sender == _borrower ||
                 (msg.sender == stabilityPoolAddress && msg.value > 0 && _ZUSDChange == 0)
@@ -420,7 +420,7 @@ contract BorrowerOperations is
 
         contractsCache.troveManager.applyPendingRewards(_borrower);
 
-        // Get the collChange based on whether or not ETH was sent in the transaction
+        // Get the collChange based on whether or not BTC was sent in the transaction
         (vars.collChange, vars.isCollIncrease) = _getCollChange(msg.value, _collWithdrawal);
 
         vars.netDebtChange = _ZUSDChange;
@@ -498,7 +498,7 @@ contract BorrowerOperations is
         emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
 
         // Use the unmodified _ZUSDChange here, as we don't send the fee to the user
-        _moveTokensAndETHfromAdjustment(
+        _moveTokensAndBTCfromAdjustment(
             contractsCache.activePool,
             contractsCache.zusdToken,
             msg.sender,
@@ -553,14 +553,14 @@ contract BorrowerOperations is
         _repayZUSD(activePoolCached, zusdTokenCached, gasPoolAddress, ZUSD_GAS_COMPENSATION);
 
         // Send the collateral back to the user
-        activePoolCached.sendETH(msg.sender, coll);
+        activePoolCached.sendBTC(msg.sender, coll);
     }
 
     /**
      * Claim remaining collateral from a redemption or from a liquidation with ICR > MCR in Recovery Mode
      */
     function claimCollateral() external override {
-        // send ETH from CollSurplus Pool to owner
+        // send BTC from CollSurplus Pool to owner
         collSurplusPool.claimColl(msg.sender);
     }
 
@@ -620,7 +620,7 @@ contract BorrowerOperations is
         return (newColl, newDebt);
     }
 
-    function _moveTokensAndETHfromAdjustment(
+    function _moveTokensAndBTCfromAdjustment(
         IActivePool _activePool,
         IZUSDToken _zusdToken,
         address _borrower,
@@ -640,14 +640,14 @@ contract BorrowerOperations is
         if (_isCollIncrease) {
             _activePoolAddColl(_activePool, _collChange);
         } else {
-            _activePool.sendETH(_borrower, _collChange);
+            _activePool.sendBTC(_borrower, _collChange);
         }
     }
 
-    /// Send ETH to Active Pool and increase its recorded ETH balance
+    /// Send BTC to Active Pool and increase its recorded BTC balance
     function _activePoolAddColl(IActivePool _activePool, uint256 _amount) internal {
         (bool success, ) = address(_activePool).call{value: _amount}("");
-        require(success, "BorrowerOps: Sending ETH to ActivePool failed");
+        require(success, "BorrowerOps: Sending BTC to ActivePool failed");
     }
 
     /// Issue the specified amount of ZUSD to _account and increases the total active debt (_netDebtIncrease potentially includes a ZUSDFee)

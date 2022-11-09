@@ -346,7 +346,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     }
 
     /**
-     *  Get its offset coll/debt and ETH gas comp, and close the trove.
+     *  Get its offset coll/debt and BTC gas comp, and close the trove.
      */
     function _getCappedOffsetVals(
         uint256 _entireTroveDebt,
@@ -412,7 +412,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
         require(totals.totalDebtInSequence > 0, "TroveManager: nothing to liquidate");
 
-        // Move liquidated ETH and ZUSD to the appropriate pools
+        // Move liquidated BTC and ZUSD to the appropriate pools
         stabilityPoolCached.offset(totals.totalDebtToOffset, totals.totalCollToSendToSP);
         _redistributeDebtAndColl(
             contractsCache.activePool,
@@ -421,7 +421,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             totals.totalCollToRedistribute
         );
         if (totals.totalCollSurplus > 0) {
-            contractsCache.activePool.sendETH(address(collSurplusPool), totals.totalCollSurplus);
+            contractsCache.activePool.sendBTC(address(collSurplusPool), totals.totalCollSurplus);
         }
 
         // Update system snapshots
@@ -610,7 +610,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
         require(totals.totalDebtInSequence > 0, "TroveManager: nothing to liquidate");
 
-        // Move liquidated ETH and ZUSD to the appropriate pools
+        // Move liquidated BTC and ZUSD to the appropriate pools
         stabilityPoolCached.offset(totals.totalDebtToOffset, totals.totalCollToSendToSP);
         _redistributeDebtAndColl(
             activePoolCached,
@@ -619,7 +619,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             totals.totalCollToRedistribute
         );
         if (totals.totalCollSurplus > 0) {
-            activePoolCached.sendETH(address(collSurplusPool), totals.totalCollSurplus);
+            activePoolCached.sendBTC(address(collSurplusPool), totals.totalCollSurplus);
         }
 
         // Update system snapshots
@@ -802,14 +802,14 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         IActivePool _activePool,
         address _liquidator,
         uint256 _ZUSD,
-        uint256 _ETH
+        uint256 _BTC
     ) internal {
         if (_ZUSD > 0) {
             _zusdToken.returnFromPool(gasPoolAddress, _liquidator, _ZUSD);
         }
 
-        if (_ETH > 0) {
-            _activePool.sendETH(_liquidator, _ETH);
+        if (_BTC > 0) {
+            _activePool.sendBTC(_liquidator, _BTC);
         }
     }
 
@@ -817,9 +817,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     /// @return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
     function getNominalICR(address _borrower) public view override returns (uint256) {
-        (uint256 currentETH, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
+        (uint256 currentBTC, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint256 NICR = LiquityMath._computeNominalCR(currentETH, currentZUSDDebt);
+        uint256 NICR = LiquityMath._computeNominalCR(currentBTC, currentZUSDDebt);
         return NICR;
     }
 
@@ -828,7 +828,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _applyPendingRewards(activePool, defaultPool, _borrower);
     }
 
-    /// Update borrower's snapshots of L_ETH and L_ZUSDDebt to reflect the current values
+    /// Update borrower's snapshots of L_BTC and L_ZUSDDebt to reflect the current values
     function updateTroveRewardSnapshots(address _borrower) external override {
         _requireCallerIsBorrowerOperations();
         return _updateTroveRewardSnapshots(_borrower);
@@ -843,17 +843,17 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             uint256 debt,
             uint256 coll,
             uint256 pendingZUSDDebtReward,
-            uint256 pendingETHReward
+            uint256 pendingBTCReward
         )
     {
         debt = Troves[_borrower].debt;
         coll = Troves[_borrower].coll;
 
         pendingZUSDDebtReward = getPendingZUSDDebtReward(_borrower);
-        pendingETHReward = getPendingETHReward(_borrower);
+        pendingBTCReward = getPendingBTCReward(_borrower);
 
         debt = debt.add(pendingZUSDDebtReward);
-        coll = coll.add(pendingETHReward);
+        coll = coll.add(pendingBTCReward);
     }
 
     function removeStake(address _borrower) external override {
@@ -878,7 +878,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
         /*
          * Add distributed coll and debt rewards-per-unit-staked to the running totals. Division uses a "feedback"
-         * error correction, to keep the cumulative error low in the running totals L_ETH and L_ZUSDDebt:
+         * error correction, to keep the cumulative error low in the running totals L_BTC and L_ZUSDDebt:
          *
          * 1) Form numerators which compensate for the floor division errors that occurred the last time this
          * function was called.
@@ -887,30 +887,30 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
          * 4) Store these errors for use in the next correction when this function is called.
          * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
          */
-        uint256 ETHNumerator = _coll.mul(DECIMAL_PRECISION).add(lastETHError_Redistribution);
+        uint256 BTCNumerator = _coll.mul(DECIMAL_PRECISION).add(lastETHError_Redistribution);
         uint256 ZUSDDebtNumerator = _debt.mul(DECIMAL_PRECISION).add(
             lastZUSDDebtError_Redistribution
         );
 
         // Get the per-unit-staked terms
-        uint256 ETHRewardPerUnitStaked = ETHNumerator.div(totalStakes);
+        uint256 BTCRewardPerUnitStaked = BTCNumerator.div(totalStakes);
         uint256 ZUSDDebtRewardPerUnitStaked = ZUSDDebtNumerator.div(totalStakes);
 
-        lastETHError_Redistribution = ETHNumerator.sub(ETHRewardPerUnitStaked.mul(totalStakes));
+        lastETHError_Redistribution = BTCNumerator.sub(BTCRewardPerUnitStaked.mul(totalStakes));
         lastZUSDDebtError_Redistribution = ZUSDDebtNumerator.sub(
             ZUSDDebtRewardPerUnitStaked.mul(totalStakes)
         );
 
         // Add per-unit-staked terms to the running totals
-        L_ETH = L_ETH.add(ETHRewardPerUnitStaked);
+        L_BTC = L_BTC.add(BTCRewardPerUnitStaked);
         L_ZUSDDebt = L_ZUSDDebt.add(ZUSDDebtRewardPerUnitStaked);
 
-        emit LTermsUpdated(L_ETH, L_ZUSDDebt);
+        emit LTermsUpdated(L_BTC, L_ZUSDDebt);
 
         // Transfer coll and debt from ActivePool to DefaultPool
         _activePool.decreaseZUSDDebt(_debt);
         _defaultPool.increaseZUSDDebt(_debt);
-        _activePool.sendETH(address(_defaultPool), _coll);
+        _activePool.sendBTC(address(_defaultPool), _coll);
     }
 
     function closeTrove(address _borrower) external override {
@@ -924,9 +924,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
      *
      * The calculation excludes a portion of collateral that is in the ActivePool:
      *
-     * the total ETH gas compensation from the liquidation sequence
+     * the total BTC gas compensation from the liquidation sequence
      *
-     * The ETH as compensation must be excluded as it is always sent out at the very end of the liquidation sequence.
+     * The BTC as compensation must be excluded as it is always sent out at the very end of the liquidation sequence.
      */
     function _updateSystemSnapshots_excludeCollRemainder(
         IActivePool _activePool,
@@ -934,8 +934,8 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     ) internal {
         totalStakesSnapshot = totalStakes;
 
-        uint256 activeColl = _activePool.getETH();
-        uint256 liquidatedColl = defaultPool.getETH();
+        uint256 activeColl = _activePool.getBTC();
+        uint256 liquidatedColl = defaultPool.getBTC();
         totalCollateralSnapshot = activeColl.sub(_collRemainder).add(liquidatedColl);
 
         emit SystemSnapshotsUpdated(totalStakesSnapshot, totalCollateralSnapshot);
@@ -979,7 +979,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _checkRecoveryMode(_price);
     }
 
-    // Check whether or not the system *would be* in Recovery Mode, given an ETH:USD price, and the entire system coll and debt.
+    // Check whether or not the system *would be* in Recovery Mode, given an BTC:USD price, and the entire system coll and debt.
     function _checkPotentialRecoveryMode(
         uint256 _entireSystemColl,
         uint256 _entireSystemDebt,
@@ -994,8 +994,8 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _calcRedemptionRate(_calcDecayedBaseRate());
     }
 
-    function getRedemptionFeeWithDecay(uint256 _ETHDrawn) external view override returns (uint256) {
-        return _calcRedemptionFee(getRedemptionRateWithDecay(), _ETHDrawn);
+    function getRedemptionFeeWithDecay(uint256 _BTCDrawn) external view override returns (uint256) {
+        return _calcRedemptionFee(getRedemptionRateWithDecay(), _BTCDrawn);
     }
 
     // --- Borrowing fee functions ---
@@ -1125,8 +1125,8 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _getCurrentICR(_borrower, _price);
     }
 
-    function getPendingETHReward(address _borrower) public view override returns (uint256) {
-        return _getPendingETHReward(_borrower);
+    function getPendingBTCReward(address _borrower) public view override returns (uint256) {
+        return _getPendingBTCReward(_borrower);
     }
 
     function getPendingZUSDDebtReward(address _borrower) public view override returns (uint256) {

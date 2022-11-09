@@ -9,10 +9,10 @@ import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
 
 /**
- * The Default Pool holds the ETH and ZUSD debt (but not ZUSD tokens) from liquidations that have been redistributed
+ * The Default Pool holds the BTC and ZUSD debt (but not ZUSD tokens) from liquidations that have been redistributed
  * to active troves but not yet "applied", i.e. not yet recorded on a recipient active trove's struct.
  *
- * When a trove makes an operation that applies its pending ETH and ZUSD debt, its pending ETH and ZUSD debt is moved
+ * When a trove makes an operation that applies its pending BTC and ZUSD debt, its pending BTC and ZUSD debt is moved
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
@@ -20,7 +20,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event DefaultPoolETHBalanceUpdated(uint _ETH);
+    event DefaultPoolBTCBalanceUpdated(uint _BTC);
 
     // --- Dependency setters ---
 
@@ -46,12 +46,12 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     // --- Getters for public variables. Required by IPool interface ---
 
     /**
-    * @return the ETH state variable.
+    * @return the BTC state variable.
     *
-    * Not necessarily equal to the the contract's raw ETH balance - bitcoin can be forcibly sent to contracts.
+    * Not necessarily equal to the the contract's raw BTC balance - bitcoin can be forcibly sent to contracts.
     */
-    function getETH() external view override returns (uint) {
-        return ETH;
+    function getBTC() external view override returns (uint) {
+        return BTC;
     }
 
     function getZUSDDebt() external view override returns (uint) {
@@ -60,15 +60,15 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     // --- Pool functionality ---
 
-    function sendETHToActivePool(uint _amount) external override {
+    function sendBTCToActivePool(uint _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        ETH = ETH.sub(_amount);
-        emit DefaultPoolETHBalanceUpdated(ETH);
+        BTC = BTC.sub(_amount);
+        emit DefaultPoolBTCBalanceUpdated(BTC);
         emit BTCSent(activePool, _amount);
 
         (bool success, ) = activePool.call{ value: _amount }("");
-        require(success, "DefaultPool: sending ETH failed");
+        require(success, "DefaultPool: sending BTC failed");
     }
 
     function increaseZUSDDebt(uint _amount) external override {
@@ -97,7 +97,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
-        emit DefaultPoolETHBalanceUpdated(ETH);
+        BTC = BTC.add(msg.value);
+        emit DefaultPoolBTCBalanceUpdated(BTC);
     }
 }

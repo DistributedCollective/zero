@@ -58,7 +58,7 @@
           "type": "uint256"
         }
       ],
-      "name": "F_ETHUpdated",
+      "name": "F_BTCUpdated",
       "type": "event"
     },
     {
@@ -300,7 +300,7 @@
           "type": "address"
         }
       ],
-      "name": "getPendingETHGain",
+      "name": "getPendingBTCGain",
       "outputs": [
         {
           "internalType": "uint256",
@@ -334,7 +334,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_ETHFee",
+          "name": "_BTCFee",
           "type": "uint256"
         }
       ],
@@ -460,7 +460,7 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "F_ETH_Snapshot",
+          "name": "F_BTC_Snapshot",
           "type": "uint256"
         },
         {

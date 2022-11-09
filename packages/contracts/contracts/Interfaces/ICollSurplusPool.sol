@@ -28,8 +28,8 @@ interface ICollSurplusPool {
     ) external;
 
     /// @notice Not necessarily equal to the raw bitcoin balance - bitcoin can be forcibly sent to contracts.
-    /// @return ETH state variable
-    function getETH() external view returns (uint256);
+    /// @return BTC state variable
+    function getBTC() external view returns (uint256);
 
     /// @param _account account to retrieve collateral
     /// @return collateral

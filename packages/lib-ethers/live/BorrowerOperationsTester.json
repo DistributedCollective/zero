@@ -705,7 +705,7 @@
           "type": "address"
         }
       ],
-      "name": "moveETHGainToTrove",
+      "name": "moveBTCGainToTrove",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"

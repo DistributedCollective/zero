@@ -6,7 +6,7 @@ pragma solidity 0.6.11;
 interface IPool {
     // --- Events ---
 
-    event ETHBalanceUpdated(uint _newBalance);
+    event BTCBalanceUpdated(uint _newBalance);
     event ZUSDBalanceUpdated(uint _newBalance);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
@@ -16,8 +16,8 @@ interface IPool {
     // --- Functions ---
 
     /// @notice Not necessarily equal to the raw bitcoin balance - bitcoin can be forcibly sent to contracts.
-    /// @return ETH pool balance
-    function getETH() external view returns (uint);
+    /// @return BTC pool balance
+    function getBTC() external view returns (uint);
 
     /// @return ZUSD debt pool balance
     function getZUSDDebt() external view returns (uint);

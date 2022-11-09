@@ -39,7 +39,7 @@
           "type": "uint256"
         }
       ],
-      "name": "DefaultPoolETHBalanceUpdated",
+      "name": "DefaultPoolBTCBalanceUpdated",
       "type": "event"
     },
     {
@@ -186,7 +186,7 @@
           "type": "uint256"
         }
       ],
-      "name": "sendETHToActivePool",
+      "name": "sendBTCToActivePool",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

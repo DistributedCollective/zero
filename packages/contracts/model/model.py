@@ -14,14 +14,14 @@ class ModelParams:
         self.T = 5 # weighting for price change in trove issuance
         self.F = 5 # weighting for momentum change in trove issuance
 
-        self.lookback = 5 # Lookback parameter for ETH price momentum
+        self.lookback = 5 # Lookback parameter for BTC price momentum
 
         self.max_redemption_fraction = 0.5 # Maximum fraction of supply that can be redeemed in a timestep
 
 # time series data 
 class Data:
     def __init__(self):
-        self.ETH_price = [500.0]
+        self.BTC_price = [500.0]
         self.momentum = [0.0]
         self.base_fee = [0.0]
         self.redeemed_amount = [0.0]
@@ -33,28 +33,28 @@ class Data:
   
         
 ### Functions
-def get_new_momentum(data, params, ETH_price):
+def get_new_momentum(data, params, BTC_price):
     lookback = params.lookback
     if lookback == 0:
         return 0
 
-    ETH_price_past = get_past_ETH_price(data, params)
+    BTC_price_past = get_past_BTC_price(data, params)
 
-    new_momentum = (ETH_price - ETH_price_past) /  ETH_price_past
+    new_momentum = (BTC_price - BTC_price_past) /  BTC_price_past
     return new_momentum
 
-def get_past_ETH_price(data, params):
-    length = len(data.ETH_price)
+def get_past_BTC_price(data, params):
+    length = len(data.BTC_price)
     
-    ETH_price_past = None
+    BTC_price_past = None
     if (params.lookback > length):
-        ETH_price_past = data.ETH_price[0]
+        BTC_price_past = data.BTC_price[0]
     else:
-        ETH_price_past = data.ETH_price[length - params.lookback - 1]
+        BTC_price_past = data.BTC_price[length - params.lookback - 1]
 
-    if ETH_price_past == 0:
+    if BTC_price_past == 0:
         return 1
-    return ETH_price_past
+    return BTC_price_past
 
 def get_new_redeemed_amount(data, params):
     max_redeemable  = data.token_supply[-1] * params.max_redemption_fraction 
@@ -125,13 +125,13 @@ def get_new_token_supply(trove_issuance, redeemed):
     else: 
         return new_supply
   
-### Various ETH price functions
+### Various BTC price functions
 
-def constant_ETH_price(last_price):
+def constant_BTC_price(last_price):
     return last_price
 
-# ETH price generator is a random walk (normal dist.), with occasional large +ve and -ve jumps
-def randomwalk_ETH_price(last_price):
+# BTC price generator is a random walk (normal dist.), with occasional large +ve and -ve jumps
+def randomwalk_BTC_price(last_price):
     big_event = 0
     big_event_chance = np.random.normal()
 
@@ -145,19 +145,19 @@ def randomwalk_ETH_price(last_price):
     else:
         return new_price
 
-def linear_increasing_ETH_price(last_price, gradient):
+def linear_increasing_BTC_price(last_price, gradient):
     return last_price + gradient
 
-def oscillating_ETH_price(min, magnitude, i):
+def oscillating_BTC_price(min, magnitude, i):
     return min + magnitude + magnitude*np.sin(i)
 
-def linear_decreasing_ETH_price(last_price, gradient):
+def linear_decreasing_BTC_price(last_price, gradient):
     return last_price - gradient
 
-def quadratic_ETH_price(scale, i):
+def quadratic_BTC_price(scale, i):
     return scale*(i**2)
 
-def sublinear_ETH_price(last_price, steepness, i):
+def sublinear_BTC_price(last_price, steepness, i):
     return last_price + 1/(2*np.sqrt(steepness*(i+1)))
     
 
@@ -167,20 +167,20 @@ params = ModelParams()
 data = Data() # initialize data timeseries
 
 for i in range(1, 100):
-    # update exogenous ETH price
-    last_ETH_price =  data.ETH_price[-1]
+    # update exogenous BTC price
+    last_BTC_price =  data.BTC_price[-1]
 
-    # ETH_price = last_ETH_price
-    # ETH_price = randomwalk_ETH_price(last_ETH_price)
-    # ETH_price = oscillating_ETH_price(500, 10, i)
-    # ETH_price = quadratic_ETH_price(10, i)
-    # ETH_price = linear_increasing_ETH_price(last_ETH_price, 100)
-    # ETH_price = linear_decreasing_ETH_price(last_ETH_price, 1)
-    ETH_price = sublinear_ETH_price(last_ETH_price, 10, i)
+    # BTC_price = last_BTC_price
+    # BTC_price = randomwalk_BTC_price(last_BTC_price)
+    # BTC_price = oscillating_BTC_price(500, 10, i)
+    # BTC_price = quadratic_BTC_price(10, i)
+    # BTC_price = linear_increasing_BTC_price(last_BTC_price, 100)
+    # BTC_price = linear_decreasing_BTC_price(last_BTC_price, 1)
+    BTC_price = sublinear_BTC_price(last_BTC_price, 10, i)
     
-    # print(ETH_price)
+    # print(BTC_price)
 
-    momentum = get_new_momentum(data, params, ETH_price)
+    momentum = get_new_momentum(data, params, BTC_price)
     redeemed_amount = get_new_redeemed_amount(data, params)
     base_fee = get_new_base_fee(data, redeemed_amount)
 
@@ -195,7 +195,7 @@ for i in range(1, 100):
     
     # display all new data
     print(f'step: {i}')
-    print(f'ETH price: {ETH_price}')
+    print(f'BTC price: {BTC_price}')
     print(f'momentum: {momentum}')
     print(f'redeemed amount: {redeemed_amount}')
     print(f'base fee: {base_fee}')
@@ -205,7 +205,7 @@ for i in range(1, 100):
     print(f'token_supply: {token_supply}')
 
     # update all time series
-    data.ETH_price.append(ETH_price)
+    data.BTC_price.append(BTC_price)
     data.momentum.append(momentum)
     data.redeemed_amount.append(redeemed_amount)
     data.base_fee.append(base_fee)
@@ -232,8 +232,8 @@ ax2.set_title('Redeemed amount')
 plt.plot(data.redeemed_amount)
 
 ax3 = fig.add_subplot(223)
-ax3.set_title('ETH Price')
-plt.plot(data.ETH_price)
+ax3.set_title('BTC Price')
+plt.plot(data.BTC_price)
 
 ax4 = fig.add_subplot(224)
 ax4.set_title('Base Fee')

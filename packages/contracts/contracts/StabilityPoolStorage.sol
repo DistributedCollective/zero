@@ -26,7 +26,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     ICommunityIssuance public communityIssuance;
 
-    uint256 internal ETH;  // deposited bitcoin tracker
+    uint256 internal BTC;  // deposited bitcoin tracker
 
     // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
     uint256 internal totalZUSDDeposits;
@@ -74,7 +74,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     // With each offset that fully empties the Pool, the epoch is incremented by 1
     uint128 public currentEpoch;
 
-    /* ETH Gain sum 'S': During its lifetime, each deposit d_t earns an ETH gain of ( d_t * [S - S_t] )/P_t, where S_t
+    /* BTC Gain sum 'S': During its lifetime, each deposit d_t earns an BTC gain of ( d_t * [S - S_t] )/P_t, where S_t
     * is the depositor's snapshot of S taken at the time t when the deposit was made.
     *
     * The 'S' sums are stored in a nested mapping (epoch => scale => sum):

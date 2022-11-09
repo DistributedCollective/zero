@@ -44,14 +44,14 @@ contract LiquityBase is BaseMath, ILiquityBase {
         return _debt.sub(ZUSD_GAS_COMPENSATION);
     }
 
-    /// Return the amount of ETH to be drawn from a trove's collateral and sent as gas compensation.
+    /// Return the amount of BTC to be drawn from a trove's collateral and sent as gas compensation.
     function _getCollGasCompensation(uint256 _entireColl) internal view returns (uint256) {
         return _entireColl / liquityBaseParams.PERCENT_DIVISOR();
     }
 
     function getEntireSystemColl() public view returns (uint256 entireSystemColl) {
-        uint256 activeColl = activePool.getETH();
-        uint256 liquidatedColl = defaultPool.getETH();
+        uint256 activeColl = activePool.getBTC();
+        uint256 liquidatedColl = defaultPool.getBTC();
 
         return activeColl.add(liquidatedColl);
     }

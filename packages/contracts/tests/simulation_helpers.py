@@ -303,30 +303,30 @@ for i in range(1, period1):
     random.seed(2019375+10000*i)
     shock_BTC = random.normalvariate(0, sd_BTC)
     price_BTC.append(price_BTC[i-1] * (1 + shock_BTC) * (1 + drift_BTC1))
-print(" - ETH period 1 -")
-print(f"Min ETH price: {min(price_BTC[1:period1])}")
-print(f"Max ETH price: {max(price_BTC[1:period1])}")
+print(" - BTC period 1 -")
+print(f"Min BTC price: {min(price_BTC[1:period1])}")
+print(f"Max BTC price: {max(price_BTC[1:period1])}")
 for i in range(period1, period2):
     random.seed(2019375+10000*i)
     shock_BTC = random.normalvariate(0, sd_BTC)
     price_BTC.append(price_BTC[i-1] * (1 + shock_BTC) * (1 + drift_BTC2))
-print(" - ETH period 2 -")
-print(f"Min ETH price: {min(price_BTC[period1:period2])}")
-print(f"Max ETH price: {max(price_BTC[period1:period2])}")
+print(" - BTC period 2 -")
+print(f"Min BTC price: {min(price_BTC[period1:period2])}")
+print(f"Max BTC price: {max(price_BTC[period1:period2])}")
 for i in range(period2, period3):
     random.seed(2019375+10000*i)
     shock_BTC = random.normalvariate(0, sd_BTC)
     price_BTC.append(price_BTC[i-1] * (1 + shock_BTC) * (1 + drift_BTC3))
-print(" - ETH period 3 -")
-print(f"Min ETH price: {min(price_BTC[period2:period3])}")
-print(f"Max ETH price: {max(price_BTC[period2:period3])}")
+print(" - BTC period 3 -")
+print(f"Min BTC price: {min(price_BTC[period2:period3])}")
+print(f"Max BTC price: {max(price_BTC[period2:period3])}")
 for i in range(period3, period4):
     random.seed(2019375+10000*i)
     shock_BTC = random.normalvariate(0, sd_BTC)
     price_BTC.append(price_BTC[i-1] * (1 + shock_BTC) * (1 + drift_BTC4))
-print(" - ETH period 4 -")
-print(f"Min ETH price: {min(price_BTC[period3:period4])}")
-print(f"Max ETH price: {max(price_BTC[period3:period4])}")
+print(" - BTC period 4 -")
+print(f"Min BTC price: {min(price_BTC[period3:period4])}")
+print(f"Max BTC price: {max(price_BTC[period3:period4])}")
 
 """Natural Rate"""
 
@@ -409,7 +409,7 @@ def liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, pr
         return [0, 0]
 
     stability_pool_previous = contracts.stabilityPool.getTotalZUSDDeposits() / 1e18
-    stability_pool_eth_previous = contracts.stabilityPool.getETH() / 1e18
+    stability_pool_btc_previous = contracts.stabilityPool.getBTC() / 1e18
 
     while pending_liquidations(contracts, price_BTC_current):
         try:
@@ -431,10 +431,10 @@ def liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, pr
                 ICR = contracts.troveManager.getCurrentICR(trove, Wei(price_BTC_current * 1e18))
                 print(f"ICR: {ICR}")
     stability_pool_current = contracts.stabilityPool.getTotalZUSDDeposits() / 1e18
-    stability_pool_eth_current = contracts.stabilityPool.getETH() / 1e18
+    stability_pool_btc_current = contracts.stabilityPool.getBTC() / 1e18
 
     debt_liquidated = stability_pool_current - stability_pool_previous
-    BTC_liquidated = stability_pool_eth_current - stability_pool_eth_previous
+    BTC_liquidated = stability_pool_btc_current - stability_pool_btc_previous
     liquidation_gain = BTC_liquidated * price_BTC_current - debt_liquidated * price_ZUSD
     airdrop_gain = price_ZERO_current * quantity_ZERO_airdrop(index)
 
@@ -635,7 +635,7 @@ def adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price
                 coll_added = floatToWei(coll_added_float)
                 contracts.borrowerOperations.addColl(hints[0], hints[1], { 'from': account, 'value': coll_added })
             elif check > 2 and not is_recovery_mode(contracts, price_BTC_current):
-                # withdraw ETH
+                # withdraw BTC
                 coll_withdrawn = floatToWei(coll - coll_new)
                 if isNewTCRAboveCCR(contracts, coll_withdrawn, False, 0, False, floatToWei(price_BTC_current)):
                     contracts.borrowerOperations.withdrawColl(coll_withdrawn, hints[0], hints[1], { 'from': account })

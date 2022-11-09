@@ -112,36 +112,36 @@ contract('BorrowerWrappers', async accounts => {
     await revertToSnapshot();
   });
 
-  it('proxy owner can recover ETH', async () => {
+  it('proxy owner can recover BTC', async () => {
     const amount = toBN(dec(1, 18))
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
 
-    // send some ETH to proxy
+    // send some BTC to proxy
     await web3.eth.sendTransaction({ from: owner, to: proxyAddress, value: amount })
     assert.equal(await web3.eth.getBalance(proxyAddress), amount.toString())
 
     const balanceBefore = toBN(await web3.eth.getBalance(alice))
 
-    // recover ETH
-    await borrowerWrappers.transferETH(alice, amount, { from: alice, gasPrice: 0 })
+    // recover BTC
+    await borrowerWrappers.transferBTC(alice, amount, { from: alice, gasPrice: 0 })
     const balanceAfter = toBN(await web3.eth.getBalance(alice))
 
     assert.equal(balanceAfter.sub(balanceBefore), amount.toString())
   })
 
-  it('non proxy owner cannot recover ETH', async () => {
+  it('non proxy owner cannot recover BTC', async () => {
     const amount = toBN(dec(1, 18))
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
 
-    // send some ETH to proxy
+    // send some BTC to proxy
     await web3.eth.sendTransaction({ from: owner, to: proxyAddress, value: amount })
     assert.equal(await web3.eth.getBalance(proxyAddress), amount.toString())
 
     const balanceBefore = toBN(await web3.eth.getBalance(alice))
 
-    // try to recover ETH
+    // try to recover BTC
     const proxy = borrowerWrappers.getProxyFromUser(alice)
-    const signature = 'transferETH(address,uint256)'
+    const signature = 'transferBTC(address,uint256)'
     const calldata = th.getTransactionData(signature, [alice, amount])
     await assertRevert(proxy.methods["execute(address,bytes)"](borrowerWrappers.scriptAddress, calldata, { from: bob }), 'ds-auth-unauthorized')
 
@@ -304,11 +304,11 @@ contract('BorrowerWrappers', async accounts => {
     const expectedCompoundedZUSDDeposit_A = toBN(dec(150, 18)).sub(expectedZUSDLoss_A)
     const compoundedZUSDDeposit_A = await stabilityPool.getCompoundedZUSDDeposit(alice)
     // collateral * 150 / 2500 * 0.995
-    const expectedETHGain_A = collateral.mul(aliceDeposit).div(totalDeposits).mul(toBN(dec(995, 15))).div(mv._1e18BN)
+    const expectedBTCGain_A = collateral.mul(aliceDeposit).div(totalDeposits).mul(toBN(dec(995, 15))).div(mv._1e18BN)
 
     assert.isAtMost(th.getDifference(expectedCompoundedZUSDDeposit_A, compoundedZUSDDeposit_A), 1000)
 
-    const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
     const zusdBalanceBefore = await zusdToken.balanceOf(alice)
     const troveDebtBefore = await troveManager.getTroveDebt(alice)
@@ -318,7 +318,7 @@ contract('BorrowerWrappers', async accounts => {
     const stakeBefore = await zeroStaking.stakes(alice)
 
     
-    const proportionalZUSD = expectedETHGain_A.mul(price).div(ICRBefore)
+    const proportionalZUSD = expectedBTCGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(mv._1e18BN).div(mv._1e18BN.add(borrowingRate))
 
@@ -336,7 +336,7 @@ contract('BorrowerWrappers', async accounts => {
     const proxyAddress = borrowerWrappers.getProxyAddressFromUser(alice)
     await borrowerWrappers.claimSPRewardsAndRecycle(th._100pct, alice, alice, { from: alice })
 
-    const ethBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollAfter = await troveManager.getTroveColl(alice)
     const zusdBalanceAfter = await zusdToken.balanceOf(alice)
     const troveDebtAfter = await troveManager.getTroveDebt(alice)
@@ -346,13 +346,13 @@ contract('BorrowerWrappers', async accounts => {
     const stakeAfter = await zeroStaking.stakes(alice)
 
     // check proxy balances remain the same
-    assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
+    assert.equal(btcBalanceAfter.toString(), btcBalanceBefore.toString())
     assert.equal(zusdBalanceAfter.toString(), zusdBalanceBefore.toString())
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to BTC gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalZUSD))
-    // check trove has increased collateral by the ETH gain
-    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
+    // check trove has increased collateral by the BTC gain
+    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedBTCGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
     // check that Stability Pool deposit
@@ -364,9 +364,9 @@ contract('BorrowerWrappers', async accounts => {
     // disabled as zero token is not used in beta 
     // th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e13)
 
-    // Expect Alice has withdrawn all ETH gain
-    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
-    assert.equal(alice_pendingETHGain, 0)
+    // Expect Alice has withdrawn all BTC gain
+    const alice_pendingBTCGain = await stabilityPool.getDepositorBTCGain(alice)
+    assert.equal(alice_pendingBTCGain, 0)
   })
 
 
@@ -439,7 +439,7 @@ contract('BorrowerWrappers', async accounts => {
     const redeemedAmount = toBN(dec(100, 18))
     await th.redeemCollateral(whale, contracts, redeemedAmount)
 
-    const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
     const zusdBalanceBefore = await zusdToken.balanceOf(alice)
     const troveDebtBefore = await troveManager.getTroveDebt(alice)
@@ -454,7 +454,7 @@ contract('BorrowerWrappers', async accounts => {
       'BorrowerWrappersScript: caller must have an active trove'
     )
 
-    const ethBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollAfter = await troveManager.getTroveColl(alice)
     const zusdBalanceAfter = await zusdToken.balanceOf(alice)
     const troveDebtAfter = await troveManager.getTroveDebt(alice)
@@ -464,7 +464,7 @@ contract('BorrowerWrappers', async accounts => {
     const stakeAfter = await zeroStaking.stakes(alice)
 
     // check everything remains the same
-    assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
+    assert.equal(btcBalanceAfter.toString(), btcBalanceBefore.toString())
     assert.equal(zusdBalanceAfter.toString(), zusdBalanceBefore.toString())
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore, 10000)
@@ -475,12 +475,12 @@ contract('BorrowerWrappers', async accounts => {
     // ZERO staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore)
 
-    // Expect Alice has withdrawn all ETH gain
-    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
-    assert.equal(alice_pendingETHGain, 0)
+    // Expect Alice has withdrawn all BTC gain
+    const alice_pendingBTCGain = await stabilityPool.getDepositorBTCGain(alice)
+    assert.equal(alice_pendingBTCGain, 0)
   })
 
-  it('claimStakingGainsAndRecycle(): with only ETH gain', async () => {
+  it('claimStakingGainsAndRecycle(): with only BTC gain', async () => {
     const price = toBN(dec(200, 18))
   
     // Whale opens Trove
@@ -516,16 +516,16 @@ contract('BorrowerWrappers', async accounts => {
     await th.redeemCollateral(whale, contracts, redeemedAmount)
     const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
  
-    // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
+    // Alice BTC gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
     // 20% sent to SovFeeCollector address
     const redemptionFeeToSovCollector = redemptionFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const expectedETHGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
+    const expectedBTCGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
 
     const redemptionFeeToZeroStalking = redemptionFee.sub(redemptionFeeToSovCollector)
-    const expectedETHGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
+    const expectedBTCGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
 
-    const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
     const zusdBalanceBefore = await zusdToken.balanceOf(alice)
     const troveDebtBefore = await troveManager.getTroveDebt(alice)
@@ -534,7 +534,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await zeroStaking.stakes(alice)
 
-    const proportionalZUSD = expectedETHGain_A.mul(price).div(ICRBefore)
+    const proportionalZUSD = expectedBTCGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
 
@@ -552,7 +552,7 @@ contract('BorrowerWrappers', async accounts => {
     const newBorrowingFeeToZeroStalking = newBorrowingFee.sub(newBorrowingFeeToSovCollector)
     const expectedNewZUSDGain_A = newBorrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
-    const ethBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollAfter = await troveManager.getTroveColl(alice)
     const zusdBalanceAfter = await zusdToken.balanceOf(alice)
     const troveDebtAfter = await troveManager.getTroveDebt(alice)
@@ -562,14 +562,14 @@ contract('BorrowerWrappers', async accounts => {
     const stakeAfter = await zeroStaking.stakes(alice)
 
     // check proxy balances remain the same
-    assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
+    assert.equal(btcBalanceAfter.toString(), btcBalanceBefore.toString())
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     // check proxy zusd balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(zusdBalanceAfter, zusdBalanceBefore.add(expectedNewZUSDGain_A))
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to BTC gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalZUSD), 10000)
-    // check trove has increased collateral by the ETH gain
-    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
+    // check trove has increased collateral by the BTC gain
+    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedBTCGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
     // check that Stability Pool deposit
@@ -582,12 +582,12 @@ contract('BorrowerWrappers', async accounts => {
 
     // check sovFeeCollector has increased ZUSD balance
     th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
-    // check sovFeeCollector has increased ETH balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
+    // check sovFeeCollector has increased BTC balance
+    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedBTCGainSovCollector), 10000)
 
-    // Expect Alice has withdrawn all ETH gain
-    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
-    assert.equal(alice_pendingETHGain, 0)
+    // Expect Alice has withdrawn all BTC gain
+    const alice_pendingBTCGain = await stabilityPool.getDepositorBTCGain(alice)
+    assert.equal(alice_pendingBTCGain, 0)
   })
 
   it('claimStakingGainsAndRecycle(): with only ZUSD gain', async () => {
@@ -622,7 +622,7 @@ contract('BorrowerWrappers', async accounts => {
     // Alice ZUSD gain is ((150/2000) * borrowingFee)
     const expectedZUSDGain_A = borrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
-    const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
     const zusdBalanceBefore = await zusdToken.balanceOf(alice)
     const troveDebtBefore = await troveManager.getTroveDebt(alice)
@@ -636,7 +636,7 @@ contract('BorrowerWrappers', async accounts => {
     // Alice claims staking rewards and puts them back in the system through the proxy
     await borrowerWrappers.claimStakingGainsAndRecycle(th._100pct, alice, alice, { from: alice })
 
-    const ethBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollAfter = await troveManager.getTroveColl(alice)
     const zusdBalanceAfter = await zusdToken.balanceOf(alice)
     const troveDebtAfter = await troveManager.getTroveDebt(alice)
@@ -646,13 +646,13 @@ contract('BorrowerWrappers', async accounts => {
     const stakeAfter = await zeroStaking.stakes(alice)
 
     // check proxy balances remain the same
-    assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
+    assert.equal(btcBalanceAfter.toString(), btcBalanceBefore.toString())
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     // check proxy zusd balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(zusdBalanceAfter, zusdBalanceBefore)
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to BTC gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore, 10000)
-    // check trove has increased collateral by the ETH gain
+    // check trove has increased collateral by the BTC gain
     th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore)
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
@@ -663,12 +663,12 @@ contract('BorrowerWrappers', async accounts => {
     // check sovFeeCollector has increased ZUSD balance
     th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
 
-    // Expect Alice has withdrawn all ETH gain
-    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
-    assert.equal(alice_pendingETHGain, 0)
+    // Expect Alice has withdrawn all BTC gain
+    const alice_pendingBTCGain = await stabilityPool.getDepositorBTCGain(alice)
+    assert.equal(alice_pendingBTCGain, 0)
   })
 
-  it('claimStakingGainsAndRecycle(): with both ETH and ZUSD gains', async () => {
+  it('claimStakingGainsAndRecycle(): with both BTC and ZUSD gains', async () => {
     const price = toBN(dec(200, 18))
 
     // Whale opens Trove
@@ -709,16 +709,16 @@ contract('BorrowerWrappers', async accounts => {
     await th.redeemCollateral(whale, contracts, redeemedAmount)
     const sovFeeCollectorBalanceAfter = await wrbtcToken.balanceOf(sovFeeCollector)
 
-    // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
+    // Alice BTC gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
     // 100% sent to SovFeeCollector address
     const redemptionFeeToSovCollector = redemptionFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const expectedETHGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
+    const expectedBTCGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
 
     const redemptionFeeToZeroStalking = redemptionFee.sub(redemptionFeeToSovCollector)
-    const expectedETHGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
+    const expectedBTCGain_A = redemptionFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18))).mul(mv._1e18BN).div(price)
 
-    const ethBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollBefore = await troveManager.getTroveColl(alice)
     const zusdBalanceBefore = await zusdToken.balanceOf(alice)
     const troveDebtBefore = await troveManager.getTroveDebt(alice)
@@ -727,7 +727,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await zeroStaking.stakes(alice)
 
-    const proportionalZUSD = expectedETHGain_A.mul(price).div(ICRBefore)
+    const proportionalZUSD = expectedBTCGain_A.mul(price).div(ICRBefore)
     const borrowingRate = await troveManagerOriginal.getBorrowingRateWithDecay()
     const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
     const expectedTotalZUSD = expectedZUSDGain_A.add(netDebtChange)
@@ -744,7 +744,7 @@ contract('BorrowerWrappers', async accounts => {
     const newBorrowingFeeToZeroStalking = newBorrowingFee.sub(newBorrowingFeeToSovCollector)
     const expectedNewZUSDGain_A = newBorrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
-    const ethBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
+    const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const troveCollAfter = await troveManager.getTroveColl(alice)
     const zusdBalanceAfter = await zusdToken.balanceOf(alice)
     const troveDebtAfter = await troveManager.getTroveDebt(alice)
@@ -754,14 +754,14 @@ contract('BorrowerWrappers', async accounts => {
     const stakeAfter = await zeroStaking.stakes(alice)
 
     // check proxy balances remain the same
-    assert.equal(ethBalanceAfter.toString(), ethBalanceBefore.toString())
+    assert.equal(btcBalanceAfter.toString(), btcBalanceBefore.toString())
     assert.equal(zeroBalanceAfter.toString(), zeroBalanceBefore.toString())
     // check proxy zusd balance has increased by own adjust trove reward
     th.assertIsApproximatelyEqual(zusdBalanceAfter, zusdBalanceBefore.add(expectedNewZUSDGain_A))
-    // check trove has increased debt by the ICR proportional amount to ETH gain
+    // check trove has increased debt by the ICR proportional amount to BTC gain
     th.assertIsApproximatelyEqual(troveDebtAfter, troveDebtBefore.add(proportionalZUSD), 10000)
-    // check trove has increased collateral by the ETH gain
-    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedETHGain_A))
+    // check trove has increased collateral by the BTC gain
+    th.assertIsApproximatelyEqual(troveCollAfter, troveCollBefore.add(expectedBTCGain_A))
     // check that ICR remains constant
     th.assertIsApproximatelyEqual(ICRAfter, ICRBefore)
     // check that Stability Pool deposit
@@ -774,12 +774,12 @@ contract('BorrowerWrappers', async accounts => {
 
     // check sovFeeCollector has increased ZUSD balance
     th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
-    // check sovFeeCollector has increased ETH balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
+    // check sovFeeCollector has increased BTC balance
+    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedBTCGainSovCollector), 10000)
 
-    // Expect Alice has withdrawn all ETH gain
-    const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
-    assert.equal(alice_pendingETHGain, 0)
+    // Expect Alice has withdrawn all BTC gain
+    const alice_pendingBTCGain = await stabilityPool.getDepositorBTCGain(alice)
+    assert.equal(alice_pendingBTCGain, 0)
   })
 
 })

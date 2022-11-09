@@ -320,7 +320,7 @@ class MainnetDeploymentHelper {
       ))
   }
 
-  // --- Verify on Ethrescan ---
+  // --- Verify on BTCrescan ---
   async verifyContract(name, deploymentState, constructorArguments=[]) {
     if (!deploymentState[name] || !deploymentState[name].address) {
       console.error(`  --> No deployment state for contract ${name}!!`)

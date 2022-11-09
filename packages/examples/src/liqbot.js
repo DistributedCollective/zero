@@ -111,7 +111,7 @@ async function tryToLiquidate(zero) {
       .add(zusdGasCompensation);
 
     success(
-      `Received ${bold(`${collateralGasCompensation.toString(4)} ETH`)} + ` +
+      `Received ${bold(`${collateralGasCompensation.toString(4)} BTC`)} + ` +
         `${bold(`${zusdGasCompensation.toString(2)} ZUSD`)} compensation (` +
         (totalCompensation.gte(gasCost)
           ? `${green(`$${totalCompensation.sub(gasCost).toString(2)}`)} profit`

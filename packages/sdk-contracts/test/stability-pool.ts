@@ -48,9 +48,9 @@ describe("Stability Pool Operations", () => {
     expect(stabilityPool.withdrawFromSP).to.be.calledWith(100, 0x0);
   });
   describe("Withdraw RBTC gain to trove", async () => {
-    it("should call withdrawETHGainToTrove with borrower address as parameters", async () => {});
+    it("should call withdrawBTCGainToTrove with borrower address as parameters", async () => {});
     await testIntegration.testWithdrawRBTCGainToTrove();
-    expect(stabilityPool.withdrawETHGainToTrove).to.be.calledWith(
+    expect(stabilityPool.withdrawBTCGainToTrove).to.be.calledWith(
       signers[0].address,
       signers[0].address
     );

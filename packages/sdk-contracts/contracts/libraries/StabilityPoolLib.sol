@@ -44,6 +44,6 @@ library StabilityPoolLib {
         isContractAddress(_stabilityPoolAddress)
     {
         IStabilityPool stabilityPool = IStabilityPool(_stabilityPoolAddress);
-        stabilityPool.withdrawETHGainToTrove(msg.sender, msg.sender);
+        stabilityPool.withdrawBTCGainToTrove(msg.sender, msg.sender);
     }
 }

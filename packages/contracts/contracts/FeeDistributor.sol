@@ -110,12 +110,12 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         wrbtc.approve(address(sovFeeCollector), feeToSovCollector);
         sovFeeCollector.transferTokens(address(wrbtc), uint96(feeToSovCollector));
 
-        // Send the ETH fee to the ZERO staking contract
+        // Send the BTC fee to the ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
         if (feeToZeroStaking != 0) {
             (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
-            require(success, "FeeDistributor: sending ETH failed");
-            zeroStaking.increaseF_ETH(feeToZeroStaking);
+            require(success, "FeeDistributor: sending BTC failed");
+            zeroStaking.increaseF_BTC(feeToZeroStaking);
         }
         emit RBTCistributed(toDistribute);
     }

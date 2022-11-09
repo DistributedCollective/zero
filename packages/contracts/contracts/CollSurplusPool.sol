@@ -46,10 +46,10 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         
     }
 
-    /** Returns the ETH state variable at ActivePool address.
+    /** Returns the BTC state variable at ActivePool address.
        Not necessarily equal to the raw bitcoin balance - bitcoin can be forcibly sent to contracts. */
-    function getETH() external view override returns (uint) {
-        return ETH;
+    function getBTC() external view override returns (uint) {
+        return BTC;
     }
 
     function getCollateral(address _account) external view override returns (uint) {
@@ -75,11 +75,11 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        ETH = ETH.sub(claimableColl);
+        BTC = BTC.sub(claimableColl);
         emit BTCSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
-        require(success, "CollSurplusPool: sending ETH failed");
+        require(success, "CollSurplusPool: sending BTC failed");
     }
 
     // --- 'require' functions ---
@@ -106,6 +106,6 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
+        BTC = BTC.add(msg.value);
     }
 }

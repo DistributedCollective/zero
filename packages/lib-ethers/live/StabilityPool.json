@@ -413,7 +413,7 @@
           "type": "uint256"
         }
       ],
-      "name": "StabilityPoolETHBalanceUpdated",
+      "name": "StabilityPoolBTCBalanceUpdated",
       "type": "event"
     },
     {
@@ -921,7 +921,7 @@
           "type": "address"
         }
       ],
-      "name": "getDepositorETHGain",
+      "name": "getDepositorBTCGain",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1244,7 +1244,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawETHGainToTrove",
+      "name": "withdrawBTCGainToTrove",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

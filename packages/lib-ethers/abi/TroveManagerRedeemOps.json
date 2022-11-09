@@ -112,13 +112,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_ETHSent",
+        "name": "_BTCSent",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_ETHFee",
+        "name": "_BTCFee",
         "type": "uint256"
       }
     ],
@@ -496,7 +496,7 @@
         "type": "address"
       }
     ],
-    "name": "_getPendingETHReward",
+    "name": "_getPendingBTCReward",
     "outputs": [
       {
         "internalType": "uint256",

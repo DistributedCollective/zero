@@ -24,12 +24,12 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     event ActivePoolAddressSet(address _activePoolAddress);
 
     event StakeChanged(address indexed staker, uint256 newStake);
-    event StakingGainsWithdrawn(address indexed staker, uint256 ZUSDGain, uint256 ETHGain);
-    event F_ETHUpdated(uint256 _F_ETH);
+    event StakingGainsWithdrawn(address indexed staker, uint256 ZUSDGain, uint256 BTCGain);
+    event F_BTCUpdated(uint256 _F_BTC);
     event F_ZUSDUpdated(uint256 _F_ZUSD);
     event TotalZEROStakedUpdated(uint256 _totalZEROStaked);
     event BTCSent(address _account, uint256 _amount);
-    event StakerSnapshotsUpdated(address _staker, uint256 _F_ETH, uint256 _F_ZUSD);
+    event StakerSnapshotsUpdated(address _staker, uint256 _F_BTC, uint256 _F_ZUSD);
 
     // --- Functions ---
 
@@ -55,17 +55,17 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         emit ActivePoolAddressSet(_activePoolAddress);
     }
 
-    // If caller has a pre-existing stake, send any accumulated ETH and ZUSD gains to them.
+    // If caller has a pre-existing stake, send any accumulated BTC and ZUSD gains to them.
     function stake(uint256 _ZEROamount) external override {
         _requireNonZeroAmount(_ZEROamount);
 
         uint256 currentStake = stakes[msg.sender];
 
-        uint256 ETHGain;
+        uint256 BTCGain;
         uint256 ZUSDGain;
-        // Grab any accumulated ETH and ZUSD gains from the current stake
+        // Grab any accumulated BTC and ZUSD gains from the current stake
         if (currentStake != 0) {
-            ETHGain = _getPendingETHGain(msg.sender);
+            BTCGain = _getPendingBTCGain(msg.sender);
             ZUSDGain = _getPendingZUSDGain(msg.sender);
         }
 
@@ -82,23 +82,23 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
         zeroToken.sendToZEROStaking(msg.sender, _ZEROamount);
 
         emit StakeChanged(msg.sender, newStake);
-        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, ETHGain);
+        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, BTCGain);
 
-        // Send accumulated ZUSD and ETH gains to the caller
+        // Send accumulated ZUSD and BTC gains to the caller
         if (currentStake != 0) {
             require(zusdToken.transfer(msg.sender, ZUSDGain), "Coudn't execute ZUSD transfer");
-            _sendETHGainToUser(ETHGain);
+            _sendBTCGainToUser(BTCGain);
         }
     }
 
-    /// Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & ETH gains.
+    /// Unstake the ZERO and send the it back to the caller, along with their accumulated ZUSD & BTC gains.
     /// If requested amount > stake, send their entire stake.
     function unstake(uint256 _ZEROamount) external override {
         uint256 currentStake = stakes[msg.sender];
         _requireUserHasStake(currentStake);
 
-        // Grab any accumulated ETH and ZUSD gains from the current stake
-        uint256 ETHGain = _getPendingETHGain(msg.sender);
+        // Grab any accumulated BTC and ZUSD gains from the current stake
+        uint256 BTCGain = _getPendingBTCGain(msg.sender);
         uint256 ZUSDGain = _getPendingZUSDGain(msg.sender);
 
         _updateUserSnapshots(msg.sender);
@@ -122,25 +122,25 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
             emit StakeChanged(msg.sender, newStake);
         }
 
-        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, ETHGain);
+        emit StakingGainsWithdrawn(msg.sender, ZUSDGain, BTCGain);
 
-        // Send accumulated ZUSD and ETH gains to the caller
+        // Send accumulated ZUSD and BTC gains to the caller
         require(zusdToken.transfer(msg.sender, ZUSDGain), "Couldn't execute ZUSD transfer");
-        _sendETHGainToUser(ETHGain);
+        _sendBTCGainToUser(BTCGain);
     }
 
     // --- Reward-per-unit-staked increase functions. Called by Zero core contracts ---
 
-    function increaseF_ETH(uint256 _ETHFee) external override {
+    function increaseF_BTC(uint256 _BTCFee) external override {
         _requireCallerIsFeeDistributor();
-        uint256 ETHFeePerZEROStaked;
+        uint256 BTCFeePerZEROStaked;
 
         if (totalZEROStaked > 0) {
-            ETHFeePerZEROStaked = _ETHFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);
+            BTCFeePerZEROStaked = _BTCFee.mul(DECIMAL_PRECISION).div(totalZEROStaked);
         }
 
-        F_ETH = F_ETH.add(ETHFeePerZEROStaked);
-        emit F_ETHUpdated(F_ETH);
+        F_BTC = F_BTC.add(BTCFeePerZEROStaked);
+        emit F_BTCUpdated(F_BTC);
     }
 
     function increaseF_ZUSD(uint256 _ZUSDFee) external override {
@@ -157,14 +157,14 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
 
     // --- Pending reward functions ---
 
-    function getPendingETHGain(address _user) external view override returns (uint256) {
-        return _getPendingETHGain(_user);
+    function getPendingBTCGain(address _user) external view override returns (uint256) {
+        return _getPendingBTCGain(_user);
     }
 
-    function _getPendingETHGain(address _user) internal view returns (uint256) {
-        uint256 F_ETH_Snapshot = snapshots[_user].F_ETH_Snapshot;
-        uint256 ETHGain = stakes[_user].mul(F_ETH.sub(F_ETH_Snapshot)).div(DECIMAL_PRECISION);
-        return ETHGain;
+    function _getPendingBTCGain(address _user) internal view returns (uint256) {
+        uint256 F_BTC_Snapshot = snapshots[_user].F_BTC_Snapshot;
+        uint256 BTCGain = stakes[_user].mul(F_BTC.sub(F_BTC_Snapshot)).div(DECIMAL_PRECISION);
+        return BTCGain;
     }
 
     function getPendingZUSDGain(address _user) external view override returns (uint256) {
@@ -180,15 +180,15 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     // --- Internal helper functions ---
 
     function _updateUserSnapshots(address _user) internal {
-        snapshots[_user].F_ETH_Snapshot = F_ETH;
+        snapshots[_user].F_BTC_Snapshot = F_BTC;
         snapshots[_user].F_ZUSD_Snapshot = F_ZUSD;
-        emit StakerSnapshotsUpdated(_user, F_ETH, F_ZUSD);
+        emit StakerSnapshotsUpdated(_user, F_BTC, F_ZUSD);
     }
 
-    function _sendETHGainToUser(uint256 ETHGain) internal {
-        emit BTCSent(msg.sender, ETHGain);
-        (bool success, ) = msg.sender.call{value: ETHGain}("");
-        require(success, "ZEROStaking: Failed to send accumulated ETHGain");
+    function _sendBTCGainToUser(uint256 BTCGain) internal {
+        emit BTCSent(msg.sender, BTCGain);
+        (bool success, ) = msg.sender.call{value: BTCGain}("");
+        require(success, "ZEROStaking: Failed to send accumulated BTCGain");
     }
 
     // --- 'require' functions ---

@@ -74,21 +74,21 @@ contract TroveManagerStorage is Ownable, BaseMath {
     uint public totalCollateralSnapshot;
 
     /*
-    * L_ETH and L_ZUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
+    * L_BTC and L_ZUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
     *
-    * An ETH gain of ( stake * [L_ETH - L_ETH(0)] )
+    * An BTC gain of ( stake * [L_BTC - L_BTC(0)] )
     * A ZUSDDebt increase  of ( stake * [L_ZUSDDebt - L_ZUSDDebt(0)] )
     *
-    * Where L_ETH(0) and L_ZUSDDebt(0) are snapshots of L_ETH and L_ZUSDDebt for the active Trove taken at the instant the stake was made
+    * Where L_BTC(0) and L_ZUSDDebt(0) are snapshots of L_BTC and L_ZUSDDebt for the active Trove taken at the instant the stake was made
     */
-    uint public L_ETH;
+    uint public L_BTC;
     uint public L_ZUSDDebt;
 
     // Map addresses with active troves to their RewardSnapshot
     mapping (address => RewardSnapshot) public rewardSnapshots;
 
-    // Object containing the ETH and ZUSD snapshots for a given active trove
-    struct RewardSnapshot { uint ETH; uint ZUSDDebt;}
+    // Object containing the BTC and ZUSD snapshots for a given active trove
+    struct RewardSnapshot { uint BTC; uint ZUSDDebt;}
 
     // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
     address[] public TroveOwners;

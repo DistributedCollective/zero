@@ -76,7 +76,7 @@ const addGasForPotentialListTraversal = (gas: BigNumber) => gas.add(80000);
 
 const addGasForZEROIssuance = (gas: BigNumber) => gas.add(50000);
 
-// To get the best entropy available, we'd do something like:
+// To get the best entropy available, we'd do sombtcing like:
 //
 // const bigRandomNumber = () =>
 //   BigNumber.from(
@@ -249,11 +249,11 @@ export class PopulatedEthersRedemption
       ({ logs }) =>
         troveManager
           .extractEvents(logs, "Redemption")
-          .map(({ args: { _ETHSent, _ETHFee, _actualZUSDAmount, _attemptedZUSDAmount } }) => ({
+          .map(({ args: { _BTCSent, _BTCFee, _actualZUSDAmount, _attemptedZUSDAmount } }) => ({
             attemptedZUSDAmount: decimalify(_attemptedZUSDAmount),
             actualZUSDAmount: decimalify(_actualZUSDAmount),
-            collateralTaken: decimalify(_ETHSent),
-            fee: decimalify(_ETHFee)
+            collateralTaken: decimalify(_BTCSent),
+            fee: decimalify(_BTCFee)
           }))[0]
     );
 
@@ -413,7 +413,7 @@ export class PopulatableEthersLiquity
 
     const [[collateralGain, zusdLoss]] = stabilityPool
       .extractEvents(logs, "ETHGainWithdrawn")
-      .map(({ args: { _ETH, _ZUSDLoss } }) => [decimalify(_ETH), decimalify(_ZUSDLoss)]);
+      .map(({ args: { _BTC, _ZUSDLoss } }) => [decimalify(_BTC), decimalify(_ZUSDLoss)]);
 
     const [zeroReward] = stabilityPool
       .extractEvents(logs, "ZEROPaidToDepositor")
@@ -927,7 +927,7 @@ export class PopulatableEthersLiquity
     const finalTrove = initialTrove.addCollateral(stabilityDeposit.collateralGain);
 
     return this._wrapCollateralGainTransfer(
-      await stabilityPool.estimateAndPopulate.withdrawETHGainToTrove(
+      await stabilityPool.estimateAndPopulate.withdrawBTCGainToTrove(
         { ...overrides },
         compose(addGasForPotentialListTraversal, addGasForZEROIssuance),
         ...(await this._findHints(finalTrove))

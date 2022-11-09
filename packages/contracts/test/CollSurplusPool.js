@@ -59,9 +59,9 @@ contract('CollSurplusPool', async accounts => {
     await revertToSnapshot();
   });
 
-  it("CollSurplusPool::getETH(): Returns the ETH balance of the CollSurplusPool after redemption", async () => {
-    const ETH_1 = await collSurplusPool.getETH()
-    assert.equal(ETH_1, '0')
+  it("CollSurplusPool::getBTC(): Returns the BTC balance of the CollSurplusPool after redemption", async () => {
+    const BTC_1 = await collSurplusPool.getBTC()
+    assert.equal(BTC_1, '0')
 
     const price = toBN(dec(100, 18))
     await priceFeed.setPrice(price)
@@ -72,11 +72,11 @@ contract('CollSurplusPool', async accounts => {
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
-    // At ETH:USD = 100, this redemption should leave 1 bitcoin of coll surplus
+    // At BTC:USD = 100, this redemption should leave 1 bitcoin of coll surplus
     await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
 
-    const ETH_2 = await collSurplusPool.getETH()
-    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+    const BTC_2 = await collSurplusPool.getBTC()
+    th.assertIsApproximatelyEqual(BTC_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
   })
 
   it("CollSurplusPool: claimColl(): Reverts if caller is not Borrower Operations", async () => {
@@ -87,7 +87,7 @@ contract('CollSurplusPool', async accounts => {
     await th.assertRevert(borrowerOperations.claimCollateral({ from: A }), 'CollSurplusPool: No collateral available to claim')
   })
 
-  it("CollSurplusPool: claimColl(): Reverts if owner cannot receive ETH surplus", async () => {
+  it("CollSurplusPool: claimColl(): Reverts if owner cannot receive BTC surplus", async () => {
     const nonPayable = await NonPayable.new()
 
     const price = toBN(dec(100, 18))
@@ -104,17 +104,17 @@ contract('CollSurplusPool', async accounts => {
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
-    // At ETH:USD = 100, this redemption should leave 1 bitcoin of coll surplus for B
+    // At BTC:USD = 100, this redemption should leave 1 bitcoin of coll surplus for B
     await th.redeemCollateralAndGetTxObject(A, contracts, B_netDebt)
 
-    const ETH_2 = await collSurplusPool.getETH()
-    th.assertIsApproximatelyEqual(ETH_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
+    const BTC_2 = await collSurplusPool.getBTC()
+    th.assertIsApproximatelyEqual(BTC_2, B_coll.sub(B_netDebt.mul(mv._1e18BN).div(price)))
 
     const claimCollateralData = th.getTransactionData('claimCollateral()', [])
-    await th.assertRevert(nonPayable.forward(borrowerOperations.address, claimCollateralData), 'CollSurplusPool: sending ETH failed')
+    await th.assertRevert(nonPayable.forward(borrowerOperations.address, claimCollateralData), 'CollSurplusPool: sending BTC failed')
   })
 
-  it('CollSurplusPool: reverts trying to send ETH to it', async () => {
+  it('CollSurplusPool: reverts trying to send BTC to it', async () => {
     await th.assertRevert(web3.eth.sendTransaction({ from: A, to: collSurplusPool.address, value: 1 }), 'CollSurplusPool: Caller is not Active Pool')
   })
 

@@ -94,9 +94,9 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
     struct RedemptionTotals {
         uint256 remainingZUSD;
         uint256 totalZUSDToRedeem;
-        uint256 totalETHDrawn;
-        uint256 ETHFee;
-        uint256 ETHToSendToRedeemer;
+        uint256 totalBTCDrawn;
+        uint256 BTCFee;
+        uint256 BTCToSendToRedeemer;
         uint256 decayedBaseRate;
         uint256 price;
         uint256 totalZUSDSupplyAtStart;
@@ -104,7 +104,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
     struct SingleRedemptionValues {
         uint256 ZUSDLot;
-        uint256 ETHLot;
+        uint256 BTCLot;
         bool cancelledPartial;
     }
 
@@ -119,8 +119,8 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
     event Redemption(
         uint256 _attemptedZUSDAmount,
         uint256 _actualZUSDAmount,
-        uint256 _ETHSent,
-        uint256 _ETHFee
+        uint256 _BTCSent,
+        uint256 _BTCFee
     );
     event TroveUpdated(
         address indexed _borrower,
@@ -139,8 +139,8 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event TotalStakesUpdated(uint256 _newTotalStakes);
     event SystemSnapshotsUpdated(uint256 _totalStakesSnapshot, uint256 _totalCollateralSnapshot);
-    event LTermsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
-    event TroveSnapshotsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
+    event LTermsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
+    event TroveSnapshotsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
     event TroveIndexUpdated(address _borrower, uint256 _newIndex);
 
     enum TroveManagerOperation {
@@ -152,26 +152,26 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
     /// Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
     function _getCurrentICR(address _borrower, uint256 _price) public view returns (uint256) {
-        (uint256 currentETH, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
+        (uint256 currentBTC, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint256 ICR = LiquityMath._computeCR(currentETH, currentZUSDDebt, _price);
+        uint256 ICR = LiquityMath._computeCR(currentBTC, currentZUSDDebt, _price);
         return ICR;
     }
 
     function _getCurrentTroveAmounts(address _borrower) internal view returns (uint256, uint256) {
-        uint256 pendingETHReward = _getPendingETHReward(_borrower);
+        uint256 pendingBTCReward = _getPendingBTCReward(_borrower);
         uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
-        uint256 currentETH = Troves[_borrower].coll.add(pendingETHReward);
+        uint256 currentBTC = Troves[_borrower].coll.add(pendingBTCReward);
         uint256 currentZUSDDebt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
 
-        return (currentETH, currentZUSDDebt);
+        return (currentBTC, currentZUSDDebt);
     }
 
-    /// Get the borrower's pending accumulated ETH reward, earned by their stake
-    function _getPendingETHReward(address _borrower) public view returns (uint256) {
-        uint256 snapshotETH = rewardSnapshots[_borrower].ETH;
-        uint256 rewardPerUnitStaked = L_ETH.sub(snapshotETH);
+    /// Get the borrower's pending accumulated BTC reward, earned by their stake
+    function _getPendingBTCReward(address _borrower) public view returns (uint256) {
+        uint256 snapshotBTC = rewardSnapshots[_borrower].BTC;
+        uint256 rewardPerUnitStaked = L_BTC.sub(snapshotBTC);
 
         if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
             return 0;
@@ -179,9 +179,9 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
         uint256 stake = Troves[_borrower].stake;
 
-        uint256 pendingETHReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
+        uint256 pendingBTCReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
 
-        return pendingETHReward;
+        return pendingBTCReward;
     }
 
     /// Get the borrower's pending accumulated ZUSD reward, earned by their stake
@@ -210,11 +210,11 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
             _requireTroveIsActive(_borrower);
 
             // Compute pending rewards
-            uint256 pendingETHReward = _getPendingETHReward(_borrower);
+            uint256 pendingBTCReward = _getPendingBTCReward(_borrower);
             uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
             // Apply pending rewards to trove's state
-            Troves[_borrower].coll = Troves[_borrower].coll.add(pendingETHReward);
+            Troves[_borrower].coll = Troves[_borrower].coll.add(pendingBTCReward);
             Troves[_borrower].debt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
 
             _updateTroveRewardSnapshots(_borrower);
@@ -224,7 +224,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
                 _activePool,
                 _defaultPool,
                 pendingZUSDDebtReward,
-                pendingETHReward
+                pendingBTCReward
             );
 
             emit TroveUpdated(
@@ -247,13 +247,13 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
             return false;
         }
 
-        return (rewardSnapshots[_borrower].ETH < L_ETH);
+        return (rewardSnapshots[_borrower].BTC < L_BTC);
     }
 
     function _updateTroveRewardSnapshots(address _borrower) internal {
-        rewardSnapshots[_borrower].ETH = L_ETH;
+        rewardSnapshots[_borrower].BTC = L_BTC;
         rewardSnapshots[_borrower].ZUSDDebt = L_ZUSDDebt;
-        emit TroveSnapshotsUpdated(L_ETH, L_ZUSDDebt);
+        emit TroveSnapshotsUpdated(L_BTC, L_ZUSDDebt);
     }
 
     /// Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
@@ -261,11 +261,11 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         uint256 _ZUSD,
-        uint256 _ETH
+        uint256 _BTC
     ) internal {
         _defaultPool.decreaseZUSDDebt(_ZUSD);
         _activePool.increaseZUSDDebt(_ZUSD);
-        _defaultPool.sendETHToActivePool(_ETH);
+        _defaultPool.sendBTCToActivePool(_BTC);
     }
 
     /// Remove borrower's stake from the totalStakes sum, and set their stake to 0
@@ -285,7 +285,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
         Troves[_borrower].coll = 0;
         Troves[_borrower].debt = 0;
 
-        rewardSnapshots[_borrower].ETH = 0;
+        rewardSnapshots[_borrower].BTC = 0;
         rewardSnapshots[_borrower].ZUSDDebt = 0;
 
         _removeTroveOwner(_borrower, TroveOwnersArrayLength);
@@ -343,13 +343,13 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
         }
     }
 
-    function _calcRedemptionFee(uint256 _redemptionRate, uint256 _ETHDrawn)
+    function _calcRedemptionFee(uint256 _redemptionRate, uint256 _BTCDrawn)
         internal
         pure
         returns (uint256)
     {
-        uint256 redemptionFee = _redemptionRate.mul(_ETHDrawn).div(DECIMAL_PRECISION);
-        require(redemptionFee < _ETHDrawn, "TroveManager: Fee would eat up all returned collateral");
+        uint256 redemptionFee = _redemptionRate.mul(_BTCDrawn).div(DECIMAL_PRECISION);
+        require(redemptionFee < _BTCDrawn, "TroveManager: Fee would eat up all returned collateral");
         return redemptionFee;
     }
 
@@ -357,8 +357,8 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
         return _calcRedemptionRate(baseRate);
     }
 
-    function _getRedemptionFee(uint256 _ETHDrawn) internal view returns (uint256) {
-        return _calcRedemptionFee(_getRedemptionRate(), _ETHDrawn);
+    function _getRedemptionFee(uint256 _BTCDrawn) internal view returns (uint256) {
+        return _calcRedemptionFee(_getRedemptionRate(), _BTCDrawn);
     }
 
     function _calcRedemptionRate(uint256 _baseRate) internal view returns (uint256) {
