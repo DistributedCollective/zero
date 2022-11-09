@@ -1143,7 +1143,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     // A deposits 10000
     // L1, L2, L3 liquidated with 10000 ZUSD each
     // A withdraws all
-    // Expect A to withdraw 0 deposit and ether only from reward L1
+    // Expect A to withdraw 0 deposit and bitcoin only from reward L1
     it("withdrawETHGainToTrove(): single deposit fully offset. After subsequent liquidations, depositor withdraws 0 deposit and *only* the ETH Gain from one liquidation", async () => {
       // Whale opens Trove with 100k ETH
       await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(100000, 18)), whale, whale, { from: whale, value: dec(100000, 'ether') })
@@ -1352,7 +1352,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawETHGainToTrove(ZERO_ADDRESS, ZERO_ADDRESS, { from: bob })
       const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Expect Bob to retain 1% of initial deposit (100 ZUSD) and all the liquidated ETH (60 ether)
+      // Expect Bob to retain 1% of initial deposit (100 ZUSD) and all the liquidated ETH (60 bitcoin)
       assert.isAtMost(th.getDifference((await stabilityPool.getCompoundedZUSDDeposit(bob)).toString(), '100000000000000000000'), 100000)
       assert.isAtMost(th.getDifference(bob_ETHWithdrawn, '59700000000000000000'), 100000)
       
@@ -1421,11 +1421,11 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       /* Expect depositors to retain 1% of their initial deposit, and an ETH gain 
       in proportion to their initial deposit:
      
-      Bob:  1000 ZUSD, 55 Ether
-      Carol:  2000 ZUSD, 110 Ether
-      Dennis:  3000 ZUSD, 165 Ether
+      Bob:  1000 ZUSD, 55 Bitcoin
+      Carol:  2000 ZUSD, 110 Bitcoin
+      Dennis:  3000 ZUSD, 165 Bitcoin
      
-      Total: 6000 ZUSD, 300 Ether
+      Total: 6000 ZUSD, 300 Bitcoin
       */
       assert.isAtMost(th.getDifference((await stabilityPool.getCompoundedZUSDDeposit(bob)).toString(), dec(100, 18)), 100000)
       assert.isAtMost(th.getDifference((await stabilityPool.getCompoundedZUSDDeposit(carol)).toString(), dec(200, 18)), 100000)
@@ -1493,7 +1493,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
       const txB = await stabilityPool.withdrawETHGainToTrove(ZERO_ADDRESS, ZERO_ADDRESS, { from: bob })
       const bob_ETHWithdrawn = await th.getEventArgByName(txB, 'ETHGainWithdrawn', '_ETH').toString()
 
-      // Bob should withdraw 1e-5 of initial deposit: 0.1 ZUSD and the full ETH gain of 100 ether
+      // Bob should withdraw 1e-5 of initial deposit: 0.1 ZUSD and the full ETH gain of 100 bitcoin
       assert.isAtMost(th.getDifference((await stabilityPool.getCompoundedZUSDDeposit(bob)).toString(), dec(1, 17)), 100000)
       assert.isAtMost(th.getDifference(bob_ETHWithdrawn, dec(995, 17)), 100000000000)
     })
@@ -1611,7 +1611,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
     L3 decreases P by(~1e-5)P. L3:  9999.900000000000000000 ZUSD, 1 ETH
     D makes deposit 9999.9, brings SP to 10k
     L4 decreases P by(~1e-5)P. L4:  9999.900000000000000000 ZUSD, 1 ETH
-    expect A, B, C, D each withdraw ~100 Ether
+    expect A, B, C, D each withdraw ~100 Bitcoin
     */
     it("withdrawETHGainToTrove(): Several deposits of 10000 ZUSD span one scale factor change. Depositors withdraws correct compounded deposit and ETH Gain after one liquidation", async () => {
       // Whale opens Trove with 100k ETH

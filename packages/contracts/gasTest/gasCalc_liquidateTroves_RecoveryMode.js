@@ -61,7 +61,7 @@ contract("Gas cost tests", async accounts => {
   // 1 trove
   it("", async () => {
     const message = "liquidateTroves(). n = 1. Pure redistribution, Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -72,7 +72,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //1 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //1 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _1_Defaulter = accounts.slice(1, 2);
     await th.openTrove_allAccounts(_1_Defaulter, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -81,7 +81,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -124,7 +124,7 @@ contract("Gas cost tests", async accounts => {
   // 2 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 2. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -135,7 +135,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //2 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //2 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _2_Defaulters = accounts.slice(1, 3);
     await th.openTrove_allAccounts(_2_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -144,7 +144,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -186,7 +186,7 @@ contract("Gas cost tests", async accounts => {
   // 3 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 3. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -197,7 +197,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //3 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //3 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _3_Defaulters = accounts.slice(1, 4);
     await th.openTrove_allAccounts(_3_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -206,7 +206,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -248,7 +248,7 @@ contract("Gas cost tests", async accounts => {
   // 5 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 5. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -259,7 +259,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //5 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //5 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _5_Defaulters = accounts.slice(1, 6);
     await th.openTrove_allAccounts(_5_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -268,7 +268,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -310,7 +310,7 @@ contract("Gas cost tests", async accounts => {
   // 10 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 10. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -321,7 +321,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //10 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //10 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _10_Defaulters = accounts.slice(1, 11);
     await th.openTrove_allAccounts(_10_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -330,7 +330,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -372,7 +372,7 @@ contract("Gas cost tests", async accounts => {
   //20 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 20. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 90 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 90 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -383,7 +383,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //20 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //20 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _20_Defaulters = accounts.slice(1, 21);
     await th.openTrove_allAccounts(_20_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -392,7 +392,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -434,7 +434,7 @@ contract("Gas cost tests", async accounts => {
   // 30 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 30. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 90 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 90 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -445,7 +445,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //30 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //30 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _30_Defaulters = accounts.slice(1, 31);
     await th.openTrove_allAccounts(_30_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -454,7 +454,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -496,7 +496,7 @@ contract("Gas cost tests", async accounts => {
   // 40 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 40. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 90 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 90 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -507,7 +507,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //40 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //40 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _40_Defaulters = accounts.slice(1, 41);
     await th.openTrove_allAccounts(_40_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -516,7 +516,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -558,7 +558,7 @@ contract("Gas cost tests", async accounts => {
   // 45 troves
   it("", async () => {
     const message = "liquidateTroves(). n = 45. Pure redistribution. Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -569,7 +569,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //45 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //45 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _45_Defaulters = accounts.slice(1, 46);
     await th.openTrove_allAccounts(_45_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -578,7 +578,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 100 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 100 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(60, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -623,7 +623,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 1. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -646,7 +646,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //1 acct opens Trove with 1 ether and withdraw 100 ZUSD
+    //1 acct opens Trove with 1 bitcoin and withdraw 100 ZUSD
     const _1_Defaulter = accounts.slice(1, 2);
     await th.openTrove_allAccounts(_1_Defaulter, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -703,7 +703,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 2. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -726,7 +726,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //2 acct opens Trove with 1 ether and withdraw 100 ZUSD
+    //2 acct opens Trove with 1 bitcoin and withdraw 100 ZUSD
     const _2_Defaulters = accounts.slice(1, 3);
     await th.openTrove_allAccounts(_2_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -782,7 +782,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 3. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -805,7 +805,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //3 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //3 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _3_Defaulters = accounts.slice(1, 4);
     await th.openTrove_allAccounts(_3_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -861,7 +861,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 5. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -884,7 +884,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //5 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //5 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _5_Defaulters = accounts.slice(1, 6);
     await th.openTrove_allAccounts(_5_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -940,7 +940,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 10. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -963,7 +963,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //10 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //10 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _10_Defaulters = accounts.slice(1, 11);
     await th.openTrove_allAccounts(_10_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1019,7 +1019,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 20. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1042,7 +1042,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //30 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //30 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _20_Defaulters = accounts.slice(1, 21);
     await th.openTrove_allAccounts(_20_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1098,7 +1098,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 30. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1121,7 +1121,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //30 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //30 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _30_Defaulters = accounts.slice(1, 31);
     await th.openTrove_allAccounts(_30_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1177,7 +1177,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 40. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1200,7 +1200,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //40 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //40 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _40_Defaulters = accounts.slice(1, 41);
     await th.openTrove_allAccounts(_40_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1256,7 +1256,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 45. All fully offset with Stability Pool. No pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1279,7 +1279,7 @@ contract("Gas cost tests", async accounts => {
     const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString();
     assert.equal(ZUSDinSP, dec(9, 28));
 
-    //45 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //45 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _45_Defaulters = accounts.slice(1, 46);
     await th.openTrove_allAccounts(_45_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1337,7 +1337,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 1. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1348,7 +1348,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //1 acct opens Trove with 1 ether and withdraw 100 ZUSD
+    //1 acct opens Trove with 1 bitcoin and withdraw 100 ZUSD
     const _1_Defaulter = accounts.slice(1, 2);
     await th.openTrove_allAccounts(_1_Defaulter, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1357,7 +1357,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -1434,7 +1434,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 2. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1445,7 +1445,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //2 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //2 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _2_Defaulters = accounts.slice(1, 3);
     await th.openTrove_allAccounts(_2_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1454,7 +1454,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -1531,7 +1531,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 3. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1542,7 +1542,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //3 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //3 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _3_Defaulters = accounts.slice(1, 4);
     await th.openTrove_allAccounts(_3_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1551,7 +1551,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -1628,7 +1628,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 5. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1639,7 +1639,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //5 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //5 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _5_Defaulters = accounts.slice(1, 6);
     await th.openTrove_allAccounts(_5_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1648,7 +1648,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -1725,7 +1725,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 10. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1736,7 +1736,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //10 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //10 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _10_Defaulters = accounts.slice(1, 11);
     await th.openTrove_allAccounts(_10_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1745,7 +1745,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -1822,7 +1822,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 20. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1833,7 +1833,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //20 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //20 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _20_Defaulters = accounts.slice(1, 21);
     await th.openTrove_allAccounts(_20_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1842,7 +1842,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -1919,7 +1919,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 30. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -1930,7 +1930,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //30 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //30 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _30_Defaulters = accounts.slice(1, 31);
     await th.openTrove_allAccounts(_30_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -1939,7 +1939,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2016,7 +2016,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 40. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -2027,7 +2027,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //40 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //40 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _40_Defaulters = accounts.slice(1, 41);
     await th.openTrove_allAccounts(_40_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -2036,7 +2036,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2113,7 +2113,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "liquidateTroves(). n = 45. All fully offset with Stability Pool. Has pending distribution rewards. In Recovery Mode";
-    // 10 accts each open Trove with 10 ether, withdraw 900 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 900 ZUSD
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
       contracts,
@@ -2124,7 +2124,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    //45 accts open Trove with 1 ether and withdraw 100 ZUSD
+    //45 accts open Trove with 1 bitcoin and withdraw 100 ZUSD
     const _45_Defaulters = accounts.slice(1, 46);
     await th.openTrove_allAccounts(_45_Defaulters, contracts, dec(1, "ether"), dec(60, 18));
 
@@ -2133,7 +2133,7 @@ contract("Gas cost tests", async accounts => {
       assert.isTrue(await sortedTroves.contains(account));
     }
 
-    // Account 500 opens with 1 ether and withdraws 110 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 110 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(110, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2214,7 +2214,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 10. Pure redistribution. Has pending distribution rewards.";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2223,7 +2223,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2263,7 +2263,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 40. Pure redistribution. Has pending distribution rewards.";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2272,7 +2272,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2312,7 +2312,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 45. Pure redistribution. Has pending distribution rewards.";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2321,7 +2321,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2361,7 +2361,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 50. Pure redistribution. Has pending distribution rewards.";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2370,7 +2370,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2412,7 +2412,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 10. All troves fully offset. Have pending distribution rewards";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2421,7 +2421,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2470,7 +2470,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 40. All troves fully offset. Have pending distribution rewards";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2479,7 +2479,7 @@ contract("Gas cost tests", async accounts => {
       dec(10, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2528,7 +2528,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 45. All troves fully offset. Have pending distribution rewards";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2537,7 +2537,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")
@@ -2586,7 +2586,7 @@ contract("Gas cost tests", async accounts => {
   it("", async () => {
     const message =
       "batchLiquidateTroves(). n = 50. All troves fully offset. Have pending distribution rewards";
-    // 10 accts each open Trove with 10 ether, withdraw 180 ZUSD
+    // 10 accts each open Trove with 10 bitcoin, withdraw 180 ZUSD
 
     await th.openTrove_allAccounts(
       accounts.slice(101, 111),
@@ -2595,7 +2595,7 @@ contract("Gas cost tests", async accounts => {
       dec(130, 18)
     );
 
-    // Account 500 opens with 1 ether and withdraws 180 ZUSD
+    // Account 500 opens with 1 bitcoin and withdraws 180 ZUSD
     await borrowerOperations.openTrove(_100pct, dec(130, 18), accounts[500], ZERO_ADDRESS, {
       from: accounts[500],
       value: dec(1, "ether")

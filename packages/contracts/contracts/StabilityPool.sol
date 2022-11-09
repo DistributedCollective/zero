@@ -178,7 +178,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
     event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
     event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
-    event EtherSent(address _to, uint _amount);
+    event BTCSent(address _to, uint _amount);
 
     // --- Contract setters ---
 
@@ -373,7 +373,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ETH = ETH.sub(depositorETHGain);
         emit StabilityPoolETHBalanceUpdated(ETH);
-        emit EtherSent(msg.sender, depositorETHGain);
+        emit BTCSent(msg.sender, depositorETHGain);
 
         borrowerOperations.moveETHGainToTrove{ value: depositorETHGain }(msg.sender, _upperHint, _lowerHint);
     }
@@ -752,7 +752,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint newETH = ETH.sub(_amount);
         ETH = newETH;
         emit StabilityPoolETHBalanceUpdated(newETH);
-        emit EtherSent(msg.sender, _amount);
+        emit BTCSent(msg.sender, _amount);
 
         (bool success, ) = msg.sender.call{ value: _amount }("");
         require(success, "StabilityPool: sending ETH failed");

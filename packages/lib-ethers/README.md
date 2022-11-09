@@ -10,7 +10,7 @@ Install in your project:
 npm install @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
 ```
 
-Connecting to an Ethereum node and sending a transaction:
+Connecting to a blockchain node and sending a transaction:
 
 ```javascript
 const { Wallet, providers } = require("ethers");

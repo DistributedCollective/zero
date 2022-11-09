@@ -71,11 +71,8 @@ const wrbtcAddresses = {
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-<<<<<<< Updated upstream
   rsktestnet: "0xEF660F708AAe1041A1c871f4e3Ffb5e166437383",
-=======
-  rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d",
->>>>>>> Stashed changes
+  //rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d", //Stashed change?
   dev: "0x0000000000000000000000000000000000000003"
 };
 
@@ -129,7 +126,7 @@ const config: HardhatUserConfig = {
       gas: 13e6, // tx gas limit
       blockGasLimit: 13e6,
 
-      // Let Ethers throw instead of Buidler EVM
+      // Let Ethers throw instead of Hardhat EVM
       // This is closer to what will happen in production
       throwOnCallFailures: false,
       throwOnTransactionFailures: false

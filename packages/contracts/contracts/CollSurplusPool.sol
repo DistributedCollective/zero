@@ -18,7 +18,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event EtherSent(address _to, uint _amount);
+    event BTCSent(address _to, uint _amount);
     
     // --- Contract setters ---
 
@@ -47,7 +47,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     }
 
     /** Returns the ETH state variable at ActivePool address.
-       Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts. */
+       Not necessarily equal to the raw bitcoin balance - bitcoin can be forcibly sent to contracts. */
     function getETH() external view override returns (uint) {
         return ETH;
     }
@@ -76,7 +76,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         emit CollBalanceUpdated(_account, 0);
 
         ETH = ETH.sub(claimableColl);
-        emit EtherSent(_account, claimableColl);
+        emit BTCSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
         require(success, "CollSurplusPool: sending ETH failed");

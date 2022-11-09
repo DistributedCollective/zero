@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-// Make accounts with 1 trillion Ether
+// Make accounts with 1 trillion Bitcoin
 const makeAccount = () => {
   acc = `{ privateKey: "${randomHex()}", balance: "'0xc097ce7bc90715b34b9f1000000000'" }`
   return acc

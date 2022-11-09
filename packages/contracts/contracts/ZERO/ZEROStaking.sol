@@ -28,7 +28,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     event F_ETHUpdated(uint256 _F_ETH);
     event F_ZUSDUpdated(uint256 _F_ZUSD);
     event TotalZEROStakedUpdated(uint256 _totalZEROStaked);
-    event EtherSent(address _account, uint256 _amount);
+    event BTCSent(address _account, uint256 _amount);
     event StakerSnapshotsUpdated(address _staker, uint256 _F_ETH, uint256 _F_ZUSD);
 
     // --- Functions ---
@@ -186,7 +186,7 @@ contract ZEROStaking is ZEROStakingStorage, IZEROStaking, CheckContract, BaseMat
     }
 
     function _sendETHGainToUser(uint256 ETHGain) internal {
-        emit EtherSent(msg.sender, ETHGain);
+        emit BTCSent(msg.sender, ETHGain);
         (bool success, ) = msg.sender.call{value: ETHGain}("");
         require(success, "ZEROStaking: Failed to send accumulated ETHGain");
     }

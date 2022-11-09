@@ -146,11 +146,11 @@ contract('TroveManager', async accounts => {
 
     // check ActivePool ETH and ZUSD debt before
     const activePool_ETH_Before = (await activePool.getETH()).toString()
-    const activePool_RawEther_Before = (await web3.eth.getBalance(activePool.address)).toString()
+    const activePool_RawBTC_Before = (await web3.eth.getBalance(activePool.address)).toString()
     const activePool_ZUSDDebt_Before = (await activePool.getZUSDDebt()).toString()
 
     assert.equal(activePool_ETH_Before, A_collateral.add(B_collateral))
-    assert.equal(activePool_RawEther_Before, A_collateral.add(B_collateral))
+    assert.equal(activePool_RawBTC_Before, A_collateral.add(B_collateral))
     th.assertIsApproximatelyEqual(activePool_ZUSDDebt_Before, A_totalDebt.add(B_totalDebt))
 
     // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
@@ -159,17 +159,17 @@ contract('TroveManager', async accounts => {
     // Confirm system is not in Recovery Mode
     assert.isFalse(await th.checkRecoveryMode(contracts));
 
-    /* close Bob's Trove. Should liquidate his ether and ZUSD, 
-    leaving Alice’s ether and ZUSD debt in the ActivePool. */
+    /* close Bob's Trove. Should liquidate his bitcoin and ZUSD, 
+    leaving Alice’s bitcoin and ZUSD debt in the ActivePool. */
     await troveManager.liquidate(bob, { from: owner });
 
     // check ActivePool ETH and ZUSD debt 
     const activePool_ETH_After = (await activePool.getETH()).toString()
-    const activePool_RawEther_After = (await web3.eth.getBalance(activePool.address)).toString()
+    const activePool_RawBTC_After = (await web3.eth.getBalance(activePool.address)).toString()
     const activePool_ZUSDDebt_After = (await activePool.getZUSDDebt()).toString()
 
     assert.equal(activePool_ETH_After, A_collateral)
-    assert.equal(activePool_RawEther_After, A_collateral)
+    assert.equal(activePool_RawBTC_After, A_collateral)
     th.assertIsApproximatelyEqual(activePool_ZUSDDebt_After, A_totalDebt)
   })
 
@@ -182,11 +182,11 @@ contract('TroveManager', async accounts => {
 
     // check DefaultPool ETH and ZUSD debt before
     const defaultPool_ETH_Before = (await defaultPool.getETH())
-    const defaultPool_RawEther_Before = (await web3.eth.getBalance(defaultPool.address)).toString()
+    const defaultPool_RawBTC_Before = (await web3.eth.getBalance(defaultPool.address)).toString()
     const defaultPool_ZUSDDebt_Before = (await defaultPool.getZUSDDebt()).toString()
 
     assert.equal(defaultPool_ETH_Before, '0')
-    assert.equal(defaultPool_RawEther_Before, '0')
+    assert.equal(defaultPool_RawBTC_Before, '0')
     assert.equal(defaultPool_ZUSDDebt_Before, '0')
 
     // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
@@ -200,12 +200,12 @@ contract('TroveManager', async accounts => {
 
     // check after
     const defaultPool_ETH_After = (await defaultPool.getETH()).toString()
-    const defaultPool_RawEther_After = (await web3.eth.getBalance(defaultPool.address)).toString()
+    const defaultPool_RawBTC_After = (await web3.eth.getBalance(defaultPool.address)).toString()
     const defaultPool_ZUSDDebt_After = (await defaultPool.getZUSDDebt()).toString()
 
     const defaultPool_ETH = th.applyLiquidationFee(B_collateral)
     assert.equal(defaultPool_ETH_After, defaultPool_ETH)
-    assert.equal(defaultPool_RawEther_After, defaultPool_ETH)
+    assert.equal(defaultPool_RawBTC_After, defaultPool_ETH)
     th.assertIsApproximatelyEqual(defaultPool_ZUSDDebt_After, B_totalDebt)
   })
 
@@ -322,9 +322,9 @@ contract('TroveManager', async accounts => {
     await troveManager.liquidate(bob, { from: owner });
 
     /* check snapshots after. Total stakes should be equal to the  remaining stake then the system: 
-    10 ether, Alice's stake.
+    10 bitcoin, Alice's stake.
      
-    Total collateral should be equal to Alice's collateral plus her pending ETH reward (Bob’s collaterale*0.995 ether), earned
+    Total collateral should be equal to Alice's collateral plus her pending ETH reward (Bob’s collaterale*0.995 bitcoin), earned
     from the liquidation of Bob's Trove */
     const totalStakesSnapshot_After = (await troveManager.totalStakesSnapshot()).toString()
     const totalCollateralSnapshot_After = (await troveManager.totalCollateralSnapshot()).toString()
@@ -2384,7 +2384,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received Ether
+    // Don't pay for gas, as it makes it easier to calculate the received Bitcoin
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       firstRedemptionHint,
@@ -2464,7 +2464,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received Ether
+    // Don't pay for gas, as it makes it easier to calculate the received Bitcoin
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       ZERO_ADDRESS, // invalid first hint
@@ -2544,7 +2544,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received Ether
+    // Don't pay for gas, as it makes it easier to calculate the received Bitcoin
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       erin, // invalid first hint, it doesn’t have a trove
@@ -2630,7 +2630,7 @@ contract('TroveManager', async accounts => {
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
     // Dennis redeems 20 ZUSD
-    // Don't pay for gas, as it makes it easier to calculate the received Ether
+    // Don't pay for gas, as it makes it easier to calculate the received Bitcoin
     const redemptionTx = await troveManager.redeemCollateral(
       redemptionAmount,
       erin, // invalid trove, below MCR
@@ -3370,7 +3370,7 @@ contract('TroveManager', async accounts => {
     const activePool_debt_after = await activePool.getZUSDDebt()
     assert.equal(activePool_debt_before.sub(activePool_debt_after), dec(400, 18))
 
-    /* Check ActivePool coll reduced by $400 worth of Ether: at ETH:USD price of $200, this should be 2 ETH.
+    /* Check ActivePool coll reduced by $400 worth of Bitcoin: at ETH:USD price of $200, this should be 2 ETH.
 
     therefore remaining ActivePool ETH should be 198 */
     const activePool_coll_after = await activePool.getETH()
@@ -3547,7 +3547,7 @@ contract('TroveManager', async accounts => {
     const _373_ZUSD = '373000000000000000000'
     const _950_ZUSD = '950000000000000000000'
 
-    // Check Ether in activePool
+    // Check Bitcoin in activePool
     const activeETH_0 = await activePool.getETH()
     assert.equal(activeETH_0, totalColl.toString());
 
@@ -4307,7 +4307,7 @@ contract('TroveManager', async accounts => {
         partialRedemptionHintNICR
       } = await hintHelpers.getRedemptionHints(zusdAmount, price, 0)
 
-      // Don't pay for gas, as it makes it easier to calculate the received Ether
+      // Don't pay for gas, as it makes it easier to calculate the received Bitcoin
       const redemptionTx = await troveManager.redeemCollateral(
         zusdAmount,
         firstRedemptionHint,

@@ -57,7 +57,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     // --- Getters for public variables. Required by IPool interface ---
 
     
-    /// @notice Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
+    /// @notice Not necessarily equal to the the contract's raw ETH balance - bitcoin can be forcibly sent to contracts.
     /// @return the ETH state variable.
     function getETH() external view override returns (uint) {
         return ETH;
@@ -77,7 +77,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         _requireCallerIsBOorTroveMorSP();
         ETH = ETH.sub(_amount);
         emit ActivePoolETHBalanceUpdated(ETH);
-        emit EtherSent(_account, _amount);
+        emit BTCSent(_account, _amount);
 
         (bool success, ) = _account.call{value: _amount}("");
         require(success, "ActivePool: sending ETH failed");

@@ -26,7 +26,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     ICommunityIssuance public communityIssuance;
 
-    uint256 internal ETH;  // deposited ether tracker
+    uint256 internal ETH;  // deposited bitcoin tracker
 
     // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
     uint256 internal totalZUSDDeposits;

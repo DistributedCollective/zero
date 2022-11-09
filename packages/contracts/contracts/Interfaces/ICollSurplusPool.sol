@@ -10,7 +10,7 @@ interface ICollSurplusPool {
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint256 _newBalance);
-    event EtherSent(address _to, uint256 _amount);
+    event BTCSent(address _to, uint256 _amount);
 
     // --- Contract setters ---
 
@@ -27,7 +27,7 @@ interface ICollSurplusPool {
         address _activePoolAddress
     ) external;
 
-    /// @notice Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts.
+    /// @notice Not necessarily equal to the raw bitcoin balance - bitcoin can be forcibly sent to contracts.
     /// @return ETH state variable
     function getETH() external view returns (uint256);
 

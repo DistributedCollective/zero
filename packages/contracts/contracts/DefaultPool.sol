@@ -48,7 +48,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     /**
     * @return the ETH state variable.
     *
-    * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
+    * Not necessarily equal to the the contract's raw ETH balance - bitcoin can be forcibly sent to contracts.
     */
     function getETH() external view override returns (uint) {
         return ETH;
@@ -65,7 +65,7 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         address activePool = activePoolAddress; // cache to save an SLOAD
         ETH = ETH.sub(_amount);
         emit DefaultPoolETHBalanceUpdated(ETH);
-        emit EtherSent(activePool, _amount);
+        emit BTCSent(activePool, _amount);
 
         (bool success, ) = activePool.call{ value: _amount }("");
         require(success, "DefaultPool: sending ETH failed");

@@ -569,7 +569,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isTrue(txA.receipt.status)
     assert.isFalse(await sortedTroves.contains(alice))
 
-    // Expect Bob now holds all Ether and ZUSDDebt in the system: 2 + 0.4975+0.4975*0.995+0.995 Ether and 110*3 ZUSD (10 each for gas compensation)
+    // Expect Bob now holds all Bitcoin and ZUSDDebt in the system: 2 + 0.4975+0.4975*0.995+0.995 Bitcoin and 110*3 ZUSD (10 each for gas compensation)
     const bob_Coll = ((await troveManager.Troves(bob))[1]
       .add(await troveManager.getPendingETHReward(bob)))
       .toString()
@@ -674,7 +674,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
   })
 
   it("redistribution: Trove with the majority stake tops up. A,B,C, D open. Liq(D). C tops up. E Enters, Liq(E). Distributes correct rewards", async () => {
-    const _998_Ether = toBN('998000000000000000000')
+    const _998_Bitcoin = toBN('998000000000000000000')
     // A, B, C, D open troves
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraParams: { from: alice } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(110, 18), extraParams: { from: bob } })
@@ -772,7 +772,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
   })
 
   it("redistribution: Trove with the majority stake tops up. A,B,C, D open. Liq(D). A, B, C top up. E Enters, Liq(E). Distributes correct rewards", async () => {
-    const _998_Ether = toBN('998000000000000000000')
+    const _998_Bitcoin = toBN('998000000000000000000')
     // A, B, C open troves
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraParams: { from: alice } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(110, 18), extraParams: { from: bob } })
@@ -907,7 +907,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     assert.isTrue(txA.receipt.status)
     assert.isFalse(await sortedTroves.contains(alice))
 
-    // Expect Bob now holds all Ether and ZUSDDebt in the system: 2.5 Ether and 300 ZUSD
+    // Expect Bob now holds all Bitcoin and ZUSDDebt in the system: 2.5 Bitcoin and 300 ZUSD
     // 1 + 0.995/2 - 0.5 + 1.4975*0.995
     const bob_Coll = ((await troveManager.Troves(bob))[1]
       .add(await troveManager.getPendingETHReward(bob)))
@@ -1021,7 +1021,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
   })
 
   it("redistribution: Trove with the majority stake withdraws. A,B,C,D open. Liq(D). C withdraws some coll. E Enters, Liq(E). Distributes correct rewards", async () => {
-    const _998_Ether = toBN('998000000000000000000')
+    const _998_Bitcoin = toBN('998000000000000000000')
     // A, B, C, D open troves
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraParams: { from: alice } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(110, 18), extraParams: { from: bob } })
@@ -1119,7 +1119,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
   })
 
   it("redistribution: Trove with the majority stake withdraws. A,B,C,D open. Liq(D). A, B, C withdraw. E Enters, Liq(E). Distributes correct rewards", async () => {
-    const _998_Ether = toBN('998000000000000000000')
+    const _998_Bitcoin = toBN('998000000000000000000')
     // A, B, C, D open troves
     const { collateral: A_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraParams: { from: alice } })
     const { collateral: B_coll } = await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(110, 18), extraParams: { from: bob } })

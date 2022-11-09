@@ -237,7 +237,7 @@ contract BorrowerOperations is
         vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
         emit TroveCreated(msg.sender, vars.arrayIndex);
 
-        // Move the ether to the Active Pool, and mint the ZUSDAmount to the borrower
+        // Move bitcoin to the Active Pool, and mint the ZUSDAmount to the borrower
         _activePoolAddColl(contractsCache.activePool, msg.value);
         _withdrawZUSD(
             contractsCache.activePool,

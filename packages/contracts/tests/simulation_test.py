@@ -146,8 +146,8 @@ def contracts():
 
 @pytest.fixture
 def print_expectations():
-    # ether_price_one_year = price_ether_initial * (1 + drift_ether)**8760
-    # print("Expected ether price at the end of the year: $", ether_price_one_year)
+    # BTC_price_one_year = price_BTC_initial * (1 + drift_BTC)**8760
+    # print("Expected bitcoin price at the end of the year: $", BTC_price_one_year)
     print("Expected ZERO price at the end of first month: $", price_ZERO_initial * (1 + drift_ZERO)**720)
 
     print("\n Open troves")
@@ -172,7 +172,7 @@ def _test_test(contracts):
 > In each period, the following events occur sequentially
 
 
-* exogenous ether price input
+* exogenous bitcoin price input
 * trove liquidation
 * return of the previous period's stability pool determined (liquidation gain & airdropped ZERO gain)
 * trove closure
@@ -191,7 +191,7 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
     ZUSD_GAS_COMPENSATION = contracts.troveManager.ZUSD_GAS_COMPENSATION() / 1e18
     MIN_NET_DEBT = contracts.troveManager.MIN_NET_DEBT() / 1e18
 
-    contracts.priceFeedTestnet.setPrice(floatToWei(price_ether[0]), { 'from': accounts[0] })
+    contracts.priceFeedTestnet.setPrice(floatToWei(price_BTC[0]), { 'from': accounts[0] })
     # whale
     whale_coll = 30000.0
     contracts.borrowerOperations.openTrove(MAX_FEE, Wei(10e24), ZERO_ADDRESS, ZERO_ADDRESS,
@@ -222,23 +222,23 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
         for index in range(1, n_sim):
             print('\n  --> Iteration', index)
             print('  -------------------\n')
-            #exogenous ether price input
-            price_ether_current = price_ether[index]
-            contracts.priceFeedTestnet.setPrice(floatToWei(price_ether_current), { 'from': accounts[0] })
+            #exogenous bitcoin price input
+            price_BTC_current = price_BTC[index]
+            contracts.priceFeedTestnet.setPrice(floatToWei(price_BTC_current), { 'from': accounts[0] })
 
             #trove liquidation & return of stability pool
-            result_liquidation = liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, price_ZERO_current, data, index)
+            result_liquidation = liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, price_ZERO_current, data, index)
             total_coll_liquidated = total_coll_liquidated + result_liquidation[0]
             return_stability = result_liquidation[1]
 
             #close troves
-            result_close = close_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, index)
+            result_close = close_troves(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, index)
 
             #adjust troves
-            [coll_added_adjust, issuance_ZUSD_adjust] = adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, index)
+            [coll_added_adjust, issuance_ZUSD_adjust] = adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, index)
 
             #open troves
-            [coll_added_open, issuance_ZUSD_open] = open_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, index)
+            [coll_added_open, issuance_ZUSD_open] = open_troves(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, index)
             total_coll_added = total_coll_added + coll_added_adjust + coll_added_open
             #active_accounts.sort(key=lambda a : a.get('CR_initial'))
 
@@ -246,7 +246,7 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             stability_update(accounts, contracts, active_accounts, return_stability, index)
 
             #Calculating Price, Liquidity Pool, and Redemption
-            [price_ZUSD, redemption_pool, redemption_fee, issuance_ZUSD_stabilizer] = price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, index)
+            [price_ZUSD, redemption_pool, redemption_fee, issuance_ZUSD_stabilizer] = price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, index)
             total_zusd_redempted = total_zusd_redempted + redemption_pool
             print('ZUSD price', price_ZUSD)
             print('ZERO price', price_ZERO_current)

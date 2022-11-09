@@ -1793,7 +1793,7 @@ contract('StabilityPool', async accounts => {
       const liquidationTx_1 = await troveManager.liquidate(defaulter_1, { from: owner })  // 180 ZUSD closed
       const [, liquidatedColl,] = th.getEmittedLiquidationValues(liquidationTx_1)
 
-      //Get ActivePool and StabilityPool Ether before retrieval:
+      //Get ActivePool and StabilityPool Bitcoin before retrieval:
       const active_ETH_Before = await activePool.getETH()
       const stability_ETH_Before = await stabilityPool.getETH()
 
@@ -3219,7 +3219,7 @@ contract('StabilityPool', async accounts => {
       // price bounces back
       await priceFeed.setPrice(dec(200, 18));
 
-      //check activePool and StabilityPool Ether before retrieval:
+      //check activePool and StabilityPool Bitcoin before retrieval:
       const active_ETH_Before = await activePool.getETH()
       const stability_ETH_Before = await stabilityPool.getETH()
 
@@ -3295,7 +3295,7 @@ contract('StabilityPool', async accounts => {
       /* All depositors attempt to withdraw their ETH gain to their Trove. Each depositor 
       receives (liquidatedColl/ 6).
 
-      Thus, expected new collateral for each depositor with 1 Ether in their trove originally, is 
+      Thus, expected new collateral for each depositor with 1 Bitcoin in their trove originally, is 
       (1 + liquidatedColl/6)
       */
 

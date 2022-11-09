@@ -13,18 +13,18 @@ const TroveManagerTester = artifacts.require("./TroveManagerTester")
 const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 
 contract('TroveManager - in Recovery Mode', async accounts => {
-  const _1_Ether = web3.utils.toWei('1', 'ether')
-  const _2_Ether = web3.utils.toWei('2', 'ether')
-  const _3_Ether = web3.utils.toWei('3', 'ether')
-  const _3pt5_Ether = web3.utils.toWei('3.5', 'ether')
-  const _6_Ether = web3.utils.toWei('6', 'ether')
-  const _10_Ether = web3.utils.toWei('10', 'ether')
-  const _20_Ether = web3.utils.toWei('20', 'ether')
-  const _21_Ether = web3.utils.toWei('21', 'ether')
-  const _22_Ether = web3.utils.toWei('22', 'ether')
-  const _24_Ether = web3.utils.toWei('24', 'ether')
-  const _25_Ether = web3.utils.toWei('25', 'ether')
-  const _30_Ether = web3.utils.toWei('30', 'ether')
+  const _1_Bitcoin = web3.utils.toWei('1', 'ether')
+  const _2_Bitcoin = web3.utils.toWei('2', 'ether')
+  const _3_Bitcoin = web3.utils.toWei('3', 'ether')
+  const _3pt5_Bitcoin = web3.utils.toWei('3.5', 'ether')
+  const _6_Bitcoin = web3.utils.toWei('6', 'ether')
+  const _10_Bitcoin = web3.utils.toWei('10', 'ether')
+  const _20_Bitcoin = web3.utils.toWei('20', 'ether')
+  const _21_Bitcoin = web3.utils.toWei('21', 'ether')
+  const _22_Bitcoin = web3.utils.toWei('22', 'ether')
+  const _24_Bitcoin = web3.utils.toWei('24', 'ether')
+  const _25_Bitcoin = web3.utils.toWei('25', 'ether')
+  const _30_Bitcoin = web3.utils.toWei('30', 'ether')
 
   const ZERO_ADDRESS = th.ZERO_ADDRESS
   const [
@@ -145,7 +145,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const recoveryMode_Before = await th.checkRecoveryMode(contracts);
     assert.isFalse(recoveryMode_Before)
 
-    await borrowerOperations.withdrawColl(_1_Ether, alice, alice, { from: alice })
+    await borrowerOperations.withdrawColl(_1_Bitcoin, alice, alice, { from: alice })
 
     const recoveryMode_After = await th.checkRecoveryMode(contracts);
     assert.isFalse(recoveryMode_After)
@@ -396,7 +396,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     Prior to Dennis liquidation, total stakes and total collateral were each 27 ether. 
   
     Check snapshots. Dennis' liquidated collateral is distributed and remains in the system. His 
-    stake is removed, leaving 24+3*0.995 ether total collateral, and 24 ether total stakes. */
+    stake is removed, leaving 24+3*0.995 bitcoin total collateral, and 24 bitcoin total stakes. */
 
     const totalStakesSnaphot_2 = (await troveManager.totalStakesSnapshot()).toString()
     const totalCollateralSnapshot_2 = (await troveManager.totalCollateralSnapshot()).toString()
@@ -415,7 +415,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     // Liquidate Bob
     await troveManager.liquidate(bob, { from: owner })
 
-    /* After Bob's liquidation, Bob's stake (21 ether) should be removed from total stakes, 
+    /* After Bob's liquidation, Bob's stake (21 bitcoin) should be removed from total stakes, 
     but his collateral should remain in the system (*0.995). */
     const totalStakesSnaphot_3 = (await troveManager.totalStakesSnapshot())
     const totalCollateralSnapshot_3 = (await troveManager.totalCollateralSnapshot())
@@ -492,15 +492,15 @@ contract('TroveManager - in Recovery Mode', async accounts => {
 
     assert.equal(P_Before, '1000000000000000000')
 
-    /* Now, liquidate Bob. Liquidated coll is 21 ether, and liquidated debt is 2000 ZUSD.
+    /* Now, liquidate Bob. Liquidated coll is 21 bitcoin, and liquidated debt is 2000 ZUSD.
     
     With 390 ZUSD in the StabilityPool, 390 ZUSD should be offset with the pool, leaving 0 in the pool.
   
     Stability Pool rewards for alice should be:
     ZUSDLoss: 390ZUSD
-    ETHGain: (390 / 2000) * 21*0.995 = 4.074525 ether
+    ETHGain: (390 / 2000) * 21*0.995 = 4.074525 bitcoin
 
-    After offsetting 390 ZUSD and 4.074525 ether, the remainders - 1610 ZUSD and 16.820475 ether - should be redistributed to all active Troves.
+    After offsetting 390 ZUSD and 4.074525 bitcoin, the remainders - 1610 ZUSD and 16.820475 bitcoin - should be redistributed to all active Troves.
    */
     // Liquidate Bob
     await troveManager.liquidate(bob, { from: owner })
@@ -512,14 +512,14 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     assert.equal(aliceDeposit.toString(), 0)
     assert.equal(aliceETHGain.toString(), aliceExpectedETHGain)
 
-    /* Now, check redistribution to active Troves. Remainders of 1610 ZUSD and 16.82 ether are distributed.
+    /* Now, check redistribution to active Troves. Remainders of 1610 ZUSD and 16.82 bitcoin are distributed.
     
-    Now, only Alice and Dennis have a stake in the system - 3 ether each, thus total stakes is 6 ether.
+    Now, only Alice and Dennis have a stake in the system - 3 bitcoin each, thus total stakes is 6 ether.
   
     Rewards-per-unit-staked from the redistribution should be:
   
     L_ZUSDDebt = 1610 / 6 = 268.333 ZUSD
-    L_ETH = 16.820475 /6 =  2.8034125 ether
+    L_ETH = 16.820475 /6 =  2.8034125 bitcoin
     */
     const L_ZUSDDebt = (await troveManager.L_ZUSDDebt()).toString()
     const L_ETH = (await troveManager.L_ETH()).toString()
@@ -619,7 +619,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     As liquidated debt (250 ZUSD) was completely offset
 
     Alice's expected compounded deposit: (1490 - 250) = 1240ZUSD
-    Alice's expected ETH gain:  Bob's liquidated capped coll (minus gas comp), 2.75*0.995 ether
+    Alice's expected ETH gain:  Bob's liquidated capped coll (minus gas comp), 2.75*0.995 bitcoin
   
     */
     const aliceExpectedDeposit = await stabilityPool.getCompoundedZUSDDeposit(alice)
@@ -670,7 +670,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     As liquidated debt (250 ZUSD) was completely offset
 
     Alice's expected compounded deposit: (1490 - 250) = 1240ZUSD
-    Alice's expected ETH gain:  Bob's liquidated capped coll (minus gas comp), 2.75*0.995 ether
+    Alice's expected ETH gain:  Bob's liquidated capped coll (minus gas comp), 2.75*0.995 bitcoin
 
     */
     const aliceExpectedDeposit = await stabilityPool.getCompoundedZUSDDeposit(alice)
@@ -769,7 +769,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     const totalStakesSnaphot_After = (await troveManager.totalStakesSnapshot())
     const totalCollateralSnapshot_After = (await troveManager.totalCollateralSnapshot())
 
-    // totalStakesSnapshot should have reduced to 22 ether - the sum of Alice's coll( 20 ether) and Dennis' coll (2 ether )
+    // totalStakesSnapshot should have reduced to 22 bitcoin - the sum of Alice's coll( 20 bitcoin) and Dennis' coll (2 bitcoin )
     assert.equal(totalStakesSnaphot_After.toString(), A_coll.add(D_coll))
     // Total collateral should also reduce, since all liquidated coll has been moved to a reward for Stability Pool depositors
     assert.equal(totalCollateralSnapshot_After.toString(), A_coll.add(D_coll))
@@ -1027,7 +1027,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
 
     /*  Since Bob's debt (250 ZUSD) is larger than all ZUSD in the Stability Pool, Liquidation won’t happen
 
-    After liquidation, totalStakes snapshot should equal Alice's stake (20 ether) + Dennis stake (2 ether) = 22 ether.
+    After liquidation, totalStakes snapshot should equal Alice's stake (20 bitcoin) + Dennis stake (2 bitcoin) = 22 ether.
 
     Since there has been no redistribution, the totalCollateral snapshot should equal the totalStakes snapshot: 22 ether.
 
@@ -1074,7 +1074,7 @@ contract('TroveManager - in Recovery Mode', async accounts => {
     // Liquidate Bob, it won’t happen as there are no funds in the SP
     await assertRevert(troveManager.liquidate(bob, { from: owner }), "TroveManager: nothing to liquidate")
 
-    /* After liquidation, totalStakes snapshot should still equal the total stake: 25 ether
+    /* After liquidation, totalStakes snapshot should still equal the total stake: 25 bitcoin
 
     Since there has been no redistribution, the totalCollateral snapshot should equal the totalStakes snapshot: 25 ether.*/
 

@@ -15,6 +15,6 @@ contract ActivePoolStorage is Ownable {
     address public troveManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
-    uint256 internal ETH; // deposited ether tracker
+    uint256 internal ETH; // deposited bitcoin tracker
     uint256 internal ZUSDDebt;
 }

@@ -162,24 +162,24 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("addColl(): Increases the activePool ETH and raw ether balance by correct amount", async () => {
+    it("addColl(): Increases the activePool ETH and raw bitcoin balance by correct amount", async () => {
       const { collateral: aliceColl } = await openTrove({
         ICR: toBN(dec(2, 18)),
         extraParams: { from: alice }
       });
 
       const activePool_ETH_Before = await activePool.getETH();
-      const activePool_RawEther_Before = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_Before = toBN(await web3.eth.getBalance(activePool.address));
 
       assert.isTrue(activePool_ETH_Before.eq(aliceColl));
-      assert.isTrue(activePool_RawEther_Before.eq(aliceColl));
+      assert.isTrue(activePool_RawBTC_Before.eq(aliceColl));
 
       await borrowerOperations.addColl(alice, alice, { from: alice, value: dec(1, 16) });
 
       const activePool_ETH_After = await activePool.getETH();
-      const activePool_RawEther_After = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_After.eq(aliceColl.add(toBN(dec(1, 16)))));
-      assert.isTrue(activePool_RawEther_After.eq(aliceColl.add(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_RawBTC_After.eq(aliceColl.add(toBN(dec(1, 16)))));
     });
 
     it("addColl(), active Trove: adds the correct collateral amount to the Trove", async () => {
@@ -225,7 +225,7 @@ contract("BorrowerOperations", async accounts => {
     });
 
     it("addColl(), active Trove: updates the stake and updates the total stakes", async () => {
-      //  Alice creates initial Trove with 1 ether
+      //  Alice creates initial Trove with 1 bitcoin
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } });
 
       const alice_Trove_Before = await troveManager.Troves(alice);
@@ -234,7 +234,7 @@ contract("BorrowerOperations", async accounts => {
 
       assert.isTrue(totalStakes_Before.eq(alice_Stake_Before));
 
-      // Alice tops up Trove collateral with 2 ether
+      // Alice tops up Trove collateral with 2 bitcoin
       await borrowerOperations.addColl(alice, alice, { from: alice, value: dec(2, "ether") });
 
       // Check stake and total stakes get updated
@@ -354,7 +354,7 @@ contract("BorrowerOperations", async accounts => {
     //   // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
     //   await priceFeed.setPrice('1000000000000000000');
 
-    //   // close Carol's Trove, liquidating her 5 ether and 900ZUSD.
+    //   // close Carol's Trove, liquidating her 5 bitcoin and 900ZUSD.
     //   await troveManager.liquidate(carol, { from: owner });
 
     //   // dennis tops up his trove by 1 ETH
@@ -371,7 +371,7 @@ contract("BorrowerOperations", async accounts => {
     //   totalStakes = (alice_Stake + bob_Stake + dennis_orig_stake ) = (15 + 4 + 1) =  20 ETH.
     //   totalCollateral = (alice_Collateral + bob_Collateral + dennis_orig_coll + totalPendingETHReward) = (15 + 4 + 1 + 5)  = 25 ETH.
 
-    //   Therefore, as Dennis adds 1 ether collateral, his corrected stake should be:  s = 2 * (20 / 25 ) = 1.6 ETH */
+    //   Therefore, as Dennis adds 1 bitcoin collateral, his corrected stake should be:  s = 2 * (20 / 25 ) = 1.6 ETH */
     //   const dennis_Trove = await troveManager.Troves(dennis)
 
     //   const dennis_Stake = dennis_Trove[2]
@@ -613,35 +613,35 @@ contract("BorrowerOperations", async accounts => {
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } });
       const aliceCollBefore = await getTroveEntireColl(alice);
 
-      // Alice withdraws 1 ether
+      // Alice withdraws 1 bitcoin
       await borrowerOperations.withdrawColl(dec(1, 16), alice, alice, { from: alice });
 
-      // Check 1 ether remaining
+      // Check 1 bitcoin remaining
       const alice_Trove_After = await troveManager.Troves(alice);
       const aliceCollAfter = await getTroveEntireColl(alice);
 
       assert.isTrue(aliceCollAfter.eq(aliceCollBefore.sub(toBN(dec(1, 16)))));
     });
 
-    it("withdrawColl(): reduces ActivePool ETH and raw ether by correct amount", async () => {
+    it("withdrawColl(): reduces ActivePool ETH and raw bitcoin by correct amount", async () => {
       await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: alice } });
       const aliceCollBefore = await getTroveEntireColl(alice);
 
       // check before
       const activePool_ETH_before = await activePool.getETH();
-      const activePool_RawEther_before = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_before = toBN(await web3.eth.getBalance(activePool.address));
 
       await borrowerOperations.withdrawColl(dec(1, 16), alice, alice, { from: alice });
 
       // check after
       const activePool_ETH_After = await activePool.getETH();
-      const activePool_RawEther_After = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_After.eq(activePool_ETH_before.sub(toBN(dec(1, 16)))));
-      assert.isTrue(activePool_RawEther_After.eq(activePool_RawEther_before.sub(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_RawBTC_After.eq(activePool_RawBTC_before.sub(toBN(dec(1, 16)))));
     });
 
     it("withdrawColl(): updates the stake and updates the total stakes", async () => {
-      //  Alice creates initial Trove with 2 ether
+      //  Alice creates initial Trove with 2 bitcoin
       await openTrove({
         ICR: toBN(dec(2, 18)),
         extraParams: { from: alice, value: toBN(dec(5, "ether")) }
@@ -656,7 +656,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(alice_Stake_Before.eq(aliceColl));
       assert.isTrue(totalStakes_Before.eq(aliceColl));
 
-      // Alice withdraws 1 ether
+      // Alice withdraws 1 bitcoin
       await borrowerOperations.withdrawColl(dec(1, 16), alice, alice, { from: alice });
 
       // Check stake and total stakes get updated
@@ -685,7 +685,7 @@ contract("BorrowerOperations", async accounts => {
 
     it("withdrawColl(): applies pending rewards and updates user's L_ETH, L_ZUSDDebt snapshots", async () => {
       // --- SETUP ---
-      // Alice adds 15 ether, Bob adds 5 ether, Carol adds 1 ether
+      // Alice adds 15 bitcoin, Bob adds 5 bitcoin, Carol adds 1 bitcoin
       await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
       await openTrove({
         ICR: toBN(dec(3, 18)),
@@ -710,7 +710,7 @@ contract("BorrowerOperations", async accounts => {
       // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
       await priceFeed.setPrice("100000000000000000000");
 
-      // close Carol's Trove, liquidating her 1 ether and 180ZUSD.
+      // close Carol's Trove, liquidating her 1 bitcoin and 180ZUSD.
       await troveManager.liquidate(carol, { from: owner });
 
       const L_ETH = await troveManager.L_ETH();
@@ -3199,7 +3199,7 @@ contract("BorrowerOperations", async accounts => {
         extraParams: { from: bob }
       });
 
-      // Bob attempts to increase debt by 100 ZUSD and 1 ether, i.e. a change that constitutes a 100% ratio of coll:debt.
+      // Bob attempts to increase debt by 100 ZUSD and 1 bitcoin, i.e. a change that constitutes a 100% ratio of coll:debt.
       // Since his ICR prior is 110%, this change would reduce his ICR below MCR.
       try {
         const txBob = await borrowerOperations.adjustTrove(
@@ -3643,7 +3643,7 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("adjustTrove(): Changes the activePool ETH and raw ether balance by the requested decrease", async () => {
+    it("adjustTrove(): Changes the activePool ETH and raw bitcoin balance by the requested decrease", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 16)),
         ICR: toBN(dec(10, 18)),
@@ -3657,9 +3657,9 @@ contract("BorrowerOperations", async accounts => {
       });
 
       const activePool_ETH_Before = await activePool.getETH();
-      const activePool_RawEther_Before = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_Before = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_Before.gt(toBN("0")));
-      assert.isTrue(activePool_RawEther_Before.gt(toBN("0")));
+      assert.isTrue(activePool_RawBTC_Before.gt(toBN("0")));
 
       // Alice adjusts trove - coll decrease and debt decrease
       await borrowerOperations.adjustTrove(
@@ -3673,12 +3673,12 @@ contract("BorrowerOperations", async accounts => {
       );
 
       const activePool_ETH_After = await activePool.getETH();
-      const activePool_RawEther_After = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_After.eq(activePool_ETH_Before.sub(toBN(dec(1, 17)))));
-      assert.isTrue(activePool_RawEther_After.eq(activePool_ETH_Before.sub(toBN(dec(1, 17)))));
+      assert.isTrue(activePool_RawBTC_After.eq(activePool_ETH_Before.sub(toBN(dec(1, 17)))));
     });
 
-    it("adjustTrove(): Changes the activePool ETH and raw ether balance by the amount of ETH sent", async () => {
+    it("adjustTrove(): Changes the activePool ETH and raw bitcoin balance by the amount of ETH sent", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 16)),
         ICR: toBN(dec(10, 18)),
@@ -3692,9 +3692,9 @@ contract("BorrowerOperations", async accounts => {
       });
 
       const activePool_ETH_Before = await activePool.getETH();
-      const activePool_RawEther_Before = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_Before = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_Before.gt(toBN("0")));
-      assert.isTrue(activePool_RawEther_Before.gt(toBN("0")));
+      assert.isTrue(activePool_RawBTC_Before.gt(toBN("0")));
 
       // Alice adjusts trove - coll increase and debt increase
       await borrowerOperations.adjustTrove(th._100pct, 0, dec(100, 16), true, alice, alice, {
@@ -3703,9 +3703,9 @@ contract("BorrowerOperations", async accounts => {
       });
 
       const activePool_ETH_After = await activePool.getETH();
-      const activePool_RawEther_After = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_After.eq(activePool_ETH_Before.add(toBN(dec(1, 16)))));
-      assert.isTrue(activePool_RawEther_After.eq(activePool_ETH_Before.add(toBN(dec(1, 16)))));
+      assert.isTrue(activePool_RawBTC_After.eq(activePool_ETH_Before.add(toBN(dec(1, 16)))));
     });
 
     it("adjustTrove(): Changes the ZUSD debt in ActivePool by requested decrease", async () => {
@@ -3814,7 +3814,7 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("adjustTrove(): Reverts if requested coll withdrawal and ether is sent", async () => {
+    it("adjustTrove(): Reverts if requested coll withdrawal and bitcoin is sent", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 18)),
         ICR: toBN(dec(10, 18)),
@@ -4300,7 +4300,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isFalse(await sortedTroves.contains(alice));
     });
 
-    it("closeTrove(): reduces ActivePool ETH and raw ether by correct amount", async () => {
+    it("closeTrove(): reduces ActivePool ETH and raw bitcoin by correct amount", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 18)),
         ICR: toBN(dec(2, 18)),
@@ -4319,10 +4319,10 @@ contract("BorrowerOperations", async accounts => {
 
       // Check active Pool ETH before
       const activePool_ETH_before = await activePool.getETH();
-      const activePool_RawEther_before = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_before = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_before.eq(aliceColl.add(dennisColl)));
       assert.isTrue(activePool_ETH_before.gt(toBN("0")));
-      assert.isTrue(activePool_RawEther_before.eq(activePool_ETH_before));
+      assert.isTrue(activePool_RawBTC_before.eq(activePool_ETH_before));
 
       // to compensate borrowing fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
@@ -4332,9 +4332,9 @@ contract("BorrowerOperations", async accounts => {
 
       // Check after
       const activePool_ETH_After = await activePool.getETH();
-      const activePool_RawEther_After = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_After.eq(dennisColl));
-      assert.isTrue(activePool_RawEther_After.eq(dennisColl));
+      assert.isTrue(activePool_RawBTC_After.eq(dennisColl));
     });
 
     it("closeTrove(): reduces ActivePool debt by correct amount", async () => {
@@ -5873,11 +5873,11 @@ contract("BorrowerOperations", async accounts => {
       assert.equal(listIsEmpty_After, false);
     });
 
-    it("openTrove(): Increases the activePool ETH and raw ether balance by correct amount", async () => {
+    it("openTrove(): Increases the activePool ETH and raw bitcoin balance by correct amount", async () => {
       const activePool_ETH_Before = await activePool.getETH();
-      const activePool_RawEther_Before = await web3.eth.getBalance(activePool.address);
+      const activePool_RawBTC_Before = await web3.eth.getBalance(activePool.address);
       assert.equal(activePool_ETH_Before, 0);
-      assert.equal(activePool_RawEther_Before, 0);
+      assert.equal(activePool_RawBTC_Before, 0);
 
       await openTrove({
         extraZUSDAmount: toBN(dec(5000, 18)),
@@ -5887,9 +5887,9 @@ contract("BorrowerOperations", async accounts => {
       const aliceCollAfter = await getTroveEntireColl(alice);
 
       const activePool_ETH_After = await activePool.getETH();
-      const activePool_RawEther_After = toBN(await web3.eth.getBalance(activePool.address));
+      const activePool_RawBTC_After = toBN(await web3.eth.getBalance(activePool.address));
       assert.isTrue(activePool_ETH_After.eq(aliceCollAfter));
-      assert.isTrue(activePool_RawEther_After.eq(aliceCollAfter));
+      assert.isTrue(activePool_RawBTC_After.eq(aliceCollAfter));
     });
 
     it("openTrove(): records up-to-date initial snapshots of L_ETH and L_ZUSDDebt", async () => {
@@ -5911,14 +5911,14 @@ contract("BorrowerOperations", async accounts => {
       // price drops to 1ETH:100ZUSD, reducing Carol's ICR below MCR
       await priceFeed.setPrice(dec(100, 18));
 
-      // close Carol's Trove, liquidating her 1 ether and 180ZUSD.
+      // close Carol's Trove, liquidating her 1 bitcoin and 180ZUSD.
       const liquidationTx = await troveManager.liquidate(carol, { from: owner });
       const [liquidatedDebt, liquidatedColl, gasComp] = th.getEmittedLiquidationValues(
         liquidationTx
       );
 
-      /* with total stakes = 10 ether, after liquidation, L_ETH should equal 1/10 ether per-ether-staked,
-       and L_ZUSD should equal 18 ZUSD per-ether-staked. */
+      /* with total stakes = 10 bitcoin, after liquidation, L_ETH should equal 1/10 bitcoin per-bitcoin-staked,
+       and L_ZUSD should equal 18 ZUSD per-bitcoin-staked. */
 
       const L_ETH = await troveManager.L_ETH();
       const L_ZUSD = await troveManager.L_ZUSDDebt();

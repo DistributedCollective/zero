@@ -138,7 +138,7 @@ const config: HardhatUserConfig = {
       gas: 13e6, // tx gas limit
       blockGasLimit: 13e6,
 
-      // Let Ethers throw instead of Buidler EVM
+      // Let Ethers throw instead of Hardhat EVM
       // This is closer to what will happen in production
       throwOnCallFailures: false,
       throwOnTransactionFailures: false

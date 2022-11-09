@@ -62,7 +62,7 @@ interface IBorrowerOperations {
     ) external;
 
     /**
-     * @notice payable function that creates a Trove for the caller with the requested debt, and the Ether received as collateral.
+     * @notice payable function that creates a Trove for the caller with the requested debt, and the Bitcoin received as collateral.
      * Successful execution is conditional mainly on the resulting collateralization ratio which must exceed the minimum (110% in Normal Mode, 150% in Recovery Mode).
      * In addition to the requested debt, extra debt is issued to pay the issuance fee, and cover the gas compensation.
      * The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee.
@@ -79,7 +79,7 @@ interface IBorrowerOperations {
     ) external payable;
 
     /**
-     * @notice payable function that creates a Trove for the caller with the requested debt, and the Ether received as collateral.
+     * @notice payable function that creates a Trove for the caller with the requested debt, and the Bitcoin received as collateral.
      * Successful execution is conditional mainly on the resulting collateralization ratio which must exceed the minimum (110% in Normal Mode, 150% in Recovery Mode).
      * In addition to the requested debt, extra debt is issued to pay the issuance fee, and cover the gas compensation.
      * The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee.
@@ -96,7 +96,7 @@ interface IBorrowerOperations {
         address _lowerHint
     ) external payable;
 
-    /// @notice payable function that adds the received Ether to the caller's active Trove.
+    /// @notice payable function that adds the received Bitcoin to the caller's active Trove.
     /// @param _upperHint upper trove id hint
     /// @param _lowerHint lower trove id hint
     function addColl(address _upperHint, address _lowerHint) external payable;

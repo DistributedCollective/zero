@@ -66,7 +66,7 @@ interface IStabilityPool {
     event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
     event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
     event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
-    event EtherSent(address _to, uint _amount);
+    event BTCSent(address _to, uint _amount);
 
     // --- Functions ---
 

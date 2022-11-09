@@ -1010,7 +1010,7 @@ it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 
   await borrowerOperations.openTrove(0, 0,  accounts[99], { from: accounts[99], value: dec(100, 'ether') })
   await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
-  // Troves open with 100-200 million ether
+  // Troves open with 100-200 million bitcoin
   await th.openTrove_allAccounts_randomETH(100000000, 200000000, accounts.slice(1, 10), contracts, dec(170, 18))
 
   await priceFeed.setPrice(dec(100, 18))
@@ -1047,7 +1047,7 @@ it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 50
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1000, 'ether') })
   await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], { from: accounts[0], value: dec(1, 'ether') })
 
-   // Troves open with 100-200 million ether
+   // Troves open with 100-200 million bitcoin
   await th.openTrove_allAccounts_randomETH(100000000, 200000000, accounts.slice(1, 100), contracts, dec(170, 18))
 
   await priceFeed.setPrice(dec(100, 18))
@@ -1082,7 +1082,7 @@ it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 50
 it("11 accounts with random ETH and proportional ZUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
   await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1, 27) })
 
-  // Troves open with 100-200 million ether and proportional ZUSD Debt
+  // Troves open with 100-200 million bitcoin and proportional ZUSD Debt
   await th.openTrove_allAccounts_randomETH_ProportionalZUSD(100000000, 200000000, accounts.slice(0, 11), contracts, 180)
 
   await priceFeed.setPrice(dec(100, 18))
@@ -1125,7 +1125,7 @@ it("11 accounts with random ETH and proportional ZUSD (180:1). 10 liquidations. 
   it("101 accounts with random ETH and proportional ZUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
     await borrowerOperations.openTrove(0, 0,  accounts[999], { from: accounts[999], value: dec(1, 28) })
 
-    // Troves open with 100-200 million ether and proportional ZUSD Debt
+    // Troves open with 100-200 million bitcoin and proportional ZUSD Debt
     await th.openTrove_allAccounts_randomETH_ProportionalZUSD(100000000, 200000000, accounts.slice(0, 101), contracts, 180)
 
     await priceFeed.setPrice(dec(100, 18))
