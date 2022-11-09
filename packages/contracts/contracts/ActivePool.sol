@@ -10,16 +10,16 @@ import "./ActivePoolStorage.sol";
 
 /**
  * @title Active Pool
- * @notice The Active Pool holds the BTC collateral and ZUSD debt (but not ZUSD tokens) for all active troves.
+ * @notice The Active Pool holds the BTC collateral and ZUSD debt (but not ZUSD tokens) for all active locs.
  * 
- * When a trove is liquidated, it's BTC and ZUSD debt are transferred from the Active Pool, to either the
+ * When a LoC is liquidated, it's BTC and ZUSD debt are transferred from the Active Pool, to either the
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  */
 contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     using SafeMath for uint256;
     // --- Events ---
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolZUSDDebtUpdated(uint _ZUSDDebt);
     event ActivePoolBTCBalanceUpdated(uint _BTC);
 
@@ -27,27 +27,27 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @notice initializer function that sets required addresses
     /// @dev Checks addresses are contracts. Only callable by contract owner.
     /// @param _borrowerOperationsAddress BorrowerOperations contract address
-    /// @param _troveManagerAddress TroveManager contract address
+    /// @param _locManagerAddress LoCManager contract address
     /// @param _stabilityPoolAddress StabilityPool contract address
     /// @param _defaultPoolAddress DefaultPool contract address
     function setAddresses(
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _stabilityPoolAddress,
         address _defaultPoolAddress
     ) external onlyOwner {
         checkContract(_borrowerOperationsAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_defaultPoolAddress);
 
         borrowerOperationsAddress = _borrowerOperationsAddress;
-        troveManagerAddress = _troveManagerAddress;
+        locManagerAddress = _locManagerAddress;
         stabilityPoolAddress = _stabilityPoolAddress;
         defaultPoolAddress = _defaultPoolAddress;
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
 
@@ -70,11 +70,11 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     // --- Pool functionality ---
 
-    /// @notice Send BTC amount to given account. Updates ActivePool balance. Only callable by BorrowerOperations, TroveManager or StabilityPool.
+    /// @notice Send BTC amount to given account. Updates ActivePool balance. Only callable by BorrowerOperations, LoCManager or StabilityPool.
     /// @param _account account to receive the BTC amount
     /// @param _amount BTC amount to send
     function sendBTC(address _account, uint _amount) external override {
-        _requireCallerIsBOorTroveMorSP();
+        _requireCallerIsBOorLoCMorSP();
         BTC = BTC.sub(_amount);
         emit ActivePoolBTCBalanceUpdated(BTC);
         emit BTCSent(_account, _amount);
@@ -83,18 +83,18 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         require(success, "ActivePool: sending BTC failed");
     }
 
-    /// @notice Increases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
+    /// @notice Increases ZUSD debt of the active pool. Only callable by BorrowerOperations, LoCManager or StabilityPool.
     /// @param _amount ZUSD amount to add to the pool debt
     function increaseZUSDDebt(uint _amount) external override {
-        _requireCallerIsBOorTroveM();
+        _requireCallerIsBOorLoCM();
         ZUSDDebt = ZUSDDebt.add(_amount);
         ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
 
-    /// @notice Decreases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
+    /// @notice Decreases ZUSD debt of the active pool. Only callable by BorrowerOperations, LoCManager or StabilityPool.
     /// @param _amount ZUSD amount to sub to the pool debt
     function decreaseZUSDDebt(uint _amount) external override {
-        _requireCallerIsBOorTroveMorSP();
+        _requireCallerIsBOorLoCMorSP();
         ZUSDDebt = ZUSDDebt.sub(_amount);
         ActivePoolZUSDDebtUpdated(ZUSDDebt);
     }
@@ -108,19 +108,19 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         );
     }
 
-    function _requireCallerIsBOorTroveMorSP() internal view {
+    function _requireCallerIsBOorLoCMorSP() internal view {
         require(
             msg.sender == borrowerOperationsAddress ||
-                msg.sender == troveManagerAddress ||
+                msg.sender == locManagerAddress ||
                 msg.sender == stabilityPoolAddress,
-            "ActivePool: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+            "ActivePool: Caller is neither BorrowerOperations nor LoCManager nor StabilityPool"
         );
     }
 
-    function _requireCallerIsBOorTroveM() internal view {
+    function _requireCallerIsBOorLoCM() internal view {
         require(
-            msg.sender == borrowerOperationsAddress || msg.sender == troveManagerAddress,
-            "ActivePool: Caller is neither BorrowerOperations nor TroveManager"
+            msg.sender == borrowerOperationsAddress || msg.sender == locManagerAddress,
+            "ActivePool: Caller is neither BorrowerOperations nor LoCManager"
         );
     }
 

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-import "@sovryn-zero/contracts/contracts/Interfaces/ITroveManager.sol";
+import "@sovryn-zero/contracts/contracts/Interfaces/ILoCManager.sol";
 
 /// @title ZERO-SDK Liquidation Lib
-/// @notice Library containing view functions regarding troves
-library TroveStatisticsLib {
+/// @notice Library containing view functions regarding locs
+library LoCStatisticsLib {
     modifier isContractAddress(address contractAddress) {
         uint256 size;
         assembly {
@@ -15,28 +15,28 @@ library TroveStatisticsLib {
         _;
     }
 
-    /// @return collateralRatio the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
-    /// @param troveManagerContractAddress address of TroveManager contract
-    function getNominalICR(address troveManagerContractAddress, address _borrower)
+    /// @return collateralRatio the nominal collateral ratio (ICR) of a given LoC, without the price. Takes a LoC's pending coll and debt rewards from redistributions into account.
+    /// @param locManagerContractAddress address of LoCManager contract
+    function getNominalICR(address locManagerContractAddress, address _borrower)
         internal
         view
-        isContractAddress(troveManagerContractAddress)
+        isContractAddress(locManagerContractAddress)
         returns (uint256 collateralRatio)
     {
-        ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
-        return troveManager.getNominalICR(_borrower);
+        ILoCManager locManager = ILoCManager(locManagerContractAddress);
+        return locManager.getNominalICR(_borrower);
     }
 
-    /// @param troveManagerContractAddress address of TroveManager contract
+    /// @param locManagerContractAddress address of LoCManager contract
     /// @param _borrower address of the borrower
-    /// @return debt of the troves of borrower
-    /// @return coll collateral of the troves of the borrower
+    /// @return debt of the locs of borrower
+    /// @return coll collateral of the locs of the borrower
     /// @return pendingZUSDDebtReward sum of all ZUSD pending rewards from redistributions
     /// @return pendingRBTCReward sum of all RBTC pending rewards from redistributions
-    function getEntireDebtAndColl(address troveManagerContractAddress, address _borrower)
+    function getEntireDebtAndColl(address locManagerContractAddress, address _borrower)
         internal
         view
-        isContractAddress(troveManagerContractAddress)
+        isContractAddress(locManagerContractAddress)
         returns (
             uint256 debt,
             uint256 coll,
@@ -44,20 +44,20 @@ library TroveStatisticsLib {
             uint256 pendingRBTCReward
         )
     {
-        ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
-        return troveManager.getEntireDebtAndColl(_borrower);
+        ILoCManager locManager = ILoCManager(locManagerContractAddress);
+        return locManager.getEntireDebtAndColl(_borrower);
     }
 
-    /// @param troveManagerContractAddress address of TroveManager contract
+    /// @param locManagerContractAddress address of LoCManager contract
     /// @param _ZUSDDebt debt parameter for which a fee will be calculated against
     /// @return borrowingFee calculated borrowing fee for the corresponding debt
-    function calculateBorrowingFee(address troveManagerContractAddress, uint256 _ZUSDDebt)
+    function calculateBorrowingFee(address locManagerContractAddress, uint256 _ZUSDDebt)
         internal
         view
-        isContractAddress(troveManagerContractAddress)
+        isContractAddress(locManagerContractAddress)
         returns (uint256 borrowingFee)
     {
-        ITroveManager troveManager = ITroveManager(troveManagerContractAddress);
-        return troveManager.getBorrowingFee(_ZUSDDebt);
+        ILoCManager locManager = ILoCManager(locManagerContractAddress);
+        return locManager.getBorrowingFee(_ZUSDDebt);
     }
 }

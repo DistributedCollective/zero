@@ -1,13 +1,13 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "TroveManagerScript",
-  "sourceName": "contracts/Proxy/TroveManagerScript.sol",
+  "contractName": "LoCManagerScript",
+  "sourceName": "contracts/Proxy/LoCManagerScript.sol",
   "abi": [
     {
       "inputs": [
         {
-          "internalType": "contract ITroveManager",
-          "name": "_troveManager",
+          "internalType": "contract ILoCManager",
+          "name": "_locManager",
           "type": "address"
         }
       ],

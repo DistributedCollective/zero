@@ -17,7 +17,7 @@ module.exports = {
 
   skipFiles: [
     "TestContracts/",
-    "MultiTroveGetter.sol",
+    "MultiLoCGetter.sol",
     "Migrations.sol",
     "Interfaces/",
     "LPRewards/Dependencies/",

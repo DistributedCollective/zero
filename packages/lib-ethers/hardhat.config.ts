@@ -261,7 +261,7 @@ type SetAddressParams = {
 
 const defaultChannel = process.env.CHANNEL || "default";
 
-task("setMassetAddress", "Sets address of masset contract in order to support NUE troves")
+task("setMassetAddress", "Sets address of masset contract in order to support NUE locs")
   .addParam("address", "address of deployed MassetProxy contract")
   .addParam("nuetokenaddress", "address of NUE token")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
@@ -463,7 +463,7 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     const deployment = getDeploymentData(hre.network.name, channel);
     const {
       zusdToken: zusdTokenAddress,
-      troveManager: troveManagerAddress,
+      locManager: locManagerAddress,
       stabilityPool: stabilityPoolAddress,
       borrowerOperations: borrowerOperationsAddress
     } = deployment.addresses;
@@ -489,7 +489,7 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
       deployer
     )) as unknown) as ZUSDToken;
     //call initialize on the new zusdToken by calling proxy
-    await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+    await zusdToken.initialize(locManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
 
     const oldZUSDAddress = await zusdTokenProxy.getImplementation();
     console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);

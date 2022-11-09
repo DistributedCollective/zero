@@ -1,23 +1,23 @@
 import { Decimal } from "./Decimal";
-import { Trove, TroveWithPendingRedistribution } from "./Trove";
+import { LoC, LoCWithPendingRedistribution } from "./LoC";
 import { StabilityDeposit } from "./StabilityDeposit";
 
 /** @alpha */
 export interface ObservableZero {
   watchTotalRedistributed(
-    onTotalRedistributedChanged: (totalRedistributed: Trove) => void
+    onTotalRedistributedChanged: (totalRedistributed: LoC) => void
   ): () => void;
 
-  watchTroveWithoutRewards(
-    onTroveChanged: (trove: TroveWithPendingRedistribution) => void,
+  watchLoCWithoutRewards(
+    onLoCChanged: (loc: LoCWithPendingRedistribution) => void,
     address?: string
   ): () => void;
 
-  watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
+  watchNumberOfLoCs(onNumberOfLoCsChanged: (numberOfLoCs: number) => void): () => void;
 
   watchPrice(onPriceChanged: (price: Decimal) => void): () => void;
 
-  watchTotal(onTotalChanged: (total: Trove) => void): () => void;
+  watchTotal(onTotalChanged: (total: LoC) => void): () => void;
 
   watchStabilityDeposit(
     onStabilityDepositChanged: (stabilityDeposit: StabilityDeposit) => void,

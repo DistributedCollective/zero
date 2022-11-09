@@ -1,6 +1,6 @@
 const { red, blue, green, yellow, dim, bold } = require("chalk");
 const { Wallet, providers } = require("ethers");
-const { Decimal, UserTrove, ZUSD_LIQUIDATION_RESERVE } = require("@sovryn-zero/lib-base");
+const { Decimal, UserLoC, ZUSD_LIQUIDATION_RESERVE } = require("@sovryn-zero/lib-base");
 const { EthersZero, EthersZeroWithStore } = require("@sovryn-zero/lib-ethers");
 
 function log(message) {
@@ -35,13 +35,13 @@ async function main() {
 
 /**
  * @param {Decimal} [price]
- * @returns {(trove: UserTrove) => boolean}
+ * @returns {(loc: UserLoC) => boolean}
  */
-const underCollateralized = price => trove => trove.collateralRatioIsBelowMinimum(price);
+const underCollateralized = price => loc => loc.collateralRatioIsBelowMinimum(price);
 
 /**
- * @param {UserTrove}
- * @param {UserTrove}
+ * @param {UserLoC}
+ * @param {UserLoC}
  */
 const byDescendingCollateral = ({ collateral: a }, { collateral: b }) =>
   b.gt(a) ? 1 : b.lt(a) ? -1 : 0;
@@ -52,37 +52,37 @@ const byDescendingCollateral = ({ collateral: a }, { collateral: b }) =>
 async function tryToLiquidate(zero) {
   const { store } = zero;
 
-  const [gasPrice, riskiestTroves] = await Promise.all([
+  const [gasPrice, riskiestLoCs] = await Promise.all([
     zero.connection.provider.getGasPrice().then(bn => Decimal.fromBigNumberString(bn.toHexString())),
 
-    zero.getTroves({
+    zero.getLoCs({
       first: 1000,
       sortedBy: "ascendingCollateralRatio"
     })
   ]);
 
-  const troves = riskiestTroves
+  const locs = riskiestLoCs
     .filter(underCollateralized(store.state.price))
     .sort(byDescendingCollateral)
     .slice(0, 40);
 
-  if (troves.length === 0) {
+  if (locs.length === 0) {
     // Nothing to liquidate
     return;
   }
 
-  const addresses = troves.map(trove => trove.ownerAddress);
+  const addresses = locs.map(loc => loc.ownerAddress);
 
   try {
     const liquidation = await zero.populate.liquidate(addresses, { gasPrice: gasPrice.hex });
     const gasLimit = liquidation.rawPopulatedTransaction.gasLimit.toNumber();
     const expectedCost = gasPrice.mul(gasLimit).mul(store.state.price);
 
-    const total = troves.reduce((a, b) => a.add(b));
+    const total = locs.reduce((a, b) => a.add(b));
     const expectedCompensation = total.collateral
       .mul(0.005)
       .mul(store.state.price)
-      .add(ZUSD_LIQUIDATION_RESERVE.mul(troves.length));
+      .add(ZUSD_LIQUIDATION_RESERVE.mul(locs.length));
 
     if (expectedCost.gt(expectedCompensation)) {
       // In reality, the TX cost will be lower than this thanks to storage refunds, but let's be
@@ -94,7 +94,7 @@ async function tryToLiquidate(zero) {
       return;
     }
 
-    info(`Attempting to liquidate ${troves.length} Trove(s)...`);
+    info(`Attempting to liquidate ${locs.length} LoC(s)...`);
 
     const tx = await liquidation.send();
     const receipt = await tx.waitForReceipt();
@@ -116,7 +116,7 @@ async function tryToLiquidate(zero) {
         (totalCompensation.gte(gasCost)
           ? `${green(`$${totalCompensation.sub(gasCost).toString(2)}`)} profit`
           : `${red(`$${gasCost.sub(totalCompensation).toString(2)}`)} loss`) +
-        `) for liquidating ${liquidatedAddresses.length} Trove(s).`
+        `) for liquidating ${liquidatedAddresses.length} LoC(s).`
     );
   } catch (err) {
     error("Unexpected error:");

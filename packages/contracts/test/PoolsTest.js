@@ -133,14 +133,14 @@ contract('ActivePool', async accounts => {
 
 contract('DefaultPool', async accounts => {
  
-  let defaultPool, mockTroveManager, mockActivePool
+  let defaultPool, mockLoCManager, mockActivePool
 
   const [owner, alice] = accounts;
   beforeEach(async () => {
     defaultPool = await DefaultPool.new()
-    mockTroveManager = await NonPayable.new()
+    mockLoCManager = await NonPayable.new()
     mockActivePool = await NonPayable.new()
-    await defaultPool.setAddresses(mockTroveManager.address, mockActivePool.address)
+    await defaultPool.setAddresses(mockLoCManager.address, mockActivePool.address)
   })
 
   it('getBTC(): gets the recorded ZUSD balance', async () => {
@@ -157,9 +157,9 @@ contract('DefaultPool', async accounts => {
     const recordedZUSD_balanceBefore = await defaultPool.getZUSDDebt()
     assert.equal(recordedZUSD_balanceBefore, 0)
 
-    // await defaultPool.increaseZUSDDebt(100, { from: mockTroveManagerAddress })
+    // await defaultPool.increaseZUSDDebt(100, { from: mockLoCManagerAddress })
     const increaseZUSDDebtData = th.getTransactionData('increaseZUSDDebt(uint256)', ['0x64'])
-    const tx = await mockTroveManager.forward(defaultPool.address, increaseZUSDDebtData)
+    const tx = await mockLoCManager.forward(defaultPool.address, increaseZUSDDebtData)
     assert.isTrue(tx.receipt.status)
 
     const recordedZUSD_balanceAfter = await defaultPool.getZUSDDebt()
@@ -168,17 +168,17 @@ contract('DefaultPool', async accounts => {
   
   it('decreaseZUSD(): decreases the recorded ZUSD balance by the correct amount', async () => {
     // start the pool on 100 wei
-    //await defaultPool.increaseZUSDDebt(100, { from: mockTroveManagerAddress })
+    //await defaultPool.increaseZUSDDebt(100, { from: mockLoCManagerAddress })
     const increaseZUSDDebtData = th.getTransactionData('increaseZUSDDebt(uint256)', ['0x64'])
-    const tx1 = await mockTroveManager.forward(defaultPool.address, increaseZUSDDebtData)
+    const tx1 = await mockLoCManager.forward(defaultPool.address, increaseZUSDDebtData)
     assert.isTrue(tx1.receipt.status)
 
     const recordedZUSD_balanceBefore = await defaultPool.getZUSDDebt()
     assert.equal(recordedZUSD_balanceBefore, 100)
 
-    // await defaultPool.decreaseZUSDDebt(100, { from: mockTroveManagerAddress })
+    // await defaultPool.decreaseZUSDDebt(100, { from: mockLoCManagerAddress })
     const decreaseZUSDDebtData = th.getTransactionData('decreaseZUSDDebt(uint256)', ['0x64'])
-    const tx2 = await mockTroveManager.forward(defaultPool.address, decreaseZUSDDebtData)
+    const tx2 = await mockLoCManager.forward(defaultPool.address, decreaseZUSDDebtData)
     assert.isTrue(tx2.receipt.status)
 
     const recordedZUSD_balanceAfter = await defaultPool.getZUSDDebt()
@@ -202,10 +202,10 @@ contract('DefaultPool', async accounts => {
     assert.equal(defaultPool_BalanceBeforeTx, dec(2, 'ether'))
 
     // send bitcoin from pool to alice
-    //await defaultPool.sendBTCToActivePool(dec(1, 'ether'), { from: mockTroveManagerAddress })
+    //await defaultPool.sendBTCToActivePool(dec(1, 'ether'), { from: mockLoCManagerAddress })
     const sendBTCData = th.getTransactionData('sendBTCToActivePool(uint256)', [web3.utils.toHex(dec(1, 'ether'))])
     await mockActivePool.setPayable(true)
-    const tx2 = await mockTroveManager.forward(defaultPool.address, sendBTCData, { from: owner })
+    const tx2 = await mockLoCManager.forward(defaultPool.address, sendBTCData, { from: owner })
     assert.isTrue(tx2.receipt.status)
 
     const defaultPool_BalanceAfterTx = web3.utils.toBN(await web3.eth.getBalance(defaultPool.address))

@@ -5,7 +5,7 @@ const testHelpers = require("../utils/testHelpers.js")
 const timeMachine = require('ganache-time-traveler');
 
 const ZEROStakingTester = artifacts.require('ZEROStakingTester')
-const TroveManagerTester = artifacts.require("TroveManagerTester")
+const LoCManagerTester = artifacts.require("LoCManagerTester")
 const NonPayable = artifacts.require("./NonPayable.sol")
 
 const th = testHelpers.TestHelper
@@ -21,7 +21,7 @@ const ZERO = th.toBN('0')
  * gains are non-zero, occur when they should, and are in correct proportion to the user's stake. 
  *
  * Specific BTC/ZUSD gain values will depend on the final fee schedule used, and the final choices for
- * parameters BETA and MINUTE_DECAY_FACTOR in the TroveManager, which are still TBD based on economic
+ * parameters BETA and MINUTE_DECAY_FACTOR in the LoCManager, which are still TBD based on economic
  * modelling.
  * 
  */ 
@@ -35,8 +35,8 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
     let priceFeed
     let zusdToken
-    let sortedTroves
-    let troveManager
+    let sortedLoCs
+    let locManager
     let activePool
     let stabilityPool
     let defaultPool
@@ -46,11 +46,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
     let contracts
   
-    const openTrove = async (params) => th.openTrove(contracts, params)
+    const openLoC = async (params) => th.openLoC(contracts, params)
   
     before(async () => {
       contracts = await deploymentHelper.deployZeroCore()
-      contracts.troveManager = await TroveManagerTester.new()
+      contracts.locManager = await LoCManagerTester.new()
       contracts = await deploymentHelper.deployZUSDTokenTester(contracts)
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
       
@@ -63,8 +63,8 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       nonPayable = await NonPayable.new() 
       priceFeed = contracts.priceFeedTestnet
       zusdToken = contracts.zusdToken
-      sortedTroves = contracts.sortedTroves
-      troveManager = contracts.troveManager
+      sortedLoCs = contracts.sortedLoCs
+      locManager = contracts.locManager
       activePool = contracts.activePool
       stabilityPool = contracts.stabilityPool
       defaultPool = contracts.defaultPool
@@ -101,10 +101,10 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("ETH fee per ZERO staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -146,11 +146,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("ETH fee per ZERO staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -179,11 +179,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("ZUSD fee per ZERO staked increases when a redemption fee is triggered and totalStakes > 0", async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -207,7 +207,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
       // Check base rate is now non-zero
-      const baseRate = await troveManager.baseRate()
+      const baseRate = await locManager.baseRate()
       assert.isTrue(baseRate.gt(toBN('0')))
   
       // D draws debt
@@ -230,11 +230,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("ZUSD fee per ZERO staked doesn't change when a redemption fee is triggered and totalStakes == 0", async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -254,7 +254,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption))
   
       // Check base rate is now non-zero
-      const baseRate = await troveManager.baseRate()
+      const baseRate = await locManager.baseRate()
       assert.isTrue(baseRate.gt(toBN('0')))
   
       // D draws debt
@@ -270,11 +270,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("ZERO Staking: A single staker earns all BTC and ZERO fees that occur", async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -354,11 +354,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("stake(): Top-up sends out all accumulated BTC and ZUSD gains to the staker", async () => { 
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -438,11 +438,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("getPendingBTCGain(): Returns the staker's correct pending BTC gain", async () => { 
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -489,11 +489,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
   
     it("getPendingZUSDGain(): Returns the staker's correct pending ZUSD gain", async () => { 
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -554,14 +554,14 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
     // - multi depositors, several rewards
     it("ZERO Staking: Multiple stakers earn the correct share of all BTC and ZERO fees, based on their stake size", async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: G } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: E } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: F } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: G } })
   
       // FF time one year so owner can transfer ZERO
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
@@ -737,11 +737,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
     })
    
     it("unstake(): reverts if caller has BTC gains and can't receive ETH",  async () => {
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })  
-      await openTrove({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
-      await openTrove({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
-      await openTrove({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })  
+      await openLoC({ extraZUSDAmount: toBN(dec(20000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(30000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(40000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } })
+      await openLoC({ extraZUSDAmount: toBN(dec(50000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: D } })
   
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider)
   
@@ -789,7 +789,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       await assertRevert(unstakeTxPromise2)
     })
   
-    it('Test requireCallerIsTroveManager', async () => {
+    it('Test requireCallerIsLoCManager', async () => {
       const zeroStakingTester = await ZEROStakingTester.new()
       await assertRevert(zeroStakingTester.requireCallerIsFeeDistributor(), 'ZEROStaking: caller is not FeeDistributor')
     })

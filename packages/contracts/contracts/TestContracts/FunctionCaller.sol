@@ -2,33 +2,33 @@
 
 pragma solidity 0.6.11;
 
-import "../Interfaces/ITroveManager.sol";
-import "../Interfaces/ISortedTroves.sol";
+import "../Interfaces/ILoCManager.sol";
+import "../Interfaces/ISortedLoCs.sol";
 import "../Interfaces/IPriceFeed.sol";
 import "../Dependencies/ZeroMath.sol";
 
 /* Wrapper contract - used for calculating gas of read-only and internal functions. 
 Not part of the Zero application. */
 contract FunctionCaller {
-    ITroveManager troveManager;
-    address public troveManagerAddress;
+    ILoCManager locManager;
+    address public locManagerAddress;
 
-    ISortedTroves sortedTroves;
-    address public sortedTrovesAddress;
+    ISortedLoCs sortedLoCs;
+    address public sortedLoCsAddress;
 
     IPriceFeed priceFeed;
     address public priceFeedAddress;
 
     // --- Dependency setters ---
 
-    function setTroveManagerAddress(address _troveManagerAddress) external {
-        troveManagerAddress = _troveManagerAddress;
-        troveManager = ITroveManager(_troveManagerAddress);
+    function setLoCManagerAddress(address _locManagerAddress) external {
+        locManagerAddress = _locManagerAddress;
+        locManager = ILoCManager(_locManagerAddress);
     }
 
-    function setSortedTrovesAddress(address _sortedTrovesAddress) external {
-        troveManagerAddress = _sortedTrovesAddress;
-        sortedTroves = ISortedTroves(_sortedTrovesAddress);
+    function setSortedLoCsAddress(address _sortedLoCsAddress) external {
+        locManagerAddress = _sortedLoCsAddress;
+        sortedLoCs = ISortedLoCs(_sortedLoCsAddress);
     }
 
     function setPriceFeedAddress(address _priceFeedAddress) external {
@@ -38,18 +38,18 @@ contract FunctionCaller {
 
     // --- Non-view wrapper functions used for calculating gas ---
 
-    function troveManager_getCurrentICR(address _address, uint256 _price)
+    function locManager_getCurrentICR(address _address, uint256 _price)
         external
         returns (uint256)
     {
-        return troveManager.getCurrentICR(_address, _price);
+        return locManager.getCurrentICR(_address, _price);
     }
 
-    function sortedTroves_findInsertPosition(
+    function sortedLoCs_findInsertPosition(
         uint256 _NICR,
         address _prevId,
         address _nextId
     ) external returns (address, address) {
-        return sortedTroves.findInsertPosition(_NICR, _prevId, _nextId);
+        return sortedLoCs.findInsertPosition(_NICR, _prevId, _nextId);
     }
 }

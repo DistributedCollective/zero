@@ -207,11 +207,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_troveManager",
+          "name": "_locManager",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressSet",
+      "name": "LoCManagerAddressSet",
       "type": "event"
     },
     {
@@ -422,7 +422,7 @@
         },
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         },
         {
@@ -512,7 +512,7 @@
     },
     {
       "inputs": [],
-      "name": "troveManagerAddress",
+      "name": "locManagerAddress",
       "outputs": [
         {
           "internalType": "address",

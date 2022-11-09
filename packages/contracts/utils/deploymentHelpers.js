@@ -1,8 +1,8 @@
 const { artifacts } = require("hardhat");
-const SortedTroves = artifacts.require("./SortedTroves.sol");
+const SortedLoCs = artifacts.require("./SortedLoCs.sol");
 const ZeroBaseParams = artifacts.require("./ZeroBaseParams.sol");
-const TroveManagerRedeemOps = artifacts.require("./Dependencies/TroveManagerRedeemOps.sol");
-const TroveManager = artifacts.require("./TroveManager.sol");
+const LoCManagerRedeemOps = artifacts.require("./Dependencies/LoCManagerRedeemOps.sol");
+const LoCManager = artifacts.require("./LoCManager.sol");
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
 const ZUSDToken = artifacts.require("./ZUSDToken.sol");
 const ActivePool = artifacts.require("./ActivePool.sol");
@@ -27,7 +27,7 @@ const ActivePoolTester = artifacts.require("./ActivePoolTester.sol");
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol");
 const ZeroMathTester = artifacts.require("./ZeroMathTester.sol");
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol");
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
+const LoCManagerTester = artifacts.require("./LoCManagerTester.sol");
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol");
 const WRBTCTokenTester = artifacts.require("./WRBTCTokenTester.sol");
 
@@ -39,7 +39,7 @@ const NonPayable = artifacts.require("./NonPayable.sol");
 // Proxy scripts
 const BorrowerOperationsScript = artifacts.require("BorrowerOperationsScript");
 const BorrowerWrappersScript = artifacts.require("BorrowerWrappersScript");
-const TroveManagerScript = artifacts.require("TroveManagerScript");
+const LoCManagerScript = artifacts.require("LoCManagerScript");
 const StabilityPoolScript = artifacts.require("StabilityPoolScript");
 const TokenScript = artifacts.require("TokenScript");
 const ZEROStakingScript = artifacts.require("ZEROStakingScript");
@@ -48,9 +48,9 @@ const {
   buildUserProxies,
   BorrowerOperationsProxy,
   BorrowerWrappersProxy,
-  TroveManagerProxy,
+  LoCManagerProxy,
   StabilityPoolProxy,
-  SortedTrovesProxy,
+  SortedLoCsProxy,
   TokenProxy,
   ZEROStakingProxy,
   FeeDistributorProxy
@@ -95,10 +95,10 @@ class DeploymentHelper {
 
   static async deployZeroCoreHardhat() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
-    const sortedTroves = await SortedTroves.new();
+    const sortedLoCs = await SortedLoCs.new();
     const zeroBaseParams = await ZeroBaseParams.new();
-    const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    const troveManager = await TroveManager.new();
+    const locManagerRedeemOps = await LoCManagerRedeemOps.new();
+    const locManager = await LoCManager.new();
     const activePool = await ActivePool.new();
     const stabilityPool = await StabilityPool.new();
     const gasPool = await GasPool.new();
@@ -111,7 +111,7 @@ class DeploymentHelper {
     const feeDistributor = await FeeDistributor.new();
     const wrbtcTokenTester = await WRBTCTokenTester.new();
     await zusdToken.initialize(
-      troveManager.address,
+      locManager.address,
       stabilityPool.address,
       borrowerOperations.address
     );
@@ -119,10 +119,10 @@ class DeploymentHelper {
     ZUSDToken.setAsDeployed(zusdToken);
     DefaultPool.setAsDeployed(defaultPool);
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet);
-    SortedTroves.setAsDeployed(sortedTroves);
+    SortedLoCs.setAsDeployed(sortedLoCs);
     ZeroBaseParams.setAsDeployed(zeroBaseParams);
-    TroveManagerRedeemOps.setAsDeployed(troveManagerRedeemOps);
-    TroveManager.setAsDeployed(troveManager);
+    LoCManagerRedeemOps.setAsDeployed(locManagerRedeemOps);
+    LoCManager.setAsDeployed(locManager);
     ActivePool.setAsDeployed(activePool);
     StabilityPool.setAsDeployed(stabilityPool);
     GasPool.setAsDeployed(gasPool);
@@ -136,10 +136,10 @@ class DeploymentHelper {
     const coreContracts = {
       priceFeedTestnet,
       zusdToken,
-      sortedTroves,
+      sortedLoCs,
       zeroBaseParams,
-      troveManagerRedeemOps,
-      troveManager,
+      locManagerRedeemOps,
+      locManager,
       activePool,
       stabilityPool,
       gasPool,
@@ -160,7 +160,7 @@ class DeploymentHelper {
     // Contract without testers (yet)
     testerContracts.zeroBaseParams = await ZeroBaseParams.new();
     testerContracts.priceFeedTestnet = await PriceFeedTestnet.new();
-    testerContracts.sortedTroves = await SortedTroves.new();
+    testerContracts.sortedLoCs = await SortedLoCs.new();
     // Actual tester contracts
     testerContracts.communityIssuance = await CommunityIssuanceTester.new();
     testerContracts.activePool = await ActivePoolTester.new();
@@ -170,12 +170,12 @@ class DeploymentHelper {
     testerContracts.collSurplusPool = await CollSurplusPool.new();
     testerContracts.math = await ZeroMathTester.new();
     testerContracts.borrowerOperations = await BorrowerOperationsTester.new();
-    testerContracts.troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    testerContracts.troveManager = await TroveManagerTester.new();
+    testerContracts.locManagerRedeemOps = await LoCManagerRedeemOps.new();
+    testerContracts.locManager = await LoCManagerTester.new();
     testerContracts.functionCaller = await FunctionCaller.new();
     testerContracts.hintHelpers = await HintHelpers.new();
     testerContracts.zusdToken = await ZUSDTokenTester.new(
-      testerContracts.troveManager.address,
+      testerContracts.locManager.address,
       testerContracts.stabilityPool.address,
       testerContracts.borrowerOperations.address
     );
@@ -252,10 +252,10 @@ class DeploymentHelper {
 
   static async deployZeroCoreTruffle() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
-    const sortedTroves = await SortedTroves.new();
+    const sortedLoCs = await SortedLoCs.new();
     const zeroBaseParams = await ZeroBaseParams.new();
-    const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    const troveManager = await TroveManager.new();
+    const locManagerRedeemOps = await LoCManagerRedeemOps.new();
+    const locManager = await LoCManager.new();
     const activePool = await ActivePool.new();
     const stabilityPool = await StabilityPool.new();
     const gasPool = await GasPool.new();
@@ -267,7 +267,7 @@ class DeploymentHelper {
     const zusdToken = await ZUSDToken.new();
     const feeDistributor = await FeeDistributor.new();
     await zusdToken.initialize(
-      troveManager.address,
+      locManager.address,
       stabilityPool.address,
       borrowerOperations.address
     );
@@ -275,10 +275,10 @@ class DeploymentHelper {
     const coreContracts = {
       priceFeedTestnet,
       zusdToken,
-      sortedTroves,
+      sortedLoCs,
       zeroBaseParams,
-      troveManagerRedeemOps,
-      troveManager,
+      locManagerRedeemOps,
+      locManager,
       activePool,
       stabilityPool,
       gasPool,
@@ -317,7 +317,7 @@ class DeploymentHelper {
   static async deployZUSDToken(contracts) {
     contracts.zusdToken = await ZUSDToken.new();
     await contracts.zusdToken.initialize(
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     );
@@ -326,7 +326,7 @@ class DeploymentHelper {
 
   static async deployZUSDTokenTester(contracts) {
     contracts.zusdToken = await ZUSDTokenTester.new(
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     );
@@ -338,7 +338,7 @@ class DeploymentHelper {
 
     const borrowerWrappersScript = await BorrowerWrappersScript.new(
       contracts.borrowerOperations.address,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       ZEROContracts.zeroStaking.address,
       contracts.stabilityPool.address,
       contracts.priceFeedTestnet.address,
@@ -361,12 +361,12 @@ class DeploymentHelper {
       contracts.borrowerOperations
     );
 
-    const troveManagerScript = await TroveManagerScript.new(contracts.troveManager.address);
-    contracts.troveManager = new TroveManagerProxy(
+    const locManagerScript = await LoCManagerScript.new(contracts.locManager.address);
+    contracts.locManager = new LoCManagerProxy(
       owner,
       proxies,
-      troveManagerScript.address,
-      contracts.troveManager
+      locManagerScript.address,
+      contracts.locManager
     );
 
     const stabilityPoolScript = await StabilityPoolScript.new(contracts.stabilityPool.address);
@@ -377,7 +377,7 @@ class DeploymentHelper {
       contracts.stabilityPool
     );
 
-    contracts.sortedTroves = new SortedTrovesProxy(owner, proxies, contracts.sortedTroves);
+    contracts.sortedLoCs = new SortedLoCsProxy(owner, proxies, contracts.sortedLoCs);
 
     const zusdTokenScript = await TokenScript.new(contracts.zusdToken.address);
     contracts.zusdToken = new TokenProxy(
@@ -406,21 +406,21 @@ class DeploymentHelper {
 
   // Connect contracts to their dependencies
   static async connectCoreContracts(contracts, ZEROContracts) {
-    // set TroveManager addr in SortedTroves
-    await contracts.sortedTroves.setParams(
+    // set LoCManager addr in SortedLoCs
+    await contracts.sortedLoCs.setParams(
       maxBytes32,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.borrowerOperations.address
     );
 
     // set contract addresses in the FunctionCaller
-    await contracts.functionCaller.setTroveManagerAddress(contracts.troveManager.address);
-    await contracts.functionCaller.setSortedTrovesAddress(contracts.sortedTroves.address);
+    await contracts.functionCaller.setLoCManagerAddress(contracts.locManager.address);
+    await contracts.functionCaller.setSortedLoCsAddress(contracts.sortedLoCs.address);
 
-    // set contracts in the Trove Manager
-    await contracts.troveManager.setAddresses(
+    // set contracts in the LoC Manager
+    await contracts.locManager.setAddresses(
       contracts.feeDistributor.address,
-      contracts.troveManagerRedeemOps.address,
+      contracts.locManagerRedeemOps.address,
       contracts.zeroBaseParams.address,
       contracts.borrowerOperations.address,
       contracts.activePool.address,
@@ -430,7 +430,7 @@ class DeploymentHelper {
       contracts.collSurplusPool.address,
       contracts.priceFeedTestnet.address,
       contracts.zusdToken.address,
-      contracts.sortedTroves.address,
+      contracts.sortedLoCs.address,
       ZEROContracts.zeroToken.address,
       ZEROContracts.zeroStaking.address
     );
@@ -439,14 +439,14 @@ class DeploymentHelper {
     await contracts.borrowerOperations.setAddresses(
       contracts.feeDistributor.address,
       contracts.zeroBaseParams.address,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.activePool.address,
       contracts.defaultPool.address,
       contracts.stabilityPool.address,
       contracts.gasPool.address,
       contracts.collSurplusPool.address,
       contracts.priceFeedTestnet.address,
-      contracts.sortedTroves.address,
+      contracts.sortedLoCs.address,
       contracts.zusdToken.address,
       ZEROContracts.zeroStaking.address
     );
@@ -456,7 +456,7 @@ class DeploymentHelper {
       ZEROContracts.mockFeeSharingProxy.address,
       ZEROContracts.zeroStaking.address,
       contracts.borrowerOperations.address,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.wrbtcTokenTester.address,
       contracts.zusdToken.address,
       contracts.activePool.address
@@ -466,37 +466,37 @@ class DeploymentHelper {
     await contracts.stabilityPool.setAddresses(
       contracts.zeroBaseParams.address,
       contracts.borrowerOperations.address,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.activePool.address,
       contracts.zusdToken.address,
-      contracts.sortedTroves.address,
+      contracts.sortedLoCs.address,
       contracts.priceFeedTestnet.address,
       ZEROContracts.communityIssuance.address
     );
 
     await contracts.activePool.setAddresses(
       contracts.borrowerOperations.address,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.stabilityPool.address,
       contracts.defaultPool.address
     );
 
     await contracts.defaultPool.setAddresses(
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.activePool.address
     );
 
     await contracts.collSurplusPool.setAddresses(
       contracts.borrowerOperations.address,
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.activePool.address
     );
 
     // set contracts in HintHelpers
     await contracts.hintHelpers.setAddresses(
       contracts.zeroBaseParams.address,
-      contracts.sortedTroves.address,
-      contracts.troveManager.address
+      contracts.sortedLoCs.address,
+      contracts.locManager.address
     );
   }
 

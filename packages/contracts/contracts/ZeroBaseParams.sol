@@ -12,7 +12,7 @@ import "./Dependencies/Initializable.sol";
 contract ZeroBaseParams is IZeroBaseParams, Ownable, Initializable, BaseMath {
     using SafeMath for uint256;
 
-    /// Minimum collateral ratio for individual troves
+    /// Minimum collateral ratio for individual locs
     uint256 public override MCR;
 
     /// Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.

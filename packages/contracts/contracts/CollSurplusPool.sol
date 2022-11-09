@@ -14,7 +14,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint _newBalance);
@@ -24,7 +24,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     function setAddresses(
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress
     )
         external
@@ -32,15 +32,15 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         onlyOwner
     {
         checkContract(_borrowerOperationsAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_activePoolAddress);
 
         borrowerOperationsAddress = _borrowerOperationsAddress;
-        troveManagerAddress = _troveManagerAddress;
+        locManagerAddress = _locManagerAddress;
         activePoolAddress = _activePoolAddress;
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
 
         
@@ -59,7 +59,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     // --- Pool functionality ---
 
     function accountSurplus(address _account, uint _amount) external override {
-        _requireCallerIsTroveManager();
+        _requireCallerIsLoCManager();
 
         uint newAmount = balances[_account].add(_amount);
         balances[_account] = newAmount;
@@ -90,10 +90,10 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
             "CollSurplusPool: Caller is not Borrower Operations");
     }
 
-    function _requireCallerIsTroveManager() internal view {
+    function _requireCallerIsLoCManager() internal view {
         require(
-            msg.sender == troveManagerAddress,
-            "CollSurplusPool: Caller is not TroveManager");
+            msg.sender == locManagerAddress,
+            "CollSurplusPool: Caller is not LoCManager");
     }
 
     function _requireCallerIsActivePool() internal view {

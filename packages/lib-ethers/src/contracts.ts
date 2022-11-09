@@ -14,8 +14,8 @@ import {
 
 import activePoolAbi from "../abi/ActivePool.json";
 import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
-import troveManagerAbi from "../abi/TroveManager.json";
-import troveManagerRedeemOpsAbi from "../abi/TroveManagerRedeemOps.json";
+import locManagerAbi from "../abi/LoCManager.json";
+import locManagerRedeemOpsAbi from "../abi/LoCManagerRedeemOps.json";
 import zusdTokenAbi from "../abi/ZUSDToken.json";
 import nueTokenAbi from "../abi/IERC20.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
@@ -24,10 +24,10 @@ import defaultPoolAbi from "../abi/DefaultPool.json";
 import zeroTokenAbi from "../abi/ZEROToken.json";
 import hintHelpersAbi from "../abi/HintHelpers.json";
 import zeroStakingAbi from "../abi/ZEROStaking.json";
-import multiTroveGetterAbi from "../abi/MultiTroveGetter.json";
+import multiLoCGetterAbi from "../abi/MultiLoCGetter.json";
 import priceFeedAbi from "../abi/PriceFeed.json";
 import priceFeedTestnetAbi from "../abi/PriceFeedTestnet.json";
-import sortedTrovesAbi from "../abi/SortedTroves.json";
+import sortedLoCsAbi from "../abi/SortedLoCs.json";
 import stabilityPoolAbi from "../abi/StabilityPool.json";
 import gasPoolAbi from "../abi/GasPool.json";
 import zeroBaseParamsAbi from "../abi/ZeroBaseParams.json";
@@ -36,8 +36,8 @@ import feeDistributorAbi from "../abi/FeeDistributor.json";
 import {
   ActivePool,
   BorrowerOperations,
-  TroveManager,
-  TroveManagerRedeemOps,
+  LoCManager,
+  LoCManagerRedeemOps,
   ZUSDToken,
   CollSurplusPool,
   CommunityIssuance,
@@ -45,10 +45,10 @@ import {
   ZEROToken,
   HintHelpers,
   ZEROStaking,
-  MultiTroveGetter,
+  MultiLoCGetter,
   PriceFeed,
   PriceFeedTestnet,
-  SortedTroves,
+  SortedLoCs,
   StabilityPool,
   GasPool,
   ZeroBaseParams,
@@ -155,8 +155,8 @@ export type _TypedZeroContract<T = unknown, U = unknown> = TypedContract<_ZeroCo
 export interface _ZeroContracts {
   activePool: ActivePool;
   borrowerOperations: BorrowerOperations;
-  troveManager: TroveManager;
-  troveManagerRedeemOps: TroveManagerRedeemOps;
+  locManager: LoCManager;
+  locManagerRedeemOps: LoCManagerRedeemOps;
   zusdToken: ZUSDToken;
   nueToken?: IERC20;
   collSurplusPool: CollSurplusPool;
@@ -165,9 +165,9 @@ export interface _ZeroContracts {
   zeroToken: ZEROToken;
   hintHelpers: HintHelpers;
   zeroStaking: ZEROStaking;
-  multiTroveGetter: MultiTroveGetter;
+  multiLoCGetter: MultiLoCGetter;
   priceFeed: PriceFeed | PriceFeedTestnet;
-  sortedTroves: SortedTroves;
+  sortedLoCs: SortedLoCs;
   stabilityPool: StabilityPool;
   gasPool: GasPool;
   zeroBaseParams: ZeroBaseParams;
@@ -188,8 +188,8 @@ type ZeroContractAbis = Record<ZeroContractsKey, JsonFragment[]>;
 const getAbi = (priceFeedIsTestnet: boolean): ZeroContractAbis => ({
   activePool: activePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
-  troveManager: troveManagerAbi,
-  troveManagerRedeemOps: troveManagerRedeemOpsAbi,
+  locManager: locManagerAbi,
+  locManagerRedeemOps: locManagerRedeemOpsAbi,
   zusdToken: zusdTokenAbi,
   nueToken: nueTokenAbi,
   communityIssuance: communityIssuanceAbi,
@@ -197,9 +197,9 @@ const getAbi = (priceFeedIsTestnet: boolean): ZeroContractAbis => ({
   zeroToken: zeroTokenAbi,
   hintHelpers: hintHelpersAbi,
   zeroStaking: zeroStakingAbi,
-  multiTroveGetter: multiTroveGetterAbi,
+  multiLoCGetter: multiLoCGetterAbi,
   priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
-  sortedTroves: sortedTrovesAbi,
+  sortedLoCs: sortedLoCsAbi,
   stabilityPool: stabilityPoolAbi,
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,

@@ -2,19 +2,19 @@
 
 pragma solidity 0.6.11;
 
-import "./Interfaces/ISortedTroves.sol";
-import "./Interfaces/ITroveManager.sol";
+import "./Interfaces/ISortedLoCs.sol";
+import "./Interfaces/ILoCManager.sol";
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
-contract SortedTrovesStorage is Ownable {
-    string constant public NAME = "SortedTroves";
+contract SortedLoCsStorage is Ownable {
+    string constant public NAME = "SortedLoCs";
 
     address public borrowerOperationsAddress;
 
-    ITroveManager public troveManager;
+    ILoCManager public locManager;
 
     // Information for a node in the list
     struct Node {

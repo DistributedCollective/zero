@@ -9,16 +9,16 @@ contract('DefaultPool', async accounts => {
   let defaultPool
   let nonPayable
   let mockActivePool
-  let mockTroveManager
+  let mockLoCManager
 
   let [owner] = accounts
 
   beforeEach('Deploy contracts', async () => {
     defaultPool = await DefaultPool.new()
     nonPayable = await NonPayable.new()
-    mockTroveManager = await NonPayable.new()
+    mockLoCManager = await NonPayable.new()
     mockActivePool = await NonPayable.new()
-    await defaultPool.setAddresses(mockTroveManager.address, mockActivePool.address)
+    await defaultPool.setAddresses(mockLoCManager.address, mockActivePool.address)
   })
 
   it('sendBTCToActivePool(): fails if receiver cannot receive BTC', async () => {
@@ -32,7 +32,7 @@ contract('DefaultPool', async accounts => {
     // try to send bitcoin from pool to non-payable
     //await th.assertRevert(defaultPool.sendBTCToActivePool(amount, { from: owner }), 'DefaultPool: sending BTC failed')
     const sendBTCData = th.getTransactionData('sendBTCToActivePool(uint256)', [web3.utils.toHex(amount)])
-    await th.assertRevert(mockTroveManager.forward(defaultPool.address, sendBTCData, { from: owner }), 'DefaultPool: sending BTC failed')
+    await th.assertRevert(mockLoCManager.forward(defaultPool.address, sendBTCData, { from: owner }), 'DefaultPool: sending BTC failed')
   })
 })
 

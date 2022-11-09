@@ -14,15 +14,15 @@ import {
   StabilityPoolGainsWithdrawalDetails,
   TransactableZero,
   TransactionFailedError,
-  Trove,
-  TroveAdjustmentDetails,
-  TroveAdjustmentParams,
-  TroveClosureDetails,
-  TroveCreationDetails,
-  TroveCreationParams,
-  TroveListingParams,
-  TroveWithPendingRedistribution,
-  UserTrove
+  LoC,
+  LoCAdjustmentDetails,
+  LoCAdjustmentParams,
+  LoCClosureDetails,
+  LoCCreationDetails,
+  LoCCreationParams,
+  LoCListingParams,
+  LoCWithPendingRedistribution,
+  UserLoC
 } from "@sovryn-zero/lib-base";
 
 import {
@@ -152,26 +152,26 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotalRedistributed} */
-  getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove> {
+  getTotalRedistributed(overrides?: EthersCallOverrides): Promise<LoC> {
     return this._readable.getTotalRedistributed(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTroveBeforeRedistribution} */
-  getTroveBeforeRedistribution(
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getLoCBeforeRedistribution} */
+  getLoCBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
-  ): Promise<TroveWithPendingRedistribution> {
-    return this._readable.getTroveBeforeRedistribution(address, overrides);
+  ): Promise<LoCWithPendingRedistribution> {
+    return this._readable.getLoCBeforeRedistribution(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTrove} */
-  getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove> {
-    return this._readable.getTrove(address, overrides);
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getLoC} */
+  getLoC(address?: string, overrides?: EthersCallOverrides): Promise<UserLoC> {
+    return this._readable.getLoC(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getNumberOfTroves} */
-  getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number> {
-    return this._readable.getNumberOfTroves(overrides);
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getNumberOfLoCs} */
+  getNumberOfLoCs(overrides?: EthersCallOverrides): Promise<number> {
+    return this._readable.getNumberOfLoCs(overrides);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getPrice} */
@@ -180,17 +180,17 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   }
 
   /** @internal */
-  _getActivePool(overrides?: EthersCallOverrides): Promise<Trove> {
+  _getActivePool(overrides?: EthersCallOverrides): Promise<LoC> {
     return this._readable._getActivePool(overrides);
   }
 
   /** @internal */
-  _getDefaultPool(overrides?: EthersCallOverrides): Promise<Trove> {
+  _getDefaultPool(overrides?: EthersCallOverrides): Promise<LoC> {
     return this._readable._getDefaultPool(overrides);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotal} */
-  getTotal(overrides?: EthersCallOverrides): Promise<Trove> {
+  getTotal(overrides?: EthersCallOverrides): Promise<LoC> {
     return this._readable.getTotal(overrides);
   }
 
@@ -225,16 +225,16 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   }
 
   /** @internal */
-  getTroves(
-    params: TroveListingParams & { beforeRedistribution: true },
+  getLoCs(
+    params: LoCListingParams & { beforeRedistribution: true },
     overrides?: EthersCallOverrides
-  ): Promise<TroveWithPendingRedistribution[]>;
+  ): Promise<LoCWithPendingRedistribution[]>;
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.(getTroves:2)} */
-  getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.(getLoCs:2)} */
+  getLoCs(params: LoCListingParams, overrides?: EthersCallOverrides): Promise<UserLoC[]>;
 
-  getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]> {
-    return this._readable.getTroves(params, overrides);
+  getLoCs(params: LoCListingParams, overrides?: EthersCallOverrides): Promise<UserLoC[]> {
+    return this._readable.getLoCs(params, overrides);
   }
 
   /** @internal */
@@ -265,79 +265,79 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.openTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.openLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  openTrove(
-    params: TroveCreationParams<Decimalish>,
+  openLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveCreationDetails> {
-    return this.send.openTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  ): Promise<LoCCreationDetails> {
+    return this.send.openLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.openTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.openLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  openNueTrove(
-    params: TroveCreationParams<Decimalish>,
+  openNueLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveCreationDetails> {
-    return this.send.openNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  ): Promise<LoCCreationDetails> {
+    return this.send.openNueLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.closeTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.closeLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  closeTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
-    return this.send.closeTrove(overrides).then(waitForSuccess);
+  closeLoC(overrides?: EthersTransactionOverrides): Promise<LoCClosureDetails> {
+    return this.send.closeLoC(overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.closeNueTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.closeNueLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
-    return this.send.closeNueTrove(overrides).then(waitForSuccess);
+  closeNueLoC(overrides?: EthersTransactionOverrides): Promise<LoCClosureDetails> {
+    return this.send.closeNueLoC(overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.adjustTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.adjustLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  adjustTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  adjustLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveAdjustmentDetails> {
-    return this.send.adjustTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  ): Promise<LoCAdjustmentDetails> {
+    return this.send.adjustLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.adjustNueTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.adjustNueLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  adjustNueTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  adjustNueLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveAdjustmentDetails> {
-    return this.send.adjustNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+  ): Promise<LoCAdjustmentDetails> {
+    return this.send.adjustNueLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -349,7 +349,7 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveAdjustmentDetails> {
+  ): Promise<LoCAdjustmentDetails> {
     return this.send.depositCollateral(amount, overrides).then(waitForSuccess);
   }
 
@@ -362,7 +362,7 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveAdjustmentDetails> {
+  ): Promise<LoCAdjustmentDetails> {
     return this.send.withdrawCollateral(amount, overrides).then(waitForSuccess);
   }
 
@@ -376,7 +376,7 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveAdjustmentDetails> {
+  ): Promise<LoCAdjustmentDetails> {
     return this.send.borrowZUSD(amount, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
@@ -389,7 +389,7 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   repayZUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<TroveAdjustmentDetails> {
+  ): Promise<LoCAdjustmentDetails> {
     return this.send.repayZUSD(amount, overrides).then(waitForSuccess);
   }
 
@@ -418,10 +418,10 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
   liquidateUpTo(
-    maximumNumberOfTrovesToLiquidate: number,
+    maximumNumberOfLoCsToLiquidate: number,
     overrides?: EthersTransactionOverrides
   ): Promise<LiquidationDetails> {
-    return this.send.liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides).then(waitForSuccess);
+    return this.send.liquidateUpTo(maximumNumberOfLoCsToLiquidate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -464,15 +464,15 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.transferCollateralGainToTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.transferCollateralGainToLoC}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  transferCollateralGainToTrove(
+  transferCollateralGainToLoC(
     overrides?: EthersTransactionOverrides
   ): Promise<CollateralGainTransferDetails> {
-    return this.send.transferCollateralGainToTrove(overrides).then(waitForSuccess);
+    return this.send.transferCollateralGainToLoC(overrides).then(waitForSuccess);
   }
 
   /**

@@ -2,14 +2,14 @@
 
 pragma solidity 0.6.11;
 
-import "./Interfaces/ITroveManager.sol";
-import "./Interfaces/ISortedTroves.sol";
+import "./Interfaces/ILoCManager.sol";
+import "./Interfaces/ISortedLoCs.sol";
 import "./Dependencies/Ownable.sol";
 
 contract HintHelpersStorage is Ownable {
     string constant public NAME = "HintHelpers";
 
-    ISortedTroves public sortedTroves;
-    ITroveManager public troveManager;
+    ISortedLoCs public sortedLoCs;
+    ILoCManager public locManager;
 
 }

@@ -8,7 +8,7 @@ import "./Dependencies/Ownable.sol";
 contract DefaultPoolStorage is Ownable {
     string constant public NAME = "DefaultPool";
 
-    address public troveManagerAddress;
+    address public locManagerAddress;
     address public activePoolAddress;
     uint256 internal BTC;  // deposited BTC tracker
     uint256 internal ZUSDDebt;  // debt

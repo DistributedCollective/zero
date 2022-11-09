@@ -1,6 +1,6 @@
 export * from "./src/constants";
 export * from "./src/Decimal";
-export * from "./src/Trove";
+export * from "./src/LoC";
 export * from "./src/StabilityDeposit";
 export * from "./src/ZEROStake";
 export * from "./src/Fees";

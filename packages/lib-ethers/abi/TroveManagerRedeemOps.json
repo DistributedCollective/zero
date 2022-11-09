@@ -173,7 +173,7 @@
         "type": "uint256"
       }
     ],
-    "name": "TroveIndexUpdated",
+    "name": "LoCIndexUpdated",
     "type": "event"
   },
   {
@@ -199,12 +199,12 @@
       },
       {
         "indexed": false,
-        "internalType": "enum TroveManagerBase.TroveManagerOperation",
+        "internalType": "enum LoCManagerBase.LoCManagerOperation",
         "name": "_operation",
         "type": "uint8"
       }
     ],
-    "name": "TroveLiquidated",
+    "name": "LoCLiquidated",
     "type": "event"
   },
   {
@@ -223,7 +223,7 @@
         "type": "uint256"
       }
     ],
-    "name": "TroveSnapshotsUpdated",
+    "name": "LoCSnapshotsUpdated",
     "type": "event"
   },
   {
@@ -255,12 +255,12 @@
       },
       {
         "indexed": false,
-        "internalType": "enum TroveManagerBase.TroveManagerOperation",
+        "internalType": "enum LoCManagerBase.LoCManagerOperation",
         "name": "_operation",
         "type": "uint8"
       }
     ],
-    "name": "TroveUpdated",
+    "name": "LoCUpdated",
     "type": "event"
   },
   {
@@ -388,7 +388,7 @@
         "type": "uint256"
       }
     ],
-    "name": "TroveOwners",
+    "name": "LoCOwners",
     "outputs": [
       {
         "internalType": "address",
@@ -407,7 +407,7 @@
         "type": "address"
       }
     ],
-    "name": "Troves",
+    "name": "LoCs",
     "outputs": [
       {
         "internalType": "uint256",
@@ -425,7 +425,7 @@
         "type": "uint256"
       },
       {
-        "internalType": "enum TroveManagerStorage.Status",
+        "internalType": "enum LoCManagerStorage.Status",
         "name": "status",
         "type": "uint8"
       },
@@ -861,10 +861,10 @@
   },
   {
     "inputs": [],
-    "name": "sortedTroves",
+    "name": "sortedLoCs",
     "outputs": [
       {
-        "internalType": "contract ISortedTroves",
+        "internalType": "contract ISortedLoCs",
         "name": "",
         "type": "address"
       }
@@ -913,7 +913,7 @@
   },
   {
     "inputs": [],
-    "name": "troveManagerRedeemOps",
+    "name": "locManagerRedeemOps",
     "outputs": [
       {
         "internalType": "address",

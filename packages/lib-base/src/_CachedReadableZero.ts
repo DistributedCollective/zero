@@ -2,8 +2,8 @@ import { Decimal } from "./Decimal";
 import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
 import { StabilityDeposit } from "./StabilityDeposit";
-import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
-import { FrontendStatus, ReadableZero, TroveListingParams } from "./ReadableZero";
+import { LoC, LoCWithPendingRedistribution, UserLoC } from "./LoC";
+import { FrontendStatus, ReadableZero, LoCListingParams } from "./ReadableZero";
 
 /** @internal */
 export type _ReadableZeroWithExtraParamsBase<T extends unknown[]> = {
@@ -24,22 +24,22 @@ export type _ZeroReadCacheBase<T extends unknown[]> = {
 /** @internal */
 export interface _ReadableZeroWithExtraParams<T extends unknown[]>
   extends _ReadableZeroWithExtraParamsBase<T> {
-  getTroves(
-    params: TroveListingParams & { beforeRedistribution: true },
+  getLoCs(
+    params: LoCListingParams & { beforeRedistribution: true },
     ...extraParams: T
-  ): Promise<TroveWithPendingRedistribution[]>;
+  ): Promise<LoCWithPendingRedistribution[]>;
 
-  getTroves(params: TroveListingParams, ...extraParams: T): Promise<UserTrove[]>;
+  getLoCs(params: LoCListingParams, ...extraParams: T): Promise<UserLoC[]>;
 }
 
 /** @internal */
 export interface _ZeroReadCache<T extends unknown[]> extends _ZeroReadCacheBase<T> {
-  getTroves(
-    params: TroveListingParams & { beforeRedistribution: true },
+  getLoCs(
+    params: LoCListingParams & { beforeRedistribution: true },
     ...extraParams: T
-  ): TroveWithPendingRedistribution[] | undefined;
+  ): LoCWithPendingRedistribution[] | undefined;
 
-  getTroves(params: TroveListingParams, ...extraParams: T): UserTrove[] | undefined;
+  getLoCs(params: LoCListingParams, ...extraParams: T): UserLoC[] | undefined;
 }
 
 /** @internal */
@@ -53,36 +53,36 @@ export class _CachedReadableZero<T extends unknown[]>
     this._cache = cache;
   }
 
-  async getTotalRedistributed(...extraParams: T): Promise<Trove> {
+  async getTotalRedistributed(...extraParams: T): Promise<LoC> {
     return (
       this._cache.getTotalRedistributed(...extraParams) ??
       this._readable.getTotalRedistributed(...extraParams)
     );
   }
 
-  async getTroveBeforeRedistribution(
+  async getLoCBeforeRedistribution(
     address?: string,
     ...extraParams: T
-  ): Promise<TroveWithPendingRedistribution> {
+  ): Promise<LoCWithPendingRedistribution> {
     return (
-      this._cache.getTroveBeforeRedistribution(address, ...extraParams) ??
-      this._readable.getTroveBeforeRedistribution(address, ...extraParams)
+      this._cache.getLoCBeforeRedistribution(address, ...extraParams) ??
+      this._readable.getLoCBeforeRedistribution(address, ...extraParams)
     );
   }
 
-  async getTrove(address?: string, ...extraParams: T): Promise<UserTrove> {
-    const [troveBeforeRedistribution, totalRedistributed] = await Promise.all([
-      this.getTroveBeforeRedistribution(address, ...extraParams),
+  async getLoC(address?: string, ...extraParams: T): Promise<UserLoC> {
+    const [locBeforeRedistribution, totalRedistributed] = await Promise.all([
+      this.getLoCBeforeRedistribution(address, ...extraParams),
       this.getTotalRedistributed(...extraParams)
     ]);
 
-    return troveBeforeRedistribution.applyRedistribution(totalRedistributed);
+    return locBeforeRedistribution.applyRedistribution(totalRedistributed);
   }
 
-  async getNumberOfTroves(...extraParams: T): Promise<number> {
+  async getNumberOfLoCs(...extraParams: T): Promise<number> {
     return (
-      this._cache.getNumberOfTroves(...extraParams) ??
-      this._readable.getNumberOfTroves(...extraParams)
+      this._cache.getNumberOfLoCs(...extraParams) ??
+      this._readable.getNumberOfLoCs(...extraParams)
     );
   }
 
@@ -90,7 +90,7 @@ export class _CachedReadableZero<T extends unknown[]>
     return this._cache.getPrice(...extraParams) ?? this._readable.getPrice(...extraParams);
   }
 
-  async getTotal(...extraParams: T): Promise<Trove> {
+  async getTotal(...extraParams: T): Promise<LoC> {
     return this._cache.getTotal(...extraParams) ?? this._readable.getTotal(...extraParams);
   }
 
@@ -136,26 +136,26 @@ export class _CachedReadableZero<T extends unknown[]>
     );
   }
 
-  getTroves(
-    params: TroveListingParams & { beforeRedistribution: true },
+  getLoCs(
+    params: LoCListingParams & { beforeRedistribution: true },
     ...extraParams: T
-  ): Promise<TroveWithPendingRedistribution[]>;
+  ): Promise<LoCWithPendingRedistribution[]>;
 
-  getTroves(params: TroveListingParams, ...extraParams: T): Promise<UserTrove[]>;
+  getLoCs(params: LoCListingParams, ...extraParams: T): Promise<UserLoC[]>;
 
-  async getTroves(params: TroveListingParams, ...extraParams: T): Promise<UserTrove[]> {
+  async getLoCs(params: LoCListingParams, ...extraParams: T): Promise<UserLoC[]> {
     const { beforeRedistribution, ...restOfParams } = params;
 
-    const [totalRedistributed, troves] = await Promise.all([
+    const [totalRedistributed, locs] = await Promise.all([
       beforeRedistribution ? undefined : this.getTotalRedistributed(...extraParams),
-      this._cache.getTroves({ beforeRedistribution: true, ...restOfParams }, ...extraParams) ??
-        this._readable.getTroves({ beforeRedistribution: true, ...restOfParams }, ...extraParams)
+      this._cache.getLoCs({ beforeRedistribution: true, ...restOfParams }, ...extraParams) ??
+        this._readable.getLoCs({ beforeRedistribution: true, ...restOfParams }, ...extraParams)
     ]);
 
     if (totalRedistributed) {
-      return troves.map(trove => trove.applyRedistribution(totalRedistributed));
+      return locs.map(loc => loc.applyRedistribution(totalRedistributed));
     } else {
-      return troves;
+      return locs;
     }
   }
 

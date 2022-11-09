@@ -104,11 +104,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressChanged",
+      "name": "LoCManagerAddressChanged",
       "type": "event"
     },
     {

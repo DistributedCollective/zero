@@ -1,6 +1,6 @@
 // Hardhat script
-const SortedTroves = artifacts.require("./SortedTroves.sol")
-const TroveManager = artifacts.require("./TroveManager.sol")
+const SortedLoCs = artifacts.require("./SortedLoCs.sol")
+const LoCManager = artifacts.require("./LoCManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
 const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
@@ -19,7 +19,7 @@ const ActivePoolTester = artifacts.require("./ActivePoolTester.sol")
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
 const ZeroMathTester = artifacts.require("./ZeroMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
+const LoCManagerTester = artifacts.require("./LoCManagerTester.sol")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
 
 const { TestHelper: th } = require("../utils/testHelpers.js")
@@ -31,8 +31,8 @@ const coreContractABIs = [
   BorrowerOperations,
   PriceFeed,
   ZUSDToken,
-  SortedTroves,
-  TroveManager,
+  SortedLoCs,
+  LoCManager,
   ActivePool,
   StabilityPool,
   DefaultPool,
@@ -52,7 +52,7 @@ const TesterContractABIs  = [
   DefaultPoolTester,
   ZeroMathTester,
   BorrowerOperationsTester,
-  TroveManagerTester,
+  LoCManagerTester,
   ZUSDTokenTester,
 ]
 

@@ -36,10 +36,10 @@ export type _DebtChange<T> =
 export type _NoDebtChange = _NoZUSDBorrowing & _NoZUSDRepayment;
 
 /**
- * Parameters of an {@link TransactableZero.openTrove | openTrove()} transaction.
+ * Parameters of an {@link TransactableZero.openLoC | openLoC()} transaction.
  *
  * @remarks
- * The type parameter `T` specifies the allowed value type(s) of the particular `TroveCreationParams`
+ * The type parameter `T` specifies the allowed value type(s) of the particular `LoCCreationParams`
  * object's properties.
  *
  * <h2>Properties</h2>
@@ -68,16 +68,16 @@ export type _NoDebtChange = _NoZUSDBorrowing & _NoZUSDRepayment;
  *
  * @public
  */
-export type TroveCreationParams<T = unknown> = _CollateralDeposit<T> &
+export type LoCCreationParams<T = unknown> = _CollateralDeposit<T> &
   _NoCollateralWithdrawal &
   _ZUSDBorrowing<T> &
   _NoZUSDRepayment;
 
 /**
- * Parameters of a {@link TransactableZero.closeTrove | closeTrove()} transaction.
+ * Parameters of a {@link TransactableZero.closeLoC | closeLoC()} transaction.
  *
  * @remarks
- * The type parameter `T` specifies the allowed value type(s) of the particular `TroveClosureParams`
+ * The type parameter `T` specifies the allowed value type(s) of the particular `LoCClosureParams`
  * object's properties.
  *
  * <h2>Properties</h2>
@@ -106,19 +106,19 @@ export type TroveCreationParams<T = unknown> = _CollateralDeposit<T> &
  *
  * @public
  */
-export type TroveClosureParams<T> = _CollateralWithdrawal<T> &
+export type LoCClosureParams<T> = _CollateralWithdrawal<T> &
   _NoCollateralDeposit &
   Partial<_ZUSDRepayment<T>> &
   _NoZUSDBorrowing;
 
 /**
- * Parameters of an {@link TransactableZero.adjustTrove | adjustTrove()} transaction.
+ * Parameters of an {@link TransactableZero.adjustLoC | adjustLoC()} transaction.
  *
  * @remarks
  * The type parameter `T` specifies the allowed value type(s) of the particular
- * `TroveAdjustmentParams` object's properties.
+ * `LoCAdjustmentParams` object's properties.
  *
- * Even though all properties are optional, a valid `TroveAdjustmentParams` object must define at
+ * Even though all properties are optional, a valid `LoCAdjustmentParams` object must define at
  * least one.
  *
  * Defining both `depositCollateral` and `withdrawCollateral`, or both `borrowZUSD` and `repayZUSD`
@@ -162,16 +162,16 @@ export type TroveClosureParams<T> = _CollateralWithdrawal<T> &
  *
  * @public
  */
-export type TroveAdjustmentParams<T = unknown> =
+export type LoCAdjustmentParams<T = unknown> =
   | (_CollateralChange<T> & _NoDebtChange)
   | (_DebtChange<T> & _NoCollateralChange)
   | (_CollateralChange<T> & _DebtChange<T>);
 
 /**
- * Describes why a Trove could not be created.
+ * Describes why a LoC could not be created.
  *
  * @remarks
- * See {@link TroveChange}.
+ * See {@link LoCChange}.
  *
  * <h2>Possible values</h2>
  *
@@ -184,7 +184,7 @@ export type TroveAdjustmentParams<T = unknown> =
  *
  *   <tr>
  *     <td> "missingLiquidationReserve" </td>
- *     <td> A Trove's debt cannot be less than the liquidation reserve. </td>
+ *     <td> A LoC's debt cannot be less than the liquidation reserve. </td>
  *   </tr>
  *
  * </table>
@@ -193,53 +193,53 @@ export type TroveAdjustmentParams<T = unknown> =
  *
  * @public
  */
-export type TroveCreationError = "missingLiquidationReserve";
+export type LoCCreationError = "missingLiquidationReserve";
 
 /**
- * Represents the change between two Trove states.
+ * Represents the change between two LoC states.
  *
  * @remarks
- * Returned by {@link Trove.whatChanged}.
+ * Returned by {@link LoC.whatChanged}.
  *
- * Passed as a parameter to {@link Trove.apply}.
+ * Passed as a parameter to {@link LoC.apply}.
  *
  * @public
  */
-export type TroveChange<T> =
-  | { type: "invalidCreation"; invalidTrove: Trove; error: TroveCreationError }
-  | { type: "creation"; params: TroveCreationParams<T> }
-  | { type: "closure"; params: TroveClosureParams<T> }
-  | { type: "adjustment"; params: TroveAdjustmentParams<T>; setToZero?: "collateral" | "debt" };
+export type LoCChange<T> =
+  | { type: "invalidCreation"; invalidLoC: LoC; error: LoCCreationError }
+  | { type: "creation"; params: LoCCreationParams<T> }
+  | { type: "closure"; params: LoCClosureParams<T> }
+  | { type: "adjustment"; params: LoCAdjustmentParams<T>; setToZero?: "collateral" | "debt" };
 
 // This might seem backwards, but this way we avoid spamming the .d.ts and generated docs
-type InvalidTroveCreation = Extract<TroveChange<never>, { type: "invalidCreation" }>;
-type TroveCreation<T> = Extract<TroveChange<T>, { type: "creation" }>;
-type TroveClosure<T> = Extract<TroveChange<T>, { type: "closure" }>;
-type TroveAdjustment<T> = Extract<TroveChange<T>, { type: "adjustment" }>;
+type InvalidLoCCreation = Extract<LoCChange<never>, { type: "invalidCreation" }>;
+type LoCCreation<T> = Extract<LoCChange<T>, { type: "creation" }>;
+type LoCClosure<T> = Extract<LoCChange<T>, { type: "closure" }>;
+type LoCAdjustment<T> = Extract<LoCChange<T>, { type: "adjustment" }>;
 
-const invalidTroveCreation = (
-  invalidTrove: Trove,
-  error: TroveCreationError
-): InvalidTroveCreation => ({
+const invalidLoCCreation = (
+  invalidLoC: LoC,
+  error: LoCCreationError
+): InvalidLoCCreation => ({
   type: "invalidCreation",
-  invalidTrove,
+  invalidLoC,
   error
 });
 
-const troveCreation = <T>(params: TroveCreationParams<T>): TroveCreation<T> => ({
+const locCreation = <T>(params: LoCCreationParams<T>): LoCCreation<T> => ({
   type: "creation",
   params
 });
 
-const troveClosure = <T>(params: TroveClosureParams<T>): TroveClosure<T> => ({
+const locClosure = <T>(params: LoCClosureParams<T>): LoCClosure<T> => ({
   type: "closure",
   params
 });
 
-const troveAdjustment = <T>(
-  params: TroveAdjustmentParams<T>,
+const locAdjustment = <T>(
+  params: LoCAdjustmentParams<T>,
   setToZero?: "collateral" | "debt"
-): TroveAdjustment<T> => ({
+): LoCAdjustment<T> => ({
   type: "adjustment",
   params,
   setToZero
@@ -255,31 +255,31 @@ type AllowedKey<T> = Exclude<
   undefined
 >;
 
-const allowedTroveCreationKeys: AllowedKey<TroveCreationParams>[] = [
+const allowedLoCCreationKeys: AllowedKey<LoCCreationParams>[] = [
   "depositCollateral",
   "borrowZUSD"
 ];
 
-function checkAllowedTroveCreationKeys<T>(
+function checkAllowedLoCCreationKeys<T>(
   entries: [string, T][]
-): asserts entries is [AllowedKey<TroveCreationParams>, T][] {
+): asserts entries is [AllowedKey<LoCCreationParams>, T][] {
   const badKeys = entries
-    .filter(([k]) => !(allowedTroveCreationKeys as string[]).includes(k))
+    .filter(([k]) => !(allowedLoCCreationKeys as string[]).includes(k))
     .map(([k]) => `'${k}'`);
 
   if (badKeys.length > 0) {
-    throw new Error(`TroveCreationParams: property ${badKeys.join(", ")} not allowed`);
+    throw new Error(`LoCCreationParams: property ${badKeys.join(", ")} not allowed`);
   }
 }
 
-const troveCreationParamsFromEntries = <T>(
-  entries: [AllowedKey<TroveCreationParams>, T][]
-): TroveCreationParams<T> => {
-  const params = Object.fromEntries(entries) as Record<AllowedKey<TroveCreationParams>, T>;
-  const missingKeys = allowedTroveCreationKeys.filter(k => !(k in params)).map(k => `'${k}'`);
+const locCreationParamsFromEntries = <T>(
+  entries: [AllowedKey<LoCCreationParams>, T][]
+): LoCCreationParams<T> => {
+  const params = Object.fromEntries(entries) as Record<AllowedKey<LoCCreationParams>, T>;
+  const missingKeys = allowedLoCCreationKeys.filter(k => !(k in params)).map(k => `'${k}'`);
 
   if (missingKeys.length > 0) {
-    throw new Error(`TroveCreationParams: property ${missingKeys.join(", ")} missing`);
+    throw new Error(`LoCCreationParams: property ${missingKeys.join(", ")} missing`);
   }
 
   return params;
@@ -289,42 +289,42 @@ const decimalize = <T>([k, v]: [T, Decimalish]): [T, Decimal] => [k, Decimal.fro
 const nonZero = <T>([, v]: [T, Decimal]): boolean => !v.isZero;
 
 /** @internal */
-export const _normalizeTroveCreation = (
+export const _normalizeLoCCreation = (
   params: Record<string, Decimalish | undefined>
-): TroveCreationParams<Decimal> => {
+): LoCCreationParams<Decimal> => {
   const definedEntries = Object.entries(params).filter(valueIsDefined);
-  checkAllowedTroveCreationKeys(definedEntries);
+  checkAllowedLoCCreationKeys(definedEntries);
   const nonZeroEntries = definedEntries.map(decimalize);
 
-  return troveCreationParamsFromEntries(nonZeroEntries);
+  return locCreationParamsFromEntries(nonZeroEntries);
 };
 
-const allowedTroveAdjustmentKeys: AllowedKey<TroveAdjustmentParams>[] = [
+const allowedLoCAdjustmentKeys: AllowedKey<LoCAdjustmentParams>[] = [
   "depositCollateral",
   "withdrawCollateral",
   "borrowZUSD",
   "repayZUSD"
 ];
 
-function checkAllowedTroveAdjustmentKeys<T>(
+function checkAllowedLoCAdjustmentKeys<T>(
   entries: [string, T][]
-): asserts entries is [AllowedKey<TroveAdjustmentParams>, T][] {
+): asserts entries is [AllowedKey<LoCAdjustmentParams>, T][] {
   const badKeys = entries
-    .filter(([k]) => !(allowedTroveAdjustmentKeys as string[]).includes(k))
+    .filter(([k]) => !(allowedLoCAdjustmentKeys as string[]).includes(k))
     .map(([k]) => `'${k}'`);
 
   if (badKeys.length > 0) {
-    throw new Error(`TroveAdjustmentParams: property ${badKeys.join(", ")} not allowed`);
+    throw new Error(`LoCAdjustmentParams: property ${badKeys.join(", ")} not allowed`);
   }
 }
 
 const collateralChangeFrom = <T>({
   depositCollateral,
   withdrawCollateral
-}: Partial<Record<AllowedKey<TroveAdjustmentParams>, T>>): _CollateralChange<T> | undefined => {
+}: Partial<Record<AllowedKey<LoCAdjustmentParams>, T>>): _CollateralChange<T> | undefined => {
   if (depositCollateral !== undefined && withdrawCollateral !== undefined) {
     throw new Error(
-      "TroveAdjustmentParams: 'depositCollateral' and 'withdrawCollateral' " +
+      "LoCAdjustmentParams: 'depositCollateral' and 'withdrawCollateral' " +
         "can't be present at the same time"
     );
   }
@@ -341,10 +341,10 @@ const collateralChangeFrom = <T>({
 const debtChangeFrom = <T>({
   borrowZUSD,
   repayZUSD
-}: Partial<Record<AllowedKey<TroveAdjustmentParams>, T>>): _DebtChange<T> | undefined => {
+}: Partial<Record<AllowedKey<LoCAdjustmentParams>, T>>): _DebtChange<T> | undefined => {
   if (borrowZUSD !== undefined && repayZUSD !== undefined) {
     throw new Error(
-      "TroveAdjustmentParams: 'borrowZUSD' and 'repayZUSD' can't be present at the same time"
+      "LoCAdjustmentParams: 'borrowZUSD' and 'repayZUSD' can't be present at the same time"
     );
   }
 
@@ -357,11 +357,11 @@ const debtChangeFrom = <T>({
   }
 };
 
-const troveAdjustmentParamsFromEntries = <T>(
-  entries: [AllowedKey<TroveAdjustmentParams>, T][]
-): TroveAdjustmentParams<T> => {
+const locAdjustmentParamsFromEntries = <T>(
+  entries: [AllowedKey<LoCAdjustmentParams>, T][]
+): LoCAdjustmentParams<T> => {
   const params = Object.fromEntries(entries) as Partial<
-    Record<AllowedKey<TroveAdjustmentParams>, T>
+    Record<AllowedKey<LoCAdjustmentParams>, T>
   >;
 
   const collateralChange = collateralChangeFrom(params);
@@ -379,18 +379,18 @@ const troveAdjustmentParamsFromEntries = <T>(
     return debtChange;
   }
 
-  throw new Error("TroveAdjustmentParams: must include at least one non-zero parameter");
+  throw new Error("LoCAdjustmentParams: must include at least one non-zero parameter");
 };
 
 /** @internal */
-export const _normalizeTroveAdjustment = (
+export const _normalizeLoCAdjustment = (
   params: Record<string, Decimalish | undefined>
-): TroveAdjustmentParams<Decimal> => {
+): LoCAdjustmentParams<Decimal> => {
   const definedEntries = Object.entries(params).filter(valueIsDefined);
-  checkAllowedTroveAdjustmentKeys(definedEntries);
+  checkAllowedLoCAdjustmentKeys(definedEntries);
   const nonZeroEntries = definedEntries.map(decimalize).filter(nonZero);
 
-  return troveAdjustmentParamsFromEntries(nonZeroEntries);
+  return locAdjustmentParamsFromEntries(nonZeroEntries);
 };
 
 const applyFee = (borrowingRate: Decimalish, debtIncrease: Decimal) =>
@@ -406,7 +406,7 @@ const NOMINAL_COLLATERAL_RATIO_PRECISION = Decimal.from(100);
  *
  * @public
  */
-export class Trove {
+export class LoC {
   /** Amount of native currency (e.g. Bitcoin) collateralized. */
   readonly collateral: Decimal;
 
@@ -424,7 +424,7 @@ export class Trove {
   }
 
   /**
-   * Amount of ZUSD that must be repaid to close this Trove.
+   * Amount of ZUSD that must be repaid to close this LoC.
    *
    * @remarks
    * This doesn't include the liquidation reserve, which is refunded in case of normal closure.
@@ -442,16 +442,16 @@ export class Trove {
     return this.collateral.mulDiv(NOMINAL_COLLATERAL_RATIO_PRECISION, this.debt);
   }
 
-  /** Calculate the Trove's collateralization ratio at a given price. */
+  /** Calculate the LoC's collateralization ratio at a given price. */
   collateralRatio(price: Decimalish): Decimal {
     return this.collateral.mulDiv(price, this.debt);
   }
 
   /**
-   * Whether the Trove is undercollateralized at a given price.
+   * Whether the LoC is undercollateralized at a given price.
    *
    * @returns
-   * `true` if the Trove's collateralization ratio is less than the
+   * `true` if the LoC's collateralization ratio is less than the
    * {@link MINIMUM_COLLATERAL_RATIO}.
    */
   collateralRatioIsBelowMinimum(price: Decimalish): boolean {
@@ -479,7 +479,7 @@ export class Trove {
     return this.collateralRatio(price).lt(CRITICAL_COLLATERAL_RATIO);
   }
 
-  /** Whether the Trove is sufficiently collateralized to be opened during recovery mode. */
+  /** Whether the LoC is sufficiently collateralized to be opened during recovery mode. */
   isOpenableInRecoveryMode(price: Decimalish): boolean {
     return this.collateralRatio(price).gte(CRITICAL_COLLATERAL_RATIO);
   }
@@ -489,96 +489,96 @@ export class Trove {
     return `{ collateral: ${this.collateral}, debt: ${this.debt} }`;
   }
 
-  equals(that: Trove): boolean {
+  equals(that: LoC): boolean {
     return this.collateral.eq(that.collateral) && this.debt.eq(that.debt);
   }
 
-  add(that: Trove): Trove {
-    return new Trove(this.collateral.add(that.collateral), this.debt.add(that.debt));
+  add(that: LoC): LoC {
+    return new LoC(this.collateral.add(that.collateral), this.debt.add(that.debt));
   }
 
-  addCollateral(collateral: Decimalish): Trove {
-    return new Trove(this.collateral.add(collateral), this.debt);
+  addCollateral(collateral: Decimalish): LoC {
+    return new LoC(this.collateral.add(collateral), this.debt);
   }
 
-  addDebt(debt: Decimalish): Trove {
-    return new Trove(this.collateral, this.debt.add(debt));
+  addDebt(debt: Decimalish): LoC {
+    return new LoC(this.collateral, this.debt.add(debt));
   }
 
-  subtract(that: Trove): Trove {
+  subtract(that: LoC): LoC {
     const { collateral, debt } = that;
 
-    return new Trove(
+    return new LoC(
       this.collateral.gt(collateral) ? this.collateral.sub(collateral) : Decimal.ZERO,
       this.debt.gt(debt) ? this.debt.sub(debt) : Decimal.ZERO
     );
   }
 
-  subtractCollateral(collateral: Decimalish): Trove {
-    return new Trove(
+  subtractCollateral(collateral: Decimalish): LoC {
+    return new LoC(
       this.collateral.gt(collateral) ? this.collateral.sub(collateral) : Decimal.ZERO,
       this.debt
     );
   }
 
-  subtractDebt(debt: Decimalish): Trove {
-    return new Trove(this.collateral, this.debt.gt(debt) ? this.debt.sub(debt) : Decimal.ZERO);
+  subtractDebt(debt: Decimalish): LoC {
+    return new LoC(this.collateral, this.debt.gt(debt) ? this.debt.sub(debt) : Decimal.ZERO);
   }
 
-  multiply(multiplier: Decimalish): Trove {
-    return new Trove(this.collateral.mul(multiplier), this.debt.mul(multiplier));
+  multiply(multiplier: Decimalish): LoC {
+    return new LoC(this.collateral.mul(multiplier), this.debt.mul(multiplier));
   }
 
-  setCollateral(collateral: Decimalish): Trove {
-    return new Trove(Decimal.from(collateral), this.debt);
+  setCollateral(collateral: Decimalish): LoC {
+    return new LoC(Decimal.from(collateral), this.debt);
   }
 
-  setDebt(debt: Decimalish): Trove {
-    return new Trove(this.collateral, Decimal.from(debt));
+  setDebt(debt: Decimalish): LoC {
+    return new LoC(this.collateral, Decimal.from(debt));
   }
 
-  private _debtChange({ debt }: Trove, borrowingRate: Decimalish): _DebtChange<Decimal> {
+  private _debtChange({ debt }: LoC, borrowingRate: Decimalish): _DebtChange<Decimal> {
     return debt.gt(this.debt)
       ? { borrowZUSD: unapplyFee(borrowingRate, debt.sub(this.debt)) }
       : { repayZUSD: this.debt.sub(debt) };
   }
 
-  private _collateralChange({ collateral }: Trove): _CollateralChange<Decimal> {
+  private _collateralChange({ collateral }: LoC): _CollateralChange<Decimal> {
     return collateral.gt(this.collateral)
       ? { depositCollateral: collateral.sub(this.collateral) }
       : { withdrawCollateral: this.collateral.sub(collateral) };
   }
 
   /**
-   * Calculate the difference between this Trove and another.
+   * Calculate the difference between this LoC and another.
    *
-   * @param that - The other Trove.
+   * @param that - The other LoC.
    * @param borrowingRate - Borrowing rate to use when calculating a borrowed amount.
    *
    * @returns
-   * An object representing the change, or `undefined` if the Troves are equal.
+   * An object representing the change, or `undefined` if the LoCs are equal.
    */
   whatChanged(
-    that: Trove,
+    that: LoC,
     borrowingRate: Decimalish = MINIMUM_BORROWING_RATE
-  ): TroveChange<Decimal> | undefined {
+  ): LoCChange<Decimal> | undefined {
     if (this.collateral.eq(that.collateral) && this.debt.eq(that.debt)) {
       return undefined;
     }
 
     if (this.isEmpty) {
       if (that.debt.lt(ZUSD_LIQUIDATION_RESERVE)) {
-        return invalidTroveCreation(that, "missingLiquidationReserve");
+        return invalidLoCCreation(that, "missingLiquidationReserve");
       }
 
-      return troveCreation({
+      return locCreation({
         depositCollateral: that.collateral,
         borrowZUSD: unapplyFee(borrowingRate, that.netDebt)
       });
     }
 
     if (that.isEmpty) {
-      return troveClosure(
+      return locClosure(
         this.netDebt.nonZero
           ? { withdrawCollateral: this.collateral, repayZUSD: this.netDebt }
           : { withdrawCollateral: this.collateral }
@@ -586,10 +586,10 @@ export class Trove {
     }
 
     return this.collateral.eq(that.collateral)
-      ? troveAdjustment<Decimal>(this._debtChange(that, borrowingRate), that.debt.zero && "debt")
+      ? locAdjustment<Decimal>(this._debtChange(that, borrowingRate), that.debt.zero && "debt")
       : this.debt.eq(that.debt)
-      ? troveAdjustment<Decimal>(this._collateralChange(that), that.collateral.zero && "collateral")
-      : troveAdjustment<Decimal>(
+      ? locAdjustment<Decimal>(this._collateralChange(that), that.collateral.zero && "collateral")
+      : locAdjustment<Decimal>(
           {
             ...this._debtChange(that, borrowingRate),
             ...this._collateralChange(that)
@@ -599,15 +599,15 @@ export class Trove {
   }
 
   /**
-   * Make a new Trove by applying a {@link TroveChange} to this Trove.
+   * Make a new LoC by applying a {@link LoCChange} to this LoC.
    *
    * @param change - The change to apply.
-   * @param borrowingRate - Borrowing rate to use when adding a borrowed amount to the Trove's debt.
+   * @param borrowingRate - Borrowing rate to use when adding a borrowed amount to the LoC's debt.
    */
   apply(
-    change: TroveChange<Decimal> | undefined,
+    change: LoCChange<Decimal> | undefined,
     borrowingRate: Decimalish = MINIMUM_BORROWING_RATE
-  ): Trove {
+  ): LoC {
     if (!change) {
       return this;
     }
@@ -615,19 +615,19 @@ export class Trove {
     switch (change.type) {
       case "invalidCreation":
         if (!this.isEmpty) {
-          throw new Error("Can't create onto existing Trove");
+          throw new Error("Can't create onto existing LoC");
         }
 
-        return change.invalidTrove;
+        return change.invalidLoC;
 
       case "creation": {
         if (!this.isEmpty) {
-          throw new Error("Can't create onto existing Trove");
+          throw new Error("Can't create onto existing LoC");
         }
 
         const { depositCollateral, borrowZUSD } = change.params;
 
-        return new Trove(
+        return new LoC(
           depositCollateral,
           ZUSD_LIQUIDATION_RESERVE.add(applyFee(borrowingRate, borrowZUSD))
         );
@@ -635,10 +635,10 @@ export class Trove {
 
       case "closure":
         if (this.isEmpty) {
-          throw new Error("Can't close empty Trove");
+          throw new Error("Can't close empty LoC");
         }
 
-        return _emptyTrove;
+        return _emptyLoC;
 
       case "adjustment": {
         const {
@@ -657,55 +657,55 @@ export class Trove {
           ? this.setDebt(Decimal.ZERO)
               .addCollateral(collateralIncrease)
               .subtractCollateral(collateralDecrease)
-          : this.add(new Trove(collateralIncrease, debtIncrease)).subtract(
-              new Trove(collateralDecrease, debtDecrease)
+          : this.add(new LoC(collateralIncrease, debtIncrease)).subtract(
+              new LoC(collateralDecrease, debtDecrease)
             );
       }
     }
   }
 
   /**
-   * Calculate the result of an {@link TransactableZero.openTrove | openTrove()} transaction.
+   * Calculate the result of an {@link TransactableZero.openLoC | openLoC()} transaction.
    *
    * @param params - Parameters of the transaction.
-   * @param borrowingRate - Borrowing rate to use when calculating the Trove's debt.
+   * @param borrowingRate - Borrowing rate to use when calculating the LoC's debt.
    */
-  static create(params: TroveCreationParams<Decimalish>, borrowingRate?: Decimalish): Trove {
-    return _emptyTrove.apply(troveCreation(_normalizeTroveCreation(params)), borrowingRate);
+  static create(params: LoCCreationParams<Decimalish>, borrowingRate?: Decimalish): LoC {
+    return _emptyLoC.apply(locCreation(_normalizeLoCCreation(params)), borrowingRate);
   }
 
   /**
-   * Calculate the parameters of an {@link TransactableZero.openTrove | openTrove()} transaction
-   * that will result in the given Trove.
+   * Calculate the parameters of an {@link TransactableZero.openLoC | openLoC()} transaction
+   * that will result in the given LoC.
    *
-   * @param that - The Trove to recreate.
+   * @param that - The LoC to recreate.
    * @param borrowingRate - Current borrowing rate.
    */
-  static recreate(that: Trove, borrowingRate?: Decimalish): TroveCreationParams<Decimal> {
-    const change = _emptyTrove.whatChanged(that, borrowingRate);
+  static recreate(that: LoC, borrowingRate?: Decimalish): LoCCreationParams<Decimal> {
+    const change = _emptyLoC.whatChanged(that, borrowingRate);
     assert(change?.type === "creation");
     return change.params;
   }
 
   /**
-   * Calculate the result of an {@link TransactableZero.adjustTrove | adjustTrove()} transaction
-   * on this Trove.
+   * Calculate the result of an {@link TransactableZero.adjustLoC | adjustLoC()} transaction
+   * on this LoC.
    *
    * @param params - Parameters of the transaction.
-   * @param borrowingRate - Borrowing rate to use when adding to the Trove's debt.
+   * @param borrowingRate - Borrowing rate to use when adding to the LoC's debt.
    */
-  adjust(params: TroveAdjustmentParams<Decimalish>, borrowingRate?: Decimalish): Trove {
-    return this.apply(troveAdjustment(_normalizeTroveAdjustment(params)), borrowingRate);
+  adjust(params: LoCAdjustmentParams<Decimalish>, borrowingRate?: Decimalish): LoC {
+    return this.apply(locAdjustment(_normalizeLoCAdjustment(params)), borrowingRate);
   }
 
   /**
-   * Calculate the parameters of an {@link TransactableZero.adjustTrove | adjustTrove()}
-   * transaction that will change this Trove into the given Trove.
+   * Calculate the parameters of an {@link TransactableZero.adjustLoC | adjustLoC()}
+   * transaction that will change this LoC into the given LoC.
    *
    * @param that - The desired result of the transaction.
    * @param borrowingRate - Current borrowing rate.
    */
-  adjustTo(that: Trove, borrowingRate?: Decimalish): TroveAdjustmentParams<Decimal> {
+  adjustTo(that: LoC, borrowingRate?: Decimalish): LoCAdjustmentParams<Decimal> {
     const change = this.whatChanged(that, borrowingRate);
     assert(change?.type === "adjustment");
     return change.params;
@@ -713,14 +713,14 @@ export class Trove {
 }
 
 /** @internal */
-export const _emptyTrove = new Trove();
+export const _emptyLoC = new LoC();
 
 /**
- * Represents whether a UserTrove is open or not, or why it was closed.
+ * Represents whether a UserLoC is open or not, or why it was closed.
  *
  * @public
  */
-export type UserTroveStatus =
+export type UserLoCStatus =
   | "nonExistent"
   | "open"
   | "closedByOwner"
@@ -728,34 +728,34 @@ export type UserTroveStatus =
   | "closedByRedemption";
 
 /**
- * A Trove that is associated with a single owner.
+ * A LoC that is associated with a single owner.
  *
  * @remarks
- * The SDK uses the base {@link Trove} class as a generic container of collateral and debt, for
+ * The SDK uses the base {@link LoC} class as a generic container of collateral and debt, for
  * example to represent the {@link ReadableZero.getTotal | total collateral and debt} locked up
  * in the protocol.
  *
- * The `UserTrove` class extends `Trove` with extra information that's only available for Troves
- * that are associated with a single owner (such as the owner's address, or the Trove's status).
+ * The `UserLoC` class extends `LoC` with extra information that's only available for LoCs
+ * that are associated with a single owner (such as the owner's address, or the LoC's status).
  *
  * @public
  */
-export class UserTrove extends Trove {
-  /** Address that owns this Trove. */
+export class UserLoC extends LoC {
+  /** Address that owns this LoC. */
   readonly ownerAddress: string;
 
-  /** Provides more information when the UserTrove is empty. */
-  readonly status: UserTroveStatus;
+  /** Provides more information when the UserLoC is empty. */
+  readonly status: UserLoCStatus;
 
   /** @internal */
-  constructor(ownerAddress: string, status: UserTroveStatus, collateral?: Decimal, debt?: Decimal) {
+  constructor(ownerAddress: string, status: UserLoCStatus, collateral?: Decimal, debt?: Decimal) {
     super(collateral, debt);
 
     this.ownerAddress = ownerAddress;
     this.status = status;
   }
 
-  equals(that: UserTrove): boolean {
+  equals(that: UserLoC): boolean {
     return (
       super.equals(that) && this.ownerAddress === that.ownerAddress && this.status === that.status
     );
@@ -773,27 +773,27 @@ export class UserTrove extends Trove {
 }
 
 /**
- * A Trove in its state after the last direct modification.
+ * A LoC in its state after the last direct modification.
  *
  * @remarks
- * The Trove may have received collateral and debt shares from liquidations since then.
- * Use {@link TroveWithPendingRedistribution.applyRedistribution | applyRedistribution()} to
- * calculate the Trove's most up-to-date state.
+ * The LoC may have received collateral and debt shares from liquidations since then.
+ * Use {@link LoCWithPendingRedistribution.applyRedistribution | applyRedistribution()} to
+ * calculate the LoC's most up-to-date state.
  *
  * @public
  */
-export class TroveWithPendingRedistribution extends UserTrove {
+export class LoCWithPendingRedistribution extends UserLoC {
   private readonly stake: Decimal;
-  private readonly snapshotOfTotalRedistributed: Trove;
+  private readonly snapshotOfTotalRedistributed: LoC;
 
   /** @internal */
   constructor(
     ownerAddress: string,
-    status: UserTroveStatus,
+    status: UserLoCStatus,
     collateral?: Decimal,
     debt?: Decimal,
     stake = Decimal.ZERO,
-    snapshotOfTotalRedistributed = _emptyTrove
+    snapshotOfTotalRedistributed = _emptyLoC
   ) {
     super(ownerAddress, status, collateral, debt);
 
@@ -801,12 +801,12 @@ export class TroveWithPendingRedistribution extends UserTrove {
     this.snapshotOfTotalRedistributed = snapshotOfTotalRedistributed;
   }
 
-  applyRedistribution(totalRedistributed: Trove): UserTrove {
+  applyRedistribution(totalRedistributed: LoC): UserLoC {
     const afterRedistribution = this.add(
       totalRedistributed.subtract(this.snapshotOfTotalRedistributed).multiply(this.stake)
     );
 
-    return new UserTrove(
+    return new UserLoC(
       this.ownerAddress,
       this.status,
       afterRedistribution.collateral,
@@ -814,7 +814,7 @@ export class TroveWithPendingRedistribution extends UserTrove {
     );
   }
 
-  equals(that: TroveWithPendingRedistribution): boolean {
+  equals(that: LoCWithPendingRedistribution): boolean {
     return (
       super.equals(that) &&
       this.stake.eq(that.stake) &&

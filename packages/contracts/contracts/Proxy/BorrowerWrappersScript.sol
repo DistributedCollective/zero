@@ -6,7 +6,7 @@ import "../Dependencies/SafeMath.sol";
 import "../Dependencies/ZeroMath.sol";
 import "../Dependencies/IERC20.sol";
 import "../Interfaces/IBorrowerOperations.sol";
-import "../Interfaces/ITroveManager.sol";
+import "../Interfaces/ILoCManager.sol";
 import "../Interfaces/IStabilityPool.sol";
 import "../Interfaces/IPriceFeed.sol";
 import "../Interfaces/IZEROStaking.sol";
@@ -21,7 +21,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
 
     string constant public NAME = "BorrowerWrappersScript";
 
-    ITroveManager immutable troveManager;
+    ILoCManager immutable locManager;
     IStabilityPool immutable stabilityPool;
     IPriceFeed immutable priceFeed;
     IERC20 immutable zusdToken;
@@ -30,7 +30,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
 
     constructor(
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _zeroStakingAddress,
         address _stabilityPoolAddress,
         address _priceFeedAddress,
@@ -41,9 +41,9 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
         ZEROStakingScript(_zeroStakingAddress)
         public
     {
-        checkContract(_troveManagerAddress);
-        ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
-        troveManager = troveManagerCached;
+        checkContract(_locManagerAddress);
+        ILoCManager locManagerCached = ILoCManager(_locManagerAddress);
+        locManager = locManagerCached;
 
         IStabilityPool stabilityPoolCached = IStabilityPool(_stabilityPoolAddress);
         checkContract(_stabilityPoolAddress);
@@ -64,7 +64,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
         zeroStaking = zeroStakingCached;
     }
 
-    function claimCollateralAndOpenTrove(uint _maxFee, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable {
+    function claimCollateralAndOpenLoC(uint _maxFee, uint _ZUSDAmount, address _upperHint, address _lowerHint) external payable {
         uint balanceBefore = address(this).balance;
 
         // Claim collateral
@@ -77,8 +77,8 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
 
         uint totalCollateral = balanceAfter.sub(balanceBefore).add(msg.value);
 
-        // Open trove with obtained collateral, plus collateral sent by user
-        borrowerOperations.openTrove{ value: totalCollateral }(_maxFee, _ZUSDAmount, _upperHint, _lowerHint);
+        // Open LoC with obtained collateral, plus collateral sent by user
+        borrowerOperations.openLoC{ value: totalCollateral }(_maxFee, _ZUSDAmount, _upperHint, _lowerHint);
     }
 
     function claimSPRewardsAndRecycle(uint _maxFee, address _upperHint, address _lowerHint) external {
@@ -92,11 +92,11 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
         uint zeroBalanceAfter = zeroToken.balanceOf(address(this));
         uint claimedCollateral = collBalanceAfter.sub(collBalanceBefore);
 
-        // Add claimed BTC to trove, get more ZUSD and stake it into the Stability Pool
+        // Add claimed BTC to loc, get more ZUSD and stake it into the Stability Pool
         if (claimedCollateral > 0) {
-            _requireUserHasTrove(address(this));
+            _requireUserHasLoC(address(this));
             uint ZUSDAmount = _getNetZUSDAmount(claimedCollateral);
-            borrowerOperations.adjustTrove{ value: claimedCollateral }(_maxFee, 0, ZUSDAmount, true, _upperHint, _lowerHint);
+            borrowerOperations.adjustLoC{ value: claimedCollateral }(_maxFee, 0, ZUSDAmount, true, _upperHint, _lowerHint);
             // Provide withdrawn ZUSD to Stability Pool
             if (ZUSDAmount > 0) {
                 stabilityPool.provideToSP(ZUSDAmount, address(0));
@@ -122,11 +122,11 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
         uint gainedZUSD = zusdToken.balanceOf(address(this)).sub(zusdBalanceBefore);
 
         uint netZUSDAmount;
-        // Top up trove and get more ZUSD, keeping ICR constant
+        // Top up LoC and get more ZUSD, keeping ICR constant
         if (gainedCollateral > 0) {
-            _requireUserHasTrove(address(this));
+            _requireUserHasLoC(address(this));
             netZUSDAmount = _getNetZUSDAmount(gainedCollateral);
-            borrowerOperations.adjustTrove{ value: gainedCollateral }(_maxFee, 0, netZUSDAmount, true, _upperHint, _lowerHint);
+            borrowerOperations.adjustLoC{ value: gainedCollateral }(_maxFee, 0, netZUSDAmount, true, _upperHint, _lowerHint);
         }
 
         uint totalZUSD = gainedZUSD.add(netZUSDAmount);
@@ -145,16 +145,16 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
 
     function _getNetZUSDAmount(uint _collateral) internal returns (uint) {
         uint price = priceFeed.fetchPrice();
-        uint ICR = troveManager.getCurrentICR(address(this), price);
+        uint ICR = locManager.getCurrentICR(address(this), price);
 
         uint ZUSDAmount = _collateral.mul(price).div(ICR);
-        uint borrowingRate = troveManager.getBorrowingRateWithDecay();
+        uint borrowingRate = locManager.getBorrowingRateWithDecay();
         uint netDebt = ZUSDAmount.mul(ZeroMath.DECIMAL_PRECISION).div(ZeroMath.DECIMAL_PRECISION.add(borrowingRate));
 
         return netDebt;
     }
 
-    function _requireUserHasTrove(address _depositor) internal view {
-        require(troveManager.getTroveStatus(_depositor) == 1, "BorrowerWrappersScript: caller must have an active trove");
+    function _requireUserHasLoC(address _depositor) internal view {
+        require(locManager.getLoCStatus(_depositor) == 1, "BorrowerWrappersScript: caller must have an active loc");
     }
 }

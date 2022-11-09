@@ -151,11 +151,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newTroveManagerAddress",
+          "name": "_newLoCManagerAddress",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressChanged",
+      "name": "LoCManagerAddressChanged",
       "type": "event"
     },
     {
@@ -302,7 +302,7 @@
         },
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         },
         {
@@ -336,7 +336,7 @@
     },
     {
       "inputs": [],
-      "name": "troveManagerAddress",
+      "name": "locManagerAddress",
       "outputs": [
         {
           "internalType": "address",

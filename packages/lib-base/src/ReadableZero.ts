@@ -1,5 +1,5 @@
 import { Decimal } from "./Decimal";
-import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
+import { LoC, LoCWithPendingRedistribution, UserLoC } from "./LoC";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
@@ -20,26 +20,26 @@ export type FrontendStatus =
   | { status: "registered"; kickbackRate: Decimal };
 
 /**
- * Parameters of the {@link ReadableZero.(getTroves:2) | getTroves()} function.
+ * Parameters of the {@link ReadableZero.(getLoCs:2) | getLoCs()} function.
  *
  * @public
  */
-export interface TroveListingParams {
-  /** Number of Troves to retrieve. */
+export interface LoCListingParams {
+  /** Number of LoCs to retrieve. */
   readonly first: number;
 
-  /** How the Troves should be sorted. */
+  /** How the LoCs should be sorted. */
   readonly sortedBy: "ascendingCollateralRatio" | "descendingCollateralRatio";
 
-  /** Index of the first Trove to retrieve from the sorted list. */
+  /** Index of the first LoC to retrieve from the sorted list. */
   readonly startingAt?: number;
 
   /**
-   * When set to `true`, the retrieved Troves won't include the liquidation shares received since
+   * When set to `true`, the retrieved LoCs won't include the liquidation shares received since
    * the last time they were directly modified.
    *
    * @remarks
-   * Changes the type of returned Troves to {@link TroveWithPendingRedistribution}.
+   * Changes the type of returned LoCs to {@link LoCWithPendingRedistribution}.
    */
   readonly beforeRedistribution?: boolean;
 }
@@ -57,32 +57,32 @@ export interface ReadableZero {
    * Get the total collateral and debt per stake that has been liquidated through redistribution.
    *
    * @remarks
-   * Needed when dealing with instances of {@link @sovryn-zero/lib-base#TroveWithPendingRedistribution}.
+   * Needed when dealing with instances of {@link @sovryn-zero/lib-base#LoCWithPendingRedistribution}.
    */
-  getTotalRedistributed(): Promise<Trove>;
+  getTotalRedistributed(): Promise<LoC>;
 
   /**
-   * Get a Trove in its state after the last direct modification.
+   * Get a LoC in its state after the last direct modification.
    *
-   * @param address - Address that owns the Trove.
+   * @param address - Address that owns the LoC.
    *
    * @remarks
-   * The current state of a Trove can be fetched using
-   * {@link @sovryn-zero/lib-base#ReadableZero.getTrove | getTrove()}.
+   * The current state of a LoC can be fetched using
+   * {@link @sovryn-zero/lib-base#ReadableZero.getLoC | getLoC()}.
    */
-  getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistribution>;
+  getLoCBeforeRedistribution(address?: string): Promise<LoCWithPendingRedistribution>;
 
   /**
-   * Get the current state of a Trove.
+   * Get the current state of a LoC.
    *
-   * @param address - Address that owns the Trove.
+   * @param address - Address that owns the LoC.
    */
-  getTrove(address?: string): Promise<UserTrove>;
+  getLoC(address?: string): Promise<UserLoC>;
 
   /**
-   * Get number of Troves that are currently open.
+   * Get number of LoCs that are currently open.
    */
-  getNumberOfTroves(): Promise<number>;
+  getNumberOfLoCs(): Promise<number>;
 
   /**
    * Get the current price of the native currency (e.g. Bitcoin) in USD.
@@ -92,7 +92,7 @@ export interface ReadableZero {
   /**
    * Get the total amount of collateral and debt in the Zero system.
    */
-  getTotal(): Promise<Trove>;
+  getTotal(): Promise<LoC>;
 
   /**
    * Get the current state of a Stability Deposit.
@@ -129,7 +129,7 @@ export interface ReadableZero {
    * Get the amount of leftover collateral available for withdrawal by an address.
    *
    * @remarks
-   * When a Trove gets liquidated or redeemed, any collateral it has above 110% (in case of
+   * When a LoC gets liquidated or redeemed, any collateral it has above 110% (in case of
    * liquidation) or 100% collateralization (in case of redemption) gets sent to a pool, where it
    * can be withdrawn from using
    * {@link @sovryn-zero/lib-base#TransactableZero.claimCollateralSurplus | claimCollateralSurplus()}.
@@ -137,17 +137,17 @@ export interface ReadableZero {
   getCollateralSurplusBalance(address?: string): Promise<Decimal>;
 
   /** @internal */
-  getTroves(
-    params: TroveListingParams & { beforeRedistribution: true }
-  ): Promise<TroveWithPendingRedistribution[]>;
+  getLoCs(
+    params: LoCListingParams & { beforeRedistribution: true }
+  ): Promise<LoCWithPendingRedistribution[]>;
 
   /**
-   * Get a slice from the list of Troves.
+   * Get a slice from the list of LoCs.
    *
    * @param params - Controls how the list is sorted, and where the slice begins and ends.
-   * @returns Pairs of owner addresses and their Troves.
+   * @returns Pairs of owner addresses and their LoCs.
    */
-  getTroves(params: TroveListingParams): Promise<UserTrove[]>;
+  getLoCs(params: LoCListingParams): Promise<UserLoC[]>;
 
   /**
    * Get a calculator for current fees.

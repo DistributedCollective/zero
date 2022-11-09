@@ -8,7 +8,7 @@ const dec = th.dec
 const toBN = th.toBN
 const getDifference = th.getDifference
 
-const TroveManagerTester = artifacts.require("TroveManagerTester")
+const LoCManagerTester = artifacts.require("LoCManagerTester")
 const ZUSDToken = artifacts.require("ZUSDToken")
 
 contract('StabilityPool - ZERO Rewards', async accounts => {
@@ -27,8 +27,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
   let priceFeed
   let stabilityPool
-  let sortedTroves
-  let troveManager
+  let sortedLoCs
+  let locManager
   let borrowerOperations
   let zeroToken
   let communityIssuanceTester
@@ -43,17 +43,17 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
   const ZERO_ADDRESS = th.ZERO_ADDRESS
 
-  const getOpenTroveZUSDAmount = async (totalDebt) => th.getOpenTroveZUSDAmount(contracts, totalDebt)
+  const getOpenLoCZUSDAmount = async (totalDebt) => th.getOpenLoCZUSDAmount(contracts, totalDebt)
 
-  const openTrove = async (params) => th.openTrove(contracts, params)
+  const openLoC = async (params) => th.openLoC(contracts, params)
   describe("ZERO Rewards", async () => {
 
     before(async () => {
       contracts = await deploymentHelper.deployZeroCore();
-      contracts.troveManager = await TroveManagerTester.new();
+      contracts.locManager = await LoCManagerTester.new();
       contracts.zusdToken = await ZUSDToken.new();
       await contracts.zusdToken.initialize(
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
       );
@@ -62,8 +62,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       priceFeed = contracts.priceFeedTestnet;
       zusdToken = contracts.zusdToken;
       stabilityPool = contracts.stabilityPool;
-      sortedTroves = contracts.sortedTroves;
-      troveManager = contracts.troveManager;
+      sortedLoCs = contracts.sortedLoCs;
+      locManager = contracts.locManager;
       stabilityPool = contracts.stabilityPool;
       borrowerOperations = contracts.borrowerOperations;
 
@@ -131,8 +131,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
     it("liquidation < 1 minute after a deposit does not change totalZEROIssued", async () => {
       
       
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: {from: A } })
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: {from: B } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: {from: A } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: {from: B } })
 
       // A, B provide to SP
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: A })
@@ -150,10 +150,10 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const totalZEROIssued_1 = await communityIssuanceTester.totalZEROIssued()
       assert.isTrue(totalZEROIssued_1.gt(toBN('0')))
       
-      await troveManager.liquidate(B)
+      await locManager.liquidate(B)
       const blockTimestamp_2 = th.toBN(await th.getLatestBlockTimestamp(web3))
 
-      assert.isFalse(await sortedTroves.contains(B))
+      assert.isFalse(await sortedLoCs.contains(B))
 
       const totalZEROIssued_2 = await communityIssuanceTester.totalZEROIssued()
 
@@ -178,14 +178,14 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
 
     it("withdrawFromSP(): reward term G does not update when no ZERO is issued", async () => {
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(1000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(1000, 'ether') })
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: A })
 
       const A_initialDeposit = ((await stabilityPool.deposits(A))[0]).toString()
       assert.equal(A_initialDeposit, dec(10000, 18))
 
-      // defaulter opens trove
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
+      // defaulter opens loc
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(10000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(100, 'ether') })
 
       // BTC drops
       await priceFeed.setPrice(dec(100, 18))
@@ -193,8 +193,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider)
 
       // Liquidate d1. Triggers issuance.
-      await troveManager.liquidate(defaulter_1)
-      assert.isFalse(await sortedTroves.contains(defaulter_1))
+      await locManager.liquidate(defaulter_1)
+      assert.isFalse(await sortedLoCs.contains(defaulter_1))
 
       // Get G and communityIssuance before
       const G_Before = await stabilityPool.epochToScaleToG(0, 0)
@@ -226,13 +226,13 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, dec(1, 22), A, A, { from: A, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(1, 22), B, B, { from: B, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(1, 22), C, C, { from: C, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(1, 22), D, D, { from: D, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(1, 22), A, A, { from: A, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(1, 22), B, B, { from: B, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(1, 22), C, C, { from: C, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(1, 22), D, D, { from: D, value: dec(100, 'ether') })
 
       // Check all ZERO balances are initially 0
       assert.equal(await zeroToken.balanceOf(A), 0)
@@ -307,13 +307,13 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(20000, 18), B, B, { from: B, value: dec(300, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(30000, 18), C, C, { from: C, value: dec(400, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), D, D, { from: D, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(20000, 18), B, B, { from: B, value: dec(300, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(30000, 18), C, C, { from: C, value: dec(400, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), D, D, { from: D, value: dec(100, 'ether') })
 
       // Check all ZERO balances are initially 0
       assert.equal(await zeroToken.balanceOf(A), 0)
@@ -407,16 +407,16 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(20000, 18), B, B, { from: B, value: dec(300, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(30000, 18), C, C, { from: C, value: dec(400, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(40000, 18), D, D, { from: D, value: dec(500, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(40000, 18), E, E, { from: E, value: dec(600, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(20000, 18), B, B, { from: B, value: dec(300, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(30000, 18), C, C, { from: C, value: dec(400, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(40000, 18), D, D, { from: D, value: dec(500, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(40000, 18), E, E, { from: E, value: dec(600, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(30000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(300, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(30000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(300, 'ether') })
 
       // Check all ZERO balances are initially 0
       assert.equal(await zeroToken.balanceOf(A), 0)
@@ -437,8 +437,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       // Price Drops, defaulter1 liquidated. Stability Pool size drops by 50%
       await priceFeed.setPrice(dec(100, 18))
       assert.isFalse(await th.checkRecoveryMode(contracts))
-      await troveManager.liquidate(defaulter_1)
-      assert.isFalse(await sortedTroves.contains(defaulter_1))
+      await locManager.liquidate(defaulter_1)
+      assert.isFalse(await sortedLoCs.contains(defaulter_1))
 
       // Confirm SP dropped from 60k to 30k
       assert.isAtMost(getDifference(await stabilityPool.getTotalZUSDDeposits(), dec(30000, 18)), 1000)
@@ -546,15 +546,15 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       const allDepositors = [A, B, C, D, E, F, G, H]
-      // 4 Defaulters open trove with 200ZUSD debt, and 200% ICR
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(20000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(20000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(200, 'ether') })
+      // 4 Defaulters open LoC with 200ZUSD debt, and 200% ICR
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(20000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(20000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(20000, 18)), defaulter_4, defaulter_4, { from: defaulter_4, value: dec(200, 'ether') })
 
       // price drops by 50%: defaulter ICR falls to 100%
       await priceFeed.setPrice(dec(100, 18));
@@ -567,7 +567,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       // A, B each deposit 10k ZUSD
       const depositors_1 = [A, B]
       for (account of depositors_1) {
-        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
+        await borrowerOperations.openLoC(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
@@ -575,12 +575,12 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider)
 
       // Defaulter 1 liquidated. 20k ZUSD fully offset with pool.
-      await troveManager.liquidate(defaulter_1, { from: owner });
+      await locManager.liquidate(defaulter_1, { from: owner });
 
       // C, D each deposit 10k ZUSD
       const depositors_2 = [C, D]
       for (account of depositors_2) {
-        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
+        await borrowerOperations.openLoC(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
@@ -588,12 +588,12 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 2 liquidated. 10k ZUSD offset
-      await troveManager.liquidate(defaulter_2, { from: owner });
+      await locManager.liquidate(defaulter_2, { from: owner });
 
       // Erin, Flyn each deposit 100 ZUSD
       const depositors_3 = [E, F]
       for (account of depositors_3) {
-        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
+        await borrowerOperations.openLoC(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
@@ -601,12 +601,12 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 3 liquidated. 100 ZUSD offset
-      await troveManager.liquidate(defaulter_3, { from: owner });
+      await locManager.liquidate(defaulter_3, { from: owner });
 
       // Graham, Harriet each deposit 10k ZUSD
       const depositors_4 = [G, H]
       for (account of depositors_4) {
-        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
+        await borrowerOperations.openLoC(th._100pct, dec(10000, 18), account, account, { from: account, value: dec(200, 'ether') })
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, { from: account })
       }
 
@@ -614,7 +614,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 4 liquidated. 100 ZUSD offset
-      await troveManager.liquidate(defaulter_4, { from: owner });
+      await locManager.liquidate(defaulter_4, { from: owner });
 
       // All depositors withdraw from SP
       for (depositor of allDepositors) {
@@ -659,9 +659,9 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
     it('ZERO issuance for a given period is not obtainable if the SP was empty during the period', async () => {
       const CIBalanceBefore = await zeroToken.balanceOf(communityIssuanceTester.address)
 
-      await borrowerOperations.openTrove(th._100pct, dec(16000, 18), A, A, { from: A, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), B, B, { from: B, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(16000, 18), C, C, { from: C, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(16000, 18), A, A, { from: A, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), B, B, { from: B, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(16000, 18), C, C, { from: C, value: dec(200, 'ether') })
 
       const totalZEROissuance_0 = await communityIssuanceTester.totalZEROIssued()
       const G_0 = await stabilityPool.epochToScaleToG(0, 0)  // epochs and scales will not change in this test: no liquidations
@@ -768,25 +768,25 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
     expect A, B, C, D each withdraw ~1 month's worth of ZERO */
     it("withdrawFromSP(): Several deposits of 100 ZUSD span one scale factor change. Depositors withdraw correct ZERO gains", async () => {
-      // Whale opens Trove with 100 BTC
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(100, 'ether') })
+      // Whale opens LoC with 100 BTC
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(10000, 18)), whale, whale, { from: whale, value: dec(100, 'ether') })
 
       const fiveDefaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4, defaulter_5]
 
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: A, value: dec(10000, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: B, value: dec(10000, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: C, value: dec(10000, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: D, value: dec(10000, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: E, value: dec(10000, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: F, value: dec(10000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: A, value: dec(10000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: B, value: dec(10000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: C, value: dec(10000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: D, value: dec(10000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: E, value: dec(10000, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, { from: F, value: dec(10000, 'ether') })
 
       for (const defaulter of fiveDefaulters) {
         // Defaulters 1-5 each withdraw to 9999.9 debt (including gas comp)
-        await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount('9999900000000000000000'), defaulter, defaulter, { from: defaulter, value: dec(100, 'ether') })
+        await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount('9999900000000000000000'), defaulter, defaulter, { from: defaulter, value: dec(100, 'ether') })
       }
 
       // Defaulter 6 withdraws to 10k debt (inc. gas comp)
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), defaulter_6, defaulter_6, { from: defaulter_6, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(10000, 18)), defaulter_6, defaulter_6, { from: defaulter_6, value: dec(100, 'ether') })
 
       // Confirm all depositors have 0 ZERO
       for (const depositor of [A, B, C, D, E, F]) {
@@ -805,8 +805,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider)
 
       // Defaulter 1 liquidated.  Value of P updated to  to 1e-5
-      const txL1 = await troveManager.liquidate(defaulter_1, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_1))
+      const txL1 = await locManager.liquidate(defaulter_1, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_1))
       assert.isTrue(txL1.receipt.status)
 
       // Check scale is 0
@@ -820,8 +820,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 2 liquidated
-      const txL2 = await troveManager.liquidate(defaulter_2, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_2))
+      const txL2 = await locManager.liquidate(defaulter_2, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_2))
       assert.isTrue(txL2.receipt.status)
 
       // Check scale is 1
@@ -835,8 +835,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 3 liquidated
-      const txL3 = await troveManager.liquidate(defaulter_3, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_3))
+      const txL3 = await locManager.liquidate(defaulter_3, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_3))
       assert.isTrue(txL3.receipt.status)
 
       // Check scale is 1
@@ -850,8 +850,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 4 liquidated
-      const txL4 = await troveManager.liquidate(defaulter_4, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_4))
+      const txL4 = await locManager.liquidate(defaulter_4, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_4))
       assert.isTrue(txL4.receipt.status)
 
       // Check scale is 2
@@ -865,8 +865,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 5 liquidated
-      const txL5 = await troveManager.liquidate(defaulter_5, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_5))
+      const txL5 = await locManager.liquidate(defaulter_5, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_5))
       assert.isTrue(txL5.receipt.status)
 
       // Check scale is 2
@@ -882,8 +882,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       assert.equal(await stabilityPool.currentEpoch(), '0')
 
       // Defaulter 6 liquidated
-      const txL6 = await troveManager.liquidate(defaulter_6, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_6))
+      const txL6 = await locManager.liquidate(defaulter_6, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_6))
       assert.isTrue(txL6.receipt.status)
 
       // Check scale is 0, epoch is 1
@@ -940,14 +940,14 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), B, B, { from: B, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), C, C, { from: C, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), D, D, { from: D, value: dec(100, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), E, E, { from: E, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), B, B, { from: B, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), C, C, { from: C, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), D, D, { from: D, value: dec(100, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), E, E, { from: E, value: dec(100, 'ether') })
 
       // Check all ZERO balances are initially 0
       assert.equal(await zeroToken.balanceOf(A), 0)
@@ -1084,20 +1084,20 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const initialIssuance = await communityIssuanceTester.totalZEROIssued()
       assert.equal(initialIssuance, 0)
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(60000, 18), B, B, { from: B, value: dec(800, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(30000, 18), C, C, { from: C, value: dec(400, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, dec(40000, 18), D, D, { from: D, value: dec(500, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), A, A, { from: A, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(60000, 18), B, B, { from: B, value: dec(800, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(30000, 18), C, C, { from: C, value: dec(400, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(40000, 18), D, D, { from: D, value: dec(500, 'ether') })
 
-      await borrowerOperations.openTrove(th._100pct, dec(30000, 18), E, E, { from: E, value: dec(400, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(30000, 18), E, E, { from: E, value: dec(400, 'ether') })
 
-      // D1, D2, D3 open troves with total debt 50k, 30k, 10k respectively (inc. gas comp)
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(50000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(500, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
-      await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
+      // D1, D2, D3 open locs with total debt 50k, 30k, 10k respectively (inc. gas comp)
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(50000, 18)), defaulter_1, defaulter_1, { from: defaulter_1, value: dec(500, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(20000, 18)), defaulter_2, defaulter_2, { from: defaulter_2, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(10000, 18)), defaulter_3, defaulter_3, { from: defaulter_3, value: dec(100, 'ether') })
 
       // Check all ZERO balances are initially 0
       assert.equal(await zeroToken.balanceOf(A), 0)
@@ -1130,8 +1130,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       assert.equal(await stabilityPool.getTotalZUSDDeposits(), dec(100000, 18)) // total 100k
 
       // LIQUIDATION 1
-      await troveManager.liquidate(defaulter_1)
-      assert.isFalse(await sortedTroves.contains(defaulter_1))
+      await locManager.liquidate(defaulter_1)
+      assert.isFalse(await sortedLoCs.contains(defaulter_1))
 
       th.assertIsApproximatelyEqual(await stabilityPool.getTotalZUSDDeposits(), dec(50000, 18))  // 50k
 
@@ -1190,8 +1190,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // LIQUIDATION 2
-      await troveManager.liquidate(defaulter_2)
-      assert.isFalse(await sortedTroves.contains(defaulter_2))
+      await locManager.liquidate(defaulter_2)
+      assert.isFalse(await sortedLoCs.contains(defaulter_2))
 
       th.assertIsApproximatelyEqual(await stabilityPool.getTotalZUSDDeposits(), dec(60000, 18))
 
@@ -1268,8 +1268,8 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // LIQUIDATION 3
-      await troveManager.liquidate(defaulter_3)
-      assert.isFalse(await sortedTroves.contains(defaulter_3))
+      await locManager.liquidate(defaulter_3)
+      assert.isFalse(await sortedLoCs.contains(defaulter_3))
 
       th.assertIsApproximatelyEqual(await stabilityPool.getTotalZUSDDeposits(), dec(90000, 18))
 
@@ -1472,14 +1472,14 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const kickbackRate = toBN(dec(80, 16)) // F1 kicks 80% back to depositor
       await stabilityPool.registerFrontEnd(kickbackRate, { from: frontEnd_1 })
 
-      // Whale opens Trove with 10k BTC
-      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
+      // Whale opens LoC with 10k BTC
+      await borrowerOperations.openLoC(th._100pct, dec(10000, 18), whale, whale, { from: whale, value: dec(10000, 'ether') })
 
       const _4_Defaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4]
 
       for (const defaulter of _4_Defaulters) {
         // Defaulters 1-4 each withdraw to 9999.9 debt (including gas comp)
-        await borrowerOperations.openTrove(th._100pct, await getOpenTroveZUSDAmount(dec(99999, 17)), defaulter, defaulter, { from: defaulter, value: dec(100, 'ether') })
+        await borrowerOperations.openLoC(th._100pct, await getOpenLoCZUSDAmount(dec(99999, 17)), defaulter, defaulter, { from: defaulter, value: dec(100, 'ether') })
       }
 
       // Confirm all would-be depositors have 0 ZERO
@@ -1495,62 +1495,62 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       assert.equal(await stabilityPool.currentScale(), '0')
 
       // A, B provides 5000 ZUSD to SP
-      await borrowerOperations.openTrove(th._100pct, dec(5000, 18), A, A, { from: A, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(5000, 18), A, A, { from: A, value: dec(200, 'ether') })
       await stabilityPool.provideToSP(dec(5000, 18), frontEnd_1, { from: A })
-      await borrowerOperations.openTrove(th._100pct, dec(5000, 18), B, B, { from: B, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(5000, 18), B, B, { from: B, value: dec(200, 'ether') })
       await stabilityPool.provideToSP(dec(5000, 18), frontEnd_1, { from: B })
 
       // 1 month passes (M1)
       await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider)
 
       // Defaulter 1 liquidated.  Value of P updated to  to 9999999, i.e. in decimal, ~1e-10
-      const txL1 = await troveManager.liquidate(defaulter_1, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_1))
+      const txL1 = await locManager.liquidate(defaulter_1, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_1))
       assert.isTrue(txL1.receipt.status)
 
       // Check scale is 0
       assert.equal(await stabilityPool.currentScale(), '0')
 
       // C provides to SP
-      await borrowerOperations.openTrove(th._100pct, dec(99999, 17), C, C, { from: C, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(99999, 17), C, C, { from: C, value: dec(200, 'ether') })
       await stabilityPool.provideToSP(dec(99999, 17), frontEnd_1, { from: C })
 
       // 1 month passes (M2)
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 2 liquidated
-      const txL2 = await troveManager.liquidate(defaulter_2, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_2))
+      const txL2 = await locManager.liquidate(defaulter_2, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_2))
       assert.isTrue(txL2.receipt.status)
 
       // Check scale is 1
       assert.equal(await stabilityPool.currentScale(), '1')
 
       // D provides to SP
-      await borrowerOperations.openTrove(th._100pct, dec(99999, 17), D, D, { from: D, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(99999, 17), D, D, { from: D, value: dec(200, 'ether') })
       await stabilityPool.provideToSP(dec(99999, 17), frontEnd_1, { from: D })
 
       // 1 month passes (M3)
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 3 liquidated
-      const txL3 = await troveManager.liquidate(defaulter_3, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_3))
+      const txL3 = await locManager.liquidate(defaulter_3, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_3))
       assert.isTrue(txL3.receipt.status)
 
       // Check scale is 1
       assert.equal(await stabilityPool.currentScale(), '1')
 
       // E provides to SP
-      await borrowerOperations.openTrove(th._100pct, dec(99999, 17), E, E, { from: E, value: dec(200, 'ether') })
+      await borrowerOperations.openLoC(th._100pct, dec(99999, 17), E, E, { from: E, value: dec(200, 'ether') })
       await stabilityPool.provideToSP(dec(99999, 17), frontEnd_1, { from: E })
 
       // 1 month passes (M4)
       await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider)
 
       // Defaulter 4 liquidated
-      const txL4 = await troveManager.liquidate(defaulter_4, { from: owner });
-      assert.isFalse(await sortedTroves.contains(defaulter_4))
+      const txL4 = await locManager.liquidate(defaulter_4, { from: owner });
+      assert.isFalse(await sortedLoCs.contains(defaulter_4))
       assert.isTrue(txL4.receipt.status)
 
       // Check scale is 2

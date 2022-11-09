@@ -6,12 +6,12 @@ import "../Interfaces/IActivePool.sol";
 import "../Interfaces/IDefaultPool.sol";
 import "../Interfaces/IZUSDToken.sol";
 import "../Interfaces/IZEROStaking.sol";
-import "../Interfaces/ISortedTroves.sol";
+import "../Interfaces/ISortedLoCs.sol";
 import "../Interfaces/ICollSurplusPool.sol";
-import "../TroveManagerStorage.sol";
+import "../LoCManagerStorage.sol";
 import "../Dependencies/ZeroBase.sol";
 
-contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
+contract LoCManagerBase1MinuteBootstrap is ZeroBase, LoCManagerStorage {
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
@@ -57,8 +57,8 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
     }
 
     struct LiquidationValues {
-        uint256 entireTroveDebt;
-        uint256 entireTroveColl;
+        uint256 entireLoCDebt;
+        uint256 entireLoCColl;
         uint256 collGasCompensation;
         uint256 ZUSDGasCompensation;
         uint256 debtToOffset;
@@ -85,7 +85,7 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         IDefaultPool defaultPool;
         IZUSDToken zusdToken;
         IZEROStaking zeroStaking;
-        ISortedTroves sortedTroves;
+        ISortedLoCs sortedLoCs;
         ICollSurplusPool collSurplusPool;
         address gasPoolAddress;
     }
@@ -122,48 +122,48 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         uint256 _BTCSent,
         uint256 _BTCFee
     );
-    event TroveUpdated(
+    event LoCUpdated(
         address indexed _borrower,
         uint256 _debt,
         uint256 _coll,
         uint256 _stake,
-        TroveManagerOperation _operation
+        LoCManagerOperation _operation
     );
-    event TroveLiquidated(
+    event LoCLiquidated(
         address indexed _borrower,
         uint256 _debt,
         uint256 _coll,
-        TroveManagerOperation _operation
+        LoCManagerOperation _operation
     );
     event BaseRateUpdated(uint256 _baseRate);
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event TotalStakesUpdated(uint256 _newTotalStakes);
     event SystemSnapshotsUpdated(uint256 _totalStakesSnapshot, uint256 _totalCollateralSnapshot);
     event LTermsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
-    event TroveSnapshotsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
-    event TroveIndexUpdated(address _borrower, uint256 _newIndex);
+    event LoCSnapshotsUpdated(uint256 _L_BTC, uint256 _L_ZUSDDebt);
+    event LoCIndexUpdated(address _borrower, uint256 _newIndex);
 
-    enum TroveManagerOperation {
+    enum LoCManagerOperation {
         applyPendingRewards,
         liquidateInNormalMode,
         liquidateInRecoveryMode,
         redeemCollateral
     }
 
-    /// Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
+    /// Return the current collateral ratio (ICR) of a given LoC. Takes a LoC's pending coll and debt rewards from redistributions into account.
     function _getCurrentICR(address _borrower, uint256 _price) public view returns (uint256) {
-        (uint256 currentBTC, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
+        (uint256 currentBTC, uint256 currentZUSDDebt) = _getCurrentLoCAmounts(_borrower);
 
         uint256 ICR = ZeroMath._computeCR(currentBTC, currentZUSDDebt, _price);
         return ICR;
     }
 
-    function _getCurrentTroveAmounts(address _borrower) internal view returns (uint256, uint256) {
+    function _getCurrentLoCAmounts(address _borrower) internal view returns (uint256, uint256) {
         uint256 pendingBTCReward = _getPendingBTCReward(_borrower);
         uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
-        uint256 currentBTC = Troves[_borrower].coll.add(pendingBTCReward);
-        uint256 currentZUSDDebt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
+        uint256 currentBTC = LoCs[_borrower].coll.add(pendingBTCReward);
+        uint256 currentZUSDDebt = LoCs[_borrower].debt.add(pendingZUSDDebtReward);
 
         return (currentBTC, currentZUSDDebt);
     }
@@ -173,11 +173,11 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         uint256 snapshotBTC = rewardSnapshots[_borrower].BTC;
         uint256 rewardPerUnitStaked = L_BTC.sub(snapshotBTC);
 
-        if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
+        if (rewardPerUnitStaked == 0 || LoCs[_borrower].status != Status.active) {
             return 0;
         }
 
-        uint256 stake = Troves[_borrower].stake;
+        uint256 stake = LoCs[_borrower].stake;
 
         uint256 pendingBTCReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
 
@@ -189,75 +189,75 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         uint256 snapshotZUSDDebt = rewardSnapshots[_borrower].ZUSDDebt;
         uint256 rewardPerUnitStaked = L_ZUSDDebt.sub(snapshotZUSDDebt);
 
-        if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
+        if (rewardPerUnitStaked == 0 || LoCs[_borrower].status != Status.active) {
             return 0;
         }
 
-        uint256 stake = Troves[_borrower].stake;
+        uint256 stake = LoCs[_borrower].stake;
 
         uint256 pendingZUSDDebtReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
 
         return pendingZUSDDebtReward;
     }
 
-    /// Add the borrowers's coll and debt rewards earned from redistributions, to their Trove
+    /// Add the borrowers's coll and debt rewards earned from redistributions, to their LoC
     function _applyPendingRewards(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         address _borrower
     ) internal {
         if (_hasPendingRewards(_borrower)) {
-            _requireTroveIsActive(_borrower);
+            _requireLoCIsActive(_borrower);
 
             // Compute pending rewards
             uint256 pendingBTCReward = _getPendingBTCReward(_borrower);
             uint256 pendingZUSDDebtReward = _getPendingZUSDDebtReward(_borrower);
 
-            // Apply pending rewards to trove's state
-            Troves[_borrower].coll = Troves[_borrower].coll.add(pendingBTCReward);
-            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingZUSDDebtReward);
+            // Apply pending rewards to LoC's state
+            LoCs[_borrower].coll = LoCs[_borrower].coll.add(pendingBTCReward);
+            LoCs[_borrower].debt = LoCs[_borrower].debt.add(pendingZUSDDebtReward);
 
-            _updateTroveRewardSnapshots(_borrower);
+            _updateLoCRewardSnapshots(_borrower);
 
             // Transfer from DefaultPool to ActivePool
-            _movePendingTroveRewardsToActivePool(
+            _movePendingLoCRewardsToActivePool(
                 _activePool,
                 _defaultPool,
                 pendingZUSDDebtReward,
                 pendingBTCReward
             );
 
-            emit TroveUpdated(
+            emit LoCUpdated(
                 _borrower,
-                Troves[_borrower].debt,
-                Troves[_borrower].coll,
-                Troves[_borrower].stake,
-                TroveManagerOperation.applyPendingRewards
+                LoCs[_borrower].debt,
+                LoCs[_borrower].coll,
+                LoCs[_borrower].stake,
+                LoCManagerOperation.applyPendingRewards
             );
         }
     }
 
     function _hasPendingRewards(address _borrower) public view returns (bool) {
         /*
-         * A Trove has pending rewards if its snapshot is less than the current rewards per-unit-staked sum:
+         * A LoC has pending rewards if its snapshot is less than the current rewards per-unit-staked sum:
          * this indicates that rewards have occured since the snapshot was made, and the user therefore has
          * pending rewards
          */
-        if (Troves[_borrower].status != Status.active) {
+        if (LoCs[_borrower].status != Status.active) {
             return false;
         }
 
         return (rewardSnapshots[_borrower].BTC < L_BTC);
     }
 
-    function _updateTroveRewardSnapshots(address _borrower) internal {
+    function _updateLoCRewardSnapshots(address _borrower) internal {
         rewardSnapshots[_borrower].BTC = L_BTC;
         rewardSnapshots[_borrower].ZUSDDebt = L_ZUSDDebt;
-        emit TroveSnapshotsUpdated(L_BTC, L_ZUSDDebt);
+        emit LoCSnapshotsUpdated(L_BTC, L_ZUSDDebt);
     }
 
-    /// Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
-    function _movePendingTroveRewardsToActivePool(
+    /// Move a LoC's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
+    function _movePendingLoCRewardsToActivePool(
         IActivePool _activePool,
         IDefaultPool _defaultPool,
         uint256 _ZUSD,
@@ -270,33 +270,33 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
 
     /// Remove borrower's stake from the totalStakes sum, and set their stake to 0
     function _removeStake(address _borrower) internal {
-        uint256 stake = Troves[_borrower].stake;
+        uint256 stake = LoCs[_borrower].stake;
         totalStakes = totalStakes.sub(stake);
-        Troves[_borrower].stake = 0;
+        LoCs[_borrower].stake = 0;
     }
 
-    function _closeTrove(address _borrower, Status closedStatus) internal {
+    function _closeLoC(address _borrower, Status closedStatus) internal {
         assert(closedStatus != Status.nonExistent && closedStatus != Status.active);
 
-        uint256 TroveOwnersArrayLength = TroveOwners.length;
-        _requireMoreThanOneTroveInSystem(TroveOwnersArrayLength);
+        uint256 LoCOwnersArrayLength = LoCOwners.length;
+        _requireMoreThanOneLoCInSystem(LoCOwnersArrayLength);
 
-        Troves[_borrower].status = closedStatus;
-        Troves[_borrower].coll = 0;
-        Troves[_borrower].debt = 0;
+        LoCs[_borrower].status = closedStatus;
+        LoCs[_borrower].coll = 0;
+        LoCs[_borrower].debt = 0;
 
         rewardSnapshots[_borrower].BTC = 0;
         rewardSnapshots[_borrower].ZUSDDebt = 0;
 
-        _removeTroveOwner(_borrower, TroveOwnersArrayLength);
-        sortedTroves.remove(_borrower);
+        _removeLoCOwner(_borrower, LoCOwnersArrayLength);
+        sortedLoCs.remove(_borrower);
     }
 
     /// Update borrower's stake based on their latest collateral value
     function _updateStakeAndTotalStakes(address _borrower) internal returns (uint256) {
-        uint256 newStake = _computeNewStake(Troves[_borrower].coll);
-        uint256 oldStake = Troves[_borrower].stake;
-        Troves[_borrower].stake = newStake;
+        uint256 newStake = _computeNewStake(LoCs[_borrower].coll);
+        uint256 oldStake = LoCs[_borrower].stake;
+        LoCs[_borrower].stake = newStake;
 
         totalStakes = totalStakes.sub(oldStake).add(newStake);
         emit TotalStakesUpdated(totalStakes);
@@ -312,8 +312,8 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         } else {
             /*
              * The following assert() holds true because:
-             * - The system always contains >= 1 trove
-             * - When we close or liquidate a trove, we redistribute the pending rewards, so if all troves were closed/liquidated,
+             * - The system always contains >= 1 loc
+             * - When we close or liquidate a loc, we redistribute the pending rewards, so if all locs were closed/liquidated,
              * rewards would’ve been emptied and totalCollateralSnapshot would be zero too.
              */
             assert(totalStakesSnapshot > 0);
@@ -349,7 +349,7 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         returns (uint256)
     {
         uint256 redemptionFee = _redemptionRate.mul(_BTCDrawn).div(DECIMAL_PRECISION);
-        require(redemptionFee < _BTCDrawn, "TroveManager: Fee would eat up all returned collateral");
+        require(redemptionFee < _BTCDrawn, "LoCManager: Fee would eat up all returned collateral");
         return redemptionFee;
     }
 
@@ -370,27 +370,27 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
     }
 
     /**
-      Remove a Trove owner from the TroveOwners array, not preserving array order. Removing owner 'B' does the following:
-      [A B C D E] => [A E C D], and updates E's Trove struct to point to its new array index.
+      Remove a LoC owner from the LoCOwners array, not preserving array order. Removing owner 'B' does the following:
+      [A B C D E] => [A E C D], and updates E's LoC struct to point to its new array index.
      */
-    function _removeTroveOwner(address _borrower, uint256 TroveOwnersArrayLength) internal {
-        Status troveStatus = Troves[_borrower].status;
-        // It’s set in caller function `_closeTrove`
-        assert(troveStatus != Status.nonExistent && troveStatus != Status.active);
+    function _removeLoCOwner(address _borrower, uint256 LoCOwnersArrayLength) internal {
+        Status locStatus = LoCs[_borrower].status;
+        // It’s set in caller function `_closeLoC`
+        assert(locStatus != Status.nonExistent && locStatus != Status.active);
 
-        uint128 index = Troves[_borrower].arrayIndex;
-        uint256 length = TroveOwnersArrayLength;
+        uint128 index = LoCs[_borrower].arrayIndex;
+        uint256 length = LoCOwnersArrayLength;
         uint256 idxLast = length.sub(1);
 
         assert(index <= idxLast);
 
-        address addressToMove = TroveOwners[idxLast];
+        address addressToMove = LoCOwners[idxLast];
 
-        TroveOwners[index] = addressToMove;
-        Troves[addressToMove].arrayIndex = index;
-        emit TroveIndexUpdated(addressToMove, index);
+        LoCOwners[index] = addressToMove;
+        LoCs[addressToMove].arrayIndex = index;
+        emit LoCIndexUpdated(addressToMove, index);
 
-        TroveOwners.pop();
+        LoCOwners.pop();
     }
 
     // --- 'require' wrapper functions ---
@@ -398,14 +398,14 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
     function _requireCallerIsBorrowerOperations() internal view {
         require(
             msg.sender == borrowerOperationsAddress,
-            "TroveManager: Caller is not the BorrowerOperations contract"
+            "LoCManager: Caller is not the BorrowerOperations contract"
         );
     }
 
-    function _requireTroveIsActive(address _borrower) internal view {
+    function _requireLoCIsActive(address _borrower) internal view {
         require(
-            Troves[_borrower].status == Status.active,
-            "TroveManager: Trove does not exist or is closed"
+            LoCs[_borrower].status == Status.active,
+            "LoCManager: LoC does not exist or is closed"
         );
     }
 
@@ -416,25 +416,25 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
     ) internal view {
         require(
             _zusdToken.balanceOf(_redeemer) >= _amount,
-            "TroveManager: Requested redemption amount must be <= user's ZUSD token balance"
+            "LoCManager: Requested redemption amount must be <= user's ZUSD token balance"
         );
     }
 
-    function _requireMoreThanOneTroveInSystem(uint256 TroveOwnersArrayLength) internal view {
+    function _requireMoreThanOneLoCInSystem(uint256 LoCOwnersArrayLength) internal view {
         require(
-            TroveOwnersArrayLength > 1 && sortedTroves.getSize() > 1,
-            "TroveManager: Only one trove in the system"
+            LoCOwnersArrayLength > 1 && sortedLoCs.getSize() > 1,
+            "LoCManager: Only one LoC in the system"
         );
     }
 
     function _requireAmountGreaterThanZero(uint256 _amount) internal pure {
-        require(_amount > 0, "TroveManager: Amount must be greater than zero");
+        require(_amount > 0, "LoCManager: Amount must be greater than zero");
     }
 
     function _requireTCRoverMCR(uint256 _price) internal view {
         require(
             _getTCR(_price) >= zeroBaseParams.MCR(),
-            "TroveManager: Cannot redeem when TCR < MCR"
+            "LoCManager: Cannot redeem when TCR < MCR"
         );
     }
 
@@ -442,7 +442,7 @@ contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
         uint256 systemDeploymentTime = _zeroToken.getDeploymentStartTime();
         require(
             block.timestamp >= systemDeploymentTime.add(BOOTSTRAP_PERIOD),
-            "TroveManager: Redemptions are not allowed during bootstrap phase"
+            "LoCManager: Redemptions are not allowed during bootstrap phase"
         );
     }
 

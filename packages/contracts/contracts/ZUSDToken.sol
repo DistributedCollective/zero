@@ -30,21 +30,21 @@ import "./ZUSDTokenStorage.sol";
 contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
     using SafeMath for uint256;
     // --- Events ---
-    event TroveManagerAddressChanged(address _troveManagerAddress);
+    event LoCManagerAddressChanged(address _locManagerAddress);
     event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
 
     function initialize(
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
     ) public initializer onlyOwner {
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_borrowerOperationsAddress);
 
-        troveManagerAddress = _troveManagerAddress;
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        locManagerAddress = _locManagerAddress;
+        emit LoCManagerAddressChanged(_locManagerAddress);
 
         stabilityPoolAddress = _stabilityPoolAddress;
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
@@ -69,7 +69,7 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
     }
 
     function burn(address _account, uint256 _amount) external override {
-        _requireCallerIsBOorTroveMorSP();
+        _requireCallerIsBOorLoCMorSP();
         _burn(_account, _amount);
     }
 
@@ -87,7 +87,7 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         address _receiver,
         uint256 _amount
     ) external override {
-        _requireCallerIsTroveMorSP();
+        _requireCallerIsLoCMorSP();
         _transfer(_poolAddress, _receiver, _amount);
     }
 
@@ -264,9 +264,9 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         );
         require(
             _recipient != stabilityPoolAddress &&
-                _recipient != troveManagerAddress &&
+                _recipient != locManagerAddress &&
                 _recipient != borrowerOperationsAddress,
-            "ZUSD: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
+            "ZUSD: Cannot transfer tokens directly to the StabilityPool, LoCManager or BorrowerOps"
         );
     }
 
@@ -277,12 +277,12 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         );
     }
 
-    function _requireCallerIsBOorTroveMorSP() internal view {
+    function _requireCallerIsBOorLoCMorSP() internal view {
         require(
             msg.sender == borrowerOperationsAddress ||
-                msg.sender == troveManagerAddress ||
+                msg.sender == locManagerAddress ||
                 msg.sender == stabilityPoolAddress,
-            "ZUSD: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+            "ZUSD: Caller is neither BorrowerOperations nor LoCManager nor StabilityPool"
         );
     }
 
@@ -290,10 +290,10 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         require(msg.sender == stabilityPoolAddress, "ZUSD: Caller is not the StabilityPool");
     }
 
-    function _requireCallerIsTroveMorSP() internal view {
+    function _requireCallerIsLoCMorSP() internal view {
         require(
-            msg.sender == troveManagerAddress || msg.sender == stabilityPoolAddress,
-            "ZUSD: Caller is neither TroveManager nor StabilityPool"
+            msg.sender == locManagerAddress || msg.sender == stabilityPoolAddress,
+            "ZUSD: Caller is neither LoCManager nor StabilityPool"
         );
     }
 

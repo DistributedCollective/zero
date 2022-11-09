@@ -24,7 +24,7 @@ contract StabilityPoolScript is CheckContract {
         stabilityPool.withdrawFromSP(_amount);
     }
 
-    function withdrawBTCGainToTrove(address _upperHint, address _lowerHint) external {
-        stabilityPool.withdrawBTCGainToTrove(_upperHint, _lowerHint);
+    function withdrawBTCGainToLoC(address _upperHint, address _lowerHint) external {
+        stabilityPool.withdrawBTCGainToLoC(_upperHint, _lowerHint);
     }
 }

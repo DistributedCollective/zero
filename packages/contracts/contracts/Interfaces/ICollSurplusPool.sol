@@ -6,7 +6,7 @@ interface ICollSurplusPool {
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint256 _newBalance);
@@ -18,12 +18,12 @@ interface ICollSurplusPool {
      * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
      * @param _borrowerOperationsAddress BorrowerOperations contract address
-     * @param _troveManagerAddress TroveManager contract address
+     * @param _locManagerAddress LoCManager contract address
      * @param _activePoolAddress ActivePool contract address
      */
     function setAddresses(
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress
     ) external;
 
@@ -35,7 +35,7 @@ interface ICollSurplusPool {
     /// @return collateral
     function getCollateral(address _account) external view returns (uint256);
 
-    /// @notice adds amount to current account balance. Only callable by TroveManager.
+    /// @notice adds amount to current account balance. Only callable by LoCManager.
     /// @param _account account to add amount
     /// @param _amount amount to add
     function accountSurplus(address _account, uint256 _amount) external;

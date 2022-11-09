@@ -19,16 +19,16 @@ import {
   SentZeroTransaction,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
-  Trove,
-  TroveAdjustmentDetails,
-  TroveAdjustmentParams,
-  TroveClosureDetails,
-  TroveCreationDetails,
-  TroveCreationParams,
-  TroveWithPendingRedistribution,
+  LoC,
+  LoCAdjustmentDetails,
+  LoCAdjustmentParams,
+  LoCClosureDetails,
+  LoCCreationDetails,
+  LoCCreationParams,
+  LoCWithPendingRedistribution,
   _failedReceipt,
-  _normalizeTroveAdjustment,
-  _normalizeTroveCreation,
+  _normalizeLoCAdjustment,
+  _normalizeLoCCreation,
   _pendingReceipt,
   _successfulReceipt
 } from "@sovryn-zero/lib-base";
@@ -85,7 +85,7 @@ const addGasForZEROIssuance = (gas: BigNumber) => gas.add(50000);
 //       .join("")}`
 //   );
 //
-// However, Window.crypto is browser-specific. Since we only use this for randomly picking Troves
+// However, Window.crypto is browser-specific. Since we only use this for randomly picking LoCs
 // during the search for hints, Math.random() will do fine, too.
 //
 // This returns a random integer between 0 and Number.MAX_SAFE_INTEGER
@@ -240,14 +240,14 @@ export class PopulatedEthersRedemption
       maxRedemptionRate?: Decimalish
     ) => Promise<PopulatedEthersRedemption>
   ) {
-    const { troveManager } = _getContracts(connection);
+    const { locManager } = _getContracts(connection);
 
     super(
       rawPopulatedTransaction,
       connection,
 
       ({ logs }) =>
-        troveManager
+        locManager
           .extractEvents(logs, "Redemption")
           .map(({ args: { _BTCSent, _BTCFee, _actualZUSDAmount, _attemptedZUSDAmount } }) => ({
             attemptedZUSDAmount: decimalify(_attemptedZUSDAmount),
@@ -279,9 +279,9 @@ export class PopulatedEthersRedemption
 }
 
 /** @internal */
-export interface _TroveChangeWithFees<T> {
+export interface _LoCChangeWithFees<T> {
   params: T;
-  newTrove: Trove;
+  newLoC: LoC;
   fee: Decimal;
 }
 
@@ -313,10 +313,10 @@ export class PopulatableEthersZero
     );
   }
 
-  private _wrapTroveChangeWithFees<T>(
+  private _wrapLoCChangeWithFees<T>(
     params: T,
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersZeroTransaction<_TroveChangeWithFees<T>> {
+  ): PopulatedEthersZeroTransaction<_LoCChangeWithFees<T>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return new PopulatedEthersZeroTransaction(
@@ -324,9 +324,9 @@ export class PopulatableEthersZero
       this._readable.connection,
 
       ({ logs }) => {
-        const [newTrove] = borrowerOperations
-          .extractEvents(logs, "TroveUpdated")
-          .map(({ args: { _coll, _debt } }) => new Trove(decimalify(_coll), decimalify(_debt)));
+        const [newLoC] = borrowerOperations
+          .extractEvents(logs, "LoCUpdated")
+          .map(({ args: { _coll, _debt } }) => new LoC(decimalify(_coll), decimalify(_debt)));
 
         const [fee] = borrowerOperations
           .extractEvents(logs, "ZUSDBorrowingFeePaid")
@@ -334,16 +334,16 @@ export class PopulatableEthersZero
 
         return {
           params,
-          newTrove,
+          newLoC,
           fee
         };
       }
     );
   }
 
-  private async _wrapTroveClosure(
+  private async _wrapLoCClosure(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCClosureDetails>> {
     const { activePool, zusdToken } = _getContracts(this._readable.connection);
 
     return new PopulatedEthersZeroTransaction(
@@ -371,18 +371,18 @@ export class PopulatableEthersZero
   private _wrapLiquidation(
     rawPopulatedTransaction: EthersPopulatedTransaction
   ): PopulatedEthersZeroTransaction<LiquidationDetails> {
-    const { troveManager } = _getContracts(this._readable.connection);
+    const { locManager } = _getContracts(this._readable.connection);
 
     return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
       ({ logs }) => {
-        const liquidatedAddresses = troveManager
-          .extractEvents(logs, "TroveLiquidated")
+        const liquidatedAddresses = locManager
+          .extractEvents(logs, "LoCLiquidated")
           .map(({ args: { _borrower } }) => _borrower);
 
-        const [totals] = troveManager
+        const [totals] = locManager
           .extractEvents(logs, "Liquidation")
           .map(
             ({
@@ -390,7 +390,7 @@ export class PopulatableEthersZero
             }) => ({
               collateralGasCompensation: decimalify(_collGasCompensation),
               zusdGasCompensation: decimalify(_ZUSDGasCompensation),
-              totalLiquidated: new Trove(decimalify(_liquidatedColl), decimalify(_liquidatedDebt))
+              totalLiquidated: new LoC(decimalify(_liquidatedColl), decimalify(_liquidatedDebt))
             })
           );
 
@@ -487,13 +487,13 @@ export class PopulatableEthersZero
       this._readable.connection,
 
       ({ logs }) => {
-        const [newTrove] = borrowerOperations
-          .extractEvents(logs, "TroveUpdated")
-          .map(({ args: { _coll, _debt } }) => new Trove(decimalify(_coll), decimalify(_debt)));
+        const [newLoC] = borrowerOperations
+          .extractEvents(logs, "LoCUpdated")
+          .map(({ args: { _coll, _debt } }) => new LoC(decimalify(_coll), decimalify(_debt)));
 
         return {
           ...this._extractStabilityPoolGainsWithdrawalDetails(logs),
-          newTrove
+          newLoC
         };
       }
     );
@@ -502,18 +502,18 @@ export class PopulatableEthersZero
   private async _findHintsForNominalCollateralRatio(
     nominalCollateralRatio: Decimal
   ): Promise<[string, string]> {
-    const { sortedTroves, hintHelpers } = _getContracts(this._readable.connection);
-    const numberOfTroves = await this._readable.getNumberOfTroves();
+    const { sortedLoCs, hintHelpers } = _getContracts(this._readable.connection);
+    const numberOfLoCs = await this._readable.getNumberOfLoCs();
 
-    if (!numberOfTroves) {
+    if (!numberOfLoCs) {
       return [AddressZero, AddressZero];
     }
 
     if (nominalCollateralRatio.infinite) {
-      return [AddressZero, await sortedTroves.getFirst()];
+      return [AddressZero, await sortedLoCs.getFirst()];
     }
 
-    const totalNumberOfTrials = Math.ceil(10 * Math.sqrt(numberOfTroves));
+    const totalNumberOfTrials = Math.ceil(10 * Math.sqrt(numberOfLoCs));
     const [firstTrials, ...restOfTrials] = generateTrials(totalNumberOfTrials);
 
     const collectApproxHint = (
@@ -540,15 +540,15 @@ export class PopulatableEthersZero
 
     const { hintAddress } = results.reduce((a, b) => (a.diff.lt(b.diff) ? a : b));
 
-    return sortedTroves.findInsertPosition(nominalCollateralRatio.hex, hintAddress, hintAddress);
+    return sortedLoCs.findInsertPosition(nominalCollateralRatio.hex, hintAddress, hintAddress);
   }
 
-  private async _findHints(trove: Trove): Promise<[string, string]> {
-    if (trove instanceof TroveWithPendingRedistribution) {
-      throw new Error("Rewards must be applied to this Trove");
+  private async _findHints(loc: LoC): Promise<[string, string]> {
+    if (loc instanceof LoCWithPendingRedistribution) {
+      throw new Error("Rewards must be applied to this LoC");
     }
 
-    return this._findHintsForNominalCollateralRatio(trove._nominalCollateralRatio);
+    return this._findHintsForNominalCollateralRatio(loc._nominalCollateralRatio);
   }
 
   private async _findRedemptionHints(
@@ -587,89 +587,89 @@ export class PopulatableEthersZero
     ];
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openTrove} */
-  async openTrove(
-    params: TroveCreationParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openLoC} */
+  async openLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    const normalized = _normalizeTroveCreation(params);
+    const normalized = _normalizeLoCCreation(params);
     const { depositCollateral, borrowZUSD } = normalized;
 
     const fees = await this._readable.getFees();
     const borrowingRate = fees.borrowingRate();
-    const newTrove = Trove.create(normalized, borrowingRate);
+    const newLoC = LoC.create(normalized, borrowingRate);
 
     maxBorrowingRate =
       maxBorrowingRate !== undefined
         ? Decimal.from(maxBorrowingRate)
         : borrowingRate.add(defaultBorrowingRateSlippageTolerance);
 
-    return this._wrapTroveChangeWithFees(
+    return this._wrapLoCChangeWithFees(
       normalized,
-      await borrowerOperations.estimateAndPopulate.openTrove(
+      await borrowerOperations.estimateAndPopulate.openLoC(
         { value: depositCollateral.hex, ...overrides },
         compose(addGasForPotentialLastFeeOperationTimeUpdate, addGasForPotentialListTraversal),
         maxBorrowingRate.hex,
         borrowZUSD.hex,
-        ...(await this._findHints(newTrove))
+        ...(await this._findHints(newLoC))
       )
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openNueTrove} */
-  async openNueTrove(
-    params: TroveCreationParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openNueLoC} */
+  async openNueLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    const normalized = _normalizeTroveCreation(params);
+    const normalized = _normalizeLoCCreation(params);
     const { depositCollateral, borrowZUSD } = normalized;
 
     const fees = await this._readable.getFees();
     const borrowingRate = fees.borrowingRate();
-    const newTrove = Trove.create(normalized, borrowingRate);
+    const newLoC = LoC.create(normalized, borrowingRate);
 
     maxBorrowingRate =
       maxBorrowingRate !== undefined
         ? Decimal.from(maxBorrowingRate)
         : borrowingRate.add(defaultBorrowingRateSlippageTolerance);
 
-    return this._wrapTroveChangeWithFees(
+    return this._wrapLoCChangeWithFees(
       normalized,
-      await borrowerOperations.estimateAndPopulate.openNueTrove(
+      await borrowerOperations.estimateAndPopulate.openNueLoC(
         { value: depositCollateral.hex, ...overrides },
         compose(addGasForPotentialLastFeeOperationTimeUpdate, addGasForPotentialListTraversal),
         maxBorrowingRate.hex,
         borrowZUSD.hex,
-        ...(await this._findHints(newTrove))
+        ...(await this._findHints(newLoC))
       )
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.closeTrove} */
-  async closeTrove(
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.closeLoC} */
+  async closeLoC(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCClosureDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    return this._wrapTroveClosure(
-      await borrowerOperations.estimateAndPopulate.closeTrove({ ...overrides }, id)
+    return this._wrapLoCClosure(
+      await borrowerOperations.estimateAndPopulate.closeLoC({ ...overrides }, id)
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.closeNueTrove} */
-  async closeNueTrove(
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.closeNueLoC} */
+  async closeNueLoC(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCClosureDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    return this._wrapTroveClosure(
-      await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, gas =>
+    return this._wrapLoCClosure(
+      await borrowerOperations.estimateAndPopulate.closeNueLoC({ ...overrides }, gas =>
         gas.mul(125).div(100)
       )
     );
@@ -679,16 +679,16 @@ export class PopulatableEthersZero
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ depositCollateral: amount }, undefined, overrides);
+  ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
+    return this.adjustLoC({ depositCollateral: amount }, undefined, overrides);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ withdrawCollateral: amount }, undefined, overrides);
+  ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
+    return this.adjustLoC({ withdrawCollateral: amount }, undefined, overrides);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.borrowZUSD} */
@@ -696,46 +696,46 @@ export class PopulatableEthersZero
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ borrowZUSD: amount }, maxBorrowingRate, overrides);
+  ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
+    return this.adjustLoC({ borrowZUSD: amount }, maxBorrowingRate, overrides);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.repayZUSD} */
   repayZUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
-    return this.adjustTrove({ repayZUSD: amount }, undefined, overrides);
+  ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
+    return this.adjustLoC({ repayZUSD: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustTrove} */
-  async adjustTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustLoC} */
+  async adjustLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    const normalized = _normalizeTroveAdjustment(params);
+    const normalized = _normalizeLoCAdjustment(params);
     const { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD } = normalized;
 
-    const [trove, fees] = await Promise.all([
-      this._readable.getTrove(address),
+    const [loc, fees] = await Promise.all([
+      this._readable.getLoC(address),
       borrowZUSD && this._readable.getFees()
     ]);
 
     const borrowingRate = fees?.borrowingRate();
-    const finalTrove = trove.adjust(normalized, borrowingRate);
+    const finalLoC = loc.adjust(normalized, borrowingRate);
 
     maxBorrowingRate =
       maxBorrowingRate !== undefined
         ? Decimal.from(maxBorrowingRate)
         : borrowingRate?.add(defaultBorrowingRateSlippageTolerance) ?? Decimal.ZERO;
 
-    return this._wrapTroveChangeWithFees(
+    return this._wrapLoCChangeWithFees(
       normalized,
-      await borrowerOperations.estimateAndPopulate.adjustTrove(
+      await borrowerOperations.estimateAndPopulate.adjustLoC(
         { value: depositCollateral?.hex, ...overrides },
         compose(
           borrowZUSD ? addGasForPotentialLastFeeOperationTimeUpdate : id,
@@ -745,39 +745,39 @@ export class PopulatableEthersZero
         (withdrawCollateral ?? Decimal.ZERO).hex,
         (borrowZUSD ?? repayZUSD ?? Decimal.ZERO).hex,
         !!borrowZUSD,
-        ...(await this._findHints(finalTrove))
+        ...(await this._findHints(finalLoC))
       )
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustNueTrove} */
-  async adjustNueTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustNueLoC} */
+  async adjustNueLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    const normalized = _normalizeTroveAdjustment(params);
+    const normalized = _normalizeLoCAdjustment(params);
     const { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD } = normalized;
 
-    const [trove, fees] = await Promise.all([
-      this._readable.getTrove(address),
+    const [loc, fees] = await Promise.all([
+      this._readable.getLoC(address),
       borrowZUSD && this._readable.getFees()
     ]);
 
     const borrowingRate = fees?.borrowingRate();
-    const finalTrove = trove.adjust(normalized, borrowingRate);
+    const finalLoC = loc.adjust(normalized, borrowingRate);
 
     maxBorrowingRate =
       maxBorrowingRate !== undefined
         ? Decimal.from(maxBorrowingRate)
         : borrowingRate?.add(defaultBorrowingRateSlippageTolerance) ?? Decimal.ZERO;
 
-    return this._wrapTroveChangeWithFees(
+    return this._wrapLoCChangeWithFees(
       normalized,
-      await borrowerOperations.estimateAndPopulate.adjustNueTrove(
+      await borrowerOperations.estimateAndPopulate.adjustNueLoC(
         { value: depositCollateral?.hex, ...overrides },
         compose(
           borrowZUSD ? addGasForPotentialLastFeeOperationTimeUpdate : id,
@@ -787,7 +787,7 @@ export class PopulatableEthersZero
         (withdrawCollateral ?? Decimal.ZERO).hex,
         (borrowZUSD ?? repayZUSD ?? Decimal.ZERO).hex,
         !!borrowZUSD,
-        ...(await this._findHints(finalTrove))
+        ...(await this._findHints(finalLoC))
       )
     );
   }
@@ -824,11 +824,11 @@ export class PopulatableEthersZero
     address: string | string[],
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>> {
-    const { troveManager } = _getContracts(this._readable.connection);
+    const { locManager } = _getContracts(this._readable.connection);
 
     if (Array.isArray(address)) {
       return this._wrapLiquidation(
-        await troveManager.estimateAndPopulate.batchLiquidateTroves(
+        await locManager.estimateAndPopulate.batchLiquidateLoCs(
           { ...overrides },
           addGasForZEROIssuance,
           address
@@ -836,7 +836,7 @@ export class PopulatableEthersZero
       );
     } else {
       return this._wrapLiquidation(
-        await troveManager.estimateAndPopulate.liquidate(
+        await locManager.estimateAndPopulate.liquidate(
           { ...overrides },
           addGasForZEROIssuance,
           address
@@ -847,16 +847,16 @@ export class PopulatableEthersZero
 
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.liquidateUpTo} */
   async liquidateUpTo(
-    maximumNumberOfTrovesToLiquidate: number,
+    maximumNumberOfLoCsToLiquidate: number,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>> {
-    const { troveManager } = _getContracts(this._readable.connection);
+    const { locManager } = _getContracts(this._readable.connection);
 
     return this._wrapLiquidation(
-      await troveManager.estimateAndPopulate.liquidateTroves(
+      await locManager.estimateAndPopulate.liquidateLoCs(
         { ...overrides },
         addGasForZEROIssuance,
-        maximumNumberOfTrovesToLiquidate
+        maximumNumberOfLoCsToLiquidate
       )
     );
   }
@@ -912,25 +912,25 @@ export class PopulatableEthersZero
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.transferCollateralGainToTrove} */
-  async transferCollateralGainToTrove(
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.transferCollateralGainToLoC} */
+  async transferCollateralGainToLoC(
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<CollateralGainTransferDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
 
-    const [initialTrove, stabilityDeposit] = await Promise.all([
-      this._readable.getTrove(address),
+    const [initialLoC, stabilityDeposit] = await Promise.all([
+      this._readable.getLoC(address),
       this._readable.getStabilityDeposit(address)
     ]);
 
-    const finalTrove = initialTrove.addCollateral(stabilityDeposit.collateralGain);
+    const finalLoC = initialLoC.addCollateral(stabilityDeposit.collateralGain);
 
     return this._wrapCollateralGainTransfer(
-      await stabilityPool.estimateAndPopulate.withdrawBTCGainToTrove(
+      await stabilityPool.estimateAndPopulate.withdrawBTCGainToLoC(
         { ...overrides },
         compose(addGasForPotentialListTraversal, addGasForZEROIssuance),
-        ...(await this._findHints(finalTrove))
+        ...(await this._findHints(finalLoC))
       )
     );
   }
@@ -977,7 +977,7 @@ export class PopulatableEthersZero
     maxRedemptionRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersRedemption> {
-    const { troveManager } = _getContracts(this._readable.connection);
+    const { locManager } = _getContracts(this._readable.connection);
     const attemptedZUSDAmount = Decimal.from(amount);
 
     const [
@@ -1014,7 +1014,7 @@ export class PopulatableEthersZero
           : defaultMaxRedemptionRate(truncatedAmount);
 
       return new PopulatedEthersRedemption(
-        await troveManager.estimateAndPopulate.redeemCollateral(
+        await locManager.estimateAndPopulate.redeemCollateral(
           { ...overrides },
           addGasForPotentialLastFeeOperationTimeUpdate,
           truncatedAmount.hex,

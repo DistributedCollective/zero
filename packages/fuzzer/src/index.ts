@@ -10,8 +10,8 @@ import {
   Decimal,
   Difference,
   ZUSD_LIQUIDATION_RESERVE,
-  Trove,
-  TroveWithPendingRedistribution
+  LoC,
+  LoCWithPendingRedistribution
 } from "@sovryn-zero/lib-base";
 
 import { EthersZero as Zero } from "@sovryn-zero/lib-ethers";
@@ -19,11 +19,11 @@ import { EthersZero as Zero } from "@sovryn-zero/lib-ethers";
 import {
   checkPoolBalances,
   checkSubgraph,
-  checkTroveOrdering,
+  checkLoCOrdering,
   connectUsers,
   createRandomWallets,
-  dumpTroves,
-  getListOfTrovesBeforeRedistribution,
+  dumpLoCs,
+  getListOfLoCsBeforeRedistribution,
   shortenAddress
 } from "./utils";
 
@@ -47,20 +47,20 @@ yargs
 
   .command(
     "warzone",
-    "Create lots of Troves.",
+    "Create lots of LoCs.",
     {
-      troves: {
+      locs: {
         alias: "n",
         default: 1000,
-        description: "Number of troves to create"
+        description: "Number of locs to create"
       }
     },
-    async ({ troves }) => {
+    async ({ locs }) => {
       const deployerZero = await Zero.connect(deployer);
 
       const price = await deployerZero.getPrice();
 
-      for (let i = 1; i <= troves; ++i) {
+      for (let i = 1; i <= locs; ++i) {
         const user = Wallet.createRandom().connect(provider);
         const userAddress = await user.getAddress();
         const debt = ZUSD_LIQUIDATION_RESERVE.add(99999 * Math.random());
@@ -74,7 +74,7 @@ yargs
         });
 
         const fees = await zero.getFees();
-        await zero.openTrove(Trove.recreate(new Trove(collateral, debt), fees.borrowingRate()), {
+        await zero.openLoC(LoC.recreate(new LoC(collateral, debt), fees.borrowingRate()), {
           gasPrice: 0
         });
 
@@ -84,7 +84,7 @@ yargs
         }
 
         if (i % 10 === 0) {
-          console.log(`Created ${i} Troves.`);
+          console.log(`Created ${i} LoCs.`);
         }
 
         //await new Promise(resolve => setTimeout(resolve, 4000));
@@ -125,7 +125,7 @@ yargs
         frontendZero
       );
 
-      let previousListOfTroves: [string, TroveWithPendingRedistribution][] | undefined = undefined;
+      let previousListOfLoCs: [string, LoCWithPendingRedistribution][] | undefined = undefined;
 
       console.log();
       console.log("// Keys");
@@ -139,7 +139,7 @@ yargs
         console.log(`// Round #${i}`);
 
         const price = await fixture.setRandomPrice();
-        await fixture.liquidateRandomNumberOfTroves(price);
+        await fixture.liquidateRandomNumberOfLoCs(price);
 
         for (let i = 0; i < randomUsers.length; ++i) {
           const user = randomUsers[i];
@@ -148,15 +148,15 @@ yargs
           const x = Math.random();
 
           if (x < 0.5) {
-            const trove = await zero.getTrove();
+            const loc = await zero.getLoC();
 
-            if (trove.isEmpty) {
-              await fixture.openRandomTrove(user.address, zero);
+            if (loc.isEmpty) {
+              await fixture.openRandomLoC(user.address, zero);
             } else {
               if (x < 0.4) {
-                await fixture.randomlyAdjustTrove(user.address, zero, trove);
+                await fixture.randomlyAdjustLoC(user.address, zero, loc);
               } else {
-                await fixture.closeTrove(user.address, zero, trove);
+                await fixture.closeLoC(user.address, zero, loc);
               }
             }
           } else if (x < 0.7) {
@@ -182,13 +182,13 @@ yargs
           // await fixture.sweepZUSD(zero);
           await fixture.sweepZERO(zero);
 
-          const listOfTroves = await getListOfTrovesBeforeRedistribution(deployerZero);
+          const listOfLoCs = await getListOfLoCsBeforeRedistribution(deployerZero);
           const totalRedistributed = await deployerZero.getTotalRedistributed();
 
-          checkTroveOrdering(listOfTroves, totalRedistributed, price, previousListOfTroves);
-          await checkPoolBalances(deployerZero, listOfTroves, totalRedistributed);
+          checkLoCOrdering(listOfLoCs, totalRedistributed, price, previousListOfLoCs);
+          await checkPoolBalances(deployerZero, listOfLoCs, totalRedistributed);
 
-          previousListOfTroves = listOfTroves;
+          previousListOfLoCs = listOfLoCs;
         }
       }
 
@@ -198,82 +198,82 @@ yargs
 
   .command(
     "order",
-    "End chaos and restore order by liquidating every Trove except the Funder's.",
+    "End chaos and restore order by liquidating every LoC except the Funder's.",
     {},
     async () => {
       const [deployerZero, funderZero] = await connectUsers([deployer, funder]);
 
       const initialPrice = await deployerZero.getPrice();
-      let initialNumberOfTroves = await funderZero.getNumberOfTroves();
+      let initialNumberOfLoCs = await funderZero.getNumberOfLoCs();
 
-      let [[firstTroveOwner]] = await funderZero.getTroves({
+      let [[firstLoCOwner]] = await funderZero.getLoCs({
         first: 1,
         sortedBy: "descendingCollateralRatio"
       });
 
-      if (firstTroveOwner !== funder.address) {
-        let trove = await funderZero.getTrove();
+      if (firstLoCOwner !== funder.address) {
+        let loc = await funderZero.getLoC();
 
-        if (trove.isEmpty) {
-          await funderZero.openTrove({ depositCollateral: 1000 });
-          trove = await funderZero.getTrove();
+        if (loc.isEmpty) {
+          await funderZero.openLoC({ depositCollateral: 1000 });
+          loc = await funderZero.getLoC();
         }
 
         const zusdBalance = await funderZero.getZUSDBalance();
 
-        if (zusdBalance.lt(trove.netDebt)) {
+        if (zusdBalance.lt(loc.netDebt)) {
           const [randomUser] = createRandomWallets(1, provider);
           const randomZero = await Zero.connect(randomUser);
 
-          const zusdNeeded = trove.netDebt.sub(zusdBalance);
-          const tempTrove = {
+          const zusdNeeded = loc.netDebt.sub(zusdBalance);
+          const tempLoC = {
             depositCollateral: ZUSD_LIQUIDATION_RESERVE.add(zusdNeeded).div(initialPrice).mul(3),
             borrowZUSD: zusdNeeded
           };
 
           await funder.sendTransaction({
             to: randomUser.address,
-            value: tempTrove.depositCollateral.hex
+            value: tempLoC.depositCollateral.hex
           });
 
-          await randomZero.openTrove(tempTrove, { gasPrice: 0 });
-          initialNumberOfTroves++;
+          await randomZero.openLoC(tempLoC, { gasPrice: 0 });
+          initialNumberOfLoCs++;
           await randomZero.sendZUSD(funder.address, zusdNeeded, { gasPrice: 0 });
         }
 
-        await funderZero.repayZUSD(trove.netDebt);
+        await funderZero.repayZUSD(loc.netDebt);
       }
 
-      [[firstTroveOwner]] = await funderZero.getTroves({
+      [[firstLoCOwner]] = await funderZero.getLoCs({
         first: 1,
         sortedBy: "descendingCollateralRatio"
       });
 
-      if (firstTroveOwner !== funder.address) {
-        throw new Error("didn't manage to hoist Funder's Trove to head of SortedTroves");
+      if (firstLoCOwner !== funder.address) {
+        throw new Error("didn't manage to hoist Funder's LoC to head of SortedLoCs");
       }
 
       await deployerZero.setPrice(0.001);
 
-      let numberOfTroves: number;
-      while ((numberOfTroves = await funderZero.getNumberOfTroves()) > 1) {
-        const numberOfTrovesToLiquidate = numberOfTroves > 10 ? 10 : numberOfTroves - 1;
+      let numberOfLoCs: number;
+      while ((numberOfLoCs = await funderZero.getNumberOfLoCs()) > 1) {
+        const numberOfLoCsToLiquidate = numberOfLoCs > 10 ? 10 : numberOfLoCs - 1;
 
-        console.log(`${numberOfTroves} Troves left.`);
-        await funderZero.liquidateUpTo(numberOfTrovesToLiquidate);
+        console.log(`${numberOfLoCs} LoCs left.`);
+        await funderZero.liquidateUpTo(numberOfLoCsToLiquidate);
       }
 
       await deployerZero.setPrice(initialPrice);
 
-      if ((await funderZero.getNumberOfTroves()) !== 1) {
-        throw new Error("didn't manage to liquidate every Trove");
+      if ((await funderZero.getNumberOfLoCs()) !== 1) {
+        throw new Error("didn't manage to liquidate every LoC");
       }
 
-      const funderTrove = await funderZero.getTrove();
+      const funderLoC = await funderZero.getLoC();
       const total = await funderZero.getTotal();
 
-      const collateralDifference = Difference.between(total.collateral, funderTrove.collateral);
-      const debtDifference = Difference.between(total.debt, funderTrove.debt);
+      const collateralDifference = Difference.between(total.collateral, funderLoC.collateral);
+      const debtDifference = Difference.between(total.debt, funderLoC.debt);
 
       console.log();
       console.log("Discrepancies:");
@@ -282,15 +282,15 @@ yargs
     }
   )
 
-  .command("check-sorting", "Check if Troves are sorted by ICR.", {}, async () => {
+  .command("check-sorting", "Check if LoCs are sorted by ICR.", {}, async () => {
     const deployerZero = await Zero.connect(deployer);
-    const listOfTroves = await getListOfTrovesBeforeRedistribution(deployerZero);
+    const listOfLoCs = await getListOfLoCsBeforeRedistribution(deployerZero);
     const totalRedistributed = await deployerZero.getTotalRedistributed();
     const price = await deployerZero.getPrice();
 
-    checkTroveOrdering(listOfTroves, totalRedistributed, price);
+    checkLoCOrdering(listOfLoCs, totalRedistributed, price);
 
-    console.log("All Troves are sorted.");
+    console.log("All LoCs are sorted.");
   })
 
   .command("check-subgraph", "Check that subgraph data matches layer 1.", {}, async () => {
@@ -301,13 +301,13 @@ yargs
     console.log("Subgraph looks fine.");
   })
 
-  .command("dump-troves", "Dump list of Troves.", {}, async () => {
+  .command("dump-locs", "Dump list of LoCs.", {}, async () => {
     const deployerZero = await Zero.connect(deployer);
-    const listOfTroves = await getListOfTrovesBeforeRedistribution(deployerZero);
+    const listOfLoCs = await getListOfLoCsBeforeRedistribution(deployerZero);
     const totalRedistributed = await deployerZero.getTotalRedistributed();
     const price = await deployerZero.getPrice();
 
-    dumpTroves(listOfTroves, totalRedistributed, price);
+    dumpLoCs(listOfLoCs, totalRedistributed, price);
   })
 
   .demandCommand()

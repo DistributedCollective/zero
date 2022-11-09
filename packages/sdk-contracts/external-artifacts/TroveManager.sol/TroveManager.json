@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "TroveManager",
-  "sourceName": "contracts/TroveManager.sol",
+  "contractName": "LoCManager",
+  "sourceName": "contracts/LoCManager.sol",
   "abi": [
     {
       "anonymous": false,
@@ -239,11 +239,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         }
       ],
-      "name": "SortedTrovesAddressChanged",
+      "name": "SortedLoCsAddressChanged",
       "type": "event"
     },
     {
@@ -307,7 +307,7 @@
           "type": "uint256"
         }
       ],
-      "name": "TroveIndexUpdated",
+      "name": "LoCIndexUpdated",
       "type": "event"
     },
     {
@@ -338,7 +338,7 @@
           "type": "uint8"
         }
       ],
-      "name": "TroveLiquidated",
+      "name": "LoCLiquidated",
       "type": "event"
     },
     {
@@ -347,11 +347,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_troveManagerRedeemOps",
+          "name": "_locManagerRedeemOps",
           "type": "address"
         }
       ],
-      "name": "TroveManagerRedeemOpsAddressChanged",
+      "name": "LoCManagerRedeemOpsAddressChanged",
       "type": "event"
     },
     {
@@ -370,7 +370,7 @@
           "type": "uint256"
         }
       ],
-      "name": "TroveSnapshotsUpdated",
+      "name": "LoCSnapshotsUpdated",
       "type": "event"
     },
     {
@@ -407,7 +407,7 @@
           "type": "uint8"
         }
       ],
-      "name": "TroveUpdated",
+      "name": "LoCUpdated",
       "type": "event"
     },
     {
@@ -600,7 +600,7 @@
           "type": "uint256"
         }
       ],
-      "name": "TroveOwners",
+      "name": "LoCOwners",
       "outputs": [
         {
           "internalType": "address",
@@ -619,7 +619,7 @@
           "type": "address"
         }
       ],
-      "name": "Troves",
+      "name": "LoCs",
       "outputs": [
         {
           "internalType": "uint256",
@@ -637,7 +637,7 @@
           "type": "uint256"
         },
         {
-          "internalType": "enum TroveManagerStorage.Status",
+          "internalType": "enum LoCManagerStorage.Status",
           "name": "status",
           "type": "uint8"
         },
@@ -843,7 +843,7 @@
           "type": "address"
         }
       ],
-      "name": "addTroveOwnerToArray",
+      "name": "addLoCOwnerToArray",
       "outputs": [
         {
           "internalType": "uint256",
@@ -884,11 +884,11 @@
       "inputs": [
         {
           "internalType": "address[]",
-          "name": "_troveArray",
+          "name": "_locArray",
           "type": "address[]"
         }
       ],
-      "name": "batchLiquidateTroves",
+      "name": "batchLiquidateLoCs",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -933,7 +933,7 @@
           "type": "address"
         }
       ],
-      "name": "closeTrove",
+      "name": "closeLoC",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -958,7 +958,7 @@
           "type": "uint256"
         }
       ],
-      "name": "decreaseTroveColl",
+      "name": "decreaseLoCColl",
       "outputs": [
         {
           "internalType": "uint256",
@@ -982,7 +982,7 @@
           "type": "uint256"
         }
       ],
-      "name": "decreaseTroveDebt",
+      "name": "decreaseLoCDebt",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1309,7 +1309,7 @@
           "type": "address"
         }
       ],
-      "name": "getTroveColl",
+      "name": "getLoCColl",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1328,7 +1328,7 @@
           "type": "address"
         }
       ],
-      "name": "getTroveDebt",
+      "name": "getLoCDebt",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1347,7 +1347,7 @@
           "type": "uint256"
         }
       ],
-      "name": "getTroveFromTroveOwnersArray",
+      "name": "getLoCFromLoCOwnersArray",
       "outputs": [
         {
           "internalType": "address",
@@ -1360,7 +1360,7 @@
     },
     {
       "inputs": [],
-      "name": "getTroveOwnersCount",
+      "name": "getLoCOwnersCount",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1379,7 +1379,7 @@
           "type": "address"
         }
       ],
-      "name": "getTroveStake",
+      "name": "getLoCStake",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1398,7 +1398,7 @@
           "type": "address"
         }
       ],
-      "name": "getTroveStatus",
+      "name": "getLoCStatus",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1441,7 +1441,7 @@
           "type": "uint256"
         }
       ],
-      "name": "increaseTroveColl",
+      "name": "increaseLoCColl",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1465,7 +1465,7 @@
           "type": "uint256"
         }
       ],
-      "name": "increaseTroveDebt",
+      "name": "increaseLoCDebt",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1536,7 +1536,7 @@
           "type": "uint256"
         }
       ],
-      "name": "liquidateTroves",
+      "name": "liquidateLoCs",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1656,7 +1656,7 @@
         },
         {
           "internalType": "address",
-          "name": "_troveManagerRedeemOps",
+          "name": "_locManagerRedeemOps",
           "type": "address"
         },
         {
@@ -1706,7 +1706,7 @@
         },
         {
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         },
         {
@@ -1751,17 +1751,17 @@
           "type": "uint256"
         }
       ],
-      "name": "setTroveStatus",
+      "name": "setLoCStatus",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "name": "sortedTroves",
+      "name": "sortedLoCs",
       "outputs": [
         {
-          "internalType": "contract ISortedTroves",
+          "internalType": "contract ISortedLoCs",
           "name": "",
           "type": "address"
         }
@@ -1810,7 +1810,7 @@
     },
     {
       "inputs": [],
-      "name": "troveManagerRedeemOps",
+      "name": "locManagerRedeemOps",
       "outputs": [
         {
           "internalType": "address",
@@ -1848,7 +1848,7 @@
           "type": "address"
         }
       ],
-      "name": "updateTroveRewardSnapshots",
+      "name": "updateLoCRewardSnapshots",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

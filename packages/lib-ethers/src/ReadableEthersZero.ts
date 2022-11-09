@@ -8,16 +8,16 @@ import {
   ZEROStake,
   ReadableZero,
   StabilityDeposit,
-  Trove,
-  TroveListingParams,
-  TroveWithPendingRedistribution,
-  UserTrove,
-  UserTroveStatus,
+  LoC,
+  LoCListingParams,
+  LoCWithPendingRedistribution,
+  UserLoC,
+  UserLoCStatus,
   _CachedReadableZero,
   _ZeroReadCache
 } from "@sovryn-zero/lib-base";
 
-import { MultiTroveGetter } from "../types";
+import { MultiLoCGetter } from "../types";
 
 import { EthersCallOverrides, EthersProvider, EthersSigner } from "./types";
 
@@ -40,7 +40,7 @@ import { BlockPolledZeroStore } from "./BlockPolledZeroStore";
 const MINUTE_DECAY_FACTOR = Decimal.from("0.999037758833783000");
 const BETA = Decimal.from(2);
 
-enum BackendTroveStatus {
+enum BackendLoCStatus {
   nonExistent,
   active,
   closedByOwner,
@@ -52,16 +52,16 @@ const panic = <T>(error: Error): T => {
   throw error;
 };
 
-const userTroveStatusFrom = (backendStatus: BackendTroveStatus): UserTroveStatus =>
-  backendStatus === BackendTroveStatus.nonExistent
+const userLoCStatusFrom = (backendStatus: BackendLoCStatus): UserLoCStatus =>
+  backendStatus === BackendLoCStatus.nonExistent
     ? "nonExistent"
-    : backendStatus === BackendTroveStatus.active
+    : backendStatus === BackendLoCStatus.active
     ? "open"
-    : backendStatus === BackendTroveStatus.closedByOwner
+    : backendStatus === BackendLoCStatus.closedByOwner
     ? "closedByOwner"
-    : backendStatus === BackendTroveStatus.closedByLiquidation
+    : backendStatus === BackendLoCStatus.closedByLiquidation
     ? "closedByLiquidation"
-    : backendStatus === BackendTroveStatus.closedByRedemption
+    : backendStatus === BackendLoCStatus.closedByRedemption
     ? "closedByRedemption"
     : panic(new Error(`invalid backendStatus ${backendStatus}`));
 
@@ -153,59 +153,59 @@ export class ReadableEthersZero implements ReadableZero {
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotalRedistributed} */
-  async getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove> {
-    const { troveManager } = _getContracts(this.connection);
+  async getTotalRedistributed(overrides?: EthersCallOverrides): Promise<LoC> {
+    const { locManager } = _getContracts(this.connection);
 
     const [collateral, debt] = await Promise.all([
-      troveManager.L_BTC({ ...overrides }).then(decimalify),
-      troveManager.L_ZUSDDebt({ ...overrides }).then(decimalify)
+      locManager.L_BTC({ ...overrides }).then(decimalify),
+      locManager.L_ZUSDDebt({ ...overrides }).then(decimalify)
     ]);
 
-    return new Trove(collateral, debt);
+    return new LoC(collateral, debt);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTroveBeforeRedistribution} */
-  async getTroveBeforeRedistribution(
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getLoCBeforeRedistribution} */
+  async getLoCBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
-  ): Promise<TroveWithPendingRedistribution> {
+  ): Promise<LoCWithPendingRedistribution> {
     address ??= _requireAddress(this.connection);
-    const { troveManager } = _getContracts(this.connection);
+    const { locManager } = _getContracts(this.connection);
 
-    const [trove, snapshot] = await Promise.all([
-      troveManager.Troves(address, { ...overrides }),
-      troveManager.rewardSnapshots(address, { ...overrides })
+    const [loc, snapshot] = await Promise.all([
+      locManager.LoCs(address, { ...overrides }),
+      locManager.rewardSnapshots(address, { ...overrides })
     ]);
 
-    if (trove.status === BackendTroveStatus.active) {
-      return new TroveWithPendingRedistribution(
+    if (loc.status === BackendLoCStatus.active) {
+      return new LoCWithPendingRedistribution(
         address,
-        userTroveStatusFrom(trove.status),
-        decimalify(trove.coll),
-        decimalify(trove.debt),
-        decimalify(trove.stake),
-        new Trove(decimalify(snapshot.BTC), decimalify(snapshot.ZUSDDebt))
+        userLoCStatusFrom(loc.status),
+        decimalify(loc.coll),
+        decimalify(loc.debt),
+        decimalify(loc.stake),
+        new LoC(decimalify(snapshot.BTC), decimalify(snapshot.ZUSDDebt))
       );
     } else {
-      return new TroveWithPendingRedistribution(address, userTroveStatusFrom(trove.status));
+      return new LoCWithPendingRedistribution(address, userLoCStatusFrom(loc.status));
     }
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTrove} */
-  async getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove> {
-    const [trove, totalRedistributed] = await Promise.all([
-      this.getTroveBeforeRedistribution(address, overrides),
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getLoC} */
+  async getLoC(address?: string, overrides?: EthersCallOverrides): Promise<UserLoC> {
+    const [loc, totalRedistributed] = await Promise.all([
+      this.getLoCBeforeRedistribution(address, overrides),
       this.getTotalRedistributed(overrides)
     ]);
 
-    return trove.applyRedistribution(totalRedistributed);
+    return loc.applyRedistribution(totalRedistributed);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getNumberOfTroves} */
-  async getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number> {
-    const { troveManager } = _getContracts(this.connection);
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getNumberOfLoCs} */
+  async getNumberOfLoCs(overrides?: EthersCallOverrides): Promise<number> {
+    const { locManager } = _getContracts(this.connection);
 
-    return (await troveManager.getTroveOwnersCount({ ...overrides })).toNumber();
+    return (await locManager.getLoCOwnersCount({ ...overrides })).toNumber();
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getPrice} */
@@ -216,7 +216,7 @@ export class ReadableEthersZero implements ReadableZero {
   }
 
   /** @internal */
-  async _getActivePool(overrides?: EthersCallOverrides): Promise<Trove> {
+  async _getActivePool(overrides?: EthersCallOverrides): Promise<LoC> {
     const { activePool } = _getContracts(this.connection);
 
     const [activeCollateral, activeDebt] = await Promise.all(
@@ -226,11 +226,11 @@ export class ReadableEthersZero implements ReadableZero {
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
 
-    return new Trove(activeCollateral, activeDebt);
+    return new LoC(activeCollateral, activeDebt);
   }
 
   /** @internal */
-  async _getDefaultPool(overrides?: EthersCallOverrides): Promise<Trove> {
+  async _getDefaultPool(overrides?: EthersCallOverrides): Promise<LoC> {
     const { defaultPool } = _getContracts(this.connection);
 
     const [liquidatedCollateral, closedDebt] = await Promise.all(
@@ -240,11 +240,11 @@ export class ReadableEthersZero implements ReadableZero {
       ].map(getBigNumber => getBigNumber.then(decimalify))
     );
 
-    return new Trove(liquidatedCollateral, closedDebt);
+    return new LoC(liquidatedCollateral, closedDebt);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotal} */
-  async getTotal(overrides?: EthersCallOverrides): Promise<Trove> {
+  async getTotal(overrides?: EthersCallOverrides): Promise<LoC> {
     const [activePool, defaultPool] = await Promise.all([
       this._getActivePool(overrides),
       this._getDefaultPool(overrides)
@@ -328,19 +328,19 @@ export class ReadableEthersZero implements ReadableZero {
   }
 
   /** @internal */
-  getTroves(
-    params: TroveListingParams & { beforeRedistribution: true },
+  getLoCs(
+    params: LoCListingParams & { beforeRedistribution: true },
     overrides?: EthersCallOverrides
-  ): Promise<TroveWithPendingRedistribution[]>;
+  ): Promise<LoCWithPendingRedistribution[]>;
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.(getTroves:2)} */
-  getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.(getLoCs:2)} */
+  getLoCs(params: LoCListingParams, overrides?: EthersCallOverrides): Promise<UserLoC[]>;
 
-  async getTroves(
-    params: TroveListingParams,
+  async getLoCs(
+    params: LoCListingParams,
     overrides?: EthersCallOverrides
-  ): Promise<UserTrove[]> {
-    const { multiTroveGetter } = _getContracts(this.connection);
+  ): Promise<UserLoC[]> {
+    const { multiLoCGetter } = _getContracts(this.connection);
 
     expectPositiveInt(params, "first");
     expectPositiveInt(params, "startingAt");
@@ -351,9 +351,9 @@ export class ReadableEthersZero implements ReadableZero {
       );
     }
 
-    const [totalRedistributed, backendTroves] = await Promise.all([
+    const [totalRedistributed, backendLoCs] = await Promise.all([
       params.beforeRedistribution ? undefined : this.getTotalRedistributed({ ...overrides }),
-      multiTroveGetter.getMultipleSortedTroves(
+      multiLoCGetter.getMultipleSortedLoCs(
         params.sortedBy === "descendingCollateralRatio"
           ? params.startingAt ?? 0
           : -((params.startingAt ?? 0) + 1),
@@ -362,12 +362,12 @@ export class ReadableEthersZero implements ReadableZero {
       )
     ]);
 
-    const troves = mapBackendTroves(backendTroves);
+    const locs = mapBackendLoCs(backendLoCs);
 
     if (totalRedistributed) {
-      return troves.map(trove => trove.applyRedistribution(totalRedistributed));
+      return locs.map(loc => loc.applyRedistribution(totalRedistributed));
     } else {
-      return troves;
+      return locs;
     }
   }
 
@@ -375,11 +375,11 @@ export class ReadableEthersZero implements ReadableZero {
   async _getFeesFactory(
     overrides?: EthersCallOverrides
   ): Promise<(blockTimestamp: number, recoveryMode: boolean) => Fees> {
-    const { troveManager } = _getContracts(this.connection);
+    const { locManager } = _getContracts(this.connection);
 
     const [lastFeeOperationTime, baseRateWithoutDecay] = await Promise.all([
-      troveManager.lastFeeOperationTime({ ...overrides }),
-      troveManager.baseRate({ ...overrides }).then(decimalify)
+      locManager.lastFeeOperationTime({ ...overrides }),
+      locManager.baseRate({ ...overrides }).then(decimalify)
     ]);
 
     return (blockTimestamp, recoveryMode) =>
@@ -445,18 +445,18 @@ export class ReadableEthersZero implements ReadableZero {
 }
 
 type Resolved<T> = T extends Promise<infer U> ? U : T;
-type BackendTroves = Resolved<ReturnType<MultiTroveGetter["getMultipleSortedTroves"]>>;
+type BackendLoCs = Resolved<ReturnType<MultiLoCGetter["getMultipleSortedLoCs"]>>;
 
-const mapBackendTroves = (troves: BackendTroves): TroveWithPendingRedistribution[] =>
-  troves.map(
-    trove =>
-      new TroveWithPendingRedistribution(
-        trove.owner,
-        "open", // These Troves are coming from the SortedTroves list, so they must be open
-        decimalify(trove.coll),
-        decimalify(trove.debt),
-        decimalify(trove.stake),
-        new Trove(decimalify(trove.snapshotBTC), decimalify(trove.snapshotZUSDDebt))
+const mapBackendLoCs = (locs: BackendLoCs): LoCWithPendingRedistribution[] =>
+  locs.map(
+    loc =>
+      new LoCWithPendingRedistribution(
+        loc.owner,
+        "open", // These LoCs are coming from the SortedLoCs list, so they must be open
+        decimalify(loc.coll),
+        decimalify(loc.debt),
+        decimalify(loc.stake),
+        new LoC(decimalify(loc.snapshotBTC), decimalify(loc.snapshotZUSDDebt))
       )
   );
 
@@ -501,30 +501,30 @@ class BlockPolledZeroStoreBasedCache
     );
   }
 
-  getTotalRedistributed(overrides?: EthersCallOverrides): Trove | undefined {
+  getTotalRedistributed(overrides?: EthersCallOverrides): LoC | undefined {
     if (this._blockHit(overrides)) {
       return this._store.state.totalRedistributed;
     }
   }
 
-  getTroveBeforeRedistribution(
+  getLoCBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
-  ): TroveWithPendingRedistribution | undefined {
+  ): LoCWithPendingRedistribution | undefined {
     if (this._userHit(address, overrides)) {
-      return this._store.state.troveBeforeRedistribution;
+      return this._store.state.locBeforeRedistribution;
     }
   }
 
-  getTrove(address?: string, overrides?: EthersCallOverrides): UserTrove | undefined {
+  getLoC(address?: string, overrides?: EthersCallOverrides): UserLoC | undefined {
     if (this._userHit(address, overrides)) {
-      return this._store.state.trove;
+      return this._store.state.loc;
     }
   }
 
-  getNumberOfTroves(overrides?: EthersCallOverrides): number | undefined {
+  getNumberOfLoCs(overrides?: EthersCallOverrides): number | undefined {
     if (this._blockHit(overrides)) {
-      return this._store.state.numberOfTroves;
+      return this._store.state.numberOfLoCs;
     }
   }
 
@@ -534,7 +534,7 @@ class BlockPolledZeroStoreBasedCache
     }
   }
 
-  getTotal(overrides?: EthersCallOverrides): Trove | undefined {
+  getTotal(overrides?: EthersCallOverrides): LoC | undefined {
     if (this._blockHit(overrides)) {
       return this._store.state.total;
     }
@@ -609,7 +609,7 @@ class BlockPolledZeroStoreBasedCache
     }
   }
 
-  getTroves() {
+  getLoCs() {
     return undefined;
   }
 }
@@ -633,11 +633,11 @@ class _BlockPolledReadableEthersZero
     return store === undefined || store === "blockPolled";
   }
 
-  _getActivePool(): Promise<Trove> {
+  _getActivePool(): Promise<LoC> {
     throw new Error("Method not implemented.");
   }
 
-  _getDefaultPool(): Promise<Trove> {
+  _getDefaultPool(): Promise<LoC> {
     throw new Error("Method not implemented.");
   }
 

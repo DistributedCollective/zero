@@ -1,10 +1,10 @@
 // Buidler-Truffle fixture for deployment to Buidler EVM
 
-const SortedTroves = artifacts.require("./SortedTroves.sol")
+const SortedLoCs = artifacts.require("./SortedLoCs.sol")
 const ActivePool = artifacts.require("./ActivePool.sol")
 const DefaultPool = artifacts.require("./DefaultPool.sol")
 const StabilityPool = artifacts.require("./StabilityPool.sol")
-const TroveManager = artifacts.require("./TroveManager.sol")
+const LoCManager = artifacts.require("./LoCManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
 const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const FunctionCaller = artifacts.require("./FunctionCaller.sol")
@@ -18,21 +18,21 @@ const connectContracts = deploymentHelpers.connectContracts
 module.exports = async () => {
   const borrowerOperations = await BorrowerOperations.new()
   const priceFeed = await PriceFeed.new()
-  const sortedTroves = await SortedTroves.new()
-  const troveManager = await TroveManager.new()
+  const sortedLoCs = await SortedLoCs.new()
+  const locManager = await LoCManager.new()
   const activePool = await ActivePool.new()
   const stabilityPool = await StabilityPool.new()
   const defaultPool = await DefaultPool.new()
   const functionCaller = await FunctionCaller.new()
   const zusdToken = await ZUSDToken.new(
-    troveManager.address,
+    locManager.address,
     stabilityPool.address,
     borrowerOperations.address
   )
   BorrowerOperations.setAsDeployed(borrowerOperations)
   PriceFeed.setAsDeployed(priceFeed)
-  SortedTroves.setAsDeployed(sortedTroves)
-  TroveManager.setAsDeployed(troveManager)
+  SortedLoCs.setAsDeployed(sortedLoCs)
+  LoCManager.setAsDeployed(locManager)
   ActivePool.setAsDeployed(activePool)
   StabilityPool.setAsDeployed(stabilityPool)
   DefaultPool.setAsDeployed(defaultPool)
@@ -43,8 +43,8 @@ module.exports = async () => {
     borrowerOperations,
     priceFeed,
     zusdToken,
-    sortedTroves,
-    troveManager,
+    sortedLoCs,
+    locManager,
     activePool,
     stabilityPool,
     defaultPool,

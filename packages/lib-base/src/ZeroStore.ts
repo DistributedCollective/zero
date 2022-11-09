@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { Decimal } from "./Decimal";
 import { StabilityDeposit } from "./StabilityDeposit";
-import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
+import { LoC, LoCWithPendingRedistribution, UserLoC } from "./LoC";
 import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
 import { FrontendStatus } from "./ReadableZero";
@@ -19,8 +19,8 @@ export interface ZeroStoreBaseState {
   /** Status of user's own frontend. */
   ownFrontend: FrontendStatus;
 
-  /** Number of Troves that are currently open. */
-  numberOfTroves: number;
+  /** Number of LoCs that are currently open. */
+  numberOfLoCs: number;
 
   /** User's native currency balance (e.g. Bitcoin). */
   accountBalance: Decimal;
@@ -50,24 +50,24 @@ export interface ZeroStoreBaseState {
   zusdInStabilityPool: Decimal;
 
   /** Total collateral and debt in the Zero system. */
-  total: Trove;
+  total: LoC;
 
   /**
    * Total collateral and debt per stake that has been liquidated through redistribution.
    *
    * @remarks
-   * Needed when dealing with instances of {@link TroveWithPendingRedistribution}.
+   * Needed when dealing with instances of {@link LoCWithPendingRedistribution}.
    */
-  totalRedistributed: Trove;
+  totalRedistributed: LoC;
 
   /**
-   * User's Trove in its state after the last direct modification.
+   * User's LoC in its state after the last direct modification.
    *
    * @remarks
-   * The current state of the user's Trove can be found as
-   * {@link ZeroStoreDerivedState.trove | trove}.
+   * The current state of the user's LoC can be found as
+   * {@link ZeroStoreDerivedState.loc | loc}.
    */
-  troveBeforeRedistribution: TroveWithPendingRedistribution;
+  locBeforeRedistribution: LoCWithPendingRedistribution;
 
   /** User's stability deposit. */
   stabilityDeposit: StabilityDeposit;
@@ -85,7 +85,7 @@ export interface ZeroStoreBaseState {
   totalStakedZERO: Decimal;
 
   /** @internal */
-  _riskiestTroveBeforeRedistribution: TroveWithPendingRedistribution;
+  _riskiestLoCBeforeRedistribution: LoCWithPendingRedistribution;
 }
 
 /**
@@ -94,8 +94,8 @@ export interface ZeroStoreBaseState {
  * @public
  */
 export interface ZeroStoreDerivedState {
-  /** Current state of user's Trove */
-  trove: UserTrove;
+  /** Current state of user's LoC */
+  loc: UserLoC;
 
   /** Calculator for current fees. */
   fees: Fees;
@@ -123,10 +123,10 @@ export interface ZeroStoreDerivedState {
   redemptionRate: Decimal;
 
   /**
-   * Whether there are any Troves with collateral ratio below the
+   * Whether there are any LoCs with collateral ratio below the
    * {@link MINIMUM_COLLATERAL_RATIO | minimum}.
    */
-  haveUndercollateralizedTroves: boolean;
+  haveUndercollateralizedLoCs: boolean;
 }
 
 /**
@@ -323,11 +323,11 @@ export abstract class ZeroStore<T = unknown> {
         showFrontendStatus
       ),
 
-      numberOfTroves: this._updateIfChanged(
+      numberOfLoCs: this._updateIfChanged(
         strictEquals,
-        "numberOfTroves",
-        baseState.numberOfTroves,
-        baseStateUpdate.numberOfTroves
+        "numberOfLoCs",
+        baseState.numberOfLoCs,
+        baseStateUpdate.numberOfLoCs
       ),
 
       accountBalance: this._updateIfChanged(
@@ -383,11 +383,11 @@ export abstract class ZeroStore<T = unknown> {
         baseStateUpdate.totalRedistributed
       ),
 
-      troveBeforeRedistribution: this._updateIfChanged(
+      locBeforeRedistribution: this._updateIfChanged(
         equals,
-        "troveBeforeRedistribution",
-        baseState.troveBeforeRedistribution,
-        baseStateUpdate.troveBeforeRedistribution
+        "locBeforeRedistribution",
+        baseState.locBeforeRedistribution,
+        baseStateUpdate.locBeforeRedistribution
       ),
 
       stabilityDeposit: this._updateIfChanged(
@@ -423,30 +423,30 @@ export abstract class ZeroStore<T = unknown> {
         baseStateUpdate.totalStakedZERO
       ),
 
-      _riskiestTroveBeforeRedistribution: this._silentlyUpdateIfChanged(
+      _riskiestLoCBeforeRedistribution: this._silentlyUpdateIfChanged(
         equals,
-        baseState._riskiestTroveBeforeRedistribution,
-        baseStateUpdate._riskiestTroveBeforeRedistribution
+        baseState._riskiestLoCBeforeRedistribution,
+        baseStateUpdate._riskiestLoCBeforeRedistribution
       )
     };
   }
 
   private _derive({
-    troveBeforeRedistribution,
+    locBeforeRedistribution,
     totalRedistributed,
     _feesInNormalMode,
     total,
     price,
-    _riskiestTroveBeforeRedistribution
+    _riskiestLoCBeforeRedistribution
   }: ZeroStoreBaseState): ZeroStoreDerivedState {
     const fees = _feesInNormalMode._setRecoveryMode(total.collateralRatioIsBelowCritical(price));
 
     return {
-      trove: troveBeforeRedistribution.applyRedistribution(totalRedistributed),
+      loc: locBeforeRedistribution.applyRedistribution(totalRedistributed),
       fees,
       borrowingRate: fees.borrowingRate(),
       redemptionRate: fees.redemptionRate(),
-      haveUndercollateralizedTroves: _riskiestTroveBeforeRedistribution
+      haveUndercollateralizedLoCs: _riskiestLoCBeforeRedistribution
         .applyRedistribution(totalRedistributed)
         .collateralRatioIsBelowMinimum(price)
     };
@@ -459,7 +459,7 @@ export abstract class ZeroStore<T = unknown> {
     return {
       fees: this._updateFees("fees", derivedState.fees, derivedStateUpdate.fees),
 
-      trove: this._updateIfChanged(equals, "trove", derivedState.trove, derivedStateUpdate.trove),
+      loc: this._updateIfChanged(equals, "loc", derivedState.loc, derivedStateUpdate.loc),
 
       borrowingRate: this._silentlyUpdateIfChanged(
         eq,
@@ -473,11 +473,11 @@ export abstract class ZeroStore<T = unknown> {
         derivedStateUpdate.redemptionRate
       ),
 
-      haveUndercollateralizedTroves: this._updateIfChanged(
+      haveUndercollateralizedLoCs: this._updateIfChanged(
         strictEquals,
-        "haveUndercollateralizedTroves",
-        derivedState.haveUndercollateralizedTroves,
-        derivedStateUpdate.haveUndercollateralizedTroves
+        "haveUndercollateralizedLoCs",
+        derivedState.haveUndercollateralizedLoCs,
+        derivedStateUpdate.haveUndercollateralizedLoCs
       )
     };
   }

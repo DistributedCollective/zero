@@ -1,6 +1,6 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js");
 const testHelpers = require("../utils/testHelpers.js");
-const TroveManagerTester = artifacts.require("TroveManagerTester");
+const LoCManagerTester = artifacts.require("LoCManagerTester");
 
 const th = testHelpers.TestHelper;
 const timeValues = testHelpers.TimeValues;
@@ -24,8 +24,8 @@ contract(
 
     let priceFeed;
     let zusdToken;
-    let sortedTroves;
-    let troveManager;
+    let sortedLoCs;
+    let locManager;
     let nameRegistry;
     let activePool;
     let stabilityPool;
@@ -39,14 +39,14 @@ contract(
 
     before(async () => {
       coreContracts = await deploymentHelper.deployZeroCore();
-      coreContracts.troveManager = await TroveManagerTester.new();
+      coreContracts.locManager = await LoCManagerTester.new();
       coreContracts = await deploymentHelper.deployZUSDTokenTester(coreContracts);
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig);
 
       priceFeed = coreContracts.priceFeed;
       zusdToken = coreContracts.zusdToken;
-      sortedTroves = coreContracts.sortedTroves;
-      troveManager = coreContracts.troveManager;
+      sortedLoCs = coreContracts.sortedLoCs;
+      locManager = coreContracts.locManager;
       nameRegistry = coreContracts.nameRegistry;
       activePool = coreContracts.activePool;
       stabilityPool = coreContracts.stabilityPool;
@@ -67,7 +67,7 @@ contract(
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
 
       for (account of accounts.slice(0, 10)) {
-        await th.openTrove(coreContracts, {
+        await th.openLoC(coreContracts, {
           extraZUSDAmount: toBN(dec(20000, 18)),
           ICR: toBN(dec(2, 18)),
           extraParams: { from: account }
@@ -76,10 +76,10 @@ contract(
     });
 
     describe("BorrowerOperations", async accounts => {
-      it("moveBTCGainToTrove(): reverts when called by an account that is not StabilityPool", async () => {
+      it("moveBTCGainToLoC(): reverts when called by an account that is not StabilityPool", async () => {
         // Attempt call from alice
         try {
-          const tx1 = await borrowerOperations.moveBTCGainToTrove(bob, bob, bob, { from: bob });
+          const tx1 = await borrowerOperations.moveBTCGainToLoC(bob, bob, bob, { from: bob });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "BorrowerOps: Caller is not Stability Pool")
@@ -87,12 +87,12 @@ contract(
       });
     });
 
-    describe("TroveManager", async accounts => {
+    describe("LoCManager", async accounts => {
       // applyPendingRewards
       it("applyPendingRewards(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.applyPendingRewards(bob, { from: alice });
+          const txAlice = await locManager.applyPendingRewards(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
@@ -103,7 +103,7 @@ contract(
       it("updateRewardSnapshots(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.updateTroveRewardSnapshots(bob, { from: alice });
+          const txAlice = await locManager.updateLoCRewardSnapshots(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
@@ -114,7 +114,7 @@ contract(
       it("removeStake(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.removeStake(bob, { from: alice });
+          const txAlice = await locManager.removeStake(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
@@ -125,84 +125,84 @@ contract(
       it("updateStakeAndTotalStakes(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.updateStakeAndTotalStakes(bob, { from: alice });
+          const txAlice = await locManager.updateStakeAndTotalStakes(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // closeTrove
-      it("closeTrove(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // closeLoC
+      it("closeLoC(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.closeTrove(bob, { from: alice });
+          const txAlice = await locManager.closeLoC(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // addTroveOwnerToArray
-      it("addTroveOwnerToArray(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // addLoCOwnerToArray
+      it("addLoCOwnerToArray(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.addTroveOwnerToArray(bob, { from: alice });
+          const txAlice = await locManager.addLoCOwnerToArray(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // setTroveStatus
-      it("setTroveStatus(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // setLoCStatus
+      it("setLoCStatus(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.setTroveStatus(bob, 1, { from: alice });
+          const txAlice = await locManager.setLoCStatus(bob, 1, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // increaseTroveColl
-      it("increaseTroveColl(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // increaseLoCColl
+      it("increaseLoCColl(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.increaseTroveColl(bob, 100, { from: alice });
+          const txAlice = await locManager.increaseLoCColl(bob, 100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // decreaseTroveColl
-      it("decreaseTroveColl(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // decreaseLoCColl
+      it("decreaseLoCColl(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.decreaseTroveColl(bob, 100, { from: alice });
+          const txAlice = await locManager.decreaseLoCColl(bob, 100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // increaseTroveDebt
-      it("increaseTroveDebt(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // increaseLoCDebt
+      it("increaseLoCDebt(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.increaseTroveDebt(bob, 100, { from: alice });
+          const txAlice = await locManager.increaseLoCDebt(bob, 100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
         }
       });
 
-      // decreaseTroveDebt
-      it("decreaseTroveDebt(): reverts when called by an account that is not BorrowerOperations", async () => {
+      // decreaseLoCDebt
+      it("decreaseLoCDebt(): reverts when called by an account that is not BorrowerOperations", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await troveManager.decreaseTroveDebt(bob, 100, { from: alice });
+          const txAlice = await locManager.decreaseLoCDebt(bob, 100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
           // assert.include(err.message, "Caller is not the BorrowerOperations contract")
@@ -212,7 +212,7 @@ contract(
 
     describe("ActivePool", async accounts => {
       // sendBTC
-      it("sendBTC(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
+      it("sendBTC(): reverts when called by an account that is not BO nor LoCM nor SP", async () => {
         // Attempt call from alice
         try {
           const txAlice = await activePool.sendBTC(alice, 100, { from: alice });
@@ -220,24 +220,24 @@ contract(
           assert.include(err.message, "revert");
           assert.include(
             err.message,
-            "Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+            "Caller is neither BorrowerOperations nor LoCManager nor StabilityPool"
           );
         }
       });
 
       // increaseZUSD
-      it("increaseZUSDDebt(): reverts when called by an account that is not BO nor TroveM", async () => {
+      it("increaseZUSDDebt(): reverts when called by an account that is not BO nor LoCM", async () => {
         // Attempt call from alice
         try {
           const txAlice = await activePool.increaseZUSDDebt(100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
-          assert.include(err.message, "Caller is neither BorrowerOperations nor TroveManager");
+          assert.include(err.message, "Caller is neither BorrowerOperations nor LoCManager");
         }
       });
 
       // decreaseZUSD
-      it("decreaseZUSDDebt(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
+      it("decreaseZUSDDebt(): reverts when called by an account that is not BO nor LoCM nor SP", async () => {
         // Attempt call from alice
         try {
           const txAlice = await activePool.decreaseZUSDDebt(100, { from: alice });
@@ -245,7 +245,7 @@ contract(
           assert.include(err.message, "revert");
           assert.include(
             err.message,
-            "Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+            "Caller is neither BorrowerOperations nor LoCManager nor StabilityPool"
           );
         }
       });
@@ -268,35 +268,35 @@ contract(
 
     describe("DefaultPool", async accounts => {
       // sendBTCToActivePool
-      it("sendBTCToActivePool(): reverts when called by an account that is not TroveManager", async () => {
+      it("sendBTCToActivePool(): reverts when called by an account that is not LoCManager", async () => {
         // Attempt call from alice
         try {
           const txAlice = await defaultPool.sendBTCToActivePool(100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
-          assert.include(err.message, "Caller is not the TroveManager");
+          assert.include(err.message, "Caller is not the LoCManager");
         }
       });
 
       // increaseZUSD
-      it("increaseZUSDDebt(): reverts when called by an account that is not TroveManager", async () => {
+      it("increaseZUSDDebt(): reverts when called by an account that is not LoCManager", async () => {
         // Attempt call from alice
         try {
           const txAlice = await defaultPool.increaseZUSDDebt(100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
-          assert.include(err.message, "Caller is not the TroveManager");
+          assert.include(err.message, "Caller is not the LoCManager");
         }
       });
 
       // decreaseZUSD
-      it("decreaseZUSD(): reverts when called by an account that is not TroveManager", async () => {
+      it("decreaseZUSD(): reverts when called by an account that is not LoCManager", async () => {
         // Attempt call from alice
         try {
           const txAlice = await defaultPool.decreaseZUSDDebt(100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
-          assert.include(err.message, "Caller is not the TroveManager");
+          assert.include(err.message, "Caller is not the LoCManager");
         }
       });
 
@@ -317,17 +317,17 @@ contract(
     });
 
     describe("StabilityPool", async accounts => {
-      // --- onlyTroveManager ---
+      // --- onlyLoCManager ---
 
       // offset
-      it("offset(): reverts when called by an account that is not TroveManager", async () => {
+      it("offset(): reverts when called by an account that is not LoCManager", async () => {
         // Attempt call from alice
         try {
           txAlice = await stabilityPool.offset(100, 10, { from: alice });
           assert.fail(txAlice);
         } catch (err) {
           assert.include(err.message, "revert");
-          assert.include(err.message, "Caller is not TroveManager");
+          assert.include(err.message, "Caller is not LoCManager");
         }
       });
 
@@ -358,13 +358,13 @@ contract(
       });
 
       // burn
-      it("burn(): reverts when called by an account that is not BO nor TroveM nor SP", async () => {
+      it("burn(): reverts when called by an account that is not BO nor LoCM nor SP", async () => {
         // Attempt call from alice
         try {
           const txAlice = await zusdToken.burn(bob, 100, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
-          // assert.include(err.message, "Caller is neither BorrowerOperations nor TroveManager nor StabilityPool")
+          // assert.include(err.message, "Caller is neither BorrowerOperations nor LoCManager nor StabilityPool")
         }
       });
 
@@ -380,7 +380,7 @@ contract(
       });
 
       // returnFromPool
-      it("returnFromPool(): reverts when called by an account that is not TroveManager nor StabilityPool", async () => {
+      it("returnFromPool(): reverts when called by an account that is not LoCManager nor StabilityPool", async () => {
         // Attempt call from alice
         try {
           const txAlice = await zusdToken.returnFromPool(activePool.address, bob, 100, {
@@ -388,55 +388,55 @@ contract(
           });
         } catch (err) {
           assert.include(err.message, "revert");
-          // assert.include(err.message, "Caller is neither TroveManager nor StabilityPool")
+          // assert.include(err.message, "Caller is neither LoCManager nor StabilityPool")
         }
       });
     });
 
-    describe("SortedTroves", async accounts => {
+    describe("SortedLoCs", async accounts => {
       // --- onlyBorrowerOperations ---
       //     insert
-      it("insert(): reverts when called by an account that is not BorrowerOps or TroveM", async () => {
+      it("insert(): reverts when called by an account that is not BorrowerOps or LoCM", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await sortedTroves.insert(bob, "150000000000000000000", bob, bob, {
+          const txAlice = await sortedLoCs.insert(bob, "150000000000000000000", bob, bob, {
             from: alice
           });
         } catch (err) {
           assert.include(err.message, "revert");
-          // assert.include(err.message, " Caller is neither BO nor TroveM")
+          // assert.include(err.message, " Caller is neither BO nor LoCM")
         }
       });
 
-      // --- onlyTroveManager ---
+      // --- onlyLoCManager ---
       // remove
-      it("remove(): reverts when called by an account that is not TroveManager", async () => {
+      it("remove(): reverts when called by an account that is not LoCManager", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await sortedTroves.remove(bob, { from: alice });
+          const txAlice = await sortedLoCs.remove(bob, { from: alice });
         } catch (err) {
           assert.include(err.message, "revert");
-          // assert.include(err.message, " Caller is not the TroveManager")
+          // assert.include(err.message, " Caller is not the LoCManager")
         }
       });
 
-      // --- onlyTroveMorBM ---
+      // --- onlyLoCMorBM ---
       // reinsert
-      it("reinsert(): reverts when called by an account that is neither BorrowerOps nor TroveManager", async () => {
+      it("reinsert(): reverts when called by an account that is neither BorrowerOps nor LoCManager", async () => {
         // Attempt call from alice
         try {
-          const txAlice = await sortedTroves.reInsert(bob, "150000000000000000000", bob, bob, {
+          const txAlice = await sortedLoCs.reInsert(bob, "150000000000000000000", bob, bob, {
             from: alice
           });
         } catch (err) {
           assert.include(err.message, "revert");
-          // assert.include(err.message, "Caller is neither BO nor TroveM")
+          // assert.include(err.message, "Caller is neither BO nor LoCM")
         }
       });
     });
 
     describe("ZEROStaking", async accounts => {
-      it("increaseF_ZUSD(): reverts when caller is not TroveManager", async () => {
+      it("increaseF_ZUSD(): reverts when caller is not LoCManager", async () => {
         try {
           const txAlice = await zeroStaking.increaseF_ZUSD(dec(1, 18), { from: alice });
         } catch (err) {

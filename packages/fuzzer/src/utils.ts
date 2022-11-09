@@ -7,8 +7,8 @@ import {
   Decimalish,
   Difference,
   Percent,
-  Trove,
-  TroveWithPendingRedistribution,
+  LoC,
+  LoCWithPendingRedistribution,
   ReadableZero,
   ZUSD_LIQUIDATION_RESERVE
 } from "@sovryn-zero/lib-base";
@@ -32,7 +32,7 @@ export const createRandomWallets = (numberOfWallets: number, provider: Provider)
   return accounts;
 };
 
-export const createRandomTrove = (price: Decimal) => {
+export const createRandomLoC = (price: Decimal) => {
   let randomValue = truncateLastDigits(benford(1000));
 
   if (Math.random() < 0.5) {
@@ -40,7 +40,7 @@ export const createRandomTrove = (price: Decimal) => {
     const maxDebt = parseInt(price.mul(collateral).toString(0));
     const debt = ZUSD_LIQUIDATION_RESERVE.add(truncateLastDigits(maxDebt - benford(maxDebt)));
 
-    return new Trove(collateral, debt);
+    return new LoC(collateral, debt);
   } else {
     const debt = ZUSD_LIQUIDATION_RESERVE.add(100 * randomValue);
 
@@ -52,60 +52,60 @@ export const createRandomTrove = (price: Decimal) => {
         .toString(4)
     );
 
-    return new Trove(collateral, debt);
+    return new LoC(collateral, debt);
   }
 };
 
-export const randomCollateralChange = ({ collateral }: Trove) =>
+export const randomCollateralChange = ({ collateral }: LoC) =>
   Math.random() < 0.5
     ? { withdrawCollateral: collateral.mul(1.1 * Math.random()) }
     : { depositCollateral: collateral.mul(0.5 * Math.random()) };
 
-export const randomDebtChange = ({ debt }: Trove) =>
+export const randomDebtChange = ({ debt }: LoC) =>
   Math.random() < 0.5
     ? { repayZUSD: debt.mul(1.1 * Math.random()) }
     : { borrowZUSD: debt.mul(0.5 * Math.random()) };
 
-export const getListOfTroves = async (zero: ReadableZero) =>
-  zero.getTroves({
-    first: await zero.getNumberOfTroves(),
+export const getListOfLoCs = async (zero: ReadableZero) =>
+  zero.getLoCs({
+    first: await zero.getNumberOfLoCs(),
     sortedBy: "descendingCollateralRatio",
     beforeRedistribution: false
   });
 
-export const getListOfTrovesBeforeRedistribution = async (zero: ReadableZero) =>
-  zero.getTroves({
-    first: await zero.getNumberOfTroves(),
+export const getListOfLoCsBeforeRedistribution = async (zero: ReadableZero) =>
+  zero.getLoCs({
+    first: await zero.getNumberOfLoCs(),
     sortedBy: "descendingCollateralRatio",
     beforeRedistribution: true
   });
 
-export const getListOfTroveOwners = async (zero: ReadableZero) =>
-  getListOfTrovesBeforeRedistribution(zero).then(troves => troves.map(([owner]) => owner));
+export const getListOfLoCOwners = async (zero: ReadableZero) =>
+  getListOfLoCsBeforeRedistribution(zero).then(locs => locs.map(([owner]) => owner));
 
 const tinyDifference = Decimal.from("0.000000001");
 
 const sortedByICR = (
-  listOfTroves: [string, TroveWithPendingRedistribution][],
-  totalRedistributed: Trove,
+  listOfLoCs: [string, LoCWithPendingRedistribution][],
+  totalRedistributed: LoC,
   price: Decimalish
 ) => {
-  if (listOfTroves.length < 2) {
+  if (listOfLoCs.length < 2) {
     return true;
   }
 
-  let currentTrove = listOfTroves[0][1].applyRedistribution(totalRedistributed);
+  let currentLoC = listOfLoCs[0][1].applyRedistribution(totalRedistributed);
 
-  for (let i = 1; i < listOfTroves.length; ++i) {
-    const nextTrove = listOfTroves[i][1].applyRedistribution(totalRedistributed);
+  for (let i = 1; i < listOfLoCs.length; ++i) {
+    const nextLoC = listOfLoCs[i][1].applyRedistribution(totalRedistributed);
 
     if (
-      nextTrove.collateralRatio(price).gt(currentTrove.collateralRatio(price).add(tinyDifference))
+      nextLoC.collateralRatio(price).gt(currentLoC.collateralRatio(price).add(tinyDifference))
     ) {
       return false;
     }
 
-    currentTrove = nextTrove;
+    currentLoC = nextLoC;
   }
 
   return true;
@@ -116,66 +116,66 @@ export const listDifference = (listA: string[], listB: string[]) => {
   return listA.filter(x => !setB.has(x));
 };
 
-export const listOfTrovesShouldBeEqual = (
-  listA: [string, TroveWithPendingRedistribution][],
-  listB: [string, TroveWithPendingRedistribution][]
+export const listOfLoCsShouldBeEqual = (
+  listA: [string, LoCWithPendingRedistribution][],
+  listB: [string, LoCWithPendingRedistribution][]
 ) => {
   if (listA.length !== listB.length) {
-    throw new Error("length of trove lists is different");
+    throw new Error("length of LoC lists is different");
   }
 
   const mapB = new Map(listB);
 
-  listA.forEach(([owner, troveA]) => {
-    const troveB = mapB.get(owner);
+  listA.forEach(([owner, locA]) => {
+    const locB = mapB.get(owner);
 
-    if (!troveB) {
-      throw new Error(`${owner} has no trove in listB`);
+    if (!locB) {
+      throw new Error(`${owner} has no LoC in listB`);
     }
 
-    if (!troveA.equals(troveB)) {
-      throw new Error(`${owner} has different troves in listA & listB`);
+    if (!locA.equals(locB)) {
+      throw new Error(`${owner} has different locs in listA & listB`);
     }
   });
 };
 
-export const checkTroveOrdering = (
-  listOfTroves: [string, TroveWithPendingRedistribution][],
-  totalRedistributed: Trove,
+export const checkLoCOrdering = (
+  listOfLoCs: [string, LoCWithPendingRedistribution][],
+  totalRedistributed: LoC,
   price: Decimal,
-  previousListOfTroves?: [string, TroveWithPendingRedistribution][]
+  previousListOfLoCs?: [string, LoCWithPendingRedistribution][]
 ) => {
-  if (!sortedByICR(listOfTroves, totalRedistributed, price)) {
-    if (previousListOfTroves) {
+  if (!sortedByICR(listOfLoCs, totalRedistributed, price)) {
+    if (previousListOfLoCs) {
       console.log();
-      console.log("// List of Troves before:");
-      dumpTroves(previousListOfTroves, totalRedistributed, price);
+      console.log("// List of LoCs before:");
+      dumpLoCs(previousListOfLoCs, totalRedistributed, price);
 
       console.log();
-      console.log("// List of Troves after:");
+      console.log("// List of LoCs after:");
     }
 
-    dumpTroves(listOfTroves, totalRedistributed, price);
+    dumpLoCs(listOfLoCs, totalRedistributed, price);
     throw new Error("ordering is broken");
   }
 };
 
 export const checkPoolBalances = async (
   zero: ReadableEthersZero,
-  listOfTroves: [string, TroveWithPendingRedistribution][],
-  totalRedistributed: Trove
+  listOfLoCs: [string, LoCWithPendingRedistribution][],
+  totalRedistributed: LoC
 ) => {
   const activePool = await zero._getActivePool();
   const defaultPool = await zero._getDefaultPool();
 
-  const [activeTotal, defaultTotal] = listOfTroves.reduce(
-    ([activeTotal, defaultTotal], [, troveActive]) => {
-      const troveTotal = troveActive.applyRedistribution(totalRedistributed);
-      const troveDefault = troveTotal.subtract(troveActive);
+  const [activeTotal, defaultTotal] = listOfLoCs.reduce(
+    ([activeTotal, defaultTotal], [, locActive]) => {
+      const locTotal = locActive.applyRedistribution(totalRedistributed);
+      const locDefault = locTotal.subtract(locActive);
 
-      return [activeTotal.add(troveActive), defaultTotal.add(troveDefault)];
+      return [activeTotal.add(locActive), defaultTotal.add(locDefault)];
     },
-    [new Trove(), new Trove()]
+    [new LoC(), new LoC()]
   );
 
   const diffs = [
@@ -194,18 +194,18 @@ export const checkPoolBalances = async (
     console.log(`  Total default: ${defaultTotal}`);
     console.log();
 
-    throw new Error("discrepancy between Troves & Pools");
+    throw new Error("discrepancy between LoCs & Pools");
   }
 };
 
 const numbersEqual = (a: number, b: number) => a === b;
 const decimalsEqual = (a: Decimal, b: Decimal) => a.eq(b);
-const trovesEqual = (a: Trove, b: Trove) => a.equals(b);
+const locsEqual = (a: LoC, b: LoC) => a.equals(b);
 
-const trovesRoughlyEqual = (troveA: Trove, troveB: Trove) =>
+const locsRoughlyEqual = (locA: LoC, locB: LoC) =>
   [
-    [troveA.collateral, troveB.collateral],
-    [troveA.debt, troveB.debt]
+    [locA.collateral, locB.collateral],
+    [locA.debt, locB.debt]
   ].every(([a, b]) => Difference.between(a, b).absoluteValue?.lt(tinyDifference));
 
 class EqualityCheck<T> {
@@ -233,81 +233,81 @@ class EqualityCheck<T> {
 }
 
 const checks = [
-  new EqualityCheck("numberOfTroves", l => l.getNumberOfTroves(), numbersEqual),
+  new EqualityCheck("numberOfLoCs", l => l.getNumberOfLoCs(), numbersEqual),
   new EqualityCheck("price", l => l.getPrice(), decimalsEqual),
-  new EqualityCheck("total", l => l.getTotal(), trovesRoughlyEqual),
-  new EqualityCheck("totalRedistributed", l => l.getTotalRedistributed(), trovesEqual),
+  new EqualityCheck("total", l => l.getTotal(), locsRoughlyEqual),
+  new EqualityCheck("totalRedistributed", l => l.getTotalRedistributed(), locsEqual),
   new EqualityCheck("tokensInStabilityPool", l => l.getZUSDInStabilityPool(), decimalsEqual)
 ];
 
 export const checkSubgraph = async (subgraph: SubgraphZero, l1Zero: ReadableZero) => {
   await Promise.all(checks.map(check => check.allEqual([subgraph, l1Zero])));
 
-  const l1ListOfTroves = await getListOfTrovesBeforeRedistribution(l1Zero);
-  const subgraphListOfTroves = await getListOfTrovesBeforeRedistribution(subgraph);
-  listOfTrovesShouldBeEqual(l1ListOfTroves, subgraphListOfTroves);
+  const l1ListOfLoCs = await getListOfLoCsBeforeRedistribution(l1Zero);
+  const subgraphListOfLoCs = await getListOfLoCsBeforeRedistribution(subgraph);
+  listOfLoCsShouldBeEqual(l1ListOfLoCs, subgraphListOfLoCs);
 
   const totalRedistributed = await subgraph.getTotalRedistributed();
   const price = await subgraph.getPrice();
 
-  if (!sortedByICR(subgraphListOfTroves, totalRedistributed, price)) {
+  if (!sortedByICR(subgraphListOfLoCs, totalRedistributed, price)) {
     console.log();
-    console.log("// List of Troves returned by subgraph:");
-    dumpTroves(subgraphListOfTroves, totalRedistributed, price);
+    console.log("// List of LoCs returned by subgraph:");
+    dumpLoCs(subgraphListOfLoCs, totalRedistributed, price);
     throw new Error("subgraph sorting broken");
   }
 };
 
 export const shortenAddress = (address: string) => address.substr(0, 6) + "..." + address.substr(-4);
 
-const troveToString = (
+const locToString = (
   address: string,
-  troveWithPendingRewards: TroveWithPendingRedistribution,
-  totalRedistributed: Trove,
+  locWithPendingRewards: LoCWithPendingRedistribution,
+  totalRedistributed: LoC,
   price: Decimalish
 ) => {
-  const trove = troveWithPendingRewards.applyRedistribution(totalRedistributed);
-  const rewards = trove.subtract(troveWithPendingRewards);
+  const loc = locWithPendingRewards.applyRedistribution(totalRedistributed);
+  const rewards = loc.subtract(locWithPendingRewards);
 
   return (
     `[${shortenAddress(address)}]: ` +
-    `ICR = ${new Percent(trove.collateralRatio(price)).toString(2)}, ` +
-    `ICR w/o reward = ${new Percent(troveWithPendingRewards.collateralRatio(price)).toString(2)}, ` +
-    `coll = ${trove.collateral.toString(2)}, ` +
-    `debt = ${trove.debt.toString(2)}, ` +
+    `ICR = ${new Percent(loc.collateralRatio(price)).toString(2)}, ` +
+    `ICR w/o reward = ${new Percent(locWithPendingRewards.collateralRatio(price)).toString(2)}, ` +
+    `coll = ${loc.collateral.toString(2)}, ` +
+    `debt = ${loc.debt.toString(2)}, ` +
     `coll reward = ${rewards.collateral.toString(2)}, ` +
     `debt reward = ${rewards.debt.toString(2)}`
   );
 };
 
-export const dumpTroves = (
-  listOfTroves: [string, TroveWithPendingRedistribution][],
-  totalRedistributed: Trove,
+export const dumpLoCs = (
+  listOfLoCs: [string, LoCWithPendingRedistribution][],
+  totalRedistributed: LoC,
   price: Decimalish
 ) => {
-  if (listOfTroves.length === 0) {
+  if (listOfLoCs.length === 0) {
     return;
   }
 
-  let [currentOwner, currentTrove] = listOfTroves[0];
-  console.log(`   ${troveToString(currentOwner, currentTrove, totalRedistributed, price)}`);
+  let [currentOwner, currentLoC] = listOfLoCs[0];
+  console.log(`   ${locToString(currentOwner, currentLoC, totalRedistributed, price)}`);
 
-  for (let i = 1; i < listOfTroves.length; ++i) {
-    const [nextOwner, nextTrove] = listOfTroves[i];
+  for (let i = 1; i < listOfLoCs.length; ++i) {
+    const [nextOwner, nextLoC] = listOfLoCs[i];
 
     if (
-      nextTrove
+      nextLoC
         .applyRedistribution(totalRedistributed)
         .collateralRatio(price)
         .sub(tinyDifference)
-        .gt(currentTrove.applyRedistribution(totalRedistributed).collateralRatio(price))
+        .gt(currentLoC.applyRedistribution(totalRedistributed).collateralRatio(price))
     ) {
-      console.log(`!! ${troveToString(nextOwner, nextTrove, totalRedistributed, price)}`.red);
+      console.log(`!! ${locToString(nextOwner, nextLoC, totalRedistributed, price)}`.red);
     } else {
-      console.log(`   ${troveToString(nextOwner, nextTrove, totalRedistributed, price)}`);
+      console.log(`   ${locToString(nextOwner, nextLoC, totalRedistributed, price)}`);
     }
 
-    [currentOwner, currentTrove] = [nextOwner, nextTrove];
+    [currentOwner, currentLoC] = [nextOwner, nextLoC];
   }
 };
 

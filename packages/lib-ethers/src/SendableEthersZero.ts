@@ -6,11 +6,11 @@ import {
   SendableZero,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
-  TroveAdjustmentDetails,
-  TroveAdjustmentParams,
-  TroveClosureDetails,
-  TroveCreationDetails,
-  TroveCreationParams
+  LoCAdjustmentDetails,
+  LoCAdjustmentParams,
+  LoCClosureDetails,
+  LoCCreationDetails,
+  LoCCreationParams
 } from "@sovryn-zero/lib-base";
 
 import {
@@ -40,61 +40,61 @@ export class SendableEthersZero
     this._populate = populatable;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.openTrove} */
-  openTrove(
-    params: TroveCreationParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.openLoC} */
+  openLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveCreationDetails>> {
-    return this._populate.openTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  ): Promise<SentEthersZeroTransaction<LoCCreationDetails>> {
+    return this._populate.openLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.openNueTrove} */
-  openNueTrove(
-    params: TroveCreationParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.openNueLoC} */
+  openNueLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveCreationDetails>> {
-    return this._populate.openNueTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  ): Promise<SentEthersZeroTransaction<LoCCreationDetails>> {
+    return this._populate.openNueLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.closeTrove} */
-  closeTrove(
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.closeLoC} */
+  closeLoC(
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveClosureDetails>> {
-    return this._populate.closeTrove(overrides).then(sendTransaction);
+  ): Promise<SentEthersZeroTransaction<LoCClosureDetails>> {
+    return this._populate.closeLoC(overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.closeNueTrove} */
-  closeNueTrove(
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.closeNueLoC} */
+  closeNueLoC(
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveClosureDetails>> {
-    return this._populate.closeNueTrove(overrides).then(sendTransaction);
+  ): Promise<SentEthersZeroTransaction<LoCClosureDetails>> {
+    return this._populate.closeNueLoC(overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.adjustTrove} */
-  adjustTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.adjustLoC} */
+  adjustLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>> {
-    return this._populate.adjustTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
+    return this._populate.adjustLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.adjustNueTrove} */
-  adjustNueTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.adjustNueLoC} */
+  adjustNueLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>> {
-    return this._populate.adjustNueTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+  ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
+    return this._populate.adjustNueLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.depositCollateral} */
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>> {
+  ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
     return this._populate.depositCollateral(amount, overrides).then(sendTransaction);
   }
 
@@ -102,7 +102,7 @@ export class SendableEthersZero
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>> {
+  ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
     return this._populate.withdrawCollateral(amount, overrides).then(sendTransaction);
   }
 
@@ -111,7 +111,7 @@ export class SendableEthersZero
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>> {
+  ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
     return this._populate.borrowZUSD(amount, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
@@ -119,7 +119,7 @@ export class SendableEthersZero
   repayZUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>> {
+  ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
     return this._populate.repayZUSD(amount, overrides).then(sendTransaction);
   }
 
@@ -141,11 +141,11 @@ export class SendableEthersZero
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.liquidateUpTo} */
   liquidateUpTo(
-    maximumNumberOfTrovesToLiquidate: number,
+    maximumNumberOfLoCsToLiquidate: number,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<LiquidationDetails>> {
     return this._populate
-      .liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides)
+      .liquidateUpTo(maximumNumberOfLoCsToLiquidate, overrides)
       .then(sendTransaction);
   }
 
@@ -175,11 +175,11 @@ export class SendableEthersZero
     return this._populate.withdrawGainsFromStabilityPool(overrides).then(sendTransaction);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.transferCollateralGainToTrove} */
-  transferCollateralGainToTrove(
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.transferCollateralGainToLoC} */
+  transferCollateralGainToLoC(
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<CollateralGainTransferDetails>> {
-    return this._populate.transferCollateralGainToTrove(overrides).then(sendTransaction);
+    return this._populate.transferCollateralGainToLoC(overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.sendZUSD} */

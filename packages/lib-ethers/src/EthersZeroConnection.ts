@@ -230,10 +230,10 @@ const validStoreOptions = ["blockPolled"];
  */
 export interface EthersZeroConnectionOptionalParams {
   /**
-   * Address whose Trove, Stability Deposit, ZERO Stake and balances will be read by default.
+   * Address whose LoC, Stability Deposit, ZERO Stake and balances will be read by default.
    *
    * @remarks
-   * For example {@link EthersZero.getTrove | getTrove(address?)} will return the Trove owned by
+   * For example {@link EthersZero.getLoC | getLoC(address?)} will return the LoC owned by
    * `userAddress` when the `address` parameter is omitted.
    *
    * Should be omitted when connecting through a {@link EthersSigner | Signer}. Instead `userAddress`

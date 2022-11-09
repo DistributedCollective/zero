@@ -18,7 +18,7 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
   let priceFeed
   let zusdToken
   let stabilityPool
-  let troveManager
+  let locManager
   let borrowerOperations
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken
     stabilityPool = contracts.stabilityPool
-    troveManager = contracts.troveManager
+    locManager = contracts.locManager
     borrowerOperations = contracts.borrowerOperations
 
     const contractAddresses = getAddresses(contracts)
@@ -41,13 +41,13 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
     const defaulters = accounts.slice(101, 301)
 
     for (let account of depositors) {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
       await stabilityPool.provideToSP(dec(100, 18), { from: account })
     }
 
-    // Defaulter opens trove with 200% ICR
+    // Defaulter opens LoC with 200% ICR
     for (let defaulter of defaulters) {
-      await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter } })
+      await openLoC({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter } })
       }
     const price = await priceFeed.getPrice()
 
@@ -56,7 +56,7 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
 
     // Defaulters liquidated
     for (let defaulter of defaulters) {
-      await troveManager.liquidate(defaulter, { from: owner });
+      await locManager.liquidate(defaulter, { from: owner });
     }
 
     const SP_TotalDeposits = await stabilityPool.getTotalZUSDDeposits()

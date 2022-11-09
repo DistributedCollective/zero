@@ -5,9 +5,9 @@ pragma solidity 0.6.11;
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/ITroveManager.sol';
+import './Interfaces/ILoCManager.sol';
 import './Interfaces/IZUSDToken.sol';
-import './Interfaces/ISortedTroves.sol';
+import './Interfaces/ISortedLoCs.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/BaseMath.sol";
@@ -17,18 +17,18 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     IBorrowerOperations public borrowerOperations;
 
-    ITroveManager public troveManager;
+    ILoCManager public locManager;
 
     IZUSDToken public zusdToken;
 
     // Needed to check if there are pending liquidations
-    ISortedTroves public sortedTroves;
+    ISortedLoCs public sortedLoCs;
 
     ICommunityIssuance public communityIssuance;
 
     uint256 internal BTC;  // deposited bitcoin tracker
 
-    // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+    // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when LoC debt is offset.
     uint256 internal totalZUSDDeposits;
 
    // --- Data structures ---

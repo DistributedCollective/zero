@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "SortedTrovesTester",
-  "sourceName": "contracts/TestContracts/SortedTrovesTester.sol",
+  "contractName": "SortedLoCsTester",
+  "sourceName": "contracts/TestContracts/SortedLoCsTester.sol",
   "abi": [
     {
       "inputs": [
@@ -119,11 +119,11 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         }
       ],
-      "name": "setSortedTroves",
+      "name": "setSortedLoCs",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

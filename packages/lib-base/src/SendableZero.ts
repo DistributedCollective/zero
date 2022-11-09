@@ -1,5 +1,5 @@
 import { Decimalish } from "./Decimal";
-import { TroveAdjustmentParams, TroveCreationParams } from "./Trove";
+import { LoCAdjustmentParams, LoCCreationParams } from "./LoC";
 
 import {
   CollateralGainTransferDetails,
@@ -8,9 +8,9 @@ import {
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
   TransactableZero,
-  TroveAdjustmentDetails,
-  TroveClosureDetails,
-  TroveCreationDetails
+  LoCAdjustmentDetails,
+  LoCClosureDetails,
+  LoCCreationDetails
 } from "./TransactableZero";
 
 /**
@@ -144,41 +144,41 @@ export interface SendableZero<R = unknown, S = unknown>
   extends _SendableFrom<TransactableZero, R, S> {
   // Methods re-declared for documentation purposes
 
-  /** {@inheritDoc TransactableZero.openTrove} */
-  openTrove(
-    params: TroveCreationParams<Decimalish>,
+  /** {@inheritDoc TransactableZero.openLoC} */
+  openLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish
-  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveCreationDetails>>>;
+  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>;
 
-  /** {@inheritDoc TransactableZero.closeTrove} */
-  closeTrove(): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveClosureDetails>>>;
+  /** {@inheritDoc TransactableZero.closeLoC} */
+  closeLoC(): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCClosureDetails>>>;
 
-  /** {@inheritDoc TransactableZero.adjustTrove} */
-  adjustTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  /** {@inheritDoc TransactableZero.adjustLoC} */
+  adjustLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish
-  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** {@inheritDoc TransactableZero.depositCollateral} */
   depositCollateral(
     amount: Decimalish
-  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** {@inheritDoc TransactableZero.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish
-  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** {@inheritDoc TransactableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish
-  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** {@inheritDoc TransactableZero.repayZUSD} */
   repayZUSD(
     amount: Decimalish
-  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+  ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** @internal */
   setPrice(price: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
@@ -190,7 +190,7 @@ export interface SendableZero<R = unknown, S = unknown>
 
   /** {@inheritDoc TransactableZero.liquidateUpTo} */
   liquidateUpTo(
-    maximumNumberOfTrovesToLiquidate: number
+    maximumNumberOfLoCsToLiquidate: number
   ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
 
   /** {@inheritDoc TransactableZero.depositZUSDInStabilityPool} */
@@ -209,8 +209,8 @@ export interface SendableZero<R = unknown, S = unknown>
     SentZeroTransaction<S, ZeroReceipt<R, StabilityPoolGainsWithdrawalDetails>>
   >;
 
-  /** {@inheritDoc TransactableZero.transferCollateralGainToTrove} */
-  transferCollateralGainToTrove(): Promise<
+  /** {@inheritDoc TransactableZero.transferCollateralGainToLoC} */
+  transferCollateralGainToLoC(): Promise<
     SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>
   >;
 

@@ -1,5 +1,5 @@
 import { Decimal, Decimalish } from "./Decimal";
-import { TroveAdjustmentParams, TroveCreationParams } from "./Trove";
+import { LoCAdjustmentParams, LoCCreationParams } from "./LoC";
 import { ZeroReceipt, SendableZero, SentZeroTransaction } from "./SendableZero";
 
 import {
@@ -8,9 +8,9 @@ import {
   RedemptionDetails,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
-  TroveAdjustmentDetails,
-  TroveClosureDetails,
-  TroveCreationDetails
+  LoCAdjustmentDetails,
+  LoCClosureDetails,
+  LoCCreationDetails
 } from "./TransactableZero";
 
 /**
@@ -40,9 +40,9 @@ export interface PopulatedZeroTransaction<
  * A redemption transaction that has been prepared for sending.
  *
  * @remarks
- * The Zero protocol fulfills redemptions by repaying the debt of Troves in ascending order of
+ * The Zero protocol fulfills redemptions by repaying the debt of LoCs in ascending order of
  * their collateralization ratio, and taking a portion of their collateral in exchange. Due to the
- * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
+ * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT | minimum debt} requirement that LoCs must fulfill,
  * some ZUSD amounts are not possible to redeem exactly.
  *
  * When {@link @sovryn-zero/lib-base#PopulatableZero.redeemZUSD | redeemZUSD()} is called with an
@@ -111,30 +111,30 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   extends _PopulatableFrom<SendableZero<R, S>, P> {
   // Methods re-declared for documentation purposes
 
-  /** {@inheritDoc TransactableZero.openTrove} */
-  openTrove(
-    params: TroveCreationParams<Decimalish>,
+  /** {@inheritDoc TransactableZero.openLoC} */
+  openLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish
   ): Promise<
     PopulatedZeroTransaction<
       P,
-      SentZeroTransaction<S, ZeroReceipt<R, TroveCreationDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableZero.closeTrove} */
-  closeTrove(): Promise<
-    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveClosureDetails>>>
+  /** {@inheritDoc TransactableZero.closeLoC} */
+  closeLoC(): Promise<
+    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCClosureDetails>>>
   >;
 
-  /** {@inheritDoc TransactableZero.adjustTrove} */
-  adjustTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  /** {@inheritDoc TransactableZero.adjustLoC} */
+  adjustLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish
   ): Promise<
     PopulatedZeroTransaction<
       P,
-      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>
     >
   >;
 
@@ -144,7 +144,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   ): Promise<
     PopulatedZeroTransaction<
       P,
-      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>
     >
   >;
 
@@ -154,7 +154,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   ): Promise<
     PopulatedZeroTransaction<
       P,
-      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>
     >
   >;
 
@@ -165,7 +165,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   ): Promise<
     PopulatedZeroTransaction<
       P,
-      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>
     >
   >;
 
@@ -175,7 +175,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   ): Promise<
     PopulatedZeroTransaction<
       P,
-      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>
     >
   >;
 
@@ -193,7 +193,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
 
   /** {@inheritDoc TransactableZero.liquidateUpTo} */
   liquidateUpTo(
-    maximumNumberOfTrovesToLiquidate: number
+    maximumNumberOfLoCsToLiquidate: number
   ): Promise<
     PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>
   >;
@@ -227,8 +227,8 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
     >
   >;
 
-  /** {@inheritDoc TransactableZero.transferCollateralGainToTrove} */
-  transferCollateralGainToTrove(): Promise<
+  /** {@inheritDoc TransactableZero.transferCollateralGainToLoC} */
+  transferCollateralGainToLoC(): Promise<
     PopulatedZeroTransaction<
       P,
       SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>

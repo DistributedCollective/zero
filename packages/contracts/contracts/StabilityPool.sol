@@ -5,9 +5,9 @@ pragma solidity 0.6.11;
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/ITroveManager.sol';
+import './Interfaces/ILoCManager.sol';
 import './Interfaces/IZUSDToken.sol';
-import './Interfaces/ISortedTroves.sol';
+import './Interfaces/ISortedLoCs.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/ZeroBase.sol";
 import "./Dependencies/ZeroSafeMath128.sol";
@@ -18,11 +18,11 @@ import "./StabilityPoolStorage.sol";
 /**
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
  *
- * When a trove is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
+ * When a LoC is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
  * ZUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of ZUSD tokens in the Stability Pool is burned.
  *
  * Thus, a liquidation causes each depositor to receive a ZUSD loss, in proportion to their deposit as a share of total deposits.
- * They also receive an BTC gain, as the BTC collateral of the liquidated trove is distributed among Stability depositors,
+ * They also receive an BTC gain, as the BTC collateral of the liquidated LoC is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
@@ -153,11 +153,11 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
     event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
     event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
-    event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
+    event SortedLoCsAddressChanged(address _newSortedLoCsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
 
@@ -185,10 +185,10 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
     function setAddresses(
         address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress,
         address _zusdTokenAddress,
-        address _sortedTrovesAddress,
+        address _sortedLoCsAddress,
         address _priceFeedAddress,
         address _communityIssuanceAddress
     )
@@ -198,10 +198,10 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
     {
         checkContract(_zeroBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_activePoolAddress);
         checkContract(_zusdTokenAddress);
-        checkContract(_sortedTrovesAddress);
+        checkContract(_sortedLoCsAddress);
         checkContract(_priceFeedAddress);
         checkContract(_communityIssuanceAddress);
 
@@ -209,18 +209,18 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
         
         zeroBaseParams = IZeroBaseParams(_zeroBaseParamsAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
-        troveManager = ITroveManager(_troveManagerAddress);
+        locManager = ILoCManager(_locManagerAddress);
         activePool = IActivePool(_activePoolAddress);
         zusdToken = IZUSDToken(_zusdTokenAddress);
-        sortedTroves = ISortedTroves(_sortedTrovesAddress);
+        sortedLoCs = ISortedLoCs(_sortedLoCsAddress);
         priceFeed = IPriceFeed(_priceFeedAddress);
         communityIssuance = ICommunityIssuance(_communityIssuanceAddress);
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
         emit ZUSDTokenAddressChanged(_zusdTokenAddress);
-        emit SortedTrovesAddressChanged(_sortedTrovesAddress);
+        emit SortedLoCsAddressChanged(_sortedLoCsAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
 
@@ -295,7 +295,7 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
     * If _amount > userDeposit, the user withdraws all of their compounded deposit.
     */
     function withdrawFromSP(uint _amount) external override {
-        if (_amount !=0) {_requireNoUnderCollateralizedTroves();}
+        if (_amount !=0) {_requireNoUnderCollateralizedLoCs();}
         uint initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
 
@@ -331,17 +331,17 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
         _sendBTCGainToDepositor(depositorBTCGain);
     }
 
-    /** withdrawBTCGainToTrove:
+    /** withdrawBTCGainToLoC:
     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
     * - Sends all depositor's ZERO gain to  depositor
     * - Sends all tagged front end's ZERO gain to the tagged front end
-    * - Transfers the depositor's entire BTC gain from the Stability Pool to the caller's trove
+    * - Transfers the depositor's entire BTC gain from the Stability Pool to the caller's loc
     * - Leaves their compounded deposit in the Stability Pool
     * - Updates snapshots for deposit and tagged front end stake */
-    function withdrawBTCGainToTrove(address _upperHint, address _lowerHint) external override {
+    function withdrawBTCGainToLoC(address _upperHint, address _lowerHint) external override {
         uint initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
-        _requireUserHasTrove(msg.sender);
+        _requireUserHasLoC(msg.sender);
         _requireUserHasBTCGain(msg.sender);
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
@@ -365,9 +365,9 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
 
         _updateDepositAndSnapshots(msg.sender, compoundedZUSDDeposit);
 
-        /* Emit events before transferring BTC gain to Trove.
+        /* Emit events before transferring BTC gain to LoC.
          This lets the event log make more sense (i.e. so it appears that first the BTC gain is withdrawn
-        and then it is deposited into the Trove, not the other way around). */
+        and then it is deposited into the LoC, not the other way around). */
         emit BTCGainWithdrawn(msg.sender, depositorBTCGain, ZUSDLoss);
         emit UserDepositChanged(msg.sender, compoundedZUSDDeposit);
 
@@ -375,7 +375,7 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
         emit StabilityPoolBTCBalanceUpdated(BTC);
         emit BTCSent(msg.sender, depositorBTCGain);
 
-        borrowerOperations.moveBTCGainToTrove{ value: depositorBTCGain }(msg.sender, _upperHint, _lowerHint);
+        borrowerOperations.moveBTCGainToLoC{ value: depositorBTCGain }(msg.sender, _upperHint, _lowerHint);
     }
 
     // --- ZERO issuance functions ---
@@ -427,11 +427,11 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
 
     /**
     * Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
-    * and transfers the Trove's BTC collateral from ActivePool to StabilityPool.
-    * Only called by liquidation functions in the TroveManager.
+    * and transfers the LoC's BTC collateral from ActivePool to StabilityPool.
+    * Only called by liquidation functions in the LoCManager.
     */
     function offset(uint _debtToOffset, uint _collToAdd) external override {
-        _requireCallerIsTroveManager();
+        _requireCallerIsLoCManager();
         uint totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
         if (totalZUSD == 0 || _debtToOffset == 0) { return; }
 
@@ -860,15 +860,15 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
         require( msg.sender == address(activePool), "StabilityPool: Caller is not ActivePool");
     }
 
-    function _requireCallerIsTroveManager() internal view {
-        require(msg.sender == address(troveManager), "StabilityPool: Caller is not TroveManager");
+    function _requireCallerIsLoCManager() internal view {
+        require(msg.sender == address(locManager), "StabilityPool: Caller is not LoCManager");
     }
 
-    function _requireNoUnderCollateralizedTroves() internal {
+    function _requireNoUnderCollateralizedLoCs() internal {
         uint price = priceFeed.fetchPrice();
-        address lowestTrove = sortedTroves.getLast();
-        uint ICR = troveManager.getCurrentICR(lowestTrove, price);
-        require(ICR >= zeroBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
+        address lowestLoC = sortedLoCs.getLast();
+        uint ICR = locManager.getCurrentICR(lowestLoC, price);
+        require(ICR >= zeroBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are locs with ICR < MCR");
     }
 
     function _requireUserHasDeposit(uint _initialDeposit) internal pure {
@@ -884,8 +884,8 @@ contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabil
         require(_amount > 0, 'StabilityPool: Amount must be non-zero');
     }
 
-    function _requireUserHasTrove(address _depositor) internal view {
-        require(troveManager.getTroveStatus(_depositor) == 1, "StabilityPool: caller must have an active trove to withdraw BTCGain to");
+    function _requireUserHasLoC(address _depositor) internal view {
+        require(locManager.getLoCStatus(_depositor) == 1, "StabilityPool: caller must have an active LoC to withdraw BTCGain to");
     }
 
     function _requireUserHasBTCGain(address _depositor) internal view {

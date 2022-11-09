@@ -58,7 +58,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawBTCGainToTrove",
+      "name": "withdrawBTCGainToLoC",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

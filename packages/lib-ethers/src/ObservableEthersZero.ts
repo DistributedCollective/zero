@@ -5,8 +5,8 @@ import {
   Decimal,
   ObservableZero,
   StabilityDeposit,
-  Trove,
-  TroveWithPendingRedistribution
+  LoC,
+  LoCWithPendingRedistribution
 } from "@sovryn-zero/lib-base";
 
 import { _getContracts, _requireAddress } from "./EthersZeroConnection";
@@ -45,7 +45,7 @@ export class ObservableEthersZero implements ObservableZero {
   }
 
   watchTotalRedistributed(
-    onTotalRedistributedChanged: (totalRedistributed: Trove) => void
+    onTotalRedistributedChanged: (totalRedistributed: LoC) => void
   ): () => void {
     const { activePool, defaultPool } = _getContracts(this._readable.connection);
     const etherSent = activePool.filters.EtherSent();
@@ -67,42 +67,42 @@ export class ObservableEthersZero implements ObservableZero {
     };
   }
 
-  watchTroveWithoutRewards(
-    onTroveChanged: (trove: TroveWithPendingRedistribution) => void,
+  watchLoCWithoutRewards(
+    onLoCChanged: (loc: LoCWithPendingRedistribution) => void,
     address?: string
   ): () => void {
     address ??= _requireAddress(this._readable.connection);
 
-    const { troveManager, borrowerOperations } = _getContracts(this._readable.connection);
-    const troveUpdatedByTroveManager = troveManager.filters.TroveUpdated(address);
-    const troveUpdatedByBorrowerOperations = borrowerOperations.filters.TroveUpdated(address);
+    const { locManager, borrowerOperations } = _getContracts(this._readable.connection);
+    const locUpdatedByLoCManager = locManager.filters.LoCUpdated(address);
+    const locUpdatedByBorrowerOperations = borrowerOperations.filters.LoCUpdated(address);
 
-    const troveListener = debounce((blockTag: number) => {
-      this._readable.getTroveBeforeRedistribution(address, { blockTag }).then(onTroveChanged);
+    const locListener = debounce((blockTag: number) => {
+      this._readable.getLoCBeforeRedistribution(address, { blockTag }).then(onLoCChanged);
     });
 
-    troveManager.on(troveUpdatedByTroveManager, troveListener);
-    borrowerOperations.on(troveUpdatedByBorrowerOperations, troveListener);
+    locManager.on(locUpdatedByLoCManager, locListener);
+    borrowerOperations.on(locUpdatedByBorrowerOperations, locListener);
 
     return () => {
-      troveManager.removeListener(troveUpdatedByTroveManager, troveListener);
-      borrowerOperations.removeListener(troveUpdatedByBorrowerOperations, troveListener);
+      locManager.removeListener(locUpdatedByLoCManager, locListener);
+      borrowerOperations.removeListener(locUpdatedByBorrowerOperations, locListener);
     };
   }
 
-  watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void {
-    const { troveManager } = _getContracts(this._readable.connection);
-    const { TroveUpdated } = troveManager.filters;
-    const troveUpdated = TroveUpdated();
+  watchNumberOfLoCs(onNumberOfLoCsChanged: (numberOfLoCs: number) => void): () => void {
+    const { locManager } = _getContracts(this._readable.connection);
+    const { LoCUpdated } = locManager.filters;
+    const locUpdated = LoCUpdated();
 
-    const troveUpdatedListener = debounce((blockTag: number) => {
-      this._readable.getNumberOfTroves({ blockTag }).then(onNumberOfTrovesChanged);
+    const locUpdatedListener = debounce((blockTag: number) => {
+      this._readable.getNumberOfLoCs({ blockTag }).then(onNumberOfLoCsChanged);
     });
 
-    troveManager.on(troveUpdated, troveUpdatedListener);
+    locManager.on(locUpdated, locUpdatedListener);
 
     return () => {
-      troveManager.removeListener(troveUpdated, troveUpdatedListener);
+      locManager.removeListener(locUpdated, locUpdatedListener);
     };
   }
 
@@ -114,19 +114,19 @@ export class ObservableEthersZero implements ObservableZero {
     throw new Error("Method not implemented.");
   }
 
-  watchTotal(onTotalChanged: (total: Trove) => void): () => void {
-    const { troveManager } = _getContracts(this._readable.connection);
-    const { TroveUpdated } = troveManager.filters;
-    const troveUpdated = TroveUpdated();
+  watchTotal(onTotalChanged: (total: LoC) => void): () => void {
+    const { locManager } = _getContracts(this._readable.connection);
+    const { LoCUpdated } = locManager.filters;
+    const locUpdated = LoCUpdated();
 
     const totalListener = debounce((blockTag: number) => {
       this._readable.getTotal({ blockTag }).then(onTotalChanged);
     });
 
-    troveManager.on(troveUpdated, totalListener);
+    locManager.on(locUpdated, totalListener);
 
     return () => {
-      troveManager.removeListener(troveUpdated, totalListener);
+      locManager.removeListener(locUpdated, totalListener);
     };
   }
 

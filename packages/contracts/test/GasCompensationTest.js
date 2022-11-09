@@ -1,7 +1,7 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 const testHelpers = require("../utils/testHelpers.js")
 const timeMachine = require('ganache-time-traveler');
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
+const LoCManagerTester = artifacts.require("./LoCManagerTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
 const ZUSDToken = artifacts.require("ZUSDToken")
 
@@ -21,18 +21,18 @@ contract('Gas compensation tests', async accounts => {
 
   let priceFeed
   let zusdToken
-  let sortedTroves
+  let sortedLoCs
   let activePool
   let stabilityPool
   let defaultPool
   let borrowerOperations
 
   let contracts
-  let troveManager
+  let locManager
   let borrowerOperationsTester
 
-  const getOpenTroveZUSDAmount = async (totalDebt) => th.getOpenTroveZUSDAmount(contracts, totalDebt)
-  const openTrove = async (params) => th.openTrove(contracts, params)
+  const getOpenLoCZUSDAmount = async (totalDebt) => th.getOpenLoCZUSDAmount(contracts, totalDebt)
+  const openLoC = async (params) => th.openLoC(contracts, params)
 
   const logICRs = (ICRList) => {
     for (let i = 0; i < ICRList.length; i++) {
@@ -41,16 +41,16 @@ contract('Gas compensation tests', async accounts => {
   }
 
   before(async () => {
-    //troveManager = await TroveManagerTester.new()
+    //locManager = await LoCManagerTester.new()
     borrowerOperationsTester = await BorrowerOperationsTester.new()
 
-    //TroveManagerTester.setAsDeployed(troveManager)
+    //LoCManagerTester.setAsDeployed(locManager)
     BorrowerOperationsTester.setAsDeployed(borrowerOperationsTester)
     contracts = await deploymentHelper.deployZeroCore()
-    contracts.troveManager = await TroveManagerTester.new()
+    contracts.locManager = await LoCManagerTester.new()
     contracts.zusdToken = await ZUSDToken.new()
     await contracts.zusdToken.initialize(
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     )
@@ -58,8 +58,8 @@ contract('Gas compensation tests', async accounts => {
   
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken
-    sortedTroves = contracts.sortedTroves
-    troveManager = contracts.troveManager
+    sortedLoCs = contracts.sortedLoCs
+    locManager = contracts.locManager
     activePool = contracts.activePool
     stabilityPool = contracts.stabilityPool
     defaultPool = contracts.defaultPool
@@ -90,7 +90,7 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall as gas compensation */
     await priceFeed.setPrice(dec(1, 18))
     // const price_1 = await priceFeed.getPrice()
-    const gasCompensation_1 = (await troveManager.getCollGasCompensation(dec(1, 'ether'))).toString()
+    const gasCompensation_1 = (await locManager.getCollGasCompensation(dec(1, 'ether'))).toString()
     assert.equal(gasCompensation_1, dec(5, 15))
 
     /* 
@@ -99,7 +99,7 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall as gas compensation */
     await priceFeed.setPrice('28400000000000000000')
     // const price_2 = await priceFeed.getPrice()
-    const gasCompensation_2 = (await troveManager.getCollGasCompensation(dec(100, 'finney'))).toString()
+    const gasCompensation_2 = (await locManager.getCollGasCompensation(dec(100, 'finney'))).toString()
     assert.equal(gasCompensation_2, dec(5, 14))
 
     /* 
@@ -108,7 +108,7 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall as gas compensation */
     await priceFeed.setPrice(dec(1, 27))
     // const price_3 = await priceFeed.getPrice()
-    const gasCompensation_3 = (await troveManager.getCollGasCompensation('5000000000')).toString()
+    const gasCompensation_3 = (await locManager.getCollGasCompensation('5000000000')).toString()
     assert.equal(gasCompensation_3, '25000000')
   })
 
@@ -121,21 +121,21 @@ contract('Gas compensation tests', async accounts => {
     coll = 9.999 BTC  
     0.5% of coll = 0.04995 BTC. USD value: $9.99
     -> Expect 0.5% of collaterall as gas compensation */
-    const gasCompensation_1 = (await troveManager.getCollGasCompensation('9999000000000000000')).toString()
+    const gasCompensation_1 = (await locManager.getCollGasCompensation('9999000000000000000')).toString()
     assert.equal(gasCompensation_1, '49995000000000000')
 
     /* BTC:USD price = 200
      coll = 0.055 BTC  
      0.5% of coll = 0.000275 BTC. USD value: $0.055
      -> Expect 0.5% of collaterall as gas compensation */
-    const gasCompensation_2 = (await troveManager.getCollGasCompensation('55000000000000000')).toString()
+    const gasCompensation_2 = (await locManager.getCollGasCompensation('55000000000000000')).toString()
     assert.equal(gasCompensation_2, dec(275, 12))
 
     /* BTC:USD price = 200
     coll = 6.09232408808723580 BTC  
     0.5% of coll = 0.004995 BTC. USD value: $6.09
     -> Expect 0.5% of collaterall as gas compensation */
-    const gasCompensation_3 = (await troveManager.getCollGasCompensation('6092324088087235800')).toString()
+    const gasCompensation_3 = (await locManager.getCollGasCompensation('6092324088087235800')).toString()
     assert.equal(gasCompensation_3, '30461620440436179')
   })
 
@@ -148,7 +148,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 10 BTC  
     0.5% of coll = 0.5 BTC. USD value: $10
     -> Expect 0.5% of collaterall as gas compensation */
-    const gasCompensation = (await troveManager.getCollGasCompensation(dec(10, 'ether'))).toString()
+    const gasCompensation = (await locManager.getCollGasCompensation(dec(10, 'ether'))).toString()
     assert.equal(gasCompensation, '50000000000000000')
   })
 
@@ -161,7 +161,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 100 BTC  
     0.5% of coll = 0.5 BTC. USD value: $100
     -> Expect $100 gas compensation, i.e. 0.5 BTC */
-    const gasCompensation_1 = (await troveManager.getCollGasCompensation(dec(100, 'ether'))).toString()
+    const gasCompensation_1 = (await locManager.getCollGasCompensation(dec(100, 'ether'))).toString()
     assert.equal(gasCompensation_1, dec(500, 'finney'))
 
     /* 
@@ -169,7 +169,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 10.001 BTC  
     0.5% of coll = 0.050005 BTC. USD value: $10.001
     -> Expect $100 gas compensation, i.e.  0.050005  BTC */
-    const gasCompensation_2 = (await troveManager.getCollGasCompensation('10001000000000000000')).toString()
+    const gasCompensation_2 = (await locManager.getCollGasCompensation('10001000000000000000')).toString()
     assert.equal(gasCompensation_2, '50005000000000000')
 
     /* 
@@ -177,7 +177,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 37.5 BTC  
     0.5% of coll = 0.1875 BTC. USD value: $37.5
     -> Expect $37.5 gas compensation i.e.  0.1875  BTC */
-    const gasCompensation_3 = (await troveManager.getCollGasCompensation('37500000000000000000')).toString()
+    const gasCompensation_3 = (await locManager.getCollGasCompensation('37500000000000000000')).toString()
     assert.equal(gasCompensation_3, '187500000000000000')
 
     /* 
@@ -186,7 +186,7 @@ contract('Gas compensation tests', async accounts => {
     0.5% of coll = 473.7911529 BTC. USD value: $21473894.84
     -> Expect $21473894.8385808 gas compensation, i.e.  473.7911529115490  BTC */
     await priceFeed.setPrice('45323545420000000000000')
-    const gasCompensation_4 = await troveManager.getCollGasCompensation('94758230582309850000000')
+    const gasCompensation_4 = await locManager.getCollGasCompensation('94758230582309850000000')
     assert.isAtMost(th.getDifference(gasCompensation_4, '473791152911549000000'), 1000000)
 
     /* 
@@ -196,7 +196,7 @@ contract('Gas compensation tests', async accounts => {
     -> Expect $150000000000 gas compensation, i.e. 1500000 BTC */
     await priceFeed.setPrice(dec(1, 24))
     const price_2 = await priceFeed.getPrice()
-    const gasCompensation_5 = (await troveManager.getCollGasCompensation('300000000000000000000000000')).toString()
+    const gasCompensation_5 = (await locManager.getCollGasCompensation('300000000000000000000000000')).toString()
     assert.equal(gasCompensation_5, '1500000000000000000000000')
   })
 
@@ -213,7 +213,7 @@ contract('Gas compensation tests', async accounts => {
     debt = 10 ZUSD
     0.5% of coll = 0.04995 BTC. USD value: $9.99
     -> Expect composite debt = 10 + 20  = 30 ZUSD*/
-    const compositeDebt_1 = await troveManager.getCompositeDebt(dec(10, 18))
+    const compositeDebt_1 = await locManager.getCompositeDebt(dec(10, 18))
     assert.equal(compositeDebt_1, dec(30, 18))
 
     /* BTC:USD price = 200
@@ -221,7 +221,7 @@ contract('Gas compensation tests', async accounts => {
      debt = 0 ZUSD
      0.5% of coll = 0.000275 BTC. USD value: $0.055
      -> Expect composite debt = 0 + 20 = 20 ZUSD*/
-    const compositeDebt_2 = await troveManager.getCompositeDebt(0)
+    const compositeDebt_2 = await locManager.getCompositeDebt(0)
     assert.equal(compositeDebt_2, dec(20, 18))
 
     // /* BTC:USD price = 200
@@ -229,7 +229,7 @@ contract('Gas compensation tests', async accounts => {
     // debt = 200 ZUSD 
     // 0.5% of coll = 0.004995 BTC. USD value: $6.09
     // -> Expect  composite debt =  200 + 20 = 220  ZUSD */
-    const compositeDebt_3 = await troveManager.getCompositeDebt(dec(200, 18))
+    const compositeDebt_3 = await locManager.getCompositeDebt(dec(200, 18))
     assert.equal(compositeDebt_3, '220000000000000000000')
   })
 
@@ -244,7 +244,7 @@ contract('Gas compensation tests', async accounts => {
     debt = 123.45 ZUSD
     0.5% of coll = 0.5 BTC. USD value: $10
     -> Expect composite debt = (123.45 + 20) = 143.45 ZUSD  */
-    const compositeDebt = await troveManager.getCompositeDebt('123450000000000000000')
+    const compositeDebt = await locManager.getCompositeDebt('123450000000000000000')
     assert.equal(compositeDebt, '143450000000000000000')
   })
 
@@ -260,7 +260,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 100 BTC  
     debt = 2000 ZUSD
     -> Expect composite debt = (2000 + 20) = 2020 ZUSD  */
-    const compositeDebt_1 = (await troveManager.getCompositeDebt(dec(2000, 18))).toString()
+    const compositeDebt_1 = (await locManager.getCompositeDebt(dec(2000, 18))).toString()
     assert.equal(compositeDebt_1, '2020000000000000000000')
 
     /* 
@@ -268,7 +268,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 10.001 BTC  
     debt = 200 ZUSD
     -> Expect composite debt = (200 + 20) = 220 ZUSD  */
-    const compositeDebt_2 = (await troveManager.getCompositeDebt(dec(200, 18))).toString()
+    const compositeDebt_2 = (await locManager.getCompositeDebt(dec(200, 18))).toString()
     assert.equal(compositeDebt_2, '220000000000000000000')
 
     /* 
@@ -276,7 +276,7 @@ contract('Gas compensation tests', async accounts => {
     coll = 37.5 BTC  
     debt = 500 ZUSD
     -> Expect composite debt = (500 + 20) = 520 ZUSD  */
-    const compositeDebt_3 = (await troveManager.getCompositeDebt(dec(500, 18))).toString()
+    const compositeDebt_3 = (await locManager.getCompositeDebt(dec(500, 18))).toString()
     assert.equal(compositeDebt_3, '520000000000000000000')
 
     /* 
@@ -286,7 +286,7 @@ contract('Gas compensation tests', async accounts => {
     -> Expect composite debt = (1000000000 + 20) = 1000000020 ZUSD  */
     await priceFeed.setPrice('45323545420000000000000')
     const price_2 = await priceFeed.getPrice()
-    const compositeDebt_4 = (await troveManager.getCompositeDebt(dec(1, 27))).toString()
+    const compositeDebt_4 = (await locManager.getCompositeDebt(dec(1, 27))).toString()
     assert.isAtMost(th.getDifference(compositeDebt_4, '1000000020000000000000000000'), 100000000000)
 
     /* 
@@ -296,54 +296,54 @@ contract('Gas compensation tests', async accounts => {
    -> Expect composite debt = (54321.123456789 + 20) = 54341.123456789 ZUSD */
     await priceFeed.setPrice(dec(1, 24))
     const price_3 = await priceFeed.getPrice()
-    const compositeDebt_5 = (await troveManager.getCompositeDebt('54321123456789000000000')).toString()
+    const compositeDebt_5 = (await locManager.getCompositeDebt('54321123456789000000000')).toString()
     assert.equal(compositeDebt_5, '54341123456789000000000')
   })
 
   // --- Test ICRs with virtual debt ---
-  it('getCurrentICR(): Incorporates virtual debt, and returns the correct ICR for new troves', async () => {
+  it('getCurrentICR(): Incorporates virtual debt, and returns the correct ICR for new locs', async () => {
     const price = await priceFeed.getPrice()
-    await openTrove({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
 
     // A opens with 1 BTC, 110 ZUSD
-    await openTrove({ ICR: toBN('1818181818181818181'), extraParams: { from: alice } })
-    const alice_ICR = (await troveManager.getCurrentICR(alice, price)).toString()
+    await openLoC({ ICR: toBN('1818181818181818181'), extraParams: { from: alice } })
+    const alice_ICR = (await locManager.getCurrentICR(alice, price)).toString()
     // Expect aliceICR = (1 * 200) / (110) = 181.81%
     assert.isAtMost(th.getDifference(alice_ICR, '1818181818181818181'), 1000)
 
     // B opens with 0.5 BTC, 50 ZUSD
-    await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-    const bob_ICR = (await troveManager.getCurrentICR(bob, price)).toString()
+    await openLoC({ ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+    const bob_ICR = (await locManager.getCurrentICR(bob, price)).toString()
     // Expect Bob's ICR = (0.5 * 200) / 50 = 200%
     assert.isAtMost(th.getDifference(bob_ICR, dec(2, 18)), 1000)
 
     // F opens with 1 BTC, 100 ZUSD
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: flyn } })
-    const flyn_ICR = (await troveManager.getCurrentICR(flyn, price)).toString()
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: flyn } })
+    const flyn_ICR = (await locManager.getCurrentICR(flyn, price)).toString()
     // Expect Flyn's ICR = (1 * 200) / 100 = 200%
     assert.isAtMost(th.getDifference(flyn_ICR, dec(2, 18)), 1000)
 
     // C opens with 2.5 BTC, 160 ZUSD
-    await openTrove({ ICR: toBN(dec(3125, 15)), extraParams: { from: carol } })
-    const carol_ICR = (await troveManager.getCurrentICR(carol, price)).toString()
+    await openLoC({ ICR: toBN(dec(3125, 15)), extraParams: { from: carol } })
+    const carol_ICR = (await locManager.getCurrentICR(carol, price)).toString()
     // Expect Carol's ICR = (2.5 * 200) / (160) = 312.50%
     assert.isAtMost(th.getDifference(carol_ICR, '3125000000000000000'), 1000)
 
     // D opens with 1 BTC, 0 ZUSD
-    await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: dennis } })
-    const dennis_ICR = (await troveManager.getCurrentICR(dennis, price)).toString()
+    await openLoC({ ICR: toBN(dec(4, 18)), extraParams: { from: dennis } })
+    const dennis_ICR = (await locManager.getCurrentICR(dennis, price)).toString()
     // Expect Dennis's ICR = (1 * 200) / (50) = 400.00%
     assert.isAtMost(th.getDifference(dennis_ICR, dec(4, 18)), 1000)
 
     // E opens with 4405.45 BTC, 32598.35 ZUSD
-    await openTrove({ ICR: toBN('27028668628933700000'), extraParams: { from: erin } })
-    const erin_ICR = (await troveManager.getCurrentICR(erin, price)).toString()
+    await openLoC({ ICR: toBN('27028668628933700000'), extraParams: { from: erin } })
+    const erin_ICR = (await locManager.getCurrentICR(erin, price)).toString()
     // Expect Erin's ICR = (4405.45 * 200) / (32598.35) = 2702.87%
     assert.isAtMost(th.getDifference(erin_ICR, '27028668628933700000'), 100000)
 
     // H opens with 1 BTC, 180 ZUSD
-    await openTrove({ ICR: toBN('1111111111111111111'), extraParams: { from: harriet } })
-    const harriet_ICR = (await troveManager.getCurrentICR(harriet, price)).toString()
+    await openLoC({ ICR: toBN('1111111111111111111'), extraParams: { from: harriet } })
+    const harriet_ICR = (await locManager.getCurrentICR(harriet, price)).toString()
     // Expect Harriet's ICR = (1 * 200) / (180) = 111.11%
     assert.isAtMost(th.getDifference(harriet_ICR, '1111111111111111111'), 1000)
   })
@@ -351,14 +351,14 @@ contract('Gas compensation tests', async accounts => {
   // Test compensation amounts and liquidation amounts
 
   it('Gas compensation from pool-offset liquidations. All collateral paid as compensation', async () => {
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-E open troves
-    const { totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: alice } })
-    const { totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: bob } })
-    const { totalDebt: C_totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(300, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: A_totalDebt, extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: B_totalDebt.add(C_totalDebt), extraParams: { from: erin } })
+    // A-E open locs
+    const { totalDebt: A_totalDebt } = await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: alice } })
+    const { totalDebt: B_totalDebt } = await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: bob } })
+    const { totalDebt: C_totalDebt } = await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(300, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: A_totalDebt, extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: B_totalDebt.add(C_totalDebt), extraParams: { from: erin } })
 
     // D, E each provide ZUSD to SP
     await stabilityPool.provideToSP(A_totalDebt, ZERO_ADDRESS, { from: dennis })
@@ -375,13 +375,13 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
-    const aliceColl = (await troveManager.Troves(alice))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
     // Liquidate A (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by 0.5% of A's coll (1 BTC)
@@ -406,12 +406,12 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
-    const bobColl = (await troveManager.Troves(bob))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by B's 0.5% of coll, 2 BTC
@@ -438,12 +438,12 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
-    const carolColl = (await troveManager.Troves(carol))[1]
+    const carolColl = (await locManager.LoCs(carol))[1]
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_C = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(carol, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(carol, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_C = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by C's 0.5% of coll, 3 BTC
@@ -462,14 +462,14 @@ contract('Gas compensation tests', async accounts => {
 
   it('gas compensation from pool-offset liquidations: 0.5% collateral < $10 in value. Compensates $10 worth of collateral, liquidates the remainder', async () => {
     await priceFeed.setPrice(dec(400, 18))
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-E open troves
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: alice } })
-    await openTrove({ ICR: toBN(dec(120, 16)), extraZUSDAmount: dec(5000, 18), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(60, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    // A-E open locs
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: alice } })
+    await openLoC({ ICR: toBN(dec(120, 16)), extraZUSDAmount: dec(5000, 18), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(60, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
 
     // D, E each provide 10000 ZUSD to SP
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: dennis })
@@ -491,16 +491,16 @@ contract('Gas compensation tests', async accounts => {
     and (1 - 0.05000025000125001) = 0.94999974999875 BTC remainder liquidated */
 
     // Check collateral value in USD is > $10
-    const aliceColl = (await troveManager.Troves(alice))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const aliceICR = await troveManager.getCurrentICR(alice, price_1)
+    const aliceICR = await locManager.getCurrentICR(alice, price_1)
     assert.isTrue(aliceICR.lt(mv._MCR))
 
     // Liquidate A (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by 0.5% of coll
@@ -533,16 +533,16 @@ contract('Gas compensation tests', async accounts => {
     and (15 - 0.666666666666666666) BTC remainder liquidated */
 
     // Check collateral value in USD is > $10
-    const bobColl = (await troveManager.Troves(bob))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const bobICR = await troveManager.getCurrentICR(bob, price_2)
+    const bobICR = await locManager.getCurrentICR(bob, price_2)
     assert.isTrue(bobICR.lte(mv._MCR))
 
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by $10 worth of coll
@@ -564,16 +564,16 @@ contract('Gas compensation tests', async accounts => {
   })
 
   it('gas compensation from pool-offset liquidations: 0.5% collateral > $10 in value. Compensates 0.5% of  collateral, liquidates the remainder', async () => {
-    // open troves
+    // open locs
     await priceFeed.setPrice(dec(400, 18))
-    await openTrove({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
 
-    // A-E open troves
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
-    await openTrove({ ICR: toBN(dec(1875, 15)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    // A-E open locs
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
+    await openLoC({ ICR: toBN(dec(1875, 15)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
 
     // D, E each provide 10000 ZUSD to SP
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: dennis })
@@ -594,17 +594,17 @@ contract('Gas compensation tests', async accounts => {
     and (10.001 - 0.050005) BTC remainder liquidated */
 
     // Check value of 0.5% of collateral in USD is > $10
-    const aliceColl = (await troveManager.Troves(alice))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const aliceICR = await troveManager.getCurrentICR(alice, price_1)
+    const aliceICR = await locManager.getCurrentICR(alice, price_1)
     assert.isTrue(aliceICR.lt(mv._MCR))
 
     // Liquidate A (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_A = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by 0.5% of coll
@@ -633,17 +633,17 @@ contract('Gas compensation tests', async accounts => {
    and (37.5 - 0.1875 BTC) BTC remainder liquidated */
 
     // Check value of 0.5% of collateral in USD is > $10
-    const bobColl = (await troveManager.Troves(bob))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
     const _0pt5percent_bobColl = bobColl.div(web3.utils.toBN('200'))
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const bobICR = await troveManager.getCurrentICR(bob, price_1)
+    const bobICR = await locManager.getCurrentICR(bob, price_1)
     assert.isTrue(bobICR.lt(mv._MCR))
 
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
     const liquidatorBalance_before_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after_B = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check liquidator's balance increases by 0.5% of coll
@@ -667,14 +667,14 @@ contract('Gas compensation tests', async accounts => {
   // --- Event emission in single liquidation ---
 
   it('Gas compensation from pool-offset liquidations. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-E open troves
-    const { totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: alice } })
-    const { totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(300, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: A_totalDebt, extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: B_totalDebt, extraParams: { from: erin } })
+    // A-E open locs
+    const { totalDebt: A_totalDebt } = await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(100, 18), extraParams: { from: alice } })
+    const { totalDebt: B_totalDebt } = await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(300, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: A_totalDebt, extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: B_totalDebt, extraParams: { from: erin } })
 
     // D, E each provide ZUSD to SP
     await stabilityPool.provideToSP(A_totalDebt, ZERO_ADDRESS, { from: dennis })
@@ -682,7 +682,7 @@ contract('Gas compensation tests', async accounts => {
 
     const ZUSDinSP_0 = await stabilityPool.getTotalZUSDDeposits()
 
-    th.logBN('TCR', await troveManager.getTCR(await priceFeed.getPrice()))
+    th.logBN('TCR', await locManager.getTCR(await priceFeed.getPrice()))
     // --- Price drops to 9.99 ---
     await priceFeed.setPrice('9990000000000000000')
     const price_1 = await priceFeed.getPrice()
@@ -692,14 +692,14 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const aliceDebt = (await troveManager.Troves(alice))[0]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const aliceDebt = (await locManager.LoCs(alice))[0]
 
-    th.logBN('TCR', await troveManager.getTCR(await priceFeed.getPrice()))
+    th.logBN('TCR', await locManager.getTCR(await priceFeed.getPrice()))
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
     // Liquidate A (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
-    const liquidationTxA = await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
+    const liquidationTxA = await locManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
 
     const expectedGasComp_A = aliceColl.mul(th.toBN(5)).div(th.toBN(1000))
     const expectedLiquidatedColl_A = aliceColl.sub(expectedGasComp_A)
@@ -720,12 +720,12 @@ contract('Gas compensation tests', async accounts => {
     -> Expect 0.5% of collaterall to be sent to liquidator, as gas compensation */
 
     // Check collateral value in USD is < $10
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const bobDebt = (await troveManager.Troves(bob))[0]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const bobDebt = (await locManager.LoCs(bob))[0]
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
-    const liquidationTxB = await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
+    const liquidationTxB = await locManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
 
     const expectedGasComp_B = bobColl.mul(th.toBN(5)).div(th.toBN(1000))
     const expectedLiquidatedColl_B = bobColl.sub(expectedGasComp_B)
@@ -741,14 +741,14 @@ contract('Gas compensation tests', async accounts => {
 
   it('gas compensation from pool-offset liquidations. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
     await priceFeed.setPrice(dec(400, 18))
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-E open troves
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: alice } })
-    await openTrove({ ICR: toBN(dec(120, 16)), extraZUSDAmount: dec(5000, 18), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(60, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    // A-E open locs
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(200, 18), extraParams: { from: alice } })
+    await openLoC({ ICR: toBN(dec(120, 16)), extraZUSDAmount: dec(5000, 18), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(60, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(80, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
 
     // D, E each provide 10000 ZUSD to SP
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: dennis })
@@ -770,8 +770,8 @@ contract('Gas compensation tests', async accounts => {
     and (1 - 0.05000025000125001) = 0.94999974999875 BTC remainder liquidated */
 
     // Check collateral value in USD is > $10
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const aliceDebt = (await troveManager.Troves(alice))[0]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const aliceDebt = (await locManager.LoCs(alice))[0]
     const aliceCollValueInUSD = (await borrowerOperationsTester.getUSDValue(aliceColl, price_1))
     assert.isTrue(aliceCollValueInUSD.gt(th.toBN(dec(10, 18))))
 
@@ -780,11 +780,11 @@ contract('Gas compensation tests', async accounts => {
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const aliceICR = await troveManager.getCurrentICR(alice, price_1)
+    const aliceICR = await locManager.getCurrentICR(alice, price_1)
     assert.isTrue(aliceICR.lt(mv._MCR))
 
     // Liquidate A (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
-    const liquidationTxA = await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
+    const liquidationTxA = await locManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
 
     const expectedGasComp_A = _0pt5percent_aliceColl
     const expectedLiquidatedColl_A = aliceColl.sub(expectedGasComp_A)
@@ -809,17 +809,17 @@ contract('Gas compensation tests', async accounts => {
     and (15 - 0.666666666666666666) BTC remainder liquidated */
 
     // Check collateral value in USD is > $10
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const bobDebt = (await troveManager.Troves(bob))[0]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const bobDebt = (await locManager.LoCs(bob))[0]
 
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const bobICR = await troveManager.getCurrentICR(bob, price_2)
+    const bobICR = await locManager.getCurrentICR(bob, price_2)
     assert.isTrue(bobICR.lte(mv._MCR))
 
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives
-    const liquidationTxB = await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
+    const liquidationTxB = await locManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
 
     const _0pt5percent_bobColl = bobColl.div(web3.utils.toBN('200'))
     const expectedGasComp_B = _0pt5percent_bobColl
@@ -835,16 +835,16 @@ contract('Gas compensation tests', async accounts => {
 
 
   it('gas compensation from pool-offset liquidations: 0.5% collateral > $10 in value. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
-    // open troves
+    // open locs
     await priceFeed.setPrice(dec(400, 18))
-    await openTrove({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
 
-    // A-E open troves
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
-    await openTrove({ ICR: toBN(dec(1875, 15)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    // A-E open locs
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
+    await openLoC({ ICR: toBN(dec(1875, 15)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(2, 18)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(4, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
 
     // D, E each provide 10000 ZUSD to SP
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: dennis })
@@ -857,17 +857,17 @@ contract('Gas compensation tests', async accounts => {
     const price_1 = await priceFeed.getPrice()
 
     // Check value of 0.5% of collateral in USD is > $10
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const aliceDebt = (await troveManager.Troves(alice))[0]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const aliceDebt = (await locManager.LoCs(alice))[0]
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const aliceICR = await troveManager.getCurrentICR(alice, price_1)
+    const aliceICR = await locManager.getCurrentICR(alice, price_1)
     assert.isTrue(aliceICR.lt(mv._MCR))
 
     // Liquidate A (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
-    const liquidationTxA = await troveManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
+    const liquidationTxA = await locManager.liquidate(alice, { from: liquidator, gasPrice: 0 })
     
     const expectedGasComp_A = _0pt5percent_aliceColl
     const expectedLiquidatedColl_A = aliceColl.sub(_0pt5percent_aliceColl)
@@ -889,17 +889,17 @@ contract('Gas compensation tests', async accounts => {
    and (37.5 - 0.1875 BTC) BTC remainder liquidated */
 
     // Check value of 0.5% of collateral in USD is > $10
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const bobDebt = (await troveManager.Troves(bob))[0]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const bobDebt = (await locManager.LoCs(bob))[0]
     const _0pt5percent_bobColl = bobColl.div(web3.utils.toBN('200'))
 
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
-    const bobICR = await troveManager.getCurrentICR(bob, price_1)
+    const bobICR = await locManager.getCurrentICR(bob, price_1)
     assert.isTrue(bobICR.lt(mv._MCR))
 
     // Liquidate B (use 0 gas price to easily check the amount the compensation amount the liquidator receives)
-    const liquidationTxB = await troveManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
+    const liquidationTxB = await locManager.liquidate(bob, { from: liquidator, gasPrice: 0 })
     
     const expectedGasComp_B = _0pt5percent_bobColl
     const expectedLiquidatedColl_B = bobColl.sub(_0pt5percent_bobColl)
@@ -913,19 +913,19 @@ contract('Gas compensation tests', async accounts => {
   })
 
 
-  // liquidateTroves - full offset
-  it('liquidateTroves(): full offset.  Compensates the correct amount, and liquidates the remainder', async () => {
+  // liquidateLoCs - full offset
+  it('liquidateLoCs(): full offset.  Compensates the correct amount, and liquidates the remainder', async () => {
     await priceFeed.setPrice(dec(1000, 18))
 
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-F open troves
-    await openTrove({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
-    await openTrove({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
-    await openTrove({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: flyn } })
+    // A-F open locs
+    await openLoC({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
+    await openLoC({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    await openLoC({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: flyn } })
 
     // D, E each provide 10000 ZUSD to SP
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: erin })
@@ -941,21 +941,21 @@ contract('Gas compensation tests', async accounts => {
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
     // Check A, B, C, D have ICR < MCR
-    assert.isTrue((await troveManager.getCurrentICR(alice, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(bob, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(carol, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(dennis, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(alice, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(bob, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(carol, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(dennis, price)).lt(mv._MCR))
 
     // Check E, F have ICR > MCR
-    assert.isTrue((await troveManager.getCurrentICR(erin, price)).gt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(flyn, price)).gt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(erin, price)).gt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(flyn, price)).gt(mv._MCR))
 
 
     // --- Check value of of A's collateral is < $10, and value of B,C,D collateral are > $10  ---
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const carolColl = (await troveManager.Troves(carol))[1]
-    const dennisColl = (await troveManager.Troves(dennis))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const carolColl = (await locManager.LoCs(carol))[1]
+    const dennisColl = (await locManager.LoCs(dennis))[1]
 
     // --- Check value of 0.5% of A, B, and C's collateral is <$10, and value of 0.5% of D's collateral is > $10 ---
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
@@ -963,7 +963,7 @@ contract('Gas compensation tests', async accounts => {
     const _0pt5percent_carolColl = carolColl.div(web3.utils.toBN('200'))
     const _0pt5percent_dennisColl = dennisColl.div(web3.utils.toBN('200'))
 
-    const collGasCompensation = await troveManager.getCollGasCompensation(price)
+    const collGasCompensation = await locManager.getCollGasCompensation(price)
     assert.equal(collGasCompensation, dec(1, 18))
 
     /* Expect total gas compensation = 
@@ -982,10 +982,10 @@ contract('Gas compensation tests', async accounts => {
       .add(carolColl.sub(_0pt5percent_carolColl))
       .add(dennisColl.sub(_0pt5percent_dennisColl))
 
-    // Liquidate troves A-D
+    // Liquidate locs A-D
 
     const liquidatorBalance_before = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidateTroves(4, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidateLoCs(4, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check ZUSD in SP has decreased
@@ -1001,17 +1001,17 @@ contract('Gas compensation tests', async accounts => {
     assert.equal(expectedLiquidatedColl, BTCinSP)
   })
 
-  // liquidateTroves - full redistribution
-  it('liquidateTroves(): full redistribution. Compensates the correct amount, and liquidates the remainder', async () => {
+  // liquidateLoCs - full redistribution
+  it('liquidateLoCs(): full redistribution. Compensates the correct amount, and liquidates the remainder', async () => {
     await priceFeed.setPrice(dec(1000, 18))
 
-    await openTrove({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(200, 18)), extraParams: { from: whale } })
 
-    // A-D open troves
-    await openTrove({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 16), extraParams: { from: alice } })
-    await openTrove({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 16), extraParams: { from: bob } })
-    await openTrove({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 16), extraParams: { from: carol } })
-    await openTrove({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 21), extraParams: { from: dennis } })
+    // A-D open locs
+    await openLoC({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 16), extraParams: { from: alice } })
+    await openLoC({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 16), extraParams: { from: bob } })
+    await openLoC({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 16), extraParams: { from: carol } })
+    await openLoC({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 21), extraParams: { from: dennis } })
 
     const ZUSDinDefaultPool_0 = await defaultPool.getZUSDDebt()
 
@@ -1023,16 +1023,16 @@ contract('Gas compensation tests', async accounts => {
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
     // Check A, B, C, D have ICR < MCR
-    assert.isTrue((await troveManager.getCurrentICR(alice, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(bob, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(carol, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(dennis, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(alice, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(bob, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(carol, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(dennis, price)).lt(mv._MCR))
 
     // --- Check value of of A's collateral is < $10, and value of B,C,D collateral are > $10  ---
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const carolColl = (await troveManager.Troves(carol))[1]
-    const dennisColl = (await troveManager.Troves(dennis))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const carolColl = (await locManager.LoCs(carol))[1]
+    const dennisColl = (await locManager.LoCs(dennis))[1]
 
     // --- Check value of 0.5% of A, B, and C's collateral is <$10, and value of 0.5% of D's collateral is > $10 ---
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
@@ -1040,7 +1040,7 @@ contract('Gas compensation tests', async accounts => {
     const _0pt5percent_carolColl = carolColl.div(web3.utils.toBN('200'))
     const _0pt5percent_dennisColl = dennisColl.div(web3.utils.toBN('200'))
 
-    const collGasCompensation = await troveManager.getCollGasCompensation(price)
+    const collGasCompensation = await locManager.getCollGasCompensation(price)
     assert.equal(collGasCompensation, dec(1 , 18))
 
     /* Expect total gas compensation = 
@@ -1059,9 +1059,9 @@ contract('Gas compensation tests', async accounts => {
       .add(carolColl.sub(_0pt5percent_carolColl))
       .add(dennisColl.sub(_0pt5percent_dennisColl))
 
-    // Liquidate troves A-D
+    // Liquidate locs A-D
     const liquidatorBalance_before = web3.utils.toBN(await web3.eth.getBalance(liquidator))
-    await troveManager.liquidateTroves(4, { from: liquidator, gasPrice: 0 })
+    await locManager.liquidateLoCs(4, { from: liquidator, gasPrice: 0 })
     const liquidatorBalance_after = web3.utils.toBN(await web3.eth.getBalance(liquidator))
 
     // Check ZUSD in DefaultPool has decreased
@@ -1079,18 +1079,18 @@ contract('Gas compensation tests', async accounts => {
   })
 
   //  --- event emission in liquidation sequence ---
-  it('liquidateTroves(): full offset. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
+  it('liquidateLoCs(): full offset. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
     await priceFeed.setPrice(dec(1000, 18))
 
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-F open troves
-    const { totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
-    const { totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
-    const { totalDebt: C_totalDebt } = await openTrove({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    const { totalDebt: D_totalDebt } = await openTrove({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
-    await openTrove({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: flyn } })
+    // A-F open locs
+    const { totalDebt: A_totalDebt } = await openLoC({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
+    const { totalDebt: B_totalDebt } = await openLoC({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
+    const { totalDebt: C_totalDebt } = await openLoC({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    const { totalDebt: D_totalDebt } = await openLoC({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    await openLoC({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: flyn } })
 
     // D, E each provide 10000 ZUSD to SP
     await stabilityPool.provideToSP(dec(1, 23), ZERO_ADDRESS, { from: erin })
@@ -1106,21 +1106,21 @@ contract('Gas compensation tests', async accounts => {
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
     // Check A, B, C, D have ICR < MCR
-    assert.isTrue((await troveManager.getCurrentICR(alice, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(bob, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(carol, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(dennis, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(alice, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(bob, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(carol, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(dennis, price)).lt(mv._MCR))
 
     // Check E, F have ICR > MCR
-    assert.isTrue((await troveManager.getCurrentICR(erin, price)).gt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(flyn, price)).gt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(erin, price)).gt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(flyn, price)).gt(mv._MCR))
 
 
     // --- Check value of of A's collateral is < $10, and value of B,C,D collateral are > $10  ---
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const carolColl = (await troveManager.Troves(carol))[1]
-    const dennisColl = (await troveManager.Troves(dennis))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const carolColl = (await locManager.LoCs(carol))[1]
+    const dennisColl = (await locManager.LoCs(dennis))[1]
 
     // --- Check value of 0.5% of A, B, and C's collateral is <$10, and value of 0.5% of D's collateral is > $10 ---
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
@@ -1128,7 +1128,7 @@ contract('Gas compensation tests', async accounts => {
     const _0pt5percent_carolColl = carolColl.div(web3.utils.toBN('200'))
     const _0pt5percent_dennisColl = dennisColl.div(web3.utils.toBN('200'))
 
-    const collGasCompensation = await troveManager.getCollGasCompensation(price)
+    const collGasCompensation = await locManager.getCollGasCompensation(price)
     assert.equal(collGasCompensation, dec(1, 18))
 
     /* Expect total gas compensation = 
@@ -1150,8 +1150,8 @@ contract('Gas compensation tests', async accounts => {
     // Expect liquidatedDebt = 51 + 190 + 1025 + 13510 = 14646 ZUSD
     const expectedLiquidatedDebt = A_totalDebt.add(B_totalDebt).add(C_totalDebt).add(D_totalDebt)
 
-    // Liquidate troves A-D
-    const liquidationTxData = await troveManager.liquidateTroves(4, { from: liquidator, gasPrice: 0 })
+    // Liquidate locs A-D
+    const liquidationTxData = await locManager.liquidateLoCs(4, { from: liquidator, gasPrice: 0 })
 
     // Get data from the liquidation event logs
     const [loggedDebt, loggedColl, loggedGasComp, ] = th.getEmittedLiquidationValues(liquidationTxData)
@@ -1161,18 +1161,18 @@ contract('Gas compensation tests', async accounts => {
     assert.isAtMost(th.getDifference(expectedGasComp, loggedGasComp), 1000)
   })
 
-  it('liquidateTroves(): full redistribution. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
+  it('liquidateLoCs(): full redistribution. Liquidation event emits the correct gas compensation and total liquidated coll and debt', async () => {
     await priceFeed.setPrice(dec(1000, 18))
 
-    await openTrove({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
+    await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: whale } })
 
-    // A-F open troves
-    const { totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
-    const { totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
-    const { totalDebt: C_totalDebt } = await openTrove({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
-    const { totalDebt: D_totalDebt } = await openTrove({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
-    await openTrove({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
-    await openTrove({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: flyn } })
+    // A-F open locs
+    const { totalDebt: A_totalDebt } = await openLoC({ ICR: toBN(dec(118, 16)), extraZUSDAmount: dec(2000, 18), extraParams: { from: alice } })
+    const { totalDebt: B_totalDebt } = await openLoC({ ICR: toBN(dec(526, 16)), extraZUSDAmount: dec(8000, 18), extraParams: { from: bob } })
+    const { totalDebt: C_totalDebt } = await openLoC({ ICR: toBN(dec(488, 16)), extraZUSDAmount: dec(600, 18), extraParams: { from: carol } })
+    const { totalDebt: D_totalDebt } = await openLoC({ ICR: toBN(dec(545, 16)), extraZUSDAmount: dec(1, 23), extraParams: { from: dennis } })
+    await openLoC({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: erin } })
+    await openLoC({ ICR: toBN(dec(10, 18)), extraZUSDAmount: dec(1, 23), extraParams: { from: flyn } })
 
     const ZUSDinDefaultPool_0 = await defaultPool.getZUSDDebt()
 
@@ -1184,15 +1184,15 @@ contract('Gas compensation tests', async accounts => {
     assert.isFalse(await th.checkRecoveryMode(contracts))
 
     // Check A, B, C, D have ICR < MCR
-    assert.isTrue((await troveManager.getCurrentICR(alice, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(bob, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(carol, price)).lt(mv._MCR))
-    assert.isTrue((await troveManager.getCurrentICR(dennis, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(alice, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(bob, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(carol, price)).lt(mv._MCR))
+    assert.isTrue((await locManager.getCurrentICR(dennis, price)).lt(mv._MCR))
 
-    const aliceColl = (await troveManager.Troves(alice))[1]
-    const bobColl = (await troveManager.Troves(bob))[1]
-    const carolColl = (await troveManager.Troves(carol))[1]
-    const dennisColl = (await troveManager.Troves(dennis))[1]
+    const aliceColl = (await locManager.LoCs(alice))[1]
+    const bobColl = (await locManager.LoCs(bob))[1]
+    const carolColl = (await locManager.LoCs(carol))[1]
+    const dennisColl = (await locManager.LoCs(dennis))[1]
 
     // --- Check value of 0.5% of A, B, and C's collateral is <$10, and value of 0.5% of D's collateral is > $10 ---
     const _0pt5percent_aliceColl = aliceColl.div(web3.utils.toBN('200'))
@@ -1219,8 +1219,8 @@ contract('Gas compensation tests', async accounts => {
     // Expect liquidatedDebt = 51 + 190 + 1025 + 13510 = 14646 ZUSD
     const expectedLiquidatedDebt = A_totalDebt.add(B_totalDebt).add(C_totalDebt).add(D_totalDebt)
 
-    // Liquidate troves A-D
-    const liquidationTxData = await troveManager.liquidateTroves(4, { from: liquidator, gasPrice: 0 })
+    // Liquidate locs A-D
+    const liquidationTxData = await locManager.liquidateLoCs(4, { from: liquidator, gasPrice: 0 })
 
     // Get data from the liquidation event logs
     const [loggedDebt, loggedColl, loggedGasComp, ] = th.getEmittedLiquidationValues(liquidationTxData)
@@ -1230,25 +1230,25 @@ contract('Gas compensation tests', async accounts => {
     assert.isAtMost(th.getDifference(expectedGasComp, loggedGasComp), 1000)
   })
 
-  // --- Trove ordering by ICR tests ---
+  // --- LoC ordering by ICR tests ---
 
-  it('Trove ordering: same collateral, decreasing debt. Price successively increases. Troves should maintain ordering by ICR', async () => {
+  it('LoC ordering: same collateral, decreasing debt. Price successively increases. LoCs should maintain ordering by ICR', async () => {
     const _10_accounts = accounts.slice(1, 11)
 
     let debt = 50
-    // create 10 troves, constant coll, descending debt 100 to 90 ZUSD
+    // create 10 locs, constant coll, descending debt 100 to 90 ZUSD
     for (const account of _10_accounts) {
 
       const debtString = debt.toString().concat('000000000000000000')
-      await openTrove({ extraZUSDAmount: debtString, extraParams: { from: account, value: dec(30, 'ether') } })
+      await openLoC({ extraZUSDAmount: debtString, extraParams: { from: account, value: dec(30, 'ether') } })
 
-      const squeezedTroveAddr = th.squeezeAddr(account)
+      const squeezedLoCAddr = th.squeezeAddr(account)
 
       debt -= 1
     }
 
     const initialPrice = await priceFeed.getPrice()
-    const firstColl = (await troveManager.Troves(_10_accounts[0]))[1]
+    const firstColl = (await locManager.LoCs(_10_accounts[0]))[1]
 
     // Vary price 200-210
     let price = 200
@@ -1258,28 +1258,28 @@ contract('Gas compensation tests', async accounts => {
       await priceFeed.setPrice(priceString)
 
       const ICRList = []
-      const coll_firstTrove = (await troveManager.Troves(_10_accounts[0]))[1]
-      const gasComp_firstTrove = (await troveManager.getCollGasCompensation(coll_firstTrove)).toString()
+      const coll_firstLoC = (await locManager.LoCs(_10_accounts[0]))[1]
+      const gasComp_firstLoC = (await locManager.getCollGasCompensation(coll_firstLoC)).toString()
 
       for (account of _10_accounts) {
-        // Check gas compensation is the same for all troves
-        const coll = (await troveManager.Troves(account))[1]
-        const gasCompensation = (await troveManager.getCollGasCompensation(coll)).toString()
+        // Check gas compensation is the same for all locs
+        const coll = (await locManager.LoCs(account))[1]
+        const gasCompensation = (await locManager.getCollGasCompensation(coll)).toString()
 
-        assert.equal(gasCompensation, gasComp_firstTrove)
+        assert.equal(gasCompensation, gasComp_firstLoC)
 
-        const ICR = await troveManager.getCurrentICR(account, price)
+        const ICR = await locManager.getCurrentICR(account, price)
         ICRList.push(ICR)
 
 
-        // Check trove ordering by ICR is maintained
+        // Check LoC ordering by ICR is maintained
         if (ICRList.length > 1) {
           const prevICR = ICRList[ICRList.length - 2]
 
           try {
             assert.isTrue(ICR.gte(prevICR))
           } catch (error) {
-            console.log(`BTC price at which trove ordering breaks: ${price}`)
+            console.log(`BTC price at which LoC ordering breaks: ${price}`)
             logICRs(ICRList)
           }
         }
@@ -1289,15 +1289,15 @@ contract('Gas compensation tests', async accounts => {
     }
   })
 
-  it('Trove ordering: increasing collateral, constant debt. Price successively increases. Troves should maintain ordering by ICR', async () => {
+  it('LoC ordering: increasing collateral, constant debt. Price successively increases. LoCs should maintain ordering by ICR', async () => {
     const _20_accounts = accounts.slice(1, 21)
 
     let coll = 50
-    // create 20 troves, increasing collateral, constant debt = 100ZUSD
+    // create 20 locs, increasing collateral, constant debt = 100ZUSD
     for (const account of _20_accounts) {
 
       const collString = coll.toString().concat('000000000000000000')
-      await openTrove({ extraZUSDAmount: dec(100, 18), extraParams: { from: account, value: collString } })
+      await openLoC({ extraZUSDAmount: dec(100, 18), extraParams: { from: account, value: collString } })
 
       coll += 5
     }
@@ -1314,17 +1314,17 @@ contract('Gas compensation tests', async accounts => {
       const ICRList = []
 
       for (account of _20_accounts) {
-        const ICR = await troveManager.getCurrentICR(account, price)
+        const ICR = await locManager.getCurrentICR(account, price)
         ICRList.push(ICR)
 
-        // Check trove ordering by ICR is maintained
+        // Check LoC ordering by ICR is maintained
         if (ICRList.length > 1) {
           const prevICR = ICRList[ICRList.length - 2]
 
           try {
             assert.isTrue(ICR.gte(prevICR))
           } catch (error) {
-            console.log(`BTC price at which trove ordering breaks: ${price}`)
+            console.log(`BTC price at which LoC ordering breaks: ${price}`)
             logICRs(ICRList)
           }
         }
@@ -1334,7 +1334,7 @@ contract('Gas compensation tests', async accounts => {
     }
   })
 
-  it('Trove ordering: Constant raw collateral ratio (excluding virtual debt). Price successively increases. Troves should maintain ordering by ICR', async () => {
+  it('LoC ordering: Constant raw collateral ratio (excluding virtual debt). Price successively increases. LoCs should maintain ordering by ICR', async () => {
     let collVals = [1, 5, 10, 25, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000].map(v => v * 20)
     const accountsList = accounts.slice(1, collVals.length + 1)
 
@@ -1345,7 +1345,7 @@ contract('Gas compensation tests', async accounts => {
 
       const account = accountsList[accountIdx]
       const collString = coll.toString().concat('000000000000000000')
-      await openTrove({ extraZUSDAmount: dec(100, 18), extraParams: { from: account, value: collString } })
+      await openLoC({ extraZUSDAmount: dec(100, 18), extraParams: { from: account, value: collString } })
 
       accountIdx += 1
     }
@@ -1362,10 +1362,10 @@ contract('Gas compensation tests', async accounts => {
       const ICRList = []
 
       for (account of accountsList) {
-        const ICR = await troveManager.getCurrentICR(account, price)
+        const ICR = await locManager.getCurrentICR(account, price)
         ICRList.push(ICR)
 
-        // Check trove ordering by ICR is maintained
+        // Check LoC ordering by ICR is maintained
         if (ICRList.length > 1) {
           const prevICR = ICRList[ICRList.length - 2]
 
@@ -1373,7 +1373,7 @@ contract('Gas compensation tests', async accounts => {
             assert.isTrue(ICR.gte(prevICR))
           } catch (error) {
             console.log(error)
-            console.log(`BTC price at which trove ordering breaks: ${price}`)
+            console.log(`BTC price at which LoC ordering breaks: ${price}`)
             logICRs(ICRList)
           }
         }

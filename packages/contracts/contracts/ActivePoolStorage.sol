@@ -12,7 +12,7 @@ contract ActivePoolStorage is Ownable {
     string public constant NAME = "ActivePool";
 
     address public borrowerOperationsAddress;
-    address public troveManagerAddress;
+    address public locManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
     uint256 internal BTC; // deposited bitcoin tracker

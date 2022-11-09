@@ -1,5 +1,5 @@
 import { Decimal, Decimalish } from "./Decimal";
-import { Trove, TroveAdjustmentParams, TroveClosureParams, TroveCreationParams } from "./Trove";
+import { LoC, LoCAdjustmentParams, LoCClosureParams, LoCCreationParams } from "./LoC";
 import { StabilityDepositChange } from "./StabilityDeposit";
 import { FailedReceipt } from "./SendableZero";
 
@@ -20,45 +20,45 @@ export class TransactionFailedError<T extends FailedReceipt = FailedReceipt> ext
 }
 
 /**
- * Details of an {@link TransactableZero.openTrove | openTrove()} transaction.
+ * Details of an {@link TransactableZero.openLoC | openLoC()} transaction.
  *
  * @public
  */
-export interface TroveCreationDetails {
+export interface LoCCreationDetails {
   /** How much was deposited and borrowed. */
-  params: TroveCreationParams<Decimal>;
+  params: LoCCreationParams<Decimal>;
 
-  /** The Trove that was created by the transaction. */
-  newTrove: Trove;
+  /** The LoC that was created by the transaction. */
+  newLoC: LoC;
 
-  /** Amount of ZUSD added to the Trove's debt as borrowing fee. */
+  /** Amount of ZUSD added to the LoC's debt as borrowing fee. */
   fee: Decimal;
 }
 
 /**
- * Details of an {@link TransactableZero.adjustTrove | adjustTrove()} transaction.
+ * Details of an {@link TransactableZero.adjustLoC | adjustLoC()} transaction.
  *
  * @public
  */
-export interface TroveAdjustmentDetails {
+export interface LoCAdjustmentDetails {
   /** Parameters of the adjustment. */
-  params: TroveAdjustmentParams<Decimal>;
+  params: LoCAdjustmentParams<Decimal>;
 
-  /** New state of the adjusted Trove directly after the transaction. */
-  newTrove: Trove;
+  /** New state of the adjusted LoC directly after the transaction. */
+  newLoC: LoC;
 
-  /** Amount of ZUSD added to the Trove's debt as borrowing fee. */
+  /** Amount of ZUSD added to the LoC's debt as borrowing fee. */
   fee: Decimal;
 }
 
 /**
- * Details of a {@link TransactableZero.closeTrove | closeTrove()} transaction.
+ * Details of a {@link TransactableZero.closeLoC | closeLoC()} transaction.
  *
  * @public
  */
-export interface TroveClosureDetails {
+export interface LoCClosureDetails {
   /** How much was withdrawn and repaid. */
-  params: TroveClosureParams<Decimal>;
+  params: LoCClosureParams<Decimal>;
 }
 
 /**
@@ -68,11 +68,11 @@ export interface TroveClosureDetails {
  * @public
  */
 export interface LiquidationDetails {
-  /** Addresses whose Troves were liquidated by the transaction. */
+  /** Addresses whose LoCs were liquidated by the transaction. */
   liquidatedAddresses: string[];
 
   /** Total collateral liquidated and debt cleared by the transaction. */
-  totalLiquidated: Trove;
+  totalLiquidated: LoC;
 
   /** Amount of ZUSD paid to the liquidator as gas compensation. */
   zusdGasCompensation: Decimal;
@@ -95,13 +95,13 @@ export interface RedemptionDetails {
    *
    * @remarks
    * This can end up being lower than `attemptedZUSDAmount` due to interference from another
-   * transaction that modifies the list of Troves.
+   * transaction that modifies the list of LoCs.
    *
    * @public
    */
   actualZUSDAmount: Decimal;
 
-  /** Amount of collateral (e.g. Bitcoin) taken from Troves by the transaction. */
+  /** Amount of collateral (e.g. Bitcoin) taken from LoCs by the transaction. */
   collateralTaken: Decimal;
 
   /** Amount of native currency (e.g. Bitcoin) deducted as fee from collateral taken. */
@@ -144,14 +144,14 @@ export interface StabilityDepositChangeDetails extends StabilityPoolGainsWithdra
 
 /**
  * Details of a
- * {@link TransactableZero.transferCollateralGainToTrove | transferCollateralGainToTrove()}
+ * {@link TransactableZero.transferCollateralGainToLoC | transferCollateralGainToLoC()}
  * transaction.
  *
  * @public
  */
 export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdrawalDetails {
-  /** New state of the depositor's Trove directly after the transaction. */
-  newTrove: Trove;
+  /** New state of the depositor's LoC directly after the transaction. */
+  newLoC: LoC;
 }
 
 /**
@@ -167,7 +167,7 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
  */
 export interface TransactableZero {
   /**
-   * Open a new Trove by depositing collateral and borrowing ZUSD.
+   * Open a new LoC by depositing collateral and borrowing ZUSD.
    *
    * @param params - How much to deposit and borrow.
    * @param maxBorrowingRate - Maximum acceptable
@@ -180,21 +180,21 @@ export interface TransactableZero {
    * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
    */
-  openTrove(
-    params: TroveCreationParams<Decimalish>,
+  openLoC(
+    params: LoCCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish
-  ): Promise<TroveCreationDetails>;
+  ): Promise<LoCCreationDetails>;
 
   /**
-   * Close existing Trove by repaying all debt and withdrawing all collateral.
+   * Close existing LoC by repaying all debt and withdrawing all collateral.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
    */
-  closeTrove(): Promise<TroveClosureDetails>;
+  closeLoC(): Promise<LoCClosureDetails>;
 
   /**
-   * Adjust existing Trove by changing its collateral, debt, or both.
+   * Adjust existing LoC by changing its collateral, debt, or both.
    *
    * @param params - Parameters of the adjustment.
    * @param maxBorrowingRate - Maximum acceptable
@@ -205,21 +205,21 @@ export interface TransactableZero {
    * Throws {@link TransactionFailedError} in case of transaction failure.
    *
    * @remarks
-   * The transaction will fail if the Trove's debt would fall below
+   * The transaction will fail if the LoC's debt would fall below
    * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT}.
    *
    * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
    */
-  adjustTrove(
-    params: TroveAdjustmentParams<Decimalish>,
+  adjustLoC(
+    params: LoCAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish
-  ): Promise<TroveAdjustmentDetails>;
+  ): Promise<LoCAdjustmentDetails>;
 
   /**
-   * Adjust existing Trove by depositing more collateral.
+   * Adjust existing LoC by depositing more collateral.
    *
-   * @param amount - The amount of collateral to add to the Trove's existing collateral.
+   * @param amount - The amount of collateral to add to the LoC's existing collateral.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -228,15 +228,15 @@ export interface TransactableZero {
    * Equivalent to:
    *
    * ```typescript
-   * adjustTrove({ depositCollateral: amount })
+   * adjustLoC({ depositCollateral: amount })
    * ```
    */
-  depositCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+  depositCollateral(amount: Decimalish): Promise<LoCAdjustmentDetails>;
 
   /**
-   * Adjust existing Trove by withdrawing some of its collateral.
+   * Adjust existing LoC by withdrawing some of its collateral.
    *
-   * @param amount - The amount of collateral to withdraw from the Trove.
+   * @param amount - The amount of collateral to withdraw from the LoC.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -245,13 +245,13 @@ export interface TransactableZero {
    * Equivalent to:
    *
    * ```typescript
-   * adjustTrove({ withdrawCollateral: amount })
+   * adjustLoC({ withdrawCollateral: amount })
    * ```
    */
-  withdrawCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+  withdrawCollateral(amount: Decimalish): Promise<LoCAdjustmentDetails>;
 
   /**
-   * Adjust existing Trove by borrowing more ZUSD.
+   * Adjust existing LoC by borrowing more ZUSD.
    *
    * @param amount - The amount of ZUSD to borrow.
    * @param maxBorrowingRate - Maximum acceptable
@@ -264,13 +264,13 @@ export interface TransactableZero {
    * Equivalent to:
    *
    * ```typescript
-   * adjustTrove({ borrowZUSD: amount }, maxBorrowingRate)
+   * adjustLoC({ borrowZUSD: amount }, maxBorrowingRate)
    * ```
    */
-  borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
+  borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<LoCAdjustmentDetails>;
 
   /**
-   * Adjust existing Trove by repaying some of its debt.
+   * Adjust existing LoC by repaying some of its debt.
    *
    * @param amount - The amount of ZUSD to repay.
    *
@@ -281,18 +281,18 @@ export interface TransactableZero {
    * Equivalent to:
    *
    * ```typescript
-   * adjustTrove({ repayZUSD: amount })
+   * adjustLoC({ repayZUSD: amount })
    * ```
    */
-  repayZUSD(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+  repayZUSD(amount: Decimalish): Promise<LoCAdjustmentDetails>;
 
   /** @internal */
   setPrice(price: Decimalish): Promise<void>;
 
   /**
-   * Liquidate one or more undercollateralized Troves.
+   * Liquidate one or more undercollateralized LoCs.
    *
-   * @param address - Address or array of addresses whose Troves to liquidate.
+   * @param address - Address or array of addresses whose LoCs to liquidate.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -300,14 +300,14 @@ export interface TransactableZero {
   liquidate(address: string | string[]): Promise<LiquidationDetails>;
 
   /**
-   * Liquidate the least collateralized Troves up to a maximum number.
+   * Liquidate the least collateralized LoCs up to a maximum number.
    *
-   * @param maximumNumberOfTrovesToLiquidate - Stop after liquidating this many Troves.
+   * @param maximumNumberOfLoCsToLiquidate - Stop after liquidating this many LoCs.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
    */
-  liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<LiquidationDetails>;
+  liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<LiquidationDetails>;
 
   /**
    * Make a new Stability Deposit, or top up existing one.
@@ -356,18 +356,18 @@ export interface TransactableZero {
 
   /**
    * Transfer {@link @sovryn-zero/lib-base#StabilityDeposit.collateralGain | collateral gain} from
-   * Stability Deposit to Trove.
+   * Stability Deposit to LoC.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
    *
    * @remarks
-   * The collateral gain is transfered to the Trove as additional collateral.
+   * The collateral gain is transfered to the LoC as additional collateral.
    *
    * As a side-effect, the transaction will also pay out the Stability Deposit's
    * {@link @sovryn-zero/lib-base#StabilityDeposit.zeroReward | ZERO reward}.
    */
-  transferCollateralGainToTrove(): Promise<CollateralGainTransferDetails>;
+  transferCollateralGainToLoC(): Promise<CollateralGainTransferDetails>;
 
   /**
    * Send ZUSD tokens to an address.

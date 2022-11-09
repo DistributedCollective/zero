@@ -1,18 +1,18 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "MultiTroveGetter",
-  "sourceName": "contracts/MultiTroveGetter.sol",
+  "contractName": "MultiLoCGetter",
+  "sourceName": "contracts/MultiLoCGetter.sol",
   "abi": [
     {
       "inputs": [
         {
-          "internalType": "contract TroveManager",
-          "name": "_troveManager",
+          "internalType": "contract LoCManager",
+          "name": "_locManager",
           "type": "address"
         },
         {
-          "internalType": "contract ISortedTroves",
-          "name": "_sortedTroves",
+          "internalType": "contract ISortedLoCs",
+          "name": "_sortedLoCs",
           "type": "address"
         }
       ],
@@ -32,7 +32,7 @@
           "type": "uint256"
         }
       ],
-      "name": "getMultipleSortedTroves",
+      "name": "getMultipleSortedLoCs",
       "outputs": [
         {
           "components": [
@@ -67,8 +67,8 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct MultiTroveGetter.CombinedTroveData[]",
-          "name": "_troves",
+          "internalType": "struct MultiLoCGetter.CombinedLoCData[]",
+          "name": "_locs",
           "type": "tuple[]"
         }
       ],
@@ -77,10 +77,10 @@
     },
     {
       "inputs": [],
-      "name": "sortedTroves",
+      "name": "sortedLoCs",
       "outputs": [
         {
-          "internalType": "contract ISortedTroves",
+          "internalType": "contract ISortedLoCs",
           "name": "",
           "type": "address"
         }
@@ -90,10 +90,10 @@
     },
     {
       "inputs": [],
-      "name": "troveManager",
+      "name": "locManager",
       "outputs": [
         {
-          "internalType": "contract TroveManager",
+          "internalType": "contract LoCManager",
           "name": "",
           "type": "address"
         }

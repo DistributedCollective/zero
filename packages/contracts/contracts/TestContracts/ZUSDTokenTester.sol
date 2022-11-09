@@ -7,11 +7,11 @@ import "../ZUSDToken.sol";
 contract ZUSDTokenTester is ZUSDToken {
     
     constructor( 
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
     ) public  {
-        initialize(_troveManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress);
+        initialize(_locManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress);
     }
     
     function unprotectedMint(address _account, uint256 _amount) external {

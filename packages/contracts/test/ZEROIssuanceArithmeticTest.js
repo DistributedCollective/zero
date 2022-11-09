@@ -791,8 +791,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Register front end with kickback rate = 100%
     await stabilityPool.registerFrontEnd(dec(1, 18), { from: frontEnd_1 })
 
-    // Alice opens trove and deposits to SP
-    await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
+    // Alice opens LoC and deposits to SP
+    await borrowerOperations.openLoC(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
     assert.isTrue(await stabilityPool.isEligibleForZERO(alice))
@@ -826,8 +826,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Register front end with kickback rate = 100%
     await stabilityPool.registerFrontEnd(dec(1, 18), { from: frontEnd_1 })
 
-    // Alice opens trove and deposits to SP
-    await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
+    // Alice opens LoC and deposits to SP
+    await borrowerOperations.openLoC(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
     assert.isTrue(await stabilityPool.isEligibleForZERO(alice))
@@ -860,8 +860,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Register front end with kickback rate = 100%
     await stabilityPool.registerFrontEnd(dec(1, 18), { from: frontEnd_1 })
 
-    // Alice opens trove and deposits to SP
-    await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
+    // Alice opens LoC and deposits to SP
+    await borrowerOperations.openLoC(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
     assert.isTrue(await stabilityPool.isEligibleForZERO(alice))
@@ -895,8 +895,8 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     // Register front end with kickback rate = 100%
     await stabilityPool.registerFrontEnd(dec(1, 18), { from: frontEnd_1 })
 
-    // Alice opens trove and deposits to SP
-    await borrowerOperations.openTrove(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
+    // Alice opens LoC and deposits to SP
+    await borrowerOperations.openLoC(th._100pct, dec(1, 18), alice, alice, { from: alice, value: dec(1, 'ether') })
     await stabilityPool.provideToSP(dec(1, 18), frontEnd_1, { from: alice })
 
     assert.isTrue(await stabilityPool.isEligibleForZERO(alice))

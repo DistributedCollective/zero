@@ -6,19 +6,19 @@ import {
   ZEROStake,
   StabilityDeposit,
   TransactableZero,
-  Trove,
-  TroveAdjustmentParams
+  LoC,
+  LoCAdjustmentParams
 } from "@sovryn-zero/lib-base";
 
 import { EthersZero as Zero } from "@sovryn-zero/lib-ethers";
 
 import {
-  createRandomTrove,
+  createRandomLoC,
   shortenAddress,
   benford,
-  getListOfTroveOwners,
+  getListOfLoCOwners,
   listDifference,
-  getListOfTroves,
+  getListOfLoCs,
   randomCollateralChange,
   randomDebtChange,
   objToString
@@ -32,9 +32,9 @@ type _GasHistogramsFrom<T> = {
 
 type GasHistograms = Pick<
   _GasHistogramsFrom<TransactableZero>,
-  | "openTrove"
-  | "adjustTrove"
-  | "closeTrove"
+  | "openLoC"
+  | "adjustLoC"
+  | "closeLoC"
   | "redeemZUSD"
   | "depositZUSDInStabilityPool"
   | "withdrawZUSDFromStabilityPool"
@@ -70,9 +70,9 @@ export class Fixture {
     this.price = price;
 
     this.gasHistograms = {
-      openTrove: new GasHistogram(),
-      adjustTrove: new GasHistogram(),
-      closeTrove: new GasHistogram(),
+      openLoC: new GasHistogram(),
+      adjustLoC: new GasHistogram(),
+      closeLoC: new GasHistogram(),
       redeemZUSD: new GasHistogram(),
       depositZUSDInStabilityPool: new GasHistogram(),
       withdrawZUSDFromStabilityPool: new GasHistogram(),
@@ -109,37 +109,37 @@ export class Fixture {
     const zusdBalance = await this.funderZero.getZUSDBalance();
 
     if (zusdBalance.lt(amount)) {
-      const trove = await this.funderZero.getTrove();
+      const loc = await this.funderZero.getLoC();
       const total = await this.funderZero.getTotal();
       const fees = await this.funderZero.getFees();
 
       const targetCollateralRatio =
-        trove.isEmpty || !total.collateralRatioIsBelowCritical(this.price)
+        loc.isEmpty || !total.collateralRatioIsBelowCritical(this.price)
           ? 1.51
-          : Decimal.max(trove.collateralRatio(this.price).add(0.00001), 1.11);
+          : Decimal.max(loc.collateralRatio(this.price).add(0.00001), 1.11);
 
-      let newTrove = trove.isEmpty ? Trove.create({ depositCollateral: 1 }) : trove;
-      newTrove = newTrove.adjust({ borrowZUSD: amount.sub(zusdBalance).mul(2) });
-      newTrove = newTrove.setCollateral(newTrove.debt.mulDiv(targetCollateralRatio, this.price));
+      let newLoC = loc.isEmpty ? LoC.create({ depositCollateral: 1 }) : loc;
+      newLoC = newLoC.adjust({ borrowZUSD: amount.sub(zusdBalance).mul(2) });
+      newLoC = newLoC.setCollateral(newLoC.debt.mulDiv(targetCollateralRatio, this.price));
 
-      if (trove.isEmpty) {
-        const params = Trove.recreate(newTrove, fees.borrowingRate());
-        console.log(`[funder] openTrove(${objToString(params)})`);
-        await this.funderZero.openTrove(params);
+      if (loc.isEmpty) {
+        const params = LoC.recreate(newLoC, fees.borrowingRate());
+        console.log(`[funder] openLoC(${objToString(params)})`);
+        await this.funderZero.openLoC(params);
       } else {
-        let newTotal = total.add(newTrove).subtract(trove);
+        let newTotal = total.add(newLoC).subtract(loc);
 
         if (
           !total.collateralRatioIsBelowCritical(this.price) &&
           newTotal.collateralRatioIsBelowCritical(this.price)
         ) {
           newTotal = newTotal.setCollateral(newTotal.debt.mulDiv(1.51, this.price));
-          newTrove = trove.add(newTotal).subtract(total);
+          newLoC = loc.add(newTotal).subtract(total);
         }
 
-        const params = trove.adjustTo(newTrove, fees.borrowingRate());
-        console.log(`[funder] adjustTrove(${objToString(params)})`);
-        await this.funderZero.adjustTrove(params);
+        const params = loc.adjustTo(newLoC, fees.borrowingRate());
+        console.log(`[funder] adjustLoC(${objToString(params)})`);
+        await this.funderZero.adjustLoC(params);
       }
     }
 
@@ -154,109 +154,109 @@ export class Fixture {
     return this.price;
   }
 
-  async liquidateRandomNumberOfTroves(price: Decimal) {
+  async liquidateRandomNumberOfLoCs(price: Decimal) {
     const zusdInStabilityPoolBefore = await this.deployerZero.getZUSDInStabilityPool();
     console.log(`// Stability Pool balance: ${zusdInStabilityPoolBefore}`);
 
-    const trovesBefore = await getListOfTroves(this.deployerZero);
+    const locsBefore = await getListOfLoCs(this.deployerZero);
 
-    if (trovesBefore.length === 0) {
-      console.log("// No Troves to liquidate");
+    if (locsBefore.length === 0) {
+      console.log("// No LoCs to liquidate");
       return;
     }
 
-    const troveOwnersBefore = trovesBefore.map(([owner]) => owner);
-    const [, lastTrove] = trovesBefore[trovesBefore.length - 1];
+    const locOwnersBefore = locsBefore.map(([owner]) => owner);
+    const [, lastLoC] = locsBefore[locsBefore.length - 1];
 
-    if (!lastTrove.collateralRatioIsBelowMinimum(price)) {
-      console.log("// No Troves to liquidate");
+    if (!lastLoC.collateralRatioIsBelowMinimum(price)) {
+      console.log("// No LoCs to liquidate");
       return;
     }
 
-    const maximumNumberOfTrovesToLiquidate = Math.floor(50 * Math.random()) + 1;
-    console.log(`[deployer] liquidateUpTo(${maximumNumberOfTrovesToLiquidate})`);
-    await this.deployerZero.liquidateUpTo(maximumNumberOfTrovesToLiquidate);
+    const maximumNumberOfLoCsToLiquidate = Math.floor(50 * Math.random()) + 1;
+    console.log(`[deployer] liquidateUpTo(${maximumNumberOfLoCsToLiquidate})`);
+    await this.deployerZero.liquidateUpTo(maximumNumberOfLoCsToLiquidate);
 
-    const troveOwnersAfter = await getListOfTroveOwners(this.deployerZero);
-    const liquidatedTroves = listDifference(troveOwnersBefore, troveOwnersAfter);
+    const locOwnersAfter = await getListOfLoCOwners(this.deployerZero);
+    const liquidatedLoCs = listDifference(locOwnersBefore, locOwnersAfter);
 
-    if (liquidatedTroves.length > 0) {
-      for (const liquidatedTrove of liquidatedTroves) {
-        console.log(`// Liquidated ${shortenAddress(liquidatedTrove)}`);
+    if (liquidatedLoCs.length > 0) {
+      for (const liquidatedLoC of liquidatedLoCs) {
+        console.log(`// Liquidated ${shortenAddress(liquidatedLoC)}`);
       }
     }
 
-    this.totalNumberOfLiquidations += liquidatedTroves.length;
+    this.totalNumberOfLiquidations += liquidatedLoCs.length;
 
     const zusdInStabilityPoolAfter = await this.deployerZero.getZUSDInStabilityPool();
     console.log(`// Stability Pool balance: ${zusdInStabilityPoolAfter}`);
   }
 
-  async openRandomTrove(userAddress: string, zero: Zero) {
+  async openRandomLoC(userAddress: string, zero: Zero) {
     const total = await zero.getTotal();
     const fees = await zero.getFees();
 
-    let newTrove: Trove;
+    let newLoC: LoC;
 
-    const cannotOpen = (newTrove: Trove) =>
+    const cannotOpen = (newLoC: LoC) =>
       total.collateralRatioIsBelowCritical(this.price)
-        ? newTrove.collateralRatioIsBelowCritical(this.price)
-        : newTrove.collateralRatioIsBelowMinimum(this.price) ||
-          total.add(newTrove).collateralRatioIsBelowCritical(this.price);
+        ? newLoC.collateralRatioIsBelowCritical(this.price)
+        : newLoC.collateralRatioIsBelowMinimum(this.price) ||
+          total.add(newLoC).collateralRatioIsBelowCritical(this.price);
 
     // do {
-    newTrove = createRandomTrove(this.price);
-    // } while (cannotOpen(newTrove));
+    newLoC = createRandomLoC(this.price);
+    // } while (cannotOpen(newLoC));
 
     await this.funder.sendTransaction({
       to: userAddress,
-      value: newTrove.collateral.hex
+      value: newLoC.collateral.hex
     });
 
-    const params = Trove.recreate(newTrove, fees.borrowingRate());
+    const params = LoC.recreate(newLoC, fees.borrowingRate());
 
-    if (cannotOpen(newTrove)) {
+    if (cannotOpen(newLoC)) {
       console.log(
-        `// [${shortenAddress(userAddress)}] openTrove(${objToString(params)}) expected to fail`
+        `// [${shortenAddress(userAddress)}] openLoC(${objToString(params)}) expected to fail`
       );
 
-      await this.gasHistograms.openTrove.expectFailure(() =>
-        zero.openTrove(params, { gasPrice: 0 })
+      await this.gasHistograms.openLoC.expectFailure(() =>
+        zero.openLoC(params, { gasPrice: 0 })
       );
     } else {
-      console.log(`[${shortenAddress(userAddress)}] openTrove(${objToString(params)})`);
+      console.log(`[${shortenAddress(userAddress)}] openLoC(${objToString(params)})`);
 
-      await this.gasHistograms.openTrove.expectSuccess(() =>
-        zero.send.openTrove(params, { gasPrice: 0 })
+      await this.gasHistograms.openLoC.expectSuccess(() =>
+        zero.send.openLoC(params, { gasPrice: 0 })
       );
     }
   }
 
-  async randomlyAdjustTrove(userAddress: string, zero: Zero, trove: Trove) {
+  async randomlyAdjustLoC(userAddress: string, zero: Zero, loc: LoC) {
     const total = await zero.getTotal();
     const fees = await zero.getFees();
     const x = Math.random();
 
-    const params: TroveAdjustmentParams<Decimal> =
+    const params: LoCAdjustmentParams<Decimal> =
       x < 0.333
-        ? randomCollateralChange(trove)
+        ? randomCollateralChange(loc)
         : x < 0.666
-        ? randomDebtChange(trove)
-        : { ...randomCollateralChange(trove), ...randomDebtChange(trove) };
+        ? randomDebtChange(loc)
+        : { ...randomCollateralChange(loc), ...randomDebtChange(loc) };
 
-    const cannotAdjust = (trove: Trove, params: TroveAdjustmentParams<Decimal>) => {
-      if (params.withdrawCollateral?.gte(trove.collateral) || params.repayZUSD?.gt(trove.netDebt)) {
+    const cannotAdjust = (loc: LoC, params: LoCAdjustmentParams<Decimal>) => {
+      if (params.withdrawCollateral?.gte(loc.collateral) || params.repayZUSD?.gt(loc.netDebt)) {
         return true;
       }
 
-      const adjusted = trove.adjust(params, fees.borrowingRate());
+      const adjusted = loc.adjust(params, fees.borrowingRate());
 
       return (
         (params.withdrawCollateral?.nonZero || params.borrowZUSD?.nonZero) &&
         (adjusted.collateralRatioIsBelowMinimum(this.price) ||
           (total.collateralRatioIsBelowCritical(this.price)
-            ? adjusted._nominalCollateralRatio.lt(trove._nominalCollateralRatio)
-            : total.add(adjusted).subtract(trove).collateralRatioIsBelowCritical(this.price)))
+            ? adjusted._nominalCollateralRatio.lt(loc._nominalCollateralRatio)
+            : total.add(adjusted).subtract(loc).collateralRatioIsBelowCritical(this.price)))
       );
     };
 
@@ -271,38 +271,38 @@ export class Fixture {
       await this.sendZUSDFromFunder(userAddress, params.repayZUSD);
     }
 
-    if (cannotAdjust(trove, params)) {
+    if (cannotAdjust(loc, params)) {
       console.log(
-        `// [${shortenAddress(userAddress)}] adjustTrove(${objToString(params)}) expected to fail`
+        `// [${shortenAddress(userAddress)}] adjustLoC(${objToString(params)}) expected to fail`
       );
 
-      await this.gasHistograms.adjustTrove.expectFailure(() =>
-        zero.adjustTrove(params, { gasPrice: 0 })
+      await this.gasHistograms.adjustLoC.expectFailure(() =>
+        zero.adjustLoC(params, { gasPrice: 0 })
       );
     } else {
-      console.log(`[${shortenAddress(userAddress)}] adjustTrove(${objToString(params)})`);
+      console.log(`[${shortenAddress(userAddress)}] adjustLoC(${objToString(params)})`);
 
-      await this.gasHistograms.adjustTrove.expectSuccess(() =>
-        zero.send.adjustTrove(params, { gasPrice: 0 })
+      await this.gasHistograms.adjustLoC.expectSuccess(() =>
+        zero.send.adjustLoC(params, { gasPrice: 0 })
       );
     }
   }
 
-  async closeTrove(userAddress: string, zero: Zero, trove: Trove) {
+  async closeLoC(userAddress: string, zero: Zero, loc: LoC) {
     const total = await zero.getTotal();
 
     if (total.collateralRatioIsBelowCritical(this.price)) {
-      // Cannot close Trove during recovery mode
-      console.log("// Skipping closeTrove() in recovery mode");
+      // Cannot close LoC during recovery mode
+      console.log("// Skipping closeLoC() in recovery mode");
       return;
     }
 
-    await this.sendZUSDFromFunder(userAddress, trove.netDebt);
+    await this.sendZUSDFromFunder(userAddress, loc.netDebt);
 
-    console.log(`[${shortenAddress(userAddress)}] closeTrove()`);
+    console.log(`[${shortenAddress(userAddress)}] closeLoC()`);
 
-    await this.gasHistograms.closeTrove.expectSuccess(() =>
-      zero.send.closeTrove({ gasPrice: 0 })
+    await this.gasHistograms.closeLoC.expectSuccess(() =>
+      zero.send.closeLoC({ gasPrice: 0 })
     );
   }
 
@@ -343,7 +343,7 @@ export class Fixture {
     zero: Zero,
     deposit: StabilityDeposit
   ) {
-    const [[, lastTrove]] = await zero.getTroves({
+    const [[, lastLoC]] = await zero.getLoCs({
       first: 1,
       sortedBy: "ascendingCollateralRatio"
     });
@@ -351,7 +351,7 @@ export class Fixture {
     const amount = deposit.currentZUSD.mul(1.1 * Math.random()).add(10 * Math.random());
 
     const cannotWithdraw = (amount: Decimal) =>
-      amount.nonZero && lastTrove.collateralRatioIsBelowMinimum(this.price);
+      amount.nonZero && lastLoC.collateralRatioIsBelowMinimum(this.price);
 
     if (cannotWithdraw(amount)) {
       console.log(

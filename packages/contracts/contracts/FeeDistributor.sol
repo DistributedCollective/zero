@@ -15,7 +15,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _troveManagerAddress);
+    event LoCManagerAddressChanged(address _locManagerAddress);
     event WrbtcAddressChanged(address _wrbtcAddress);
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
@@ -29,7 +29,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         address _sovFeeCollectorAddress,
         address _zeroStakingAddress,
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _wrbtcAddress,
         address _zusdTokenAddress,
         address _activePoolAddress
@@ -37,7 +37,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         checkContract(_sovFeeCollectorAddress);
         checkContract(_zeroStakingAddress);
         checkContract(_borrowerOperationsAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_wrbtcAddress);
         checkContract(_zusdTokenAddress);
         checkContract(_activePoolAddress);
@@ -45,7 +45,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         sovFeeCollector = IFeeSharingProxy(_sovFeeCollectorAddress);
         zeroStaking = IZEROStaking(_zeroStakingAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
-        troveManager = ITroveManager(_troveManagerAddress);
+        locManager = ILoCManager(_locManagerAddress);
         wrbtc = IWrbtc(_wrbtcAddress);
         zusdToken = IZUSDToken(_zusdTokenAddress);
         activePoolAddress = _activePoolAddress;
@@ -56,7 +56,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         emit SOVFeeCollectorAddressChanged(_sovFeeCollectorAddress);
         emit ZeroStakingAddressChanged(_zeroStakingAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit WrbtcAddressChanged(_wrbtcAddress);
         emit ZUSDTokenAddressChanged(_zusdTokenAddress);
         emit ActivePoolAddressSet(_activePoolAddress);
@@ -68,7 +68,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
 
     function distributeFees() public override {
         require(
-            msg.sender == address(borrowerOperations) || msg.sender == address(troveManager),
+            msg.sender == address(borrowerOperations) || msg.sender == address(locManager),
             "FeeDistributor: invalid caller"
         );
         uint256 zusdtoDistribute = zusdToken.balanceOf(address(this));

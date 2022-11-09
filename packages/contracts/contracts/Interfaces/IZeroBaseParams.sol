@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 
 interface IZeroBaseParams {
 
-    /// Minimum collateral ratio for individual troves
+    /// Minimum collateral ratio for individual locs
     function MCR() external view returns (uint);
 
     /// Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.

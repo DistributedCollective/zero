@@ -377,11 +377,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newSortedTrovesAddress",
+          "name": "_newSortedLoCsAddress",
           "type": "address"
         }
       ],
-      "name": "SortedTrovesAddressChanged",
+      "name": "SortedLoCsAddressChanged",
       "type": "event"
     },
     {
@@ -416,11 +416,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newTroveManagerAddress",
+          "name": "_newLoCManagerAddress",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressChanged",
+      "name": "LoCManagerAddressChanged",
       "type": "event"
     },
     {
@@ -621,7 +621,7 @@
         },
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         },
         {
@@ -636,7 +636,7 @@
         },
         {
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         },
         {
@@ -668,7 +668,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawBTCGainToTrove",
+      "name": "withdrawBTCGainToLoC",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

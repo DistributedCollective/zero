@@ -2,8 +2,8 @@
 
 pragma solidity 0.6.11;
 
-import "./Interfaces/ITroveManager.sol";
-import "./Interfaces/ISortedTroves.sol";
+import "./Interfaces/ILoCManager.sol";
+import "./Interfaces/ISortedLoCs.sol";
 import "./Dependencies/ZeroBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./HintHelpersStorage.sol";
@@ -12,29 +12,29 @@ contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
 
     // --- Events ---
 
-    event SortedTrovesAddressChanged(address _sortedTrovesAddress);
-    event TroveManagerAddressChanged(address _troveManagerAddress);
+    event SortedLoCsAddressChanged(address _sortedLoCsAddress);
+    event LoCManagerAddressChanged(address _locManagerAddress);
 
     // --- Dependency setters ---
 
     function setAddresses(
         address _zeroBaseParamsAddress,
-        address _sortedTrovesAddress,
-        address _troveManagerAddress
+        address _sortedLoCsAddress,
+        address _locManagerAddress
     )
         external
         onlyOwner
     {
         checkContract(_zeroBaseParamsAddress);
-        checkContract(_sortedTrovesAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_sortedLoCsAddress);
+        checkContract(_locManagerAddress);
 
         zeroBaseParams = IZeroBaseParams(_zeroBaseParamsAddress);
-        sortedTroves = ISortedTroves(_sortedTrovesAddress);
-        troveManager = ITroveManager(_troveManagerAddress);
+        sortedLoCs = ISortedLoCs(_sortedLoCsAddress);
+        locManager = ILoCManager(_locManagerAddress);
 
-        emit SortedTrovesAddressChanged(_sortedTrovesAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit SortedLoCsAddressChanged(_sortedLoCsAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
 
         
     }
@@ -43,18 +43,18 @@ contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
 
     /** getRedemptionHints() - Helper function for finding the right hints to pass to redeemCollateral().
      *
-     * It simulates a redemption of `_ZUSDamount` to figure out where the redemption sequence will start and what state the final Trove
+     * It simulates a redemption of `_ZUSDamount` to figure out where the redemption sequence will start and what state the final LoC
      * of the sequence will end up in.
      *
      * Returns three hints:
-     *  - `firstRedemptionHint` is the address of the first Trove with ICR >= MCR (i.e. the first Trove that will be redeemed).
-     *  - `partialRedemptionHintNICR` is the final nominal ICR of the last Trove of the sequence after being hit by partial redemption,
+     *  - `firstRedemptionHint` is the address of the first LoC with ICR >= MCR (i.e. the first LoC that will be redeemed).
+     *  - `partialRedemptionHintNICR` is the final nominal ICR of the last LoC of the sequence after being hit by partial redemption,
      *     or zero in case of no partial redemption.
      *  - `truncatedZUSDamount` is the maximum amount that can be redeemed out of the the provided `_ZUSDamount`. This can be lower than
-     *    `_ZUSDamount` when redeeming the full amount would leave the last Trove of the redemption sequence with less net debt than the
+     *    `_ZUSDamount` when redeeming the full amount would leave the last LoC of the redemption sequence with less net debt than the
      *    minimum allowed value (i.e. MIN_NET_DEBT).
      *
-     * The number of Troves to consider for redemption can be capped by passing a non-zero value as `_maxIterations`, while passing zero
+     * The number of LoCs to consider for redemption can be capped by passing a non-zero value as `_maxIterations`, while passing zero
      * will leave it uncapped.
      */
 
@@ -71,31 +71,31 @@ contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
             uint truncatedZUSDamount
         )
     {
-        ISortedTroves sortedTrovesCached = sortedTroves;
+        ISortedLoCs sortedLoCsCached = sortedLoCs;
 
         uint remainingZUSD = _ZUSDamount;
-        address currentTroveuser = sortedTrovesCached.getLast();
+        address currentLoCuser = sortedLoCsCached.getLast();
 
-        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < zeroBaseParams.MCR()) {
-            currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
+        while (currentLoCuser != address(0) && locManager.getCurrentICR(currentLoCuser, _price) < zeroBaseParams.MCR()) {
+            currentLoCuser = sortedLoCsCached.getPrev(currentLoCuser);
         }
 
-        firstRedemptionHint = currentTroveuser;
+        firstRedemptionHint = currentLoCuser;
 
         if (_maxIterations == 0) {
             _maxIterations = uint(-1);
         }
 
-        while (currentTroveuser != address(0) && remainingZUSD > 0 && _maxIterations-- > 0) {
-            uint netZUSDDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
-                .add(troveManager.getPendingZUSDDebtReward(currentTroveuser));
+        while (currentLoCuser != address(0) && remainingZUSD > 0 && _maxIterations-- > 0) {
+            uint netZUSDDebt = _getNetDebt(locManager.getLoCDebt(currentLoCuser))
+                .add(locManager.getPendingZUSDDebtReward(currentLoCuser));
 
             if (netZUSDDebt > remainingZUSD) {
                 if (netZUSDDebt > MIN_NET_DEBT) {
                     uint maxRedeemableZUSD = ZeroMath._min(remainingZUSD, netZUSDDebt.sub(MIN_NET_DEBT));
 
-                    uint BTC = troveManager.getTroveColl(currentTroveuser)
-                        .add(troveManager.getPendingBTCReward(currentTroveuser));
+                    uint BTC = locManager.getLoCColl(currentLoCuser)
+                        .add(locManager.getPendingBTCReward(currentLoCuser));
 
                     uint newColl = BTC.sub(maxRedeemableZUSD.mul(DECIMAL_PRECISION).div(_price));
                     uint newDebt = netZUSDDebt.sub(maxRedeemableZUSD);
@@ -110,14 +110,14 @@ contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
                 remainingZUSD = remainingZUSD.sub(netZUSDDebt);
             }
 
-            currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
+            currentLoCuser = sortedLoCsCached.getPrev(currentLoCuser);
         }
 
         truncatedZUSDamount = _ZUSDamount.sub(remainingZUSD);
     }
 
-    /** getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 
-    sortedTroves list from the correct insert position of the Trove to be inserted. 
+    /** getApproxHint() - return address of a LoC that is, on average, (length / numTrials) positions away in the 
+    sortedLoCs list from the correct insert position of the LoC to be inserted. 
     
     Note: The output address is worst-case O(n) positions away from the correct insert position, however, the function 
     is probabilistic. Input can be tuned to guarantee results to a high degree of confidence, e.g:
@@ -130,14 +130,14 @@ contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
         view
         returns (address hintAddress, uint diff, uint latestRandomSeed)
     {
-        uint arrayLength = troveManager.getTroveOwnersCount();
+        uint arrayLength = locManager.getLoCOwnersCount();
 
         if (arrayLength == 0) {
             return (address(0), 0, _inputRandomSeed);
         }
 
-        hintAddress = sortedTroves.getLast();
-        diff = ZeroMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress));
+        hintAddress = sortedLoCs.getLast();
+        diff = ZeroMath._getAbsoluteDifference(_CR, locManager.getNominalICR(hintAddress));
         latestRandomSeed = _inputRandomSeed;
 
         uint i = 1;
@@ -146,8 +146,8 @@ contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
             latestRandomSeed = uint(keccak256(abi.encodePacked(latestRandomSeed)));
 
             uint arrayIndex = latestRandomSeed % arrayLength;
-            address currentAddress = troveManager.getTroveFromTroveOwnersArray(arrayIndex);
-            uint currentNICR = troveManager.getNominalICR(currentAddress);
+            address currentAddress = locManager.getLoCFromLoCOwnersArray(arrayIndex);
+            uint currentNICR = locManager.getNominalICR(currentAddress);
 
             // check if abs(current - CR) > abs(closest - CR), and update closest if current is closer
             uint currentDiff = ZeroMath._getAbsoluteDifference(currentNICR, _CR);

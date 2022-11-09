@@ -5,7 +5,7 @@
 import { TestIntegration } from "../types/TestIntegration";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { TestIntegration__factory } from "../types/factories/TestIntegration__factory";
-import { TroveManager } from "../types/TroveManager";
+import { LoCManager } from "../types/LoCManager";
 import { HintHelpers } from "../types/HintHelpers";
 import { PriceFeed } from "../types/PriceFeed";
 import { ethers } from "hardhat";
@@ -25,12 +25,12 @@ describe("Liquidation Library Operations", () => {
   let testIntegration: MockContract<TestIntegration>;
   let hintHelpers: FakeContract<HintHelpers>;
   let priceFeed: FakeContract<PriceFeed>;
-  let troveManager: FakeContract<TroveManager>;
+  let locManager: FakeContract<LoCManager>;
   let signers: SignerWithAddress[];
   beforeEach(async () => {
     signers = await ethers.getSigners();
 
-    troveManager = await smock.fake<TroveManager>("TroveManager");
+    locManager = await smock.fake<LoCManager>("LoCManager");
     hintHelpers = await smock.fake<HintHelpers>("HintHelpers");
     priceFeed = await smock.fake<PriceFeed>("PriceFeed");
 
@@ -38,26 +38,26 @@ describe("Liquidation Library Operations", () => {
       "TestIntegration"
     );
 
-    testIntegration = await testIntegrationFactory.deploy(troveManager.address);
+    testIntegration = await testIntegrationFactory.deploy(locManager.address);
     await testIntegration.deployed();
   });
   describe("Borrower Liquidation", async () => {
     it("should call liquidate function with borrower address", async () => {
       await testIntegration.testBorrowerLiquidation(signers[1].address);
-      expect(troveManager.liquidate).to.have.been.calledOnceWith(
+      expect(locManager.liquidate).to.have.been.calledOnceWith(
         signers[1].address
       );
     });
   });
 
   describe("Liquidate N positions", async () => {
-    it("should call liquidate trove function with correct number of max troves to liquadte", async () => {
+    it("should call liquidate LoC function with correct number of max locs to liquadte", async () => {
       const getRandomNumber = (min: number, max: number) => {
         return Math.floor(Math.random() * (max - min)) + min;
       };
       const maxLiquidations = getRandomNumber(1, 100);
       await testIntegration.testNPositionsLiquidation(maxLiquidations);
-      expect(troveManager.liquidateTroves).to.have.been.calledOnceWith(
+      expect(locManager.liquidateLoCs).to.have.been.calledOnceWith(
         maxLiquidations
       );
     });
@@ -79,7 +79,7 @@ describe("Liquidation Library Operations", () => {
         5,
         0
       );
-      expect(troveManager.redeemCollateral).to.have.been.calledOnceWith(
+      expect(locManager.redeemCollateral).to.have.been.calledOnceWith(
         100,
         signers[0].address,
         signers[0].address,

@@ -2,11 +2,11 @@
 
 pragma solidity 0.6.11;
 
-// Common interface for the SortedTroves Doubly Linked List.
-interface ISortedTroves {
+// Common interface for the SortedLoCs Doubly Linked List.
+interface ISortedLoCs {
     // --- Events ---
 
-    event SortedTrovesAddressChanged(address _sortedDoublyLLAddress);
+    event SortedLoCsAddressChanged(address _sortedDoublyLLAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
     event NodeAdded(address _id, uint256 _NICR);
     event NodeRemoved(address _id);
@@ -16,13 +16,13 @@ interface ISortedTroves {
     /**
      * @notice Called only once on init, to set addresses of other Zero contracts and size. Callable only by owner
      * @dev initializer function, checks addresses are contracts
-     * @param _size max size of troves list
-     * @param _TroveManagerAddress TroveManager contract address
+     * @param _size max size of locs list
+     * @param _LoCManagerAddress LoCManager contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
      */
     function setParams(
         uint256 _size,
-        address _TroveManagerAddress,
+        address _LoCManagerAddress,
         address _borrowerOperationsAddress
     ) external;
 

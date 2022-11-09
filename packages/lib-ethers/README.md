@@ -21,12 +21,12 @@ async function example() {
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
   const zero = await EthersZero.connect(wallet);
 
-  const { newTrove } = await zero.openTrove({
+  const { newLoC } = await zero.openLoC({
     depositCollateral: 5, // BTC
     borrowZUSD: 2000
   });
 
-  console.log(`Successfully opened a Zero Trove (${newTrove})!`);
+  console.log(`Successfully opened a Zero LoC (${newLoC})!`);
 }
 ```
 

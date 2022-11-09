@@ -9,12 +9,12 @@ import { ethers, network, deployZero } from "hardhat";
 import {
   Decimal,
   Decimalish,
-  Trove,
+  LoC,
   StabilityDeposit,
   ZeroReceipt,
   SuccessfulReceipt,
   SentZeroTransaction,
-  TroveCreationParams,
+  LoCCreationParams,
   Fees,
   ZUSD_LIQUIDATION_RESERVE,
   MAXIMUM_BORROWING_RATE,
@@ -96,14 +96,14 @@ describe("EthersZero", () => {
   const connectUsers = (users: Signer[]) =>
     Promise.all(users.map(user => connectToDeployment(deployment, user)));
 
-  const openTroves = (users: Signer[], params: TroveCreationParams<Decimalish>[]) =>
+  const openLoCs = (users: Signer[], params: LoCCreationParams<Decimalish>[]) =>
     params
       .map((params, i) => () =>
         Promise.all([
           connectToDeployment(deployment, users[i]),
           sendTo(users[i], params.depositCollateral).then(tx => tx.wait())
         ]).then(async ([zero]) => {
-          await zero.openTrove(params, undefined, { gasPrice: 0 });
+          await zero.openLoC(params, undefined, { gasPrice: 0 });
         })
       )
       .reduce((a, b) => a.then(b), Promise.resolve());
@@ -177,7 +177,7 @@ describe("EthersZero", () => {
 
       const borrowerOperations = {
         estimateAndPopulate: {
-          openTrove: () => ({})
+          openLoC: () => ({})
         }
       };
 
@@ -185,12 +185,12 @@ describe("EthersZero", () => {
         getApproxHint: () => Promise.resolve(fakeHints.shift())
       });
 
-      const sortedTroves = chai.spy.interface({
+      const sortedLoCs = chai.spy.interface({
         findInsertPosition: () => Promise.resolve(["fake insert position"])
       });
 
       const fakeZero = new PopulatableEthersZero(({
-        getNumberOfTroves: () => Promise.resolve(1000000),
+        getNumberOfLoCs: () => Promise.resolve(1000000),
         getFees: () => Promise.resolve(new Fees(0, 0.99, 1, new Date(), new Date(), false)),
 
         connection: {
@@ -198,18 +198,18 @@ describe("EthersZero", () => {
           _contracts: {
             borrowerOperations,
             hintHelpers,
-            sortedTroves
+            sortedLoCs
           }
         }
       } as unknown) as ReadableEthersZero);
 
       const nominalCollateralRatio = Decimal.from(0.5);
 
-      const params = Trove.recreate(new Trove(Decimal.from(1), ZUSD_MINIMUM_DEBT));
-      const trove = Trove.create(params);
-      expect(`${trove._nominalCollateralRatio}`).to.equal(`${nominalCollateralRatio}`);
+      const params = LoC.recreate(new LoC(Decimal.from(1), ZUSD_MINIMUM_DEBT));
+      const loc = LoC.create(params);
+      expect(`${loc._nominalCollateralRatio}`).to.equal(`${nominalCollateralRatio}`);
 
-      await fakeZero.openTrove(params);
+      await fakeZero.openLoC(params);
 
       expect(hintHelpers.getApproxHint).to.have.been.called.exactly(4);
       expect(hintHelpers.getApproxHint).to.have.been.called.with(nominalCollateralRatio.hex);
@@ -219,61 +219,61 @@ describe("EthersZero", () => {
       expect(hintHelpers.getApproxHint).to.have.been.called.with(BigNumber.from(2222));
       expect(hintHelpers.getApproxHint).to.have.been.called.with(BigNumber.from(3333));
 
-      expect(sortedTroves.findInsertPosition).to.have.been.called.once;
-      expect(sortedTroves.findInsertPosition).to.have.been.called.with(
+      expect(sortedLoCs.findInsertPosition).to.have.been.called.once;
+      expect(sortedLoCs.findInsertPosition).to.have.been.called.with(
         nominalCollateralRatio.hex,
         "carol"
       );
     });
   });
 
-  describe("Trove", () => {
-    it("should have no Trove initially", async () => {
-      const trove = await zero.getTrove();
-      expect(trove.isEmpty).to.be.true;
+  describe("LoC", () => {
+    it("should have no LoC initially", async () => {
+      const loc = await zero.getLoC();
+      expect(loc.isEmpty).to.be.true;
     });
 
-    it("should fail to create an undercollateralized Trove", async () => {
+    it("should fail to create an undercollateralized LoC", async () => {
       const price = await zero.getPrice();
-      const undercollateralized = new Trove(ZUSD_MINIMUM_DEBT.div(price), ZUSD_MINIMUM_DEBT);
+      const undercollateralized = new LoC(ZUSD_MINIMUM_DEBT.div(price), ZUSD_MINIMUM_DEBT);
 
-      await expect(zero.openTrove(Trove.recreate(undercollateralized))).to.eventually.be.rejected;
+      await expect(zero.openLoC(LoC.recreate(undercollateralized))).to.eventually.be.rejected;
     });
 
-    it("should fail to create a Trove with too little debt", async () => {
-      const withTooLittleDebt = new Trove(Decimal.from(50), ZUSD_MINIMUM_DEBT.sub(1));
+    it("should fail to create a LoC with too little debt", async () => {
+      const withTooLittleDebt = new LoC(Decimal.from(50), ZUSD_MINIMUM_DEBT.sub(1));
 
-      await expect(zero.openTrove(Trove.recreate(withTooLittleDebt))).to.eventually.be.rejected;
+      await expect(zero.openLoC(LoC.recreate(withTooLittleDebt))).to.eventually.be.rejected;
     });
 
     const withSomeBorrowing = { depositCollateral: 50, borrowZUSD: ZUSD_MINIMUM_NET_DEBT.add(100) };
 
-    it("should create a Trove with some borrowing", async () => {
-      const { newTrove, fee } = await zero.openTrove(withSomeBorrowing);
-      expect(newTrove).to.deep.equal(Trove.create(withSomeBorrowing));
+    it("should create a LoC with some borrowing", async () => {
+      const { newLoC, fee } = await zero.openLoC(withSomeBorrowing);
+      expect(newLoC).to.deep.equal(LoC.create(withSomeBorrowing));
       expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(withSomeBorrowing.borrowZUSD)}`);
     });
 
-    it("should fail to withdraw all the collateral while the Trove has debt", async () => {
-      const trove = await zero.getTrove();
+    it("should fail to withdraw all the collateral while the LoC has debt", async () => {
+      const loc = await zero.getLoC();
 
-      await expect(zero.withdrawCollateral(trove.collateral)).to.eventually.be.rejected;
+      await expect(zero.withdrawCollateral(loc.collateral)).to.eventually.be.rejected;
     });
 
     const repaySomeDebt = { repayZUSD: 10 };
 
     it("should repay some debt", async () => {
-      const { newTrove, fee } = await zero.repayZUSD(repaySomeDebt.repayZUSD);
-      expect(newTrove).to.deep.equal(Trove.create(withSomeBorrowing).adjust(repaySomeDebt));
+      const { newLoC, fee } = await zero.repayZUSD(repaySomeDebt.repayZUSD);
+      expect(newLoC).to.deep.equal(LoC.create(withSomeBorrowing).adjust(repaySomeDebt));
       expect(`${fee}`).to.equal("0");
     });
 
     const borrowSomeMore = { borrowZUSD: 20 };
 
     it("should borrow some more", async () => {
-      const { newTrove, fee } = await zero.borrowZUSD(borrowSomeMore.borrowZUSD);
-      expect(newTrove).to.deep.equal(
-        Trove.create(withSomeBorrowing).adjust(repaySomeDebt).adjust(borrowSomeMore)
+      const { newLoC, fee } = await zero.borrowZUSD(borrowSomeMore.borrowZUSD);
+      expect(newLoC).to.deep.equal(
+        LoC.create(withSomeBorrowing).adjust(repaySomeDebt).adjust(borrowSomeMore)
       );
       expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowSomeMore.borrowZUSD)}`);
     });
@@ -281,9 +281,9 @@ describe("EthersZero", () => {
     const depositMoreCollateral = { depositCollateral: 1 };
 
     it("should deposit more collateral", async () => {
-      const { newTrove } = await zero.depositCollateral(depositMoreCollateral.depositCollateral);
-      expect(newTrove).to.deep.equal(
-        Trove.create(withSomeBorrowing)
+      const { newLoC } = await zero.depositCollateral(depositMoreCollateral.depositCollateral);
+      expect(newLoC).to.deep.equal(
+        LoC.create(withSomeBorrowing)
           .adjust(repaySomeDebt)
           .adjust(borrowSomeMore)
           .adjust(depositMoreCollateral)
@@ -293,10 +293,10 @@ describe("EthersZero", () => {
     const repayAndWithdraw = { repayZUSD: 60, withdrawCollateral: 0.5 };
 
     it("should repay some debt and withdraw some collateral at the same time", async () => {
-      const { newTrove } = await zero.adjustTrove(repayAndWithdraw, undefined, { gasPrice: 0 });
+      const { newLoC } = await zero.adjustLoC(repayAndWithdraw, undefined, { gasPrice: 0 });
 
-      expect(newTrove).to.deep.equal(
-        Trove.create(withSomeBorrowing)
+      expect(newLoC).to.deep.equal(
+        LoC.create(withSomeBorrowing)
           .adjust(repaySomeDebt)
           .adjust(borrowSomeMore)
           .adjust(depositMoreCollateral)
@@ -310,12 +310,12 @@ describe("EthersZero", () => {
     const borrowAndDeposit = { borrowZUSD: 60, depositCollateral: 0.5 };
 
     it("should borrow more and deposit some collateral at the same time", async () => {
-      const { newTrove, fee } = await zero.adjustTrove(borrowAndDeposit, undefined, {
+      const { newLoC, fee } = await zero.adjustLoC(borrowAndDeposit, undefined, {
         gasPrice: 0
       });
 
-      expect(newTrove).to.deep.equal(
-        Trove.create(withSomeBorrowing)
+      expect(newLoC).to.deep.equal(
+        LoC.create(withSomeBorrowing)
           .adjust(repaySomeDebt)
           .adjust(borrowSomeMore)
           .adjust(depositMoreCollateral)
@@ -329,36 +329,36 @@ describe("EthersZero", () => {
       expect(`${btcBalance}`).to.equal("99.5");
     });
 
-    it("should close the Trove with some ZUSD from another user", async () => {
+    it("should close the LoC with some ZUSD from another user", async () => {
       const price = await zero.getPrice();
-      const initialTrove = await zero.getTrove();
+      const initialLoC = await zero.getLoC();
       const zusdBalance = await zero.getZEROBalance();
-      const zusdShortage = initialTrove.netDebt.sub(zusdBalance);
+      const zusdShortage = initialLoC.netDebt.sub(zusdBalance);
 
-      let funderTrove = Trove.create({ depositCollateral: 1, borrowZUSD: zusdShortage });
-      funderTrove = funderTrove.setDebt(Decimal.max(funderTrove.debt, ZUSD_MINIMUM_DEBT));
-      funderTrove = funderTrove.setCollateral(funderTrove.debt.mulDiv(1.51, price));
+      let funderLoC = LoC.create({ depositCollateral: 1, borrowZUSD: zusdShortage });
+      funderLoC = funderLoC.setDebt(Decimal.max(funderLoC.debt, ZUSD_MINIMUM_DEBT));
+      funderLoC = funderLoC.setCollateral(funderLoC.debt.mulDiv(1.51, price));
 
       const funderZero = await connectToDeployment(deployment, funder);
-      await funderZero.openTrove(Trove.recreate(funderTrove));
+      await funderZero.openLoC(LoC.recreate(funderLoC));
       await funderZero.sendZUSD(await user.getAddress(), zusdShortage);
 
-      const { params } = await zero.closeTrove();
+      const { params } = await zero.closeLoC();
 
       expect(params).to.deep.equal({
-        withdrawCollateral: initialTrove.collateral,
-        repayZUSD: initialTrove.netDebt
+        withdrawCollateral: initialLoC.collateral,
+        repayZUSD: initialLoC.netDebt
       });
 
-      const finalTrove = await zero.getTrove();
-      expect(finalTrove.isEmpty).to.be.true;
+      const finalLoC = await zero.getLoC();
+      expect(finalLoC.isEmpty).to.be.true;
     });
   });
 
   describe("SendableEthersZero", () => {
     it("should parse failed transactions without throwing", async () => {
       // By passing a gasLimit, we avoid automatic use of estimateGas which would throw
-      const tx = await zero.send.openTrove(
+      const tx = await zero.send.openLoC(
         { depositCollateral: 0.01, borrowZUSD: 0.01 },
         undefined,
         { gasLimit: 1e6 }
@@ -396,7 +396,7 @@ describe("EthersZero", () => {
       });
 
       const otherZero = await connectToDeployment(deployment, otherUsers[0], frontendTag);
-      await otherZero.openTrove({ depositCollateral: 20, borrowZUSD: ZUSD_MINIMUM_DEBT });
+      await otherZero.openLoC({ depositCollateral: 20, borrowZUSD: ZUSD_MINIMUM_DEBT });
 
       if (deployment.presaleAddress) {
         const presale = new ethers.Contract(
@@ -429,7 +429,7 @@ describe("EthersZero", () => {
       });
     });
 
-    const initialTroveOfDepositor = Trove.create({
+    const initialLoCOfDepositor = LoC.create({
       depositCollateral: ZUSD_MINIMUM_DEBT.div(100),
       borrowZUSD: ZUSD_MINIMUM_NET_DEBT
     });
@@ -442,8 +442,8 @@ describe("EthersZero", () => {
     });
 
     it("should make a small stability deposit", async () => {
-      const { newTrove } = await zero.openTrove(Trove.recreate(initialTroveOfDepositor));
-      expect(newTrove).to.deep.equal(initialTroveOfDepositor);
+      const { newLoC } = await zero.openLoC(LoC.recreate(initialLoCOfDepositor));
+      expect(newLoC).to.deep.equal(initialLoCOfDepositor);
 
       if (deployment.presaleAddress) {
         const presale = new ethers.Contract(
@@ -468,16 +468,16 @@ describe("EthersZero", () => {
       });
     });
 
-    const troveWithVeryLowICR = Trove.create({
+    const locWithVeryLowICR = LoC.create({
       depositCollateral: ZUSD_MINIMUM_DEBT.div(180),
       borrowZUSD: ZUSD_MINIMUM_NET_DEBT
     });
 
-    it("other user should make a Trove with very low ICR", async () => {
-      const { newTrove } = await otherLiquities[0].openTrove(Trove.recreate(troveWithVeryLowICR));
+    it("other user should make a LoC with very low ICR", async () => {
+      const { newLoC } = await otherLiquities[0].openLoC(LoC.recreate(locWithVeryLowICR));
 
       const price = await zero.getPrice();
-      expect(Number(`${newTrove.collateralRatio(price)}`)).to.be.below(1.15);
+      expect(Number(`${newLoC.collateralRatio(price)}`)).to.be.below(1.15);
     });
 
     const dippedPrice = Decimal.from(190);
@@ -489,25 +489,25 @@ describe("EthersZero", () => {
       expect(`${price}`).to.equal(`${dippedPrice}`);
     });
 
-    it("should liquidate other user's Trove", async () => {
+    it("should liquidate other user's LoC", async () => {
       const details = await zero.liquidateUpTo(1);
 
       expect(details).to.deep.equal({
         liquidatedAddresses: [await otherUsers[0].getAddress()],
 
-        collateralGasCompensation: troveWithVeryLowICR.collateral.mul(0.005), // 0.5%
+        collateralGasCompensation: locWithVeryLowICR.collateral.mul(0.005), // 0.5%
         zusdGasCompensation: ZUSD_LIQUIDATION_RESERVE,
 
-        totalLiquidated: new Trove(
-          troveWithVeryLowICR.collateral
+        totalLiquidated: new LoC(
+          locWithVeryLowICR.collateral
             .mul(0.995) // -0.5% gas compensation
             .add("0.000000000000000001"), // tiny imprecision
-          troveWithVeryLowICR.debt
+          locWithVeryLowICR.debt
         )
       });
 
-      const otherTrove = await otherLiquities[0].getTrove();
-      expect(otherTrove.isEmpty).to.be.true;
+      const otherLoC = await otherLiquities[0].getLoC();
+      expect(otherLoC.isEmpty).to.be.true;
     });
 
     it("should have a depleted stability deposit and some collateral gain", async () => {
@@ -517,9 +517,9 @@ describe("EthersZero", () => {
         new StabilityDeposit(
           smallStabilityDeposit,
           Decimal.ZERO,
-          troveWithVeryLowICR.collateral
+          locWithVeryLowICR.collateral
             .mul(0.995) // -0.5% gas compensation
-            .mulDiv(smallStabilityDeposit, troveWithVeryLowICR.debt)
+            .mulDiv(smallStabilityDeposit, locWithVeryLowICR.debt)
             .sub("0.000000000000000005"), // tiny imprecision
           Decimal.ZERO,
           AddressZero
@@ -527,53 +527,53 @@ describe("EthersZero", () => {
       );
     });
 
-    it("the Trove should have received some liquidation shares", async () => {
-      const trove = await zero.getTrove();
+    it("the LoC should have received some liquidation shares", async () => {
+      const loc = await zero.getLoC();
 
-      expect(trove).to.deep.equal({
+      expect(loc).to.deep.equal({
         ownerAddress: await user.getAddress(),
         status: "open",
 
-        ...initialTroveOfDepositor
-          .addDebt(troveWithVeryLowICR.debt.sub(smallStabilityDeposit))
+        ...initialLoCOfDepositor
+          .addDebt(locWithVeryLowICR.debt.sub(smallStabilityDeposit))
           .addCollateral(
-            troveWithVeryLowICR.collateral
+            locWithVeryLowICR.collateral
               .mul(0.995) // -0.5% gas compensation
-              .mulDiv(troveWithVeryLowICR.debt.sub(smallStabilityDeposit), troveWithVeryLowICR.debt)
+              .mulDiv(locWithVeryLowICR.debt.sub(smallStabilityDeposit), locWithVeryLowICR.debt)
               .add("0.000000000000000001") // tiny imprecision
           )
       });
     });
 
-    it("total should equal the Trove", async () => {
-      const trove = await zero.getTrove();
+    it("total should equal the LoC", async () => {
+      const loc = await zero.getLoC();
 
-      const numberOfTroves = await zero.getNumberOfTroves();
-      expect(numberOfTroves).to.equal(1);
+      const numberOfLoCs = await zero.getNumberOfLoCs();
+      expect(numberOfLoCs).to.equal(1);
 
       const total = await zero.getTotal();
       expect(total).to.deep.equal(
-        trove.addCollateral("0.000000000000000001") // tiny imprecision
+        loc.addCollateral("0.000000000000000001") // tiny imprecision
       );
     });
 
-    it("should transfer the gains to the Trove", async () => {
-      const details = await zero.transferCollateralGainToTrove();
+    it("should transfer the gains to the LoC", async () => {
+      const details = await zero.transferCollateralGainToLoC();
 
       expect(details).to.deep.equal({
         zusdLoss: smallStabilityDeposit,
         newZUSDDeposit: Decimal.ZERO,
         zeroReward: Decimal.ZERO,
 
-        collateralGain: troveWithVeryLowICR.collateral
+        collateralGain: locWithVeryLowICR.collateral
           .mul(0.995) // -0.5% gas compensation
-          .mulDiv(smallStabilityDeposit, troveWithVeryLowICR.debt)
+          .mulDiv(smallStabilityDeposit, locWithVeryLowICR.debt)
           .sub("0.000000000000000005"), // tiny imprecision
 
-        newTrove: initialTroveOfDepositor
-          .addDebt(troveWithVeryLowICR.debt.sub(smallStabilityDeposit))
+        newLoC: initialLoCOfDepositor
+          .addDebt(locWithVeryLowICR.debt.sub(smallStabilityDeposit))
           .addCollateral(
-            troveWithVeryLowICR.collateral
+            locWithVeryLowICR.collateral
               .mul(0.995) // -0.5% gas compensation
               .sub("0.000000000000000005") // tiny imprecision
           )
@@ -609,16 +609,16 @@ describe("EthersZero", () => {
         await deployerZero.setPrice(price);
 
         // Use this account to print ZUSD
-        await zero.openTrove({ depositCollateral: 50, borrowZUSD: 5000 });
+        await zero.openLoC({ depositCollateral: 50, borrowZUSD: 5000 });
 
         // otherLiquities[0-2] will be independent stability depositors
         await zero.sendZUSD(await otherUsers[0].getAddress(), 3000);
         await zero.sendZUSD(await otherUsers[1].getAddress(), 1000);
         await zero.sendZUSD(await otherUsers[2].getAddress(), 1000);
 
-        // otherLiquities[3-4] will be Trove owners whose Troves get liquidated
-        await otherLiquities[3].openTrove({ depositCollateral: 21, borrowZUSD: 2900 });
-        await otherLiquities[4].openTrove({ depositCollateral: 21, borrowZUSD: 2900 });
+        // otherLiquities[3-4] will be LoC owners whose LoCs get liquidated
+        await otherLiquities[3].openLoC({ depositCollateral: 21, borrowZUSD: 2900 });
+        await otherLiquities[4].openLoC({ depositCollateral: 21, borrowZUSD: 2900 });
 
         await otherLiquities[0].depositZUSDInStabilityPool(3000);
         await otherLiquities[1].depositZUSDInStabilityPool(1000);
@@ -630,14 +630,14 @@ describe("EthersZero", () => {
 
         // Liquidate first victim
         await zero.liquidate(await otherUsers[3].getAddress());
-        expect((await otherLiquities[3].getTrove()).isEmpty).to.be.true;
+        expect((await otherLiquities[3].getLoC()).isEmpty).to.be.true;
 
         // Now otherLiquities[2] makes their deposit too
         await otherLiquities[2].depositZUSDInStabilityPool(1000);
 
         // Liquidate second victim
         await zero.liquidate(await otherUsers[4].getAddress());
-        expect((await otherLiquities[4].getTrove()).isEmpty).to.be.true;
+        expect((await otherLiquities[4].getLoC()).isEmpty).to.be.true;
 
         // Stability Pool is now empty
         expect(`${await zero.getZUSDInStabilityPool()}`).to.equal("0");
@@ -653,7 +653,7 @@ describe("EthersZero", () => {
   });
 
   describe("Redemption", () => {
-    const troveCreations = [
+    const locCreations = [
       { depositCollateral: 99, borrowZUSD: 4600 },
       { depositCollateral: 20, borrowZUSD: 2000 }, // net debt: 2010
       { depositCollateral: 20, borrowZUSD: 2100 }, // net debt: 2110.5
@@ -681,10 +681,10 @@ describe("EthersZero", () => {
     });
 
     it("should fail to redeem during the bootstrap phase", async () => {
-      await zero.openTrove(troveCreations[0]);
-      await otherLiquities[0].openTrove(troveCreations[1]);
-      await otherLiquities[1].openTrove(troveCreations[2]);
-      await otherLiquities[2].openTrove(troveCreations[3]);
+      await zero.openLoC(locCreations[0]);
+      await otherLiquities[0].openLoC(locCreations[1]);
+      await otherLiquities[1].openLoC(locCreations[2]);
+      await otherLiquities[2].openLoC(locCreations[3]);
 
       await expect(zero.redeemZUSD(4326.5, undefined, { gasPrice: 0 })).to.eventually.be.rejected;
     });
@@ -699,8 +699,8 @@ describe("EthersZero", () => {
       expect(`${await otherLiquities[1].getCollateralSurplusBalance()}`).to.equal("0");
       expect(`${await otherLiquities[2].getCollateralSurplusBalance()}`).to.equal("0");
 
-      const expectedTotal = troveCreations
-        .map(params => Trove.create(params))
+      const expectedTotal = locCreations
+        .map(params => LoC.create(params))
         .reduce((a, b) => a.add(b));
 
       const total = await zero.getTotal();
@@ -725,16 +725,16 @@ describe("EthersZero", () => {
 
       expect(`${await zero.getZUSDBalance()}`).to.equal("273.5");
 
-      expect(`${(await otherLiquities[0].getTrove()).debt}`).to.equal(
-        `${Trove.create(troveCreations[1]).debt.sub(
+      expect(`${(await otherLiquities[0].getLoC()).debt}`).to.equal(
+        `${LoC.create(locCreations[1]).debt.sub(
           someZUSD
-            .sub(Trove.create(troveCreations[2]).netDebt)
-            .sub(Trove.create(troveCreations[3]).netDebt)
+            .sub(LoC.create(locCreations[2]).netDebt)
+            .sub(LoC.create(locCreations[3]).netDebt)
         )}`
       );
 
-      expect((await otherLiquities[1].getTrove()).isEmpty).to.be.true;
-      expect((await otherLiquities[2].getTrove()).isEmpty).to.be.true;
+      expect((await otherLiquities[1].getLoC()).isEmpty).to.be.true;
+      expect((await otherLiquities[2].getLoC()).isEmpty).to.be.true;
     });
 
     it("should claim the collateral surplus after redemption", async () => {
@@ -744,12 +744,12 @@ describe("EthersZero", () => {
       expect(`${await otherLiquities[0].getCollateralSurplusBalance()}`).to.equal("0");
 
       const surplus1 = await otherLiquities[1].getCollateralSurplusBalance();
-      const trove1 = Trove.create(troveCreations[2]);
-      expect(`${surplus1}`).to.equal(`${trove1.collateral.sub(trove1.netDebt.div(200))}`);
+      const loc1 = LoC.create(locCreations[2]);
+      expect(`${surplus1}`).to.equal(`${loc1.collateral.sub(loc1.netDebt.div(200))}`);
 
       const surplus2 = await otherLiquities[2].getCollateralSurplusBalance();
-      const trove2 = Trove.create(troveCreations[3]);
-      expect(`${surplus2}`).to.equal(`${trove2.collateral.sub(trove2.netDebt.div(200))}`);
+      const loc2 = LoC.create(locCreations[3]);
+      expect(`${surplus2}`).to.equal(`${loc2.collateral.sub(loc2.netDebt.div(200))}`);
 
       await otherLiquities[1].claimCollateralSurplus({ gasPrice: 0 });
       await otherLiquities[2].claimCollateralSurplus({ gasPrice: 0 });
@@ -767,20 +767,20 @@ describe("EthersZero", () => {
     it("borrowing rate should be maxed out now", async () => {
       const borrowZUSD = Decimal.from(10);
 
-      const { fee, newTrove } = await zero.borrowZUSD(borrowZUSD);
+      const { fee, newLoC } = await zero.borrowZUSD(borrowZUSD);
       expect(`${fee}`).to.equal(`${borrowZUSD.mul(MAXIMUM_BORROWING_RATE)}`);
 
-      expect(newTrove).to.deep.equal(
-        Trove.create(troveCreations[0]).adjust({ borrowZUSD }, MAXIMUM_BORROWING_RATE)
+      expect(newLoC).to.deep.equal(
+        LoC.create(locCreations[0]).adjust({ borrowZUSD }, MAXIMUM_BORROWING_RATE)
       );
     });
   });
 
   describe("Redemption (truncation)", () => {
-    const troveCreationParams = { depositCollateral: 20, borrowZUSD: 2000 };
-    const netDebtPerTrove = Trove.create(troveCreationParams).netDebt;
+    const locCreationParams = { depositCollateral: 20, borrowZUSD: 2000 };
+    const netDebtPerLoC = LoC.create(locCreationParams).netDebt;
     const amountToAttempt = Decimal.from(3900);
-    const expectedRedeemable = netDebtPerTrove.mul(2).sub(ZUSD_MINIMUM_NET_DEBT);
+    const expectedRedeemable = netDebtPerLoC.mul(2).sub(ZUSD_MINIMUM_NET_DEBT);
 
     before(function () {
       if (network.name !== "hardhat") {
@@ -804,15 +804,15 @@ describe("EthersZero", () => {
 
       await sendToEach(otherUsersSubset, 20.1);
 
-      await zero.openTrove({ depositCollateral: 99, borrowZUSD: 5000 });
-      await otherLiquities[0].openTrove(troveCreationParams);
-      await otherLiquities[1].openTrove(troveCreationParams);
-      await otherLiquities[2].openTrove(troveCreationParams);
+      await zero.openLoC({ depositCollateral: 99, borrowZUSD: 5000 });
+      await otherLiquities[0].openLoC(locCreationParams);
+      await otherLiquities[1].openLoC(locCreationParams);
+      await otherLiquities[2].openLoC(locCreationParams);
 
       increaseTime(60 * 60 * 24 * 15);
     });
 
-    it("should truncate the amount if it would put the last Trove below the min debt", async () => {
+    it("should truncate the amount if it would put the last LoC below the min debt", async () => {
       const redemption = await zero.populate.redeemZUSD(amountToAttempt);
       expect(`${redemption.attemptedZUSDAmount}`).to.equal(`${amountToAttempt}`);
       expect(`${redemption.redeemableZUSDAmount}`).to.equal(`${expectedRedeemable}`);
@@ -838,7 +838,7 @@ describe("EthersZero", () => {
     });
 
     it("should fail to increase the amount if it's not truncated", async () => {
-      const redemption = await zero.populate.redeemZUSD(netDebtPerTrove);
+      const redemption = await zero.populate.redeemZUSD(netDebtPerLoC);
       expect(redemption.isTruncated).to.be.false;
 
       expect(() => redemption.increaseAmountByMinimumNetDebt()).to.throw(
@@ -852,13 +852,13 @@ describe("EthersZero", () => {
 
     const massivePrice = Decimal.from(1000000);
 
-    const amountToBorrowPerTrove = Decimal.from(2000);
-    const netDebtPerTrove = MINIMUM_BORROWING_RATE.add(1).mul(amountToBorrowPerTrove);
-    const collateralPerTrove = netDebtPerTrove
+    const amountToBorrowPerLoC = Decimal.from(2000);
+    const netDebtPerLoC = MINIMUM_BORROWING_RATE.add(1).mul(amountToBorrowPerLoC);
+    const collateralPerLoC = netDebtPerLoC
       .add(ZUSD_LIQUIDATION_RESERVE)
       .mulDiv(1.5, massivePrice);
 
-    const amountToRedeem = netDebtPerTrove.mul(_redeemMaxIterations);
+    const amountToRedeem = netDebtPerLoC.mul(_redeemMaxIterations);
     const amountToDeposit = MINIMUM_BORROWING_RATE.add(1)
       .mul(amountToRedeem)
       .add(ZUSD_LIQUIDATION_RESERVE)
@@ -883,13 +883,13 @@ describe("EthersZero", () => {
       ]);
 
       await deployerZero.setPrice(massivePrice);
-      await sendToEach(otherUsersSubset, collateralPerTrove);
+      await sendToEach(otherUsersSubset, collateralPerLoC);
 
       for (const otherZero of otherLiquities) {
-        await otherZero.openTrove(
+        await otherZero.openLoC(
           {
-            depositCollateral: collateralPerTrove,
-            borrowZUSD: amountToBorrowPerTrove
+            depositCollateral: collateralPerLoC,
+            borrowZUSD: amountToBorrowPerLoC
           },
           undefined,
           { gasPrice: 0 }
@@ -900,7 +900,7 @@ describe("EthersZero", () => {
     });
 
     it("should redeem using the maximum iterations and almost all gas", async () => {
-      await zero.openTrove({
+      await zero.openLoC({
         depositCollateral: amountToDeposit,
         borrowZUSD: amountToRedeem
       });
@@ -915,7 +915,7 @@ describe("EthersZero", () => {
   });
 
   describe("Gas estimation", () => {
-    const troveWithICRBetween = (a: Trove, b: Trove) => a.add(b).multiply(0.5);
+    const locWithICRBetween = (a: LoC, b: LoC) => a.add(b).multiply(0.5);
 
     let rudeUser: Signer;
     let fiveOtherUsers: Signer[];
@@ -939,7 +939,7 @@ describe("EthersZero", () => {
         ...fiveOtherUsers
       ]);
 
-      await openTroves(fiveOtherUsers, [
+      await openLoCs(fiveOtherUsers, [
         { depositCollateral: 20, borrowZUSD: 2040 },
         { depositCollateral: 20, borrowZUSD: 2050 },
         { depositCollateral: 20, borrowZUSD: 2060 },
@@ -951,7 +951,7 @@ describe("EthersZero", () => {
     });
 
     it("should include enough gas for updating lastFeeOperationTime", async () => {
-      await zero.openTrove({ depositCollateral: 20, borrowZUSD: 2090 });
+      await zero.openLoC({ depositCollateral: 20, borrowZUSD: 2090 });
 
       // We just updated lastFeeOperationTime, so this won't anticipate having to update that
       // during estimateGas
@@ -974,23 +974,23 @@ describe("EthersZero", () => {
     });
 
     it("should include enough gas for one extra traversal", async () => {
-      const troves = await zero.getTroves({ first: 10, sortedBy: "ascendingCollateralRatio" });
+      const locs = await zero.getLoCs({ first: 10, sortedBy: "ascendingCollateralRatio" });
 
-      const trove = await zero.getTrove();
-      const newTrove = troveWithICRBetween(troves[3], troves[4]);
+      const loc = await zero.getLoC();
+      const newLoC = locWithICRBetween(locs[3], locs[4]);
 
       // First, we want to test a non-borrowing case, to make sure we're not passing due to any
       // extra gas we add to cover a potential lastFeeOperationTime update
-      const adjustment = trove.adjustTo(newTrove);
+      const adjustment = loc.adjustTo(newLoC);
       expect(adjustment.borrowZUSD).to.be.undefined;
 
-      const tx = await zero.populate.adjustTrove(adjustment);
+      const tx = await zero.populate.adjustLoC(adjustment);
       const originalGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
 
       // A terribly rude user interferes
-      const rudeTrove = newTrove.addDebt(1);
-      const rudeCreation = Trove.recreate(rudeTrove);
-      await openTroves([rudeUser], [rudeCreation]);
+      const rudeLoC = newLoC.addDebt(1);
+      const rudeCreation = LoC.recreate(rudeLoC);
+      await openLoCs([rudeUser], [rudeCreation]);
 
       const newGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
       const gasIncrease = newGasEstimate.sub(originalGasEstimate).toNumber();
@@ -999,27 +999,27 @@ describe("EthersZero", () => {
       expect(gasIncrease).to.be.within(10000, 30000);
 
       assertDefined(rudeCreation.borrowZUSD);
-      const zusdShortage = rudeTrove.debt.sub(rudeCreation.borrowZUSD);
+      const zusdShortage = rudeLoC.debt.sub(rudeCreation.borrowZUSD);
 
       await zero.sendZUSD(await rudeUser.getAddress(), zusdShortage);
-      await rudeZero.closeTrove({ gasPrice: 0 });
+      await rudeZero.closeLoC({ gasPrice: 0 });
     });
 
     it("should include enough gas for both when borrowing", async () => {
-      const troves = await zero.getTroves({ first: 10, sortedBy: "ascendingCollateralRatio" });
+      const locs = await zero.getLoCs({ first: 10, sortedBy: "ascendingCollateralRatio" });
 
-      const trove = await zero.getTrove();
-      const newTrove = troveWithICRBetween(troves[1], troves[2]);
+      const loc = await zero.getLoC();
+      const newLoC = locWithICRBetween(locs[1], locs[2]);
 
       // Make sure we're borrowing
-      const adjustment = trove.adjustTo(newTrove);
+      const adjustment = loc.adjustTo(newLoC);
       expect(adjustment.borrowZUSD).to.not.be.undefined;
 
-      const tx = await zero.populate.adjustTrove(adjustment);
+      const tx = await zero.populate.adjustLoC(adjustment);
       const originalGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
 
       // A terribly rude user interferes again
-      await openTroves([rudeUser], [Trove.recreate(newTrove.addDebt(1))]);
+      await openLoCs([rudeUser], [LoC.recreate(newLoC.addDebt(1))]);
 
       // On top of that, we'll need to update lastFeeOperationTime
       await increaseTime(120);
@@ -1057,7 +1057,7 @@ describe("EthersZero", () => {
         await presale.connect(deployer).closePresale();
       }
 
-      await zero.openTrove({ depositCollateral: 40, borrowZUSD: 4000 });
+      await zero.openLoC({ depositCollateral: 40, borrowZUSD: 4000 });
       await zero.depositZUSDInStabilityPool(19);
 
       await increaseTime(60);
@@ -1085,9 +1085,9 @@ describe("EthersZero", () => {
 
       await waitForSuccess(claim.send());
 
-      const creation = Trove.recreate(new Trove(Decimal.from(11.1), Decimal.from(2000.1)));
+      const creation = LoC.recreate(new LoC(Decimal.from(11.1), Decimal.from(2000.1)));
 
-      await deployerZero.openTrove(creation);
+      await deployerZero.openLoC(creation);
       await deployerZero.depositZUSDInStabilityPool(creation.borrowZUSD);
       await deployerZero.setPrice(198);
 

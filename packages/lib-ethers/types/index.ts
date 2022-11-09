@@ -19,14 +19,14 @@ interface ActivePoolCalls {
   getOwner(_overrides?: CallOverrides): Promise<string>;
   getZUSDDebt(_overrides?: CallOverrides): Promise<BigNumber>;
   stabilityPoolAddress(_overrides?: CallOverrides): Promise<string>;
-  troveManagerAddress(_overrides?: CallOverrides): Promise<string>;
+  locManagerAddress(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface ActivePoolTransactions {
   decreaseZUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   increaseZUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   sendBTC(_account: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setAddresses(_borrowerOperationsAddress: string, _troveManagerAddress: string, _stabilityPoolAddress: string, _defaultPoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_borrowerOperationsAddress: string, _locManagerAddress: string, _stabilityPoolAddress: string, _defaultPoolAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
@@ -43,7 +43,7 @@ export interface ActivePool
     BTCSent(_to?: null, _amount?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     StabilityPoolAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_newLoCManagerAddress?: null): EventFilter;
     ZUSDBalanceUpdated(_newBalance?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
@@ -55,7 +55,7 @@ export interface ActivePool
   extractEvents(logs: Log[], name: "BTCSent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _newLoCManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
 }
 
@@ -76,8 +76,8 @@ interface BorrowerOperationsCalls {
   zeroBaseParams(_overrides?: CallOverrides): Promise<string>;
   masset(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
-  sortedTroves(_overrides?: CallOverrides): Promise<string>;
-  troveManager(_overrides?: CallOverrides): Promise<string>;
+  sortedLoCs(_overrides?: CallOverrides): Promise<string>;
+  locManager(_overrides?: CallOverrides): Promise<string>;
   zeroStaking(_overrides?: CallOverrides): Promise<string>;
   zeroStakingAddress(_overrides?: CallOverrides): Promise<string>;
   zusdToken(_overrides?: CallOverrides): Promise<string>;
@@ -85,16 +85,16 @@ interface BorrowerOperationsCalls {
 
 interface BorrowerOperationsTransactions {
   addColl(_upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  adjustNueTrove(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _ZUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  adjustTrove(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _ZUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  adjustNueLoC(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _ZUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  adjustLoC(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _ZUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
   claimCollateral(_overrides?: Overrides): Promise<void>;
-  closeNueTrove(_overrides?: Overrides): Promise<void>;
-  closeTrove(_overrides?: Overrides): Promise<void>;
-  moveBTCGainToTrove(_borrower: string, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  openNueTrove(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  openTrove(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  closeNueLoC(_overrides?: Overrides): Promise<void>;
+  closeLoC(_overrides?: Overrides): Promise<void>;
+  moveBTCGainToLoC(_borrower: string, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  openNueLoC(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
+  openLoC(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
   repayZUSD(_ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
-  setAddresses(_feeDistributorAddress: string, _zeroBaseParamsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _sortedTrovesAddress: string, _zusdTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_feeDistributorAddress: string, _zeroBaseParamsAddress: string, _locManagerAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _sortedLoCsAddress: string, _zusdTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
   setMassetAddress(_massetAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   withdrawColl(_collWithdrawal: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
@@ -112,11 +112,11 @@ export interface BorrowerOperations
     GasPoolAddressChanged(_gasPoolAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
+    SortedLoCsAddressChanged(_sortedLoCsAddress?: null): EventFilter;
     StabilityPoolAddressChanged(_stabilityPoolAddress?: null): EventFilter;
-    TroveCreated(_borrower?: string | null, arrayIndex?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
-    TroveUpdated(_borrower?: string | null, _debt?: null, _coll?: null, stake?: null, operation?: null): EventFilter;
+    LoCCreated(_borrower?: string | null, arrayIndex?: null): EventFilter;
+    LoCManagerAddressChanged(_newLoCManagerAddress?: null): EventFilter;
+    LoCUpdated(_borrower?: string | null, _debt?: null, _coll?: null, stake?: null, operation?: null): EventFilter;
     ZEROStakingAddressChanged(_zeroStakingAddress?: null): EventFilter;
     ZUSDBorrowingFeePaid(_borrower?: string | null, _ZUSDFee?: null): EventFilter;
     ZUSDTokenAddressChanged(_zusdTokenAddress?: null): EventFilter;
@@ -128,11 +128,11 @@ export interface BorrowerOperations
   extractEvents(logs: Log[], name: "GasPoolAddressChanged"): _TypedLogDescription<{ _gasPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedTrovesAddress: string }>[];
+  extractEvents(logs: Log[], name: "SortedLoCsAddressChanged"): _TypedLogDescription<{ _sortedLoCsAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveCreated"): _TypedLogDescription<{ _borrower: string; arrayIndex: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber; operation: number }>[];
+  extractEvents(logs: Log[], name: "LoCCreated"): _TypedLogDescription<{ _borrower: string; arrayIndex: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _newLoCManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber; operation: number }>[];
   extractEvents(logs: Log[], name: "ZEROStakingAddressChanged"): _TypedLogDescription<{ _zeroStakingAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDBorrowingFeePaid"): _TypedLogDescription<{ _borrower: string; _ZUSDFee: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _zusdTokenAddress: string }>[];
@@ -145,13 +145,13 @@ interface CollSurplusPoolCalls {
   getCollateral(_account: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getBTC(_overrides?: CallOverrides): Promise<BigNumber>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
-  troveManagerAddress(_overrides?: CallOverrides): Promise<string>;
+  locManagerAddress(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface CollSurplusPoolTransactions {
   accountSurplus(_account: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   claimColl(_account: string, _overrides?: Overrides): Promise<void>;
-  setAddresses(_borrowerOperationsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_borrowerOperationsAddress: string, _locManagerAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
@@ -164,14 +164,14 @@ export interface CollSurplusPool
     CollBalanceUpdated(_account?: string | null, _newBalance?: null): EventFilter;
     BTCSent(_to?: null, _amount?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_newLoCManagerAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
   extractEvents(logs: Log[], name: "CollBalanceUpdated"): _TypedLogDescription<{ _account: string; _newBalance: BigNumber }>[];
   extractEvents(logs: Log[], name: "BTCSent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _newLoCManagerAddress: string }>[];
 }
 
 interface CommunityIssuanceCalls {
@@ -219,14 +219,14 @@ interface DefaultPoolCalls {
   getBTC(_overrides?: CallOverrides): Promise<BigNumber>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
   getZUSDDebt(_overrides?: CallOverrides): Promise<BigNumber>;
-  troveManagerAddress(_overrides?: CallOverrides): Promise<string>;
+  locManagerAddress(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface DefaultPoolTransactions {
   decreaseZUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   increaseZUSDDebt(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   sendBTCToActivePool(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setAddresses(_troveManagerAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_locManagerAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
@@ -242,7 +242,7 @@ export interface DefaultPool
     BTCSent(_to?: null, _amount?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     StabilityPoolAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_newLoCManagerAddress?: null): EventFilter;
     ZUSDBalanceUpdated(_newBalance?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
@@ -253,7 +253,7 @@ export interface DefaultPool
   extractEvents(logs: Log[], name: "BTCSent"): _TypedLogDescription<{ _to: string; _amount: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _newLoCManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
 }
 
@@ -287,12 +287,12 @@ interface HintHelpersCalls {
   getRedemptionHints(_ZUSDamount: BigNumberish, _price: BigNumberish, _maxIterations: BigNumberish, _overrides?: CallOverrides): Promise<{ firstRedemptionHint: string; partialRedemptionHintNICR: BigNumber; truncatedZUSDamount: BigNumber }>;
   zeroBaseParams(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
-  sortedTroves(_overrides?: CallOverrides): Promise<string>;
-  troveManager(_overrides?: CallOverrides): Promise<string>;
+  sortedLoCs(_overrides?: CallOverrides): Promise<string>;
+  locManager(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface HintHelpersTransactions {
-  setAddresses(_zeroBaseParamsAddress: string, _sortedTrovesAddress: string, _troveManagerAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_zeroBaseParamsAddress: string, _sortedLoCsAddress: string, _locManagerAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
@@ -301,12 +301,12 @@ export interface HintHelpers
   readonly address: string;
   readonly filters: {
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
+    SortedLoCsAddressChanged(_sortedLoCsAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_locManagerAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedTrovesAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "SortedLoCsAddressChanged"): _TypedLogDescription<{ _sortedLoCsAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _locManagerAddress: string }>[];
 }
 
 interface IERC20Calls {
@@ -356,7 +356,7 @@ interface ZUSDTokenTransactions {
   burn(_account: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   decreaseAllowance(spender: string, subtractedValue: BigNumberish, _overrides?: Overrides): Promise<boolean>;
   increaseAllowance(spender: string, addedValue: BigNumberish, _overrides?: Overrides): Promise<boolean>;
-  initialize(_troveManagerAddress: string, _stabilityPoolAddress: string, _borrowerOperationsAddress: string, _overrides?: Overrides): Promise<void>;
+  initialize(_locManagerAddress: string, _stabilityPoolAddress: string, _borrowerOperationsAddress: string, _overrides?: Overrides): Promise<void>;
   mint(_account: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   permit(owner: string, spender: string, amount: BigNumberish, deadline: BigNumberish, v: BigNumberish, r: BytesLike, s: BytesLike, _overrides?: Overrides): Promise<void>;
   returnFromPool(_poolAddress: string, _receiver: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
@@ -375,7 +375,7 @@ export interface ZUSDToken
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     StabilityPoolAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
     Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
-    TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_locManagerAddress?: null): EventFilter;
     ZUSDTokenBalanceUpdated(_user?: null, _amount?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "Approval"): _TypedLogDescription<{ owner: string; spender: string; value: BigNumber }>[];
@@ -383,7 +383,7 @@ export interface ZUSDToken
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _locManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenBalanceUpdated"): _TypedLogDescription<{ _user: string; _amount: BigNumber }>[];
 }
 
@@ -488,20 +488,20 @@ export interface ZEROToken
   extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
 }
 
-interface MultiTroveGetterCalls {
-  getMultipleSortedTroves(_startIdx: BigNumberish, _count: BigNumberish, _overrides?: CallOverrides): Promise<{ owner: string; debt: BigNumber; coll: BigNumber; stake: BigNumber; snapshotBTC: BigNumber; snapshotZUSDDebt: BigNumber }[]>;
+interface MultiLoCGetterCalls {
+  getMultipleSortedLoCs(_startIdx: BigNumberish, _count: BigNumberish, _overrides?: CallOverrides): Promise<{ owner: string; debt: BigNumber; coll: BigNumber; stake: BigNumber; snapshotBTC: BigNumber; snapshotZUSDDebt: BigNumber }[]>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
-  sortedTroves(_overrides?: CallOverrides): Promise<string>;
-  troveManager(_overrides?: CallOverrides): Promise<string>;
+  sortedLoCs(_overrides?: CallOverrides): Promise<string>;
+  locManager(_overrides?: CallOverrides): Promise<string>;
 }
 
-interface MultiTroveGetterTransactions {
-  setAddresses(_troveManager: string, _sortedTroves: string, _overrides?: Overrides): Promise<void>;
+interface MultiLoCGetterTransactions {
+  setAddresses(_locManager: string, _sortedLoCs: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
-export interface MultiTroveGetter
-  extends _TypedZeroContract<MultiTroveGetterCalls, MultiTroveGetterTransactions> {
+export interface MultiLoCGetter
+  extends _TypedZeroContract<MultiLoCGetterCalls, MultiLoCGetterTransactions> {
   readonly address: string;
   readonly filters: {
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
@@ -555,7 +555,7 @@ export interface PriceFeedTestnet
   extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _lastGoodPrice: BigNumber }>[];
 }
 
-interface SortedTrovesCalls {
+interface SortedLoCsCalls {
   NAME(_overrides?: CallOverrides): Promise<string>;
   borrowerOperationsAddress(_overrides?: CallOverrides): Promise<string>;
   contains(_id: string, _overrides?: CallOverrides): Promise<boolean>;
@@ -570,35 +570,35 @@ interface SortedTrovesCalls {
   getSize(_overrides?: CallOverrides): Promise<BigNumber>;
   isEmpty(_overrides?: CallOverrides): Promise<boolean>;
   isFull(_overrides?: CallOverrides): Promise<boolean>;
-  troveManager(_overrides?: CallOverrides): Promise<string>;
+  locManager(_overrides?: CallOverrides): Promise<string>;
   validInsertPosition(_NICR: BigNumberish, _prevId: string, _nextId: string, _overrides?: CallOverrides): Promise<boolean>;
 }
 
-interface SortedTrovesTransactions {
+interface SortedLoCsTransactions {
   insert(_id: string, _NICR: BigNumberish, _prevId: string, _nextId: string, _overrides?: Overrides): Promise<void>;
   reInsert(_id: string, _newNICR: BigNumberish, _prevId: string, _nextId: string, _overrides?: Overrides): Promise<void>;
   remove(_id: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
-  setParams(_size: BigNumberish, _troveManagerAddress: string, _borrowerOperationsAddress: string, _overrides?: Overrides): Promise<void>;
+  setParams(_size: BigNumberish, _locManagerAddress: string, _borrowerOperationsAddress: string, _overrides?: Overrides): Promise<void>;
 }
 
-export interface SortedTroves
-  extends _TypedZeroContract<SortedTrovesCalls, SortedTrovesTransactions> {
+export interface SortedLoCs
+  extends _TypedZeroContract<SortedLoCsCalls, SortedLoCsTransactions> {
   readonly address: string;
   readonly filters: {
     BorrowerOperationsAddressChanged(_borrowerOperationsAddress?: null): EventFilter;
     NodeAdded(_id?: null, _NICR?: null): EventFilter;
     NodeRemoved(_id?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    SortedTrovesAddressChanged(_sortedDoublyLLAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
+    SortedLoCsAddressChanged(_sortedDoublyLLAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_locManagerAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _borrowerOperationsAddress: string }>[];
   extractEvents(logs: Log[], name: "NodeAdded"): _TypedLogDescription<{ _id: string; _NICR: BigNumber }>[];
   extractEvents(logs: Log[], name: "NodeRemoved"): _TypedLogDescription<{ _id: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedDoublyLLAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "SortedLoCsAddressChanged"): _TypedLogDescription<{ _sortedDoublyLLAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _locManagerAddress: string }>[];
 }
 
 interface StabilityPoolCalls {
@@ -637,8 +637,8 @@ interface StabilityPoolCalls {
   lastZUSDLossError_Offset(_overrides?: CallOverrides): Promise<BigNumber>;
   zeroBaseParams(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
-  sortedTroves(_overrides?: CallOverrides): Promise<string>;
-  troveManager(_overrides?: CallOverrides): Promise<string>;
+  sortedLoCs(_overrides?: CallOverrides): Promise<string>;
+  locManager(_overrides?: CallOverrides): Promise<string>;
   zusdToken(_overrides?: CallOverrides): Promise<string>;
 }
 
@@ -646,9 +646,9 @@ interface StabilityPoolTransactions {
   offset(_debtToOffset: BigNumberish, _collToAdd: BigNumberish, _overrides?: Overrides): Promise<void>;
   provideToSP(_amount: BigNumberish, _frontEndTag: string, _overrides?: Overrides): Promise<void>;
   registerFrontEnd(_kickbackRate: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setAddresses(_zeroBaseParamsAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _priceFeedAddress: string, _communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_zeroBaseParamsAddress: string, _borrowerOperationsAddress: string, _locManagerAddress: string, _activePoolAddress: string, _zusdTokenAddress: string, _sortedLoCsAddress: string, _priceFeedAddress: string, _communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
-  withdrawBTCGainToTrove(_upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
+  withdrawBTCGainToLoC(_upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawFromSP(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
 }
 
@@ -674,10 +674,10 @@ export interface StabilityPool
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     S_Updated(_S?: null, _epoch?: null, _scale?: null): EventFilter;
     ScaleUpdated(_currentScale?: null): EventFilter;
-    SortedTrovesAddressChanged(_newSortedTrovesAddress?: null): EventFilter;
+    SortedLoCsAddressChanged(_newSortedLoCsAddress?: null): EventFilter;
     StabilityPoolBTCBalanceUpdated(_newBalance?: null): EventFilter;
     StabilityPoolZUSDBalanceUpdated(_newBalance?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_newLoCManagerAddress?: null): EventFilter;
     UserDepositChanged(_depositor?: string | null, _newDeposit?: null): EventFilter;
     ZEROPaidToDepositor(_depositor?: string | null, _ZERO?: null): EventFilter;
     ZEROPaidToFrontEnd(_frontEnd?: string | null, _ZERO?: null): EventFilter;
@@ -701,17 +701,17 @@ export interface StabilityPool
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "S_Updated"): _TypedLogDescription<{ _S: BigNumber; _epoch: BigNumber; _scale: BigNumber }>[];
   extractEvents(logs: Log[], name: "ScaleUpdated"): _TypedLogDescription<{ _currentScale: BigNumber }>[];
-  extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _newSortedTrovesAddress: string }>[];
+  extractEvents(logs: Log[], name: "SortedLoCsAddressChanged"): _TypedLogDescription<{ _newSortedLoCsAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolBTCBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
   extractEvents(logs: Log[], name: "StabilityPoolZUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _newLoCManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "UserDepositChanged"): _TypedLogDescription<{ _depositor: string; _newDeposit: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZEROPaidToDepositor"): _TypedLogDescription<{ _depositor: string; _ZERO: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZEROPaidToFrontEnd"): _TypedLogDescription<{ _frontEnd: string; _ZERO: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _newZUSDTokenAddress: string }>[];
 }
 
-interface TroveManagerCalls {
+interface LoCManagerCalls {
   BETA(_overrides?: CallOverrides): Promise<BigNumber>;
   BOOTSTRAP_PERIOD(_overrides?: CallOverrides): Promise<BigNumber>;
   CCR(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -723,8 +723,8 @@ interface TroveManagerCalls {
   MIN_NET_DEBT(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
   SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
-  TroveOwners(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
-  Troves(arg0: string, _overrides?: CallOverrides): Promise<{ debt: BigNumber; coll: BigNumber; stake: BigNumber; status: number; arrayIndex: BigNumber }>;
+  LoCOwners(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
+  LoCs(arg0: string, _overrides?: CallOverrides): Promise<{ debt: BigNumber; coll: BigNumber; stake: BigNumber; status: number; arrayIndex: BigNumber }>;
   ZUSD_GAS_COMPENSATION(_overrides?: CallOverrides): Promise<BigNumber>;
   _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
   _getCurrentICR(_borrower: string, _price: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
@@ -758,12 +758,12 @@ interface TroveManagerCalls {
   getRedemptionRate(_overrides?: CallOverrides): Promise<BigNumber>;
   getRedemptionRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
   getTCR(_price: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
-  getTroveColl(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
-  getTroveDebt(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
-  getTroveFromTroveOwnersArray(_index: BigNumberish, _overrides?: CallOverrides): Promise<string>;
-  getTroveOwnersCount(_overrides?: CallOverrides): Promise<BigNumber>;
-  getTroveStake(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
-  getTroveStatus(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getLoCColl(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getLoCDebt(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getLoCFromLoCOwnersArray(_index: BigNumberish, _overrides?: CallOverrides): Promise<string>;
+  getLoCOwnersCount(_overrides?: CallOverrides): Promise<BigNumber>;
+  getLoCStake(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getLoCStatus(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
   hasPendingRewards(_borrower: string, _overrides?: CallOverrides): Promise<boolean>;
   lastETHError_Redistribution(_overrides?: CallOverrides): Promise<BigNumber>;
   lastFeeOperationTime(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -771,36 +771,36 @@ interface TroveManagerCalls {
   zeroBaseParams(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
   rewardSnapshots(arg0: string, _overrides?: CallOverrides): Promise<{ BTC: BigNumber; ZUSDDebt: BigNumber }>;
-  sortedTroves(_overrides?: CallOverrides): Promise<string>;
+  sortedLoCs(_overrides?: CallOverrides): Promise<string>;
   totalCollateralSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakes(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakesSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
-  troveManagerRedeemOps(_overrides?: CallOverrides): Promise<string>;
+  locManagerRedeemOps(_overrides?: CallOverrides): Promise<string>;
 }
 
-interface TroveManagerTransactions {
-  addTroveOwnerToArray(_borrower: string, _overrides?: Overrides): Promise<BigNumber>;
+interface LoCManagerTransactions {
+  addLoCOwnerToArray(_borrower: string, _overrides?: Overrides): Promise<BigNumber>;
   applyPendingRewards(_borrower: string, _overrides?: Overrides): Promise<void>;
-  batchLiquidateTroves(_troveArray: string[], _overrides?: Overrides): Promise<void>;
-  closeTrove(_borrower: string, _overrides?: Overrides): Promise<void>;
+  batchLiquidateLoCs(_locArray: string[], _overrides?: Overrides): Promise<void>;
+  closeLoC(_borrower: string, _overrides?: Overrides): Promise<void>;
   decayBaseRateFromBorrowing(_overrides?: Overrides): Promise<void>;
-  decreaseTroveColl(_borrower: string, _collDecrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
-  decreaseTroveDebt(_borrower: string, _debtDecrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
-  increaseTroveColl(_borrower: string, _collIncrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
-  increaseTroveDebt(_borrower: string, _debtIncrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
+  decreaseLoCColl(_borrower: string, _collDecrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
+  decreaseLoCDebt(_borrower: string, _debtDecrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
+  increaseLoCColl(_borrower: string, _collIncrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
+  increaseLoCDebt(_borrower: string, _debtIncrease: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
   liquidate(_borrower: string, _overrides?: Overrides): Promise<void>;
-  liquidateTroves(_n: BigNumberish, _overrides?: Overrides): Promise<void>;
+  liquidateLoCs(_n: BigNumberish, _overrides?: Overrides): Promise<void>;
   redeemCollateral(_ZUSDamount: BigNumberish, _firstRedemptionHint: string, _upperPartialRedemptionHint: string, _lowerPartialRedemptionHint: string, _partialRedemptionHintNICR: BigNumberish, _maxIterations: BigNumberish, _maxFeePercentage: BigNumberish, _overrides?: Overrides): Promise<void>;
   removeStake(_borrower: string, _overrides?: Overrides): Promise<void>;
-  setAddresses(_feeDistributorAddress: string, _troveManagerRedeemOps: string, _zeroBaseParamsAddress: string, _borrowerOperationsAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _zeroTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_feeDistributorAddress: string, _locManagerRedeemOps: string, _zeroBaseParamsAddress: string, _borrowerOperationsAddress: string, _activePoolAddress: string, _defaultPoolAddress: string, _stabilityPoolAddress: string, _gasPoolAddress: string, _collSurplusPoolAddress: string, _priceFeedAddress: string, _zusdTokenAddress: string, _sortedLoCsAddress: string, _zeroTokenAddress: string, _zeroStakingAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
-  setTroveStatus(_borrower: string, _num: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setLoCStatus(_borrower: string, _num: BigNumberish, _overrides?: Overrides): Promise<void>;
   updateStakeAndTotalStakes(_borrower: string, _overrides?: Overrides): Promise<BigNumber>;
-  updateTroveRewardSnapshots(_borrower: string, _overrides?: Overrides): Promise<void>;
+  updateLoCRewardSnapshots(_borrower: string, _overrides?: Overrides): Promise<void>;
 }
 
-export interface TroveManager
-  extends _TypedZeroContract<TroveManagerCalls, TroveManagerTransactions> {
+export interface LoCManager
+  extends _TypedZeroContract<LoCManagerCalls, LoCManagerTransactions> {
   readonly address: string;
   readonly filters: {
     ActivePoolAddressChanged(_activePoolAddress?: null): EventFilter;
@@ -817,15 +817,15 @@ export interface TroveManager
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     Redemption(_attemptedZUSDAmount?: null, _actualZUSDAmount?: null, _BTCSent?: null, _BTCFee?: null): EventFilter;
-    SortedTrovesAddressChanged(_sortedTrovesAddress?: null): EventFilter;
+    SortedLoCsAddressChanged(_sortedLoCsAddress?: null): EventFilter;
     StabilityPoolAddressChanged(_stabilityPoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
     TotalStakesUpdated(_newTotalStakes?: null): EventFilter;
-    TroveIndexUpdated(_borrower?: null, _newIndex?: null): EventFilter;
-    TroveLiquidated(_borrower?: string | null, _debt?: null, _coll?: null, operation?: null): EventFilter;
-    TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps?: null): EventFilter;
-    TroveSnapshotsUpdated(_L_BTC?: null, _L_ZUSDDebt?: null): EventFilter;
-    TroveUpdated(_borrower?: string | null, _debt?: null, _coll?: null, stake?: null, operation?: null): EventFilter;
+    LoCIndexUpdated(_borrower?: null, _newIndex?: null): EventFilter;
+    LoCLiquidated(_borrower?: string | null, _debt?: null, _coll?: null, operation?: null): EventFilter;
+    LoCManagerRedeemOpsAddressChanged(_locManagerRedeemOps?: null): EventFilter;
+    LoCSnapshotsUpdated(_L_BTC?: null, _L_ZUSDDebt?: null): EventFilter;
+    LoCUpdated(_borrower?: string | null, _debt?: null, _coll?: null, stake?: null, operation?: null): EventFilter;
     ZEROStakingAddressChanged(_zeroStakingAddress?: null): EventFilter;
     ZEROTokenAddressChanged(_zeroTokenAddress?: null): EventFilter;
     ZUSDTokenAddressChanged(_newZUSDTokenAddress?: null): EventFilter;
@@ -844,21 +844,21 @@ export interface TroveManager
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedZUSDAmount: BigNumber; _actualZUSDAmount: BigNumber; _BTCSent: BigNumber; _BTCFee: BigNumber }>[];
-  extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _sortedTrovesAddress: string }>[];
+  extractEvents(logs: Log[], name: "SortedLoCsAddressChanged"): _TypedLogDescription<{ _sortedLoCsAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
   extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
   extractEvents(logs: Log[], name: "TotalStakesUpdated"): _TypedLogDescription<{ _newTotalStakes: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveIndexUpdated"): _TypedLogDescription<{ _borrower: string; _newIndex: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveLiquidated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; operation: number }>[];
-  extractEvents(logs: Log[], name: "TroveManagerRedeemOpsAddressChanged"): _TypedLogDescription<{ _troveManagerRedeemOps: string }>[];
-  extractEvents(logs: Log[], name: "TroveSnapshotsUpdated"): _TypedLogDescription<{ _L_BTC: BigNumber; _L_ZUSDDebt: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber; operation: number }>[];
+  extractEvents(logs: Log[], name: "LoCIndexUpdated"): _TypedLogDescription<{ _borrower: string; _newIndex: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LoCLiquidated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; operation: number }>[];
+  extractEvents(logs: Log[], name: "LoCManagerRedeemOpsAddressChanged"): _TypedLogDescription<{ _locManagerRedeemOps: string }>[];
+  extractEvents(logs: Log[], name: "LoCSnapshotsUpdated"): _TypedLogDescription<{ _L_BTC: BigNumber; _L_ZUSDDebt: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LoCUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber; operation: number }>[];
   extractEvents(logs: Log[], name: "ZEROStakingAddressChanged"): _TypedLogDescription<{ _zeroStakingAddress: string }>[];
   extractEvents(logs: Log[], name: "ZEROTokenAddressChanged"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _newZUSDTokenAddress: string }>[];
 }
 
-interface TroveManagerRedeemOpsCalls {
+interface LoCManagerRedeemOpsCalls {
   BETA(_overrides?: CallOverrides): Promise<BigNumber>;
   BOOTSTRAP_PERIOD(_overrides?: CallOverrides): Promise<BigNumber>;
   DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -868,8 +868,8 @@ interface TroveManagerRedeemOpsCalls {
   MIN_NET_DEBT(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
   SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
-  TroveOwners(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
-  Troves(arg0: string, _overrides?: CallOverrides): Promise<{ debt: BigNumber; coll: BigNumber; stake: BigNumber; status: number; arrayIndex: BigNumber }>;
+  LoCOwners(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
+  LoCs(arg0: string, _overrides?: CallOverrides): Promise<{ debt: BigNumber; coll: BigNumber; stake: BigNumber; status: number; arrayIndex: BigNumber }>;
   ZUSD_GAS_COMPENSATION(_overrides?: CallOverrides): Promise<BigNumber>;
   _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
   _getCurrentICR(_borrower: string, _price: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
@@ -895,20 +895,20 @@ interface TroveManagerRedeemOpsCalls {
   zeroBaseParams(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
   rewardSnapshots(arg0: string, _overrides?: CallOverrides): Promise<{ BTC: BigNumber; ZUSDDebt: BigNumber }>;
-  sortedTroves(_overrides?: CallOverrides): Promise<string>;
+  sortedLoCs(_overrides?: CallOverrides): Promise<string>;
   totalCollateralSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakes(_overrides?: CallOverrides): Promise<BigNumber>;
   totalStakesSnapshot(_overrides?: CallOverrides): Promise<BigNumber>;
-  troveManagerRedeemOps(_overrides?: CallOverrides): Promise<string>;
+  locManagerRedeemOps(_overrides?: CallOverrides): Promise<string>;
 }
 
-interface TroveManagerRedeemOpsTransactions {
+interface LoCManagerRedeemOpsTransactions {
   redeemCollateral(_ZUSDamount: BigNumberish, _firstRedemptionHint: string, _upperPartialRedemptionHint: string, _lowerPartialRedemptionHint: string, _partialRedemptionHintNICR: BigNumberish, _maxIterations: BigNumberish, _maxFeePercentage: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
-export interface TroveManagerRedeemOps
-  extends _TypedZeroContract<TroveManagerRedeemOpsCalls, TroveManagerRedeemOpsTransactions> {
+export interface LoCManagerRedeemOps
+  extends _TypedZeroContract<LoCManagerRedeemOpsCalls, LoCManagerRedeemOpsTransactions> {
   readonly address: string;
   readonly filters: {
     BaseRateUpdated(_baseRate?: null): EventFilter;
@@ -919,10 +919,10 @@ export interface TroveManagerRedeemOps
     Redemption(_attemptedZUSDAmount?: null, _actualZUSDAmount?: null, _BTCSent?: null, _BTCFee?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
     TotalStakesUpdated(_newTotalStakes?: null): EventFilter;
-    TroveIndexUpdated(_borrower?: null, _newIndex?: null): EventFilter;
-    TroveLiquidated(_borrower?: string | null, _debt?: null, _coll?: null, _operation?: null): EventFilter;
-    TroveSnapshotsUpdated(_L_BTC?: null, _L_ZUSDDebt?: null): EventFilter;
-    TroveUpdated(_borrower?: string | null, _debt?: null, _coll?: null, _stake?: null, _operation?: null): EventFilter;
+    LoCIndexUpdated(_borrower?: null, _newIndex?: null): EventFilter;
+    LoCLiquidated(_borrower?: string | null, _debt?: null, _coll?: null, _operation?: null): EventFilter;
+    LoCSnapshotsUpdated(_L_BTC?: null, _L_ZUSDDebt?: null): EventFilter;
+    LoCUpdated(_borrower?: string | null, _debt?: null, _coll?: null, _stake?: null, _operation?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "BaseRateUpdated"): _TypedLogDescription<{ _baseRate: BigNumber }>[];
   extractEvents(logs: Log[], name: "LTermsUpdated"): _TypedLogDescription<{ _L_BTC: BigNumber; _L_ZUSDDebt: BigNumber }>[];
@@ -932,10 +932,10 @@ export interface TroveManagerRedeemOps
   extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedZUSDAmount: BigNumber; _actualZUSDAmount: BigNumber; _BTCSent: BigNumber; _BTCFee: BigNumber }>[];
   extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
   extractEvents(logs: Log[], name: "TotalStakesUpdated"): _TypedLogDescription<{ _newTotalStakes: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveIndexUpdated"): _TypedLogDescription<{ _borrower: string; _newIndex: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveLiquidated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _operation: number }>[];
-  extractEvents(logs: Log[], name: "TroveSnapshotsUpdated"): _TypedLogDescription<{ _L_BTC: BigNumber; _L_ZUSDDebt: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _stake: BigNumber; _operation: number }>[];
+  extractEvents(logs: Log[], name: "LoCIndexUpdated"): _TypedLogDescription<{ _borrower: string; _newIndex: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LoCLiquidated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _operation: number }>[];
+  extractEvents(logs: Log[], name: "LoCSnapshotsUpdated"): _TypedLogDescription<{ _L_BTC: BigNumber; _L_ZUSDDebt: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LoCUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _stake: BigNumber; _operation: number }>[];
 }
 
 interface UpgradableProxyCalls {
@@ -1013,7 +1013,7 @@ interface FeeDistributorCalls {
   borrowerOperations(_overrides?: CallOverrides): Promise<string>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
   sovFeeCollector(_overrides?: CallOverrides): Promise<string>;
-  troveManager(_overrides?: CallOverrides): Promise<string>;
+  locManager(_overrides?: CallOverrides): Promise<string>;
   wrbtc(_overrides?: CallOverrides): Promise<string>;
   zeroStaking(_overrides?: CallOverrides): Promise<string>;
   zusdToken(_overrides?: CallOverrides): Promise<string>;
@@ -1021,7 +1021,7 @@ interface FeeDistributorCalls {
 
 interface FeeDistributorTransactions {
   distributeFees(_overrides?: Overrides): Promise<void>;
-  setAddresses(_sovFeeCollectorAddress: string, _zeroStakingAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _wrbtcAddress: string, _zusdTokenAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_sovFeeCollectorAddress: string, _zeroStakingAddress: string, _borrowerOperationsAddress: string, _locManagerAddress: string, _wrbtcAddress: string, _zusdTokenAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
   setFeeToSOVCollector(FEE_TO_SOV_COLLECTOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
@@ -1035,7 +1035,7 @@ export interface FeeDistributor
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     RBTCistributed(_rbtcDistributedAmount?: null): EventFilter;
     SOVFeeCollectorAddressChanged(_sovFeeCollectorAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
+    LoCManagerAddressChanged(_locManagerAddress?: null): EventFilter;
     WrbtcAddressChanged(_wrbtcAddress?: null): EventFilter;
     ZUSDDistributed(_zusdDistributedAmount?: null): EventFilter;
     ZUSDTokenAddressChanged(_zusdTokenAddress?: null): EventFilter;
@@ -1046,7 +1046,7 @@ export interface FeeDistributor
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "RBTCistributed"): _TypedLogDescription<{ _rbtcDistributedAmount: BigNumber }>[];
   extractEvents(logs: Log[], name: "SOVFeeCollectorAddressChanged"): _TypedLogDescription<{ _sovFeeCollectorAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _locManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "WrbtcAddressChanged"): _TypedLogDescription<{ _wrbtcAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDDistributed"): _TypedLogDescription<{ _zusdDistributedAmount: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _zusdTokenAddress: string }>[];

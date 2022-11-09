@@ -9,7 +9,7 @@ const toBN = th.toBN
 const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
-const TroveManagerTester = artifacts.require("TroveManagerTester")
+const LoCManagerTester = artifacts.require("LoCManagerTester")
 const ZUSDToken = artifacts.require("ZUSDToken")
 
 contract('CollSurplusPool', async accounts => {
@@ -25,15 +25,15 @@ contract('CollSurplusPool', async accounts => {
 
   let contracts
 
-  const getOpenTroveZUSDAmount = async (totalDebt) => th.getOpenTroveZUSDAmount(contracts, totalDebt)
-  const openTrove = async (params) => th.openTrove(contracts, params)
+  const getOpenLoCZUSDAmount = async (totalDebt) => th.getOpenLoCZUSDAmount(contracts, totalDebt)
+  const openLoC = async (params) => th.openLoC(contracts, params)
 
   before(async () => {
     contracts = await deploymentHelper.deployZeroCore()
-    contracts.troveManager = await TroveManagerTester.new()
+    contracts.locManager = await LoCManagerTester.new()
     contracts.zusdToken = await ZUSDToken.new()
     await contracts.zusdToken.initialize(
-      contracts.troveManager.address,
+      contracts.locManager.address,
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     )
@@ -66,8 +66,8 @@ contract('CollSurplusPool', async accounts => {
     const price = toBN(dec(100, 18))
     await priceFeed.setPrice(price)
 
-    const { collateral: B_coll, netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(200, 16)), extraParams: { from: B } })
-    await openTrove({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
+    const { collateral: B_coll, netDebt: B_netDebt } = await openLoC({ ICR: toBN(dec(200, 16)), extraParams: { from: B } })
+    await openLoC({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -93,13 +93,13 @@ contract('CollSurplusPool', async accounts => {
     const price = toBN(dec(100, 18))
     await priceFeed.setPrice(price)
 
-    // open trove from NonPayable proxy contract
+    // open LoC from NonPayable proxy contract
     const B_coll = toBN(dec(60, 18))
     const B_zusdAmount = toBN(dec(3000, 18))
     const B_netDebt = await th.getAmountWithBorrowingFee(contracts, B_zusdAmount)
-    const openTroveData = th.getTransactionData('openTrove(uint256,uint256,address,address)', ['0xde0b6b3a7640000', web3.utils.toHex(B_zusdAmount), B, B])
-    await nonPayable.forward(borrowerOperations.address, openTroveData, { value: B_coll })
-    await openTrove({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
+    const openLoCData = th.getTransactionData('openLoC(uint256,uint256,address,address)', ['0xde0b6b3a7640000', web3.utils.toHex(B_zusdAmount), B, B])
+    await nonPayable.forward(borrowerOperations.address, openLoCData, { value: B_coll })
+    await openLoC({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -118,8 +118,8 @@ contract('CollSurplusPool', async accounts => {
     await th.assertRevert(web3.eth.sendTransaction({ from: A, to: collSurplusPool.address, value: 1 }), 'CollSurplusPool: Caller is not Active Pool')
   })
 
-  it('CollSurplusPool: accountSurplus: reverts if caller is not Trove Manager', async () => {
-    await th.assertRevert(collSurplusPool.accountSurplus(A, 1), 'CollSurplusPool: Caller is not TroveManager')
+  it('CollSurplusPool: accountSurplus: reverts if caller is not LoC Manager', async () => {
+    await th.assertRevert(collSurplusPool.accountSurplus(A, 1), 'CollSurplusPool: Caller is not LoCManager')
   })
 })
 

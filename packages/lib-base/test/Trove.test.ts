@@ -9,20 +9,20 @@ import {
 } from "../src/constants";
 
 import { Decimal, Difference } from "../src/Decimal";
-import { Trove, _emptyTrove } from "../src/Trove";
+import { LoC, _emptyLoC } from "../src/LoC";
 
 const liquidationReserve = Number(ZUSD_LIQUIDATION_RESERVE);
 const maximumBorrowingRate = Number(MAXIMUM_BORROWING_RATE);
 
 const maxDebt = 10 * Number(ZUSD_MINIMUM_DEBT);
 
-const trove = ({ collateral = 0, debt = 0 }) =>
-  new Trove(Decimal.from(collateral), Decimal.from(debt));
+const loc = ({ collateral = 0, debt = 0 }) =>
+  new LoC(Decimal.from(collateral), Decimal.from(debt));
 
-const onlyCollateral = () => fc.record({ collateral: fc.float({ min: 0.1 }) }).map(trove);
+const onlyCollateral = () => fc.record({ collateral: fc.float({ min: 0.1 }) }).map(loc);
 
 const onlyDebt = () =>
-  fc.record({ debt: fc.float({ min: liquidationReserve, max: maxDebt }) }).map(trove);
+  fc.record({ debt: fc.float({ min: liquidationReserve, max: maxDebt }) }).map(loc);
 
 const bothCollateralAndDebt = () =>
   fc
@@ -30,31 +30,31 @@ const bothCollateralAndDebt = () =>
       collateral: fc.float({ min: 0.1 }),
       debt: fc.float({ min: liquidationReserve, max: maxDebt })
     })
-    .map(trove);
+    .map(loc);
 
-const arbitraryTrove = () => fc.record({ collateral: fc.float(), debt: fc.float() }).map(trove);
+const arbitraryLoC = () => fc.record({ collateral: fc.float(), debt: fc.float() }).map(loc);
 
-const validTrove = () =>
+const validLoC = () =>
   fc
     .record({ collateral: fc.float(), debt: fc.float({ min: liquidationReserve, max: maxDebt }) })
-    .map(trove);
+    .map(loc);
 
-const validNonEmptyTrove = () => validTrove().filter(t => !t.isEmpty);
+const validNonEmptyLoC = () => validLoC().filter(t => !t.isEmpty);
 
-const roughlyEqual = (a: Trove, b: Trove) =>
+const roughlyEqual = (a: LoC, b: LoC) =>
   a.collateral.eq(b.collateral) && !!Difference.between(a.debt, b.debt).absoluteValue?.lt(1e-9);
 
-describe("Trove", () => {
-  it("applying undefined diff should yield the same Trove", () => {
-    const trove = new Trove(Decimal.from(1), Decimal.from(111));
+describe("LoC", () => {
+  it("applying undefined diff should yield the same LoC", () => {
+    const loc = new LoC(Decimal.from(1), Decimal.from(111));
 
-    assert(trove.apply(undefined) === trove);
+    assert(loc.apply(undefined) === loc);
   });
 
   it("applying diff of empty from `b` to `a` should yield empty", () => {
     fc.assert(
-      fc.property(validNonEmptyTrove(), validNonEmptyTrove(), (a, b) =>
-        a.apply(b.whatChanged(_emptyTrove)).equals(_emptyTrove)
+      fc.property(validNonEmptyLoC(), validNonEmptyLoC(), (a, b) =>
+        a.apply(b.whatChanged(_emptyLoC)).equals(_emptyLoC)
       )
     );
   });
@@ -62,7 +62,7 @@ describe("Trove", () => {
   it("applying what changed should preserve zeroings", () => {
     fc.assert(
       fc.property(
-        arbitraryTrove(),
+        arbitraryLoC(),
         bothCollateralAndDebt(),
         onlyCollateral(),
         (a, b, c) => a.apply(b.whatChanged(c)).debt.isZero
@@ -71,7 +71,7 @@ describe("Trove", () => {
 
     fc.assert(
       fc.property(
-        arbitraryTrove(),
+        arbitraryLoC(),
         bothCollateralAndDebt(),
         onlyDebt(),
         (a, b, c) => a.apply(b.whatChanged(c)).collateral.isZero
@@ -81,7 +81,7 @@ describe("Trove", () => {
 
   it("applying diff of `b` from `a` to `a` should yield `b` when borrowing rate is 0", () => {
     fc.assert(
-      fc.property(validTrove(), arbitraryTrove(), (a, b) =>
+      fc.property(validLoC(), arbitraryLoC(), (a, b) =>
         a.apply(a.whatChanged(b, 0), 0).equals(b)
       )
     );
@@ -89,7 +89,7 @@ describe("Trove", () => {
 
   it("applying diff of `b` from `a` to `a` should roughly yield `b` when borrowing rate is non-0", () => {
     fc.assert(
-      fc.property(validTrove(), arbitraryTrove(), fc.float({ max: 0.5 }), (a, b, c) =>
+      fc.property(validLoC(), arbitraryLoC(), fc.float({ max: 0.5 }), (a, b, c) =>
         roughlyEqual(a.apply(a.whatChanged(b, c), c), b)
       )
     );
@@ -97,7 +97,7 @@ describe("Trove", () => {
 
   it("applying an adjustment should never throw", () => {
     fc.assert(
-      fc.property(validNonEmptyTrove(), validNonEmptyTrove(), validNonEmptyTrove(), (a, b, c) => {
+      fc.property(validNonEmptyLoC(), validNonEmptyLoC(), validNonEmptyLoC(), (a, b, c) => {
         a.apply(b.whatChanged(c));
       })
     );
@@ -106,7 +106,7 @@ describe("Trove", () => {
   describe("whatChanged()", () => {
     it("should not define zeros on adjustment", () => {
       fc.assert(
-        fc.property(validNonEmptyTrove(), validNonEmptyTrove(), (a, b) => {
+        fc.property(validNonEmptyLoC(), validNonEmptyLoC(), (a, b) => {
           const change = a.whatChanged(b);
 
           return (
@@ -121,18 +121,18 @@ describe("Trove", () => {
       );
     });
 
-    it("should recreate a Trove with minimum debt at any borrowing rate", () => {
+    it("should recreate a LoC with minimum debt at any borrowing rate", () => {
       fc.assert(
         fc.property(fc.float({ max: maximumBorrowingRate }), borrowingRate => {
-          const withMinimumDebt = Trove.recreate(
-            new Trove(Decimal.ONE, ZUSD_MINIMUM_DEBT),
+          const withMinimumDebt = LoC.recreate(
+            new LoC(Decimal.ONE, ZUSD_MINIMUM_DEBT),
             borrowingRate
           );
 
-          const ret = Trove.create(withMinimumDebt, borrowingRate).debt.gte(ZUSD_MINIMUM_DEBT);
+          const ret = LoC.create(withMinimumDebt, borrowingRate).debt.gte(ZUSD_MINIMUM_DEBT);
 
           if (!ret) {
-            console.log(`${Trove.create(withMinimumDebt, borrowingRate).debt}`);
+            console.log(`${LoC.create(withMinimumDebt, borrowingRate).debt}`);
           }
 
           return ret;

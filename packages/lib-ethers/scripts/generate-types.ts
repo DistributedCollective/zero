@@ -14,15 +14,15 @@ import IERC20 from "../../contracts/artifacts/contracts/Dependencies/IERC20.sol/
 import ZUSDToken from "../../contracts/artifacts/contracts/ZUSDToken.sol/ZUSDToken.json";
 import ZEROStaking from "../../contracts/artifacts/contracts/ZERO/ZEROStaking.sol/ZEROStaking.json";
 import ZEROToken from "../../contracts/artifacts/contracts/ZERO/ZEROToken.sol/ZEROToken.json";
-import MultiTroveGetter from "../../contracts/artifacts/contracts/MultiTroveGetter.sol/MultiTroveGetter.json";
+import MultiLoCGetter from "../../contracts/artifacts/contracts/MultiLoCGetter.sol/MultiLoCGetter.json";
 import PriceFeed from "../../contracts/artifacts/contracts/PriceFeed.sol/PriceFeed.json";
 import PriceFeedTestnet from "../../contracts/artifacts/contracts/TestContracts/PriceFeedTestnet.sol/PriceFeedTestnet.json";
-import SortedTroves from "../../contracts/artifacts/contracts/SortedTroves.sol/SortedTroves.json";
+import SortedLoCs from "../../contracts/artifacts/contracts/SortedLoCs.sol/SortedLoCs.json";
 import StabilityPool from "../../contracts/artifacts/contracts/StabilityPool.sol/StabilityPool.json";
-import TroveManager from "../../contracts/artifacts/contracts/TroveManager.sol/TroveManager.json";
+import LoCManager from "../../contracts/artifacts/contracts/LoCManager.sol/LoCManager.json";
 import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
 import ZeroBaseParams from "../../contracts/artifacts/contracts/ZeroBaseParams.sol/ZeroBaseParams.json";
-import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
+import LoCManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/LoCManagerRedeemOps.sol/LoCManagerRedeemOps.json";
 import MockBalanceRedirectPresale from "../../contracts/artifacts/contracts/TestContracts/MockBalanceRedirectPresale.sol/MockBalanceRedirectPresale.json";
 import FeeDistributor from "../../contracts/artifacts/contracts/FeeDistributor.sol/FeeDistributor.json";
 import Ownable from "../../contracts/artifacts/contracts/Dependencies/Ownable.sol/Ownable.json";
@@ -157,13 +157,13 @@ const contractArtifacts = [
   ZUSDToken,
   ZEROStaking,
   ZEROToken,
-  MultiTroveGetter,
+  MultiLoCGetter,
   PriceFeed,
   PriceFeedTestnet,
-  SortedTroves,
+  SortedLoCs,
   StabilityPool,
-  TroveManager,
-  TroveManagerRedeemOps,
+  LoCManager,
+  LoCManagerRedeemOps,
   UpgradeableProxy,
   ZeroBaseParams,
   MockBalanceRedirectPresale,

@@ -8,35 +8,35 @@ import { Decimal } from "./Decimal";
 export const CRITICAL_COLLATERAL_RATIO = Decimal.from(1.5);
 
 /**
- * Collateral ratio below which a Trove can be liquidated in normal mode.
+ * Collateral ratio below which a LoC can be liquidated in normal mode.
  *
  * @public
  */
 export const MINIMUM_COLLATERAL_RATIO = Decimal.from(1.1);
 
 /**
- * Amount of ZUSD that's reserved for compensating the liquidator of a Trove.
+ * Amount of ZUSD that's reserved for compensating the liquidator of a LoC.
  *
  * @public
  */
 export const ZUSD_LIQUIDATION_RESERVE = Decimal.from(20);
 
 /**
- * A Trove must always have at least this much debt on top of the
+ * A LoC must always have at least this much debt on top of the
  * {@link ZUSD_LIQUIDATION_RESERVE | liquidation reserve}.
  *
  * @remarks
- * Any transaction that would result in a Trove with less net debt than this will be reverted.
+ * Any transaction that would result in a LoC with less net debt than this will be reverted.
  *
  * @public
  */
 export const ZUSD_MINIMUM_NET_DEBT = Decimal.from(180);
 
 /**
- * A Trove must always have at least this much debt.
+ * A LoC must always have at least this much debt.
  *
  * @remarks
- * Any transaction that would result in a Trove with less debt than this will be reverted.
+ * Any transaction that would result in a LoC with less debt than this will be reverted.
  *
  * @public
  */

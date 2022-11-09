@@ -73,7 +73,7 @@
         "type": "address"
       }
     ],
-    "name": "SortedTrovesAddressChanged",
+    "name": "SortedLoCsAddressChanged",
     "type": "event"
   },
   {
@@ -82,11 +82,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_troveManagerAddress",
+        "name": "_locManagerAddress",
         "type": "address"
       }
     ],
-    "name": "TroveManagerAddressChanged",
+    "name": "LoCManagerAddressChanged",
     "type": "event"
   },
   {
@@ -416,7 +416,7 @@
       },
       {
         "internalType": "address",
-        "name": "_troveManagerAddress",
+        "name": "_locManagerAddress",
         "type": "address"
       },
       {
@@ -432,10 +432,10 @@
   },
   {
     "inputs": [],
-    "name": "troveManager",
+    "name": "locManager",
     "outputs": [
       {
-        "internalType": "contract ITroveManager",
+        "internalType": "contract ILoCManager",
         "name": "",
         "type": "address"
       }

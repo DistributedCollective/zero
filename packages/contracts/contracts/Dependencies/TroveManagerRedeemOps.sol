@@ -2,28 +2,28 @@
 
 pragma solidity 0.6.11;
 
-import "./TroveManagerBase.sol";
+import "./LoCManagerBase.sol";
 
-contract TroveManagerRedeemOps is TroveManagerBase {
-    /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
-      request.  Applies pending rewards to a Trove before reducing its debt and coll.
+contract LoCManagerRedeemOps is LoCManagerBase {
+    /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many LoCs as are needed to fill the redemption
+      request.  Applies pending rewards to a LoC before reducing its debt and coll.
      
-      Note that if _amount is very large, this function can run out of gas, specially if traversed troves are small. This can be easily avoided by
+      Note that if _amount is very large, this function can run out of gas, specially if traversed locs are small. This can be easily avoided by
       splitting the total _amount in appropriate chunks and calling the function multiple times.
      
-      Param `_maxIterations` can also be provided, so the loop through Troves is capped (if it’s zero, it will be ignored).This makes it easier to
+      Param `_maxIterations` can also be provided, so the loop through LoCs is capped (if it’s zero, it will be ignored).This makes it easier to
       avoid OOG for the frontend, as only knowing approximately the average cost of an iteration is enough, without needing to know the “topology”
-      of the trove list. It also avoids the need to set the cap in stone in the contract, nor doing gas calculations, as both gas price and opcode
+      of the LoC list. It also avoids the need to set the cap in stone in the contract, nor doing gas calculations, as both gas price and opcode
       costs can vary.
      
-      All Troves that are redeemed from -- with the likely exception of the last one -- will end up with no debt left, therefore they will be closed.
-      If the last Trove does have some remaining debt, it has a finite ICR, and the reinsertion could be anywhere in the list, therefore it requires a hint.
-      A frontend should use getRedemptionHints() to calculate what the ICR of this Trove will be after redemption, and pass a hint for its position
-      in the sortedTroves list along with the ICR value that the hint was found for.
+      All LoCs that are redeemed from -- with the likely exception of the last one -- will end up with no debt left, therefore they will be closed.
+      If the last LoC does have some remaining debt, it has a finite ICR, and the reinsertion could be anywhere in the list, therefore it requires a hint.
+      A frontend should use getRedemptionHints() to calculate what the ICR of this LoC will be after redemption, and pass a hint for its position
+      in the sortedLoCs list along with the ICR value that the hint was found for.
      
       If another transaction modifies the list between calling getRedemptionHints() and passing the hints to redeemCollateral(), it
-      is very likely that the last (partially) redeemed Trove would end up with a different ICR than what the hint is for. In this case the
-      redemption will stop after the last completely redeemed Trove and the sender will keep the remaining ZUSD amount, which they can attempt
+      is very likely that the last (partially) redeemed LoC would end up with a different ICR than what the hint is for. In this case the
+      redemption will stop after the last completely redeemed LoC and the sender will keep the remaining ZUSD amount, which they can attempt
       to redeem later.
      */
     function redeemCollateral(
@@ -40,7 +40,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             defaultPool,
             _zusdToken,
             _zeroStaking,
-            sortedTroves,
+            sortedLoCs,
             collSurplusPool,
             gasPoolAddress
         );
@@ -62,31 +62,31 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
         if (
             _isValidFirstRedemptionHint(
-                contractsCache.sortedTroves,
+                contractsCache.sortedLoCs,
                 _firstRedemptionHint,
                 totals.price
             )
         ) {
             currentBorrower = _firstRedemptionHint;
         } else {
-            currentBorrower = contractsCache.sortedTroves.getLast();
-            // Find the first trove with ICR >= MCR
+            currentBorrower = contractsCache.sortedLoCs.getLast();
+            // Find the first LoC with ICR >= MCR
             while (
                 currentBorrower != address(0) &&
                 _getCurrentICR(currentBorrower, totals.price) < zeroBaseParams.MCR()
             ) {
-                currentBorrower = contractsCache.sortedTroves.getPrev(currentBorrower);
+                currentBorrower = contractsCache.sortedLoCs.getPrev(currentBorrower);
             }
         }
 
-        // Loop through the Troves starting from the one with lowest collateral ratio until _amount of ZUSD is exchanged for collateral
+        // Loop through the LoCs starting from the one with lowest collateral ratio until _amount of ZUSD is exchanged for collateral
         if (_maxIterations == 0) {
             _maxIterations = uint256(-1);
         }
         while (currentBorrower != address(0) && totals.remainingZUSD > 0 && _maxIterations > 0) {
             _maxIterations--;
-            // Save the address of the Trove preceding the current one, before potentially modifying the list
-            address nextUserToCheck = contractsCache.sortedTroves.getPrev(currentBorrower);
+            // Save the address of the LoC preceding the current one, before potentially modifying the list
+            address nextUserToCheck = contractsCache.sortedLoCs.getPrev(currentBorrower);
 
             _applyPendingRewards(
                 contractsCache.activePool,
@@ -94,7 +94,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
                 currentBorrower
             );
 
-            SingleRedemptionValues memory singleRedemption = _redeemCollateralFromTrove(
+            SingleRedemptionValues memory singleRedemption = _redeemCollateralFromLoC(
                 contractsCache,
                 currentBorrower,
                 totals.remainingZUSD,
@@ -104,7 +104,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
                 _partialRedemptionHintNICR
             );
 
-            if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
+            if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last LoC
 
             totals.totalZUSDToRedeem = totals.totalZUSDToRedeem.add(singleRedemption.ZUSDLot);
             totals.totalBTCDrawn = totals.totalBTCDrawn.add(singleRedemption.BTCLot);
@@ -112,7 +112,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             totals.remainingZUSD = totals.remainingZUSD.sub(singleRedemption.ZUSDLot);
             currentBorrower = nextUserToCheck;
         }
-        require(totals.totalBTCDrawn > 0, "TroveManager: Unable to redeem any amount");
+        require(totals.totalBTCDrawn > 0, "LoCManager: Unable to redeem any amount");
 
         // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
         // Use the saved total ZUSD supply value, from before it was reduced by the redemption.
@@ -143,24 +143,24 @@ contract TroveManagerRedeemOps is TroveManagerBase {
     }
 
     function _isValidFirstRedemptionHint(
-        ISortedTroves _sortedTroves,
+        ISortedLoCs _sortedLoCs,
         address _firstRedemptionHint,
         uint256 _price
     ) internal view returns (bool) {
         if (
             _firstRedemptionHint == address(0) ||
-            !_sortedTroves.contains(_firstRedemptionHint) ||
+            !_sortedLoCs.contains(_firstRedemptionHint) ||
             _getCurrentICR(_firstRedemptionHint, _price) < zeroBaseParams.MCR()
         ) {
             return false;
         }
 
-        address nextTrove = _sortedTroves.getNext(_firstRedemptionHint);
-        return nextTrove == address(0) || _getCurrentICR(nextTrove, _price) < zeroBaseParams.MCR();
+        address nextLoC = _sortedLoCs.getNext(_firstRedemptionHint);
+        return nextLoC == address(0) || _getCurrentICR(nextLoC, _price) < zeroBaseParams.MCR();
     }
 
-    /// Redeem as much collateral as possible from _borrower's Trove in exchange for ZUSD up to _maxZUSDamount
-    function _redeemCollateralFromTrove(
+    /// Redeem as much collateral as possible from _borrower's LoC in exchange for ZUSD up to _maxZUSDamount
+    function _redeemCollateralFromLoC(
         ContractsCache memory _contractsCache,
         address _borrower,
         uint256 _maxZUSDamount,
@@ -169,25 +169,25 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         address _lowerPartialRedemptionHint,
         uint256 _partialRedemptionHintNICR
     ) internal returns (SingleRedemptionValues memory singleRedemption) {
-        // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
+        // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the LoC minus the liquidation reserve
         singleRedemption.ZUSDLot = ZeroMath._min(
             _maxZUSDamount,
-            Troves[_borrower].debt.sub(ZUSD_GAS_COMPENSATION)
+            LoCs[_borrower].debt.sub(ZUSD_GAS_COMPENSATION)
         );
 
         // Get the BTCLot of equivalent value in USD
         singleRedemption.BTCLot = singleRedemption.ZUSDLot.mul(DECIMAL_PRECISION).div(_price);
 
-        // Decrease the debt and collateral of the current Trove according to the ZUSD lot and corresponding BTC to send
-        uint256 newDebt = (Troves[_borrower].debt).sub(singleRedemption.ZUSDLot);
-        uint256 newColl = (Troves[_borrower].coll).sub(singleRedemption.BTCLot);
+        // Decrease the debt and collateral of the current LoC according to the ZUSD lot and corresponding BTC to send
+        uint256 newDebt = (LoCs[_borrower].debt).sub(singleRedemption.ZUSDLot);
+        uint256 newColl = (LoCs[_borrower].coll).sub(singleRedemption.BTCLot);
 
         if (newDebt == ZUSD_GAS_COMPENSATION) {
-            // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
+            // No debt left in the LoC (except for the liquidation reserve), therefore the LoC gets closed
             _removeStake(_borrower);
-            _closeTrove(_borrower, Status.closedByRedemption);
-            _redeemCloseTrove(_contractsCache, _borrower, ZUSD_GAS_COMPENSATION, newColl);
-            emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.redeemCollateral);
+            _closeLoC(_borrower, Status.closedByRedemption);
+            _redeemCloseLoC(_contractsCache, _borrower, ZUSD_GAS_COMPENSATION, newColl);
+            emit LoCUpdated(_borrower, 0, 0, 0, LoCManagerOperation.redeemCollateral);
         } else {
             uint256 newNICR = ZeroMath._computeNominalCR(newColl, newDebt);
 
@@ -202,23 +202,23 @@ contract TroveManagerRedeemOps is TroveManagerBase {
                 return singleRedemption;
             }
 
-            _contractsCache.sortedTroves.reInsert(
+            _contractsCache.sortedLoCs.reInsert(
                 _borrower,
                 newNICR,
                 _upperPartialRedemptionHint,
                 _lowerPartialRedemptionHint
             );
 
-            Troves[_borrower].debt = newDebt;
-            Troves[_borrower].coll = newColl;
+            LoCs[_borrower].debt = newDebt;
+            LoCs[_borrower].coll = newColl;
             _updateStakeAndTotalStakes(_borrower);
 
-            emit TroveUpdated(
+            emit LoCUpdated(
                 _borrower,
                 newDebt,
                 newColl,
-                Troves[_borrower].stake,
-                TroveManagerOperation.redeemCollateral
+                LoCs[_borrower].stake,
+                LoCManagerOperation.redeemCollateral
             );
         }
 
@@ -257,13 +257,13 @@ contract TroveManagerRedeemOps is TroveManagerBase {
     }
 
     /**
-      Called when a full redemption occurs, and closes the trove.
+      Called when a full redemption occurs, and closes the loc.
       The redeemer swaps (debt - liquidation reserve) ZUSD for (debt - liquidation reserve) worth of BTC, so the ZUSD liquidation reserve left corresponds to the remaining debt.
-      In order to close the trove, the ZUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
-      The debt recorded on the trove's struct is zero'd elswhere, in _closeTrove.
-      Any surplus BTC left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
+      In order to close the loc, the ZUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
+      The debt recorded on the LoC's struct is zero'd elswhere, in _closeLoC.
+      Any surplus BTC left in the loc, is sent to the Coll surplus pool, and can be later claimed by the borrower.
      */
-    function _redeemCloseTrove(
+    function _redeemCloseLoC(
         ContractsCache memory _contractsCache,
         address _borrower,
         uint256 _ZUSD,

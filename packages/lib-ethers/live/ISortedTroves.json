@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "ISortedTroves",
-  "sourceName": "contracts/Interfaces/ISortedTroves.sol",
+  "contractName": "ISortedLoCs",
+  "sourceName": "contracts/Interfaces/ISortedLoCs.sol",
   "abi": [
     {
       "anonymous": false,
@@ -58,7 +58,7 @@
           "type": "address"
         }
       ],
-      "name": "SortedTrovesAddressChanged",
+      "name": "SortedLoCsAddressChanged",
       "type": "event"
     },
     {
@@ -308,7 +308,7 @@
         },
         {
           "internalType": "address",
-          "name": "_TroveManagerAddress",
+          "name": "_LoCManagerAddress",
           "type": "address"
         },
         {

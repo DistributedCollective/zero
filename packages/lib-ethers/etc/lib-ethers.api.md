@@ -35,15 +35,15 @@ import { TransactableZero } from '@sovryn-zero/lib-base';
 import { TransactionFailedError } from '@sovryn-zero/lib-base';
 import { TransactionReceipt } from '@ethersproject/abstract-provider';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
-import { Trove } from '@sovryn-zero/lib-base';
-import { TroveAdjustmentDetails } from '@sovryn-zero/lib-base';
-import { TroveAdjustmentParams } from '@sovryn-zero/lib-base';
-import { TroveClosureDetails } from '@sovryn-zero/lib-base';
-import { TroveCreationDetails } from '@sovryn-zero/lib-base';
-import { TroveCreationParams } from '@sovryn-zero/lib-base';
-import { TroveListingParams } from '@sovryn-zero/lib-base';
-import { TroveWithPendingRedistribution } from '@sovryn-zero/lib-base';
-import { UserTrove } from '@sovryn-zero/lib-base';
+import { LoC } from '@sovryn-zero/lib-base';
+import { LoCAdjustmentDetails } from '@sovryn-zero/lib-base';
+import { LoCAdjustmentParams } from '@sovryn-zero/lib-base';
+import { LoCClosureDetails } from '@sovryn-zero/lib-base';
+import { LoCCreationDetails } from '@sovryn-zero/lib-base';
+import { LoCCreationParams } from '@sovryn-zero/lib-base';
+import { LoCListingParams } from '@sovryn-zero/lib-base';
+import { LoCWithPendingRedistribution } from '@sovryn-zero/lib-base';
+import { UserLoC } from '@sovryn-zero/lib-base';
 import { ZEROStake } from '@sovryn-zero/lib-base';
 
 // @public
@@ -87,17 +87,17 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // @internal
     constructor(readable: ReadableEthersZero);
     // (undocumented)
-    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
-    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails>;
+    closeNueLoC(overrides?: EthersTransactionOverrides): Promise<LoCClosureDetails>;
     // (undocumented)
-    closeTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails>;
+    closeLoC(overrides?: EthersTransactionOverrides): Promise<LoCClosureDetails>;
     // @internal (undocumented)
     static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams: EthersZeroConnectionOptionalParams & {
         useStore: "blockPolled";
@@ -105,7 +105,7 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams?: EthersZeroConnectionOptionalParams): Promise<EthersZero>;
     readonly connection: EthersZeroConnection;
     // (undocumented)
-    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<StabilityDepositChangeDetails>;
     // @internal (undocumented)
@@ -115,11 +115,11 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // @internal (undocumented)
     static _from(connection: EthersZeroConnection): EthersZero;
     // @internal (undocumented)
-    _getActivePool(overrides?: EthersCallOverrides): Promise<Trove>;
+    _getActivePool(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
     getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // @internal (undocumented)
-    _getDefaultPool(overrides?: EthersCallOverrides): Promise<Trove>;
+    _getDefaultPool(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
     getFees(overrides?: EthersCallOverrides): Promise<Fees>;
     // @internal (undocumented)
@@ -127,7 +127,7 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // (undocumented)
     getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<FrontendStatus>;
     // (undocumented)
-    getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
+    getNumberOfLoCs(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)
     getPrice(overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
@@ -135,21 +135,21 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // (undocumented)
     getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<StabilityDeposit>;
     // (undocumented)
-    getTotal(overrides?: EthersCallOverrides): Promise<Trove>;
+    getTotal(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
-    getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove>;
+    getTotalRedistributed(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
     getTotalStakedZERO(overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
-    getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove>;
+    getLoC(address?: string, overrides?: EthersCallOverrides): Promise<UserLoC>;
     // (undocumented)
-    getTroveBeforeRedistribution(address?: string, overrides?: EthersCallOverrides): Promise<TroveWithPendingRedistribution>;
+    getLoCBeforeRedistribution(address?: string, overrides?: EthersCallOverrides): Promise<LoCWithPendingRedistribution>;
     // @internal (undocumented)
-    getTroves(params: TroveListingParams & {
+    getLoCs(params: LoCListingParams & {
         beforeRedistribution: true;
-    }, overrides?: EthersCallOverrides): Promise<TroveWithPendingRedistribution[]>;
+    }, overrides?: EthersCallOverrides): Promise<LoCWithPendingRedistribution[]>;
     // (undocumented)
-    getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
+    getLoCs(params: LoCListingParams, overrides?: EthersCallOverrides): Promise<UserLoC[]>;
     // (undocumented)
     getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
@@ -163,18 +163,18 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // (undocumented)
     liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<LiquidationDetails>;
     // (undocumented)
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<LiquidationDetails>;
+    liquidateUpTo(maximumNumberOfLoCsToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<LiquidationDetails>;
     // (undocumented)
-    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveCreationDetails>;
+    openNueLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCCreationDetails>;
     // (undocumented)
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveCreationDetails>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCCreationDetails>;
     readonly populate: PopulatableEthersZero;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<RedemptionDetails>;
     // (undocumented)
     registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
-    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     readonly send: SendableEthersZero;
     // (undocumented)
     sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
@@ -185,11 +185,11 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // (undocumented)
     stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
-    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<CollateralGainTransferDetails>;
+    transferCollateralGainToLoC(overrides?: EthersTransactionOverrides): Promise<CollateralGainTransferDetails>;
     // (undocumented)
     unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
-    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
     withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<StabilityPoolGainsWithdrawalDetails>;
     // (undocumented)
@@ -267,17 +267,17 @@ export type EthersTransactionResponse = TransactionResponse;
 export class ObservableEthersZero implements ObservableZero {
     constructor(readable: ReadableEthersZero);
     // (undocumented)
-    watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
+    watchNumberOfLoCs(onNumberOfLoCsChanged: (numberOfLoCs: number) => void): () => void;
     // (undocumented)
     watchPrice(onPriceChanged: (price: Decimal) => void): () => void;
     // (undocumented)
     watchStabilityDeposit(onStabilityDepositChanged: (stabilityDeposit: StabilityDeposit) => void, address?: string): () => void;
     // (undocumented)
-    watchTotal(onTotalChanged: (total: Trove) => void): () => void;
+    watchTotal(onTotalChanged: (total: LoC) => void): () => void;
     // (undocumented)
-    watchTotalRedistributed(onTotalRedistributedChanged: (totalRedistributed: Trove) => void): () => void;
+    watchTotalRedistributed(onTotalRedistributedChanged: (totalRedistributed: LoC) => void): () => void;
     // (undocumented)
-    watchTroveWithoutRewards(onTroveChanged: (trove: TroveWithPendingRedistribution) => void, address?: string): () => void;
+    watchLoCWithoutRewards(onLoCChanged: (loc: LoCWithPendingRedistribution) => void, address?: string): () => void;
     // (undocumented)
     watchZUSDBalance(onZUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
     // (undocumented)
@@ -288,35 +288,35 @@ export class ObservableEthersZero implements ObservableZero {
 export class PopulatableEthersZero implements PopulatableZero<EthersTransactionReceipt, EthersTransactionResponse, EthersPopulatedTransaction> {
     constructor(readable: ReadableEthersZero);
     // (undocumented)
-    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
+    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>>;
+    closeNueLoC(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCClosureDetails>>;
     // (undocumented)
-    closeTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>>;
+    closeLoC(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCClosureDetails>>;
     // (undocumented)
-    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
+    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<StabilityDepositChangeDetails>>;
     // (undocumented)
     liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>>;
+    liquidateUpTo(maximumNumberOfLoCsToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>>;
+    openNueLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersRedemption>;
     // (undocumented)
     registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
+    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
@@ -326,11 +326,11 @@ export class PopulatableEthersZero implements PopulatableZero<EthersTransactionR
     // (undocumented)
     stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<CollateralGainTransferDetails>>;
+    transferCollateralGainToLoC(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<CollateralGainTransferDetails>>;
     // (undocumented)
     unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
+    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<StabilityPoolGainsWithdrawalDetails>>;
     // (undocumented)
@@ -381,11 +381,11 @@ export class ReadableEthersZero implements ReadableZero {
     // @internal (undocumented)
     static _from(connection: EthersZeroConnection): ReadableEthersZero;
     // @internal (undocumented)
-    _getActivePool(overrides?: EthersCallOverrides): Promise<Trove>;
+    _getActivePool(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
     getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // @internal (undocumented)
-    _getDefaultPool(overrides?: EthersCallOverrides): Promise<Trove>;
+    _getDefaultPool(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
     getFees(overrides?: EthersCallOverrides): Promise<Fees>;
     // @internal (undocumented)
@@ -393,7 +393,7 @@ export class ReadableEthersZero implements ReadableZero {
     // (undocumented)
     getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<FrontendStatus>;
     // (undocumented)
-    getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
+    getNumberOfLoCs(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)
     getPrice(overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
@@ -401,21 +401,21 @@ export class ReadableEthersZero implements ReadableZero {
     // (undocumented)
     getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<StabilityDeposit>;
     // (undocumented)
-    getTotal(overrides?: EthersCallOverrides): Promise<Trove>;
+    getTotal(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
-    getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove>;
+    getTotalRedistributed(overrides?: EthersCallOverrides): Promise<LoC>;
     // (undocumented)
     getTotalStakedZERO(overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
-    getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove>;
+    getLoC(address?: string, overrides?: EthersCallOverrides): Promise<UserLoC>;
     // (undocumented)
-    getTroveBeforeRedistribution(address?: string, overrides?: EthersCallOverrides): Promise<TroveWithPendingRedistribution>;
+    getLoCBeforeRedistribution(address?: string, overrides?: EthersCallOverrides): Promise<LoCWithPendingRedistribution>;
     // @internal (undocumented)
-    getTroves(params: TroveListingParams & {
+    getLoCs(params: LoCListingParams & {
         beforeRedistribution: true;
-    }, overrides?: EthersCallOverrides): Promise<TroveWithPendingRedistribution[]>;
+    }, overrides?: EthersCallOverrides): Promise<LoCWithPendingRedistribution[]>;
     // (undocumented)
-    getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
+    getLoCs(params: LoCListingParams, overrides?: EthersCallOverrides): Promise<UserLoC[]>;
     // (undocumented)
     getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
@@ -440,35 +440,35 @@ export const _redeemMaxIterations = 70;
 export class SendableEthersZero implements SendableZero<EthersTransactionReceipt, EthersTransactionResponse> {
     constructor(populatable: PopulatableEthersZero);
     // (undocumented)
-    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
+    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveClosureDetails>>;
+    closeNueLoC(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCClosureDetails>>;
     // (undocumented)
-    closeTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveClosureDetails>>;
+    closeLoC(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCClosureDetails>>;
     // (undocumented)
-    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
+    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<StabilityDepositChangeDetails>>;
     // (undocumented)
     liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LiquidationDetails>>;
+    liquidateUpTo(maximumNumberOfLoCsToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveCreationDetails>>;
+    openNueLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveCreationDetails>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<RedemptionDetails>>;
     // (undocumented)
     registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
+    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
@@ -478,11 +478,11 @@ export class SendableEthersZero implements SendableZero<EthersTransactionReceipt
     // (undocumented)
     stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<CollateralGainTransferDetails>>;
+    transferCollateralGainToLoC(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<CollateralGainTransferDetails>>;
     // (undocumented)
     unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
+    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<StabilityPoolGainsWithdrawalDetails>>;
     // (undocumented)
@@ -503,11 +503,11 @@ export class SentEthersZeroTransaction<T = unknown> implements SentZeroTransacti
 }
 
 // @internal (undocumented)
-export interface _TroveChangeWithFees<T> {
+export interface _LoCChangeWithFees<T> {
     // (undocumented)
     fee: Decimal;
     // (undocumented)
-    newTrove: Trove;
+    newLoC: LoC;
     // (undocumented)
     params: T;
 }

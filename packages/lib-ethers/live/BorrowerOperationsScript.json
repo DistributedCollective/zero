@@ -65,7 +65,7 @@
           "type": "address"
         }
       ],
-      "name": "adjustTrove",
+      "name": "adjustLoC",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -79,7 +79,7 @@
     },
     {
       "inputs": [],
-      "name": "closeTrove",
+      "name": "closeLoC",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -107,7 +107,7 @@
           "type": "address"
         }
       ],
-      "name": "openTrove",
+      "name": "openLoC",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"

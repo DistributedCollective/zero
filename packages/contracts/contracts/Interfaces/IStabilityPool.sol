@@ -5,11 +5,11 @@ pragma solidity 0.6.11;
 /*
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
  *
- * When a trove is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
+ * When a LoC is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
  * ZUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of ZUSD tokens in the Stability Pool is burned.
  *
  * Thus, a liquidation causes each depositor to receive a ZUSD loss, in proportion to their deposit as a share of total deposits.
- * They also receive an BTC gain, as the BTC collateral of the liquidated trove is distributed among Stability depositors,
+ * They also receive an BTC gain, as the BTC collateral of the liquidated LoC is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
@@ -41,11 +41,11 @@ interface IStabilityPool {
     event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
     event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
-    event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
+    event SortedLoCsAddressChanged(address _newSortedLoCsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
 
@@ -75,20 +75,20 @@ interface IStabilityPool {
      * @dev initializer function, checks addresses are contracts
      * @param _zeroBaseParamsAddress LiquidityBaseParams contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
-     * @param _troveManagerAddress TroveManager contract address
+     * @param _locManagerAddress LoCManager contract address
      * @param _activePoolAddress ActivePool contract address
      * @param _zusdTokenAddress ZUSDToken contract address
-     * @param _sortedTrovesAddress SortedTroves contract address
+     * @param _sortedLoCsAddress SortedLoCs contract address
      * @param _priceFeedAddress PriceFeed contract address
      * @param _communityIssuanceAddress CommunityIssuanceAddress
     */
     function setAddresses(
         address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress,
         address _zusdTokenAddress,
-        address _sortedTrovesAddress,
+        address _sortedLoCsAddress,
         address _priceFeedAddress,
         address _communityIssuanceAddress
     ) external;
@@ -111,7 +111,7 @@ interface IStabilityPool {
 
     /**
      * @notice Initial checks:
-     *    - _amount is zero or there are no under collateralized troves left in the system
+     *    - _amount is zero or there are no under collateralized locs left in the system
      *    - User has a non zero deposit
      *    ---
      *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
@@ -128,19 +128,19 @@ interface IStabilityPool {
     /**
      * @notice Initial checks:
      *    - User has a non zero deposit
-     *    - User has an open trove
+     *    - User has an open loc
      *    - User has some BTC gain
      *    ---
      *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *    - Sends all depositor's ZERO gain to  depositor
      *    - Sends all tagged front end's ZERO gain to the tagged front end
-     *    - Transfers the depositor's entire BTC gain from the Stability Pool to the caller's trove
+     *    - Transfers the depositor's entire BTC gain from the Stability Pool to the caller's loc
      *    - Leaves their compounded deposit in the Stability Pool
      *    - Updates snapshots for deposit and tagged front end stake
-     * @param _upperHint upper trove id hint
-     * @param _lowerHint lower trove id hint
+     * @param _upperHint upper LoC id hint
+     * @param _lowerHint lower LoC id hint
      */
-    function withdrawBTCGainToTrove(address _upperHint, address _lowerHint) external;
+    function withdrawBTCGainToLoC(address _upperHint, address _lowerHint) external;
 
     /**
      * @notice Initial checks:
@@ -155,11 +155,11 @@ interface IStabilityPool {
 
     /**
      * @notice Initial checks:
-     *    - Caller is TroveManager
+     *    - Caller is LoCManager
      *    ---
      *    Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
-     *    and transfers the Trove's BTC collateral from ActivePool to StabilityPool.
-     *    Only called by liquidation functions in the TroveManager.
+     *    and transfers the LoC's BTC collateral from ActivePool to StabilityPool.
+     *    Only called by liquidation functions in the LoCManager.
      * @param _debt debt to cancel
      * @param _coll collateral to transfer
      */
@@ -172,7 +172,7 @@ interface IStabilityPool {
     function getBTC() external view returns (uint);
 
     /**
-     * @return ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+     * @return ZUSD held in the pool. Changes when users deposit/withdraw, and when LoC debt is offset.
      */
     function getTotalZUSDDeposits() external view returns (uint);
 

@@ -67,12 +67,12 @@ drift_liquidity=1.0003
 redemption_star = 0.8
 delta = -20
 
-#close troves
-sd_closetroves=0.5
+#close locs
+sd_closelocs=0.5
 #sensitivity to ZUSD price
 beta = 0.2
 
-#open troves
+#open locs
 distribution_parameter1_BTC_quantity=10
 distribution_parameter2_BTC_quantity=500
 distribution_parameter1_CR = 1.1
@@ -80,7 +80,7 @@ distribution_parameter2_CR = 0.1
 distribution_parameter3_CR = 16
 distribution_parameter1_inattention = 4
 distribution_parameter2_inattention = 0.08
-sd_opentroves=0.5
+sd_openlocs=0.5
 n_steady=0.5
 initial_open=10
 
@@ -117,23 +117,23 @@ for i in range(1, month):
   shock_ZERO = random.normalvariate(0,sd_ZERO)  
   price_ZERO.append(price_ZERO[i-1]*(1+shock_ZERO)*(1+drift_ZERO))
 
-"""# Troves
+"""# LoCs
 
-Liquidate Troves
+Liquidate LoCs
 """
 
-def liquidate_troves(troves, index, data):
-  troves['CR_current'] = troves['BTC_Price']*troves['BTC_Quantity']/troves['Supply']
+def liquidate_locs(locs, index, data):
+  locs['CR_current'] = locs['BTC_Price']*locs['BTC_Quantity']/locs['Supply']
   price_ZUSD_previous = data.loc[index-1,'Price_ZUSD']
   price_ZERO_previous = data.loc[index-1,'price_ZERO']
   stability_pool_previous = data.loc[index-1, 'stability']
 
-  troves_liquidated = troves[troves.CR_current < 1.1]
-  troves = troves[troves.CR_current >= 1.1]
-  debt_liquidated = troves_liquidated['Supply'].sum()
-  BTC_liquidated = troves_liquidated['BTC_Quantity'].sum()
-  n_liquidate = troves_liquidated.shape[0]
-  troves = troves.reset_index(drop = True)
+  locs_liquidated = locs[locs.CR_current < 1.1]
+  locs = locs[locs.CR_current >= 1.1]
+  debt_liquidated = locs_liquidated['Supply'].sum()
+  BTC_liquidated = locs_liquidated['BTC_Quantity'].sum()
+  n_liquidate = locs_liquidated.shape[0]
+  locs = locs.reset_index(drop = True)
 
   liquidation_gain = BTC_liquidated*price_BTC_current - debt_liquidated*price_ZUSD_previous
   airdrop_gain = price_ZERO_previous * quantity_ZERO_airdrop
@@ -148,78 +148,78 @@ def liquidate_troves(troves, index, data):
   else:
     return_stability = (365/30)*(data.loc[index-month:index, 'liquidation_gain'].sum()+data.loc[index-month:index, 'airdrop_gain'].sum())/(price_ZUSD_previous*stability_pool_previous)
   
-  return[troves, return_stability, debt_liquidated, BTC_liquidated, liquidation_gain, airdrop_gain, n_liquidate]
+  return[locs, return_stability, debt_liquidated, BTC_liquidated, liquidation_gain, airdrop_gain, n_liquidate]
 
-"""Close Troves"""
+"""Close LoCs"""
 
-def close_troves(troves, index2, price_ZUSD_previous):
+def close_locs(locs, index2, price_ZUSD_previous):
   np.random.seed(208+index2)
-  shock_closetroves = np.random.normal(0,sd_closetroves)
-  n_troves = troves.shape[0]
+  shock_closelocs = np.random.normal(0,sd_closelocs)
+  n_locs = locs.shape[0]
 
   if index2 <= 240:
-    number_closetroves = np.random.uniform(0,1)
+    number_closelocs = np.random.uniform(0,1)
   elif price_ZUSD_previous >=1:
-    number_closetroves = max(0, n_steady * (1+shock_closetroves))
+    number_closelocs = max(0, n_steady * (1+shock_closelocs))
   else:
-    number_closetroves = max(0, n_steady * (1+shock_closetroves)) + beta*(1-price_ZUSD_previous)*n_troves
+    number_closelocs = max(0, n_steady * (1+shock_closelocs)) + beta*(1-price_ZUSD_previous)*n_locs
   
-  number_closetroves = int(round(number_closetroves))
+  number_closelocs = int(round(number_closelocs))
   
   random.seed(293+100*index2)
-  drops = list(random.sample(range(len(troves)), number_closetroves))
-  troves = troves.drop(drops)
-  troves = troves.reset_index(drop=True)
-  if len(troves) < number_closetroves:
-    number_closetroves = -999
+  drops = list(random.sample(range(len(locs)), number_closelocs))
+  locs = locs.drop(drops)
+  locs = locs.reset_index(drop=True)
+  if len(locs) < number_closelocs:
+    number_closelocs = -999
 
-  return[troves, number_closetroves]
+  return[locs, number_closelocs]
 
-"""Adjust Troves"""
+"""Adjust LoCs"""
 
-def adjust_troves(troves, index):
+def adjust_locs(locs, index):
   issuance_ZUSD_adjust = 0
   random.seed(57984-3*index)
   ratio = random.uniform(0,1)
-  for i in range(0, troves.shape[0]):
+  for i in range(0, locs.shape[0]):
     random.seed(187*index + 3*i)
-    working_trove = troves.iloc[i,:]
+    working_loc = locs.iloc[i,:]
     p = random.uniform(0,1)
-    check = (working_trove['CR_current']-working_trove['CR_initial'])/(working_trove['CR_initial']*working_trove['Rational_inattention'])
+    check = (working_loc['CR_current']-working_loc['CR_initial'])/(working_loc['CR_initial']*working_loc['Rational_inattention'])
 
-  #A part of the troves are adjusted by adjusting debt
+  #A part of the locs are adjusted by adjusting debt
     if p >= ratio:
       if check<-1:
-        working_trove['Supply'] = working_trove['BTC_Price']*working_trove['BTC_Quantity']/working_trove['CR_initial']
+        working_loc['Supply'] = working_loc['BTC_Price']*working_loc['BTC_Quantity']/working_loc['CR_initial']
       if check>2:
-        supply_new = working_trove['BTC_Price']*working_trove['BTC_Quantity']/working_trove['CR_initial']
-        issuance_ZUSD_adjust = issuance_ZUSD_adjust + rate_issuance * (supply_new - working_trove['Supply'])
-        working_trove['Supply'] = supply_new
-  #Another part of the troves are adjusted by adjusting collaterals
+        supply_new = working_loc['BTC_Price']*working_loc['BTC_Quantity']/working_loc['CR_initial']
+        issuance_ZUSD_adjust = issuance_ZUSD_adjust + rate_issuance * (supply_new - working_loc['Supply'])
+        working_loc['Supply'] = supply_new
+  #Another part of the locs are adjusted by adjusting collaterals
     if p < ratio and (check < -1 or check > 2):
-      working_trove['BTC_Quantity'] = working_trove['CR_initial']*working_trove['Supply']/working_trove['BTC_Price']
+      working_loc['BTC_Quantity'] = working_loc['CR_initial']*working_loc['Supply']/working_loc['BTC_Price']
     
-    troves.loc[i] = working_trove
-  return[troves, issuance_ZUSD_adjust]
+    locs.loc[i] = working_loc
+  return[locs, issuance_ZUSD_adjust]
 
-"""Open Troves"""
+"""Open LoCs"""
 
-def open_troves(troves, index1, price_ZUSD_previous):
+def open_locs(locs, index1, price_ZUSD_previous):
   random.seed(2019*index1)  
   issuance_ZUSD_open = 0
-  shock_opentroves = random.normalvariate(0,sd_opentroves)
-  n_troves = troves.shape[0]
+  shock_openlocs = random.normalvariate(0,sd_openlocs)
+  n_locs = locs.shape[0]
 
   if index1<=0:
-    number_opentroves = initial_open
+    number_openlocs = initial_open
   elif price_ZUSD_previous <=1 + rate_issuance:
-    number_opentroves = max(0, n_steady * (1+shock_opentroves))
+    number_openlocs = max(0, n_steady * (1+shock_openlocs))
   else:
-    number_opentroves = max(0, n_steady * (1+shock_opentroves)) + alpha*(price_ZUSD_previous-rate_issuance-1)*n_troves
+    number_openlocs = max(0, n_steady * (1+shock_openlocs)) + alpha*(price_ZUSD_previous-rate_issuance-1)*n_locs
   
-  number_opentroves = int(round(float(number_opentroves)))
+  number_openlocs = int(round(float(number_openlocs)))
 
-  for i in range(0, number_opentroves):
+  for i in range(0, number_openlocs):
     price_BTC_current = price_BTC[index1]
     
     np.random.seed(2033 + index1 + i*i)
@@ -231,15 +231,15 @@ def open_troves(troves, index1, price_ZUSD_previous):
     np.random.seed(209870- index1 + i*i)
     rational_inattention = np.random.gamma(distribution_parameter1_inattention, scale=distribution_parameter2_inattention)
     
-    supply_trove = price_BTC_current * quantity_BTC / CR_ratio
-    issuance_ZUSD_open = issuance_ZUSD_open + rate_issuance * supply_trove
+    supply_loc = price_BTC_current * quantity_BTC / CR_ratio
+    issuance_ZUSD_open = issuance_ZUSD_open + rate_issuance * supply_loc
 
     new_row = {"BTC_Price": price_BTC_current, "BTC_Quantity": quantity_BTC, 
-               "CR_initial": CR_ratio, "Supply": supply_trove, 
+               "CR_initial": CR_ratio, "Supply": supply_loc, 
                "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
-    troves = troves.append(new_row, ignore_index=True)
+    locs = locs.append(new_row, ignore_index=True)
 
-  return[troves, number_opentroves, issuance_ZUSD_open]
+  return[locs, number_openlocs, issuance_ZUSD_open]
 
 """# ZUSD Market
 
@@ -258,14 +258,14 @@ def stability_update(stability_pool_previous, return_previous, index):
 
 """ZUSD Price, liquidity pool, and redemption"""
 
-def price_stabilizer(troves, index, data, stability_pool, n_open):
+def price_stabilizer(locs, index, data, stability_pool, n_open):
   issuance_ZUSD_stabilizer = 0
   redemption_fee = 0
   n_redempt = 0
   redempted = 0
   redemption_pool = 0  
 #Calculating Price
-  supply = troves['Supply'].sum()
+  supply = locs['Supply'].sum()
   np.random.seed(20*index)
   shock_liquidity = np.random.normal(0,sd_liquidity)
   liquidity_pool_previous = float(data['liquidity'][index-1])
@@ -279,18 +279,18 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
 #Stabilizer
   #Ceiling Arbitrageurs
   if price_ZUSD_current > 1.1 + rate_issuance:
-    #supply_current = sum(troves['Supply'])
+    #supply_current = sum(locs['Supply'])
     supply_wanted=stability_pool+liquidity_pool_previous*(drift_liquidity+shock_liquidity)*((1.1+rate_issuance)/price_ZUSD_previous)**delta
-    supply_trove = supply_wanted - supply
+    supply_loc = supply_wanted - supply
 
     CR_ratio = 1.1
     rational_inattention = 0.1
-    quantity_BTC = supply_trove * CR_ratio / price_BTC_current
-    issuance_ZUSD_stabilizer = rate_issuance * supply_trove
+    quantity_BTC = supply_loc * CR_ratio / price_BTC_current
+    issuance_ZUSD_stabilizer = rate_issuance * supply_loc
 
     new_row = {"BTC_Price": price_BTC_current, "BTC_Quantity": quantity_BTC, "CR_initial": CR_ratio,
-               "Supply": supply_trove, "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
-    troves = troves.append(new_row, ignore_index=True)
+               "Supply": supply_loc, "Rational_inattention": rational_inattention, "CR_current": CR_ratio}
+    locs = locs.append(new_row, ignore_index=True)
     price_ZUSD_current = 1.1 + rate_issuance
     #missing in the previous version  
     liquidity_pool = supply_wanted-stability_pool
@@ -303,7 +303,7 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
     shock_redemption = np.random.normal(0,sd_redemption)
     redemption_ratio = redemption_star * (1+shock_redemption)
 
-    #supply_current = sum(troves['Supply'])
+    #supply_current = sum(locs['Supply'])
     supply_target=stability_pool+liquidity_pool_previous*(drift_liquidity+shock_liquidity)*((1-rate_redemption)/price_ZUSD_previous)**delta
     supply_diff = supply - supply_target
     if supply_diff < redemption_ratio * liquidity_pool:
@@ -315,30 +315,30 @@ def price_stabilizer(troves, index, data, stability_pool, n_open):
       #liquidity_pool = (1-redemption_ratio)*liquidity_pool
       price_ZUSD_current= price_ZUSD_previous * (liquidity_pool/(liquidity_pool_previous*(drift_liquidity+shock_liquidity)))**(1/delta)
     
-    #Shutting down the riskiest troves
-    troves = troves.sort_values(by='CR_current', ascending = True)
-    quantity_working_trove = troves['Supply'][troves.index[0]]
-    redempted = quantity_working_trove
+    #Shutting down the riskiest locs
+    locs = locs.sort_values(by='CR_current', ascending = True)
+    quantity_working_loc = locs['Supply'][locs.index[0]]
+    redempted = quantity_working_loc
     while redempted <= redemption_pool:
-      troves = troves.drop(troves.index[0])
-      quantity_working_trove = troves['Supply'][troves.index[0]]
-      redempted = redempted + quantity_working_trove
+      locs = locs.drop(locs.index[0])
+      quantity_working_loc = locs['Supply'][locs.index[0]]
+      redempted = redempted + quantity_working_loc
       n_redempt = n_redempt + 1
     
     #Residuals
-    redempted = redempted - quantity_working_trove
+    redempted = redempted - quantity_working_loc
     residual = redemption_pool - redempted
-    wk = troves.index[0]
-    troves['Supply'][wk] = troves['Supply'][wk] - residual
-    troves['BTC_Quantity'][wk] = troves['BTC_Quantity'][wk] - residual/price_BTC_current
-    troves['CR_current'][wk] = price_BTC_current * troves['BTC_Quantity'][wk] / troves['Supply'][wk]
+    wk = locs.index[0]
+    locs['Supply'][wk] = locs['Supply'][wk] - residual
+    locs['BTC_Quantity'][wk] = locs['BTC_Quantity'][wk] - residual/price_BTC_current
+    locs['CR_current'][wk] = price_BTC_current * locs['BTC_Quantity'][wk] / locs['Supply'][wk]
 
     #Redemption Fee
     redemption_fee = rate_redemption * redemption_pool
     
 
-  troves = troves.reset_index(drop=True)
-  return[price_ZUSD_current, liquidity_pool, troves, issuance_ZUSD_stabilizer, redemption_fee, n_redempt, redemption_pool, n_open]
+  locs = locs.reset_index(drop=True)
+  return[price_ZUSD_current, liquidity_pool, locs, issuance_ZUSD_stabilizer, redemption_fee, n_redempt, redemption_pool, n_open]
 
 """# ZERO Market"""
 
@@ -365,31 +365,31 @@ def ZERO_market(index, data):
 
 #Defining Initials
 initials = {"Price_ZUSD":[1.00], "Price_BTC":[price_BTC_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
-            "n_troves":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
+            "n_locs":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
             "supply_ZUSD":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
             "price_ZERO":[price_ZERO_initial], "MC_ZERO":[0], "annualized_earning":[0]}
 data = pd.DataFrame(initials)
-troves= pd.DataFrame({"BTC_Price":[], "BTC_Quantity":[], "CR_initial":[], 
+locs= pd.DataFrame({"BTC_Price":[], "BTC_Quantity":[], "CR_initial":[], 
               "Supply":[], "Rational_inattention":[], "CR_current":[]})
-result_open = open_troves(troves, 0, data['Price_ZUSD'][0])
-troves = result_open[0]
+result_open = open_locs(locs, 0, data['Price_ZUSD'][0])
+locs = result_open[0]
 issuance_ZUSD_open = result_open[2]
 data.loc[0,'issuance_fee'] = issuance_ZUSD_open * initials["Price_ZUSD"][0]
-data.loc[0,'supply_ZUSD'] = troves["Supply"].sum()
-data.loc[0,'liquidity'] = 0.5*troves["Supply"].sum()
-data.loc[0,'stability'] = 0.5*troves["Supply"].sum()
+data.loc[0,'supply_ZUSD'] = locs["Supply"].sum()
+data.loc[0,'liquidity'] = 0.5*locs["Supply"].sum()
+data.loc[0,'stability'] = 0.5*locs["Supply"].sum()
 
 #Simulation Process
 for index in range(1, n_sim):
 #exogenous BTC price input
   price_BTC_current = price_BTC[index]
-  troves['BTC_Price'] = price_BTC_current
+  locs['BTC_Price'] = price_BTC_current
   price_ZUSD_previous = data.loc[index-1,'Price_ZUSD']
   price_ZERO_previous = data.loc[index-1,'price_ZERO']
 
-#trove liquidation & return of stability pool
-  result_liquidation = liquidate_troves(troves, index, data)
-  troves = result_liquidation[0]
+#LoC liquidation & return of stability pool
+  result_liquidation = liquidate_locs(locs, index, data)
+  locs = result_liquidation[0]
   return_stability = result_liquidation[1]
   debt_liquidated = result_liquidation[2]
   BTC_liquidated = result_liquidation[3]
@@ -397,21 +397,21 @@ for index in range(1, n_sim):
   airdrop_gain = result_liquidation[5]
   n_liquidate = result_liquidation[6]
 
-#close troves
-  result_close = close_troves(troves, index, price_ZUSD_previous)
-  troves = result_close[0]
+#close locs
+  result_close = close_locs(locs, index, price_ZUSD_previous)
+  locs = result_close[0]
   n_close = result_close[1]
   #if n_close<0:
   #  break
 
-#adjust troves
-  result_adjustment = adjust_troves(troves, index)
-  troves = result_adjustment[0]
+#adjust locs
+  result_adjustment = adjust_locs(locs, index)
+  locs = result_adjustment[0]
   issuance_ZUSD_adjust = result_adjustment[1]
 
-#open troves
-  result_open = open_troves(troves, index, price_ZUSD_previous)
-  troves = result_open[0]
+#open locs
+  result_open = open_locs(locs, index, price_ZUSD_previous)
+  locs = result_open[0]
   n_open = result_open[1]  
   issuance_ZUSD_open = result_open[2]
 
@@ -419,10 +419,10 @@ for index in range(1, n_sim):
   stability_pool = stability_update(data.loc[index-1,'stability'], return_stability, index)[0]
 
 #Calculating Price, Liquidity Pool, and Redemption
-  result_price = price_stabilizer(troves, index, data, stability_pool, n_open)
+  result_price = price_stabilizer(locs, index, data, stability_pool, n_open)
   price_ZUSD_current = result_price[0]
   liquidity_pool = result_price[1]
-  troves = result_price[2]
+  locs = result_price[2]
   issuance_ZUSD_stabilizer = result_price[3]
   redemption_fee = result_price[4]
   n_redempt = result_price[5]
@@ -439,13 +439,13 @@ for index in range(1, n_sim):
 
 #Summary
   issuance_fee = price_ZUSD_current * (issuance_ZUSD_adjust + issuance_ZUSD_open + issuance_ZUSD_stabilizer)
-  n_troves = troves.shape[0]
-  supply_ZUSD = troves['Supply'].sum()
+  n_locs = locs.shape[0]
+  supply_ZUSD = locs['Supply'].sum()
   if index >= month:
     price_ZERO.append(price_ZERO_current)
 
   new_row = {"Price_ZUSD":float(price_ZUSD_current), "Price_BTC":float(price_BTC_current), "n_open":float(n_open), "n_close":float(n_close), 
-             "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_troves":float(n_troves),
+             "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_locs":float(n_locs),
               "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_ZUSD":float(supply_ZUSD),
              "issuance_fee":float(issuance_fee), "redemption_fee":float(redemption_fee),
              "airdrop_gain":float(airdrop_gain), "liquidation_gain":float(liquidation_gain), "return_stability":float(return_stability), 
@@ -482,7 +482,7 @@ fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_troves'], name="Number of Troves"),
+    go.Scatter(x=data.index/720, y=data['n_locs'], name="Number of LoCs"),
     secondary_y=False,
 )
 fig.add_trace(
@@ -490,45 +490,45 @@ fig.add_trace(
     secondary_y=True,
 )
 fig.update_layout(
-    title_text="Dynamics of Trove Numbers and ZUSD Supply"
+    title_text="Dynamics of LoC Numbers and ZUSD Supply"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="Number of Troves", secondary_y=False)
+fig.update_yaxes(title_text="Number of LoCs", secondary_y=False)
 fig.update_yaxes(title_text="ZUSD Supply", secondary_y=True)
 fig.show()
 
 fig = make_subplots(rows=2, cols=1)
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_open'], name="Number of Troves Opened", mode='markers'),
+    go.Scatter(x=data.index/720, y=data['n_open'], name="Number of LoCs Opened", mode='markers'),
     row=1, col=1, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_close'], name="Number of Troves Closed", mode='markers'),
+    go.Scatter(x=data.index/720, y=data['n_close'], name="Number of LoCs Closed", mode='markers'),
     row=2, col=1, secondary_y=False
 )
 fig.update_layout(
-    title_text="Dynamics of Number of Troves Opened and Closed"
+    title_text="Dynamics of Number of LoCs Opened and Closed"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="Troves Opened", row=1, col=1)
-fig.update_yaxes(title_text="Troves Closed", row=2, col=1)
+fig.update_yaxes(title_text="LoCs Opened", row=1, col=1)
+fig.update_yaxes(title_text="LoCs Closed", row=2, col=1)
 fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_liquidate'], name="Number of Liquidated Troves", mode='markers'),
+    go.Scatter(x=data.index/720, y=data['n_liquidate'], name="Number of Liquidated LoCs", mode='markers'),
     secondary_y=False,
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_redempt'], name="Number of Redempted Troves", mode='markers'),
+    go.Scatter(x=data.index/720, y=data['n_redempt'], name="Number of Redempted LoCs", mode='markers'),
     secondary_y=False,
 )
 fig.update_layout(
-    title_text="Dynamics of Number of Liquidated and Redempted Troves"
+    title_text="Dynamics of Number of Liquidated and Redempted LoCs"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="Number of Liquidated Troves", secondary_y=False)
-fig.update_yaxes(title_text="Number of Redempted Troves", secondary_y=True)
+fig.update_yaxes(title_text="Number of Liquidated LoCs", secondary_y=False)
+fig.update_yaxes(title_text="Number of Redempted LoCs", secondary_y=True)
 fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -609,29 +609,29 @@ fig.update_yaxes(title_text="ZERO Price", secondary_y=False)
 fig.update_yaxes(title_text="ZERO Market Cap", secondary_y=True)
 fig.show()
 
-def trove_histogram(measure):
-  fig = px.histogram(troves, x=measure, title='Distribution of '+measure, nbins=25)
+def loc_histogram(measure):
+  fig = px.histogram(locs, x=measure, title='Distribution of '+measure, nbins=25)
   fig.show()
 
-troves
+locs
 
-trove_histogram('BTC_Quantity')
-trove_histogram('CR_initial')
-trove_histogram('Supply')
-trove_histogram('Rational_inattention')
-trove_histogram('CR_current')
+loc_histogram('BTC_Quantity')
+loc_histogram('CR_initial')
+loc_histogram('Supply')
+loc_histogram('Rational_inattention')
+loc_histogram('CR_current')
 
 import matplotlib.pyplot as plt
-plt.plot(troves["BTC_Quantity"])
+plt.plot(locs["BTC_Quantity"])
 plt.show()
 
-plt.plot(troves["CR_initial"])
+plt.plot(locs["CR_initial"])
 plt.show()
 
-plt.plot(troves["Supply"])
+plt.plot(locs["Supply"])
 plt.show()
 
-plt.plot(troves["CR_current"])
+plt.plot(locs["CR_current"])
 plt.show()
 
 data.describe()
@@ -645,36 +645,36 @@ issuance fee = redemption fee = base rate
 
 #Defining Initials
 initials = {"Price_ZUSD":[1.00], "Price_BTC":[price_BTC_initial], "n_open":[initial_open], "n_close":[0], "n_liquidate": [0], "n_redempt":[0], 
-            "n_troves":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
+            "n_locs":[initial_open], "stability":[0], "liquidity":[0], "redemption_pool":[0],
             "supply_ZUSD":[0],  "return_stability":[initial_return], "airdrop_gain":[0], "liquidation_gain":[0],  "issuance_fee":[0], "redemption_fee":[0],
             "price_ZERO":[price_ZERO_initial], "MC_ZERO":[0], "annualized_earning":[0], "base_rate":[base_rate_initial]}
 data2 = pd.DataFrame(initials)
-troves2= pd.DataFrame({"BTC_Price":[], "BTC_Quantity":[], "CR_initial":[], 
+locs2= pd.DataFrame({"BTC_Price":[], "BTC_Quantity":[], "CR_initial":[], 
               "Supply":[], "Rational_inattention":[], "CR_current":[]})
-result_open = open_troves(troves2, 0, data2['Price_ZUSD'][0])
-troves2 = result_open[0]
+result_open = open_locs(locs2, 0, data2['Price_ZUSD'][0])
+locs2 = result_open[0]
 issuance_ZUSD_open = result_open[2]
 data2.loc[0,'issuance_fee'] = issuance_ZUSD_open * initials["Price_ZUSD"][0]
-data2.loc[0,'supply_ZUSD'] = troves2["Supply"].sum()
-data2.loc[0,'liquidity'] = 0.5*troves2["Supply"].sum()
-data2.loc[0,'stability'] = 0.5*troves2["Supply"].sum()
+data2.loc[0,'supply_ZUSD'] = locs2["Supply"].sum()
+data2.loc[0,'liquidity'] = 0.5*locs2["Supply"].sum()
+data2.loc[0,'stability'] = 0.5*locs2["Supply"].sum()
 
 #Simulation Process
 for index in range(1, n_sim):
 #exogenous BTC price input
   price_BTC_current = price_BTC[index]
-  troves2['BTC_Price'] = price_BTC_current
+  locs2['BTC_Price'] = price_BTC_current
   price_ZUSD_previous = data2.loc[index-1,'Price_ZUSD']
   price_ZERO_previous = data2.loc[index-1,'price_ZERO']
 
 #policy function determines base rate
-  base_rate_current = 0.98 * data2.loc[index-1,'base_rate'] + 0.5*(data2.loc[index-1,'redemption_pool']/troves2['Supply'].sum())
+  base_rate_current = 0.98 * data2.loc[index-1,'base_rate'] + 0.5*(data2.loc[index-1,'redemption_pool']/locs2['Supply'].sum())
   rate_issuance = base_rate_current
   rate_redemption = base_rate_current
 
-#trove liquidation & return of stability pool
-  result_liquidation = liquidate_troves(troves2, index, data2)
-  troves2 = result_liquidation[0]
+#LoC liquidation & return of stability pool
+  result_liquidation = liquidate_locs(locs2, index, data2)
+  locs2 = result_liquidation[0]
   return_stability = result_liquidation[1]
   debt_liquidated = result_liquidation[2]
   BTC_liquidated = result_liquidation[3]
@@ -682,21 +682,21 @@ for index in range(1, n_sim):
   airdrop_gain = result_liquidation[5]
   n_liquidate = result_liquidation[6]
 
-#close troves
-  result_close = close_troves(troves2, index, price_ZUSD_previous)
-  troves2 = result_close[0]
+#close locs
+  result_close = close_locs(locs2, index, price_ZUSD_previous)
+  locs2 = result_close[0]
   n_close = result_close[1]
   #if n_close<0:
   #  break
 
-#adjust troves
-  result_adjustment = adjust_troves(troves2, index)
-  troves2 = result_adjustment[0]
+#adjust locs
+  result_adjustment = adjust_locs(locs2, index)
+  locs2 = result_adjustment[0]
   issuance_ZUSD_adjust = result_adjustment[1]
 
-#open troves
-  result_open = open_troves(troves2, index, price_ZUSD_previous)
-  troves2 = result_open[0]
+#open locs
+  result_open = open_locs(locs2, index, price_ZUSD_previous)
+  locs2 = result_open[0]
   n_open = result_open[1]  
   issuance_ZUSD_open = result_open[2]
 
@@ -704,10 +704,10 @@ for index in range(1, n_sim):
   stability_pool = stability_update(data2.loc[index-1,'stability'], return_stability, index)[0]
 
 #Calculating Price, Liquidity Pool, and Redemption
-  result_price = price_stabilizer(troves2, index, data2, stability_pool, n_open)
+  result_price = price_stabilizer(locs2, index, data2, stability_pool, n_open)
   price_ZUSD_current = result_price[0]
   liquidity_pool = result_price[1]
-  troves2 = result_price[2]
+  locs2 = result_price[2]
   issuance_ZUSD_stabilizer = result_price[3]
   redemption_fee = result_price[4]
   n_redempt = result_price[5]
@@ -724,13 +724,13 @@ for index in range(1, n_sim):
 
 #Summary
   issuance_fee = price_ZUSD_current * (issuance_ZUSD_adjust + issuance_ZUSD_open + issuance_ZUSD_stabilizer)
-  n_troves = troves2.shape[0]
-  supply_ZUSD = troves2['Supply'].sum()
+  n_locs = locs2.shape[0]
+  supply_ZUSD = locs2['Supply'].sum()
   if index >= month:
     price_ZERO.append(price_ZERO_current)
 
   new_row = {"Price_ZUSD":float(price_ZUSD_current), "Price_BTC":float(price_BTC_current), "n_open":float(n_open), "n_close":float(n_close), 
-             "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_troves":float(n_troves),
+             "n_liquidate":float(n_liquidate), "n_redempt": float(n_redempt), "n_locs":float(n_locs),
               "stability":float(stability_pool), "liquidity":float(liquidity_pool), "redemption_pool":float(redemption_pool), "supply_ZUSD":float(supply_ZUSD),
              "issuance_fee":float(issuance_fee), "redemption_fee":float(redemption_fee),
              "airdrop_gain":float(airdrop_gain), "liquidation_gain":float(liquidation_gain), "return_stability":float(return_stability), 
@@ -767,7 +767,7 @@ fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_troves'], name="Number of Troves"),
+    go.Scatter(x=data.index/720, y=data['n_locs'], name="Number of LoCs"),
     secondary_y=False,
 )
 fig.add_trace(
@@ -775,7 +775,7 @@ fig.add_trace(
     secondary_y=True,
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['n_troves'], name="Number of Troves New", line = dict(dash='dot')),
+    go.Scatter(x=data2.index/720, y=data2['n_locs'], name="Number of LoCs New", line = dict(dash='dot')),
     secondary_y=False,
 )
 fig.add_trace(
@@ -783,61 +783,61 @@ fig.add_trace(
     secondary_y=True,
 )
 fig.update_layout(
-    title_text="Dynamics of Trove Numbers and ZUSD Supply"
+    title_text="Dynamics of LoC Numbers and ZUSD Supply"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="Number of Troves", secondary_y=False)
+fig.update_yaxes(title_text="Number of LoCs", secondary_y=False)
 fig.update_yaxes(title_text="ZUSD Supply", secondary_y=True)
 fig.show()
 
 fig = make_subplots(rows=2, cols=2)
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_open'], name="Number of Troves Opened", mode='markers'),
+    go.Scatter(x=data.index/720, y=data['n_open'], name="Number of LoCs Opened", mode='markers'),
     row=1, col=1, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_close'], name="Number of Troves Closed", mode='markers'),
+    go.Scatter(x=data.index/720, y=data['n_close'], name="Number of LoCs Closed", mode='markers'),
     row=2, col=1, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['n_open'], name="Number of Troves Opened New", mode='markers'),
+    go.Scatter(x=data2.index/720, y=data2['n_open'], name="Number of LoCs Opened New", mode='markers'),
     row=1, col=2, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['n_close'], name="Number of Troves Closed New", mode='markers'),
+    go.Scatter(x=data2.index/720, y=data2['n_close'], name="Number of LoCs Closed New", mode='markers'),
     row=2, col=2, secondary_y=False
 )
 fig.update_layout(
-    title_text="Dynamics of Number of Troves Opened and Closed"
+    title_text="Dynamics of Number of LoCs Opened and Closed"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="Troves Opened", row=1, col=1)
-fig.update_yaxes(title_text="Troves Closed", row=2, col=1)
+fig.update_yaxes(title_text="LoCs Opened", row=1, col=1)
+fig.update_yaxes(title_text="LoCs Closed", row=2, col=1)
 fig.show()
 
 fig = make_subplots(rows=2, cols=1)
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_liquidate'], name="Number of Liquidated Troves"),
+    go.Scatter(x=data.index/720, y=data['n_liquidate'], name="Number of Liquidated LoCs"),
     row=1, col=1, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data.index/720, y=data['n_redempt'], name="Number of Redempted Troves"),
+    go.Scatter(x=data.index/720, y=data['n_redempt'], name="Number of Redempted LoCs"),
     row=2, col=1, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['n_liquidate'], name="Number of Liquidated Troves New", line = dict(dash='dot')),
+    go.Scatter(x=data2.index/720, y=data2['n_liquidate'], name="Number of Liquidated LoCs New", line = dict(dash='dot')),
     row=1, col=1, secondary_y=False
 )
 fig.add_trace(
-    go.Scatter(x=data2.index/720, y=data2['n_redempt'], name="Number of Redempted Troves New", line = dict(dash='dot')),
+    go.Scatter(x=data2.index/720, y=data2['n_redempt'], name="Number of Redempted LoCs New", line = dict(dash='dot')),
     row=2, col=1, secondary_y=False
 )
 fig.update_layout(
-    title_text="Dynamics of Number of Liquidated and Redempted Troves"
+    title_text="Dynamics of Number of Liquidated and Redempted LoCs"
 )
 fig.update_xaxes(tick0=0, dtick=1, title_text="Month")
-fig.update_yaxes(title_text="Troves Liquidated", row=1, col=1)
-fig.update_yaxes(title_text="Troves Redempted", row=2, col=1)
+fig.update_yaxes(title_text="LoCs Liquidated", row=1, col=1)
+fig.update_yaxes(title_text="LoCs Redempted", row=2, col=1)
 fig.show()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -996,12 +996,12 @@ fig.update_yaxes(title_text="Issuance Fee", secondary_y=False)
 fig.update_yaxes(title_text="Redemption Fee", secondary_y=True)
 fig.show()
 
-def trove2_histogram(measure):
-  fig = px.histogram(troves2, x=measure, title='Distribution of '+measure, nbins=25)
+def loc2_histogram(measure):
+  fig = px.histogram(locs2, x=measure, title='Distribution of '+measure, nbins=25)
   fig.show()
 
-trove2_histogram('BTC_Quantity')
-trove2_histogram('CR_initial')
-trove2_histogram('Supply')
-trove2_histogram('Rational_inattention')
-trove2_histogram('CR_current')
+loc2_histogram('BTC_Quantity')
+loc2_histogram('CR_initial')
+loc2_histogram('Supply')
+loc2_histogram('Rational_inattention')
+loc2_histogram('CR_current')

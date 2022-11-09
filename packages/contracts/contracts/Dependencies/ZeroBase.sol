@@ -11,7 +11,7 @@ import "../Interfaces/IZeroBase.sol";
 import "../Interfaces/IZeroBaseParams.sol";
 
 /**
- * Base contract for TroveManager, BorrowerOperations and StabilityPool. Contains global system constants and
+ * Base contract for LoCManager, BorrowerOperations and StabilityPool. Contains global system constants and
  * common functions.
  */
 contract ZeroBase is BaseMath, IZeroBase {
@@ -19,10 +19,10 @@ contract ZeroBase is BaseMath, IZeroBase {
 
     uint256 public constant _100pct = 1000000000000000000; // 1e18 == 100%
 
-    /// Amount of ZUSD to be locked in gas pool on opening troves
+    /// Amount of ZUSD to be locked in gas pool on opening locs
     uint256 public constant ZUSD_GAS_COMPENSATION = 20e18;
 
-    /// Minimum amount of net ZUSD debt a trove must have
+    /// Minimum amount of net ZUSD debt a LoC must have
     uint256 public constant MIN_NET_DEBT = 180e18;
 
     IActivePool public activePool;
@@ -35,7 +35,7 @@ contract ZeroBase is BaseMath, IZeroBase {
 
     // --- Gas compensation functions ---
 
-    // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
+    // Returns the composite debt (drawn debt + gas compensation) of a loc, for the purpose of ICR calculation
     function _getCompositeDebt(uint256 _debt) internal pure returns (uint256) {
         return _debt.add(ZUSD_GAS_COMPENSATION);
     }
@@ -44,7 +44,7 @@ contract ZeroBase is BaseMath, IZeroBase {
         return _debt.sub(ZUSD_GAS_COMPENSATION);
     }
 
-    /// Return the amount of BTC to be drawn from a trove's collateral and sent as gas compensation.
+    /// Return the amount of BTC to be drawn from a LoC's collateral and sent as gas compensation.
     function _getCollGasCompensation(uint256 _entireColl) internal view returns (uint256) {
         return _entireColl / zeroBaseParams.PERCENT_DIVISOR();
     }

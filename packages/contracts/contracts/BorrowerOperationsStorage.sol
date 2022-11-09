@@ -4,10 +4,10 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/IActivePool.sol";
 import "./Interfaces/IBorrowerOperations.sol";
-import "./Interfaces/ITroveManager.sol";
+import "./Interfaces/ILoCManager.sol";
 import "./Interfaces/IZUSDToken.sol";
 import "./Interfaces/ICollSurplusPool.sol";
-import "./Interfaces/ISortedTroves.sol";
+import "./Interfaces/ISortedLoCs.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/Ownable.sol";
@@ -31,7 +31,7 @@ contract BorrowerOperationsStorage is Ownable {
 
     // --- Connected contract declarations ---
 
-    ITroveManager public troveManager;
+    ILoCManager public locManager;
 
     address stabilityPoolAddress;
 
@@ -44,8 +44,8 @@ contract BorrowerOperationsStorage is Ownable {
 
     IZUSDToken public zusdToken;
 
-    // A doubly linked list of Troves, sorted by their collateral ratios
-    ISortedTroves public sortedTroves;
+    // A doubly linked list of LoCs, sorted by their collateral ratios
+    ISortedLoCs public sortedLoCs;
 
     IMasset public masset;
     IFeeDistributor public feeDistributor;

@@ -5,7 +5,7 @@ import {
   Decimal,
   ZeroStoreState,
   ZeroStoreBaseState,
-  TroveWithPendingRedistribution,
+  LoCWithPendingRedistribution,
   StabilityDeposit,
   ZEROStake,
   ZeroStore
@@ -81,19 +81,19 @@ export class BlockPolledZeroStore extends ZeroStore<BlockPolledZeroStoreExtraSta
     this._provider = _getProvider(readable.connection);
   }
 
-  private async _getRiskiestTroveBeforeRedistribution(
+  private async _getRiskiestLoCBeforeRedistribution(
     overrides?: EthersCallOverrides
-  ): Promise<TroveWithPendingRedistribution> {
-    const riskiestTroves = await this._readable.getTroves(
+  ): Promise<LoCWithPendingRedistribution> {
+    const riskiestLoCs = await this._readable.getLoCs(
       { first: 1, sortedBy: "ascendingCollateralRatio", beforeRedistribution: true },
       overrides
     );
 
-    if (riskiestTroves.length === 0) {
-      return new TroveWithPendingRedistribution(AddressZero, "nonExistent");
+    if (riskiestLoCs.length === 0) {
+      return new LoCWithPendingRedistribution(AddressZero, "nonExistent");
     }
 
-    return riskiestTroves[0];
+    return riskiestLoCs[0];
   }
 
   private async _get(
@@ -106,12 +106,12 @@ export class BlockPolledZeroStore extends ZeroStore<BlockPolledZeroStoreExtraSta
       createFees: this._readable._getFeesFactory({ blockTag }),
 
       price: this._readable.getPrice({ blockTag }),
-      numberOfTroves: this._readable.getNumberOfTroves({ blockTag }),
+      numberOfLoCs: this._readable.getNumberOfLoCs({ blockTag }),
       totalRedistributed: this._readable.getTotalRedistributed({ blockTag }),
       total: this._readable.getTotal({ blockTag }),
       zusdInStabilityPool: this._readable.getZUSDInStabilityPool({ blockTag }),
       totalStakedZERO: this._readable.getTotalStakedZERO({ blockTag }),
-      _riskiestTroveBeforeRedistribution: this._getRiskiestTroveBeforeRedistribution({ blockTag }),
+      _riskiestLoCBeforeRedistribution: this._getRiskiestLoCBeforeRedistribution({ blockTag }),
       remainingStabilityPoolZEROReward: this._readable.getRemainingStabilityPoolZEROReward({
         blockTag
       }),
@@ -129,7 +129,7 @@ export class BlockPolledZeroStore extends ZeroStore<BlockPolledZeroStoreExtraSta
             collateralSurplusBalance: this._readable.getCollateralSurplusBalance(userAddress, {
               blockTag
             }),
-            troveBeforeRedistribution: this._readable.getTroveBeforeRedistribution(userAddress, {
+            locBeforeRedistribution: this._readable.getLoCBeforeRedistribution(userAddress, {
               blockTag
             }),
             stabilityDeposit: this._readable.getStabilityDeposit(userAddress, { blockTag }),
@@ -146,7 +146,7 @@ export class BlockPolledZeroStore extends ZeroStore<BlockPolledZeroStoreExtraSta
             liquidityMiningStake: Decimal.ZERO,
             liquidityMiningZEROReward: Decimal.ZERO,
             collateralSurplusBalance: Decimal.ZERO,
-            troveBeforeRedistribution: new TroveWithPendingRedistribution(
+            locBeforeRedistribution: new LoCWithPendingRedistribution(
               AddressZero,
               "nonExistent"
             ),
