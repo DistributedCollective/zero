@@ -3,18 +3,18 @@
 pragma solidity 0.6.11;
 
 import "./BaseMath.sol";
-import "./LiquityMath.sol";
+import "./ZeroMath.sol";
 import "../Interfaces/IActivePool.sol";
 import "../Interfaces/IDefaultPool.sol";
 import "../Interfaces/IPriceFeed.sol";
-import "../Interfaces/ILiquityBase.sol";
-import "../Interfaces/ILiquityBaseParams.sol";
+import "../Interfaces/IZeroBase.sol";
+import "../Interfaces/IZeroBaseParams.sol";
 
 /**
  * Base contract for TroveManager, BorrowerOperations and StabilityPool. Contains global system constants and
  * common functions.
  */
-contract LiquityBase is BaseMath, ILiquityBase {
+contract ZeroBase is BaseMath, IZeroBase {
     using SafeMath for uint256;
 
     uint256 public constant _100pct = 1000000000000000000; // 1e18 == 100%
@@ -31,7 +31,7 @@ contract LiquityBase is BaseMath, ILiquityBase {
 
     IPriceFeed public override priceFeed;
 
-    ILiquityBaseParams public override liquityBaseParams;
+    IZeroBaseParams public override zeroBaseParams;
 
     // --- Gas compensation functions ---
 
@@ -46,7 +46,7 @@ contract LiquityBase is BaseMath, ILiquityBase {
 
     /// Return the amount of BTC to be drawn from a trove's collateral and sent as gas compensation.
     function _getCollGasCompensation(uint256 _entireColl) internal view returns (uint256) {
-        return _entireColl / liquityBaseParams.PERCENT_DIVISOR();
+        return _entireColl / zeroBaseParams.PERCENT_DIVISOR();
     }
 
     function getEntireSystemColl() public view returns (uint256 entireSystemColl) {
@@ -67,7 +67,7 @@ contract LiquityBase is BaseMath, ILiquityBase {
         uint256 entireSystemColl = getEntireSystemColl();
         uint256 entireSystemDebt = getEntireSystemDebt();
 
-        TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt, _price);
+        TCR = ZeroMath._computeCR(entireSystemColl, entireSystemDebt, _price);
 
         return TCR;
     }
@@ -75,7 +75,7 @@ contract LiquityBase is BaseMath, ILiquityBase {
     function _checkRecoveryMode(uint256 _price) internal view returns (bool) {
         uint256 TCR = _getTCR(_price);
 
-        return TCR < liquityBaseParams.CCR();
+        return TCR < zeroBaseParams.CCR();
     }
 
     function _requireUserAcceptsFee(

@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-interface ILiquityBaseParams {
+interface IZeroBaseParams {
 
     /// Minimum collateral ratio for individual troves
     function MCR() external view returns (uint);

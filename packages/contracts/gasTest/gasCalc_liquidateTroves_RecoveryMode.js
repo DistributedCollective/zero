@@ -34,7 +34,7 @@ contract("Gas cost tests", async accounts => {
   let data = [];
 
   beforeEach(async () => {
-    contracts = await deploymentHelper.deployLiquityCore();
+    contracts = await deploymentHelper.deployZeroCore();
     const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress);
 
     priceFeed = contracts.priceFeedTestnet;

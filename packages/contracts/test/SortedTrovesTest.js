@@ -59,7 +59,7 @@ contract('SortedTroves', async accounts => {
 
   describe('SortedTroves', () => {
     before(async () => {
-      contracts = await deploymentHelper.deployLiquityCore()
+      contracts = await deploymentHelper.deployZeroCore()
       contracts.troveManager = await TroveManagerTester.new()
       contracts.zusdToken = await ZUSDToken.new()
       await contracts.zusdToken.initialize(

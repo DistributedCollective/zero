@@ -6,13 +6,13 @@ import {
   Fees,
   FrontendStatus,
   LiquidationDetails,
-  LiquityStore,
+  ZeroStore,
   ZEROStake,
   RedemptionDetails,
   StabilityDeposit,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
-  TransactableLiquity,
+  TransactableZero,
   TransactionFailedError,
   Trove,
   TroveAdjustmentDetails,
@@ -26,12 +26,12 @@ import {
 } from "@sovryn-zero/lib-base";
 
 import {
-  EthersLiquityConnection,
-  EthersLiquityConnectionOptionalParams,
-  EthersLiquityStoreOption,
+  EthersZeroConnection,
+  EthersZeroConnectionOptionalParams,
+  EthersZeroStoreOption,
   _connect,
   _usingStore
-} from "./EthersLiquityConnection";
+} from "./EthersZeroConnection";
 
 import {
   EthersCallOverrides,
@@ -41,13 +41,13 @@ import {
   EthersTransactionReceipt
 } from "./types";
 
-import { PopulatableEthersLiquity, SentEthersLiquityTransaction } from "./PopulatableEthersLiquity";
-import { ReadableEthersLiquity, ReadableEthersLiquityWithStore } from "./ReadableEthersLiquity";
-import { SendableEthersLiquity } from "./SendableEthersLiquity";
-import { BlockPolledLiquityStore } from "./BlockPolledLiquityStore";
+import { PopulatableEthersZero, SentEthersZeroTransaction } from "./PopulatableEthersZero";
+import { ReadableEthersZero, ReadableEthersZeroWithStore } from "./ReadableEthersZero";
+import { SendableEthersZero } from "./SendableEthersZero";
+import { BlockPolledZeroStore } from "./BlockPolledZeroStore";
 
 /**
- * Thrown by {@link EthersLiquity} in case of transaction failure.
+ * Thrown by {@link EthersZero} in case of transaction failure.
  *
  * @public
  */
@@ -59,7 +59,7 @@ export class EthersTransactionFailedError extends TransactionFailedError<
   }
 }
 
-const waitForSuccess = async <T>(tx: SentEthersLiquityTransaction<T>) => {
+const waitForSuccess = async <T>(tx: SentEthersZeroTransaction<T>) => {
   const receipt = await tx.waitForReceipt();
 
   if (receipt.status !== "succeeded") {
@@ -74,51 +74,51 @@ const waitForSuccess = async <T>(tx: SentEthersLiquityTransaction<T>) => {
  *
  * @public
  */
-export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity {
+export class EthersZero implements ReadableEthersZero, TransactableZero {
   /** Information about the connection to the Zero protocol. */
-  readonly connection: EthersLiquityConnection;
+  readonly connection: EthersZeroConnection;
 
   /** Can be used to create populated (unsigned) transactions. */
-  readonly populate: PopulatableEthersLiquity;
+  readonly populate: PopulatableEthersZero;
 
   /** Can be used to send transactions without waiting for them to be mined. */
-  readonly send: SendableEthersLiquity;
+  readonly send: SendableEthersZero;
 
-  private _readable: ReadableEthersLiquity;
+  private _readable: ReadableEthersZero;
 
   /** @internal */
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersZero) {
     this._readable = readable;
     this.connection = readable.connection;
-    this.populate = new PopulatableEthersLiquity(readable);
-    this.send = new SendableEthersLiquity(this.populate);
+    this.populate = new PopulatableEthersZero(readable);
+    this.send = new SendableEthersZero(this.populate);
   }
 
   /** @internal */
   static _from(
-    connection: EthersLiquityConnection & { useStore: "blockPolled" }
-  ): EthersLiquityWithStore<BlockPolledLiquityStore>;
+    connection: EthersZeroConnection & { useStore: "blockPolled" }
+  ): EthersZeroWithStore<BlockPolledZeroStore>;
 
   /** @internal */
-  static _from(connection: EthersLiquityConnection): EthersLiquity;
+  static _from(connection: EthersZeroConnection): EthersZero;
 
   /** @internal */
-  static _from(connection: EthersLiquityConnection): EthersLiquity {
+  static _from(connection: EthersZeroConnection): EthersZero {
     if (_usingStore(connection)) {
-      return new _EthersLiquityWithStore(ReadableEthersLiquity._from(connection));
+      return new _EthersZeroWithStore(ReadableEthersZero._from(connection));
     } else {
-      return new EthersLiquity(ReadableEthersLiquity._from(connection));
+      return new EthersZero(ReadableEthersZero._from(connection));
     }
   }
 
   /** @internal */
   static connect(
     signerOrProvider: EthersSigner | EthersProvider,
-    optionalParams: EthersLiquityConnectionOptionalParams & { useStore: "blockPolled" }
-  ): Promise<EthersLiquityWithStore<BlockPolledLiquityStore>>;
+    optionalParams: EthersZeroConnectionOptionalParams & { useStore: "blockPolled" }
+  ): Promise<EthersZeroWithStore<BlockPolledZeroStore>>;
 
   /**
-   * Connect to the Zero protocol and create an `EthersLiquity` object.
+   * Connect to the Zero protocol and create an `EthersZero` object.
    *
    * @param signerOrProvider - Ethers `Signer` or `Provider` to use for connecting to the Ethereum
    *                           network.
@@ -126,37 +126,37 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    */
   static connect(
     signerOrProvider: EthersSigner | EthersProvider,
-    optionalParams?: EthersLiquityConnectionOptionalParams
-  ): Promise<EthersLiquity>;
+    optionalParams?: EthersZeroConnectionOptionalParams
+  ): Promise<EthersZero>;
 
   static async connect(
     signerOrProvider: EthersSigner | EthersProvider,
-    optionalParams?: EthersLiquityConnectionOptionalParams
-  ): Promise<EthersLiquity> {
-    return EthersLiquity._from(await _connect(signerOrProvider, optionalParams));
+    optionalParams?: EthersZeroConnectionOptionalParams
+  ): Promise<EthersZero> {
+    return EthersZero._from(await _connect(signerOrProvider, optionalParams));
   }
 
   /**
-   * Check whether this `EthersLiquity` is an {@link EthersLiquityWithStore}.
+   * Check whether this `EthersZero` is an {@link EthersZeroWithStore}.
    */
-  hasStore(): this is EthersLiquityWithStore;
+  hasStore(): this is EthersZeroWithStore;
 
   /**
-   * Check whether this `EthersLiquity` is an
-   * {@link EthersLiquityWithStore}\<{@link BlockPolledLiquityStore}\>.
+   * Check whether this `EthersZero` is an
+   * {@link EthersZeroWithStore}\<{@link BlockPolledZeroStore}\>.
    */
-  hasStore(store: "blockPolled"): this is EthersLiquityWithStore<BlockPolledLiquityStore>;
+  hasStore(store: "blockPolled"): this is EthersZeroWithStore<BlockPolledZeroStore>;
 
   hasStore(): boolean {
     return false;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTotalRedistributed} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotalRedistributed} */
   getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove> {
     return this._readable.getTotalRedistributed(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTroveBeforeRedistribution} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTroveBeforeRedistribution} */
   getTroveBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
@@ -164,17 +164,17 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable.getTroveBeforeRedistribution(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTrove} */
   getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove> {
     return this._readable.getTrove(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getNumberOfTroves} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getNumberOfTroves} */
   getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number> {
     return this._readable.getNumberOfTroves(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getPrice} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getPrice} */
   getPrice(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getPrice(overrides);
   }
@@ -189,37 +189,37 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable._getDefaultPool(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTotal} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotal} */
   getTotal(overrides?: EthersCallOverrides): Promise<Trove> {
     return this._readable.getTotal(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getStabilityDeposit} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getStabilityDeposit} */
   getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<StabilityDeposit> {
     return this._readable.getStabilityDeposit(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getRemainingStabilityPoolZEROReward} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getRemainingStabilityPoolZEROReward} */
   getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getRemainingStabilityPoolZEROReward(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZUSDInStabilityPool} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZUSDInStabilityPool} */
   getZUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZUSDInStabilityPool(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZUSDBalance} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZUSDBalance} */
   getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZUSDBalance(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZEROBalance} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZEROBalance} */
   getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZEROBalance(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getCollateralSurplusBalance} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getCollateralSurplusBalance} */
   getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getCollateralSurplusBalance(address, overrides);
   }
@@ -230,7 +230,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     overrides?: EthersCallOverrides
   ): Promise<TroveWithPendingRedistribution[]>;
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.(getTroves:2)} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.(getTroves:2)} */
   getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
 
   getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]> {
@@ -244,28 +244,28 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable._getFeesFactory(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getFees} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getFees} */
   getFees(overrides?: EthersCallOverrides): Promise<Fees> {
     return this._readable.getFees(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZEROStake} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZEROStake} */
   getZEROStake(address?: string, overrides?: EthersCallOverrides): Promise<ZEROStake> {
     return this._readable.getZEROStake(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTotalStakedZERO} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotalStakedZERO} */
   getTotalStakedZERO(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getTotalStakedZERO(overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getFrontendStatus} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getFrontendStatus} */
   getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<FrontendStatus> {
     return this._readable.getFrontendStatus(address, overrides);
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.openTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.openTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -279,7 +279,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.openTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.openTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -293,7 +293,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.closeTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.closeTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -303,7 +303,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.closeNueTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.closeNueTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -313,7 +313,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.adjustTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.adjustTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -327,7 +327,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.adjustNueTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.adjustNueTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -341,7 +341,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.depositCollateral}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.depositCollateral}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -354,7 +354,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.withdrawCollateral}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.withdrawCollateral}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -367,7 +367,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.borrowZUSD}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.borrowZUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -381,7 +381,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.repayZUSD}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.repayZUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -399,7 +399,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.liquidate}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.liquidate}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -412,7 +412,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.liquidateUpTo}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.liquidateUpTo}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -425,7 +425,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.depositZUSDInStabilityPool}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.depositZUSDInStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -439,7 +439,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.withdrawZUSDFromStabilityPool}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.withdrawZUSDFromStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -452,7 +452,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.withdrawGainsFromStabilityPool}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.withdrawGainsFromStabilityPool}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -464,7 +464,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.transferCollateralGainToTrove}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.transferCollateralGainToTrove}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -476,7 +476,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.sendZUSD}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.sendZUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -490,7 +490,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.sendZERO}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.sendZERO}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -504,7 +504,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.redeemZUSD}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.redeemZUSD}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -518,7 +518,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.claimCollateralSurplus}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.claimCollateralSurplus}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -528,7 +528,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.stakeZERO}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.stakeZERO}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -538,7 +538,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.unstakeZERO}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.unstakeZERO}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -548,7 +548,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.withdrawGainsFromStaking}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.withdrawGainsFromStaking}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -558,7 +558,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   }
 
   /**
-   * {@inheritDoc @sovryn-zero/lib-base#TransactableLiquity.registerFrontend}
+   * {@inheritDoc @sovryn-zero/lib-base#TransactableZero.registerFrontend}
    *
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
@@ -569,28 +569,28 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
 }
 
 /**
- * Variant of {@link EthersLiquity} that exposes a {@link @sovryn-zero/lib-base#LiquityStore}.
+ * Variant of {@link EthersZero} that exposes a {@link @sovryn-zero/lib-base#ZeroStore}.
  *
  * @public
  */
-export interface EthersLiquityWithStore<T extends LiquityStore = LiquityStore>
-  extends EthersLiquity {
-  /** An object that implements LiquityStore. */
+export interface EthersZeroWithStore<T extends ZeroStore = ZeroStore>
+  extends EthersZero {
+  /** An object that implements ZeroStore. */
   readonly store: T;
 }
 
-class _EthersLiquityWithStore<T extends LiquityStore = LiquityStore>
-  extends EthersLiquity
-  implements EthersLiquityWithStore<T> {
+class _EthersZeroWithStore<T extends ZeroStore = ZeroStore>
+  extends EthersZero
+  implements EthersZeroWithStore<T> {
   readonly store: T;
 
-  constructor(readable: ReadableEthersLiquityWithStore<T>) {
+  constructor(readable: ReadableEthersZeroWithStore<T>) {
     super(readable);
 
     this.store = readable.store;
   }
 
-  hasStore(store?: EthersLiquityStoreOption): boolean {
+  hasStore(store?: EthersZeroStoreOption): boolean {
     return store === undefined || store === this.connection.useStore;
   }
 }

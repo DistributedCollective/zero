@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "ILiquityBase",
-  "sourceName": "contracts/Interfaces/ILiquityBase.sol",
+  "contractName": "IZeroBase",
+  "sourceName": "contracts/Interfaces/IZeroBase.sol",
   "abi": [
     {
       "inputs": [],

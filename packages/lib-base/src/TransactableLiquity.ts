@@ -1,10 +1,10 @@
 import { Decimal, Decimalish } from "./Decimal";
 import { Trove, TroveAdjustmentParams, TroveClosureParams, TroveCreationParams } from "./Trove";
 import { StabilityDepositChange } from "./StabilityDeposit";
-import { FailedReceipt } from "./SendableLiquity";
+import { FailedReceipt } from "./SendableZero";
 
 /**
- * Thrown by {@link TransactableLiquity} functions in case of transaction failure.
+ * Thrown by {@link TransactableZero} functions in case of transaction failure.
  *
  * @public
  */
@@ -20,7 +20,7 @@ export class TransactionFailedError<T extends FailedReceipt = FailedReceipt> ext
 }
 
 /**
- * Details of an {@link TransactableLiquity.openTrove | openTrove()} transaction.
+ * Details of an {@link TransactableZero.openTrove | openTrove()} transaction.
  *
  * @public
  */
@@ -36,7 +36,7 @@ export interface TroveCreationDetails {
 }
 
 /**
- * Details of an {@link TransactableLiquity.adjustTrove | adjustTrove()} transaction.
+ * Details of an {@link TransactableZero.adjustTrove | adjustTrove()} transaction.
  *
  * @public
  */
@@ -52,7 +52,7 @@ export interface TroveAdjustmentDetails {
 }
 
 /**
- * Details of a {@link TransactableLiquity.closeTrove | closeTrove()} transaction.
+ * Details of a {@link TransactableZero.closeTrove | closeTrove()} transaction.
  *
  * @public
  */
@@ -62,8 +62,8 @@ export interface TroveClosureDetails {
 }
 
 /**
- * Details of a {@link TransactableLiquity.liquidate | liquidate()} or
- * {@link TransactableLiquity.liquidateUpTo | liquidateUpTo()} transaction.
+ * Details of a {@link TransactableZero.liquidate | liquidate()} or
+ * {@link TransactableZero.liquidateUpTo | liquidateUpTo()} transaction.
  *
  * @public
  */
@@ -82,7 +82,7 @@ export interface LiquidationDetails {
 }
 
 /**
- * Details of a {@link TransactableLiquity.redeemZUSD | redeemZUSD()} transaction.
+ * Details of a {@link TransactableZero.redeemZUSD | redeemZUSD()} transaction.
  *
  * @public
  */
@@ -110,7 +110,7 @@ export interface RedemptionDetails {
 
 /**
  * Details of a
- * {@link TransactableLiquity.withdrawGainsFromStabilityPool | withdrawGainsFromStabilityPool()}
+ * {@link TransactableZero.withdrawGainsFromStabilityPool | withdrawGainsFromStabilityPool()}
  * transaction.
  *
  * @public
@@ -131,8 +131,8 @@ export interface StabilityPoolGainsWithdrawalDetails {
 
 /**
  * Details of a
- * {@link TransactableLiquity.depositZUSDInStabilityPool | depositZUSDInStabilityPool()} or
- * {@link TransactableLiquity.withdrawZUSDFromStabilityPool | withdrawZUSDFromStabilityPool()}
+ * {@link TransactableZero.depositZUSDInStabilityPool | depositZUSDInStabilityPool()} or
+ * {@link TransactableZero.withdrawZUSDFromStabilityPool | withdrawZUSDFromStabilityPool()}
  * transaction.
  *
  * @public
@@ -144,7 +144,7 @@ export interface StabilityDepositChangeDetails extends StabilityPoolGainsWithdra
 
 /**
  * Details of a
- * {@link TransactableLiquity.transferCollateralGainToTrove | transferCollateralGainToTrove()}
+ * {@link TransactableZero.transferCollateralGainToTrove | transferCollateralGainToTrove()}
  * transaction.
  *
  * @public
@@ -161,11 +161,11 @@ export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdra
  * The functions return the details of the transaction (if any), or throw an implementation-specific
  * subclass of {@link TransactionFailedError} in case of transaction failure.
  *
- * Implemented by {@link @sovryn-zero/lib-ethers#EthersLiquity}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#EthersZero}.
  *
  * @public
  */
-export interface TransactableLiquity {
+export interface TransactableZero {
   /**
    * Open a new Trove by depositing collateral and borrowing ZUSD.
    *
@@ -411,7 +411,7 @@ export interface TransactableLiquity {
    * Claim leftover collateral after a liquidation or redemption.
    *
    * @remarks
-   * Use {@link @sovryn-zero/lib-base#ReadableLiquity.getCollateralSurplusBalance | getCollateralSurplusBalance()}
+   * Use {@link @sovryn-zero/lib-base#ReadableZero.getCollateralSurplusBalance | getCollateralSurplusBalance()}
    * to check the amount of collateral available for withdrawal.
    *
    * @throws

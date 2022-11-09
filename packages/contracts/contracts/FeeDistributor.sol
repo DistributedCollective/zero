@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/CheckContract.sol";
-import "./Dependencies/LiquityMath.sol";
+import "./Dependencies/ZeroMath.sol";
 import "./FeeDistributorStorage.sol";
 import "./Dependencies/SafeMath.sol";
 
@@ -51,7 +51,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         activePoolAddress = _activePoolAddress;
 
         // Not entirely removing this as per request from @light
-        FEE_TO_SOV_COLLECTOR = LiquityMath.DECIMAL_PRECISION; // 100%
+        FEE_TO_SOV_COLLECTOR = ZeroMath.DECIMAL_PRECISION; // 100%
 
         emit SOVFeeCollectorAddressChanged(_sovFeeCollectorAddress);
         emit ZeroStakingAddressChanged(_zeroStakingAddress);
@@ -84,7 +84,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     function _distributeZUSD(uint256 toDistribute) internal {
         // Send fee to the SOVFeeCollector address
         uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
-            LiquityMath.DECIMAL_PRECISION
+            ZeroMath.DECIMAL_PRECISION
         );
         zusdToken.approve(address(sovFeeCollector), feeToSovCollector);
         sovFeeCollector.transferTokens(address(zusdToken), uint96(feeToSovCollector));
@@ -104,7 +104,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     function _distributeRBTC(uint256 toDistribute) internal {
         // Send fee to the SOVFeeCollector address
         uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
-            LiquityMath.DECIMAL_PRECISION
+            ZeroMath.DECIMAL_PRECISION
         );
         wrbtc.deposit{value: feeToSovCollector}();
         wrbtc.approve(address(sovFeeCollector), feeToSovCollector);

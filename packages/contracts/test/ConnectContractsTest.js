@@ -20,7 +20,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   let feeDistributor
 
   before(async () => {
-    const coreContracts = await deploymentHelper.deployLiquityCore()
+    const coreContracts = await deploymentHelper.deployZeroCore()
     const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
 
     priceFeed = coreContracts.priceFeedTestnet

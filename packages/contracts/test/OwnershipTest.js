@@ -24,7 +24,7 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
   let zeroToken;
 
   before(async () => {
-    contracts = await deploymentHelper.deployLiquityCore();
+    contracts = await deploymentHelper.deployZeroCore();
     contracts.borrowerOperations = await BorrowerOperationsTester.new();
     contracts = await deploymentHelper.deployZUSDToken(contracts);
     const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig);

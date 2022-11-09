@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-import "../LiquityBaseParams.sol";
+import "../ZeroBaseParams.sol";
 import "../TroveManager.sol";
 import "../TroveManagerStorage.sol";
 import "../Dependencies/TroveManagerRedeemOps.sol";
@@ -31,7 +31,7 @@ contract EchidnaTester {
     uint private CCR;
     uint private ZUSD_GAS_COMPENSATION;
 
-    LiquityBaseParams public liquityBaseParams;
+    ZeroBaseParams public zeroBaseParams;
     TroveManagerRedeemOps public troveManagerRedeemOps;
     TroveManager public troveManager;
     BorrowerOperations public borrowerOperations;
@@ -49,7 +49,7 @@ contract EchidnaTester {
     uint private numberOfTroves;
 
     constructor() public payable {
-        liquityBaseParams = new LiquityBaseParams();
+        zeroBaseParams = new ZeroBaseParams();
         troveManagerRedeemOps = new TroveManagerRedeemOps();
         troveManager = new TroveManager();
         borrowerOperations = new BorrowerOperations();
@@ -72,7 +72,7 @@ contract EchidnaTester {
         troveManager.setAddresses(
             address(0),
             address(troveManagerRedeemOps),
-            address(liquityBaseParams), address(borrowerOperations), 
+            address(zeroBaseParams), address(borrowerOperations), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),
             address(priceFeedTestnet), address(zusdToken), 
@@ -80,7 +80,7 @@ contract EchidnaTester {
        
         borrowerOperations.setAddresses(
             address(0),
-            address(liquityBaseParams), address(troveManager), 
+            address(zeroBaseParams), address(troveManager), 
             address(activePool), address(defaultPool), 
             address(stabilityPool), address(gasPool), address(collSurplusPool),
             address(priceFeedTestnet), address(sortedTroves), 
@@ -92,7 +92,7 @@ contract EchidnaTester {
         defaultPool.setAddresses(address(troveManager), address(activePool));
         
         stabilityPool.setAddresses(
-            address(liquityBaseParams), address(borrowerOperations), 
+            address(zeroBaseParams), address(borrowerOperations), 
             address(troveManager), address(activePool), address(zusdToken), 
             address(sortedTroves), address(priceFeedTestnet), address(0));
 
@@ -107,8 +107,8 @@ contract EchidnaTester {
             require(success);
         }
 
-        MCR = borrowerOperations.liquityBaseParams().MCR();
-        CCR = borrowerOperations.liquityBaseParams().CCR();
+        MCR = borrowerOperations.zeroBaseParams().MCR();
+        CCR = borrowerOperations.zeroBaseParams().CCR();
         ZUSD_GAS_COMPENSATION = borrowerOperations.ZUSD_GAS_COMPENSATION();
         require(MCR > 0);
         require(CCR > 0);
@@ -161,7 +161,7 @@ contract EchidnaTester {
         uint price = priceFeedTestnet.getPrice();
         uint ZUSDAmount = _ZUSDAmount;
         uint compositeDebt = ZUSDAmount.add(ZUSD_GAS_COMPENSATION);
-        uint ICR = LiquityMath._computeCR(BTC, compositeDebt, price);
+        uint ICR = ZeroMath._computeCR(BTC, compositeDebt, price);
         if (ICR < ratio) {
             compositeDebt = BTC.mul(price).div(ratio);
             ZUSDAmount = compositeDebt.sub(ZUSD_GAS_COMPENSATION);

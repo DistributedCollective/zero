@@ -3,7 +3,7 @@ import { Trove, TroveWithPendingRedistribution } from "./Trove";
 import { StabilityDeposit } from "./StabilityDeposit";
 
 /** @alpha */
-export interface ObservableLiquity {
+export interface ObservableZero {
   watchTotalRedistributed(
     onTotalRedistributedChanged: (totalRedistributed: Trove) => void
   ): () => void;

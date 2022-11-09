@@ -49,7 +49,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
   describe("ZERO Rewards", async () => {
 
     before(async () => {
-      contracts = await deploymentHelper.deployLiquityCore();
+      contracts = await deploymentHelper.deployZeroCore();
       contracts.troveManager = await TroveManagerTester.new();
       contracts.zusdToken = await ZUSDToken.new();
       await contracts.zusdToken.initialize(

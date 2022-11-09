@@ -8,7 +8,7 @@ async function main() {
   const accounts = await web3.eth.getAccounts()
   const [borrower, A, B] = accounts
 
-  const coreContracts = await dh.deployLiquityCoreHardhat()
+  const coreContracts = await dh.deployZeroCoreHardhat()
   const ARBITRARY_ADDRESS = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419" 
   const ZEROContracts = await dh.deployZEROContractsHardhat(
       ARBITRARY_ADDRESS, 

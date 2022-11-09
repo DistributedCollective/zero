@@ -9,9 +9,9 @@ import "../Interfaces/IZEROStaking.sol";
 import "../Interfaces/ISortedTroves.sol";
 import "../Interfaces/ICollSurplusPool.sol";
 import "../TroveManagerStorage.sol";
-import "../Dependencies/LiquityBase.sol";
+import "../Dependencies/ZeroBase.sol";
 
-contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
+contract TroveManagerBase1MinuteBootstrap is ZeroBase, TroveManagerStorage {
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
@@ -154,7 +154,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
     function _getCurrentICR(address _borrower, uint256 _price) public view returns (uint256) {
         (uint256 currentBTC, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint256 ICR = LiquityMath._computeCR(currentBTC, currentZUSDDebt, _price);
+        uint256 ICR = ZeroMath._computeCR(currentBTC, currentZUSDDebt, _price);
         return ICR;
     }
 
@@ -324,7 +324,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
     function _calcDecayedBaseRate() internal view returns (uint256) {
         uint256 minutesPassed = _minutesPassedSinceLastFeeOp();
-        uint256 decayFactor = LiquityMath._decPow(MINUTE_DECAY_FACTOR, minutesPassed);
+        uint256 decayFactor = ZeroMath._decPow(MINUTE_DECAY_FACTOR, minutesPassed);
 
         return baseRate.mul(decayFactor).div(DECIMAL_PRECISION);
     }
@@ -363,8 +363,8 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
     function _calcRedemptionRate(uint256 _baseRate) internal view returns (uint256) {
         return
-            LiquityMath._min(
-                liquityBaseParams.REDEMPTION_FEE_FLOOR().add(_baseRate),
+            ZeroMath._min(
+                zeroBaseParams.REDEMPTION_FEE_FLOOR().add(_baseRate),
                 DECIMAL_PRECISION // cap at a maximum of 100%
             );
     }
@@ -433,7 +433,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
     function _requireTCRoverMCR(uint256 _price) internal view {
         require(
-            _getTCR(_price) >= liquityBaseParams.MCR(),
+            _getTCR(_price) >= zeroBaseParams.MCR(),
             "TroveManager: Cannot redeem when TCR < MCR"
         );
     }
@@ -448,7 +448,7 @@ contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
 
     function _requireValidMaxFeePercentage(uint256 _maxFeePercentage) internal view {
         require(
-            _maxFeePercentage >= liquityBaseParams.REDEMPTION_FEE_FLOOR() &&
+            _maxFeePercentage >= zeroBaseParams.REDEMPTION_FEE_FLOOR() &&
                 _maxFeePercentage <= DECIMAL_PRECISION,
             "Max fee percentage must be between 0.5% and 100%"
         );

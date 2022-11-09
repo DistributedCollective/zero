@@ -89,7 +89,7 @@ contract("BorrowerOperations", async accounts => {
 
   const testCorpus = ({ withProxy = false }) => {
     before(async () => {
-      contracts = await deploymentHelper.deployLiquityCore();
+      contracts = await deploymentHelper.deployZeroCore();
       contracts.borrowerOperations = await BorrowerOperationsTester.new();
       contracts.masset = await MassetTester.new();
       contracts.troveManager = await TroveManagerTester.new();

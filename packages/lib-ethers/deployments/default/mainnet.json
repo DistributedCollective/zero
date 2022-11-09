@@ -30,7 +30,7 @@
     "zeroToken": "0x6DEA81C8171D0bA574754EF6F8b412F2Ed88c54D",
     "multiTroveGetter": "0xFc92d0E9Fa35df17E3A6d9F40716ca2cE749922B",
     "troveManagerRedeemOps": "",
-    "liquityBaseParams": "",
+    "zeroBaseParams": "",
     "sovStakersIssuance": "",
     "uniToken": "0xF20EF17b889b437C151eB5bA15A47bFc62bfF469"
   }

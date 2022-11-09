@@ -3,7 +3,7 @@
 pragma solidity 0.6.11;
 
 import "../Dependencies/SafeMath.sol";
-import "../Dependencies/LiquityMath.sol";
+import "../Dependencies/ZeroMath.sol";
 import "../Dependencies/IERC20.sol";
 import "../Interfaces/IBorrowerOperations.sol";
 import "../Interfaces/ITroveManager.sol";
@@ -149,7 +149,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
 
         uint ZUSDAmount = _collateral.mul(price).div(ICR);
         uint borrowingRate = troveManager.getBorrowingRateWithDecay();
-        uint netDebt = ZUSDAmount.mul(LiquityMath.DECIMAL_PRECISION).div(LiquityMath.DECIMAL_PRECISION.add(borrowingRate));
+        uint netDebt = ZUSDAmount.mul(ZeroMath.DECIMAL_PRECISION).div(ZeroMath.DECIMAL_PRECISION.add(borrowingRate));
 
         return netDebt;
     }

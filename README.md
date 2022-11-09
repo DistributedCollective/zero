@@ -2,7 +2,7 @@
 
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
 
-Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "Trove", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
+Zero is a decentralized protocol based on [Zero](https://github.com/DistributedCollective/zero/main) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "Trove", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
 
 An unprecedented liquidation mechanism based on incentivized stability pool deposits and a redistribution cycle from riskier to safer Lines of Credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
 
@@ -22,7 +22,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
       - [Liquidations in Normal Mode: TCR >= 150%](#liquidations-in-normal-mode-tcr--150)
       - [Liquidations in Recovery Mode: TCR < 150%](#liquidations-in-recovery-mode-tcr--150)
   - [Gains From Liquidations](#gains-from-liquidations)
-  - [ZUSD Token Redemption](#zusd-token-redemption)
+  - [ZUSD Redemption](#zusd-redemption)
     - [Partial redemption](#partial-redemption)
     - [Full redemption](#full-redemption)
     - [Redemptions create a price floor](#redemptions-create-a-price-floor)
@@ -38,7 +38,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [PriceFeed Logic](#pricefeed-logic)
     - [Testnet PriceFeed and PriceFeed tests](#testnet-pricefeed-and-pricefeed-tests)
     - [PriceFeed limitations and known issues](#pricefeed-limitations-and-known-issues)
-    - [Keeping a sorted list of lines of credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
+    - [Keeping a sorted list of Lines of Credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
     - [Flow of RBTC in Zero](#flow-of-rbtc-in-zero)
     - [Flow of ZUSD tokens in Zero](#flow-of-zusd-tokens-in-zero)
   - [Expected User Behaviors](#expected-user-behaviors)
@@ -56,7 +56,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Hint Helper Functions - `HintHelpers.sol`](#hint-helper-functions---hinthelperssol)
     - [Stability Pool Functions - `StabilityPool.sol`](#stability-pool-functions---stabilitypoolsol)
     - [ZUSD token `ZUSDToken.sol`](#zusd-token-zusdtokensol)
-  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit--operations)
+  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit-operations)
     - [Example Borrower Operations with Hints](#example-borrower-operations-with-hints)
       - [Opening a Line of Credit](#opening-a-line-of-credit)
       - [Adjusting a Line of Credit](#adjusting-a-line-of-credit)
@@ -102,10 +102,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Prerequisites](#prerequisites-1)
     - [Running with `docker`](#running-with-docker)
     - [Configuring a public frontend](#configuring-a-public-frontend)
-      - [FRONTEND_TAG](#frontend_tag)
       - [INFURA_API_KEY](#infura_api_key)
-    - [Setting a kickback rate](#setting-a-kickback-rate)
-    - [Setting a kickback rate with Gnosis Safe](#setting-a-kickback-rate-with-gnosis-safe)
     - [Next steps for hosting a frontend](#next-steps-for-hosting-a-frontend)
       - [Example 1: using static website hosting](#example-1-using-static-website-hosting)
       - [Example 2: wrapping the frontend container in HTTPS](#example-2-wrapping-the-frontend-container-in-https)
@@ -268,7 +265,7 @@ The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `Sta
 
 `TroveManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `sovFeeCollector`. It also contains the state of each Line of Credit  i.e. a record of the Line of Credit’s collateral and debt. The TroveManager does not hold value (i.e. RBTC / other tokens). TroveManager functions call into the various Pools to tell them to move RBTC/tokens between Pools, where necessary.
 
-`LiquityBase.sol` - Both TroveManager and BorrowerOperations inherit from the parent contract `LiquityBase`, which contains global constants and some common functions.
+`ZeroBase.sol` - Both TroveManager and BorrowerOperations inherit from the parent contract `ZeroBase`, which contains global constants and some common functions.
 
 `StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits and withdrawing compounded deposits and accumulated RBTC gains. Holds the ZUSD Stability Pool deposits, and the RBTC gains from liquidations, for depositors.
 
@@ -818,7 +815,7 @@ But if the redemption causes an amount (debt - 20) to be cancelled, the Line of 
 
 ### Gas compensation helper functions
 
-Gas compensation functions are found in the parent _LiquityBase.sol_ contract:
+Gas compensation functions are found in the parent _ZeroBase.sol_ contract:
 
 `_getCollGasCompensation(uint _entireColl)` returns the amount of RBTC to be drawn from a Line of Credit's collateral and sent as gas compensation. 
 
@@ -1264,7 +1261,7 @@ Your custom built frontend can be configured by putting a file named `config.jso
 
 ## Running a frontend with Docker
 
-The quickest way to get a frontend up and running is to use the [prebuilt image](https://hub.docker.com/r/liquity/dev-frontend) available on Docker Hub.
+The quickest way to get a frontend up and running is to use the [TODO: fix link][prebuilt image](https://hub.docker.com/r/sovryn-zero/dev-frontend) available on Docker Hub.
 
 ### Prerequisites
 
@@ -1273,8 +1270,8 @@ You will need to have [Docker](https://docs.docker.com/get-docker/) installed.
 ### Running with `docker`
 
 ```
-docker pull liquity/dev-frontend
-docker run --name Zero -d --rm -p 3000:80 liquity/dev-frontend
+docker pull zero/dev-frontend
+docker run --name Zero -d --rm -p 3000:80 zero/dev-frontend
 ```
 
 This will start serving your frontend using HTTP on port 3000. If everything went well, you should be able to open http://localhost:3000/ in your browser. To use a different port, just replace 3000 with your desired port number.
@@ -1282,7 +1279,7 @@ This will start serving your frontend using HTTP on port 3000. If everything wen
 To stop the service:
 
 ```
-docker kill liquity
+docker kill zero
 ```
 
 ### Configuring a public frontend
@@ -1307,13 +1304,13 @@ To obtain the files you need to upload, you need to extract them from a frontend
 docker run --name Zero -d --rm \
   -e FRONTEND_TAG=0x2781fD154358b009abf6280db4Ec066FCC6cb435 \
   -e INFURA_API_KEY=158b6511a5c74d1ac028a8a2afe8f626 \
-  liquity/dev-frontend
+  zero/dev-frontend
 ```
 
 While the container is running, use `docker cp` to extract the frontend's files to a folder of your choosing. For example to extract them to a new folder named "devui" inside the current folder, run:
 
 ```
-docker cp liquity:/usr/share/nginx/html ./devui
+docker cp zero:/usr/share/nginx/html ./devui
 ```
 
 Upload the contents of this folder to your chosen hosting service (or serve them using your own infrastructure), and you're set!
@@ -1324,7 +1321,7 @@ If you have command line access to a server with Docker installed, hosting a fro
 
 The frontend Docker container simply serves files using plain HTTP, which is susceptible to man-in-the-middle attacks. Therefore it is highly recommended to wrap it in HTTPS using a reverse proxy. You can find an example docker-compose config [here](packages/dev-frontend/docker-compose-example/docker-compose.yml) that secures the frontend using [SWAG (Secure Web Application Gateway)](https://github.com/linuxserver/docker-swag) and uses [watchtower](https://github.com/containrrr/watchtower) for automatically updating the frontend image to the latest version on Docker Hub.
 
-Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/liquity.example.com).
+Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [TODO: fix link] [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/sovryn-zero.example.com).
 
 
 

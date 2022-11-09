@@ -1,19 +1,19 @@
-import { LiquityStore } from "@sovryn-zero/lib-base";
+import { ZeroStore } from "@sovryn-zero/lib-base";
 import React, { createContext, useEffect, useState } from "react";
 
-export const LiquityStoreContext = createContext<LiquityStore | undefined>(undefined);
+export const ZeroStoreContext = createContext<ZeroStore | undefined>(undefined);
 
-type LiquityStoreProviderProps = {
-  store: LiquityStore;
+type ZeroStoreProviderProps = {
+  store: ZeroStore;
   loader?: React.ReactNode;
 };
 
-export const LiquityStoreProvider: React.FC<LiquityStoreProviderProps> = ({
+export const ZeroStoreProvider: React.FC<ZeroStoreProviderProps> = ({
   store,
   loader,
   children
 }) => {
-  const [loadedStore, setLoadedStore] = useState<LiquityStore>();
+  const [loadedStore, setLoadedStore] = useState<ZeroStore>();
 
   useEffect(() => {
     store.onLoaded = () => setLoadedStore(store);
@@ -30,5 +30,5 @@ export const LiquityStoreProvider: React.FC<LiquityStoreProviderProps> = ({
     return <>{loader}</>;
   }
 
-  return <LiquityStoreContext.Provider value={loadedStore}>{children}</LiquityStoreContext.Provider>;
+  return <ZeroStoreContext.Provider value={loadedStore}>{children}</ZeroStoreContext.Provider>;
 };

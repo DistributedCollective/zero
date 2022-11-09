@@ -9,14 +9,14 @@ import {
   Decimal,
   Decimalish,
   LiquidationDetails,
-  LiquityReceipt,
+  ZeroReceipt,
   ZUSD_MINIMUM_NET_DEBT,
   MinedReceipt,
-  PopulatableLiquity,
-  PopulatedLiquityTransaction,
+  PopulatableZero,
+  PopulatedZeroTransaction,
   PopulatedRedemption,
   RedemptionDetails,
-  SentLiquityTransaction,
+  SentZeroTransaction,
   StabilityDepositChangeDetails,
   StabilityPoolGainsWithdrawalDetails,
   Trove,
@@ -41,16 +41,16 @@ import {
 } from "./types";
 
 import {
-  EthersLiquityConnection,
+  EthersZeroConnection,
   _getContracts,
   _getProvider,
   _requireAddress,
   _requireSigner
-} from "./EthersLiquityConnection";
+} from "./EthersZeroConnection";
 
 import { _priceFeedIsTestnet } from "./contracts";
 import { logsToString } from "./parseLogs";
-import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
+import { ReadableEthersZero } from "./ReadableEthersZero";
 
 const decimalify = (bigNumber: BigNumber) => Decimal.fromBigNumberString(bigNumber.toHexString());
 
@@ -114,23 +114,23 @@ function* generateTrials(totalNumberOfTrials: number) {
  * A transaction that has already been sent.
  *
  * @remarks
- * Returned by {@link SendableEthersLiquity} functions.
+ * Returned by {@link SendableEthersZero} functions.
  *
  * @public
  */
-export class SentEthersLiquityTransaction<T = unknown>
+export class SentEthersZeroTransaction<T = unknown>
   implements
-    SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
+    SentZeroTransaction<EthersTransactionResponse, ZeroReceipt<EthersTransactionReceipt, T>> {
   /** Ethers' representation of a sent transaction. */
   readonly rawSentTransaction: EthersTransactionResponse;
 
-  private readonly _connection: EthersLiquityConnection;
+  private readonly _connection: EthersZeroConnection;
   private readonly _parse: (rawReceipt: EthersTransactionReceipt) => T;
 
   /** @internal */
   constructor(
     rawSentTransaction: EthersTransactionResponse,
-    connection: EthersLiquityConnection,
+    connection: EthersZeroConnection,
     parse: (rawReceipt: EthersTransactionReceipt) => T
   ) {
     this.rawSentTransaction = rawSentTransaction;
@@ -148,14 +148,14 @@ export class SentEthersLiquityTransaction<T = unknown>
       : _pendingReceipt;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SentLiquityTransaction.getReceipt} */
-  async getReceipt(): Promise<LiquityReceipt<EthersTransactionReceipt, T>> {
+  /** {@inheritDoc @sovryn-zero/lib-base#SentZeroTransaction.getReceipt} */
+  async getReceipt(): Promise<ZeroReceipt<EthersTransactionReceipt, T>> {
     return this._receiptFrom(
       await _getProvider(this._connection).getTransactionReceipt(this.rawSentTransaction.hash)
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#SentLiquityTransaction.waitForReceipt} */
+  /** {@inheritDoc @sovryn-zero/lib-base#SentZeroTransaction.waitForReceipt} */
   async waitForReceipt(): Promise<MinedReceipt<EthersTransactionReceipt, T>> {
     const receipt = this._receiptFrom(
       await _getProvider(this._connection).waitForTransaction(this.rawSentTransaction.hash)
@@ -170,23 +170,23 @@ export class SentEthersLiquityTransaction<T = unknown>
  * A transaction that has been prepared for sending.
  *
  * @remarks
- * Returned by {@link PopulatableEthersLiquity} functions.
+ * Returned by {@link PopulatableEthersZero} functions.
  *
  * @public
  */
-export class PopulatedEthersLiquityTransaction<T = unknown>
+export class PopulatedEthersZeroTransaction<T = unknown>
   implements
-    PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
+    PopulatedZeroTransaction<EthersPopulatedTransaction, SentEthersZeroTransaction<T>> {
   /** Unsigned transaction object populated by Ethers. */
   readonly rawPopulatedTransaction: EthersPopulatedTransaction;
 
-  private readonly _connection: EthersLiquityConnection;
+  private readonly _connection: EthersZeroConnection;
   private readonly _parse: (rawReceipt: EthersTransactionReceipt) => T;
 
   /** @internal */
   constructor(
     rawPopulatedTransaction: EthersPopulatedTransaction,
-    connection: EthersLiquityConnection,
+    connection: EthersZeroConnection,
     parse: (rawReceipt: EthersTransactionReceipt) => T
   ) {
     this.rawPopulatedTransaction = rawPopulatedTransaction;
@@ -194,9 +194,9 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
     this._parse = parse;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedLiquityTransaction.send} */
-  async send(): Promise<SentEthersLiquityTransaction<T>> {
-    return new SentEthersLiquityTransaction(
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatedZeroTransaction.send} */
+  async send(): Promise<SentEthersZeroTransaction<T>> {
+    return new SentEthersZeroTransaction(
       await _requireSigner(this._connection).sendTransaction(this.rawPopulatedTransaction),
       this._connection,
       this._parse
@@ -210,7 +210,7 @@ export class PopulatedEthersLiquityTransaction<T = unknown>
  * @public
  */
 export class PopulatedEthersRedemption
-  extends PopulatedEthersLiquityTransaction<RedemptionDetails>
+  extends PopulatedEthersZeroTransaction<RedemptionDetails>
   implements
     PopulatedRedemption<
       EthersPopulatedTransaction,
@@ -233,7 +233,7 @@ export class PopulatedEthersRedemption
   /** @internal */
   constructor(
     rawPopulatedTransaction: EthersPopulatedTransaction,
-    connection: EthersLiquityConnection,
+    connection: EthersZeroConnection,
     attemptedZUSDAmount: Decimal,
     redeemableZUSDAmount: Decimal,
     increaseAmountByMinimumNetDebt?: (
@@ -286,27 +286,27 @@ export interface _TroveChangeWithFees<T> {
 }
 
 /**
- * Ethers-based implementation of {@link @sovryn-zero/lib-base#PopulatableLiquity}.
+ * Ethers-based implementation of {@link @sovryn-zero/lib-base#PopulatableZero}.
  *
  * @public
  */
-export class PopulatableEthersLiquity
+export class PopulatableEthersZero
   implements
-    PopulatableLiquity<
+    PopulatableZero<
       EthersTransactionReceipt,
       EthersTransactionResponse,
       EthersPopulatedTransaction
     > {
-  private readonly _readable: ReadableEthersLiquity;
+  private readonly _readable: ReadableEthersZero;
 
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersZero) {
     this._readable = readable;
   }
 
   private _wrapSimpleTransaction(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<void> {
-    return new PopulatedEthersLiquityTransaction(
+  ): PopulatedEthersZeroTransaction<void> {
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
       noDetails
@@ -316,10 +316,10 @@ export class PopulatableEthersLiquity
   private _wrapTroveChangeWithFees<T>(
     params: T,
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<_TroveChangeWithFees<T>> {
+  ): PopulatedEthersZeroTransaction<_TroveChangeWithFees<T>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -343,10 +343,10 @@ export class PopulatableEthersLiquity
 
   private async _wrapTroveClosure(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>> {
     const { activePool, zusdToken } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -370,10 +370,10 @@ export class PopulatableEthersLiquity
 
   private _wrapLiquidation(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<LiquidationDetails> {
+  ): PopulatedEthersZeroTransaction<LiquidationDetails> {
     const { troveManager } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -429,8 +429,8 @@ export class PopulatableEthersLiquity
 
   private _wrapStabilityPoolGainsWithdrawal(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails> {
-    return new PopulatedEthersLiquityTransaction(
+  ): PopulatedEthersZeroTransaction<StabilityPoolGainsWithdrawalDetails> {
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
       ({ logs }) => this._extractStabilityPoolGainsWithdrawalDetails(logs)
@@ -440,8 +440,8 @@ export class PopulatableEthersLiquity
   private _wrapStabilityDepositTopup(
     change: { depositZUSD: Decimal },
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails> {
-    return new PopulatedEthersLiquityTransaction(
+  ): PopulatedEthersZeroTransaction<StabilityDepositChangeDetails> {
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -454,10 +454,10 @@ export class PopulatableEthersLiquity
 
   private async _wrapStabilityDepositWithdrawal(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<StabilityDepositChangeDetails>> {
     const { stabilityPool, zusdToken } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -479,10 +479,10 @@ export class PopulatableEthersLiquity
 
   private _wrapCollateralGainTransfer(
     rawPopulatedTransaction: EthersPopulatedTransaction
-  ): PopulatedEthersLiquityTransaction<CollateralGainTransferDetails> {
+  ): PopulatedEthersZeroTransaction<CollateralGainTransferDetails> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
-    return new PopulatedEthersLiquityTransaction(
+    return new PopulatedEthersZeroTransaction(
       rawPopulatedTransaction,
       this._readable.connection,
 
@@ -587,12 +587,12 @@ export class PopulatableEthersLiquity
     ];
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.openTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openTrove} */
   async openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveCreationDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     const normalized = _normalizeTroveCreation(params);
@@ -619,12 +619,12 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.openNueTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openNueTrove} */
   async openNueTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveCreationDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     const normalized = _normalizeTroveCreation(params);
@@ -651,10 +651,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.closeTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.closeTrove} */
   async closeTrove(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapTroveClosure(
@@ -662,10 +662,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.closeNueTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.closeNueTrove} */
   async closeNueTrove(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapTroveClosure(
@@ -675,45 +675,45 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.depositCollateral} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.depositCollateral} */
   depositCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
     return this.adjustTrove({ depositCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawCollateral} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
     return this.adjustTrove({ withdrawCollateral: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.borrowZUSD} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
     return this.adjustTrove({ borrowZUSD: amount }, maxBorrowingRate, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.repayZUSD} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.repayZUSD} */
   repayZUSD(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
     return this.adjustTrove({ repayZUSD: amount }, undefined, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.adjustTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustTrove} */
   async adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
@@ -750,12 +750,12 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.adjustNueTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustNueTrove} */
   async adjustNueTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
@@ -792,10 +792,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.claimCollateralSurplus} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.claimCollateralSurplus} */
   async claimCollateralSurplus(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
@@ -807,7 +807,7 @@ export class PopulatableEthersLiquity
   async setPrice(
     price: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { priceFeed } = _getContracts(this._readable.connection);
 
     if (!_priceFeedIsTestnet(priceFeed)) {
@@ -819,11 +819,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.liquidate} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.liquidate} */
   async liquidate(
     address: string | string[],
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>> {
     const { troveManager } = _getContracts(this._readable.connection);
 
     if (Array.isArray(address)) {
@@ -845,11 +845,11 @@ export class PopulatableEthersLiquity
     }
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.liquidateUpTo} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.liquidateUpTo} */
   async liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>> {
     const { troveManager } = _getContracts(this._readable.connection);
 
     return this._wrapLiquidation(
@@ -861,12 +861,12 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.depositZUSDInStabilityPool} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.depositZUSDInStabilityPool} */
   async depositZUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<StabilityDepositChangeDetails>> {
     const { stabilityPool } = _getContracts(this._readable.connection);
     const depositZUSD = Decimal.from(amount);
 
@@ -881,11 +881,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawZUSDFromStabilityPool} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.withdrawZUSDFromStabilityPool} */
   async withdrawZUSDFromStabilityPool(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<StabilityDepositChangeDetails>> {
     const { stabilityPool } = _getContracts(this._readable.connection);
 
     return this._wrapStabilityDepositWithdrawal(
@@ -897,10 +897,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.withdrawGainsFromStabilityPool} */
   async withdrawGainsFromStabilityPool(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<StabilityPoolGainsWithdrawalDetails>> {
     const { stabilityPool } = _getContracts(this._readable.connection);
 
     return this._wrapStabilityPoolGainsWithdrawal(
@@ -912,10 +912,10 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.transferCollateralGainToTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.transferCollateralGainToTrove} */
   async transferCollateralGainToTrove(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<CollateralGainTransferDetails>> {
+  ): Promise<PopulatedEthersZeroTransaction<CollateralGainTransferDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
     const { stabilityPool } = _getContracts(this._readable.connection);
 
@@ -935,12 +935,12 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.sendZUSD} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.sendZUSD} */
   async sendZUSD(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { zusdToken } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
@@ -953,12 +953,12 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.sendZERO} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.sendZERO} */
   async sendZERO(
     toAddress: string,
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { zeroToken } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
@@ -971,7 +971,7 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.redeemZUSD} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.redeemZUSD} */
   async redeemZUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish,
@@ -1041,11 +1041,11 @@ export class PopulatableEthersLiquity
     return populateRedemption(attemptedZUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.stakeZERO} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.stakeZERO} */
   async stakeZERO(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { zeroStaking } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
@@ -1053,11 +1053,11 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.unstakeZERO} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.unstakeZERO} */
   async unstakeZERO(
     amount: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { zeroStaking } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(
@@ -1065,18 +1065,18 @@ export class PopulatableEthersLiquity
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.withdrawGainsFromStaking} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.withdrawGainsFromStaking} */
   withdrawGainsFromStaking(
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     return this.unstakeZERO(Decimal.ZERO, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.registerFrontend} */
+  /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.registerFrontend} */
   async registerFrontend(
     kickbackRate: Decimalish,
     overrides?: EthersTransactionOverrides
-  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+  ): Promise<PopulatedEthersZeroTransaction<void>> {
     const { stabilityPool } = _getContracts(this._readable.connection);
 
     return this._wrapSimpleTransaction(

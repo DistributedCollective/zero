@@ -14,12 +14,12 @@ Connecting to a blockchain node and sending a transaction:
 
 ```javascript
 const { Wallet, providers } = require("ethers");
-const { EthersLiquity } = require("@sovryn-zero/lib-ethers");
+const { EthersZero } = require("@sovryn-zero/lib-ethers");
 
 async function example() {
   const provider = new providers.JsonRpcProvider("http://localhost:8545");
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
-  const zero = await EthersLiquity.connect(wallet);
+  const zero = await EthersZero.connect(wallet);
 
   const { newTrove } = await zero.openTrove({
     depositCollateral: 5, // BTC

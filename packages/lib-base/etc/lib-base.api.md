@@ -5,8 +5,8 @@
 ```ts
 
 // @internal (undocumented)
-export class _CachedReadableLiquity<T extends unknown[]> implements _ReadableLiquityWithExtraParams<T> {
-    constructor(readable: _ReadableLiquityWithExtraParams<T>, cache: _LiquityReadCache<T>);
+export class _CachedReadableZero<T extends unknown[]> implements _ReadableZeroWithExtraParams<T> {
+    constructor(readable: _ReadableZeroWithExtraParams<T>, cache: _ZeroReadCache<T>);
     // (undocumented)
     getCollateralSurplusBalance(address?: string, ...extraParams: T): Promise<Decimal>;
     // (undocumented)
@@ -208,7 +208,7 @@ export interface LiquidationDetails {
 }
 
 // @internal (undocumented)
-export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCacheBase<T> {
+export interface _ZeroReadCache<T extends unknown[]> extends _ZeroReadCacheBase<T> {
     // (undocumented)
     getTroves(params: TroveListingParams & {
         beforeRedistribution: true;
@@ -218,19 +218,19 @@ export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCach
 }
 
 // @internal (undocumented)
-export type _LiquityReadCacheBase<T extends unknown[]> = {
-    [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...args: infer A) => Promise<infer R> ? (...params: [...originalParams: A, ...extraParams: T]) => R | undefined : never;
+export type _ZeroReadCacheBase<T extends unknown[]> = {
+    [P in keyof ReadableZero]: ReadableZero[P] extends (...args: infer A) => Promise<infer R> ? (...params: [...originalParams: A, ...extraParams: T]) => R | undefined : never;
 };
 
 // @public
-export type LiquityReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
+export type ZeroReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
 
 // @public
-export abstract class LiquityStore<T = unknown> {
+export abstract class ZeroStore<T = unknown> {
     // @internal (undocumented)
     protected abstract _doStart(): () => void;
     // @internal (undocumented)
-    protected _load(baseState: LiquityStoreBaseState, extraState?: T): void;
+    protected _load(baseState: ZeroStoreBaseState, extraState?: T): void;
     // @internal (undocumented)
     protected _loaded: boolean;
     logging: boolean;
@@ -238,14 +238,14 @@ export abstract class LiquityStore<T = unknown> {
     // @internal (undocumented)
     protected abstract _reduceExtra(extraState: T, extraStateUpdate: Partial<T>): T;
     start(): () => void;
-    get state(): LiquityStoreState<T>;
-    subscribe(listener: (params: LiquityStoreListenerParams<T>) => void): () => void;
+    get state(): ZeroStoreState<T>;
+    subscribe(listener: (params: ZeroStoreListenerParams<T>) => void): () => void;
     // @internal (undocumented)
-    protected _update(baseStateUpdate?: Partial<LiquityStoreBaseState>, extraStateUpdate?: Partial<T>): void;
+    protected _update(baseStateUpdate?: Partial<ZeroStoreBaseState>, extraStateUpdate?: Partial<T>): void;
     }
 
 // @public
-export interface LiquityStoreBaseState {
+export interface ZeroStoreBaseState {
     accountBalance: Decimal;
     collateralSurplusBalance: Decimal;
     // @internal (undocumented)
@@ -270,7 +270,7 @@ export interface LiquityStoreBaseState {
 }
 
 // @public
-export interface LiquityStoreDerivedState {
+export interface ZeroStoreDerivedState {
     borrowingRate: Decimal;
     fees: Fees;
     haveUndercollateralizedTroves: boolean;
@@ -279,14 +279,14 @@ export interface LiquityStoreDerivedState {
 }
 
 // @public
-export interface LiquityStoreListenerParams<T = unknown> {
-    newState: LiquityStoreState<T>;
-    oldState: LiquityStoreState<T>;
-    stateChange: Partial<LiquityStoreState<T>>;
+export interface ZeroStoreListenerParams<T = unknown> {
+    newState: ZeroStoreState<T>;
+    oldState: ZeroStoreState<T>;
+    stateChange: Partial<ZeroStoreState<T>>;
 }
 
 // @public
-export type LiquityStoreState<T = unknown> = LiquityStoreBaseState & LiquityStoreDerivedState & T;
+export type ZeroStoreState<T = unknown> = ZeroStoreBaseState & ZeroStoreDerivedState & T;
 
 // @public
 export const MAXIMUM_BORROWING_RATE: Decimal;
@@ -328,7 +328,7 @@ export type _NoZUSDBorrowing = Partial<_ZUSDBorrowing<undefined>>;
 export type _NoZUSDRepayment = Partial<_ZUSDRepayment<undefined>>;
 
 // @alpha (undocumented)
-export interface ObservableLiquity {
+export interface ObservableZero {
     // (undocumented)
     watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
     // (undocumented)
@@ -375,46 +375,46 @@ export class Percent<T extends {
 
 // @internal (undocumented)
 export type _PopulatableFrom<T, P> = {
-    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer U> ? U extends SentLiquityTransaction ? (...args: A) => Promise<PopulatedLiquityTransaction<P, U>> : never : never;
+    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer U> ? U extends SentZeroTransaction ? (...args: A) => Promise<PopulatedZeroTransaction<P, U>> : never : never;
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "PopulatableLiquity" is marked as @public, but its signature references "_PopulatableFrom" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "PopulatableZero" is marked as @public, but its signature references "_PopulatableFrom" which is marked as @internal
 //
 // @public
-export interface PopulatableLiquity<R = unknown, S = unknown, P = unknown> extends _PopulatableFrom<SendableLiquity<R, S>, P> {
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    claimCollateralSurplus(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    closeTrove(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>>;
-    depositCollateral(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>>;
-    liquidate(address: string | string[]): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>>;
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>>;
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>>>;
+export interface PopulatableZero<R = unknown, S = unknown, P = unknown> extends _PopulatableFrom<SendableZero<R, S>, P> {
+    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>>;
+    claimCollateralSurplus(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    closeTrove(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveClosureDetails>>>>;
+    depositCollateral(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>>;
+    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>>;
+    liquidate(address: string | string[]): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>>;
+    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>>;
+    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveCreationDetails>>>>;
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
-    registerFrontend(kickbackRate: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    repayZUSD(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    sendZERO(toAddress: string, amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    sendZUSD(toAddress: string, amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+    registerFrontend(kickbackRate: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    repayZUSD(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>>;
+    sendZERO(toAddress: string, amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    sendZUSD(toAddress: string, amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
     // @internal (undocumented)
-    setPrice(price: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    stakeZERO(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    transferCollateralGainToTrove(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>>>;
-    unstakeZERO(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    withdrawCollateral(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    withdrawGainsFromStabilityPool(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>>>;
-    withdrawGainsFromStaking(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>>;
+    setPrice(price: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    stakeZERO(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    transferCollateralGainToTrove(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>>>;
+    unstakeZERO(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    withdrawCollateral(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>>;
+    withdrawGainsFromStabilityPool(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityPoolGainsWithdrawalDetails>>>>;
+    withdrawGainsFromStaking(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>>;
 }
 
 // @public
-export interface PopulatedLiquityTransaction<P = unknown, T extends SentLiquityTransaction = SentLiquityTransaction> {
+export interface PopulatedZeroTransaction<P = unknown, T extends SentZeroTransaction = SentZeroTransaction> {
     readonly rawPopulatedTransaction: P;
     send(): Promise<T>;
 }
 
 // @public
-export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> extends PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>> {
+export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> extends PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, RedemptionDetails>>> {
     readonly attemptedZUSDAmount: Decimal;
     increaseAmountByMinimumNetDebt(maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
     readonly isTruncated: boolean;
@@ -422,7 +422,7 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> exte
 }
 
 // @public
-export interface ReadableLiquity {
+export interface ReadableZero {
     getCollateralSurplusBalance(address?: string): Promise<Decimal>;
     getFees(): Promise<Fees>;
     getFrontendStatus(address?: string): Promise<FrontendStatus>;
@@ -447,7 +447,7 @@ export interface ReadableLiquity {
 }
 
 // @internal (undocumented)
-export interface _ReadableLiquityWithExtraParams<T extends unknown[]> extends _ReadableLiquityWithExtraParamsBase<T> {
+export interface _ReadableZeroWithExtraParams<T extends unknown[]> extends _ReadableZeroWithExtraParamsBase<T> {
     // (undocumented)
     getTroves(params: TroveListingParams & {
         beforeRedistribution: true;
@@ -457,8 +457,8 @@ export interface _ReadableLiquityWithExtraParams<T extends unknown[]> extends _R
 }
 
 // @internal (undocumented)
-export type _ReadableLiquityWithExtraParamsBase<T extends unknown[]> = {
-    [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...params: infer A) => infer R ? (...params: [...originalParams: A, ...extraParams: T]) => R : never;
+export type _ReadableZeroWithExtraParamsBase<T extends unknown[]> = {
+    [P in keyof ReadableZero]: ReadableZero[P] extends (...params: infer A) => infer R ? (...params: [...originalParams: A, ...extraParams: T]) => R : never;
 };
 
 // @public
@@ -471,40 +471,40 @@ export interface RedemptionDetails {
 
 // @internal (undocumented)
 export type _SendableFrom<T, R, S> = {
-    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer D> ? (...args: A) => Promise<SentLiquityTransaction<S, LiquityReceipt<R, D>>> : never;
+    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer D> ? (...args: A) => Promise<SentZeroTransaction<S, ZeroReceipt<R, D>>> : never;
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "SendableLiquity" is marked as @public, but its signature references "_SendableFrom" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "SendableZero" is marked as @public, but its signature references "_SendableFrom" which is marked as @internal
 //
 // @public
-export interface SendableLiquity<R = unknown, S = unknown> extends _SendableFrom<TransactableLiquity, R, S> {
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    claimCollateralSurplus(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    closeTrove(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>;
-    depositCollateral(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>;
-    liquidate(address: string | string[]): Promise<SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>;
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>;
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>>;
-    redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>>;
-    registerFrontend(kickbackRate: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    repayZUSD(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    sendZERO(toAddress: string, amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    sendZUSD(toAddress: string, amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+export interface SendableZero<R = unknown, S = unknown> extends _SendableFrom<TransactableZero, R, S> {
+    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+    claimCollateralSurplus(): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    closeTrove(): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveClosureDetails>>>;
+    depositCollateral(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>;
+    liquidate(address: string | string[]): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
+    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
+    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveCreationDetails>>>;
+    redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, RedemptionDetails>>>;
+    registerFrontend(kickbackRate: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    repayZUSD(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+    sendZERO(toAddress: string, amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    sendZUSD(toAddress: string, amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
     // @internal (undocumented)
-    setPrice(price: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    stakeZERO(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    transferCollateralGainToTrove(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>>;
-    unstakeZERO(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    withdrawCollateral(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    withdrawGainsFromStabilityPool(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
-    withdrawGainsFromStaking(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>;
+    setPrice(price: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    stakeZERO(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    transferCollateralGainToTrove(): Promise<SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>>;
+    unstakeZERO(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    withdrawCollateral(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>>;
+    withdrawGainsFromStabilityPool(): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
+    withdrawGainsFromStaking(): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>;
 }
 
 // @public
-export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = LiquityReceipt> {
+export interface SentZeroTransaction<S = unknown, T extends ZeroReceipt = ZeroReceipt> {
     getReceipt(): Promise<T>;
     readonly rawSentTransaction: S;
     waitForReceipt(): Promise<Extract<T, MinedReceipt>>;
@@ -562,7 +562,7 @@ export type SuccessfulReceipt<R = unknown, D = unknown> = {
 export const _successfulReceipt: <R, D>(rawReceipt: R, details: D, toString?: (() => string) | undefined) => SuccessfulReceipt<R, D>;
 
 // @public
-export interface TransactableLiquity {
+export interface TransactableZero {
     adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
     borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
     claimCollateralSurplus(): Promise<void>;

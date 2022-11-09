@@ -1,12 +1,12 @@
 import { useEffect, useReducer } from "react";
 
-import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { ZeroStoreState } from "@sovryn-zero/lib-base";
 
 import { equals } from "../utils/equals";
-import { useLiquityStore } from "./useLiquityStore";
+import { useZeroStore } from "./useZeroStore";
 
-export const useLiquitySelector = <S, T>(select: (state: LiquityStoreState<T>) => S): S => {
-  const store = useLiquityStore<T>();
+export const useZeroSelector = <S, T>(select: (state: ZeroStoreState<T>) => S): S => {
+  const store = useZeroStore<T>();
   const [, rerender] = useReducer(() => ({}), {});
 
   useEffect(

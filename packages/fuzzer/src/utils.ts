@@ -9,11 +9,11 @@ import {
   Percent,
   Trove,
   TroveWithPendingRedistribution,
-  ReadableLiquity,
+  ReadableZero,
   ZUSD_LIQUIDATION_RESERVE
 } from "@sovryn-zero/lib-base";
-import { EthersLiquity, ReadableEthersLiquity } from "@sovryn-zero/lib-ethers";
-import { SubgraphLiquity } from "@sovryn-zero/lib-subgraph";
+import { EthersZero, ReadableEthersZero } from "@sovryn-zero/lib-ethers";
+import { SubgraphZero } from "@sovryn-zero/lib-subgraph";
 
 export const objToString = (o: Record<string, unknown>) =>
   "{ " +
@@ -66,22 +66,22 @@ export const randomDebtChange = ({ debt }: Trove) =>
     ? { repayZUSD: debt.mul(1.1 * Math.random()) }
     : { borrowZUSD: debt.mul(0.5 * Math.random()) };
 
-export const getListOfTroves = async (liquity: ReadableLiquity) =>
-  liquity.getTroves({
-    first: await liquity.getNumberOfTroves(),
+export const getListOfTroves = async (zero: ReadableZero) =>
+  zero.getTroves({
+    first: await zero.getNumberOfTroves(),
     sortedBy: "descendingCollateralRatio",
     beforeRedistribution: false
   });
 
-export const getListOfTrovesBeforeRedistribution = async (liquity: ReadableLiquity) =>
-  liquity.getTroves({
-    first: await liquity.getNumberOfTroves(),
+export const getListOfTrovesBeforeRedistribution = async (zero: ReadableZero) =>
+  zero.getTroves({
+    first: await zero.getNumberOfTroves(),
     sortedBy: "descendingCollateralRatio",
     beforeRedistribution: true
   });
 
-export const getListOfTroveOwners = async (liquity: ReadableLiquity) =>
-  getListOfTrovesBeforeRedistribution(liquity).then(troves => troves.map(([owner]) => owner));
+export const getListOfTroveOwners = async (zero: ReadableZero) =>
+  getListOfTrovesBeforeRedistribution(zero).then(troves => troves.map(([owner]) => owner));
 
 const tinyDifference = Decimal.from("0.000000001");
 
@@ -161,12 +161,12 @@ export const checkTroveOrdering = (
 };
 
 export const checkPoolBalances = async (
-  liquity: ReadableEthersLiquity,
+  zero: ReadableEthersZero,
   listOfTroves: [string, TroveWithPendingRedistribution][],
   totalRedistributed: Trove
 ) => {
-  const activePool = await liquity._getActivePool();
-  const defaultPool = await liquity._getDefaultPool();
+  const activePool = await zero._getActivePool();
+  const defaultPool = await zero._getDefaultPool();
 
   const [activeTotal, defaultTotal] = listOfTroves.reduce(
     ([activeTotal, defaultTotal], [, troveActive]) => {
@@ -210,12 +210,12 @@ const trovesRoughlyEqual = (troveA: Trove, troveB: Trove) =>
 
 class EqualityCheck<T> {
   private name: string;
-  private get: (l: ReadableLiquity) => Promise<T>;
+  private get: (l: ReadableZero) => Promise<T>;
   private equals: (a: T, b: T) => boolean;
 
   constructor(
     name: string,
-    get: (l: ReadableLiquity) => Promise<T>,
+    get: (l: ReadableZero) => Promise<T>,
     equals: (a: T, b: T) => boolean
   ) {
     this.name = name;
@@ -223,7 +223,7 @@ class EqualityCheck<T> {
     this.equals = equals;
   }
 
-  async allEqual(liquities: ReadableLiquity[]) {
+  async allEqual(liquities: ReadableZero[]) {
     const [a, ...rest] = await Promise.all(liquities.map(l => this.get(l)));
 
     if (!rest.every(b => this.equals(a, b))) {
@@ -240,10 +240,10 @@ const checks = [
   new EqualityCheck("tokensInStabilityPool", l => l.getZUSDInStabilityPool(), decimalsEqual)
 ];
 
-export const checkSubgraph = async (subgraph: SubgraphLiquity, l1Liquity: ReadableLiquity) => {
-  await Promise.all(checks.map(check => check.allEqual([subgraph, l1Liquity])));
+export const checkSubgraph = async (subgraph: SubgraphZero, l1Zero: ReadableZero) => {
+  await Promise.all(checks.map(check => check.allEqual([subgraph, l1Zero])));
 
-  const l1ListOfTroves = await getListOfTrovesBeforeRedistribution(l1Liquity);
+  const l1ListOfTroves = await getListOfTrovesBeforeRedistribution(l1Zero);
   const subgraphListOfTroves = await getListOfTrovesBeforeRedistribution(subgraph);
   listOfTrovesShouldBeEqual(l1ListOfTroves, subgraphListOfTroves);
 
@@ -326,4 +326,4 @@ const truncateLastDigits = (n: number) => {
 };
 
 export const connectUsers = (users: Signer[]) =>
-  Promise.all(users.map(user => EthersLiquity.connect(user)));
+  Promise.all(users.map(user => EthersZero.connect(user)));

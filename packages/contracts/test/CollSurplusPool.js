@@ -29,7 +29,7 @@ contract('CollSurplusPool', async accounts => {
   const openTrove = async (params) => th.openTrove(contracts, params)
 
   before(async () => {
-    contracts = await deploymentHelper.deployLiquityCore()
+    contracts = await deploymentHelper.deployZeroCore()
     contracts.troveManager = await TroveManagerTester.new()
     contracts.zusdToken = await ZUSDToken.new()
     await contracts.zusdToken.initialize(

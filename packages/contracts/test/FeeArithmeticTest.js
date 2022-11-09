@@ -4,7 +4,7 @@ const { BNConverter } = require("../utils/BNConverter.js")
 const testHelpers = require("../utils/testHelpers.js")
 const timeMachine = require('ganache-time-traveler');
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
+const ZeroMathTester = artifacts.require("./ZeroMathTester.sol")
 
 const th = testHelpers.TestHelper
 const timeValues = testHelpers.TimeValues
@@ -336,9 +336,9 @@ contract('Fee arithmetic tests', async accounts => {
     troveManagerTester = await TroveManagerTester.new()
     TroveManagerTester.setAsDeployed(troveManagerTester)
 
-    mathTester = await LiquityMathTester.new()
-    LiquityMathTester.setAsDeployed(mathTester)
-    contracts = await deploymentHelper.deployLiquityCore()
+    mathTester = await ZeroMathTester.new()
+    ZeroMathTester.setAsDeployed(mathTester)
+    contracts = await deploymentHelper.deployZeroCore()
     const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
   
     await deploymentHelper.connectZEROContracts(ZEROContracts)

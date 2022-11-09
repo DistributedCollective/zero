@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
 import "../Dependencies/BaseMath.sol";
-import "../Dependencies/LiquityMath.sol";
+import "../Dependencies/ZeroMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
@@ -67,7 +67,7 @@ contract CommunityIssuance is
         uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
 
         // f^t
-        uint256 power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
+        uint256 power = ZeroMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
 
         //  (1 - f^t)
         uint256 cumulativeIssuanceFraction = (uint256(DECIMAL_PRECISION).sub(power));

@@ -1,6 +1,6 @@
 const { artifacts } = require("hardhat");
 const SortedTroves = artifacts.require("./SortedTroves.sol");
-const LiquityBaseParams = artifacts.require("./LiquityBaseParams.sol");
+const ZeroBaseParams = artifacts.require("./ZeroBaseParams.sol");
 const TroveManagerRedeemOps = artifacts.require("./Dependencies/TroveManagerRedeemOps.sol");
 const TroveManager = artifacts.require("./TroveManager.sol");
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
@@ -25,7 +25,7 @@ const MockFeeSharingProxy = artifacts.require("./MockFeeSharingProxy.sol");
 const StabilityPoolTester = artifacts.require("./StabilityPoolTester.sol");
 const ActivePoolTester = artifacts.require("./ActivePoolTester.sol");
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol");
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol");
+const ZeroMathTester = artifacts.require("./ZeroMathTester.sol");
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol");
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol");
@@ -69,15 +69,15 @@ const ZERO_ADDRESS = "0x" + "0".repeat(40);
 const maxBytes32 = "0x" + "f".repeat(64);
 
 class DeploymentHelper {
-  static async deployLiquityCore() {
+  static async deployZeroCore() {
     const cmdLineArgs = process.argv;
     const frameworkPath = cmdLineArgs[1];
     // console.log(`Framework used:  ${frameworkPath}`)
 
     if (frameworkPath.includes("hardhat")) {
-      return this.deployLiquityCoreHardhat();
+      return this.deployZeroCoreHardhat();
     } else if (frameworkPath.includes("truffle")) {
-      return this.deployLiquityCoreTruffle();
+      return this.deployZeroCoreTruffle();
     }
   }
 
@@ -93,10 +93,10 @@ class DeploymentHelper {
     }
   }
 
-  static async deployLiquityCoreHardhat() {
+  static async deployZeroCoreHardhat() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const sortedTroves = await SortedTroves.new();
-    const liquityBaseParams = await LiquityBaseParams.new();
+    const zeroBaseParams = await ZeroBaseParams.new();
     const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
     const troveManager = await TroveManager.new();
     const activePool = await ActivePool.new();
@@ -115,12 +115,12 @@ class DeploymentHelper {
       stabilityPool.address,
       borrowerOperations.address
     );
-    await liquityBaseParams.initialize();
+    await zeroBaseParams.initialize();
     ZUSDToken.setAsDeployed(zusdToken);
     DefaultPool.setAsDeployed(defaultPool);
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet);
     SortedTroves.setAsDeployed(sortedTroves);
-    LiquityBaseParams.setAsDeployed(liquityBaseParams);
+    ZeroBaseParams.setAsDeployed(zeroBaseParams);
     TroveManagerRedeemOps.setAsDeployed(troveManagerRedeemOps);
     TroveManager.setAsDeployed(troveManager);
     ActivePool.setAsDeployed(activePool);
@@ -137,7 +137,7 @@ class DeploymentHelper {
       priceFeedTestnet,
       zusdToken,
       sortedTroves,
-      liquityBaseParams,
+      zeroBaseParams,
       troveManagerRedeemOps,
       troveManager,
       activePool,
@@ -158,7 +158,7 @@ class DeploymentHelper {
     const testerContracts = {};
 
     // Contract without testers (yet)
-    testerContracts.liquityBaseParams = await LiquityBaseParams.new();
+    testerContracts.zeroBaseParams = await ZeroBaseParams.new();
     testerContracts.priceFeedTestnet = await PriceFeedTestnet.new();
     testerContracts.sortedTroves = await SortedTroves.new();
     // Actual tester contracts
@@ -168,7 +168,7 @@ class DeploymentHelper {
     testerContracts.stabilityPool = await StabilityPoolTester.new();
     testerContracts.gasPool = await GasPool.new();
     testerContracts.collSurplusPool = await CollSurplusPool.new();
-    testerContracts.math = await LiquityMathTester.new();
+    testerContracts.math = await ZeroMathTester.new();
     testerContracts.borrowerOperations = await BorrowerOperationsTester.new();
     testerContracts.troveManagerRedeemOps = await TroveManagerRedeemOps.new();
     testerContracts.troveManager = await TroveManagerTester.new();
@@ -181,7 +181,7 @@ class DeploymentHelper {
     );
     testerContracts.feeDistributor = await FeeDistributor.new();
     testerContracts.wrbtcTokenTester = await WRBTCTokenTester.new();
-    await testerContracts.liquityBaseParams.initialize();
+    await testerContracts.zeroBaseParams.initialize();
     return testerContracts;
   }
 
@@ -250,10 +250,10 @@ class DeploymentHelper {
     return ZEROContracts;
   }
 
-  static async deployLiquityCoreTruffle() {
+  static async deployZeroCoreTruffle() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const sortedTroves = await SortedTroves.new();
-    const liquityBaseParams = await LiquityBaseParams.new();
+    const zeroBaseParams = await ZeroBaseParams.new();
     const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
     const troveManager = await TroveManager.new();
     const activePool = await ActivePool.new();
@@ -271,12 +271,12 @@ class DeploymentHelper {
       stabilityPool.address,
       borrowerOperations.address
     );
-    await liquityBaseParams.initialize();
+    await zeroBaseParams.initialize();
     const coreContracts = {
       priceFeedTestnet,
       zusdToken,
       sortedTroves,
-      liquityBaseParams,
+      zeroBaseParams,
       troveManagerRedeemOps,
       troveManager,
       activePool,
@@ -421,7 +421,7 @@ class DeploymentHelper {
     await contracts.troveManager.setAddresses(
       contracts.feeDistributor.address,
       contracts.troveManagerRedeemOps.address,
-      contracts.liquityBaseParams.address,
+      contracts.zeroBaseParams.address,
       contracts.borrowerOperations.address,
       contracts.activePool.address,
       contracts.defaultPool.address,
@@ -438,7 +438,7 @@ class DeploymentHelper {
     // set contracts in BorrowerOperations
     await contracts.borrowerOperations.setAddresses(
       contracts.feeDistributor.address,
-      contracts.liquityBaseParams.address,
+      contracts.zeroBaseParams.address,
       contracts.troveManager.address,
       contracts.activePool.address,
       contracts.defaultPool.address,
@@ -464,7 +464,7 @@ class DeploymentHelper {
 
     // set contracts in the Pools
     await contracts.stabilityPool.setAddresses(
-      contracts.liquityBaseParams.address,
+      contracts.zeroBaseParams.address,
       contracts.borrowerOperations.address,
       contracts.troveManager.address,
       contracts.activePool.address,
@@ -494,7 +494,7 @@ class DeploymentHelper {
 
     // set contracts in HintHelpers
     await contracts.hintHelpers.setAddresses(
-      contracts.liquityBaseParams.address,
+      contracts.zeroBaseParams.address,
       contracts.sortedTroves.address,
       contracts.troveManager.address
     );

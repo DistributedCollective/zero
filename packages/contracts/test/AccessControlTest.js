@@ -38,7 +38,7 @@ contract(
     let communityIssuance;
 
     before(async () => {
-      coreContracts = await deploymentHelper.deployLiquityCore();
+      coreContracts = await deploymentHelper.deployZeroCore();
       coreContracts.troveManager = await TroveManagerTester.new();
       coreContracts = await deploymentHelper.deployZUSDTokenTester(coreContracts);
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig);

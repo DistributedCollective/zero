@@ -4,9 +4,9 @@ import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/
 import { Contract, ethers } from "ethers";
 import {
   _connectToContracts,
-  _LiquityContractAddresses,
-  _LiquityContracts,
-  _LiquityDeploymentJSON,
+  _ZeroContractAddresses,
+  _ZeroContracts,
+  _ZeroDeploymentJSON,
   _priceFeedIsTestnet as checkPriceFeedIsTestnet
 } from "../src/contracts";
 import { PriceFeed } from "../types";
@@ -96,7 +96,7 @@ const deployContracts = async (
   isMainnet?: boolean,
   notTestnet?: boolean,
   overrides?: Overrides
-): Promise<{ addresses: Omit<_LiquityContractAddresses, "nueToken">; startBlock: number }> => {
+): Promise<{ addresses: Omit<_ZeroContractAddresses, "nueToken">; startBlock: number }> => {
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(
     deployer,
     getContractFactory,
@@ -157,10 +157,10 @@ const deployContracts = async (
       ...overrides
     }),
     gasPool: gasPool.address,
-    liquityBaseParams: await deployContractWithProxy(
+    zeroBaseParams: await deployContractWithProxy(
       deployer,
       getContractFactory,
-      "LiquityBaseParams",
+      "ZeroBaseParams",
       {
         ...overrides
       }
@@ -218,9 +218,9 @@ const connectContracts = async (
     sortedTroves,
     stabilityPool,
     gasPool,
-    liquityBaseParams,
+    zeroBaseParams,
     feeDistributor
-  }: _LiquityContracts,
+  }: _ZeroContracts,
   deployer: Signer,
   governanceAddress: string,
   sovFeeCollectorAddress: string,
@@ -238,7 +238,7 @@ const connectContracts = async (
 
   let connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
     nonce =>
-      liquityBaseParams.initialize({
+      zeroBaseParams.initialize({
         ...overrides,
         nonce
       }),
@@ -264,7 +264,7 @@ const connectContracts = async (
       troveManager.setAddresses(
         feeDistributor.address,
         troveManagerRedeemOps.address,
-        liquityBaseParams.address,
+        zeroBaseParams.address,
         borrowerOperations.address,
         activePool.address,
         defaultPool.address,
@@ -282,7 +282,7 @@ const connectContracts = async (
     nonce =>
       borrowerOperations.setAddresses(
         feeDistributor.address,
-        liquityBaseParams.address,
+        zeroBaseParams.address,
         troveManager.address,
         activePool.address,
         defaultPool.address,
@@ -298,7 +298,7 @@ const connectContracts = async (
 
     nonce =>
       stabilityPool.setAddresses(
-        liquityBaseParams.address,
+        zeroBaseParams.address,
         borrowerOperations.address,
         troveManager.address,
         activePool.address,
@@ -334,7 +334,7 @@ const connectContracts = async (
 
     nonce =>
       hintHelpers.setAddresses(
-        liquityBaseParams.address,
+        zeroBaseParams.address,
         sortedTroves.address,
         troveManager.address,
         {
@@ -420,9 +420,9 @@ const transferOwnership = async (
     priceFeed,
     sortedTroves,
     stabilityPool,
-    liquityBaseParams,
+    zeroBaseParams,
     feeDistributor
-  }: _LiquityContracts,
+  }: _ZeroContracts,
   deployer: Signer,
   governanceAddress: string,
   priceFeedIsTestnet: boolean,
@@ -513,7 +513,7 @@ const transferOwnership = async (
         nonce
       }),
     nonce =>
-      liquityBaseParams.setOwner(governanceAddress, {
+      zeroBaseParams.setOwner(governanceAddress, {
         ...overrides,
         nonce
       })
@@ -559,7 +559,7 @@ export const deployAndSetupContracts = async (
   isMainnet?: boolean,
   notTestnet?: boolean,
   overrides?: Overrides
-): Promise<_LiquityDeploymentJSON> => {
+): Promise<_ZeroDeploymentJSON> => {
   if (!deployer.provider) {
     throw new Error("Signer must have a provider.");
   }
@@ -592,7 +592,7 @@ export const deployAndSetupContracts = async (
 
   const _priceFeedIsTestnet = externalPriceFeeds === undefined;
 
-  const deployment: _LiquityDeploymentJSON = {
+  const deployment: _ZeroDeploymentJSON = {
     chainId: await deployer.getChainId(),
     version: "unknown",
     deploymentDate: new Date().getTime(),
@@ -614,7 +614,7 @@ export const deployAndSetupContracts = async (
       notTestnet,
       overrides
     ))
-  } as _LiquityDeploymentJSON;
+  } as _ZeroDeploymentJSON;
 
   const contracts = _connectToContracts(deployer, deployment);
 

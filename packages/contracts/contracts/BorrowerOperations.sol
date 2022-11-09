@@ -9,13 +9,13 @@ import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IFeeDistributor.sol";
-import "./Dependencies/LiquityBase.sol";
+import "./Dependencies/ZeroBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./BorrowerOperationsStorage.sol";
 
 contract BorrowerOperations is
-    LiquityBase,
+    ZeroBase,
     BorrowerOperationsStorage,
     CheckContract,
     IBorrowerOperations
@@ -92,7 +92,7 @@ contract BorrowerOperations is
 
     function setAddresses(
         address _feeDistributorAddress,
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,
@@ -108,7 +108,7 @@ contract BorrowerOperations is
         assert(MIN_NET_DEBT > 0);
 
         checkContract(_feeDistributorAddress);
-        checkContract(_liquityBaseParamsAddress);
+        checkContract(_zeroBaseParamsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
         checkContract(_defaultPoolAddress);
@@ -121,7 +121,7 @@ contract BorrowerOperations is
         checkContract(_zeroStakingAddress);
 
         feeDistributor = IFeeDistributor(_feeDistributorAddress);
-        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
+        zeroBaseParams = IZeroBaseParams(_zeroBaseParamsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
         defaultPool = IDefaultPool(_defaultPoolAddress);
@@ -208,8 +208,8 @@ contract BorrowerOperations is
         vars.compositeDebt = _getCompositeDebt(vars.netDebt);
         assert(vars.compositeDebt > 0);
 
-        vars.ICR = LiquityMath._computeCR(msg.value, vars.compositeDebt, vars.price);
-        vars.NICR = LiquityMath._computeNominalCR(msg.value, vars.compositeDebt);
+        vars.ICR = ZeroMath._computeCR(msg.value, vars.compositeDebt, vars.price);
+        vars.NICR = ZeroMath._computeNominalCR(msg.value, vars.compositeDebt);
 
         if (isRecoveryMode) {
             _requireICRisAboveCCR(vars.ICR);
@@ -440,7 +440,7 @@ contract BorrowerOperations is
         vars.coll = contractsCache.troveManager.getTroveColl(_borrower);
 
         // Get the trove's old ICR before the adjustment, and what its new ICR will be after the adjustment
-        vars.oldICR = LiquityMath._computeCR(vars.coll, vars.debt, vars.price);
+        vars.oldICR = ZeroMath._computeCR(vars.coll, vars.debt, vars.price);
         vars.newICR = _getNewICRFromTroveChange(
             vars.coll,
             vars.debt,
@@ -765,14 +765,14 @@ contract BorrowerOperations is
 
     function _requireICRisAboveMCR(uint256 _newICR) internal view {
         require(
-            _newICR >= liquityBaseParams.MCR(),
+            _newICR >= zeroBaseParams.MCR(),
             "BorrowerOps: An operation that would result in ICR < MCR is not permitted"
         );
     }
 
     function _requireICRisAboveCCR(uint256 _newICR) internal view {
         require(
-            _newICR >= liquityBaseParams.CCR(),
+            _newICR >= zeroBaseParams.CCR(),
             "BorrowerOps: Operation must leave trove with ICR >= CCR"
         );
     }
@@ -786,7 +786,7 @@ contract BorrowerOperations is
 
     function _requireNewTCRisAboveCCR(uint256 _newTCR) internal view {
         require(
-            _newTCR >= liquityBaseParams.CCR(),
+            _newTCR >= zeroBaseParams.CCR(),
             "BorrowerOps: An operation that would result in TCR < CCR is not permitted"
         );
     }
@@ -831,7 +831,7 @@ contract BorrowerOperations is
             );
         } else {
             require(
-                _maxFeePercentage >= liquityBaseParams.BORROWING_FEE_FLOOR() &&
+                _maxFeePercentage >= zeroBaseParams.BORROWING_FEE_FLOOR() &&
                     _maxFeePercentage <= DECIMAL_PRECISION,
                 "Max fee percentage must be between 0.5% and 100%"
             );
@@ -858,7 +858,7 @@ contract BorrowerOperations is
             _isDebtIncrease
         );
 
-        uint256 newNICR = LiquityMath._computeNominalCR(newColl, newDebt);
+        uint256 newNICR = ZeroMath._computeNominalCR(newColl, newDebt);
         return newNICR;
     }
 
@@ -881,7 +881,7 @@ contract BorrowerOperations is
             _isDebtIncrease
         );
 
-        uint256 newICR = LiquityMath._computeCR(newColl, newDebt, _price);
+        uint256 newICR = ZeroMath._computeCR(newColl, newDebt, _price);
         return newICR;
     }
 
@@ -915,7 +915,7 @@ contract BorrowerOperations is
         totalColl = _isCollIncrease ? totalColl.add(_collChange) : totalColl.sub(_collChange);
         totalDebt = _isDebtIncrease ? totalDebt.add(_debtChange) : totalDebt.sub(_debtChange);
 
-        uint256 newTCR = LiquityMath._computeCR(totalColl, totalDebt, _price);
+        uint256 newTCR = ZeroMath._computeCR(totalColl, totalDebt, _price);
         return newTCR;
     }
 
@@ -924,6 +924,6 @@ contract BorrowerOperations is
     }
 
     function BORROWING_FEE_FLOOR() external view override returns (uint256) {
-        return liquityBaseParams.BORROWING_FEE_FLOOR();
+        return zeroBaseParams.BORROWING_FEE_FLOOR();
     }
 }

@@ -4,17 +4,17 @@ import {
   Decimal,
   Fees,
   FrontendStatus,
-  LiquityStore,
+  ZeroStore,
   ZEROStake,
-  ReadableLiquity,
+  ReadableZero,
   StabilityDeposit,
   Trove,
   TroveListingParams,
   TroveWithPendingRedistribution,
   UserTrove,
   UserTroveStatus,
-  _CachedReadableLiquity,
-  _LiquityReadCache
+  _CachedReadableZero,
+  _ZeroReadCache
 } from "@sovryn-zero/lib-base";
 
 import { MultiTroveGetter } from "../types";
@@ -22,21 +22,21 @@ import { MultiTroveGetter } from "../types";
 import { EthersCallOverrides, EthersProvider, EthersSigner } from "./types";
 
 import {
-  EthersLiquityConnection,
-  EthersLiquityConnectionOptionalParams,
-  EthersLiquityStoreOption,
+  EthersZeroConnection,
+  EthersZeroConnectionOptionalParams,
+  EthersZeroStoreOption,
   _connect,
   _getBlockTimestamp,
   _getContracts,
   _requireAddress,
   _requireFrontendAddress
-} from "./EthersLiquityConnection";
+} from "./EthersZeroConnection";
 
-import { BlockPolledLiquityStore } from "./BlockPolledLiquityStore";
+import { BlockPolledZeroStore } from "./BlockPolledZeroStore";
 
 // TODO: these are constant in the contracts, so it doesn't make sense to make a call for them,
 // but to avoid having to update them here when we change them in the contracts, we could read
-// them once after deployment and save them to LiquityDeployment.
+// them once after deployment and save them to ZeroDeployment.
 const MINUTE_DECAY_FACTOR = Decimal.from("0.999037758833783000");
 const BETA = Decimal.from(2);
 
@@ -83,48 +83,48 @@ const expectPositiveInt = <K extends string>(obj: { [P in K]?: number }, key: K)
 };
 
 /**
- * Ethers-based implementation of {@link @sovryn-zero/lib-base#ReadableLiquity}.
+ * Ethers-based implementation of {@link @sovryn-zero/lib-base#ReadableZero}.
  *
  * @public
  */
-export class ReadableEthersLiquity implements ReadableLiquity {
-  readonly connection: EthersLiquityConnection;
+export class ReadableEthersZero implements ReadableZero {
+  readonly connection: EthersZeroConnection;
 
   /** @internal */
-  constructor(connection: EthersLiquityConnection) {
+  constructor(connection: EthersZeroConnection) {
     this.connection = connection;
   }
 
   /** @internal */
   static _from(
-    connection: EthersLiquityConnection & { useStore: "blockPolled" }
-  ): ReadableEthersLiquityWithStore<BlockPolledLiquityStore>;
+    connection: EthersZeroConnection & { useStore: "blockPolled" }
+  ): ReadableEthersZeroWithStore<BlockPolledZeroStore>;
 
   /** @internal */
-  static _from(connection: EthersLiquityConnection): ReadableEthersLiquity;
+  static _from(connection: EthersZeroConnection): ReadableEthersZero;
 
   /** @internal */
-  static _from(connection: EthersLiquityConnection): ReadableEthersLiquity {
-    const readable = new ReadableEthersLiquity(connection);
+  static _from(connection: EthersZeroConnection): ReadableEthersZero {
+    const readable = new ReadableEthersZero(connection);
 
     return connection.useStore === "blockPolled"
-      ? new _BlockPolledReadableEthersLiquity(readable)
+      ? new _BlockPolledReadableEthersZero(readable)
       : readable;
   }
 
   /** @internal */
   static connect(
     signerOrProvider: EthersSigner | EthersProvider,
-    optionalParams: EthersLiquityConnectionOptionalParams & { useStore: "blockPolled" }
-  ): Promise<ReadableEthersLiquityWithStore<BlockPolledLiquityStore>>;
+    optionalParams: EthersZeroConnectionOptionalParams & { useStore: "blockPolled" }
+  ): Promise<ReadableEthersZeroWithStore<BlockPolledZeroStore>>;
 
   static connect(
     signerOrProvider: EthersSigner | EthersProvider,
-    optionalParams?: EthersLiquityConnectionOptionalParams
-  ): Promise<ReadableEthersLiquity>;
+    optionalParams?: EthersZeroConnectionOptionalParams
+  ): Promise<ReadableEthersZero>;
 
   /**
-   * Connect to the Zero protocol and create a `ReadableEthersLiquity` object.
+   * Connect to the Zero protocol and create a `ReadableEthersZero` object.
    *
    * @param signerOrProvider - Ethers `Signer` or `Provider` to use for connecting to the Ethereum
    *                           network.
@@ -132,27 +132,27 @@ export class ReadableEthersLiquity implements ReadableLiquity {
    */
   static async connect(
     signerOrProvider: EthersSigner | EthersProvider,
-    optionalParams?: EthersLiquityConnectionOptionalParams
-  ): Promise<ReadableEthersLiquity> {
-    return ReadableEthersLiquity._from(await _connect(signerOrProvider, optionalParams));
+    optionalParams?: EthersZeroConnectionOptionalParams
+  ): Promise<ReadableEthersZero> {
+    return ReadableEthersZero._from(await _connect(signerOrProvider, optionalParams));
   }
 
   /**
-   * Check whether this `ReadableEthersLiquity` is a {@link ReadableEthersLiquityWithStore}.
+   * Check whether this `ReadableEthersZero` is a {@link ReadableEthersZeroWithStore}.
    */
-  hasStore(): this is ReadableEthersLiquityWithStore;
+  hasStore(): this is ReadableEthersZeroWithStore;
 
   /**
-   * Check whether this `ReadableEthersLiquity` is a
-   * {@link ReadableEthersLiquityWithStore}\<{@link BlockPolledLiquityStore}\>.
+   * Check whether this `ReadableEthersZero` is a
+   * {@link ReadableEthersZeroWithStore}\<{@link BlockPolledZeroStore}\>.
    */
-  hasStore(store: "blockPolled"): this is ReadableEthersLiquityWithStore<BlockPolledLiquityStore>;
+  hasStore(store: "blockPolled"): this is ReadableEthersZeroWithStore<BlockPolledZeroStore>;
 
   hasStore(): boolean {
     return false;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTotalRedistributed} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotalRedistributed} */
   async getTotalRedistributed(overrides?: EthersCallOverrides): Promise<Trove> {
     const { troveManager } = _getContracts(this.connection);
 
@@ -164,7 +164,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return new Trove(collateral, debt);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTroveBeforeRedistribution} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTroveBeforeRedistribution} */
   async getTroveBeforeRedistribution(
     address?: string,
     overrides?: EthersCallOverrides
@@ -191,7 +191,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     }
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTrove} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTrove} */
   async getTrove(address?: string, overrides?: EthersCallOverrides): Promise<UserTrove> {
     const [trove, totalRedistributed] = await Promise.all([
       this.getTroveBeforeRedistribution(address, overrides),
@@ -201,14 +201,14 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return trove.applyRedistribution(totalRedistributed);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getNumberOfTroves} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getNumberOfTroves} */
   async getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number> {
     const { troveManager } = _getContracts(this.connection);
 
     return (await troveManager.getTroveOwnersCount({ ...overrides })).toNumber();
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getPrice} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getPrice} */
   getPrice(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { priceFeed } = _getContracts(this.connection);
 
@@ -243,7 +243,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return new Trove(liquidatedCollateral, closedDebt);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTotal} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotal} */
   async getTotal(overrides?: EthersCallOverrides): Promise<Trove> {
     const [activePool, defaultPool] = await Promise.all([
       this._getActivePool(overrides),
@@ -253,7 +253,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return activePool.add(defaultPool);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getStabilityDeposit} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getStabilityDeposit} */
   async getStabilityDeposit(
     address?: string,
     overrides?: EthersCallOverrides
@@ -282,7 +282,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getRemainingStabilityPoolZEROReward} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getRemainingStabilityPoolZEROReward} */
   async getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { communityIssuance } = _getContracts(this.connection);
 
@@ -296,14 +296,14 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return remaining;
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZUSDInStabilityPool} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZUSDInStabilityPool} */
   getZUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { stabilityPool } = _getContracts(this.connection);
 
     return stabilityPool.getTotalZUSDDeposits({ ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZUSDBalance} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZUSDBalance} */
   getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { zusdToken } = _getContracts(this.connection);
@@ -311,7 +311,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return zusdToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZEROBalance} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZEROBalance} */
   getZEROBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { zeroToken } = _getContracts(this.connection);
@@ -319,7 +319,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return zeroToken.balanceOf(address, { ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getCollateralSurplusBalance} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getCollateralSurplusBalance} */
   getCollateralSurplusBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal> {
     address ??= _requireAddress(this.connection);
     const { collSurplusPool } = _getContracts(this.connection);
@@ -333,7 +333,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     overrides?: EthersCallOverrides
   ): Promise<TroveWithPendingRedistribution[]>;
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.(getTroves:2)} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.(getTroves:2)} */
   getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<UserTrove[]>;
 
   async getTroves(
@@ -393,7 +393,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
       );
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getFees} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getFees} */
   async getFees(overrides?: EthersCallOverrides): Promise<Fees> {
     const [createFees, total, price, blockTimestamp] = await Promise.all([
       this._getFeesFactory(overrides),
@@ -405,7 +405,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return createFees(blockTimestamp, total.collateralRatioIsBelowCritical(price));
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZEROStake} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getZEROStake} */
   async getZEROStake(address?: string, overrides?: EthersCallOverrides): Promise<ZEROStake> {
     address ??= _requireAddress(this.connection);
     const { zeroStaking } = _getContracts(this.connection);
@@ -421,14 +421,14 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     return new ZEROStake(stakedZERO, collateralGain, zusdGain);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getTotalStakedZERO} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getTotalStakedZERO} */
   async getTotalStakedZERO(overrides?: EthersCallOverrides): Promise<Decimal> {
     const { zeroStaking } = _getContracts(this.connection);
 
     return zeroStaking.totalZEROStaked({ ...overrides }).then(decimalify);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getFrontendStatus} */
+  /** {@inheritDoc @sovryn-zero/lib-base#ReadableZero.getFrontendStatus} */
   async getFrontendStatus(
     address?: string,
     overrides?: EthersCallOverrides
@@ -461,21 +461,21 @@ const mapBackendTroves = (troves: BackendTroves): TroveWithPendingRedistribution
   );
 
 /**
- * Variant of {@link ReadableEthersLiquity} that exposes a {@link @sovryn-zero/lib-base#LiquityStore}.
+ * Variant of {@link ReadableEthersZero} that exposes a {@link @sovryn-zero/lib-base#ZeroStore}.
  *
  * @public
  */
-export interface ReadableEthersLiquityWithStore<T extends LiquityStore = LiquityStore>
-  extends ReadableEthersLiquity {
-  /** An object that implements LiquityStore. */
+export interface ReadableEthersZeroWithStore<T extends ZeroStore = ZeroStore>
+  extends ReadableEthersZero {
+  /** An object that implements ZeroStore. */
   readonly store: T;
 }
 
-class BlockPolledLiquityStoreBasedCache
-  implements _LiquityReadCache<[overrides?: EthersCallOverrides]> {
-  private _store: BlockPolledLiquityStore;
+class BlockPolledZeroStoreBasedCache
+  implements _ZeroReadCache<[overrides?: EthersCallOverrides]> {
+  private _store: BlockPolledZeroStore;
 
-  constructor(store: BlockPolledLiquityStore) {
+  constructor(store: BlockPolledZeroStore) {
     this._store = store;
   }
 
@@ -614,22 +614,22 @@ class BlockPolledLiquityStoreBasedCache
   }
 }
 
-class _BlockPolledReadableEthersLiquity
-  extends _CachedReadableLiquity<[overrides?: EthersCallOverrides]>
-  implements ReadableEthersLiquityWithStore<BlockPolledLiquityStore> {
-  readonly connection: EthersLiquityConnection;
-  readonly store: BlockPolledLiquityStore;
+class _BlockPolledReadableEthersZero
+  extends _CachedReadableZero<[overrides?: EthersCallOverrides]>
+  implements ReadableEthersZeroWithStore<BlockPolledZeroStore> {
+  readonly connection: EthersZeroConnection;
+  readonly store: BlockPolledZeroStore;
 
-  constructor(readable: ReadableEthersLiquity) {
-    const store = new BlockPolledLiquityStore(readable);
+  constructor(readable: ReadableEthersZero) {
+    const store = new BlockPolledZeroStore(readable);
 
-    super(readable, new BlockPolledLiquityStoreBasedCache(store));
+    super(readable, new BlockPolledZeroStoreBasedCache(store));
 
     this.store = store;
     this.connection = readable.connection;
   }
 
-  hasStore(store?: EthersLiquityStoreOption): boolean {
+  hasStore(store?: EthersZeroStoreOption): boolean {
     return store === undefined || store === "blockPolled";
   }
 

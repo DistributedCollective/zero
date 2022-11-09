@@ -2,7 +2,7 @@ const fs = require("fs");
 const deploymentHelper = require("../utils/deploymentHelpers.js");
 const testHelpers = require("../utils/testHelpers.js");
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol");
+const ZeroMathTester = artifacts.require("./ZeroMathTester.sol");
 
 const th = testHelpers.TestHelper;
 
@@ -20,12 +20,12 @@ contract("Gas costs for math functions", async accounts => {
     troveManagerTester = await TroveManagerTester.new();
     TroveManagerTester.setAsDeployed(troveManagerTester);
 
-    mathTester = await LiquityMathTester.new();
-    LiquityMathTester.setAsDeployed(mathTester);
+    mathTester = await ZeroMathTester.new();
+    ZeroMathTester.setAsDeployed(mathTester);
   });
 
   beforeEach(async () => {
-    contracts = await deploymentHelper.deployLiquityCore();
+    contracts = await deploymentHelper.deployZeroCore();
     const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress);
 
     priceFeed = contracts.priceFeedTestnet;

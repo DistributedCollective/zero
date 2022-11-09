@@ -4,11 +4,11 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/ISortedTroves.sol";
-import "./Dependencies/LiquityBase.sol";
+import "./Dependencies/ZeroBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./HintHelpersStorage.sol";
 
-contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
+contract HintHelpers is ZeroBase, HintHelpersStorage, CheckContract {
 
     // --- Events ---
 
@@ -18,18 +18,18 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
     // --- Dependency setters ---
 
     function setAddresses(
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _sortedTrovesAddress,
         address _troveManagerAddress
     )
         external
         onlyOwner
     {
-        checkContract(_liquityBaseParamsAddress);
+        checkContract(_zeroBaseParamsAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_troveManagerAddress);
 
-        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
+        zeroBaseParams = IZeroBaseParams(_zeroBaseParamsAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
         troveManager = ITroveManager(_troveManagerAddress);
 
@@ -76,7 +76,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
         uint remainingZUSD = _ZUSDamount;
         address currentTroveuser = sortedTrovesCached.getLast();
 
-        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < liquityBaseParams.MCR()) {
+        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < zeroBaseParams.MCR()) {
             currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
         }
 
@@ -92,7 +92,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
 
             if (netZUSDDebt > remainingZUSD) {
                 if (netZUSDDebt > MIN_NET_DEBT) {
-                    uint maxRedeemableZUSD = LiquityMath._min(remainingZUSD, netZUSDDebt.sub(MIN_NET_DEBT));
+                    uint maxRedeemableZUSD = ZeroMath._min(remainingZUSD, netZUSDDebt.sub(MIN_NET_DEBT));
 
                     uint BTC = troveManager.getTroveColl(currentTroveuser)
                         .add(troveManager.getPendingBTCReward(currentTroveuser));
@@ -101,7 +101,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
                     uint newDebt = netZUSDDebt.sub(maxRedeemableZUSD);
 
                     uint compositeDebt = _getCompositeDebt(newDebt);
-                    partialRedemptionHintNICR = LiquityMath._computeNominalCR(newColl, compositeDebt);
+                    partialRedemptionHintNICR = ZeroMath._computeNominalCR(newColl, compositeDebt);
 
                     remainingZUSD = remainingZUSD.sub(maxRedeemableZUSD);
                 }
@@ -137,7 +137,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
         }
 
         hintAddress = sortedTroves.getLast();
-        diff = LiquityMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress));
+        diff = ZeroMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress));
         latestRandomSeed = _inputRandomSeed;
 
         uint i = 1;
@@ -150,7 +150,7 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
             uint currentNICR = troveManager.getNominalICR(currentAddress);
 
             // check if abs(current - CR) > abs(closest - CR), and update closest if current is closer
-            uint currentDiff = LiquityMath._getAbsoluteDifference(currentNICR, _CR);
+            uint currentDiff = ZeroMath._getAbsoluteDifference(currentNICR, _CR);
 
             if (currentDiff < diff) {
                 diff = currentDiff;
@@ -161,10 +161,10 @@ contract HintHelpers is LiquityBase, HintHelpersStorage, CheckContract {
     }
 
     function computeNominalCR(uint _coll, uint _debt) external pure returns (uint) {
-        return LiquityMath._computeNominalCR(_coll, _debt);
+        return ZeroMath._computeNominalCR(_coll, _debt);
     }
 
     function computeCR(uint _coll, uint _debt, uint _price) external pure returns (uint) {
-        return LiquityMath._computeCR(_coll, _debt, _price);
+        return ZeroMath._computeCR(_coll, _debt, _price);
     }
 }

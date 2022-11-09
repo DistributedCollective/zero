@@ -8,7 +8,7 @@ import { ZEROStake } from "./ZEROStake";
  * Represents whether an address has been registered as a Zero frontend.
  *
  * @remarks
- * Returned by the {@link ReadableLiquity.getFrontendStatus | getFrontendStatus()} function.
+ * Returned by the {@link ReadableZero.getFrontendStatus | getFrontendStatus()} function.
  *
  * When `status` is `"registered"`, `kickbackRate` gives the frontend's kickback rate as a
  * {@link Decimal} between 0 and 1.
@@ -20,7 +20,7 @@ export type FrontendStatus =
   | { status: "registered"; kickbackRate: Decimal };
 
 /**
- * Parameters of the {@link ReadableLiquity.(getTroves:2) | getTroves()} function.
+ * Parameters of the {@link ReadableZero.(getTroves:2) | getTroves()} function.
  *
  * @public
  */
@@ -48,11 +48,11 @@ export interface TroveListingParams {
  * Read the state of the Zero protocol.
  *
  * @remarks
- * Implemented by {@link @sovryn-zero/lib-ethers#EthersLiquity}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#EthersZero}.
  *
  * @public
  */
-export interface ReadableLiquity {
+export interface ReadableZero {
   /**
    * Get the total collateral and debt per stake that has been liquidated through redistribution.
    *
@@ -68,7 +68,7 @@ export interface ReadableLiquity {
    *
    * @remarks
    * The current state of a Trove can be fetched using
-   * {@link @sovryn-zero/lib-base#ReadableLiquity.getTrove | getTrove()}.
+   * {@link @sovryn-zero/lib-base#ReadableZero.getTrove | getTrove()}.
    */
   getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistribution>;
 
@@ -132,7 +132,7 @@ export interface ReadableLiquity {
    * When a Trove gets liquidated or redeemed, any collateral it has above 110% (in case of
    * liquidation) or 100% collateralization (in case of redemption) gets sent to a pool, where it
    * can be withdrawn from using
-   * {@link @sovryn-zero/lib-base#TransactableLiquity.claimCollateralSurplus | claimCollateralSurplus()}.
+   * {@link @sovryn-zero/lib-base#TransactableZero.claimCollateralSurplus | claimCollateralSurplus()}.
    */
   getCollateralSurplusBalance(address?: string): Promise<Decimal>;
 

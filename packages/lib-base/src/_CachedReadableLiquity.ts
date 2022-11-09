@@ -3,18 +3,18 @@ import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
 import { StabilityDeposit } from "./StabilityDeposit";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
-import { FrontendStatus, ReadableLiquity, TroveListingParams } from "./ReadableLiquity";
+import { FrontendStatus, ReadableZero, TroveListingParams } from "./ReadableZero";
 
 /** @internal */
-export type _ReadableLiquityWithExtraParamsBase<T extends unknown[]> = {
-  [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...params: infer A) => infer R
+export type _ReadableZeroWithExtraParamsBase<T extends unknown[]> = {
+  [P in keyof ReadableZero]: ReadableZero[P] extends (...params: infer A) => infer R
     ? (...params: [...originalParams: A, ...extraParams: T]) => R
     : never;
 };
 
 /** @internal */
-export type _LiquityReadCacheBase<T extends unknown[]> = {
-  [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...args: infer A) => Promise<infer R>
+export type _ZeroReadCacheBase<T extends unknown[]> = {
+  [P in keyof ReadableZero]: ReadableZero[P] extends (...args: infer A) => Promise<infer R>
     ? (...params: [...originalParams: A, ...extraParams: T]) => R | undefined
     : never;
 };
@@ -22,8 +22,8 @@ export type _LiquityReadCacheBase<T extends unknown[]> = {
 // Overloads get lost in the mapping, so we need to define them again...
 
 /** @internal */
-export interface _ReadableLiquityWithExtraParams<T extends unknown[]>
-  extends _ReadableLiquityWithExtraParamsBase<T> {
+export interface _ReadableZeroWithExtraParams<T extends unknown[]>
+  extends _ReadableZeroWithExtraParamsBase<T> {
   getTroves(
     params: TroveListingParams & { beforeRedistribution: true },
     ...extraParams: T
@@ -33,7 +33,7 @@ export interface _ReadableLiquityWithExtraParams<T extends unknown[]>
 }
 
 /** @internal */
-export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCacheBase<T> {
+export interface _ZeroReadCache<T extends unknown[]> extends _ZeroReadCacheBase<T> {
   getTroves(
     params: TroveListingParams & { beforeRedistribution: true },
     ...extraParams: T
@@ -43,12 +43,12 @@ export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCach
 }
 
 /** @internal */
-export class _CachedReadableLiquity<T extends unknown[]>
-  implements _ReadableLiquityWithExtraParams<T> {
-  private _readable: _ReadableLiquityWithExtraParams<T>;
-  private _cache: _LiquityReadCache<T>;
+export class _CachedReadableZero<T extends unknown[]>
+  implements _ReadableZeroWithExtraParams<T> {
+  private _readable: _ReadableZeroWithExtraParams<T>;
+  private _cache: _ZeroReadCache<T>;
 
-  constructor(readable: _ReadableLiquityWithExtraParams<T>, cache: _LiquityReadCache<T>) {
+  constructor(readable: _ReadableZeroWithExtraParams<T>, cache: _ZeroReadCache<T>) {
     this._readable = readable;
     this._cache = cache;
   }

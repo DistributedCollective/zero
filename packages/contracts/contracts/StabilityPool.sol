@@ -9,8 +9,8 @@ import './Interfaces/ITroveManager.sol';
 import './Interfaces/IZUSDToken.sol';
 import './Interfaces/ISortedTroves.sol';
 import "./Interfaces/ICommunityIssuance.sol";
-import "./Dependencies/LiquityBase.sol";
-import "./Dependencies/LiquitySafeMath128.sol";
+import "./Dependencies/ZeroBase.sol";
+import "./Dependencies/ZeroSafeMath128.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./StabilityPoolStorage.sol";
@@ -44,7 +44,7 @@ import "./StabilityPoolStorage.sol";
  * Stability Pool, they get a snapshot of the latest P and S: P_t and S_t, respectively.
  *
  * The formula for a depositor's accumulated BTC gain is derived here:
- * https://github.com/liquity/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf
+ * https://github.com/zero/dev/blob/main/packages/contracts/mathProofs/Scalable%20Compounding%20Stability%20Pool%20Deposits.pdf
  *
  * For a given deposit d_t, the ratio P/P_t tells us the factor by which a deposit has decreased since it joined the Stability Pool,
  * and the term d_t * (S - S_t)/P_t gives us the deposit's total accumulated BTC gain.
@@ -125,7 +125,7 @@ import "./StabilityPoolStorage.sol";
  * --- UPDATING P WHEN A LIQUIDATION OCCURS ---
  *
  * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / BTC gain derivations:
- * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
+ * https://github.com/zero/zero/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  *
  * --- ZERO ISSUANCE TO STABILITY POOL DEPOSITORS ---
@@ -138,14 +138,14 @@ import "./StabilityPoolStorage.sol";
  * by a given deposit, is split between the depositor and the front end through which the deposit was made, based on the front end's kickbackRate.
  *
  * Please see the system Readme for an overview:
- * https://github.com/liquity/dev/blob/main/README.md#zero-issuance-to-stability-providers
+ * TODO: add content/fix link - https://github.com/zero/dev/blob/main/README.md#zero-issuance-to-stability-providers
  *
  * We use the same mathematical product-sum approach to track ZERO gains for depositors, where 'G' is the sum corresponding to ZERO gains.
  * The product P (and snapshot P_t) is re-used, as the ratio P/P_t tracks a deposit's depletion due to liquidations.
  *
  */
-contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, IStabilityPool {
-    using LiquitySafeMath128 for uint128;
+contract StabilityPool is ZeroBase, StabilityPoolStorage, CheckContract, IStabilityPool {
+    using ZeroSafeMath128 for uint128;
 
     // --- Events ---
 
@@ -183,7 +183,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- Contract setters ---
 
     function setAddresses(
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
@@ -196,7 +196,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         override
         onlyOwner
     {
-        checkContract(_liquityBaseParamsAddress);
+        checkContract(_zeroBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_activePoolAddress);
@@ -207,7 +207,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         P = DECIMAL_PRECISION;
         
-        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
+        zeroBaseParams = IZeroBaseParams(_zeroBaseParamsAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
         activePool = IActivePool(_activePoolAddress);
@@ -306,7 +306,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint depositorBTCGain = getDepositorBTCGain(msg.sender);
 
         uint compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
-        uint ZUSDtoWithdraw = LiquityMath._min(_amount, compoundedZUSDDeposit);
+        uint ZUSDtoWithdraw = ZeroMath._min(_amount, compoundedZUSDDeposit);
         uint ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
 
         // First pay out any ZERO gains
@@ -868,7 +868,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint price = priceFeed.fetchPrice();
         address lowestTrove = sortedTroves.getLast();
         uint ICR = troveManager.getCurrentICR(lowestTrove, price);
-        require(ICR >= liquityBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
+        require(ICR >= zeroBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
     }
 
     function _requireUserHasDeposit(uint _initialDeposit) internal pure {

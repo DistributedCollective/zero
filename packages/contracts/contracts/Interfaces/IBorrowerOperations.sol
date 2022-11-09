@@ -34,7 +34,7 @@ interface IBorrowerOperations {
      * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
      * @param _feeDistributorAddress feeDistributor contract address
-     * @param _liquityBaseParamsAddress LiquidityBaseParams contract address
+     * @param _zeroBaseParamsAddress LiquidityBaseParams contract address
      * @param _troveManagerAddress TroveManager contract address
      * @param _activePoolAddress ActivePool contract address
      * @param _defaultPoolAddress DefaultPool contract address
@@ -48,7 +48,7 @@ interface IBorrowerOperations {
      */
     function setAddresses(
         address _feeDistributorAddress,
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,

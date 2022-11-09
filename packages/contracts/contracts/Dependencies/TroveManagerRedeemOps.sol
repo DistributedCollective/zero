@@ -73,7 +73,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             // Find the first trove with ICR >= MCR
             while (
                 currentBorrower != address(0) &&
-                _getCurrentICR(currentBorrower, totals.price) < liquityBaseParams.MCR()
+                _getCurrentICR(currentBorrower, totals.price) < zeroBaseParams.MCR()
             ) {
                 currentBorrower = contractsCache.sortedTroves.getPrev(currentBorrower);
             }
@@ -150,13 +150,13 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         if (
             _firstRedemptionHint == address(0) ||
             !_sortedTroves.contains(_firstRedemptionHint) ||
-            _getCurrentICR(_firstRedemptionHint, _price) < liquityBaseParams.MCR()
+            _getCurrentICR(_firstRedemptionHint, _price) < zeroBaseParams.MCR()
         ) {
             return false;
         }
 
         address nextTrove = _sortedTroves.getNext(_firstRedemptionHint);
-        return nextTrove == address(0) || _getCurrentICR(nextTrove, _price) < liquityBaseParams.MCR();
+        return nextTrove == address(0) || _getCurrentICR(nextTrove, _price) < zeroBaseParams.MCR();
     }
 
     /// Redeem as much collateral as possible from _borrower's Trove in exchange for ZUSD up to _maxZUSDamount
@@ -170,7 +170,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         uint256 _partialRedemptionHintNICR
     ) internal returns (SingleRedemptionValues memory singleRedemption) {
         // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
-        singleRedemption.ZUSDLot = LiquityMath._min(
+        singleRedemption.ZUSDLot = ZeroMath._min(
             _maxZUSDamount,
             Troves[_borrower].debt.sub(ZUSD_GAS_COMPENSATION)
         );
@@ -189,7 +189,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             _redeemCloseTrove(_contractsCache, _borrower, ZUSD_GAS_COMPENSATION, newColl);
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.redeemCollateral);
         } else {
-            uint256 newNICR = LiquityMath._computeNominalCR(newColl, newDebt);
+            uint256 newNICR = ZeroMath._computeNominalCR(newColl, newDebt);
 
             /*
              * If the provided hint is out of date, we bail since trying to reinsert without a good hint will almost
@@ -243,7 +243,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         uint256 redeemedZUSDFraction = _BTCDrawn.mul(_price).div(_totalZUSDSupply);
 
         uint256 newBaseRate = decayedBaseRate.add(redeemedZUSDFraction.div(BETA));
-        newBaseRate = LiquityMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
+        newBaseRate = ZeroMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
         //assert(newBaseRate <= DECIMAL_PRECISION); // This is already enforced in the line above
         assert(newBaseRate > 0); // Base rate is always non-zero after redemption
 

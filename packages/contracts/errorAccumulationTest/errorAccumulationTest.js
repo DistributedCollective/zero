@@ -21,7 +21,7 @@ contract('TroveManager', async accounts => {
   let borrowerOperations
   
   beforeEach(async () => {
-    contracts = await deploymentHelper.deployLiquityCore()
+    contracts = await deploymentHelper.deployZeroCore()
     const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
     
     zusdToken = contracts.zusdToken

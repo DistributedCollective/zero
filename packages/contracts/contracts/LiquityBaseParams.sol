@@ -2,14 +2,14 @@
 
 pragma solidity 0.6.11;
 
-import "./Interfaces/ILiquityBaseParams.sol";
+import "./Interfaces/IZeroBaseParams.sol";
 import "./Dependencies/BaseMath.sol";
-import "./Dependencies/LiquityMath.sol";
+import "./Dependencies/ZeroMath.sol";
 
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/Initializable.sol";
 
-contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMath {
+contract ZeroBaseParams is IZeroBaseParams, Ownable, Initializable, BaseMath {
     using SafeMath for uint256;
 
     /// Minimum collateral ratio for individual troves

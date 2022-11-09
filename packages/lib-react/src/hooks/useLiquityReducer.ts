@@ -1,28 +1,28 @@
 import { useCallback, useEffect, useReducer, useRef } from "react";
 
-import { LiquityStoreState } from "@sovryn-zero/lib-base";
+import { ZeroStoreState } from "@sovryn-zero/lib-base";
 
 import { equals } from "../utils/equals";
-import { useLiquityStore } from "./useLiquityStore";
+import { useZeroStore } from "./useZeroStore";
 
-export type LiquityStoreUpdate<T = unknown> = {
+export type ZeroStoreUpdate<T = unknown> = {
   type: "updateStore";
-  newState: LiquityStoreState<T>;
-  oldState: LiquityStoreState<T>;
-  stateChange: Partial<LiquityStoreState<T>>;
+  newState: ZeroStoreState<T>;
+  oldState: ZeroStoreState<T>;
+  stateChange: Partial<ZeroStoreState<T>>;
 };
 
-export const useLiquityReducer = <S, A, T>(
-  reduce: (state: S, action: A | LiquityStoreUpdate<T>) => S,
-  init: (storeState: LiquityStoreState<T>) => S
-): [S, (action: A | LiquityStoreUpdate<T>) => void] => {
-  const store = useLiquityStore<T>();
+export const useZeroReducer = <S, A, T>(
+  reduce: (state: S, action: A | ZeroStoreUpdate<T>) => S,
+  init: (storeState: ZeroStoreState<T>) => S
+): [S, (action: A | ZeroStoreUpdate<T>) => void] => {
+  const store = useZeroStore<T>();
   const oldStore = useRef(store);
   const state = useRef(init(store.state));
   const [, rerender] = useReducer(() => ({}), {});
 
   const dispatch = useCallback(
-    (action: A | LiquityStoreUpdate<T>) => {
+    (action: A | ZeroStoreUpdate<T>) => {
       const newState = reduce(state.current, action);
 
       if (!equals(newState, state.current)) {

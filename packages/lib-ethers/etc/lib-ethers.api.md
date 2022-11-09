@@ -13,25 +13,25 @@ import { FailedReceipt } from '@sovryn-zero/lib-base';
 import { Fees } from '@sovryn-zero/lib-base';
 import { FrontendStatus } from '@sovryn-zero/lib-base';
 import { LiquidationDetails } from '@sovryn-zero/lib-base';
-import { LiquityReceipt } from '@sovryn-zero/lib-base';
-import { LiquityStore } from '@sovryn-zero/lib-base';
-import { LiquityStoreState } from '@sovryn-zero/lib-base';
+import { ZeroReceipt } from '@sovryn-zero/lib-base';
+import { ZeroStore } from '@sovryn-zero/lib-base';
+import { ZeroStoreState } from '@sovryn-zero/lib-base';
 import { MinedReceipt } from '@sovryn-zero/lib-base';
-import { ObservableLiquity } from '@sovryn-zero/lib-base';
-import { PopulatableLiquity } from '@sovryn-zero/lib-base';
-import { PopulatedLiquityTransaction } from '@sovryn-zero/lib-base';
+import { ObservableZero } from '@sovryn-zero/lib-base';
+import { PopulatableZero } from '@sovryn-zero/lib-base';
+import { PopulatedZeroTransaction } from '@sovryn-zero/lib-base';
 import { PopulatedRedemption } from '@sovryn-zero/lib-base';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { Provider } from '@ethersproject/abstract-provider';
-import { ReadableLiquity } from '@sovryn-zero/lib-base';
+import { ReadableZero } from '@sovryn-zero/lib-base';
 import { RedemptionDetails } from '@sovryn-zero/lib-base';
-import { SendableLiquity } from '@sovryn-zero/lib-base';
-import { SentLiquityTransaction } from '@sovryn-zero/lib-base';
+import { SendableZero } from '@sovryn-zero/lib-base';
+import { SentZeroTransaction } from '@sovryn-zero/lib-base';
 import { Signer } from '@ethersproject/abstract-signer';
 import { StabilityDeposit } from '@sovryn-zero/lib-base';
 import { StabilityDepositChangeDetails } from '@sovryn-zero/lib-base';
 import { StabilityPoolGainsWithdrawalDetails } from '@sovryn-zero/lib-base';
-import { TransactableLiquity } from '@sovryn-zero/lib-base';
+import { TransactableZero } from '@sovryn-zero/lib-base';
 import { TransactionFailedError } from '@sovryn-zero/lib-base';
 import { TransactionReceipt } from '@ethersproject/abstract-provider';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
@@ -47,34 +47,34 @@ import { UserTrove } from '@sovryn-zero/lib-base';
 import { ZEROStake } from '@sovryn-zero/lib-base';
 
 // @public
-export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStoreExtraState> {
-    constructor(readable: ReadableEthersLiquity);
+export class BlockPolledZeroStore extends ZeroStore<BlockPolledZeroStoreExtraState> {
+    constructor(readable: ReadableEthersZero);
     // (undocumented)
-    readonly connection: EthersLiquityConnection;
+    readonly connection: EthersZeroConnection;
     // @internal @override (undocumented)
     protected _doStart(): () => void;
     // @internal @override (undocumented)
-    protected _reduceExtra(oldState: BlockPolledLiquityStoreExtraState, stateUpdate: Partial<BlockPolledLiquityStoreExtraState>): BlockPolledLiquityStoreExtraState;
+    protected _reduceExtra(oldState: BlockPolledZeroStoreExtraState, stateUpdate: Partial<BlockPolledZeroStoreExtraState>): BlockPolledZeroStoreExtraState;
 }
 
 // @public
-export interface BlockPolledLiquityStoreExtraState {
+export interface BlockPolledZeroStoreExtraState {
     blockTag?: number;
     blockTimestamp: number;
 }
 
 // @public
-export type BlockPolledLiquityStoreState = LiquityStoreState<BlockPolledLiquityStoreExtraState>;
+export type BlockPolledZeroStoreState = ZeroStoreState<BlockPolledZeroStoreExtraState>;
 
 // @internal (undocumented)
-export function _connectByChainId<T>(provider: EthersProvider, signer: EthersSigner | undefined, chainId: number, optionalParams: EthersLiquityConnectionOptionalParams & {
+export function _connectByChainId<T>(provider: EthersProvider, signer: EthersSigner | undefined, chainId: number, optionalParams: EthersZeroConnectionOptionalParams & {
     useStore: T;
-}): EthersLiquityConnection & {
+}): EthersZeroConnection & {
     useStore: T;
 };
 
 // @internal (undocumented)
-export function _connectByChainId(provider: EthersProvider, signer: EthersSigner | undefined, chainId: number, optionalParams?: EthersLiquityConnectionOptionalParams): EthersLiquityConnection;
+export function _connectByChainId(provider: EthersProvider, signer: EthersSigner | undefined, chainId: number, optionalParams?: EthersZeroConnectionOptionalParams): EthersZeroConnection;
 
 // @public
 export interface EthersCallOverrides {
@@ -83,9 +83,9 @@ export interface EthersCallOverrides {
 }
 
 // @public
-export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity {
+export class EthersZero implements ReadableEthersZero, TransactableZero {
     // @internal
-    constructor(readable: ReadableEthersLiquity);
+    constructor(readable: ReadableEthersZero);
     // (undocumented)
     adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
     // (undocumented)
@@ -99,21 +99,21 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     // (undocumented)
     closeTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails>;
     // @internal (undocumented)
-    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams: EthersLiquityConnectionOptionalParams & {
+    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams: EthersZeroConnectionOptionalParams & {
         useStore: "blockPolled";
-    }): Promise<EthersLiquityWithStore<BlockPolledLiquityStore>>;
-    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams?: EthersLiquityConnectionOptionalParams): Promise<EthersLiquity>;
-    readonly connection: EthersLiquityConnection;
+    }): Promise<EthersZeroWithStore<BlockPolledZeroStore>>;
+    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams?: EthersZeroConnectionOptionalParams): Promise<EthersZero>;
+    readonly connection: EthersZeroConnection;
     // (undocumented)
     depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
     // (undocumented)
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<StabilityDepositChangeDetails>;
     // @internal (undocumented)
-    static _from(connection: EthersLiquityConnection & {
+    static _from(connection: EthersZeroConnection & {
         useStore: "blockPolled";
-    }): EthersLiquityWithStore<BlockPolledLiquityStore>;
+    }): EthersZeroWithStore<BlockPolledZeroStore>;
     // @internal (undocumented)
-    static _from(connection: EthersLiquityConnection): EthersLiquity;
+    static _from(connection: EthersZeroConnection): EthersZero;
     // @internal (undocumented)
     _getActivePool(overrides?: EthersCallOverrides): Promise<Trove>;
     // (undocumented)
@@ -158,8 +158,8 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
     getZUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal>;
-    hasStore(): this is EthersLiquityWithStore;
-    hasStore(store: "blockPolled"): this is EthersLiquityWithStore<BlockPolledLiquityStore>;
+    hasStore(): this is EthersZeroWithStore;
+    hasStore(store: "blockPolled"): this is EthersZeroWithStore<BlockPolledZeroStore>;
     // (undocumented)
     liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<LiquidationDetails>;
     // (undocumented)
@@ -168,14 +168,14 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveCreationDetails>;
     // (undocumented)
     openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveCreationDetails>;
-    readonly populate: PopulatableEthersLiquity;
+    readonly populate: PopulatableEthersZero;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<RedemptionDetails>;
     // (undocumented)
     registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
     repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
-    readonly send: SendableEthersLiquity;
+    readonly send: SendableEthersZero;
     // (undocumented)
     sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
@@ -199,7 +199,7 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
 }
 
 // @public
-export interface EthersLiquityConnection extends EthersLiquityConnectionOptionalParams {
+export interface EthersZeroConnection extends EthersZeroConnectionOptionalParams {
     // @internal (undocumented)
     readonly [brand]: unique symbol;
     readonly addresses: Record<string, string>;
@@ -217,17 +217,17 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
 }
 
 // @public
-export interface EthersLiquityConnectionOptionalParams {
+export interface EthersZeroConnectionOptionalParams {
     readonly frontendTag?: string;
     readonly userAddress?: string;
-    readonly useStore?: EthersLiquityStoreOption;
+    readonly useStore?: EthersZeroStoreOption;
 }
 
 // @public
-export type EthersLiquityStoreOption = "blockPolled";
+export type EthersZeroStoreOption = "blockPolled";
 
 // @public
-export interface EthersLiquityWithStore<T extends LiquityStore = LiquityStore> extends EthersLiquity {
+export interface EthersZeroWithStore<T extends ZeroStore = ZeroStore> extends EthersZero {
     readonly store: T;
 }
 
@@ -264,8 +264,8 @@ export type EthersTransactionReceipt = TransactionReceipt;
 export type EthersTransactionResponse = TransactionResponse;
 
 // @alpha (undocumented)
-export class ObservableEthersLiquity implements ObservableLiquity {
-    constructor(readable: ReadableEthersLiquity);
+export class ObservableEthersZero implements ObservableZero {
+    constructor(readable: ReadableEthersZero);
     // (undocumented)
     watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
     // (undocumented)
@@ -285,73 +285,73 @@ export class ObservableEthersLiquity implements ObservableLiquity {
 }
 
 // @public
-export class PopulatableEthersLiquity implements PopulatableLiquity<EthersTransactionReceipt, EthersTransactionResponse, EthersPopulatedTransaction> {
-    constructor(readable: ReadableEthersLiquity);
+export class PopulatableEthersZero implements PopulatableZero<EthersTransactionReceipt, EthersTransactionResponse, EthersPopulatedTransaction> {
+    constructor(readable: ReadableEthersZero);
     // (undocumented)
-    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>>;
+    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>>;
     // (undocumented)
-    closeTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>>;
+    closeTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveClosureDetails>>;
     // (undocumented)
-    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>>;
+    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<StabilityDepositChangeDetails>>;
     // (undocumented)
-    liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>>;
+    liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>>;
+    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveCreationDetails>>;
+    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>>;
     // (undocumented)
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveCreationDetails>>;
+    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveCreationDetails>>;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersRedemption>;
     // (undocumented)
-    registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    sendZUSD(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    sendZUSD(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // @internal (undocumented)
-    setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<CollateralGainTransferDetails>>;
+    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<CollateralGainTransferDetails>>;
     // (undocumented)
-    unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails>>;
+    withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<StabilityPoolGainsWithdrawalDetails>>;
     // (undocumented)
-    withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<void>>;
+    withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
-    withdrawZUSDFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>>;
+    withdrawZUSDFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<StabilityDepositChangeDetails>>;
     }
 
 // @public
-export class PopulatedEthersLiquityTransaction<T = unknown> implements PopulatedLiquityTransaction<EthersPopulatedTransaction, SentEthersLiquityTransaction<T>> {
+export class PopulatedEthersZeroTransaction<T = unknown> implements PopulatedZeroTransaction<EthersPopulatedTransaction, SentEthersZeroTransaction<T>> {
     // @internal
-    constructor(rawPopulatedTransaction: EthersPopulatedTransaction, connection: EthersLiquityConnection, parse: (rawReceipt: EthersTransactionReceipt) => T);
+    constructor(rawPopulatedTransaction: EthersPopulatedTransaction, connection: EthersZeroConnection, parse: (rawReceipt: EthersTransactionReceipt) => T);
     readonly rawPopulatedTransaction: EthersPopulatedTransaction;
     // (undocumented)
-    send(): Promise<SentEthersLiquityTransaction<T>>;
+    send(): Promise<SentEthersZeroTransaction<T>>;
 }
 
 // @public (undocumented)
-export class PopulatedEthersRedemption extends PopulatedEthersLiquityTransaction<RedemptionDetails> implements PopulatedRedemption<EthersPopulatedTransaction, EthersTransactionResponse, EthersTransactionReceipt> {
+export class PopulatedEthersRedemption extends PopulatedEthersZeroTransaction<RedemptionDetails> implements PopulatedRedemption<EthersPopulatedTransaction, EthersTransactionResponse, EthersTransactionReceipt> {
     // @internal
-    constructor(rawPopulatedTransaction: EthersPopulatedTransaction, connection: EthersLiquityConnection, attemptedZUSDAmount: Decimal, redeemableZUSDAmount: Decimal, increaseAmountByMinimumNetDebt?: (maxRedemptionRate?: Decimalish) => Promise<PopulatedEthersRedemption>);
+    constructor(rawPopulatedTransaction: EthersPopulatedTransaction, connection: EthersZeroConnection, attemptedZUSDAmount: Decimal, redeemableZUSDAmount: Decimal, increaseAmountByMinimumNetDebt?: (maxRedemptionRate?: Decimalish) => Promise<PopulatedEthersRedemption>);
     // (undocumented)
     readonly attemptedZUSDAmount: Decimal;
     // (undocumented)
@@ -363,23 +363,23 @@ export class PopulatedEthersRedemption extends PopulatedEthersLiquityTransaction
 }
 
 // @public
-export class ReadableEthersLiquity implements ReadableLiquity {
+export class ReadableEthersZero implements ReadableZero {
     // @internal
-    constructor(connection: EthersLiquityConnection);
+    constructor(connection: EthersZeroConnection);
     // @internal (undocumented)
-    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams: EthersLiquityConnectionOptionalParams & {
+    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams: EthersZeroConnectionOptionalParams & {
         useStore: "blockPolled";
-    }): Promise<ReadableEthersLiquityWithStore<BlockPolledLiquityStore>>;
+    }): Promise<ReadableEthersZeroWithStore<BlockPolledZeroStore>>;
     // (undocumented)
-    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams?: EthersLiquityConnectionOptionalParams): Promise<ReadableEthersLiquity>;
+    static connect(signerOrProvider: EthersSigner | EthersProvider, optionalParams?: EthersZeroConnectionOptionalParams): Promise<ReadableEthersZero>;
     // (undocumented)
-    readonly connection: EthersLiquityConnection;
+    readonly connection: EthersZeroConnection;
     // @internal (undocumented)
-    static _from(connection: EthersLiquityConnection & {
+    static _from(connection: EthersZeroConnection & {
         useStore: "blockPolled";
-    }): ReadableEthersLiquityWithStore<BlockPolledLiquityStore>;
+    }): ReadableEthersZeroWithStore<BlockPolledZeroStore>;
     // @internal (undocumented)
-    static _from(connection: EthersLiquityConnection): ReadableEthersLiquity;
+    static _from(connection: EthersZeroConnection): ReadableEthersZero;
     // @internal (undocumented)
     _getActivePool(overrides?: EthersCallOverrides): Promise<Trove>;
     // (undocumented)
@@ -424,12 +424,12 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     getZUSDBalance(address?: string, overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
     getZUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal>;
-    hasStore(): this is ReadableEthersLiquityWithStore;
-    hasStore(store: "blockPolled"): this is ReadableEthersLiquityWithStore<BlockPolledLiquityStore>;
+    hasStore(): this is ReadableEthersZeroWithStore;
+    hasStore(store: "blockPolled"): this is ReadableEthersZeroWithStore<BlockPolledZeroStore>;
 }
 
 // @public
-export interface ReadableEthersLiquityWithStore<T extends LiquityStore = LiquityStore> extends ReadableEthersLiquity {
+export interface ReadableEthersZeroWithStore<T extends ZeroStore = ZeroStore> extends ReadableEthersZero {
     readonly store: T;
 }
 
@@ -437,66 +437,66 @@ export interface ReadableEthersLiquityWithStore<T extends LiquityStore = Liquity
 export const _redeemMaxIterations = 70;
 
 // @public
-export class SendableEthersLiquity implements SendableLiquity<EthersTransactionReceipt, EthersTransactionResponse> {
-    constructor(populatable: PopulatableEthersLiquity);
+export class SendableEthersZero implements SendableZero<EthersTransactionReceipt, EthersTransactionResponse> {
+    constructor(populatable: PopulatableEthersZero);
     // (undocumented)
-    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveClosureDetails>>;
+    closeNueTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveClosureDetails>>;
     // (undocumented)
-    closeTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveClosureDetails>>;
+    closeTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveClosureDetails>>;
     // (undocumented)
-    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    depositCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<StabilityDepositChangeDetails>>;
+    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<StabilityDepositChangeDetails>>;
     // (undocumented)
-    liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<LiquidationDetails>>;
+    liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<LiquidationDetails>>;
+    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveCreationDetails>>;
+    openNueTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveCreationDetails>>;
     // (undocumented)
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveCreationDetails>>;
+    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveCreationDetails>>;
     // (undocumented)
-    redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<RedemptionDetails>>;
+    redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<RedemptionDetails>>;
     // (undocumented)
-    registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    repayZUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    sendZERO(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    sendZUSD(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    sendZUSD(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // @internal (undocumented)
-    setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    setPrice(price: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    stakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<CollateralGainTransferDetails>>;
+    transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<CollateralGainTransferDetails>>;
     // (undocumented)
-    unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    unstakeZERO(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>>;
+    withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<TroveAdjustmentDetails>>;
     // (undocumented)
-    withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<StabilityPoolGainsWithdrawalDetails>>;
+    withdrawGainsFromStabilityPool(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<StabilityPoolGainsWithdrawalDetails>>;
     // (undocumented)
-    withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<void>>;
+    withdrawGainsFromStaking(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
-    withdrawZUSDFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTransaction<StabilityDepositChangeDetails>>;
+    withdrawZUSDFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<StabilityDepositChangeDetails>>;
 }
 
 // @public
-export class SentEthersLiquityTransaction<T = unknown> implements SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> {
+export class SentEthersZeroTransaction<T = unknown> implements SentZeroTransaction<EthersTransactionResponse, ZeroReceipt<EthersTransactionReceipt, T>> {
     // @internal
-    constructor(rawSentTransaction: EthersTransactionResponse, connection: EthersLiquityConnection, parse: (rawReceipt: EthersTransactionReceipt) => T);
+    constructor(rawSentTransaction: EthersTransactionResponse, connection: EthersZeroConnection, parse: (rawReceipt: EthersTransactionReceipt) => T);
     // (undocumented)
-    getReceipt(): Promise<LiquityReceipt<EthersTransactionReceipt, T>>;
+    getReceipt(): Promise<ZeroReceipt<EthersTransactionReceipt, T>>;
     readonly rawSentTransaction: EthersTransactionResponse;
     // (undocumented)
     waitForReceipt(): Promise<MinedReceipt<EthersTransactionReceipt, T>>;

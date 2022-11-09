@@ -1,6 +1,6 @@
 import { Decimal, Decimalish } from "./Decimal";
 import { TroveAdjustmentParams, TroveCreationParams } from "./Trove";
-import { LiquityReceipt, SendableLiquity, SentLiquityTransaction } from "./SendableLiquity";
+import { ZeroReceipt, SendableZero, SentZeroTransaction } from "./SendableZero";
 
 import {
   CollateralGainTransferDetails,
@@ -11,19 +11,19 @@ import {
   TroveAdjustmentDetails,
   TroveClosureDetails,
   TroveCreationDetails
-} from "./TransactableLiquity";
+} from "./TransactableZero";
 
 /**
  * A transaction that has been prepared for sending.
  *
  * @remarks
- * Implemented by {@link @sovryn-zero/lib-ethers#PopulatedEthersLiquityTransaction}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#PopulatedEthersZeroTransaction}.
  *
  * @public
  */
-export interface PopulatedLiquityTransaction<
+export interface PopulatedZeroTransaction<
   P = unknown,
-  T extends SentLiquityTransaction = SentLiquityTransaction
+  T extends SentZeroTransaction = SentZeroTransaction
 > {
   /** Implementation-specific populated transaction object. */
   readonly rawPopulatedTransaction: P;
@@ -31,7 +31,7 @@ export interface PopulatedLiquityTransaction<
   /**
    * Send the transaction.
    *
-   * @returns An object that implements {@link @sovryn-zero/lib-base#SentLiquityTransaction}.
+   * @returns An object that implements {@link @sovryn-zero/lib-base#SentZeroTransaction}.
    */
   send(): Promise<T>;
 }
@@ -45,7 +45,7 @@ export interface PopulatedLiquityTransaction<
  * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT | minimum debt} requirement that Troves must fulfill,
  * some ZUSD amounts are not possible to redeem exactly.
  *
- * When {@link @sovryn-zero/lib-base#PopulatableLiquity.redeemZUSD | redeemZUSD()} is called with an
+ * When {@link @sovryn-zero/lib-base#PopulatableZero.redeemZUSD | redeemZUSD()} is called with an
  * amount that can't be fully redeemed, the amount will be truncated (see the `redeemableZUSDAmount`
  * property). When this happens, the redeemer can either redeem the truncated amount by sending the
  * transaction unchanged, or prepare a new transaction by
@@ -56,9 +56,9 @@ export interface PopulatedLiquityTransaction<
  * @public
  */
 export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
-  extends PopulatedLiquityTransaction<
+  extends PopulatedZeroTransaction<
     P,
-    SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>
+    SentZeroTransaction<S, ZeroReceipt<R, RedemptionDetails>>
   > {
   /** Amount of ZUSD the redeemer is trying to redeem. */
   readonly attemptedZUSDAmount: Decimal;
@@ -90,8 +90,8 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown>
 /** @internal */
 export type _PopulatableFrom<T, P> = {
   [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer U>
-    ? U extends SentLiquityTransaction
-      ? (...args: A) => Promise<PopulatedLiquityTransaction<P, U>>
+    ? U extends SentZeroTransaction
+      ? (...args: A) => Promise<PopulatedZeroTransaction<P, U>>
       : never
     : never;
 };
@@ -100,181 +100,181 @@ export type _PopulatableFrom<T, P> = {
  * Prepare Zero transactions for sending.
  *
  * @remarks
- * The functions return an object implementing {@link PopulatedLiquityTransaction}, which can be
- * used to send the transaction and get a {@link SentLiquityTransaction}.
+ * The functions return an object implementing {@link PopulatedZeroTransaction}, which can be
+ * used to send the transaction and get a {@link SentZeroTransaction}.
  *
- * Implemented by {@link @sovryn-zero/lib-ethers#PopulatableEthersLiquity}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#PopulatableEthersZero}.
  *
  * @public
  */
-export interface PopulatableLiquity<R = unknown, S = unknown, P = unknown>
-  extends _PopulatableFrom<SendableLiquity<R, S>, P> {
+export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
+  extends _PopulatableFrom<SendableZero<R, S>, P> {
   // Methods re-declared for documentation purposes
 
-  /** {@inheritDoc TransactableLiquity.openTrove} */
+  /** {@inheritDoc TransactableZero.openTrove} */
   openTrove(
     params: TroveCreationParams<Decimalish>,
     maxBorrowingRate?: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, TroveCreationDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.closeTrove} */
+  /** {@inheritDoc TransactableZero.closeTrove} */
   closeTrove(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>
+    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, TroveClosureDetails>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.adjustTrove} */
+  /** {@inheritDoc TransactableZero.adjustTrove} */
   adjustTrove(
     params: TroveAdjustmentParams<Decimalish>,
     maxBorrowingRate?: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.depositCollateral} */
+  /** {@inheritDoc TransactableZero.depositCollateral} */
   depositCollateral(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.withdrawCollateral} */
+  /** {@inheritDoc TransactableZero.withdrawCollateral} */
   withdrawCollateral(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.borrowZUSD} */
+  /** {@inheritDoc TransactableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
     maxBorrowingRate?: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.repayZUSD} */
+  /** {@inheritDoc TransactableZero.repayZUSD} */
   repayZUSD(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, TroveAdjustmentDetails>>
     >
   >;
 
   /** @internal */
   setPrice(
     price: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.liquidate} */
+  /** {@inheritDoc TransactableZero.liquidate} */
   liquidate(
     address: string | string[]
   ): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>
+    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.liquidateUpTo} */
+  /** {@inheritDoc TransactableZero.liquidateUpTo} */
   liquidateUpTo(
     maximumNumberOfTrovesToLiquidate: number
   ): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>
+    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.depositZUSDInStabilityPool} */
+  /** {@inheritDoc TransactableZero.depositZUSDInStabilityPool} */
   depositZUSDInStabilityPool(
     amount: Decimalish,
     frontendTag?: string
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.withdrawZUSDFromStabilityPool} */
+  /** {@inheritDoc TransactableZero.withdrawZUSDFromStabilityPool} */
   withdrawZUSDFromStabilityPool(
     amount: Decimalish
   ): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.withdrawGainsFromStabilityPool} */
+  /** {@inheritDoc TransactableZero.withdrawGainsFromStabilityPool} */
   withdrawGainsFromStabilityPool(): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, StabilityPoolGainsWithdrawalDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.transferCollateralGainToTrove} */
+  /** {@inheritDoc TransactableZero.transferCollateralGainToTrove} */
   transferCollateralGainToTrove(): Promise<
-    PopulatedLiquityTransaction<
+    PopulatedZeroTransaction<
       P,
-      SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>
+      SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>
     >
   >;
 
-  /** {@inheritDoc TransactableLiquity.sendZUSD} */
+  /** {@inheritDoc TransactableZero.sendZUSD} */
   sendZUSD(
     toAddress: string,
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.sendZERO} */
+  /** {@inheritDoc TransactableZero.sendZERO} */
   sendZERO(
     toAddress: string,
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.redeemZUSD} */
+  /** {@inheritDoc TransactableZero.redeemZUSD} */
   redeemZUSD(
     amount: Decimalish,
     maxRedemptionRate?: Decimalish
   ): Promise<PopulatedRedemption<P, S, R>>;
 
-  /** {@inheritDoc TransactableLiquity.claimCollateralSurplus} */
+  /** {@inheritDoc TransactableZero.claimCollateralSurplus} */
   claimCollateralSurplus(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>
+    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.stakeZERO} */
+  /** {@inheritDoc TransactableZero.stakeZERO} */
   stakeZERO(
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.unstakeZERO} */
+  /** {@inheritDoc TransactableZero.unstakeZERO} */
   unstakeZERO(
     amount: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
 
-  /** {@inheritDoc TransactableLiquity.withdrawGainsFromStaking} */
+  /** {@inheritDoc TransactableZero.withdrawGainsFromStaking} */
   withdrawGainsFromStaking(): Promise<
-    PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>
+    PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>
   >;
 
-  /** {@inheritDoc TransactableLiquity.registerFrontend} */
+  /** {@inheritDoc TransactableZero.registerFrontend} */
   registerFrontend(
     kickbackRate: Decimalish
-  ): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+  ): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
 }

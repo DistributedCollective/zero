@@ -5,12 +5,12 @@ import {
   Decimalish,
   ZEROStake,
   StabilityDeposit,
-  TransactableLiquity,
+  TransactableZero,
   Trove,
   TroveAdjustmentParams
 } from "@sovryn-zero/lib-base";
 
-import { EthersLiquity as Liquity } from "@sovryn-zero/lib-ethers";
+import { EthersZero as Zero } from "@sovryn-zero/lib-ethers";
 
 import {
   createRandomTrove,
@@ -31,7 +31,7 @@ type _GasHistogramsFrom<T> = {
 };
 
 type GasHistograms = Pick<
-  _GasHistogramsFrom<TransactableLiquity>,
+  _GasHistogramsFrom<TransactableZero>,
   | "openTrove"
   | "adjustTrove"
   | "closeTrove"
@@ -43,9 +43,9 @@ type GasHistograms = Pick<
 >;
 
 export class Fixture {
-  private readonly deployerLiquity: Liquity;
+  private readonly deployerZero: Zero;
   private readonly funder: Signer;
-  private readonly funderLiquity: Liquity;
+  private readonly funderZero: Zero;
   private readonly funderAddress: string;
   private readonly frontendAddress: string;
   private readonly gasHistograms: GasHistograms;
@@ -55,16 +55,16 @@ export class Fixture {
   totalNumberOfLiquidations = 0;
 
   private constructor(
-    deployerLiquity: Liquity,
+    deployerZero: Zero,
     funder: Signer,
-    funderLiquity: Liquity,
+    funderZero: Zero,
     funderAddress: string,
     frontendAddress: string,
     price: Decimal
   ) {
-    this.deployerLiquity = deployerLiquity;
+    this.deployerZero = deployerZero;
     this.funder = funder;
-    this.funderLiquity = funderLiquity;
+    this.funderZero = funderZero;
     this.funderAddress = funderAddress;
     this.frontendAddress = frontendAddress;
     this.price = price;
@@ -82,21 +82,21 @@ export class Fixture {
   }
 
   static async setup(
-    deployerLiquity: Liquity,
+    deployerZero: Zero,
     funder: Signer,
-    funderLiquity: Liquity,
+    funderZero: Zero,
     frontendAddress: string,
-    frontendLiquity: Liquity
+    frontendZero: Zero
   ) {
     const funderAddress = await funder.getAddress();
-    const price = await deployerLiquity.getPrice();
+    const price = await deployerZero.getPrice();
 
-    await frontendLiquity.registerFrontend(Decimal.from(10).div(11));
+    await frontendZero.registerFrontend(Decimal.from(10).div(11));
 
     return new Fixture(
-      deployerLiquity,
+      deployerZero,
       funder,
-      funderLiquity,
+      funderZero,
       funderAddress,
       frontendAddress,
       price
@@ -106,12 +106,12 @@ export class Fixture {
   private async sendZUSDFromFunder(toAddress: string, amount: Decimalish) {
     amount = Decimal.from(amount);
 
-    const zusdBalance = await this.funderLiquity.getZUSDBalance();
+    const zusdBalance = await this.funderZero.getZUSDBalance();
 
     if (zusdBalance.lt(amount)) {
-      const trove = await this.funderLiquity.getTrove();
-      const total = await this.funderLiquity.getTotal();
-      const fees = await this.funderLiquity.getFees();
+      const trove = await this.funderZero.getTrove();
+      const total = await this.funderZero.getTotal();
+      const fees = await this.funderZero.getFees();
 
       const targetCollateralRatio =
         trove.isEmpty || !total.collateralRatioIsBelowCritical(this.price)
@@ -125,7 +125,7 @@ export class Fixture {
       if (trove.isEmpty) {
         const params = Trove.recreate(newTrove, fees.borrowingRate());
         console.log(`[funder] openTrove(${objToString(params)})`);
-        await this.funderLiquity.openTrove(params);
+        await this.funderZero.openTrove(params);
       } else {
         let newTotal = total.add(newTrove).subtract(trove);
 
@@ -139,26 +139,26 @@ export class Fixture {
 
         const params = trove.adjustTo(newTrove, fees.borrowingRate());
         console.log(`[funder] adjustTrove(${objToString(params)})`);
-        await this.funderLiquity.adjustTrove(params);
+        await this.funderZero.adjustTrove(params);
       }
     }
 
-    await this.funderLiquity.sendZUSD(toAddress, amount);
+    await this.funderZero.sendZUSD(toAddress, amount);
   }
 
   async setRandomPrice() {
     this.price = this.price.add(200 * Math.random() + 100).div(2);
     console.log(`[deployer] setPrice(${this.price})`);
-    await this.deployerLiquity.setPrice(this.price);
+    await this.deployerZero.setPrice(this.price);
 
     return this.price;
   }
 
   async liquidateRandomNumberOfTroves(price: Decimal) {
-    const zusdInStabilityPoolBefore = await this.deployerLiquity.getZUSDInStabilityPool();
+    const zusdInStabilityPoolBefore = await this.deployerZero.getZUSDInStabilityPool();
     console.log(`// Stability Pool balance: ${zusdInStabilityPoolBefore}`);
 
-    const trovesBefore = await getListOfTroves(this.deployerLiquity);
+    const trovesBefore = await getListOfTroves(this.deployerZero);
 
     if (trovesBefore.length === 0) {
       console.log("// No Troves to liquidate");
@@ -175,9 +175,9 @@ export class Fixture {
 
     const maximumNumberOfTrovesToLiquidate = Math.floor(50 * Math.random()) + 1;
     console.log(`[deployer] liquidateUpTo(${maximumNumberOfTrovesToLiquidate})`);
-    await this.deployerLiquity.liquidateUpTo(maximumNumberOfTrovesToLiquidate);
+    await this.deployerZero.liquidateUpTo(maximumNumberOfTrovesToLiquidate);
 
-    const troveOwnersAfter = await getListOfTroveOwners(this.deployerLiquity);
+    const troveOwnersAfter = await getListOfTroveOwners(this.deployerZero);
     const liquidatedTroves = listDifference(troveOwnersBefore, troveOwnersAfter);
 
     if (liquidatedTroves.length > 0) {
@@ -188,13 +188,13 @@ export class Fixture {
 
     this.totalNumberOfLiquidations += liquidatedTroves.length;
 
-    const zusdInStabilityPoolAfter = await this.deployerLiquity.getZUSDInStabilityPool();
+    const zusdInStabilityPoolAfter = await this.deployerZero.getZUSDInStabilityPool();
     console.log(`// Stability Pool balance: ${zusdInStabilityPoolAfter}`);
   }
 
-  async openRandomTrove(userAddress: string, liquity: Liquity) {
-    const total = await liquity.getTotal();
-    const fees = await liquity.getFees();
+  async openRandomTrove(userAddress: string, zero: Zero) {
+    const total = await zero.getTotal();
+    const fees = await zero.getFees();
 
     let newTrove: Trove;
 
@@ -221,20 +221,20 @@ export class Fixture {
       );
 
       await this.gasHistograms.openTrove.expectFailure(() =>
-        liquity.openTrove(params, { gasPrice: 0 })
+        zero.openTrove(params, { gasPrice: 0 })
       );
     } else {
       console.log(`[${shortenAddress(userAddress)}] openTrove(${objToString(params)})`);
 
       await this.gasHistograms.openTrove.expectSuccess(() =>
-        liquity.send.openTrove(params, { gasPrice: 0 })
+        zero.send.openTrove(params, { gasPrice: 0 })
       );
     }
   }
 
-  async randomlyAdjustTrove(userAddress: string, liquity: Liquity, trove: Trove) {
-    const total = await liquity.getTotal();
-    const fees = await liquity.getFees();
+  async randomlyAdjustTrove(userAddress: string, zero: Zero, trove: Trove) {
+    const total = await zero.getTotal();
+    const fees = await zero.getFees();
     const x = Math.random();
 
     const params: TroveAdjustmentParams<Decimal> =
@@ -277,19 +277,19 @@ export class Fixture {
       );
 
       await this.gasHistograms.adjustTrove.expectFailure(() =>
-        liquity.adjustTrove(params, { gasPrice: 0 })
+        zero.adjustTrove(params, { gasPrice: 0 })
       );
     } else {
       console.log(`[${shortenAddress(userAddress)}] adjustTrove(${objToString(params)})`);
 
       await this.gasHistograms.adjustTrove.expectSuccess(() =>
-        liquity.send.adjustTrove(params, { gasPrice: 0 })
+        zero.send.adjustTrove(params, { gasPrice: 0 })
       );
     }
   }
 
-  async closeTrove(userAddress: string, liquity: Liquity, trove: Trove) {
-    const total = await liquity.getTotal();
+  async closeTrove(userAddress: string, zero: Zero, trove: Trove) {
+    const total = await zero.getTotal();
 
     if (total.collateralRatioIsBelowCritical(this.price)) {
       // Cannot close Trove during recovery mode
@@ -302,12 +302,12 @@ export class Fixture {
     console.log(`[${shortenAddress(userAddress)}] closeTrove()`);
 
     await this.gasHistograms.closeTrove.expectSuccess(() =>
-      liquity.send.closeTrove({ gasPrice: 0 })
+      zero.send.closeTrove({ gasPrice: 0 })
     );
   }
 
-  async redeemRandomAmount(userAddress: string, liquity: Liquity) {
-    const total = await liquity.getTotal();
+  async redeemRandomAmount(userAddress: string, zero: Zero) {
+    const total = await zero.getTotal();
 
     if (total.collateralRatioIsBelowMinimum(this.price)) {
       console.log("// Skipping redeemZUSD() when TCR < MCR");
@@ -320,11 +320,11 @@ export class Fixture {
     console.log(`[${shortenAddress(userAddress)}] redeemZUSD(${amount})`);
 
     await this.gasHistograms.redeemZUSD.expectSuccess(() =>
-      liquity.send.redeemZUSD(amount, { gasPrice: 0 })
+      zero.send.redeemZUSD(amount, { gasPrice: 0 })
     );
   }
 
-  async depositRandomAmountInStabilityPool(userAddress: string, liquity: Liquity) {
+  async depositRandomAmountInStabilityPool(userAddress: string, zero: Zero) {
     const amount = benford(20000);
 
     await this.sendZUSDFromFunder(userAddress, amount);
@@ -332,7 +332,7 @@ export class Fixture {
     console.log(`[${shortenAddress(userAddress)}] depositZUSDInStabilityPool(${amount})`);
 
     await this.gasHistograms.depositZUSDInStabilityPool.expectSuccess(() =>
-      liquity.send.depositZUSDInStabilityPool(amount, this.frontendAddress, {
+      zero.send.depositZUSDInStabilityPool(amount, this.frontendAddress, {
         gasPrice: 0
       })
     );
@@ -340,10 +340,10 @@ export class Fixture {
 
   async withdrawRandomAmountFromStabilityPool(
     userAddress: string,
-    liquity: Liquity,
+    zero: Zero,
     deposit: StabilityDeposit
   ) {
-    const [[, lastTrove]] = await liquity.getTroves({
+    const [[, lastTrove]] = await zero.getTroves({
       first: 1,
       sortedBy: "ascendingCollateralRatio"
     });
@@ -360,53 +360,53 @@ export class Fixture {
       );
 
       await this.gasHistograms.withdrawZUSDFromStabilityPool.expectFailure(() =>
-        liquity.withdrawZUSDFromStabilityPool(amount, { gasPrice: 0 })
+        zero.withdrawZUSDFromStabilityPool(amount, { gasPrice: 0 })
       );
     } else {
       console.log(`[${shortenAddress(userAddress)}] withdrawZUSDFromStabilityPool(${amount})`);
 
       await this.gasHistograms.withdrawZUSDFromStabilityPool.expectSuccess(() =>
-        liquity.send.withdrawZUSDFromStabilityPool(amount, { gasPrice: 0 })
+        zero.send.withdrawZUSDFromStabilityPool(amount, { gasPrice: 0 })
       );
     }
   }
 
-  async stakeRandomAmount(userAddress: string, liquity: Liquity) {
-    const zeroBalance = await this.funderLiquity.getZEROBalance();
+  async stakeRandomAmount(userAddress: string, zero: Zero) {
+    const zeroBalance = await this.funderZero.getZEROBalance();
     const amount = zeroBalance.mul(Math.random() / 2);
 
-    await this.funderLiquity.sendZERO(userAddress, amount);
+    await this.funderZero.sendZERO(userAddress, amount);
 
     console.log(`[${shortenAddress(userAddress)}] stakeZERO(${amount})`);
 
     await this.gasHistograms.stakeZERO.expectSuccess(() =>
-      liquity.send.stakeZERO(amount, { gasPrice: 0 })
+      zero.send.stakeZERO(amount, { gasPrice: 0 })
     );
   }
 
-  async unstakeRandomAmount(userAddress: string, liquity: Liquity, stake: ZEROStake) {
+  async unstakeRandomAmount(userAddress: string, zero: Zero, stake: ZEROStake) {
     const amount = stake.stakedZERO.mul(1.1 * Math.random()).add(10 * Math.random());
 
     console.log(`[${shortenAddress(userAddress)}] unstakeZERO(${amount})`);
 
     await this.gasHistograms.unstakeZERO.expectSuccess(() =>
-      liquity.send.unstakeZERO(amount, { gasPrice: 0 })
+      zero.send.unstakeZERO(amount, { gasPrice: 0 })
     );
   }
 
-  async sweepZUSD(liquity: Liquity) {
-    const zusdBalance = await liquity.getZUSDBalance();
+  async sweepZUSD(zero: Zero) {
+    const zusdBalance = await zero.getZUSDBalance();
 
     if (zusdBalance.nonZero) {
-      await liquity.sendZUSD(this.funderAddress, zusdBalance, { gasPrice: 0 });
+      await zero.sendZUSD(this.funderAddress, zusdBalance, { gasPrice: 0 });
     }
   }
 
-  async sweepZERO(liquity: Liquity) {
-    const zeroBalance = await liquity.getZEROBalance();
+  async sweepZERO(zero: Zero) {
+    const zeroBalance = await zero.getZEROBalance();
 
     if (zeroBalance.nonZero) {
-      await liquity.sendZERO(this.funderAddress, zeroBalance, { gasPrice: 0 });
+      await zero.sendZERO(this.funderAddress, zeroBalance, { gasPrice: 0 });
     }
   }
 

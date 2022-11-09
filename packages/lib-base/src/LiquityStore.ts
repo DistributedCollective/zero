@@ -5,14 +5,14 @@ import { StabilityDeposit } from "./StabilityDeposit";
 import { Trove, TroveWithPendingRedistribution, UserTrove } from "./Trove";
 import { Fees } from "./Fees";
 import { ZEROStake } from "./ZEROStake";
-import { FrontendStatus } from "./ReadableLiquity";
+import { FrontendStatus } from "./ReadableZero";
 
 /**
  * State variables read from the blockchain.
  *
  * @public
  */
-export interface LiquityStoreBaseState {
+export interface ZeroStoreBaseState {
   /** Status of currently used frontend. */
   frontend: FrontendStatus;
 
@@ -38,7 +38,7 @@ export interface LiquityStoreBaseState {
    * Amount of leftover collateral available for withdrawal to the user.
    *
    * @remarks
-   * See {@link ReadableLiquity.getCollateralSurplusBalance | getCollateralSurplusBalance()} for
+   * See {@link ReadableZero.getCollateralSurplusBalance | getCollateralSurplusBalance()} for
    * more information.
    */
   collateralSurplusBalance: Decimal;
@@ -65,7 +65,7 @@ export interface LiquityStoreBaseState {
    *
    * @remarks
    * The current state of the user's Trove can be found as
-   * {@link LiquityStoreDerivedState.trove | trove}.
+   * {@link ZeroStoreDerivedState.trove | trove}.
    */
   troveBeforeRedistribution: TroveWithPendingRedistribution;
 
@@ -89,11 +89,11 @@ export interface LiquityStoreBaseState {
 }
 
 /**
- * State variables derived from {@link LiquityStoreBaseState}.
+ * State variables derived from {@link ZeroStoreBaseState}.
  *
  * @public
  */
-export interface LiquityStoreDerivedState {
+export interface ZeroStoreDerivedState {
   /** Current state of user's Trove */
   trove: UserTrove;
 
@@ -130,35 +130,35 @@ export interface LiquityStoreDerivedState {
 }
 
 /**
- * Type of {@link LiquityStore}'s {@link LiquityStore.state | state}.
+ * Type of {@link ZeroStore}'s {@link ZeroStore.state | state}.
  *
  * @remarks
- * It combines all properties of {@link LiquityStoreBaseState} and {@link LiquityStoreDerivedState}
- * with optional extra state added by the particular `LiquityStore` implementation.
+ * It combines all properties of {@link ZeroStoreBaseState} and {@link ZeroStoreDerivedState}
+ * with optional extra state added by the particular `ZeroStore` implementation.
  *
  * The type parameter `T` may be used to type the extra state.
  *
  * @public
  */
-export type LiquityStoreState<T = unknown> = LiquityStoreBaseState & LiquityStoreDerivedState & T;
+export type ZeroStoreState<T = unknown> = ZeroStoreBaseState & ZeroStoreDerivedState & T;
 
 /**
- * Parameters passed to {@link LiquityStore} listeners.
+ * Parameters passed to {@link ZeroStore} listeners.
  *
  * @remarks
- * Use the {@link LiquityStore.subscribe | subscribe()} function to register a listener.
+ * Use the {@link ZeroStore.subscribe | subscribe()} function to register a listener.
 
  * @public
  */
-export interface LiquityStoreListenerParams<T = unknown> {
+export interface ZeroStoreListenerParams<T = unknown> {
   /** The entire previous state. */
-  newState: LiquityStoreState<T>;
+  newState: ZeroStoreState<T>;
 
   /** The entire new state. */
-  oldState: LiquityStoreState<T>;
+  oldState: ZeroStoreState<T>;
 
   /** Only the state variables that have changed. */
-  stateChange: Partial<LiquityStoreState<T>>;
+  stateChange: Partial<ZeroStoreState<T>>;
 }
 
 const strictEquals = <T>(a: T, b: T) => a === b;
@@ -186,14 +186,14 @@ const difference = <T>(a: T, b: T) =>
  * Abstract base class of Zero data store implementations.
  *
  * @remarks
- * The type parameter `T` may be used to type extra state added to {@link LiquityStoreState} by the
+ * The type parameter `T` may be used to type extra state added to {@link ZeroStoreState} by the
  * subclass.
  *
- * Implemented by {@link @sovryn-zero/lib-ethers#BlockPolledLiquityStore}.
+ * Implemented by {@link @sovryn-zero/lib-ethers#BlockPolledZeroStore}.
  *
  * @public
  */
-export abstract class LiquityStore<T = unknown> {
+export abstract class ZeroStore<T = unknown> {
   /** Turn console logging on/off. */
   logging = false;
 
@@ -201,30 +201,30 @@ export abstract class LiquityStore<T = unknown> {
    * Called after the state is fetched for the first time.
    *
    * @remarks
-   * See {@link LiquityStore.start | start()}.
+   * See {@link ZeroStore.start | start()}.
    */
   onLoaded?: () => void;
 
   /** @internal */
   protected _loaded = false;
 
-  private _baseState?: LiquityStoreBaseState;
-  private _derivedState?: LiquityStoreDerivedState;
+  private _baseState?: ZeroStoreBaseState;
+  private _derivedState?: ZeroStoreDerivedState;
   private _extraState?: T;
 
   private _updateTimeoutId: ReturnType<typeof setTimeout> | undefined;
-  private _listeners = new Set<(params: LiquityStoreListenerParams<T>) => void>();
+  private _listeners = new Set<(params: ZeroStoreListenerParams<T>) => void>();
 
   /**
    * The current store state.
    *
    * @remarks
    * Should not be accessed before the store is loaded. Assign a function to
-   * {@link LiquityStore.onLoaded | onLoaded} to get a callback when this happens.
+   * {@link ZeroStore.onLoaded | onLoaded} to get a callback when this happens.
    *
-   * See {@link LiquityStoreState} for the list of properties returned.
+   * See {@link ZeroStoreState} for the list of properties returned.
    */
-  get state(): LiquityStoreState<T> {
+  get state(): ZeroStoreState<T> {
     return Object.assign({}, this._baseState, this._derivedState, this._extraState);
   }
 
@@ -235,10 +235,10 @@ export abstract class LiquityStore<T = unknown> {
    * Start monitoring the blockchain for Zero state changes.
    *
    * @remarks
-   * The {@link LiquityStore.onLoaded | onLoaded} callback will be called after the state is fetched
+   * The {@link ZeroStore.onLoaded | onLoaded} callback will be called after the state is fetched
    * for the first time.
    *
-   * Use the {@link LiquityStore.subscribe | subscribe()} function to register listeners.
+   * Use the {@link ZeroStore.subscribe | subscribe()} function to register listeners.
    *
    * @returns Function to stop the monitoring.
    */
@@ -303,9 +303,9 @@ export abstract class LiquityStore<T = unknown> {
   }
 
   private _reduce(
-    baseState: LiquityStoreBaseState,
-    baseStateUpdate: Partial<LiquityStoreBaseState>
-  ): LiquityStoreBaseState {
+    baseState: ZeroStoreBaseState,
+    baseStateUpdate: Partial<ZeroStoreBaseState>
+  ): ZeroStoreBaseState {
     return {
       frontend: this._updateIfChanged(
         frontendStatusEquals,
@@ -438,7 +438,7 @@ export abstract class LiquityStore<T = unknown> {
     total,
     price,
     _riskiestTroveBeforeRedistribution
-  }: LiquityStoreBaseState): LiquityStoreDerivedState {
+  }: ZeroStoreBaseState): ZeroStoreDerivedState {
     const fees = _feesInNormalMode._setRecoveryMode(total.collateralRatioIsBelowCritical(price));
 
     return {
@@ -453,9 +453,9 @@ export abstract class LiquityStore<T = unknown> {
   }
 
   private _reduceDerived(
-    derivedState: LiquityStoreDerivedState,
-    derivedStateUpdate: LiquityStoreDerivedState
-  ): LiquityStoreDerivedState {
+    derivedState: ZeroStoreDerivedState,
+    derivedStateUpdate: ZeroStoreDerivedState
+  ): ZeroStoreDerivedState {
     return {
       fees: this._updateFees("fees", derivedState.fees, derivedStateUpdate.fees),
 
@@ -485,7 +485,7 @@ export abstract class LiquityStore<T = unknown> {
   /** @internal */
   protected abstract _reduceExtra(extraState: T, extraStateUpdate: Partial<T>): T;
 
-  private _notify(params: LiquityStoreListenerParams<T>) {
+  private _notify(params: ZeroStoreListenerParams<T>) {
     // Iterate on a copy of `_listeners`, to avoid notifying any new listeners subscribed by
     // existing listeners, as that could result in infinite loops.
     //
@@ -505,7 +505,7 @@ export abstract class LiquityStore<T = unknown> {
    * @param listener - Function that will be called whenever state changes.
    * @returns Function to unregister this listener.
    */
-  subscribe(listener: (params: LiquityStoreListenerParams<T>) => void): () => void {
+  subscribe(listener: (params: ZeroStoreListenerParams<T>) => void): () => void {
     const uniqueListener = wrap(listener);
 
     this._listeners.add(uniqueListener);
@@ -516,7 +516,7 @@ export abstract class LiquityStore<T = unknown> {
   }
 
   /** @internal */
-  protected _load(baseState: LiquityStoreBaseState, extraState?: T): void {
+  protected _load(baseState: ZeroStoreBaseState, extraState?: T): void {
     assert(!this._loaded);
 
     this._baseState = baseState;
@@ -533,7 +533,7 @@ export abstract class LiquityStore<T = unknown> {
 
   /** @internal */
   protected _update(
-    baseStateUpdate?: Partial<LiquityStoreBaseState>,
+    baseStateUpdate?: Partial<ZeroStoreBaseState>,
     extraStateUpdate?: Partial<T>
   ): void {
     assert(this._baseState && this._derivedState);

@@ -143,7 +143,7 @@ contract("ZERO Token", async accounts => {
   };
 
   before(async () => {
-    contracts = await deploymentHelper.deployLiquityCore();
+    contracts = await deploymentHelper.deployZeroCore();
     const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig);
 
     zeroStaking = ZEROContracts.zeroStaking;

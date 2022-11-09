@@ -37,7 +37,7 @@ module.exports = function(deployer) {
     const zusdToken = await ZUSDToken.deployed()
     const functionCaller = await FunctionCaller.deployed()
 
-    const liquityContracts = {
+    const zeroContracts = {
       borrowerOperations,
       priceFeed,
       zusdToken,
@@ -50,12 +50,12 @@ module.exports = function(deployer) {
     }
 
     // Grab contract addresses
-    const liquityAddresses = getAddresses(liquityContracts)
+    const zeroAddresses = getAddresses(zeroContracts)
     console.log('deploy_contracts.js - Deployed contract addresses: \n')
-    console.log(liquityAddresses)
+    console.log(zeroAddresses)
     console.log('\n')
 
     // Connect contracts to each other
-    await connectContracts(liquityContracts, liquityAddresses)
+    await connectContracts(zeroContracts, zeroAddresses)
   })
 }

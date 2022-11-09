@@ -2,7 +2,7 @@
 const deploymentHelpers = require("../utils/truffleDeploymentHelpers.js")
 const testHelpers = require("../utils/testHelpers.js")
 
-const deployLiquity = deploymentHelpers.deployLiquity
+const deployZero = deploymentHelpers.deployZero
 const getAddresses = deploymentHelpers.getAddresses
 const connectContracts = deploymentHelpers.connectContracts
 
@@ -22,7 +22,7 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
   let borrowerOperations
 
   beforeEach(async () => {
-    contracts = await deployLiquity()
+    contracts = await deployZero()
     
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken

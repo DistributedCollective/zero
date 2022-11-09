@@ -10,8 +10,8 @@ const outputFile = "eth-usd.csv";
 
 const phase = 2;
 const answerDecimals = 8;
-const liquityDecimals = 18;
-const answerMultiplier = BigNumber.from(10).pow(liquityDecimals - answerDecimals);
+const zeroDecimals = 18;
+const answerMultiplier = BigNumber.from(10).pow(zeroDecimals - answerDecimals);
 const firstRound = BigNumber.from("0x10000000000000000").mul(phase);
 
 const aggregatorAddress = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";

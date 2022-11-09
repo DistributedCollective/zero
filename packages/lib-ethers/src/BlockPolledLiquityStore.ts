@@ -3,29 +3,29 @@ import { AddressZero } from "@ethersproject/constants";
 
 import {
   Decimal,
-  LiquityStoreState,
-  LiquityStoreBaseState,
+  ZeroStoreState,
+  ZeroStoreBaseState,
   TroveWithPendingRedistribution,
   StabilityDeposit,
   ZEROStake,
-  LiquityStore
+  ZeroStore
 } from "@sovryn-zero/lib-base";
 
-import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
+import { ReadableEthersZero } from "./ReadableEthersZero";
 import {
-  EthersLiquityConnection,
+  EthersZeroConnection,
   _getBlockTimestamp,
   _getProvider
-} from "./EthersLiquityConnection";
+} from "./EthersZeroConnection";
 import { EthersCallOverrides, EthersProvider } from "./types";
 
 /**
- * Extra state added to {@link @sovryn-zero/lib-base#LiquityStoreState} by
- * {@link BlockPolledLiquityStore}.
+ * Extra state added to {@link @sovryn-zero/lib-base#ZeroStoreState} by
+ * {@link BlockPolledZeroStore}.
  *
  * @public
  */
-export interface BlockPolledLiquityStoreExtraState {
+export interface BlockPolledZeroStoreExtraState {
   /**
    * Number of block that the store state was fetched from.
    *
@@ -41,12 +41,12 @@ export interface BlockPolledLiquityStoreExtraState {
 }
 
 /**
- * The type of {@link BlockPolledLiquityStore}'s
- * {@link @sovryn-zero/lib-base#LiquityStore.state | state}.
+ * The type of {@link BlockPolledZeroStore}'s
+ * {@link @sovryn-zero/lib-base#ZeroStore.state | state}.
  *
  * @public
  */
-export type BlockPolledLiquityStoreState = LiquityStoreState<BlockPolledLiquityStoreExtraState>;
+export type BlockPolledZeroStoreState = ZeroStoreState<BlockPolledZeroStoreExtraState>;
 
 type Resolved<T> = T extends Promise<infer U> ? U : T;
 type ResolvedValues<T> = { [P in keyof T]: Resolved<T[P]> };
@@ -62,18 +62,18 @@ const promiseAllValues = <T>(object: T) => {
 const decimalify = (bigNumber: BigNumber) => Decimal.fromBigNumberString(bigNumber.toHexString());
 
 /**
- * Ethers-based {@link @sovryn-zero/lib-base#LiquityStore} that updates state whenever there's a new
+ * Ethers-based {@link @sovryn-zero/lib-base#ZeroStore} that updates state whenever there's a new
  * block.
  *
  * @public
  */
-export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStoreExtraState> {
-  readonly connection: EthersLiquityConnection;
+export class BlockPolledZeroStore extends ZeroStore<BlockPolledZeroStoreExtraState> {
+  readonly connection: EthersZeroConnection;
 
-  private readonly _readable: ReadableEthersLiquity;
+  private readonly _readable: ReadableEthersZero;
   private readonly _provider: EthersProvider;
 
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersZero) {
     super();
 
     this.connection = readable.connection;
@@ -98,7 +98,7 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
 
   private async _get(
     blockTag?: number
-  ): Promise<[baseState: LiquityStoreBaseState, extraState: BlockPolledLiquityStoreExtraState]> {
+  ): Promise<[baseState: ZeroStoreBaseState, extraState: BlockPolledZeroStoreExtraState]> {
     const { userAddress, frontendTag } = this.connection;
 
     const { blockTimestamp, createFees, ...baseState } = await promiseAllValues({
@@ -201,9 +201,9 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
 
   /** @internal @override */
   protected _reduceExtra(
-    oldState: BlockPolledLiquityStoreExtraState,
-    stateUpdate: Partial<BlockPolledLiquityStoreExtraState>
-  ): BlockPolledLiquityStoreExtraState {
+    oldState: BlockPolledZeroStoreExtraState,
+    stateUpdate: Partial<BlockPolledZeroStoreExtraState>
+  ): BlockPolledZeroStoreExtraState {
     return {
       blockTag: stateUpdate.blockTag ?? oldState.blockTag,
       blockTimestamp: stateUpdate.blockTimestamp ?? oldState.blockTimestamp

@@ -17,7 +17,7 @@ const HintHelpers = artifacts.require("./HintHelpers.sol")
 const CommunityIssuanceTester = artifacts.require("./ZERO/CommunityIssuanceTester.sol")
 const ActivePoolTester = artifacts.require("./ActivePoolTester.sol")
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
+const ZeroMathTester = artifacts.require("./ZeroMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
@@ -50,7 +50,7 @@ const TesterContractABIs  = [
   CommunityIssuanceTester,
   ActivePoolTester,
   DefaultPoolTester,
-  LiquityMathTester,
+  ZeroMathTester,
   BorrowerOperationsTester,
   TroveManagerTester,
   ZUSDTokenTester,
@@ -106,7 +106,7 @@ const logContractBytecodeLengths = (contractABIs) => {
 
 // Run script: log deployment gas costs and bytecode lengths for all contracts
 async function main() {
-  const coreContracts = await dh.deployLiquityCoreHardhat()
+  const coreContracts = await dh.deployZeroCoreHardhat()
   const ZEROContracts = await dh.deployZEROContractsHardhat(ARBITRARY_ADDRESS, ARBITRARY_ADDRESS)
   const testerContracts = await dh.deployTesterContractsHardhat()
 

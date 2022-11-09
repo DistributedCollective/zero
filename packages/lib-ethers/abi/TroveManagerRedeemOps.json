@@ -755,10 +755,10 @@
   },
   {
     "inputs": [],
-    "name": "liquityBaseParams",
+    "name": "zeroBaseParams",
     "outputs": [
       {
-        "internalType": "contract ILiquityBaseParams",
+        "internalType": "contract IZeroBaseParams",
         "name": "",
         "type": "address"
       }

@@ -19,7 +19,7 @@ pragma solidity 0.6.11;
  * multiplying it by some factor in range ]0,1[
  *
  * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / BTC gain derivations:
- * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
+ * https://github.com/DistributedCollective/zero/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  * --- ZERO ISSUANCE TO STABILITY POOL DEPOSITORS ---
  *
@@ -31,7 +31,7 @@ pragma solidity 0.6.11;
  * by a given deposit, is split between the depositor and the front end through which the deposit was made, based on the front end's kickbackRate.
  *
  * Please see the system Readme for an overview:
- * https://github.com/liquity/dev/blob/main/README.md#zero-issuance-to-stability-providers
+ * TODO: add content/fix link - https://github.com/DistributedCollective/zero/blob/master/README.md#zero-issuance-to-stability-providers
  */
 interface IStabilityPool {
 
@@ -71,9 +71,9 @@ interface IStabilityPool {
     // --- Functions ---
 
     /**
-     * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
+     * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
-     * @param _liquityBaseParamsAddress LiquidityBaseParams contract address
+     * @param _zeroBaseParamsAddress LiquidityBaseParams contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
      * @param _troveManagerAddress TroveManager contract address
      * @param _activePoolAddress ActivePool contract address
@@ -83,7 +83,7 @@ interface IStabilityPool {
      * @param _communityIssuanceAddress CommunityIssuanceAddress
     */
     function setAddresses(
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
         address _activePoolAddress,

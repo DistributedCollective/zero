@@ -11,14 +11,14 @@ import { EthersProvider, EthersSigner } from "./types";
 
 import {
   _connectToContracts,
-  _LiquityContractAddresses,
-  _LiquityContracts,
-  _LiquityDeploymentJSON
+  _ZeroContractAddresses,
+  _ZeroContracts,
+  _ZeroDeploymentJSON
 } from "./contracts";
 
 import { _connectToMulticall, _Multicall } from "./_Multicall";
 
-const dev = devOrNull as _LiquityDeploymentJSON | null;
+const dev = devOrNull as _ZeroDeploymentJSON | null;
 
 const deployments = {
   [rsktestnet.chainId]: rsktestnet,
@@ -38,11 +38,11 @@ const branded = <T>(t: Omit<T, typeof brand>): T => t as T;
  * @remarks
  * Provided for debugging / informational purposes.
  *
- * Exposed through {@link ReadableEthersLiquity.connection} and {@link EthersLiquity.connection}.
+ * Exposed through {@link ReadableEthersZero.connection} and {@link EthersZero.connection}.
  *
  * @public
  */
-export interface EthersLiquityConnection extends EthersLiquityConnectionOptionalParams {
+export interface EthersZeroConnection extends EthersZeroConnectionOptionalParams {
   /** Ethers `Provider` used for connecting to the network. */
   readonly provider: EthersProvider;
 
@@ -78,20 +78,20 @@ export interface EthersLiquityConnection extends EthersLiquityConnectionOptional
 }
 
 /** @internal */
-export interface _InternalEthersLiquityConnection extends EthersLiquityConnection {
-  readonly addresses: _LiquityContractAddresses;
-  readonly _contracts: _LiquityContracts;
+export interface _InternalEthersZeroConnection extends EthersZeroConnection {
+  readonly addresses: _ZeroContractAddresses;
+  readonly _contracts: _ZeroContracts;
   readonly _multicall?: _Multicall;
 }
 
 const connectionFrom = (
   provider: EthersProvider,
   signer: EthersSigner | undefined,
-  _contracts: _LiquityContracts,
+  _contracts: _ZeroContracts,
   _multicall: _Multicall | undefined,
-  { deploymentDate, ...deployment }: _LiquityDeploymentJSON,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): _InternalEthersLiquityConnection => {
+  { deploymentDate, ...deployment }: _ZeroDeploymentJSON,
+  optionalParams?: EthersZeroConnectionOptionalParams
+): _InternalEthersZeroConnection => {
   if (
     optionalParams &&
     optionalParams.useStore !== undefined &&
@@ -112,11 +112,11 @@ const connectionFrom = (
 };
 
 /** @internal */
-export const _getContracts = (connection: EthersLiquityConnection): _LiquityContracts =>
-  (connection as _InternalEthersLiquityConnection)._contracts;
+export const _getContracts = (connection: EthersZeroConnection): _ZeroContracts =>
+  (connection as _InternalEthersZeroConnection)._contracts;
 
-const getMulticall = (connection: EthersLiquityConnection): _Multicall | undefined =>
-  (connection as _InternalEthersLiquityConnection)._multicall;
+const getMulticall = (connection: EthersZeroConnection): _Multicall | undefined =>
+  (connection as _InternalEthersZeroConnection)._multicall;
 
 const numberify = (bigNumber: BigNumber) => bigNumber.toNumber();
 
@@ -124,7 +124,7 @@ const getTimestampFromBlock = ({ timestamp }: Block) => timestamp;
 
 /** @internal */
 export const _getBlockTimestamp = (
-  connection: EthersLiquityConnection,
+  connection: EthersZeroConnection,
   blockTag: BlockTag = "latest"
 ): Promise<number> =>
   // Get the timestamp via a contract call whenever possible, to make it batchable with other calls
@@ -136,36 +136,36 @@ const panic = <T>(e: unknown): T => {
 };
 
 /** @internal */
-export const _requireSigner = (connection: EthersLiquityConnection): EthersSigner =>
+export const _requireSigner = (connection: EthersZeroConnection): EthersSigner =>
   connection.signer ?? panic(new Error("Must be connected through a Signer"));
 
 /** @internal */
-export const _getProvider = (connection: EthersLiquityConnection): EthersProvider =>
+export const _getProvider = (connection: EthersZeroConnection): EthersProvider =>
   connection.provider;
 
 // TODO parameterize error message?
 /** @internal */
 export const _requireAddress = (
-  connection: EthersLiquityConnection,
+  connection: EthersZeroConnection,
   overrides?: { from?: string }
 ): string =>
   overrides?.from ?? connection.userAddress ?? panic(new Error("A user address is required"));
 
 /** @internal */
-export const _requireFrontendAddress = (connection: EthersLiquityConnection): string =>
+export const _requireFrontendAddress = (connection: EthersZeroConnection): string =>
   connection.frontendTag ?? panic(new Error("A frontend address is required"));
 
 /** @internal */
 export const _usingStore = (
-  connection: EthersLiquityConnection
-): connection is EthersLiquityConnection & { useStore: EthersLiquityStoreOption } =>
+  connection: EthersZeroConnection
+): connection is EthersZeroConnection & { useStore: EthersZeroStoreOption } =>
   connection.useStore !== undefined;
 
 /**
  * Thrown when trying to connect to a network where Zero is not deployed.
  *
  * @remarks
- * Thrown by {@link ReadableEthersLiquity.(connect:2)} and {@link EthersLiquity.(connect:2)}.
+ * Thrown by {@link ReadableEthersZero.(connect:2)} and {@link EthersZero.(connect:2)}.
  *
  * @public
  */
@@ -195,10 +195,10 @@ const getProviderAndSigner = (
 
 /** @internal */
 export const _connectToDeployment = (
-  deployment: _LiquityDeploymentJSON,
+  deployment: _ZeroDeploymentJSON,
   signerOrProvider: EthersSigner | EthersProvider,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): EthersLiquityConnection =>
+  optionalParams?: EthersZeroConnectionOptionalParams
+): EthersZeroConnection =>
   connectionFrom(
     ...getProviderAndSigner(signerOrProvider),
     _connectToContracts(signerOrProvider, deployment),
@@ -209,31 +209,31 @@ export const _connectToDeployment = (
 
 /**
  * Possible values for the optional
- * {@link EthersLiquityConnectionOptionalParams.useStore | useStore}
+ * {@link EthersZeroConnectionOptionalParams.useStore | useStore}
  * connection parameter.
  *
  * @remarks
  * Currently, the only supported value is `"blockPolled"`, in which case a
- * {@link BlockPolledLiquityStore} will be created.
+ * {@link BlockPolledZeroStore} will be created.
  *
  * @public
  */
-export type EthersLiquityStoreOption = "blockPolled";
+export type EthersZeroStoreOption = "blockPolled";
 
 const validStoreOptions = ["blockPolled"];
 
 /**
- * Optional parameters of {@link ReadableEthersLiquity.(connect:2)} and
- * {@link EthersLiquity.(connect:2)}.
+ * Optional parameters of {@link ReadableEthersZero.(connect:2)} and
+ * {@link EthersZero.(connect:2)}.
  *
  * @public
  */
-export interface EthersLiquityConnectionOptionalParams {
+export interface EthersZeroConnectionOptionalParams {
   /**
    * Address whose Trove, Stability Deposit, ZERO Stake and balances will be read by default.
    *
    * @remarks
-   * For example {@link EthersLiquity.getTrove | getTrove(address?)} will return the Trove owned by
+   * For example {@link EthersZero.getTrove | getTrove(address?)} will return the Trove owned by
    * `userAddress` when the `address` parameter is omitted.
    *
    * Should be omitted when connecting through a {@link EthersSigner | Signer}. Instead `userAddress`
@@ -246,26 +246,26 @@ export interface EthersLiquityConnectionOptionalParams {
    *
    * @remarks
    * For example
-   * {@link EthersLiquity.depositZUSDInStabilityPool | depositZUSDInStabilityPool(amount, frontendTag?)}
+   * {@link EthersZero.depositZUSDInStabilityPool | depositZUSDInStabilityPool(amount, frontendTag?)}
    * will tag newly made Stability Deposits with this address when its `frontendTag` parameter is
    * omitted.
    */
   readonly frontendTag?: string;
 
   /**
-   * Create a {@link @sovryn-zero/lib-base#LiquityStore} and expose it as the `store` property.
+   * Create a {@link @sovryn-zero/lib-base#ZeroStore} and expose it as the `store` property.
    *
    * @remarks
-   * When set to one of the available {@link EthersLiquityStoreOption | options},
-   * {@link ReadableEthersLiquity.(connect:2) | ReadableEthersLiquity.connect()} will return a
-   * {@link ReadableEthersLiquityWithStore}, while
-   * {@link EthersLiquity.(connect:2) | EthersLiquity.connect()} will return an
-   * {@link EthersLiquityWithStore}.
+   * When set to one of the available {@link EthersZeroStoreOption | options},
+   * {@link ReadableEthersZero.(connect:2) | ReadableEthersZero.connect()} will return a
+   * {@link ReadableEthersZeroWithStore}, while
+   * {@link EthersZero.(connect:2) | EthersZero.connect()} will return an
+   * {@link EthersZeroWithStore}.
    *
    * Note that the store won't start monitoring the blockchain until its
-   * {@link @sovryn-zero/lib-base#LiquityStore.start | start()} function is called.
+   * {@link @sovryn-zero/lib-base#ZeroStore.start | start()} function is called.
    */
-  readonly useStore?: EthersLiquityStoreOption;
+  readonly useStore?: EthersZeroStoreOption;
 }
 
 /** @internal */
@@ -273,26 +273,26 @@ export function _connectByChainId<T>(
   provider: EthersProvider,
   signer: EthersSigner | undefined,
   chainId: number,
-  optionalParams: EthersLiquityConnectionOptionalParams & { useStore: T }
-): EthersLiquityConnection & { useStore: T };
+  optionalParams: EthersZeroConnectionOptionalParams & { useStore: T }
+): EthersZeroConnection & { useStore: T };
 
 /** @internal */
 export function _connectByChainId(
   provider: EthersProvider,
   signer: EthersSigner | undefined,
   chainId: number,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): EthersLiquityConnection;
+  optionalParams?: EthersZeroConnectionOptionalParams
+): EthersZeroConnection;
 
 /** @internal */
 export function _connectByChainId(
   provider: EthersProvider,
   signer: EthersSigner | undefined,
   chainId: number,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): EthersLiquityConnection {
-  const deployment: _LiquityDeploymentJSON =
-    (deployments[chainId] as _LiquityDeploymentJSON) ?? panic(new UnsupportedNetworkError(chainId));
+  optionalParams?: EthersZeroConnectionOptionalParams
+): EthersZeroConnection {
+  const deployment: _ZeroDeploymentJSON =
+    (deployments[chainId] as _ZeroDeploymentJSON) ?? panic(new UnsupportedNetworkError(chainId));
 
   return connectionFrom(
     provider,
@@ -307,8 +307,8 @@ export function _connectByChainId(
 /** @internal */
 export const _connect = async (
   signerOrProvider: EthersSigner | EthersProvider,
-  optionalParams?: EthersLiquityConnectionOptionalParams
-): Promise<EthersLiquityConnection> => {
+  optionalParams?: EthersZeroConnectionOptionalParams
+): Promise<EthersZeroConnection> => {
   const [provider, signer] = getProviderAndSigner(signerOrProvider);
 
   if (signer) {

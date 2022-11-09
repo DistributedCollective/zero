@@ -57,7 +57,7 @@ contract('StabilityPool - Withdrawal of stability deposit - Reward calculations'
 
     before(async () => {
       gasPriceInWei = await web3.eth.getGasPrice()
-      contracts = await deploymentHelper.deployLiquityCore()
+      contracts = await deploymentHelper.deployZeroCore()
       const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
       contracts.troveManager = await TroveManagerTester.new()
       contracts = await deploymentHelper.deployZUSDToken(contracts)

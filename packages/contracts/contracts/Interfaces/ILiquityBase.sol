@@ -3,12 +3,12 @@
 pragma solidity 0.6.11;
 
 import "./IPriceFeed.sol";
-import "./ILiquityBaseParams.sol";
+import "./IZeroBaseParams.sol";
 
-interface ILiquityBase {
+interface IZeroBase {
     /// @return PriceFeed contract
     function priceFeed() external view returns (IPriceFeed);
 
-    /// @return LiquityBaseParams contract
-    function liquityBaseParams() external view returns (ILiquityBaseParams);
+    /// @return ZeroBaseParams contract
+    function zeroBaseParams() external view returns (IZeroBaseParams);
 }

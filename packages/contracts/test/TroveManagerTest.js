@@ -54,7 +54,7 @@ contract('TroveManager', async accounts => {
   const withdrawZUSD = async (params) => th.withdrawZUSD(contracts, params)
 
   before(async () => {
-    contracts = await deploymentHelper.deployLiquityCore()
+    contracts = await deploymentHelper.deployZeroCore()
     contracts.troveManager = await TroveManagerTester.new()
     contracts.zusdToken = await ZUSDTokenTester.new(
       contracts.troveManager.address,

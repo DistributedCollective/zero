@@ -532,10 +532,10 @@
     },
     {
       "inputs": [],
-      "name": "liquityBaseParams",
+      "name": "zeroBaseParams",
       "outputs": [
         {
-          "internalType": "contract ILiquityBaseParams",
+          "internalType": "contract IZeroBaseParams",
           "name": "",
           "type": "address"
         }
@@ -680,7 +680,7 @@
         },
         {
           "internalType": "address",
-          "name": "_liquityBaseParamsAddress",
+          "name": "_zeroBaseParamsAddress",
           "type": "address"
         },
         {

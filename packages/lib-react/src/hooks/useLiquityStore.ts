@@ -1,15 +1,15 @@
 import { useContext } from "react";
 
-import { LiquityStore } from "@sovryn-zero/lib-base";
+import { ZeroStore } from "@sovryn-zero/lib-base";
 
-import { LiquityStoreContext } from "../components/LiquityStoreProvider";
+import { ZeroStoreContext } from "../components/ZeroStoreProvider";
 
-export const useLiquityStore = <T>(): LiquityStore<T> => {
-  const store = useContext(LiquityStoreContext);
+export const useZeroStore = <T>(): ZeroStore<T> => {
+  const store = useContext(ZeroStoreContext);
 
   if (!store) {
-    throw new Error("You must provide a LiquityStore via LiquityStoreProvider");
+    throw new Error("You must provide a ZeroStore via ZeroStoreProvider");
   }
 
-  return store as LiquityStore<T>;
+  return store as ZeroStore<T>;
 };

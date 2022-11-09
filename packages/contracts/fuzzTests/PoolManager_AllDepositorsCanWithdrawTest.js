@@ -213,7 +213,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     })
 
     beforeEach(async () => {
-      contracts = await deploymentHelper.deployLiquityCore()
+      contracts = await deploymentHelper.deployZeroCore()
       const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
 
       stabilityPool = contracts.stabilityPool

@@ -2,19 +2,19 @@
 
 pragma solidity 0.6.11;
 
-import "./ILiquityBase.sol";
+import "./IZeroBase.sol";
 import "./IStabilityPool.sol";
 import "./IZUSDToken.sol";
 import "./IZEROToken.sol";
 import "./IZEROStaking.sol";
 
 /// Common interface for the Trove Manager.
-interface ITroveManager is ILiquityBase {
+interface ITroveManager is IZeroBase {
     // --- Events ---
 
     event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
-    event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
+    event ZeroBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
@@ -61,7 +61,7 @@ interface ITroveManager is ILiquityBase {
      * @dev initializer function, checks addresses are contracts
      * @param _feeDistributorAddress feeDistributor contract address
      * @param _troveManagerRedeemOps TroveManagerRedeemOps contract address
-     * @param _liquityBaseParamsAddress LiquityBaseParams contract address
+     * @param _zeroBaseParamsAddress ZeroBaseParams contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
      * @param _activePoolAddress ActivePool contract address
      * @param _defaultPoolAddress DefaultPool contract address
@@ -77,7 +77,7 @@ interface ITroveManager is ILiquityBase {
     function setAddresses(
         address _feeDistributorAddress,
         address _troveManagerRedeemOps,
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,

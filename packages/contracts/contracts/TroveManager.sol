@@ -10,7 +10,7 @@ import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROToken.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IFeeDistributor.sol";
-import "./Dependencies/LiquityBase.sol";
+import "./Dependencies/ZeroBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./Dependencies/TroveManagerBase.sol";
@@ -20,7 +20,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     event FeeDistributorAddressChanged(address _feeDistributorAddress);
     event TroveManagerRedeemOpsAddressChanged(address _troveManagerRedeemOps);
-    event LiquityBaseParamsAddressChanges(address _borrowerOperationsAddress);
+    event ZeroBaseParamsAddressChanges(address _borrowerOperationsAddress);
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
@@ -38,7 +38,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     function setAddresses(
         address _feeDistributorAddress,
         address _troveManagerRedeemOps,
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
         address _activePoolAddress,
         address _defaultPoolAddress,
@@ -54,7 +54,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
         checkContract(_feeDistributorAddress);
         checkContract(_troveManagerRedeemOps);
-        checkContract(_liquityBaseParamsAddress);
+        checkContract(_zeroBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_activePoolAddress);
         checkContract(_defaultPoolAddress);
@@ -69,7 +69,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
         feeDistributor = IFeeDistributor(_feeDistributorAddress);
         troveManagerRedeemOps = _troveManagerRedeemOps;
-        liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
+        zeroBaseParams = IZeroBaseParams(_zeroBaseParamsAddress);
         borrowerOperationsAddress = _borrowerOperationsAddress;
         activePool = IActivePool(_activePoolAddress);
         defaultPool = IDefaultPool(_defaultPoolAddress);
@@ -84,7 +84,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
         emit FeeDistributorAddressChanged(_feeDistributorAddress);
         emit TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps);
-        emit LiquityBaseParamsAddressChanges(_borrowerOperationsAddress);
+        emit ZeroBaseParamsAddressChanges(_borrowerOperationsAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
@@ -230,7 +230,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
 
             // If 100% < ICR < MCR, offset as much as possible, and redistribute the remainder
-        } else if ((_ICR > _100pct) && (_ICR < liquityBaseParams.MCR())) {
+        } else if ((_ICR > _100pct) && (_ICR < zeroBaseParams.MCR())) {
             _movePendingTroveRewardsToActivePool(
                 _activePool,
                 _defaultPool,
@@ -265,7 +265,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
              * The remainder due to the capped rate will be claimable as collateral surplus.
              */
         } else if (
-            (_ICR >= liquityBaseParams.MCR()) &&
+            (_ICR >= zeroBaseParams.MCR()) &&
             (_ICR < _TCR) &&
             (singleLiquidation.entireTroveDebt <= _ZUSDInStabPool)
         ) {
@@ -297,7 +297,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             );
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.liquidateInRecoveryMode);
         } else {
-            // if (_ICR >= liquityBaseParams.MCR() && ( _ICR >= _TCR || singleLiquidation.entireTroveDebt > _ZUSDInStabPool))
+            // if (_ICR >= zeroBaseParams.MCR() && ( _ICR >= _TCR || singleLiquidation.entireTroveDebt > _ZUSDInStabPool))
             LiquidationValues memory zeroVals;
             return zeroVals;
         }
@@ -333,7 +333,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
              *  - Send a fraction of the trove's collateral to the Stability Pool, equal to the fraction of its offset debt
              *
              */
-            debtToOffset = LiquityMath._min(_debt, _ZUSDInStabPool);
+            debtToOffset = ZeroMath._min(_debt, _ZUSDInStabPool);
             collToSendToSP = _coll.mul(debtToOffset).div(_debt);
             debtToRedistribute = _debt.sub(debtToOffset);
             collToRedistribute = _coll.sub(collToSendToSP);
@@ -355,7 +355,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     ) internal view returns (LiquidationValues memory singleLiquidation) {
         singleLiquidation.entireTroveDebt = _entireTroveDebt;
         singleLiquidation.entireTroveColl = _entireTroveColl;
-        uint256 collToOffset = _entireTroveDebt.mul(liquityBaseParams.MCR()).div(_price);
+        uint256 collToOffset = _entireTroveDebt.mul(zeroBaseParams.MCR()).div(_price);
 
         singleLiquidation.collGasCompensation = _getCollGasCompensation(collToOffset);
         singleLiquidation.ZUSDGasCompensation = ZUSD_GAS_COMPENSATION;
@@ -477,12 +477,12 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             vars.ICR = _getCurrentICR(vars.user, _price);
 
             if (!vars.backToNormalMode) {
-                // Break the loop if ICR is greater than liquityBaseParams.MCR() and Stability Pool is empty
-                if (vars.ICR >= liquityBaseParams.MCR() && vars.remainingZUSDInStabPool == 0) {
+                // Break the loop if ICR is greater than zeroBaseParams.MCR() and Stability Pool is empty
+                if (vars.ICR >= zeroBaseParams.MCR() && vars.remainingZUSDInStabPool == 0) {
                     break;
                 }
 
-                uint256 TCR = LiquityMath._computeCR(
+                uint256 TCR = ZeroMath._computeCR(
                     vars.entireSystemColl,
                     vars.entireSystemDebt,
                     _price
@@ -516,7 +516,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
                     vars.entireSystemDebt,
                     _price
                 );
-            } else if (vars.backToNormalMode && vars.ICR < liquityBaseParams.MCR()) {
+            } else if (vars.backToNormalMode && vars.ICR < zeroBaseParams.MCR()) {
                 singleLiquidation = _liquidateNormalMode(
                     _contractsCache.activePool,
                     _contractsCache.defaultPool,
@@ -553,7 +553,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             vars.user = sortedTrovesCached.getLast();
             vars.ICR = _getCurrentICR(vars.user, _price);
 
-            if (vars.ICR < liquityBaseParams.MCR()) {
+            if (vars.ICR < zeroBaseParams.MCR()) {
                 singleLiquidation = _liquidateNormalMode(
                     _activePool,
                     _defaultPool,
@@ -676,12 +676,12 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             vars.ICR = _getCurrentICR(vars.user, _price);
 
             if (!vars.backToNormalMode) {
-                // Skip this trove if ICR is greater than liquityBaseParams.MCR() and Stability Pool is empty
-                if (vars.ICR >= liquityBaseParams.MCR() && vars.remainingZUSDInStabPool == 0) {
+                // Skip this trove if ICR is greater than zeroBaseParams.MCR() and Stability Pool is empty
+                if (vars.ICR >= zeroBaseParams.MCR() && vars.remainingZUSDInStabPool == 0) {
                     continue;
                 }
 
-                uint256 TCR = LiquityMath._computeCR(
+                uint256 TCR = ZeroMath._computeCR(
                     vars.entireSystemColl,
                     vars.entireSystemDebt,
                     _price
@@ -712,7 +712,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
                     vars.entireSystemDebt,
                     _price
                 );
-            } else if (vars.backToNormalMode && vars.ICR < liquityBaseParams.MCR()) {
+            } else if (vars.backToNormalMode && vars.ICR < zeroBaseParams.MCR()) {
                 singleLiquidation = _liquidateNormalMode(
                     _activePool,
                     _defaultPool,
@@ -745,7 +745,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
             vars.user = _troveArray[vars.i];
             vars.ICR = _getCurrentICR(vars.user, _price);
 
-            if (vars.ICR < liquityBaseParams.MCR()) {
+            if (vars.ICR < zeroBaseParams.MCR()) {
                 singleLiquidation = _liquidateNormalMode(
                     _activePool,
                     _defaultPool,
@@ -819,7 +819,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     function getNominalICR(address _borrower) public view override returns (uint256) {
         (uint256 currentBTC, uint256 currentZUSDDebt) = _getCurrentTroveAmounts(_borrower);
 
-        uint256 NICR = LiquityMath._computeNominalCR(currentBTC, currentZUSDDebt);
+        uint256 NICR = ZeroMath._computeNominalCR(currentBTC, currentZUSDDebt);
         return NICR;
     }
 
@@ -968,11 +968,11 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     }
 
     function MCR() external view override returns (uint256) {
-        return liquityBaseParams.MCR();
+        return zeroBaseParams.MCR();
     }
 
     function CCR() external view override returns (uint256) {
-        return liquityBaseParams.CCR();
+        return zeroBaseParams.CCR();
     }
 
     function checkRecoveryMode(uint256 _price) external view override returns (bool) {
@@ -985,9 +985,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         uint256 _entireSystemDebt,
         uint256 _price
     ) internal view returns (bool) {
-        uint256 TCR = LiquityMath._computeCR(_entireSystemColl, _entireSystemDebt, _price);
+        uint256 TCR = ZeroMath._computeCR(_entireSystemColl, _entireSystemDebt, _price);
 
-        return TCR < liquityBaseParams.CCR();
+        return TCR < zeroBaseParams.CCR();
     }
 
     function getRedemptionRateWithDecay() public view override returns (uint256) {
@@ -1010,9 +1010,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
 
     function _calcBorrowingRate(uint256 _baseRate) internal view returns (uint256) {
         return
-            LiquityMath._min(
-                liquityBaseParams.BORROWING_FEE_FLOOR().add(_baseRate),
-                liquityBaseParams.MAX_BORROWING_FEE()
+            ZeroMath._min(
+                zeroBaseParams.BORROWING_FEE_FLOOR().add(_baseRate),
+                zeroBaseParams.MAX_BORROWING_FEE()
             );
     }
 

@@ -3,14 +3,14 @@ import { Event } from "@ethersproject/contracts";
 
 import {
   Decimal,
-  ObservableLiquity,
+  ObservableZero,
   StabilityDeposit,
   Trove,
   TroveWithPendingRedistribution
 } from "@sovryn-zero/lib-base";
 
-import { _getContracts, _requireAddress } from "./EthersLiquityConnection";
-import { ReadableEthersLiquity } from "./ReadableEthersLiquity";
+import { _getContracts, _requireAddress } from "./EthersZeroConnection";
+import { ReadableEthersZero } from "./ReadableEthersZero";
 
 const debouncingDelayMs = 50;
 
@@ -37,10 +37,10 @@ const debounce = (listener: (latestBlock: number) => void) => {
 };
 
 /** @alpha */
-export class ObservableEthersLiquity implements ObservableLiquity {
-  private readonly _readable: ReadableEthersLiquity;
+export class ObservableEthersZero implements ObservableZero {
+  private readonly _readable: ReadableEthersZero;
 
-  constructor(readable: ReadableEthersLiquity) {
+  constructor(readable: ReadableEthersZero) {
     this._readable = readable;
   }
 

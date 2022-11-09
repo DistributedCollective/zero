@@ -21,7 +21,7 @@ import SortedTroves from "../../contracts/artifacts/contracts/SortedTroves.sol/S
 import StabilityPool from "../../contracts/artifacts/contracts/StabilityPool.sol/StabilityPool.json";
 import TroveManager from "../../contracts/artifacts/contracts/TroveManager.sol/TroveManager.json";
 import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
-import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
+import ZeroBaseParams from "../../contracts/artifacts/contracts/ZeroBaseParams.sol/ZeroBaseParams.json";
 import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
 import MockBalanceRedirectPresale from "../../contracts/artifacts/contracts/TestContracts/MockBalanceRedirectPresale.sol/MockBalanceRedirectPresale.json";
 import FeeDistributor from "../../contracts/artifacts/contracts/FeeDistributor.sol/FeeDistributor.json";
@@ -122,7 +122,7 @@ const declareInterface = ({
     "}\n",
 
     `export interface ${contractName}`,
-    `  extends _TypedLiquityContract<${contractName}Calls, ${contractName}Transactions> {`,
+    `  extends _TypedZeroContract<${contractName}Calls, ${contractName}Transactions> {`,
     "  readonly address: string;",
     "  readonly filters: {",
     ...Object.values(events).map(({ name, inputs }) => {
@@ -165,7 +165,7 @@ const contractArtifacts = [
   TroveManager,
   TroveManagerRedeemOps,
   UpgradeableProxy,
-  LiquityBaseParams,
+  ZeroBaseParams,
   MockBalanceRedirectPresale,
   FeeDistributor,
   Ownable
@@ -187,7 +187,7 @@ import {
   EventFilter
 } from "@ethersproject/contracts";
 
-import { _TypedLiquityContract, _TypedLogDescription } from "../src/contracts";
+import { _TypedZeroContract, _TypedLogDescription } from "../src/contracts";
 
 ${contracts.map(declareInterface).join("\n\n")}
 `;

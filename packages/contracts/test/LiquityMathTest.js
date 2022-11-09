@@ -1,13 +1,13 @@
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
+const ZeroMathTester = artifacts.require("./ZeroMathTester.sol")
 
-contract('LiquityMath', async accounts => {
-  let liquityMathTester
+contract('ZeroMath', async accounts => {
+  let zeroMathTester
   beforeEach('deploy tester', async () => {
-    liquityMathTester = await LiquityMathTester.new()
+    zeroMathTester = await ZeroMathTester.new()
   })
 
   const checkFunction = async (func, cond, params) => {
-    assert.equal(await liquityMathTester[func](...params), cond(...params))
+    assert.equal(await zeroMathTester[func](...params), cond(...params))
   }
 
   it('max works if a > b', async () => {
