@@ -74,7 +74,7 @@ yargs
         });
 
         const fees = await zero.getFees();
-        await zero.openLoC(LoC.recreate(new LoC(collateral, debt), fees.borrowingRate()), {
+        await zero.openLoC(LoC.recreate(new LoC(collateral, debt), fees.originationRate()), {
           gasPrice: 0
         });
 

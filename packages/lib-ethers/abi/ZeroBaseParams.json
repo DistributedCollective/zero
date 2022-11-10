@@ -20,7 +20,7 @@
   },
   {
     "inputs": [],
-    "name": "BORROWING_FEE_FLOOR",
+    "name": "ORIGINATION_FEE_FLOOR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -59,7 +59,7 @@
   },
   {
     "inputs": [],
-    "name": "MAX_BORROWING_FEE",
+    "name": "MAX_ORIGINATION_FEE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -133,11 +133,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "BORROWING_FEE_FLOOR_",
+        "name": "ORIGINATION_FEE_FLOOR_",
         "type": "uint256"
       }
     ],
-    "name": "setBorrowingFeeFloor",
+    "name": "setOriginationFeeFloor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -172,11 +172,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "MAX_BORROWING_FEE_",
+        "name": "MAX_ORIGINATION_FEE_",
         "type": "uint256"
       }
     ],
-    "name": "setMaxBorrowingFee",
+    "name": "setMaxOriginationFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

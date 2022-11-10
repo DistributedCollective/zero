@@ -182,7 +182,7 @@ export class Fees {
     constructor(baseRateWithoutDecay: Decimalish, minuteDecayFactor: Decimalish, beta: Decimalish, lastFeeOperation: Date, timeOfLatestBlock: Date, recoveryMode: boolean);
     // @internal (undocumented)
     baseRate(when?: Date): Decimal;
-    borrowingRate(when?: Date): Decimal;
+    originationRate(when?: Date): Decimal;
     equals(that: Fees): boolean;
     redemptionRate(redeemedFractionOfSupply?: Decimalish, when?: Date): Decimal;
     // @internal (undocumented)
@@ -271,7 +271,7 @@ export interface ZeroStoreBaseState {
 
 // @public
 export interface ZeroStoreDerivedState {
-    borrowingRate: Decimal;
+    originationRate: Decimal;
     fees: Fees;
     haveUndercollateralizedLoCs: boolean;
     redemptionRate: Decimal;
@@ -289,13 +289,13 @@ export interface ZeroStoreListenerParams<T = unknown> {
 export type ZeroStoreState<T = unknown> = ZeroStoreBaseState & ZeroStoreDerivedState & T;
 
 // @public
-export const MAXIMUM_BORROWING_RATE: Decimal;
+export const MAXIMUM_ORIGINATION_RATE: Decimal;
 
 // @public
 export type MinedReceipt<R = unknown, D = unknown> = FailedReceipt<R> | SuccessfulReceipt<R, D>;
 
 // @public
-export const MINIMUM_BORROWING_RATE: Decimal;
+export const MINIMUM_ORIGINATION_RATE: Decimal;
 
 // @public
 export const MINIMUM_COLLATERAL_RATIO: Decimal;
@@ -382,15 +382,15 @@ export type _PopulatableFrom<T, P> = {
 //
 // @public
 export interface PopulatableZero<R = unknown, S = unknown, P = unknown> extends _PopulatableFrom<SendableZero<R, S>, P> {
-    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
     claimCollateralSurplus(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
     closeLoC(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCClosureDetails>>>>;
     depositCollateral(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>>;
     liquidate(address: string | string[]): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>>;
     liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>>;
-    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>>;
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
     registerFrontend(kickbackRate: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
     repayZUSD(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
@@ -478,15 +478,15 @@ export type _SendableFrom<T, R, S> = {
 //
 // @public
 export interface SendableZero<R = unknown, S = unknown> extends _SendableFrom<TransactableZero, R, S> {
-    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
     claimCollateralSurplus(): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
     closeLoC(): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCClosureDetails>>>;
     depositCollateral(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>;
     liquidate(address: string | string[]): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
     liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
-    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>;
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, RedemptionDetails>>>;
     registerFrontend(kickbackRate: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
     repayZUSD(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
@@ -563,15 +563,15 @@ export const _successfulReceipt: <R, D>(rawReceipt: R, details: D, toString?: ((
 
 // @public
 export interface TransactableZero {
-    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<LoCAdjustmentDetails>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<LoCAdjustmentDetails>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<LoCAdjustmentDetails>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<LoCAdjustmentDetails>;
     claimCollateralSurplus(): Promise<void>;
     closeLoC(): Promise<LoCClosureDetails>;
     depositCollateral(amount: Decimalish): Promise<LoCAdjustmentDetails>;
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<StabilityDepositChangeDetails>;
     liquidate(address: string | string[]): Promise<LiquidationDetails>;
     liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<LiquidationDetails>;
-    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<LoCCreationDetails>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<LoCCreationDetails>;
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
     registerFrontend(kickbackRate: Decimalish): Promise<void>;
     repayZUSD(amount: Decimalish): Promise<LoCAdjustmentDetails>;
@@ -606,14 +606,14 @@ export class LoC {
     addCollateral(collateral: Decimalish): LoC;
     // (undocumented)
     addDebt(debt: Decimalish): LoC;
-    adjust(params: LoCAdjustmentParams<Decimalish>, borrowingRate?: Decimalish): LoC;
-    adjustTo(that: LoC, borrowingRate?: Decimalish): LoCAdjustmentParams<Decimal>;
-    apply(change: LoCChange<Decimal> | undefined, borrowingRate?: Decimalish): LoC;
+    adjust(params: LoCAdjustmentParams<Decimalish>, originationRate?: Decimalish): LoC;
+    adjustTo(that: LoC, originationRate?: Decimalish): LoCAdjustmentParams<Decimal>;
+    apply(change: LoCChange<Decimal> | undefined, originationRate?: Decimalish): LoC;
     readonly collateral: Decimal;
     collateralRatio(price: Decimalish): Decimal;
     collateralRatioIsBelowCritical(price: Decimalish): boolean;
     collateralRatioIsBelowMinimum(price: Decimalish): boolean;
-    static create(params: LoCCreationParams<Decimalish>, borrowingRate?: Decimalish): LoC;
+    static create(params: LoCCreationParams<Decimalish>, originationRate?: Decimalish): LoC;
     readonly debt: Decimal;
     // (undocumented)
     equals(that: LoC): boolean;
@@ -625,7 +625,7 @@ export class LoC {
     get netDebt(): Decimal;
     // @internal (undocumented)
     get _nominalCollateralRatio(): Decimal;
-    static recreate(that: LoC, borrowingRate?: Decimalish): LoCCreationParams<Decimal>;
+    static recreate(that: LoC, originationRate?: Decimalish): LoCCreationParams<Decimal>;
     // (undocumented)
     setCollateral(collateral: Decimalish): LoC;
     // (undocumented)
@@ -638,7 +638,7 @@ export class LoC {
     subtractDebt(debt: Decimalish): LoC;
     // @internal (undocumented)
     toString(): string;
-    whatChanged(that: LoC, borrowingRate?: Decimalish): LoCChange<Decimal> | undefined;
+    whatChanged(that: LoC, originationRate?: Decimalish): LoCChange<Decimal> | undefined;
 }
 
 // @public

@@ -77,7 +77,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [How deposits and RBTC gains are tracked](#how-deposits-and-rbtc-gains-are-tracked)
   - [Zero System Fees](#zero-system-fees)
     - [Redemption Fee](#redemption-fee)
-    - [Borrowing fee](#borrowing-fee)
+    - [Origination fee](#borrowing-fee)
     - [Fee Schedule](#fee-schedule)
     - [Intuition behind fees](#intuition-behind-fees)
     - [Fee decay Implementation](#fee-decay-implementation)
@@ -119,7 +119,7 @@ The stablecoins are economically geared towards maintaining a value of 1 ZUSD = 
 
 2. The stablecoins are fully redeemable - users can always swap $x worth of ZUSD for $x worth of RBTC (minus fees) directly with the system.
 
-3. The system algorithmically controls the generation of ZUSD through a variable borrowing fee.
+3. The system algorithmically controls the generation of ZUSD through a variable origination fee.
 
 After opening a Line of Credit with some RBTC, users may issue ("borrow") tokens such that the collateral ratio of their Line of Credit remains above 110% e.g. a user with $1000 worth of RBTC in a Line of Credit can issue up to 909.09 ZUSD.
 
@@ -261,7 +261,7 @@ The three main contracts - `BorrowerOperations.sol`, `LoCManager.sol` and `Stabi
 
 ### Core Smart Contracts
 
-`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their Line of Credit: Line of Credit creation, RBTC top-up/withdrawal, stablecoin issuance, and repayment. It also sends borrowing fees to the `sovFeeCollector`. BorrowerOperations functions call into the Line of Credit Manager, telling it to update the Line of Credit state, where necessary. BorrowerOperations functions also call into the various Pools, telling them to move RBTC/Tokens between Pools or between Pool <> user, where necessary.
+`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their Line of Credit: Line of Credit creation, RBTC top-up/withdrawal, stablecoin issuance, and repayment. It also sends origination fees to the `sovFeeCollector`. BorrowerOperations functions call into the Line of Credit Manager, telling it to update the Line of Credit state, where necessary. BorrowerOperations functions also call into the various Pools, telling them to move RBTC/Tokens between Pools or between Pool <> user, where necessary.
 
 `LoCManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `sovFeeCollector`. It also contains the state of each Line of Credit  i.e. a record of the Line of Credit’s collateral and debt. The LoCManager does not hold value (i.e. RBTC / other tokens). LoCManager functions call into the various Pools to tell them to move RBTC/tokens between Pools, where necessary.
 
@@ -401,12 +401,12 @@ The only time ZUSD is transferred to/from a Zero contract, is when a user deposi
 | Function                      | ZUSD Quantity | ERC20 Operation                      |
 | ----------------------------- | ------------- | ------------------------------------ |
 | openLoC                     | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
+|                               | Origination fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | withdrawZUSD                  | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
+|                               | Origination fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | repayZUSD                     | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
 | adjustLoC: withdrawing ZUSD | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
+|                               | Origination fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | adjustLoC: repaying ZUSD    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
 | closeLoC                    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
 
@@ -546,11 +546,11 @@ All data structures with the ‘public’ visibility specifier are ‘gettable�
 
 `withdrawColl(uint _amount, address _upperHint, address _lowerHint)`: withdraws `_amount` of collateral from the caller’s Line of Credit. Executes only if the user has an active Line of Credit, the withdrawal would not pull the user’s Line of Credit below the minimum collateralization ratio, and the resulting total collateralization ratio of the system is above 150%. 
 
-`function withdrawZUSD(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint)`: issues `_amount` of ZUSD from the caller’s Line of Credit to the caller. Executes only if the Line of Credit's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the borrowing fee.
+`function withdrawZUSD(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint)`: issues `_amount` of ZUSD from the caller’s Line of Credit to the caller. Executes only if the Line of Credit's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the origination fee.
 
 `repayZUSD(uint _amount, address _upperHint, address _lowerHint)`: repay `_amount` of ZUSD to the caller’s Line of Credit, subject to leaving 20 ZUSD debt in the Line of Credit (which corresponds to the 20 ZUSD gas compensation).
 
-`_adjustLoC(address _borrower, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage)`: enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity: if the adjustment reduces the collateralization ratio of the Line of Credit, the function only executes if the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the borrowing fee. The parameter is ignored if the debt is not increased with the transaction.
+`_adjustLoC(address _borrower, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage)`: enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity: if the adjustment reduces the collateralization ratio of the Line of Credit, the function only executes if the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the origination fee. The parameter is ignored if the debt is not increased with the transaction.
 
 `closeLoC()`: allows a borrower to repay all debt, withdraw all their collateral, and close their Line of Credit. Requires the borrower to have a ZUSD balance sufficient to repay their Line of Credit's debt, excluding gas compensation - i.e. `(debt - 20)` ZUSD.
 
@@ -666,9 +666,9 @@ Hints allow cheaper Line of Credit operations for the user, at the expense of a 
   const ZUSDAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 ZUSD
   const RBTCColl = toBN(toWei('5')) // borrower wants to lock 5 RBTC collateral
 
-  // Call deployed Line of Credit Manager contract to read the liquidation reserve and latest borrowing fee
+  // Call deployed Line of Credit Manager contract to read the liquidation reserve and latest origination fee
   const liquidationReserve = await Line of Credit Manager.ZUSD_GAS_COMPENSATION()
-  const expectedFee = await Line of Credit Manager.getBorrowingFeeWithDecay(ZUSDAmount)
+  const expectedFee = await Line of Credit Manager.getOriginationFeeWithDecay(ZUSDAmount)
   
   // Total debt of the new Line of Credit = ZUSD amount drawn, plus fee, plus the liquidation reserve
   const expectedDebt = ZUSDAmount.add(expectedFee).add(liquidationReserve)
@@ -934,7 +934,7 @@ An SOV holder may stake their SOV, and earn a share of all system fees, proporti
 
 Zero generates revenue in two ways: redemptions, and borrowing ZUSD.
 
-Redemptions fees are paid in RBTC. Borrowing fees (when a user opens a Line of Credit, or borrows more ZUSD from their existing Line of Credit) are paid in ZUSD.
+Redemptions fees are paid in RBTC. Origination fees (when a user opens a Line of Credit, or borrows more ZUSD from their existing Line of Credit) are paid in ZUSD.
 
 ### Redemption Fee
 
@@ -942,9 +942,9 @@ The redemption fee is taken as a cut of the total RBTC drawn from the system in 
 
 In the `LoCManager`, `redeemCollateral` calculates the RBTC fee and transfers it to the `sovFeeCollector`.
 
-### Borrowing fee
+### Origination fee
 
-The borrowing fee is charged on the ZUSD drawn by the user and is added to the Line of Credit's ZUSD debt. It is based on the current borrowing rate.
+The origination fee is charged on the ZUSD drawn by the user and is added to the Line of Credit's ZUSD debt. It is based on the current borrowing rate.
 
 When new ZUSD are drawn via one of the `BorrowerOperations` functions `openLoC`, `withdrawZUSD` or `adjustLoC`, an extra amount `ZUSDFee` is minted, and an equal amount of debt is added to the user’s Line of Credit. The `ZUSDFee` is transferred to the `sovFeeCollector`.
 
@@ -961,9 +961,9 @@ Upon each redemption:
 
 Upon each debt issuance:
 - `baseRate` is decayed based on time passed since the last fee event
-- The borrowing rate is given by `min{BORROWING_FEE_FLOOR + baseRate * newDebtIssued, MAX_BORROWING_FEE}`
+- The borrowing rate is given by `min{ORIGINATION_FEE_FLOOR + baseRate * newDebtIssued, MAX_ORIGINATION_FEE}`
 
-`REDEMPTION_FEE_FLOOR` and `BORROWING_FEE_FLOOR` are both set to 0.5%, while `MAX_BORROWING_FEE` is 5% and `DECIMAL_PRECISION` is 100%.
+`REDEMPTION_FEE_FLOOR` and `ORIGINATION_FEE_FLOOR` are both set to 0.5%, while `MAX_ORIGINATION_FEE` is 5% and `DECIMAL_PRECISION` is 100%.
 
 ### Intuition behind fees
 

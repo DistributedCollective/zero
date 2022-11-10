@@ -122,7 +122,7 @@ contract("Gas cost tests", async accounts => {
 
     // Between F and G
     let amount = dec(111, 18);
-    let fee = await locManager.getBorrowingFee(amount);
+    let fee = await locManager.getOriginationFee(amount);
     let debt = (await th.getCompositeDebt(contracts, amount)).add(fee);
     let { upperHint, lowerHint } = await th.getBorrowerOpsListHint(
       contracts,
@@ -135,7 +135,7 @@ contract("Gas cost tests", async accounts => {
 
     // Bottom of the list
     amount = dec(120, 18);
-    fee = await locManager.getBorrowingFee(amount);
+    fee = await locManager.getOriginationFee(amount);
     debt = (await th.getCompositeDebt(contracts, amount)).add(fee);
     ({ upperHint, lowerHint } = await th.getBorrowerOpsListHint(contracts, dec(10, "ether"), debt));
 
@@ -144,7 +144,7 @@ contract("Gas cost tests", async accounts => {
 
     // Top of the list
     amount = dec(98, 18);
-    fee = await locManager.getBorrowingFee(amount);
+    fee = await locManager.getOriginationFee(amount);
     debt = (await th.getCompositeDebt(contracts, amount)).add(fee);
     ({ upperHint, lowerHint } = await th.getBorrowerOpsListHint(contracts, dec(10, "ether"), debt));
 

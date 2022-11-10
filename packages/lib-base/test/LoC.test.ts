@@ -5,14 +5,14 @@ import fc from "fast-check";
 import {
   ZUSD_LIQUIDATION_RESERVE,
   ZUSD_MINIMUM_DEBT,
-  MAXIMUM_BORROWING_RATE
+  MAXIMUM_ORIGINATION_RATE
 } from "../src/constants";
 
 import { Decimal, Difference } from "../src/Decimal";
 import { LoC, _emptyLoC } from "../src/LoC";
 
 const liquidationReserve = Number(ZUSD_LIQUIDATION_RESERVE);
-const maximumBorrowingRate = Number(MAXIMUM_BORROWING_RATE);
+const maximumOriginationRate = Number(MAXIMUM_ORIGINATION_RATE);
 
 const maxDebt = 10 * Number(ZUSD_MINIMUM_DEBT);
 
@@ -123,16 +123,16 @@ describe("LoC", () => {
 
     it("should recreate a LoC with minimum debt at any borrowing rate", () => {
       fc.assert(
-        fc.property(fc.float({ max: maximumBorrowingRate }), borrowingRate => {
+        fc.property(fc.float({ max: maximumOriginationRate }), originationRate => {
           const withMinimumDebt = LoC.recreate(
             new LoC(Decimal.ONE, ZUSD_MINIMUM_DEBT),
-            borrowingRate
+            originationRate
           );
 
-          const ret = LoC.create(withMinimumDebt, borrowingRate).debt.gte(ZUSD_MINIMUM_DEBT);
+          const ret = LoC.create(withMinimumDebt, originationRate).debt.gte(ZUSD_MINIMUM_DEBT);
 
           if (!ret) {
-            console.log(`${LoC.create(withMinimumDebt, borrowingRate).debt}`);
+            console.log(`${LoC.create(withMinimumDebt, originationRate).debt}`);
           }
 
           return ret;

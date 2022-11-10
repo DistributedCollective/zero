@@ -87,11 +87,11 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // @internal
     constructor(readable: ReadableEthersZero);
     // (undocumented)
-    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
+    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
-    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCAdjustmentDetails>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<void>;
     // (undocumented)
@@ -165,9 +165,9 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
     // (undocumented)
     liquidateUpTo(maximumNumberOfLoCsToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<LiquidationDetails>;
     // (undocumented)
-    openNueLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCCreationDetails>;
+    openNueLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCCreationDetails>;
     // (undocumented)
-    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCCreationDetails>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<LoCCreationDetails>;
     readonly populate: PopulatableEthersZero;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<RedemptionDetails>;
@@ -288,11 +288,11 @@ export class ObservableEthersZero implements ObservableZero {
 export class PopulatableEthersZero implements PopulatableZero<EthersTransactionReceipt, EthersTransactionResponse, EthersPopulatedTransaction> {
     constructor(readable: ReadableEthersZero);
     // (undocumented)
-    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
+    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<void>>;
     // (undocumented)
@@ -308,9 +308,9 @@ export class PopulatableEthersZero implements PopulatableZero<EthersTransactionR
     // (undocumented)
     liquidateUpTo(maximumNumberOfLoCsToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    openNueLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>>;
+    openNueLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
-    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersRedemption>;
     // (undocumented)
@@ -440,11 +440,11 @@ export const _redeemMaxIterations = 70;
 export class SendableEthersZero implements SendableZero<EthersTransactionReceipt, EthersTransactionResponse> {
     constructor(populatable: PopulatableEthersZero);
     // (undocumented)
-    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
+    adjustNueLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>>;
     // (undocumented)
     claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<void>>;
     // (undocumented)
@@ -460,9 +460,9 @@ export class SendableEthersZero implements SendableZero<EthersTransactionReceipt
     // (undocumented)
     liquidateUpTo(maximumNumberOfLoCsToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LiquidationDetails>>;
     // (undocumented)
-    openNueLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCCreationDetails>>;
+    openNueLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
-    openLoC(params: LoCCreationParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCCreationDetails>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<LoCCreationDetails>>;
     // (undocumented)
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<SentEthersZeroTransaction<RedemptionDetails>>;
     // (undocumented)

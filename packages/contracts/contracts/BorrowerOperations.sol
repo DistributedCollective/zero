@@ -86,7 +86,7 @@ contract BorrowerOperations is
         uint256 stake,
         BorrowerOperation operation
     );
-    event ZUSDBorrowingFeePaid(address indexed _borrower, uint256 _ZUSDFee);
+    event ZUSDOriginationFeePaid(address indexed _borrower, uint256 _ZUSDFee);
 
     // --- Dependency setters ---
 
@@ -194,7 +194,7 @@ contract BorrowerOperations is
         vars.netDebt = _ZUSDAmount;
 
         if (!isRecoveryMode) {
-            vars.ZUSDFee = _triggerBorrowingFee(
+            vars.ZUSDFee = _triggerOriginationFee(
                 contractsCache.locManager,
                 contractsCache.zusdToken,
                 _ZUSDAmount,
@@ -204,7 +204,7 @@ contract BorrowerOperations is
         }
         _requireAtLeastMinNetDebt(vars.netDebt);
 
-        // ICR is based on the composite debt, i.e. the requested ZUSD amount + ZUSD borrowing fee + ZUSD gas comp.
+        // ICR is based on the composite debt, i.e. the requested ZUSD amount + ZUSD origination fee + ZUSD gas comp.
         vars.compositeDebt = _getCompositeDebt(vars.netDebt);
         assert(vars.compositeDebt > 0);
 
@@ -262,7 +262,7 @@ contract BorrowerOperations is
             vars.stake,
             BorrowerOperation.openLoC
         );
-        emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
+        emit ZUSDOriginationFeePaid(msg.sender, vars.ZUSDFee);
     }
 
     /// Send BTC as collateral to a loc
@@ -425,9 +425,9 @@ contract BorrowerOperations is
 
         vars.netDebtChange = _ZUSDChange;
 
-        // If the adjustment incorporates a debt increase and system is in Normal Mode, then trigger a borrowing fee
+        // If the adjustment incorporates a debt increase and system is in Normal Mode, then trigger a origination fee
         if (_isDebtIncrease && !vars.isRecoveryMode) {
-            vars.ZUSDFee = _triggerBorrowingFee(
+            vars.ZUSDFee = _triggerOriginationFee(
                 contractsCache.locManager,
                 contractsCache.zusdToken,
                 _ZUSDChange,
@@ -495,7 +495,7 @@ contract BorrowerOperations is
             vars.stake,
             BorrowerOperation.adjustLoC
         );
-        emit ZUSDBorrowingFeePaid(msg.sender, vars.ZUSDFee);
+        emit ZUSDOriginationFeePaid(msg.sender, vars.ZUSDFee);
 
         // Use the unmodified _ZUSDChange here, as we don't send the fee to the user
         _moveTokensAndBTCfromAdjustment(
@@ -566,14 +566,14 @@ contract BorrowerOperations is
 
     // --- Helper functions ---
 
-    function _triggerBorrowingFee(
+    function _triggerOriginationFee(
         ILoCManager _locManager,
         IZUSDToken _zusdToken,
         uint256 _ZUSDAmount,
         uint256 _maxFeePercentage
     ) internal returns (uint256) {
         _locManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
-        uint256 ZUSDFee = _locManager.getBorrowingFee(_ZUSDAmount);
+        uint256 ZUSDFee = _locManager.getOriginationFee(_ZUSDAmount);
 
         _requireUserAcceptsFee(ZUSDFee, _ZUSDAmount, _maxFeePercentage);
         _zusdToken.mint(address(feeDistributor), ZUSDFee);
@@ -831,7 +831,7 @@ contract BorrowerOperations is
             );
         } else {
             require(
-                _maxFeePercentage >= zeroBaseParams.BORROWING_FEE_FLOOR() &&
+                _maxFeePercentage >= zeroBaseParams.ORIGINATION_FEE_FLOOR() &&
                     _maxFeePercentage <= DECIMAL_PRECISION,
                 "Max fee percentage must be between 0.5% and 100%"
             );
@@ -923,7 +923,7 @@ contract BorrowerOperations is
         return _getCompositeDebt(_debt);
     }
 
-    function BORROWING_FEE_FLOOR() external view override returns (uint256) {
-        return zeroBaseParams.BORROWING_FEE_FLOOR();
+    function ORIGINATION_FEE_FLOOR() external view override returns (uint256) {
+        return zeroBaseParams.ORIGINATION_FEE_FLOOR();
     }
 }

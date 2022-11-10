@@ -123,7 +123,7 @@ export class Fixture {
       newLoC = newLoC.setCollateral(newLoC.debt.mulDiv(targetCollateralRatio, this.price));
 
       if (loc.isEmpty) {
-        const params = LoC.recreate(newLoC, fees.borrowingRate());
+        const params = LoC.recreate(newLoC, fees.originationRate());
         console.log(`[funder] openLoC(${objToString(params)})`);
         await this.funderZero.openLoC(params);
       } else {
@@ -137,7 +137,7 @@ export class Fixture {
           newLoC = loc.add(newTotal).subtract(total);
         }
 
-        const params = loc.adjustTo(newLoC, fees.borrowingRate());
+        const params = loc.adjustTo(newLoC, fees.originationRate());
         console.log(`[funder] adjustLoC(${objToString(params)})`);
         await this.funderZero.adjustLoC(params);
       }
@@ -213,7 +213,7 @@ export class Fixture {
       value: newLoC.collateral.hex
     });
 
-    const params = LoC.recreate(newLoC, fees.borrowingRate());
+    const params = LoC.recreate(newLoC, fees.originationRate());
 
     if (cannotOpen(newLoC)) {
       console.log(
@@ -249,7 +249,7 @@ export class Fixture {
         return true;
       }
 
-      const adjusted = loc.adjust(params, fees.borrowingRate());
+      const adjusted = loc.adjust(params, fees.originationRate());
 
       return (
         (params.withdrawCollateral?.nonZero || params.borrowZUSD?.nonZero) &&

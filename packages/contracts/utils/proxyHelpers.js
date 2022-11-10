@@ -143,8 +143,8 @@ class BorrowerOperationsProxy extends Proxy {
     return this.proxyFunction('MIN_NET_DEBT', params)
   }
 
-  async BORROWING_FEE_FLOOR(...params) {
-    return this.proxyFunction('BORROWING_FEE_FLOOR', params)
+  async ORIGINATION_FEE_FLOOR(...params) {
+    return this.proxyFunction('ORIGINATION_FEE_FLOOR', params)
   }
 }
 
@@ -255,20 +255,20 @@ class LoCManagerProxy extends Proxy {
     return this.proxyFunction('getRedemptionFeeWithDecay', params)
   }
 
-  async getBorrowingRate() {
-    return this.proxyFunction('getBorrowingRate', [])
+  async getOriginationRate() {
+    return this.proxyFunction('getOriginationRate', [])
   }
 
-  async getBorrowingRateWithDecay() {
-    return this.proxyFunction('getBorrowingRateWithDecay', [])
+  async getOriginationRateWithDecay() {
+    return this.proxyFunction('getOriginationRateWithDecay', [])
   }
 
-  async getBorrowingFee(...params) {
-    return this.proxyFunction('getBorrowingFee', params)
+  async getOriginationFee(...params) {
+    return this.proxyFunction('getOriginationFee', params)
   }
 
-  async getBorrowingFeeWithDecay(...params) {
-    return this.proxyFunction('getBorrowingFeeWithDecay', params)
+  async getOriginationFeeWithDecay(...params) {
+    return this.proxyFunction('getOriginationFeeWithDecay', params)
   }
 
   async getEntireDebtAndColl(...params) {

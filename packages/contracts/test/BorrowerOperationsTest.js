@@ -83,7 +83,7 @@ contract("BorrowerOperations", async accounts => {
 
   let ZUSD_GAS_COMPENSATION;
   let MIN_NET_DEBT;
-  let BORROWING_FEE_FLOOR;
+  let ORIGINATION_FEE_FLOOR;
 
   before(async () => {});
 
@@ -124,7 +124,7 @@ contract("BorrowerOperations", async accounts => {
 
       ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION();
       MIN_NET_DEBT = await borrowerOperations.MIN_NET_DEBT();
-      BORROWING_FEE_FLOOR = await borrowerOperations.BORROWING_FEE_FLOOR();
+      ORIGINATION_FEE_FLOOR = await borrowerOperations.ORIGINATION_FEE_FLOOR();
       const nueTokenAddress = await masset.token();
       nueToken = await NueToken.at(nueTokenAddress);
 
@@ -3091,7 +3091,7 @@ contract("BorrowerOperations", async accounts => {
 
       // Check emitted fee = 0
       const emittedFee = toBN(
-        await th.getEventArgByName(txAlice, "ZUSDBorrowingFeePaid", "_ZUSDFee")
+        await th.getEventArgByName(txAlice, "ZUSDOriginationFeePaid", "_ZUSDFee")
       );
       assert.isTrue(emittedFee.eq(toBN("0")));
 
@@ -3137,10 +3137,10 @@ contract("BorrowerOperations", async accounts => {
       const bobDebt = await getLoCEntireDebt(bob);
       assert.isTrue(bobDebt.gt(toBN("0")));
 
-      const bobFee = toBN(await th.getEventArgByIndex(bobOpenTx, "ZUSDBorrowingFeePaid", 1));
+      const bobFee = toBN(await th.getEventArgByIndex(bobOpenTx, "ZUSDOriginationFeePaid", 1));
       assert.isTrue(bobFee.gt(toBN("0")));
 
-      // Alice transfers ZUSD to bob to compensate borrowing fees
+      // Alice transfers ZUSD to bob to compensate origination fees
       await zusdToken.transfer(bob, bobFee, { from: alice });
 
       const remainingDebt = (await locManager.getLoCDebt(bob)).sub(ZUSD_GAS_COMPENSATION);
@@ -3976,7 +3976,7 @@ contract("BorrowerOperations", async accounts => {
 
       const price = await priceFeed.getPrice();
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, dec(300, 18), { from: bob });
 
       assert.isFalse(await locManager.checkRecoveryMode(price));
@@ -4091,7 +4091,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(aliceCollBefore.gt(toBN("0")));
       assert.isTrue(dennisZUSD.gt(toBN("0")));
 
-      // To compensate borrowing fees
+      // To compensate origination fees
       await zusdToken.transfer(alice, dennisZUSD.div(toBN(2)), { from: dennis });
 
       // Alice attempts to close loc
@@ -4119,9 +4119,9 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(aliceDebtBefore.gt(toBN("0")));
       assert.isTrue(dennisNUE.gt(toBN("0")));
 
-      const expectedDebt = zusdAmount.add(await locManager.getBorrowingFee(zusdAmount));
+      const expectedDebt = zusdAmount.add(await locManager.getOriginationFee(zusdAmount));
 
-      // To compensate borrowing fees
+      // To compensate origination fees
       await nueToken.transfer(alice, dennisNUE.div(toBN(2)), { from: dennis });
 
       const nueBalance_Before = await nueToken.balanceOf(alice);
@@ -4154,7 +4154,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(aliceDebtBefore.gt(toBN("0")));
       assert.isTrue(dennisZUSD.gt(toBN("0")));
 
-      // To compensate borrowing fees
+      // To compensate origination fees
       await zusdToken.transfer(alice, dennisZUSD.div(toBN(2)), { from: dennis });
 
       // Alice attempts to close loc
@@ -4184,7 +4184,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(aliceStakeBefore.gt(toBN("0")));
       assert.isTrue(dennisZUSD.gt(toBN("0")));
 
-      // To compensate borrowing fees
+      // To compensate origination fees
       await zusdToken.transfer(alice, dennisZUSD.div(toBN(2)), { from: dennis });
 
       // Alice attempts to close loc
@@ -4251,7 +4251,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(L_BTC_Snapshot_A_AfterLiquidation.gt(toBN("0")));
       assert.isTrue(L_ZUSDDebt_Snapshot_A_AfterLiquidation.gt(toBN("0")));
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
       await priceFeed.setPrice(dec(200, 18));
@@ -4287,7 +4287,7 @@ contract("BorrowerOperations", async accounts => {
       assert.equal(status_Before, 1);
       assert.isTrue(await sortedLoCs.contains(alice));
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
       // Close the loc
@@ -4324,7 +4324,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(activePool_BTC_before.gt(toBN("0")));
       assert.isTrue(activePool_RawBTC_before.eq(activePool_BTC_before));
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
       // Close the loc
@@ -4359,7 +4359,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(activePool_Debt_before.eq(aliceDebt.add(dennisDebt)));
       assert.isTrue(activePool_Debt_before.gt(toBN("0")));
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
       // Close the loc
@@ -4401,7 +4401,7 @@ contract("BorrowerOperations", async accounts => {
         totalStakesBefore.eq(aliceStakeBefore.add(bobStakeBefore).add(dennisStakeBefore))
       );
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
       // Alice closes loc
@@ -4434,7 +4434,7 @@ contract("BorrowerOperations", async accounts => {
 
         const alice_BTCBalance_Before = web3.utils.toBN(await web3.eth.getBalance(alice));
 
-        // to compensate borrowing fees
+        // to compensate origination fees
         await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
         await borrowerOperations.closeLoC({ from: alice, gasPrice: 0 });
@@ -4461,7 +4461,7 @@ contract("BorrowerOperations", async accounts => {
       const aliceDebt = await getLoCEntireDebt(alice);
       assert.isTrue(aliceDebt.gt(toBN("0")));
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, await zusdToken.balanceOf(dennis), { from: dennis });
 
       const alice_ZUSDBalance_Before = await zusdToken.balanceOf(alice);
@@ -5047,8 +5047,8 @@ contract("BorrowerOperations", async accounts => {
 
       //       actual fee percentage: 0.005000000186264514
       // user's max fee percentage:  0.0049999999999999999
-      let borrowingRate = await locManager.getBorrowingRate(); // expect max(0.5 + 5%, 5%) rate
-      assert.equal(borrowingRate, dec(5, 16));
+      let originationRate = await locManager.getOriginationRate(); // expect max(0.5 + 5%, 5%) rate
+      assert.equal(originationRate, dec(5, 16));
 
       const lessThan5pct = "49999999999999999";
       await assertRevert(
@@ -5059,8 +5059,8 @@ contract("BorrowerOperations", async accounts => {
         "Fee exceeded provided maximum"
       );
 
-      borrowingRate = await locManager.getBorrowingRate(); // expect 5% rate
-      assert.equal(borrowingRate, dec(5, 16));
+      originationRate = await locManager.getOriginationRate(); // expect 5% rate
+      assert.equal(originationRate, dec(5, 16));
       // Attempt with maxFee 1%
       await assertRevert(
         borrowerOperations.openLoC(dec(1, 16), dec(30000, 18), A, A, {
@@ -5070,8 +5070,8 @@ contract("BorrowerOperations", async accounts => {
         "Fee exceeded provided maximum"
       );
 
-      borrowingRate = await locManager.getBorrowingRate(); // expect 5% rate
-      assert.equal(borrowingRate, dec(5, 16));
+      originationRate = await locManager.getOriginationRate(); // expect 5% rate
+      assert.equal(originationRate, dec(5, 16));
       // Attempt with maxFee 3.754%
       await assertRevert(
         borrowerOperations.openLoC(dec(3754, 13), dec(30000, 18), A, A, {
@@ -5081,8 +5081,8 @@ contract("BorrowerOperations", async accounts => {
         "Fee exceeded provided maximum"
       );
 
-      borrowingRate = await locManager.getBorrowingRate(); // expect 5% rate
-      assert.equal(borrowingRate, dec(5, 16));
+      originationRate = await locManager.getOriginationRate(); // expect 5% rate
+      assert.equal(originationRate, dec(5, 16));
       // Attempt with maxFee 1e-16%
       await assertRevert(
         borrowerOperations.openLoC(dec(5, 15), dec(30000, 18), A, A, {
@@ -5114,8 +5114,8 @@ contract("BorrowerOperations", async accounts => {
       await locManager.setBaseRate(dec(5, 16));
       await locManager.setLastFeeOpTimeToNow();
 
-      let borrowingRate = await locManager.getBorrowingRate(); // expect min(0.5 + 5%, 5%) rate
-      assert.equal(borrowingRate, dec(5, 16));
+      let originationRate = await locManager.getOriginationRate(); // expect min(0.5 + 5%, 5%) rate
+      assert.equal(originationRate, dec(5, 16));
 
       // Attempt with maxFee > 5%
       const moreThan5pct = "50000000000000001";
@@ -5125,8 +5125,8 @@ contract("BorrowerOperations", async accounts => {
       });
       assert.isTrue(tx1.receipt.status);
 
-      borrowingRate = await locManager.getBorrowingRate(); // expect 5% rate
-      assert.equal(borrowingRate, dec(5, 16));
+      originationRate = await locManager.getOriginationRate(); // expect 5% rate
+      assert.equal(originationRate, dec(5, 16));
 
       // Attempt with maxFee = 5%
       const tx2 = await borrowerOperations.openLoC(dec(5, 16), dec(10000, 18), A, A, {
@@ -5135,8 +5135,8 @@ contract("BorrowerOperations", async accounts => {
       });
       assert.isTrue(tx2.receipt.status);
 
-      borrowingRate = await locManager.getBorrowingRate(); // expect 5% rate
-      assert.equal(borrowingRate, dec(5, 16));
+      originationRate = await locManager.getOriginationRate(); // expect 5% rate
+      assert.equal(originationRate, dec(5, 16));
 
       // Attempt with maxFee 10%
       const tx3 = await borrowerOperations.openLoC(dec(1, 17), dec(10000, 18), A, A, {
@@ -5145,8 +5145,8 @@ contract("BorrowerOperations", async accounts => {
       });
       assert.isTrue(tx3.receipt.status);
 
-      borrowingRate = await locManager.getBorrowingRate(); // expect 5% rate
-      assert.equal(borrowingRate, dec(5, 16));
+      originationRate = await locManager.getOriginationRate(); // expect 5% rate
+      assert.equal(originationRate, dec(5, 16));
 
       // Attempt with maxFee 37.659%
       const tx4 = await borrowerOperations.openLoC(dec(37659, 13), dec(10000, 18), A, A, {
@@ -5514,9 +5514,9 @@ contract("BorrowerOperations", async accounts => {
         ZERO_ADDRESS,
         { value: dec(100, "ether"), from: C }
       );
-      const _ZUSDFee = toBN(th.getEventArgByName(txC, "ZUSDBorrowingFeePaid", "_ZUSDFee"));
+      const _ZUSDFee = toBN(th.getEventArgByName(txC, "ZUSDOriginationFeePaid", "_ZUSDFee"));
 
-      const expectedFee = BORROWING_FEE_FLOOR.mul(toBN(ZUSDRequest)).div(toBN(dec(1, 18)));
+      const expectedFee = ORIGINATION_FEE_FLOOR.mul(toBN(ZUSDRequest)).div(toBN(dec(1, 18)));
       assert.isTrue(_ZUSDFee.eq(expectedFee));
     });
 
@@ -5756,7 +5756,7 @@ contract("BorrowerOperations", async accounts => {
       });
 
       // Get the expected debt based on the ZUSD request (adding fee and liq. reserve on top)
-      const expectedDebt = ZUSDRequest.add(await locManager.getBorrowingFee(ZUSDRequest)).add(
+      const expectedDebt = ZUSDRequest.add(await locManager.getOriginationFee(ZUSDRequest)).add(
         ZUSD_GAS_COMPENSATION
       );
 
@@ -5794,7 +5794,7 @@ contract("BorrowerOperations", async accounts => {
       });
 
       // Get the expected debt based on the ZUSD request (adding fee and liq. reserve on top)
-      const expectedDebt = ZUSDRequest.add(await locManager.getBorrowingFee(ZUSDRequest)).add(
+      const expectedDebt = ZUSDRequest.add(await locManager.getOriginationFee(ZUSDRequest)).add(
         ZUSD_GAS_COMPENSATION
       );
 
@@ -5966,7 +5966,7 @@ contract("BorrowerOperations", async accounts => {
       assert.equal(status_1, 1);
       assert.isTrue(await sortedLoCs.contains(alice));
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, dec(10000, 18), { from: whale });
 
       // Repay and close LoC

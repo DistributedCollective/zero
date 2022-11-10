@@ -128,7 +128,7 @@ contract('SortedLoCs', async accounts => {
       await openLoC({ ICR: toBN(dec(20, 18)), extraParams: { from: bob } })
       await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: carol } })
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, dec(1000, 18), { from: whale })
       await zusdToken.transfer(bob, dec(1000, 18), { from: whale })
       await zusdToken.transfer(carol, dec(1000, 18), { from: whale })
@@ -157,7 +157,7 @@ contract('SortedLoCs', async accounts => {
       await openLoC({ ICR: toBN(dec(20, 18)), extraParams: { from: bob } })
       await openLoC({ ICR: toBN(dec(2000, 18)), extraParams: { from: carol } })
 
-      // to compensate borrowing fees
+      // to compensate origination fees
       await zusdToken.transfer(alice, dec(1000, 18), { from: whale })
       await zusdToken.transfer(bob, dec(1000, 18), { from: whale })
       await zusdToken.transfer(carol, dec(1000, 18), { from: whale })

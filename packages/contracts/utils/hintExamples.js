@@ -33,9 +33,9 @@ async function main() {
   const ZUSDAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 ZUSD
   const BTCColl = toBN(toWei('5')) // borrower wants to lock 5 BTC collateral
 
-  // Call deployed LoCManager contract to read the liquidation reserve and latest borrowing fee
+  // Call deployed LoCManager contract to read the liquidation reserve and latest origination fee
   const liquidationReserve = await locManager.ZUSD_GAS_COMPENSATION()
-  const expectedFee = await locManager.getBorrowingFeeWithDecay(ZUSDAmount)
+  const expectedFee = await locManager.getOriginationFeeWithDecay(ZUSDAmount)
   
   // Total debt of the new loc = ZUSD amount drawn, plus fee, plus the liquidation reserve
   const expectedDebt = ZUSDAmount.add(expectedFee).add(liquidationReserve)

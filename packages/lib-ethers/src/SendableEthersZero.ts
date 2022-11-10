@@ -43,19 +43,19 @@ export class SendableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.openLoC} */
   openLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<LoCCreationDetails>> {
-    return this._populate.openLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.openLoC(params, maxOriginationRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.openNueLoC} */
   openNueLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<LoCCreationDetails>> {
-    return this._populate.openNueLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.openNueLoC(params, maxOriginationRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.closeLoC} */
@@ -75,19 +75,19 @@ export class SendableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.adjustLoC} */
   adjustLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
-    return this._populate.adjustLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.adjustLoC(params, maxOriginationRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.adjustNueLoC} */
   adjustNueLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
-    return this._populate.adjustNueLoC(params, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.adjustNueLoC(params, maxOriginationRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.depositCollateral} */
@@ -109,10 +109,10 @@ export class SendableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersZeroTransaction<LoCAdjustmentDetails>> {
-    return this._populate.borrowZUSD(amount, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.borrowZUSD(amount, maxOriginationRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableZero.repayZUSD} */

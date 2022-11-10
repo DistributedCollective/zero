@@ -6,7 +6,7 @@ import {
   MINIMUM_COLLATERAL_RATIO,
   CRITICAL_COLLATERAL_RATIO,
   ZUSD_LIQUIDATION_RESERVE,
-  MINIMUM_BORROWING_RATE
+  MINIMUM_ORIGINATION_RATE
 } from "./constants";
 
 /** @internal */ export type _CollateralDeposit<T> = { depositCollateral: T };
@@ -393,11 +393,11 @@ export const _normalizeLoCAdjustment = (
   return locAdjustmentParamsFromEntries(nonZeroEntries);
 };
 
-const applyFee = (borrowingRate: Decimalish, debtIncrease: Decimal) =>
-  debtIncrease.mul(Decimal.ONE.add(borrowingRate));
+const applyFee = (originationRate: Decimalish, debtIncrease: Decimal) =>
+  debtIncrease.mul(Decimal.ONE.add(originationRate));
 
-const unapplyFee = (borrowingRate: Decimalish, debtIncrease: Decimal) =>
-  debtIncrease._divCeil(Decimal.ONE.add(borrowingRate));
+const unapplyFee = (originationRate: Decimalish, debtIncrease: Decimal) =>
+  debtIncrease._divCeil(Decimal.ONE.add(originationRate));
 
 const NOMINAL_COLLATERAL_RATIO_PRECISION = Decimal.from(100);
 
@@ -537,9 +537,9 @@ export class LoC {
     return new LoC(this.collateral, Decimal.from(debt));
   }
 
-  private _debtChange({ debt }: LoC, borrowingRate: Decimalish): _DebtChange<Decimal> {
+  private _debtChange({ debt }: LoC, originationRate: Decimalish): _DebtChange<Decimal> {
     return debt.gt(this.debt)
-      ? { borrowZUSD: unapplyFee(borrowingRate, debt.sub(this.debt)) }
+      ? { borrowZUSD: unapplyFee(originationRate, debt.sub(this.debt)) }
       : { repayZUSD: this.debt.sub(debt) };
   }
 
@@ -553,14 +553,14 @@ export class LoC {
    * Calculate the difference between this LoC and another.
    *
    * @param that - The other LoC.
-   * @param borrowingRate - Borrowing rate to use when calculating a borrowed amount.
+   * @param originationRate - Borrowing rate to use when calculating a borrowed amount.
    *
    * @returns
    * An object representing the change, or `undefined` if the LoCs are equal.
    */
   whatChanged(
     that: LoC,
-    borrowingRate: Decimalish = MINIMUM_BORROWING_RATE
+    originationRate: Decimalish = MINIMUM_ORIGINATION_RATE
   ): LoCChange<Decimal> | undefined {
     if (this.collateral.eq(that.collateral) && this.debt.eq(that.debt)) {
       return undefined;
@@ -573,7 +573,7 @@ export class LoC {
 
       return locCreation({
         depositCollateral: that.collateral,
-        borrowZUSD: unapplyFee(borrowingRate, that.netDebt)
+        borrowZUSD: unapplyFee(originationRate, that.netDebt)
       });
     }
 
@@ -586,12 +586,12 @@ export class LoC {
     }
 
     return this.collateral.eq(that.collateral)
-      ? locAdjustment<Decimal>(this._debtChange(that, borrowingRate), that.debt.zero && "debt")
+      ? locAdjustment<Decimal>(this._debtChange(that, originationRate), that.debt.zero && "debt")
       : this.debt.eq(that.debt)
       ? locAdjustment<Decimal>(this._collateralChange(that), that.collateral.zero && "collateral")
       : locAdjustment<Decimal>(
           {
-            ...this._debtChange(that, borrowingRate),
+            ...this._debtChange(that, originationRate),
             ...this._collateralChange(that)
           },
           (that.debt.zero && "debt") ?? (that.collateral.zero && "collateral")
@@ -602,11 +602,11 @@ export class LoC {
    * Make a new LoC by applying a {@link LoCChange} to this LoC.
    *
    * @param change - The change to apply.
-   * @param borrowingRate - Borrowing rate to use when adding a borrowed amount to the LoC's debt.
+   * @param originationRate - Borrowing rate to use when adding a borrowed amount to the LoC's debt.
    */
   apply(
     change: LoCChange<Decimal> | undefined,
-    borrowingRate: Decimalish = MINIMUM_BORROWING_RATE
+    originationRate: Decimalish = MINIMUM_ORIGINATION_RATE
   ): LoC {
     if (!change) {
       return this;
@@ -629,7 +629,7 @@ export class LoC {
 
         return new LoC(
           depositCollateral,
-          ZUSD_LIQUIDATION_RESERVE.add(applyFee(borrowingRate, borrowZUSD))
+          ZUSD_LIQUIDATION_RESERVE.add(applyFee(originationRate, borrowZUSD))
         );
       }
 
@@ -649,7 +649,7 @@ export class LoC {
         const collateralDecrease = withdrawCollateral ?? Decimal.ZERO;
         const collateralIncrease = depositCollateral ?? Decimal.ZERO;
         const debtDecrease = repayZUSD ?? Decimal.ZERO;
-        const debtIncrease = borrowZUSD ? applyFee(borrowingRate, borrowZUSD) : Decimal.ZERO;
+        const debtIncrease = borrowZUSD ? applyFee(originationRate, borrowZUSD) : Decimal.ZERO;
 
         return setToZero === "collateral"
           ? this.setCollateral(Decimal.ZERO).addDebt(debtIncrease).subtractDebt(debtDecrease)
@@ -668,10 +668,10 @@ export class LoC {
    * Calculate the result of an {@link TransactableZero.openLoC | openLoC()} transaction.
    *
    * @param params - Parameters of the transaction.
-   * @param borrowingRate - Borrowing rate to use when calculating the LoC's debt.
+   * @param originationRate - Borrowing rate to use when calculating the LoC's debt.
    */
-  static create(params: LoCCreationParams<Decimalish>, borrowingRate?: Decimalish): LoC {
-    return _emptyLoC.apply(locCreation(_normalizeLoCCreation(params)), borrowingRate);
+  static create(params: LoCCreationParams<Decimalish>, originationRate?: Decimalish): LoC {
+    return _emptyLoC.apply(locCreation(_normalizeLoCCreation(params)), originationRate);
   }
 
   /**
@@ -679,10 +679,10 @@ export class LoC {
    * that will result in the given LoC.
    *
    * @param that - The LoC to recreate.
-   * @param borrowingRate - Current borrowing rate.
+   * @param originationRate - Current borrowing rate.
    */
-  static recreate(that: LoC, borrowingRate?: Decimalish): LoCCreationParams<Decimal> {
-    const change = _emptyLoC.whatChanged(that, borrowingRate);
+  static recreate(that: LoC, originationRate?: Decimalish): LoCCreationParams<Decimal> {
+    const change = _emptyLoC.whatChanged(that, originationRate);
     assert(change?.type === "creation");
     return change.params;
   }
@@ -692,10 +692,10 @@ export class LoC {
    * on this LoC.
    *
    * @param params - Parameters of the transaction.
-   * @param borrowingRate - Borrowing rate to use when adding to the LoC's debt.
+   * @param originationRate - Borrowing rate to use when adding to the LoC's debt.
    */
-  adjust(params: LoCAdjustmentParams<Decimalish>, borrowingRate?: Decimalish): LoC {
-    return this.apply(locAdjustment(_normalizeLoCAdjustment(params)), borrowingRate);
+  adjust(params: LoCAdjustmentParams<Decimalish>, originationRate?: Decimalish): LoC {
+    return this.apply(locAdjustment(_normalizeLoCAdjustment(params)), originationRate);
   }
 
   /**
@@ -703,10 +703,10 @@ export class LoC {
    * transaction that will change this LoC into the given LoC.
    *
    * @param that - The desired result of the transaction.
-   * @param borrowingRate - Current borrowing rate.
+   * @param originationRate - Current borrowing rate.
    */
-  adjustTo(that: LoC, borrowingRate?: Decimalish): LoCAdjustmentParams<Decimal> {
-    const change = this.whatChanged(that, borrowingRate);
+  adjustTo(that: LoC, originationRate?: Decimalish): LoCAdjustmentParams<Decimal> {
+    const change = this.whatChanged(that, originationRate);
     assert(change?.type === "adjustment");
     return change.params;
   }

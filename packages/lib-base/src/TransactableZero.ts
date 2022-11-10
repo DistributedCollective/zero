@@ -31,7 +31,7 @@ export interface LoCCreationDetails {
   /** The LoC that was created by the transaction. */
   newLoC: LoC;
 
-  /** Amount of ZUSD added to the LoC's debt as borrowing fee. */
+  /** Amount of ZUSD added to the LoC's debt as origination fee. */
   fee: Decimal;
 }
 
@@ -47,7 +47,7 @@ export interface LoCAdjustmentDetails {
   /** New state of the adjusted LoC directly after the transaction. */
   newLoC: LoC;
 
-  /** Amount of ZUSD added to the LoC's debt as borrowing fee. */
+  /** Amount of ZUSD added to the LoC's debt as origination fee. */
   fee: Decimal;
 }
 
@@ -170,19 +170,19 @@ export interface TransactableZero {
    * Open a new LoC by depositing collateral and borrowing ZUSD.
    *
    * @param params - How much to deposit and borrow.
-   * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @sovryn-zero/lib-base#Fees.borrowingRate | borrowing rate}.
+   * @param maxOriginationRate - Maximum acceptable
+   *                           {@link @sovryn-zero/lib-base#Fees.originationRate | borrowing rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
    *
    * @remarks
-   * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
+   * If `maxOriginationRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
    */
   openLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<LoCCreationDetails>;
 
   /**
@@ -197,8 +197,8 @@ export interface TransactableZero {
    * Adjust existing LoC by changing its collateral, debt, or both.
    *
    * @param params - Parameters of the adjustment.
-   * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @sovryn-zero/lib-base#Fees.borrowingRate | borrowing rate} if
+   * @param maxOriginationRate - Maximum acceptable
+   *                           {@link @sovryn-zero/lib-base#Fees.originationRate | borrowing rate} if
    *                           `params` includes `borrowZUSD`.
    *
    * @throws
@@ -208,12 +208,12 @@ export interface TransactableZero {
    * The transaction will fail if the LoC's debt would fall below
    * {@link @sovryn-zero/lib-base#ZUSD_MINIMUM_DEBT}.
    *
-   * If `maxBorrowingRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
+   * If `maxOriginationRate` is omitted, the current borrowing rate plus 0.5% is used as maximum
    * acceptable rate.
    */
   adjustLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<LoCAdjustmentDetails>;
 
   /**
@@ -254,8 +254,8 @@ export interface TransactableZero {
    * Adjust existing LoC by borrowing more ZUSD.
    *
    * @param amount - The amount of ZUSD to borrow.
-   * @param maxBorrowingRate - Maximum acceptable
-   *                           {@link @sovryn-zero/lib-base#Fees.borrowingRate | borrowing rate}.
+   * @param maxOriginationRate - Maximum acceptable
+   *                           {@link @sovryn-zero/lib-base#Fees.originationRate | borrowing rate}.
    *
    * @throws
    * Throws {@link TransactionFailedError} in case of transaction failure.
@@ -264,10 +264,10 @@ export interface TransactableZero {
    * Equivalent to:
    *
    * ```typescript
-   * adjustLoC({ borrowZUSD: amount }, maxBorrowingRate)
+   * adjustLoC({ borrowZUSD: amount }, maxOriginationRate)
    * ```
    */
-  borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<LoCAdjustmentDetails>;
+  borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<LoCAdjustmentDetails>;
 
   /**
    * Adjust existing LoC by repaying some of its debt.

@@ -96,7 +96,7 @@ contract('CollSurplusPool', async accounts => {
     // open LoC from NonPayable proxy contract
     const B_coll = toBN(dec(60, 18))
     const B_zusdAmount = toBN(dec(3000, 18))
-    const B_netDebt = await th.getAmountWithBorrowingFee(contracts, B_zusdAmount)
+    const B_netDebt = await th.getAmountWithOriginationFee(contracts, B_zusdAmount)
     const openLoCData = th.getTransactionData('openLoC(uint256,uint256,address,address)', ['0xde0b6b3a7640000', web3.utils.toHex(B_zusdAmount), B, B])
     await nonPayable.forward(borrowerOperations.address, openLoCData, { value: B_coll })
     await openLoC({ extraZUSDAmount: B_netDebt, extraParams: { from: A, value: dec(3000, 'ether') } })

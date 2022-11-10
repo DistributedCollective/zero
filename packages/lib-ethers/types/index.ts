@@ -60,7 +60,7 @@ export interface ActivePool
 }
 
 interface BorrowerOperationsCalls {
-  BORROWING_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  ORIGINATION_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
   DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
   MIN_NET_DEBT(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
@@ -118,7 +118,7 @@ export interface BorrowerOperations
     LoCManagerAddressChanged(_newLoCManagerAddress?: null): EventFilter;
     LoCUpdated(_borrower?: string | null, _debt?: null, _coll?: null, stake?: null, operation?: null): EventFilter;
     ZEROStakingAddressChanged(_zeroStakingAddress?: null): EventFilter;
-    ZUSDBorrowingFeePaid(_borrower?: string | null, _ZUSDFee?: null): EventFilter;
+    ZUSDOriginationFeePaid(_borrower?: string | null, _ZUSDFee?: null): EventFilter;
     ZUSDTokenAddressChanged(_zusdTokenAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _activePoolAddress: string }>[];
@@ -134,7 +134,7 @@ export interface BorrowerOperations
   extractEvents(logs: Log[], name: "LoCManagerAddressChanged"): _TypedLogDescription<{ _newLoCManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "LoCUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber; operation: number }>[];
   extractEvents(logs: Log[], name: "ZEROStakingAddressChanged"): _TypedLogDescription<{ _zeroStakingAddress: string }>[];
-  extractEvents(logs: Log[], name: "ZUSDBorrowingFeePaid"): _TypedLogDescription<{ _borrower: string; _ZUSDFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ZUSDOriginationFeePaid"): _TypedLogDescription<{ _borrower: string; _ZUSDFee: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _zusdTokenAddress: string }>[];
 }
 
@@ -742,10 +742,10 @@ interface LoCManagerCalls {
   checkRecoveryMode(_price: BigNumberish, _overrides?: CallOverrides): Promise<boolean>;
   defaultPool(_overrides?: CallOverrides): Promise<string>;
   feeDistributor(_overrides?: CallOverrides): Promise<string>;
-  getBorrowingFee(_ZUSDDebt: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
-  getBorrowingFeeWithDecay(_ZUSDDebt: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
-  getBorrowingRate(_overrides?: CallOverrides): Promise<BigNumber>;
-  getBorrowingRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
+  getOriginationFee(_ZUSDDebt: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+  getOriginationFeeWithDecay(_ZUSDDebt: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+  getOriginationRate(_overrides?: CallOverrides): Promise<BigNumber>;
+  getOriginationRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
   getCurrentICR(_borrower: string, _price: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ debt: BigNumber; coll: BigNumber; pendingZUSDDebtReward: BigNumber; pendingBTCReward: BigNumber }>;
   getEntireSystemColl(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -960,10 +960,10 @@ export interface UpgradableProxy
 }
 
 interface ZeroBaseParamsCalls {
-  BORROWING_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  ORIGINATION_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
   CCR(_overrides?: CallOverrides): Promise<BigNumber>;
   DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
-  MAX_BORROWING_FEE(_overrides?: CallOverrides): Promise<BigNumber>;
+  MAX_ORIGINATION_FEE(_overrides?: CallOverrides): Promise<BigNumber>;
   MCR(_overrides?: CallOverrides): Promise<BigNumber>;
   PERCENT_DIVISOR(_overrides?: CallOverrides): Promise<BigNumber>;
   REDEMPTION_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -972,10 +972,10 @@ interface ZeroBaseParamsCalls {
 
 interface ZeroBaseParamsTransactions {
   initialize(_overrides?: Overrides): Promise<void>;
-  setBorrowingFeeFloor(BORROWING_FEE_FLOOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setOriginationFeeFloor(ORIGINATION_FEE_FLOOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setCCR(CCR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setMCR(MCR_: BigNumberish, _overrides?: Overrides): Promise<void>;
-  setMaxBorrowingFee(MAX_BORROWING_FEE_: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setMaxOriginationFee(MAX_ORIGINATION_FEE_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   setPercentDivisor(PERCENT_DIVISOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setRedemptionFeeFloor(REDEMPTION_FEE_FLOOR_: BigNumberish, _overrides?: Overrides): Promise<void>;

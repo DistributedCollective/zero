@@ -319,8 +319,8 @@ contract('BorrowerWrappers', async accounts => {
 
     
     const proportionalZUSD = expectedBTCGain_A.mul(price).div(ICRBefore)
-    const borrowingRate = await locManagerOriginal.getBorrowingRateWithDecay()
-    const netDebtChange = proportionalZUSD.mul(mv._1e18BN).div(mv._1e18BN.add(borrowingRate))
+    const originationRate = await locManagerOriginal.getOriginationRateWithDecay()
+    const netDebtChange = proportionalZUSD.mul(mv._1e18BN).div(mv._1e18BN.add(originationRate))
 
     // to force ZERO issuance
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -427,10 +427,10 @@ contract('BorrowerWrappers', async accounts => {
 
     // Defaulter LoC opened
     const { zusdAmount, netDebt, totalDebt, collateral } = await openLoC({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
-    const borrowingFee = netDebt.sub(zusdAmount)
+    const originationFee = netDebt.sub(zusdAmount)
 
-    // Alice ZUSD gain is ((150/2000) * borrowingFee)
-    const expectedZUSDGain_A = borrowingFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
+    // Alice ZUSD gain is ((150/2000) * originationFee)
+    const expectedZUSDGain_A = originationFee.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -490,9 +490,9 @@ contract('BorrowerWrappers', async accounts => {
   
     // Defaulter LoC opened
     const { zusdAmount, netDebt, collateral } = await openLoC({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
-    const borrowingFee = netDebt.sub(zusdAmount)
+    const originationFee = netDebt.sub(zusdAmount)
     // 100% sent to SovFeeCollector address
-    const borrowingFeeToSovCollector = borrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
+    const originationFeeToSovCollector = originationFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const sovFeeCollectorZUSDBalanceAfter = await zusdToken.balanceOf(sovFeeCollector)
   
     // alice opens LoC and provides 150 ZUSD to StabilityPool
@@ -535,8 +535,8 @@ contract('BorrowerWrappers', async accounts => {
     const stakeBefore = await zeroStaking.stakes(alice)
 
     const proportionalZUSD = expectedBTCGain_A.mul(price).div(ICRBefore)
-    const borrowingRate = await locManagerOriginal.getBorrowingRateWithDecay()
-    const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
+    const originationRate = await locManagerOriginal.getOriginationRateWithDecay()
+    const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(originationRate))
 
     // No gains are expected
     const expectedZEROGain_A = toBN('0') // toBN('787084753044000000000000')
@@ -545,12 +545,12 @@ contract('BorrowerWrappers', async accounts => {
     // Alice claims staking rewards and puts them back in the system through the proxy
     await borrowerWrappers.claimStakingGainsAndRecycle(th._100pct, alice, alice, { from: alice })
 
-    // Alice new ZUSD gain due to her own LoC adjustment: ((150/2000) * (borrowing fee over netDebtChange))
-    const newBorrowingFee = await locManagerOriginal.getBorrowingFeeWithDecay(netDebtChange)
+    // Alice new ZUSD gain due to her own LoC adjustment: ((150/2000) * (origination fee over netDebtChange))
+    const newOriginationFee = await locManagerOriginal.getOriginationFeeWithDecay(netDebtChange)
     // 20% sent to SovFeeCollector address
-    const newBorrowingFeeToSovCollector = newBorrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const newBorrowingFeeToZeroStalking = newBorrowingFee.sub(newBorrowingFeeToSovCollector)
-    const expectedNewZUSDGain_A = newBorrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
+    const newOriginationFeeToSovCollector = newOriginationFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
+    const newOriginationFeeToZeroStalking = newOriginationFee.sub(newOriginationFeeToSovCollector)
+    const expectedNewZUSDGain_A = newOriginationFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
     const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const locCollAfter = await locManager.getLoCColl(alice)
@@ -581,7 +581,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e14)
 
     // check sovFeeCollector has increased ZUSD balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
+    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(originationFeeToSovCollector), 10000)
     // check sovFeeCollector has increased BTC balance
     th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedBTCGainSovCollector), 10000)
 
@@ -612,15 +612,15 @@ contract('BorrowerWrappers', async accounts => {
 
     // Defaulter LoC opened
     const { zusdAmount, netDebt, collateral } = await openLoC({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
-    const borrowingFee = netDebt.sub(zusdAmount)
+    const originationFee = netDebt.sub(zusdAmount)
 
     // 100% sent to SovFeeCollector address
-    const borrowingFeeToSovCollector = borrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
+    const originationFeeToSovCollector = originationFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const sovFeeCollectorZUSDBalanceAfter = await zusdToken.balanceOf(sovFeeCollector)
-    const borrowingFeeToZeroStalking = borrowingFee.sub(borrowingFeeToSovCollector)
+    const originationFeeToZeroStalking = originationFee.sub(originationFeeToSovCollector)
 
-    // Alice ZUSD gain is ((150/2000) * borrowingFee)
-    const expectedZUSDGain_A = borrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
+    // Alice ZUSD gain is ((150/2000) * originationFee)
+    const expectedZUSDGain_A = originationFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
     const btcBalanceBefore = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const locCollBefore = await locManager.getLoCColl(alice)
@@ -631,7 +631,7 @@ contract('BorrowerWrappers', async accounts => {
     const depositBefore = (await stabilityPool.deposits(alice))[0]
     const stakeBefore = await zeroStaking.stakes(alice)
 
-    const borrowingRate = await locManagerOriginal.getBorrowingRateWithDecay()
+    const originationRate = await locManagerOriginal.getOriginationRateWithDecay()
 
     // Alice claims staking rewards and puts them back in the system through the proxy
     await borrowerWrappers.claimStakingGainsAndRecycle(th._100pct, alice, alice, { from: alice })
@@ -661,7 +661,7 @@ contract('BorrowerWrappers', async accounts => {
     // check zero balance remains the same
     th.assertIsApproximatelyEqual(zeroBalanceBefore, zeroBalanceAfter)
     // check sovFeeCollector has increased ZUSD balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
+    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(originationFeeToSovCollector), 10000)
 
     // Expect Alice has withdrawn all BTC gain
     const alice_pendingBTCGain = await stabilityPool.getDepositorBTCGain(alice)
@@ -690,15 +690,15 @@ contract('BorrowerWrappers', async accounts => {
 
     // Defaulter LoC opened
     const { zusdAmount, netDebt, collateral } = await openLoC({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
-    const borrowingFee = netDebt.sub(zusdAmount)
+    const originationFee = netDebt.sub(zusdAmount)
 
     // 100% sent to SovFeeCollector address
-    const borrowingFeeToSovCollector = borrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
+    const originationFeeToSovCollector = originationFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const sovFeeCollectorZUSDBalanceAfter = await zusdToken.balanceOf(sovFeeCollector)
-    const borrowingFeeToZeroStalking = borrowingFee.sub(borrowingFeeToSovCollector)
+    const originationFeeToZeroStalking = originationFee.sub(originationFeeToSovCollector)
 
-    // Alice ZUSD gain is ((150/2000) * borrowingFee)
-    const expectedZUSDGain_A = borrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
+    // Alice ZUSD gain is ((150/2000) * originationFee)
+    const expectedZUSDGain_A = originationFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
@@ -728,8 +728,8 @@ contract('BorrowerWrappers', async accounts => {
     const stakeBefore = await zeroStaking.stakes(alice)
 
     const proportionalZUSD = expectedBTCGain_A.mul(price).div(ICRBefore)
-    const borrowingRate = await locManagerOriginal.getBorrowingRateWithDecay()
-    const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(borrowingRate))
+    const originationRate = await locManagerOriginal.getOriginationRateWithDecay()
+    const netDebtChange = proportionalZUSD.mul(toBN(dec(1, 18))).div(toBN(dec(1, 18)).add(originationRate))
     const expectedTotalZUSD = expectedZUSDGain_A.add(netDebtChange)
 
     const expectedZEROGain_A = toBN('0') //toBN('787084753044000000000000')
@@ -737,12 +737,12 @@ contract('BorrowerWrappers', async accounts => {
     // Alice claims staking rewards and puts them back in the system through the proxy
     await borrowerWrappers.claimStakingGainsAndRecycle(th._100pct, alice, alice, { from: alice })
 
-    // Alice new ZUSD gain due to her own LoC adjustment: ((150/2000) * (borrowing fee over netDebtChange))
-    const newBorrowingFee = await locManagerOriginal.getBorrowingFeeWithDecay(netDebtChange)
+    // Alice new ZUSD gain due to her own LoC adjustment: ((150/2000) * (origination fee over netDebtChange))
+    const newOriginationFee = await locManagerOriginal.getOriginationFeeWithDecay(netDebtChange)
     // 100% sent to SovFeeCollector address
-    const newBorrowingFeeToSovCollector = newBorrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const newBorrowingFeeToZeroStalking = newBorrowingFee.sub(newBorrowingFeeToSovCollector)
-    const expectedNewZUSDGain_A = newBorrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
+    const newOriginationFeeToSovCollector = newOriginationFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
+    const newOriginationFeeToZeroStalking = newOriginationFee.sub(newOriginationFeeToSovCollector)
+    const expectedNewZUSDGain_A = newOriginationFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
 
     const btcBalanceAfter = await web3.eth.getBalance(borrowerOperations.getProxyAddressFromUser(alice))
     const locCollAfter = await locManager.getLoCColl(alice)
@@ -773,7 +773,7 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e14)
 
     // check sovFeeCollector has increased ZUSD balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
+    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(originationFeeToSovCollector), 10000)
     // check sovFeeCollector has increased BTC balance
     th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedBTCGainSovCollector), 10000)
 

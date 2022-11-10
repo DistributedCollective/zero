@@ -623,7 +623,7 @@ def adjust_locs(accounts, contracts, active_accounts, inactive_accounts, price_B
                 withdraw_amount_wei = floatToWei(withdraw_amount)
                 if isNewTCRAboveCCR(contracts, 0, False, withdraw_amount_wei, True, floatToWei(price_BTC_current)):
                     contracts.borrowerOperations.withdrawZUSD(MAX_FEE, withdraw_amount_wei, hints[0], hints[1], { 'from': account })
-                    rate_issuance = contracts.locManager.getBorrowingRateWithDecay() / 1e18
+                    rate_issuance = contracts.locManager.getOriginationRateWithDecay() / 1e18
                     issuance_ZUSD_adjust = issuance_ZUSD_adjust + rate_issuance * withdraw_amount
         #Another part of the locs are adjusted by adjusting collaterals
         elif p < ratio:
@@ -669,7 +669,7 @@ def open_locs(accounts, contracts, active_accounts, inactive_accounts, price_BTC
     random.seed(2019*index)
     shock_openlocs = random.normalvariate(0,sd_openlocs)
     n_locs = len(active_accounts)
-    rate_issuance = contracts.locManager.getBorrowingRateWithDecay() / 1e18
+    rate_issuance = contracts.locManager.getOriginationRateWithDecay() / 1e18
     coll_added = 0
     issuance_ZUSD_open = 0
 
@@ -896,7 +896,7 @@ def price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, pr
 
     #Calculating Price
     price_ZUSD_current = calculate_price(price_ZUSD, liquidity_pool, liquidity_pool_next)
-    rate_issuance = contracts.locManager.getBorrowingRateWithDecay() / 1e18
+    rate_issuance = contracts.locManager.getOriginationRateWithDecay() / 1e18
     rate_redemption = contracts.locManager.getRedemptionRateWithDecay() / 1e18
 
     #Stabilizer

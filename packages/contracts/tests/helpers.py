@@ -6,10 +6,10 @@ MAX_BYTES_32 = '0x' + 'F' * 64
 def floatToWei(amount):
     return Wei(amount * 1e18)
 
-# Subtracts the borrowing fee
+# Subtracts the origination fee
 def get_zusd_amount_from_net_debt(contracts, net_debt):
-    borrowing_rate = contracts.locManager.getBorrowingRateWithDecay()
-    return Wei(net_debt * Wei(1e18) / (Wei(1e18) + borrowing_rate))
+    origination_rate = contracts.locManager.getOriginationRateWithDecay()
+    return Wei(net_debt * Wei(1e18) / (Wei(1e18) + origination_rate))
 
 def logGlobalState(contracts):
     print('\n ---- Global state ----')

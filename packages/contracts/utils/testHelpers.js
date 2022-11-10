@@ -319,34 +319,34 @@ class TestHelper {
 
   /*
    * given the requested ZUSD amomunt in openLoC, returns the total debt
-   * So, it adds the gas compensation and the borrowing fee
+   * So, it adds the gas compensation and the origination fee
    */
   static async getOpenLoCTotalDebt(contracts, zusdAmount) {
-    const fee = await contracts.locManager.getBorrowingFee(zusdAmount);
+    const fee = await contracts.locManager.getOriginationFee(zusdAmount);
     const compositeDebt = await this.getCompositeDebt(contracts, zusdAmount);
     return compositeDebt.add(fee);
   }
 
   /*
    * given the desired total debt, returns the ZUSD amount that needs to be requested in openLoC
-   * So, it subtracts the gas compensation and then the borrowing fee
+   * So, it subtracts the gas compensation and then the origination fee
    */
   static async getOpenLoCZUSDAmount(contracts, totalDebt) {
     const actualDebt = await this.getActualDebtFromComposite(totalDebt, contracts);
     return this.getNetBorrowingAmount(contracts, actualDebt);
   }
 
-  // Subtracts the borrowing fee
+  // Subtracts the origination fee
   static async getNetBorrowingAmount(contracts, debtWithFee) {
-    const borrowingRate = await contracts.locManager.getBorrowingRateWithDecay();
+    const originationRate = await contracts.locManager.getOriginationRateWithDecay();
     return this.toBN(debtWithFee)
       .mul(MoneyValues._1e18BN)
-      .div(MoneyValues._1e18BN.add(borrowingRate));
+      .div(MoneyValues._1e18BN.add(originationRate));
   }
 
-  // Adds the borrowing fee
-  static async getAmountWithBorrowingFee(contracts, zusdAmount) {
-    const fee = await contracts.locManager.getBorrowingFee(zusdAmount);
+  // Adds the origination fee
+  static async getAmountWithOriginationFee(contracts, zusdAmount) {
+    const fee = await contracts.locManager.getOriginationFee(zusdAmount);
     return zusdAmount.add(fee);
   }
 
@@ -419,11 +419,11 @@ class TestHelper {
 
   static getZUSDFeeFromZUSDBorrowingEvent(tx) {
     for (let i = 0; i < tx.logs.length; i++) {
-      if (tx.logs[i].event === "ZUSDBorrowingFeePaid") {
+      if (tx.logs[i].event === "ZUSDOriginationFeePaid") {
         return tx.logs[i].args[1].toString();
       }
     }
-    throw "The transaction logs do not contain an ZUSDBorrowingFeePaid event";
+    throw "The transaction logs do not contain an ZUSDOriginationFeePaid event";
   }
 
   static getEventArgByIndex(tx, eventName, argIndex) {
@@ -512,7 +512,7 @@ class TestHelper {
   }
 
   static async getCollAndDebtFromWithdrawZUSD(contracts, account, amount) {
-    const fee = await contracts.locManager.getBorrowingFee(amount);
+    const fee = await contracts.locManager.getOriginationFee(amount);
     const { entireColl, entireDebt } = await this.getEntireCollAndDebt(contracts, account);
 
     const newColl = entireColl;
@@ -537,7 +537,7 @@ class TestHelper {
     // const debt = (await contracts.locManager.LoCs(account))[0]
 
     const fee = ZUSDChange.gt(this.toBN("0"))
-      ? await contracts.locManager.getBorrowingFee(ZUSDChange)
+      ? await contracts.locManager.getOriginationFee(ZUSDChange)
       : this.toBN("0");
     const newColl = entireColl.add(BTCChange);
     const newDebt = entireDebt.add(ZUSDChange).add(fee);
@@ -859,7 +859,7 @@ class TestHelper {
       increasedTotalDebt = targetDebt.sub(debt);
       zusdAmount = await this.getNetBorrowingAmount(contracts, increasedTotalDebt);
     } else {
-      increasedTotalDebt = await this.getAmountWithBorrowingFee(contracts, zusdAmount);
+      increasedTotalDebt = await this.getAmountWithOriginationFee(contracts, zusdAmount);
     }
 
     await contracts.borrowerOperations.withdrawZUSD(

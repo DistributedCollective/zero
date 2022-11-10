@@ -114,7 +114,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   /** {@inheritDoc TransactableZero.openLoC} */
   openLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<
     PopulatedZeroTransaction<
       P,
@@ -130,7 +130,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   /** {@inheritDoc TransactableZero.adjustLoC} */
   adjustLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<
     PopulatedZeroTransaction<
       P,
@@ -161,7 +161,7 @@ export interface PopulatableZero<R = unknown, S = unknown, P = unknown>
   /** {@inheritDoc TransactableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<
     PopulatedZeroTransaction<
       P,

@@ -272,10 +272,10 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
    */
   openLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<LoCCreationDetails> {
-    return this.send.openLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.openLoC(params, maxOriginationRate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -286,10 +286,10 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
    */
   openNueLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<LoCCreationDetails> {
-    return this.send.openNueLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.openNueLoC(params, maxOriginationRate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -320,10 +320,10 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
    */
   adjustLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<LoCAdjustmentDetails> {
-    return this.send.adjustLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.adjustLoC(params, maxOriginationRate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -334,10 +334,10 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
    */
   adjustNueLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<LoCAdjustmentDetails> {
-    return this.send.adjustNueLoC(params, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.adjustNueLoC(params, maxOriginationRate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -374,10 +374,10 @@ export class EthersZero implements ReadableEthersZero, TransactableZero {
    */
   borrowZUSD(
     amount: Decimalish,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<LoCAdjustmentDetails> {
-    return this.send.borrowZUSD(amount, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.borrowZUSD(amount, maxOriginationRate, overrides).then(waitForSuccess);
   }
 
   /**

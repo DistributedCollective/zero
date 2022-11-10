@@ -20,7 +20,7 @@
   1. **[BorrowerLib.sol](docs/BorrowerLib.md)** - Borrower operations (Opening, Adjusting line of credit)
   2. **[LiquidationLib.sol](docs/LiquidationLib.md)** - Liquidation & Redemption operations.
   3. **[StabilityPoolLib.sol](docs/StabilityPoolLib.md)** - Pool Stability operations.
-  4. **[LoCStatiscticsLib.sol](docs/LoCStatisticsLib.md)** - View function related to the locs (get nominal collateral ratio, borrowing fee calculation, get borrower's debt of the locs).
+  4. **[LoCStatiscticsLib.sol](docs/LoCStatisticsLib.md)** - View function related to the locs (get nominal collateral ratio, origination fee calculation, get borrower's debt of the locs).
    
   **[ZERO Contracts Addresses](docs/Addresses.md)**
 

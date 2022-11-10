@@ -17,8 +17,8 @@ import {
   LoCCreationParams,
   Fees,
   ZUSD_LIQUIDATION_RESERVE,
-  MAXIMUM_BORROWING_RATE,
-  MINIMUM_BORROWING_RATE,
+  MAXIMUM_ORIGINATION_RATE,
+  MINIMUM_ORIGINATION_RATE,
   ZUSD_MINIMUM_DEBT,
   ZUSD_MINIMUM_NET_DEBT
 } from "@sovryn-zero/lib-base";
@@ -251,7 +251,7 @@ describe("EthersZero", () => {
     it("should create a LoC with some borrowing", async () => {
       const { newLoC, fee } = await zero.openLoC(withSomeBorrowing);
       expect(newLoC).to.deep.equal(LoC.create(withSomeBorrowing));
-      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(withSomeBorrowing.borrowZUSD)}`);
+      expect(`${fee}`).to.equal(`${MINIMUM_ORIGINATION_RATE.mul(withSomeBorrowing.borrowZUSD)}`);
     });
 
     it("should fail to withdraw all the collateral while the LoC has debt", async () => {
@@ -275,7 +275,7 @@ describe("EthersZero", () => {
       expect(newLoC).to.deep.equal(
         LoC.create(withSomeBorrowing).adjust(repaySomeDebt).adjust(borrowSomeMore)
       );
-      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowSomeMore.borrowZUSD)}`);
+      expect(`${fee}`).to.equal(`${MINIMUM_ORIGINATION_RATE.mul(borrowSomeMore.borrowZUSD)}`);
     });
 
     const depositMoreCollateral = { depositCollateral: 1 };
@@ -323,7 +323,7 @@ describe("EthersZero", () => {
           .adjust(borrowAndDeposit)
       );
 
-      expect(`${fee}`).to.equal(`${MINIMUM_BORROWING_RATE.mul(borrowAndDeposit.borrowZUSD)}`);
+      expect(`${fee}`).to.equal(`${MINIMUM_ORIGINATION_RATE.mul(borrowAndDeposit.borrowZUSD)}`);
 
       const btcBalance = Decimal.fromBigNumberString(`${await user.getBalance()}`);
       expect(`${btcBalance}`).to.equal("99.5");
@@ -768,10 +768,10 @@ describe("EthersZero", () => {
       const borrowZUSD = Decimal.from(10);
 
       const { fee, newLoC } = await zero.borrowZUSD(borrowZUSD);
-      expect(`${fee}`).to.equal(`${borrowZUSD.mul(MAXIMUM_BORROWING_RATE)}`);
+      expect(`${fee}`).to.equal(`${borrowZUSD.mul(MAXIMUM_ORIGINATION_RATE)}`);
 
       expect(newLoC).to.deep.equal(
-        LoC.create(locCreations[0]).adjust({ borrowZUSD }, MAXIMUM_BORROWING_RATE)
+        LoC.create(locCreations[0]).adjust({ borrowZUSD }, MAXIMUM_ORIGINATION_RATE)
       );
     });
   });
@@ -853,13 +853,13 @@ describe("EthersZero", () => {
     const massivePrice = Decimal.from(1000000);
 
     const amountToBorrowPerLoC = Decimal.from(2000);
-    const netDebtPerLoC = MINIMUM_BORROWING_RATE.add(1).mul(amountToBorrowPerLoC);
+    const netDebtPerLoC = MINIMUM_ORIGINATION_RATE.add(1).mul(amountToBorrowPerLoC);
     const collateralPerLoC = netDebtPerLoC
       .add(ZUSD_LIQUIDATION_RESERVE)
       .mulDiv(1.5, massivePrice);
 
     const amountToRedeem = netDebtPerLoC.mul(_redeemMaxIterations);
-    const amountToDeposit = MINIMUM_BORROWING_RATE.add(1)
+    const amountToDeposit = MINIMUM_ORIGINATION_RATE.add(1)
       .mul(amountToRedeem)
       .add(ZUSD_LIQUIDATION_RESERVE)
       .mulDiv(2, massivePrice);

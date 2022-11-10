@@ -26,7 +26,7 @@ interface IBorrowerOperations {
         uint256 stake,
         uint8 operation
     );
-    event ZUSDBorrowingFeePaid(address indexed _borrower, uint256 _ZUSDFee);
+    event ZUSDOriginationFeePaid(address indexed _borrower, uint256 _ZUSDFee);
 
     // --- Functions ---
 
@@ -215,5 +215,5 @@ interface IBorrowerOperations {
 
     function getCompositeDebt(uint256 _debt) external view returns (uint256);
 
-    function BORROWING_FEE_FLOOR() external view returns (uint256);
+    function ORIGINATION_FEE_FLOOR() external view returns (uint256);
 }

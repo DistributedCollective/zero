@@ -50,14 +50,14 @@ library LoCStatisticsLib {
 
     /// @param locManagerContractAddress address of LoCManager contract
     /// @param _ZUSDDebt debt parameter for which a fee will be calculated against
-    /// @return borrowingFee calculated borrowing fee for the corresponding debt
-    function calculateBorrowingFee(address locManagerContractAddress, uint256 _ZUSDDebt)
+    /// @return originationFee calculated origination fee for the corresponding debt
+    function calculateOriginationFee(address locManagerContractAddress, uint256 _ZUSDDebt)
         internal
         view
         isContractAddress(locManagerContractAddress)
-        returns (uint256 borrowingFee)
+        returns (uint256 originationFee)
     {
         ILoCManager locManager = ILoCManager(locManagerContractAddress);
-        return locManager.getBorrowingFee(_ZUSDDebt);
+        return locManager.getOriginationFee(_ZUSDDebt);
     }
 }

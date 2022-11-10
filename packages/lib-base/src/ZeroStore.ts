@@ -107,9 +107,9 @@ export interface ZeroStoreDerivedState {
    * A value between 0 and 1.
    *
    * @example
-   * For example a value of 0.01 amounts to a borrowing fee of 1% of the borrowed amount.
+   * For example a value of 0.01 amounts to a origination fee of 1% of the borrowed amount.
    */
-  borrowingRate: Decimal;
+  originationRate: Decimal;
 
   /**
    * Current redemption rate.
@@ -444,7 +444,7 @@ export abstract class ZeroStore<T = unknown> {
     return {
       loc: locBeforeRedistribution.applyRedistribution(totalRedistributed),
       fees,
-      borrowingRate: fees.borrowingRate(),
+      originationRate: fees.originationRate(),
       redemptionRate: fees.redemptionRate(),
       haveUndercollateralizedLoCs: _riskiestLoCBeforeRedistribution
         .applyRedistribution(totalRedistributed)
@@ -461,10 +461,10 @@ export abstract class ZeroStore<T = unknown> {
 
       loc: this._updateIfChanged(equals, "loc", derivedState.loc, derivedStateUpdate.loc),
 
-      borrowingRate: this._silentlyUpdateIfChanged(
+      originationRate: this._silentlyUpdateIfChanged(
         eq,
-        derivedState.borrowingRate,
-        derivedStateUpdate.borrowingRate
+        derivedState.originationRate,
+        derivedStateUpdate.originationRate
       ),
 
       redemptionRate: this._silentlyUpdateIfChanged(

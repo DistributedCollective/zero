@@ -228,18 +228,18 @@ interface ILoCManager is IZeroBase {
     function getRedemptionFeeWithDecay(uint256 _BTCDrawn) external view returns (uint256);
 
     /// @return borrowing rate
-    function getBorrowingRate() external view returns (uint256);
+    function getOriginationRate() external view returns (uint256);
 
     /// @return borrowing rate calculated using decayed as base rate
-    function getBorrowingRateWithDecay() external view returns (uint256);
+    function getOriginationRateWithDecay() external view returns (uint256);
 
     /// @param ZUSDDebt ZUSD debt amount to calculate fee
-    /// @return borrowing fee using borrowing rate
-    function getBorrowingFee(uint256 ZUSDDebt) external view returns (uint256);
+    /// @return origination fee using borrowing rate
+    function getOriginationFee(uint256 ZUSDDebt) external view returns (uint256);
 
     /// @param _ZUSDDebt ZUSD debt amount to calculate fee
-    /// @return borrowing fee using borrowing rate with decay
-    function getBorrowingFeeWithDecay(uint256 _ZUSDDebt) external view returns (uint256);
+    /// @return origination fee using borrowing rate with decay
+    function getOriginationFeeWithDecay(uint256 _ZUSDDebt) external view returns (uint256);
 
     /// @notice Updates the baseRate state variable based on time elapsed since the last redemption or ZUSD borrowing operation.
     function decayBaseRateFromBorrowing() external;

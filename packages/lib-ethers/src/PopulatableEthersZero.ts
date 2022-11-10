@@ -58,7 +58,7 @@ const decimalify = (bigNumber: BigNumber) => Decimal.fromBigNumberString(bigNumb
 /** @internal */
 export const _redeemMaxIterations = 70;
 
-const defaultBorrowingRateSlippageTolerance = Decimal.from(0.005); // 0.5%
+const defaultOriginationRateSlippageTolerance = Decimal.from(0.005); // 0.5%
 const defaultRedemptionRateSlippageTolerance = Decimal.from(0.001); // 0.1%
 
 const noDetails = () => undefined;
@@ -329,7 +329,7 @@ export class PopulatableEthersZero
           .map(({ args: { _coll, _debt } }) => new LoC(decimalify(_coll), decimalify(_debt)));
 
         const [fee] = borrowerOperations
-          .extractEvents(logs, "ZUSDBorrowingFeePaid")
+          .extractEvents(logs, "ZUSDOriginationFeePaid")
           .map(({ args: { _ZUSDFee } }) => decimalify(_ZUSDFee));
 
         return {
@@ -590,7 +590,7 @@ export class PopulatableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openLoC} */
   async openLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
@@ -599,20 +599,20 @@ export class PopulatableEthersZero
     const { depositCollateral, borrowZUSD } = normalized;
 
     const fees = await this._readable.getFees();
-    const borrowingRate = fees.borrowingRate();
-    const newLoC = LoC.create(normalized, borrowingRate);
+    const originationRate = fees.originationRate();
+    const newLoC = LoC.create(normalized, originationRate);
 
-    maxBorrowingRate =
-      maxBorrowingRate !== undefined
-        ? Decimal.from(maxBorrowingRate)
-        : borrowingRate.add(defaultBorrowingRateSlippageTolerance);
+    maxOriginationRate =
+      maxOriginationRate !== undefined
+        ? Decimal.from(maxOriginationRate)
+        : originationRate.add(defaultOriginationRateSlippageTolerance);
 
     return this._wrapLoCChangeWithFees(
       normalized,
       await borrowerOperations.estimateAndPopulate.openLoC(
         { value: depositCollateral.hex, ...overrides },
         compose(addGasForPotentialLastFeeOperationTimeUpdate, addGasForPotentialListTraversal),
-        maxBorrowingRate.hex,
+        maxOriginationRate.hex,
         borrowZUSD.hex,
         ...(await this._findHints(newLoC))
       )
@@ -622,7 +622,7 @@ export class PopulatableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.openNueLoC} */
   async openNueLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LoCCreationDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
@@ -631,20 +631,20 @@ export class PopulatableEthersZero
     const { depositCollateral, borrowZUSD } = normalized;
 
     const fees = await this._readable.getFees();
-    const borrowingRate = fees.borrowingRate();
-    const newLoC = LoC.create(normalized, borrowingRate);
+    const originationRate = fees.originationRate();
+    const newLoC = LoC.create(normalized, originationRate);
 
-    maxBorrowingRate =
-      maxBorrowingRate !== undefined
-        ? Decimal.from(maxBorrowingRate)
-        : borrowingRate.add(defaultBorrowingRateSlippageTolerance);
+    maxOriginationRate =
+      maxOriginationRate !== undefined
+        ? Decimal.from(maxOriginationRate)
+        : originationRate.add(defaultOriginationRateSlippageTolerance);
 
     return this._wrapLoCChangeWithFees(
       normalized,
       await borrowerOperations.estimateAndPopulate.openNueLoC(
         { value: depositCollateral.hex, ...overrides },
         compose(addGasForPotentialLastFeeOperationTimeUpdate, addGasForPotentialListTraversal),
-        maxBorrowingRate.hex,
+        maxOriginationRate.hex,
         borrowZUSD.hex,
         ...(await this._findHints(newLoC))
       )
@@ -694,10 +694,10 @@ export class PopulatableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
-    return this.adjustLoC({ borrowZUSD: amount }, maxBorrowingRate, overrides);
+    return this.adjustLoC({ borrowZUSD: amount }, maxOriginationRate, overrides);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.repayZUSD} */
@@ -711,7 +711,7 @@ export class PopulatableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustLoC} */
   async adjustLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
@@ -725,13 +725,13 @@ export class PopulatableEthersZero
       borrowZUSD && this._readable.getFees()
     ]);
 
-    const borrowingRate = fees?.borrowingRate();
-    const finalLoC = loc.adjust(normalized, borrowingRate);
+    const originationRate = fees?.originationRate();
+    const finalLoC = loc.adjust(normalized, originationRate);
 
-    maxBorrowingRate =
-      maxBorrowingRate !== undefined
-        ? Decimal.from(maxBorrowingRate)
-        : borrowingRate?.add(defaultBorrowingRateSlippageTolerance) ?? Decimal.ZERO;
+    maxOriginationRate =
+      maxOriginationRate !== undefined
+        ? Decimal.from(maxOriginationRate)
+        : originationRate?.add(defaultOriginationRateSlippageTolerance) ?? Decimal.ZERO;
 
     return this._wrapLoCChangeWithFees(
       normalized,
@@ -741,7 +741,7 @@ export class PopulatableEthersZero
           borrowZUSD ? addGasForPotentialLastFeeOperationTimeUpdate : id,
           addGasForPotentialListTraversal
         ),
-        maxBorrowingRate.hex,
+        maxOriginationRate.hex,
         (withdrawCollateral ?? Decimal.ZERO).hex,
         (borrowZUSD ?? repayZUSD ?? Decimal.ZERO).hex,
         !!borrowZUSD,
@@ -753,7 +753,7 @@ export class PopulatableEthersZero
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableZero.adjustNueLoC} */
   async adjustNueLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish,
+    maxOriginationRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersZeroTransaction<LoCAdjustmentDetails>> {
     const address = _requireAddress(this._readable.connection, overrides);
@@ -767,13 +767,13 @@ export class PopulatableEthersZero
       borrowZUSD && this._readable.getFees()
     ]);
 
-    const borrowingRate = fees?.borrowingRate();
-    const finalLoC = loc.adjust(normalized, borrowingRate);
+    const originationRate = fees?.originationRate();
+    const finalLoC = loc.adjust(normalized, originationRate);
 
-    maxBorrowingRate =
-      maxBorrowingRate !== undefined
-        ? Decimal.from(maxBorrowingRate)
-        : borrowingRate?.add(defaultBorrowingRateSlippageTolerance) ?? Decimal.ZERO;
+    maxOriginationRate =
+      maxOriginationRate !== undefined
+        ? Decimal.from(maxOriginationRate)
+        : originationRate?.add(defaultOriginationRateSlippageTolerance) ?? Decimal.ZERO;
 
     return this._wrapLoCChangeWithFees(
       normalized,
@@ -783,7 +783,7 @@ export class PopulatableEthersZero
           borrowZUSD ? addGasForPotentialLastFeeOperationTimeUpdate : id,
           addGasForPotentialListTraversal
         ),
-        maxBorrowingRate.hex,
+        maxOriginationRate.hex,
         (withdrawCollateral ?? Decimal.ZERO).hex,
         (borrowZUSD ?? repayZUSD ?? Decimal.ZERO).hex,
         !!borrowZUSD,

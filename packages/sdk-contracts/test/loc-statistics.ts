@@ -52,9 +52,9 @@ describe("LoC Statistics View Operations", () => {
       );
     });
   });
-  describe("Calculate Borrowing Fee", async () => {
-    it("should call calculateBorrowingFee with the correct params", async () => {});
-    await testIntegration.testCalculateBorrowingFee(100);
-    expect(locManager.getBorrowingFee).to.have.been.calledOnceWith(100);
+  describe("Calculate Origination fee", async () => {
+    it("should call calculateOriginationFee with the correct params", async () => {});
+    await testIntegration.testCalculateOriginationFee(100);
+    expect(locManager.getOriginationFee).to.have.been.calledOnceWith(100);
   });
 });

@@ -998,38 +998,38 @@ contract LoCManager is LoCManagerBase, CheckContract, ILoCManager {
         return _calcRedemptionFee(getRedemptionRateWithDecay(), _BTCDrawn);
     }
 
-    // --- Borrowing fee functions ---
+    // --- Origination fee functions ---
 
-    function getBorrowingRate() public view override returns (uint256) {
-        return _calcBorrowingRate(baseRate);
+    function getOriginationRate() public view override returns (uint256) {
+        return _calcOriginationRate(baseRate);
     }
 
-    function getBorrowingRateWithDecay() public view override returns (uint256) {
-        return _calcBorrowingRate(_calcDecayedBaseRate());
+    function getOriginationRateWithDecay() public view override returns (uint256) {
+        return _calcOriginationRate(_calcDecayedBaseRate());
     }
 
-    function _calcBorrowingRate(uint256 _baseRate) internal view returns (uint256) {
+    function _calcOriginationRate(uint256 _baseRate) internal view returns (uint256) {
         return
             ZeroMath._min(
-                zeroBaseParams.BORROWING_FEE_FLOOR().add(_baseRate),
-                zeroBaseParams.MAX_BORROWING_FEE()
+                zeroBaseParams.ORIGINATION_FEE_FLOOR().add(_baseRate),
+                zeroBaseParams.MAX_ORIGINATION_FEE()
             );
     }
 
-    function getBorrowingFee(uint256 _ZUSDDebt) external view override returns (uint256) {
-        return _calcBorrowingFee(getBorrowingRate(), _ZUSDDebt);
+    function getOriginationFee(uint256 _ZUSDDebt) external view override returns (uint256) {
+        return _calcOriginationFee(getOriginationRate(), _ZUSDDebt);
     }
 
-    function getBorrowingFeeWithDecay(uint256 _ZUSDDebt) external view override returns (uint256) {
-        return _calcBorrowingFee(getBorrowingRateWithDecay(), _ZUSDDebt);
+    function getOriginationFeeWithDecay(uint256 _ZUSDDebt) external view override returns (uint256) {
+        return _calcOriginationFee(getOriginationRateWithDecay(), _ZUSDDebt);
     }
 
-    function _calcBorrowingFee(uint256 _borrowingRate, uint256 _ZUSDDebt)
+    function _calcOriginationFee(uint256 _originationRate, uint256 _ZUSDDebt)
         internal
         pure
         returns (uint256)
     {
-        return _borrowingRate.mul(_ZUSDDebt).div(DECIMAL_PRECISION);
+        return _originationRate.mul(_ZUSDDebt).div(DECIMAL_PRECISION);
     }
 
     /// Updates the baseRate state variable based on time elapsed since the last redemption or ZUSD borrowing operation.

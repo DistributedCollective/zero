@@ -1175,7 +1175,7 @@ contract('LoCManager - in Recovery Mode', async accounts => {
     assert.equal(bob_ICR_After, bob_ICR_Before)
 
 
-    // to compensate borrowing fees
+    // to compensate origination fees
     await zusdToken.transfer(bob, dec(100, 18), { from: alice })
 
     // Remove Bob from system to test Carol's loc: price rises, Bob closes loc, price drops to 100 again
@@ -3257,7 +3257,7 @@ contract('LoCManager - in Recovery Mode', async accounts => {
     // Alice deposits ZUSD to Stability Pool
     await stabilityPool.provideToSP(spDeposit, ZERO_ADDRESS, { from: alice })
 
-    // to compensate borrowing fee
+    // to compensate origination fee
     await zusdToken.transfer(alice, A_totalDebt, { from: whale })
     // Alice closes loc
     await borrowerOperations.closeLoC({ from: alice })

@@ -438,7 +438,7 @@
     },
     {
       "inputs": [],
-      "name": "BORROWING_FEE_FLOOR",
+      "name": "ORIGINATION_FEE_FLOOR",
       "outputs": [
         {
           "internalType": "uint256",
@@ -516,7 +516,7 @@
     },
     {
       "inputs": [],
-      "name": "MAX_BORROWING_FEE",
+      "name": "MAX_ORIGINATION_FEE",
       "outputs": [
         {
           "internalType": "uint256",
@@ -961,7 +961,7 @@
           "type": "uint256"
         }
       ],
-      "name": "getBorrowingFee",
+      "name": "getOriginationFee",
       "outputs": [
         {
           "internalType": "uint256",
@@ -980,7 +980,7 @@
           "type": "uint256"
         }
       ],
-      "name": "getBorrowingFeeWithDecay",
+      "name": "getOriginationFeeWithDecay",
       "outputs": [
         {
           "internalType": "uint256",
@@ -993,7 +993,7 @@
     },
     {
       "inputs": [],
-      "name": "getBorrowingRate",
+      "name": "getOriginationRate",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1006,7 +1006,7 @@
     },
     {
       "inputs": [],
-      "name": "getBorrowingRateWithDecay",
+      "name": "getOriginationRateWithDecay",
       "outputs": [
         {
           "internalType": "uint256",

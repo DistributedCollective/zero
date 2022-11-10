@@ -89,11 +89,11 @@ contract TestIntegration {
         return LoCStatisticsLib.getEntireDebtAndColl(libraryContractAddress, _borrower);
     }
 
-    function testCalculateBorrowingFee(uint256 _ZUSDDebt)
+    function testCalculateOriginationFee(uint256 _ZUSDDebt)
         external
         view
-        returns (uint256 borrowingFee)
+        returns (uint256 originationFee)
     {
-        return LoCStatisticsLib.calculateBorrowingFee(libraryContractAddress, _ZUSDDebt);
+        return LoCStatisticsLib.calculateOriginationFee(libraryContractAddress, _ZUSDDebt);
     }
 }

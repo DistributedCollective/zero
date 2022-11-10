@@ -5,7 +5,7 @@
   "abi": [
     {
       "inputs": [],
-      "name": "BORROWING_FEE_FLOOR",
+      "name": "ORIGINATION_FEE_FLOOR",
       "outputs": [
         {
           "internalType": "uint256",

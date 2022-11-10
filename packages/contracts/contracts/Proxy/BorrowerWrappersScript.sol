@@ -148,8 +148,8 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, BTCTransferScript, 
         uint ICR = locManager.getCurrentICR(address(this), price);
 
         uint ZUSDAmount = _collateral.mul(price).div(ICR);
-        uint borrowingRate = locManager.getBorrowingRateWithDecay();
-        uint netDebt = ZUSDAmount.mul(ZeroMath.DECIMAL_PRECISION).div(ZeroMath.DECIMAL_PRECISION.add(borrowingRate));
+        uint originationRate = locManager.getOriginationRateWithDecay();
+        uint netDebt = ZUSDAmount.mul(ZeroMath.DECIMAL_PRECISION).div(ZeroMath.DECIMAL_PRECISION.add(originationRate));
 
         return netDebt;
     }

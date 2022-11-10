@@ -147,7 +147,7 @@ export interface SendableZero<R = unknown, S = unknown>
   /** {@inheritDoc TransactableZero.openLoC} */
   openLoC(
     params: LoCCreationParams<Decimalish>,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>;
 
   /** {@inheritDoc TransactableZero.closeLoC} */
@@ -156,7 +156,7 @@ export interface SendableZero<R = unknown, S = unknown>
   /** {@inheritDoc TransactableZero.adjustLoC} */
   adjustLoC(
     params: LoCAdjustmentParams<Decimalish>,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** {@inheritDoc TransactableZero.depositCollateral} */
@@ -172,7 +172,7 @@ export interface SendableZero<R = unknown, S = unknown>
   /** {@inheritDoc TransactableZero.borrowZUSD} */
   borrowZUSD(
     amount: Decimalish,
-    maxBorrowingRate?: Decimalish
+    maxOriginationRate?: Decimalish
   ): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
 
   /** {@inheritDoc TransactableZero.repayZUSD} */

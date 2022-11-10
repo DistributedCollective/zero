@@ -20,7 +20,7 @@ contract ZeroBaseParams is IZeroBaseParams, Ownable, Initializable, BaseMath {
 
     uint256 public override PERCENT_DIVISOR;
 
-    uint256 public override BORROWING_FEE_FLOOR;
+    uint256 public override ORIGINATION_FEE_FLOOR;
 
     /**
      * Half-life of 12h. 12h = 720 min
@@ -28,15 +28,15 @@ contract ZeroBaseParams is IZeroBaseParams, Ownable, Initializable, BaseMath {
      */
     uint256 public override REDEMPTION_FEE_FLOOR;
 
-    uint256 public override MAX_BORROWING_FEE;
+    uint256 public override MAX_ORIGINATION_FEE;
 
     function initialize() public initializer onlyOwner {
         MCR = 1100000000000000000; // 110%
         CCR = 1500000000000000000; // 150%
         PERCENT_DIVISOR = 200; // dividing by 200 yields 0.5%
-        BORROWING_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
+        ORIGINATION_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
         REDEMPTION_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
-        MAX_BORROWING_FEE = (DECIMAL_PRECISION / 100) * 5; // 5%
+        MAX_ORIGINATION_FEE = (DECIMAL_PRECISION / 100) * 5; // 5%
     }
 
     function setMCR(uint256 MCR_) public onlyOwner {
@@ -51,15 +51,15 @@ contract ZeroBaseParams is IZeroBaseParams, Ownable, Initializable, BaseMath {
         PERCENT_DIVISOR = PERCENT_DIVISOR_;
     }
 
-    function setBorrowingFeeFloor(uint256 BORROWING_FEE_FLOOR_) public onlyOwner {
-        BORROWING_FEE_FLOOR = BORROWING_FEE_FLOOR_;
+    function setOriginationFeeFloor(uint256 ORIGINATION_FEE_FLOOR_) public onlyOwner {
+        ORIGINATION_FEE_FLOOR = ORIGINATION_FEE_FLOOR_;
     }
 
     function setRedemptionFeeFloor(uint256 REDEMPTION_FEE_FLOOR_) public onlyOwner {
         REDEMPTION_FEE_FLOOR = REDEMPTION_FEE_FLOOR_;
     }
 
-    function setMaxBorrowingFee(uint256 MAX_BORROWING_FEE_) public onlyOwner {
-        MAX_BORROWING_FEE = MAX_BORROWING_FEE_;
+    function setMaxOriginationFee(uint256 MAX_ORIGINATION_FEE_) public onlyOwner {
+        MAX_ORIGINATION_FEE = MAX_ORIGINATION_FEE_;
     }
 }
