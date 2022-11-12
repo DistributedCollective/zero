@@ -19,12 +19,11 @@ export const WaitlistSuccess: React.FC<WaitlistSuccessProps> = () => {
         }}
       >
         <Paragraph sx={{ fontSize: 4, px: 4, fontWeight: "medium", wordBreak: "keep-all" }}>
-          Check your email!
+          You're on the list!
         </Paragraph>
         <br />
         <Paragraph sx={{ fontSize: 4, fontWeight: "medium", wordBreak: "keep-all" }}>
-          We received your email address, now click the confirmation link we just emailed you to
-          finish adding yourself to the waitlist.
+          We received your email address and will send you an invitation once we get to your place on the waitlist.
         </Paragraph>
       </Box>
 
