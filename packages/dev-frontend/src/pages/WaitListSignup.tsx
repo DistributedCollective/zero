@@ -172,8 +172,8 @@ export const WaitListSignup: React.FC = ({ children }) => {
           <Button
             sx={{
               width: 285,
-              height: "40px",
               display: "flex",
+              height: "40px",
               alignItems: "center"
             }}
             variant="secondary"
