@@ -206,7 +206,7 @@ The partially redeemed Line of Credit is re-inserted into the sorted list of Lin
 
 ### Full redemption
 
-A Line of Credit is defined as "fully redeemed from" when the redemption has caused (debt-200) of its debt to absorb (debt-200) ZUSD. Then, its 200 ZUSD Liquidation Reserve is canceled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zeroed.
+A Line of Credit is defined as "fully redeemed from" when the redemption has caused (debt-20) of its debt to absorb (debt-20) ZUSD. Then, its 20 ZUSD Liquidation Reserve is canceled with its remaining 20 debt: the Liquidation Reserve is burned from the gas address, and the 20 debt is zeroed.
 
 Before closing, we must handle the Line of Credit **collateral surplus**: that is, the excess RBTC collateral remaining after redemption due to its initial over-collateralization.
 
