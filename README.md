@@ -786,7 +786,7 @@ However, gas costs in RSK can be substantial. If the gas costs of our public liq
 
 The protocol thus directly compensates liquidators for their gas costs, to incentivize prompt liquidations in both normal and extreme periods of high gas prices. Liquidators should be confident that they will at least break even by making liquidation transactions.
 
-Gas compensation is paid in a mix of ZUSD and RBTC. While the RBTC is taken from the liquidated Line of Credit , the ZUSD is provided by the borrower. When a borrower first issues debt, some ZUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws RBTC from the Line(s) of Credit it liquidates, and sends the both the reserved ZUSD and the compensation in RBTC to the caller, and liquidates the remainder.
+Gas compensation is paid in a mix of ZUSD and RBTC. While the RBTC is taken from the liquidated Line of Credit, the ZUSD is provided by the borrower. When a borrower first issues debt, some ZUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws RBTC from the Line(s) of Credit it liquidates, and sends both the reserved ZUSD and the compensation in RBTC to the caller, and liquidates the remainder.
 
 When a liquidation transaction liquidates multiple Lines of Credit, each Line of Credit contributes ZUSD and RBTC towards the total compensation for the transaction.
 
@@ -795,7 +795,7 @@ Gas compensation per liquidated Line of Credit is given by the formula:
 Gas compensation = `20 ZUSD + 0.5% of Line of Credit’s collateral (RBTC)`
 
 The intentions behind this formula are:
-- To ensure that smaller Lines of Credit are liquidated promptly in normal times, at least
+- To ensure that smaller Lines of Credit are liquidated promptly in normal times, at least.
 - To ensure that larger Lines of Credit are liquidated promptly even in extreme high gas price periods. The larger the Line of Credit, the stronger the incentive to liquidate it.
 
 ### Gas compensation schedule
