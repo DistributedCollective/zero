@@ -19,10 +19,10 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
   - [Liquidation and the Stability Pool](#liquidation-and-the-stability-pool)
     - [Liquidation gas costs](#liquidation-gas-costs)
     - [Liquidation Logic](#liquidation-logic)
-      - [Liquidations in Normal Mode: TCR >= 150%](#liquidations-in-normal-mode-tcr--150)
-      - [Liquidations in Recovery Mode: TCR < 150%](#liquidations-in-recovery-mode-tcr--150)
+      - [Liquidations in Normal Mode: TCR \>= 150%](#liquidations-in-normal-mode-tcr--150)
+      - [Liquidations in Recovery Mode: TCR \< 150%](#liquidations-in-recovery-mode-tcr--150)
   - [Gains From Liquidations](#gains-from-liquidations)
-  - [ZUSD Token Redemption](#zusd-token-redemption)
+  - [ZUSD Redemption](#zusd-redemption)
     - [Partial redemption](#partial-redemption)
     - [Full redemption](#full-redemption)
     - [Redemptions create a price floor](#redemptions-create-a-price-floor)
@@ -38,7 +38,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [PriceFeed Logic](#pricefeed-logic)
     - [Testnet PriceFeed and PriceFeed tests](#testnet-pricefeed-and-pricefeed-tests)
     - [PriceFeed limitations and known issues](#pricefeed-limitations-and-known-issues)
-    - [Keeping a sorted list of lines of credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
+    - [Keeping a sorted list of Lines of Credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
     - [Flow of RBTC in Zero](#flow-of-rbtc-in-zero)
     - [Flow of ZUSD tokens in Zero](#flow-of-zusd-tokens-in-zero)
   - [Expected User Behaviors](#expected-user-behaviors)
@@ -56,7 +56,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Hint Helper Functions - `HintHelpers.sol`](#hint-helper-functions---hinthelperssol)
     - [Stability Pool Functions - `StabilityPool.sol`](#stability-pool-functions---stabilitypoolsol)
     - [ZUSD token `ZUSDToken.sol`](#zusd-token-zusdtokensol)
-  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit--operations)
+  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit-operations)
     - [Example Borrower Operations with Hints](#example-borrower-operations-with-hints)
       - [Opening a Line of Credit](#opening-a-line-of-credit)
       - [Adjusting a Line of Credit](#adjusting-a-line-of-credit)
@@ -89,7 +89,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
   - [Development](#development)
     - [Prerequisites](#prerequisites)
       - [Making node-gyp work](#making-node-gyp-work)
-    - [Clone & Install](#clone--install)
+    - [Clone \& Install](#clone--install)
     - [Top-level scripts](#top-level-scripts)
       - [Run all tests](#run-all-tests)
       - [Deploy contracts to a testnet](#deploy-contracts-to-a-testnet)
@@ -102,10 +102,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Prerequisites](#prerequisites-1)
     - [Running with `docker`](#running-with-docker)
     - [Configuring a public frontend](#configuring-a-public-frontend)
-      - [FRONTEND_TAG](#frontend_tag)
-      - [INFURA_API_KEY](#infura_api_key)
-    - [Setting a kickback rate](#setting-a-kickback-rate)
-    - [Setting a kickback rate with Gnosis Safe](#setting-a-kickback-rate-with-gnosis-safe)
+      - [INFURA\_API\_KEY](#infura_api_key)
     - [Next steps for hosting a frontend](#next-steps-for-hosting-a-frontend)
       - [Example 1: using static website hosting](#example-1-using-static-website-hosting)
       - [Example 2: wrapping the frontend container in HTTPS](#example-2-wrapping-the-frontend-container-in-https)
@@ -385,7 +382,7 @@ Likewise, the StabilityPool holds the total accumulated RBTC gains from liquidat
 
 | Function                | RBTC quantity                     | Path                                              |
 | ----------------------- | --------------------------------- | ------------------------------------------------- |
-| provideToSP             | depositor's accumulated RBTC gain | StabilityPool -> msg.sender                       |
+| provideToSP             | depositor's accumulated RBTC gain | msg.sender -> StabilityPool                       |
 | withdrawFromSP          | depositor's accumulated RBTC gain | StabilityPool -> msg.sender                       |
 | withdrawRBTCGainToTrove | depositor's accumulated RBTC gain | StabilityPool -> BorrowerOperations -> ActivePool |
 
