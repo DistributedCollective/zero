@@ -7,6 +7,7 @@ import "../Dependencies/Mynt/MyntLib.sol";
 import "../Interfaces/IBorrowerOperations.sol";
 import "./TroveManagerBase.sol";
 
+/// This contract is designed to be used via delegatecall from the TroveManager contract
 contract TroveManagerRedeemOps is TroveManagerBase {
     /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
       request.  Applies pending rewards to a Trove before reducing its debt and coll.
@@ -40,35 +41,6 @@ contract TroveManagerRedeemOps is TroveManagerBase {
     ) external {
         _redeemCollateral(
             _ZUSDamount,
-            _firstRedemptionHint,
-            _upperPartialRedemptionHint,
-            _lowerPartialRedemptionHint,
-            _partialRedemptionHintNICR,
-            _maxIterations,
-            _maxFeePercentage
-        );
-    }
-
-    ///DLLR _owner or _spender can use Sovryn Mynt to convert DLLR to ZUSD, then use the Zero redemption mechanism to redeem ZUSD for RBTC, all in a single transaction
-
-    function redeemCollateralViaDLLR(
-        uint256 _dllrAmount,
-        address _firstRedemptionHint,
-        address _upperPartialRedemptionHint,
-        address _lowerPartialRedemptionHint,
-        uint256 _partialRedemptionHintNICR,
-        uint256 _maxIterations,
-        uint256 _maxFeePercentage,
-        IMasset.PermitParams memory _permitParams
-    ) external {
-        uint256 _zusdAmount = MyntLib.redeemFromDLLR(
-            IBorrowerOperations(borrowerOperationsAddress).getMasset(),
-            _dllrAmount,
-            address(_zusdToken),
-            _permitParams
-        );
-        _redeemCollateral(
-            _zusdAmount,
             _firstRedemptionHint,
             _upperPartialRedemptionHint,
             _lowerPartialRedemptionHint,
@@ -199,17 +171,23 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
 
-    /*function redeemCollateralViaDllr(
+    ///DLLR _owner or _spender can use Sovryn Mynt to convert DLLR to ZUSD, then use the Zero redemption mechanism to redeem ZUSD for RBTC, all in a single transaction
+    function redeemCollateralViaDLLR(
         uint256 _dllrAmount,
         address _firstRedemptionHint,
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
-        uint256 _maxFeePercentage, 
+        uint256 _maxFeePercentage,
         IMasset.PermitParams memory _permitParams
     ) external {
-        uint256 _zusdAmount = MyntLib.redeemFromDLLR(IBorrowerOperations(borrowerOperationsAddress).getMasset(), _dllrAmount, address(_zusdToken), _permitParams);
+        uint256 _zusdAmount = MyntLib.redeemFromDLLR(
+            IBorrowerOperations(borrowerOperationsAddress).getMasset(),
+            _dllrAmount,
+            address(_zusdToken),
+            _permitParams
+        );
         _redeemCollateral(
             _zusdAmount,
             _firstRedemptionHint,
@@ -219,7 +197,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
             _maxIterations,
             _maxFeePercentage
         );
-    }*/
+    }
 
     function _isValidFirstRedemptionHint(
         ISortedTroves _sortedTroves,

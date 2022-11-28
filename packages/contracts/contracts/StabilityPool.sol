@@ -3,11 +3,11 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/IStabilityPool.sol';
-import './Interfaces/ITroveManager.sol';
-import './Interfaces/IZUSDToken.sol';
-import './Interfaces/ISortedTroves.sol';
+import "./Interfaces/IBorrowerOperations.sol";
+import "./Interfaces/IStabilityPool.sol";
+import "./Interfaces/ITroveManager.sol";
+import "./Interfaces/IZUSDToken.sol";
+import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/LiquitySafeMath128.sol";
@@ -68,9 +68,9 @@ import "./StabilityPoolStorage.sol";
  * So, to track P accurately, we use a scale factor: if a liquidation would cause P to decrease to <1e-9 (and be rounded to 0 by Solidity),
  * we first multiply P by 1e9, and increment a currentScale factor by 1.
  *
- * The added benefit of using 1e9 for the scale factor (rather than 1e18) is that it ensures negligible precision loss close to the 
- * scale boundary: when P is at its minimum value of 1e9, the relative precision loss in P due to floor division is only on the 
- * order of 1e-9. 
+ * The added benefit of using 1e9 for the scale factor (rather than 1e18) is that it ensures negligible precision loss close to the
+ * scale boundary: when P is at its minimum value of 1e9, the relative precision loss in P due to floor division is only on the
+ * order of 1e-9.
  *
  * --- EPOCHS ---
  *
@@ -174,7 +174,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S, uint _G);
     event FrontEndSnapshotUpdated(address indexed _frontEnd, uint _P, uint _G);
     event UserDepositChanged(address indexed _depositor, uint _newDeposit);
-    event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
+    event FrontEndStakeChanged(
+        address indexed _frontEnd,
+        uint _newFrontEndStake,
+        address _depositor
+    );
 
     event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
     event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
@@ -192,11 +196,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         address _sortedTrovesAddress,
         address _priceFeedAddress,
         address _communityIssuanceAddress
-    )
-        external
-        override
-        onlyOwner
-    {
+    ) external override onlyOwner {
         checkContract(_liquityBaseParamsAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
@@ -207,7 +207,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         checkContract(_communityIssuanceAddress);
 
         P = DECIMAL_PRECISION;
-        
+
         liquityBaseParams = ILiquityBaseParams(_liquityBaseParamsAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
@@ -224,8 +224,6 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
-
-        
     }
 
     // --- Getters for public variables. Required by IPool interface ---
@@ -241,13 +239,13 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- External Depositor Functions ---
 
     /**  provideToSP():
-    *
-    * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-    * - Tags the deposit with the provided front end tag param, if it's a new deposit
-    * - Sends depositor's accumulated gains (ZERO, ETH) to depositor
-    * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
-    * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
-    */
+     *
+     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     * - Tags the deposit with the provided front end tag param, if it's a new deposit
+     * - Sends depositor's accumulated gains (ZERO, ETH) to depositor
+     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
+     */
     function provideToSP(uint _amount, address _frontEndTag) external override {
         _provideToSP(_amount, _frontEndTag);
     }
@@ -263,7 +261,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         _triggerZEROIssuance(communityIssuanceCached);
 
-        if (initialDeposit == 0) {_setFrontEndTag(msg.sender, _frontEndTag);}
+        if (initialDeposit == 0) {
+            _setFrontEndTag(msg.sender, _frontEndTag);
+        }
         uint depositorETHGain = getDepositorETHGain(msg.sender);
         uint compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
         uint ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
@@ -287,37 +287,59 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit ETHGainWithdrawn(msg.sender, depositorETHGain, ZUSDLoss); // ZUSD Loss required for event log
 
         _sendETHGainToDepositor(depositorETHGain);
-     }
+    }
 
-     //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
-
-    function provideToSpFromDLLR(uint _dllrAmount, IMasset.PermitParams memory _permitParams) external override {
-        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(borrowerOperations.getMasset(), _dllrAmount, address(zusdToken), _permitParams);
+    ///DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
+    function provideToSpFromDLLR(
+        uint _dllrAmount,
+        IMasset.PermitParams memory _permitParams
+    ) external override {
+        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
+            borrowerOperations.getMasset(),
+            _dllrAmount,
+            address(zusdToken),
+            _permitParams
+        );
         _provideToSP(_ZUSDAmount, ADDRESS_ZERO);
     }
 
-    function provideToSpFromDllrBySpender(uint _dllrAmount, IMasset.PermitParams memory _permitParams, address _dllrOwner) external override {
+    function provideToSpFromDllrBySpender(
+        uint _dllrAmount,
+        IMasset.PermitParams memory _permitParams,
+        address _dllrOwner
+    ) external override {
         IERC20 dllr = IERC20(borrowerOperations.getMasset().getToken());
-        require(dllr.transferFrom(_dllrOwner, msg.sender, _dllrAmount), "SP: transferFrom DLLR failed");
-        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(borrowerOperations.getMasset(), _dllrAmount, address(zusdToken), _permitParams);
+        require(
+            dllr.transferFrom(_dllrOwner, msg.sender, _dllrAmount),
+            "SP: transferFrom DLLR failed"
+        );
+        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
+            borrowerOperations.getMasset(),
+            _dllrAmount,
+            address(zusdToken),
+            _permitParams
+        );
         _provideToSP(_ZUSDAmount, ADDRESS_ZERO);
     }
 
     /**  withdrawFromSP():
-    *
-    * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-    * - Removes the deposit's front end tag if it is a full withdrawal
-    * - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
-    * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
-    * - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
-    *
-    * If _amount > userDeposit, the user withdraws all of their compounded deposit.
-    */
+     *
+     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     * - Removes the deposit's front end tag if it is a full withdrawal
+     * - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
+     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     * - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
+     *
+     * If _amount > userDeposit, the user withdraws all of their compounded deposit.
+     */
     function withdrawFromSP(uint _amount) external override {
         _withdrawFromSP(_amount);
     }
+
     function _withdrawFromSP(uint _amount) internal {
-        if (_amount !=0) {_requireNoUnderCollateralizedTroves();}
+        if (_amount != 0) {
+            _requireNoUnderCollateralizedTroves();
+        }
         uint initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
 
@@ -334,7 +356,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         // First pay out any ZERO gains
         address frontEnd = deposits[msg.sender].frontEndTag;
         _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
-        
+
         // Update front end stake
         uint compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
         uint newFrontEndStake = compoundedFrontEndStake.sub(ZUSDtoWithdraw);
@@ -348,26 +370,29 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         _updateDepositAndSnapshots(msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
 
-        emit ETHGainWithdrawn(msg.sender, depositorETHGain, ZUSDLoss);  // ZUSD Loss required for event log
+        emit ETHGainWithdrawn(msg.sender, depositorETHGain, ZUSDLoss); // ZUSD Loss required for event log
 
         _sendETHGainToDepositor(depositorETHGain);
     }
 
-     //Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
-    function withdrawFromSPAndConvertToDLLR(uint256 _zusdAmount) external {
+    ///Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
+    function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmount) external override {
         IMasset masset = borrowerOperations.getMasset();
         _withdrawFromSP(_zusdAmount);
-        require(zusdToken.approve(address(masset), _zusdAmount), "Failed to approve ZUSD amount for Mynt mAsset to redeem");
+        require(
+            zusdToken.approve(address(masset), _zusdAmount),
+            "Failed to approve ZUSD amount for Mynt mAsset to redeem"
+        );
         masset.mintTo(address(zusdToken), _zusdAmount, msg.sender);
     }
 
     /** withdrawETHGainToTrove:
-    * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-    * - Sends all depositor's ZERO gain to  depositor
-    * - Sends all tagged front end's ZERO gain to the tagged front end
-    * - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
-    * - Leaves their compounded deposit in the Stability Pool
-    * - Updates snapshots for deposit and tagged front end stake */
+     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     * - Sends all depositor's ZERO gain to  depositor
+     * - Sends all tagged front end's ZERO gain to the tagged front end
+     * - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
+     * - Leaves their compounded deposit in the Stability Pool
+     * - Updates snapshots for deposit and tagged front end stake */
     function withdrawETHGainToTrove(address _upperHint, address _lowerHint) external override {
         uint initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
@@ -405,46 +430,56 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit StabilityPoolETHBalanceUpdated(ETH);
         emit EtherSent(msg.sender, depositorETHGain);
 
-        borrowerOperations.moveETHGainToTrove{ value: depositorETHGain }(msg.sender, _upperHint, _lowerHint);
+        borrowerOperations.moveETHGainToTrove{ value: depositorETHGain }(
+            msg.sender,
+            _upperHint,
+            _lowerHint
+        );
     }
 
     // --- ZERO issuance functions ---
 
     function _triggerZEROIssuance(ICommunityIssuance _communityIssuance) internal {
         uint ZEROIssuance = _communityIssuance.issueZERO();
-       _updateG(ZEROIssuance);
+        _updateG(ZEROIssuance);
     }
 
     function _updateG(uint _ZEROIssuance) internal {
         uint totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
         /*
-        * When total deposits is 0, G is not updated. In this case, the ZERO issued can not be obtained by later
-        * depositors - it is missed out on, and remains in the balanceof the CommunityIssuance contract.
-        *
-        */
-        if (totalZUSD == 0 || _ZEROIssuance == 0) {return;}
+         * When total deposits is 0, G is not updated. In this case, the ZERO issued can not be obtained by later
+         * depositors - it is missed out on, and remains in the balanceof the CommunityIssuance contract.
+         *
+         */
+        if (totalZUSD == 0 || _ZEROIssuance == 0) {
+            return;
+        }
 
         uint ZEROPerUnitStaked;
-        ZEROPerUnitStaked =_computeZEROPerUnitStaked(_ZEROIssuance, totalZUSD);
+        ZEROPerUnitStaked = _computeZEROPerUnitStaked(_ZEROIssuance, totalZUSD);
 
         uint marginalZEROGain = ZEROPerUnitStaked.mul(P);
-        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale].add(marginalZEROGain);
+        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale]
+            .add(marginalZEROGain);
 
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
 
-    function _computeZEROPerUnitStaked(uint _ZEROIssuance, uint _totalZUSDDeposits) internal returns (uint) {
-        /*  
-        * Calculate the ZERO-per-unit staked.  Division uses a "feedback" error correction, to keep the 
-        * cumulative error low in the running total G:
-        *
-        * 1) Form a numerator which compensates for the floor division error that occurred the last time this 
-        * function was called.  
-        * 2) Calculate "per-unit-staked" ratio.
-        * 3) Multiply the ratio back by its denominator, to reveal the current floor division error.
-        * 4) Store this error for use in the next correction when this function is called.
-        * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
-        */
+    function _computeZEROPerUnitStaked(
+        uint _ZEROIssuance,
+        uint _totalZUSDDeposits
+    ) internal returns (uint) {
+        /*
+         * Calculate the ZERO-per-unit staked.  Division uses a "feedback" error correction, to keep the
+         * cumulative error low in the running total G:
+         *
+         * 1) Form a numerator which compensates for the floor division error that occurred the last time this
+         * function was called.
+         * 2) Calculate "per-unit-staked" ratio.
+         * 3) Multiply the ratio back by its denominator, to reveal the current floor division error.
+         * 4) Store this error for use in the next correction when this function is called.
+         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
+         */
         uint ZERONumerator = _ZEROIssuance.mul(DECIMAL_PRECISION).add(lastZEROError);
 
         uint ZEROPerUnitStaked = ZERONumerator.div(_totalZUSDDeposits);
@@ -456,21 +491,26 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- Liquidation functions ---
 
     /**
-    * Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
-    * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
-    * Only called by liquidation functions in the TroveManager.
-    */
+     * Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
+     * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
+     * Only called by liquidation functions in the TroveManager.
+     */
     function offset(uint _debtToOffset, uint _collToAdd) external override {
         _requireCallerIsTroveManager();
         uint totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
-        if (totalZUSD == 0 || _debtToOffset == 0) { return; }
+        if (totalZUSD == 0 || _debtToOffset == 0) {
+            return;
+        }
 
         _triggerZEROIssuance(communityIssuance);
 
-        (uint ETHGainPerUnitStaked,
-            uint ZUSDLossPerUnitStaked) = _computeRewardsPerUnitStaked(_collToAdd, _debtToOffset, totalZUSD);
+        (uint ETHGainPerUnitStaked, uint ZUSDLossPerUnitStaked) = _computeRewardsPerUnitStaked(
+            _collToAdd,
+            _debtToOffset,
+            totalZUSD
+        );
 
-        _updateRewardSumAndProduct(ETHGainPerUnitStaked, ZUSDLossPerUnitStaked);  // updates S and P
+        _updateRewardSumAndProduct(ETHGainPerUnitStaked, ZUSDLossPerUnitStaked); // updates S and P
 
         _moveOffsetCollAndDebt(_collToAdd, _debtToOffset);
     }
@@ -481,35 +521,36 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint _collToAdd,
         uint _debtToOffset,
         uint _totalZUSDDeposits
-    )
-        internal
-        returns (uint ETHGainPerUnitStaked, uint ZUSDLossPerUnitStaked)
-    {
+    ) internal returns (uint ETHGainPerUnitStaked, uint ZUSDLossPerUnitStaked) {
         /*
-        * Compute the ZUSD and ETH rewards. Uses a "feedback" error correction, to keep
-        * the cumulative error in the P and S state variables low:
-        *
-        * 1) Form numerators which compensate for the floor division errors that occurred the last time this 
-        * function was called.  
-        * 2) Calculate "per-unit-staked" ratios.
-        * 3) Multiply each ratio back by its denominator, to reveal the current floor division error.
-        * 4) Store these errors for use in the next correction when this function is called.
-        * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
-        */
+         * Compute the ZUSD and ETH rewards. Uses a "feedback" error correction, to keep
+         * the cumulative error in the P and S state variables low:
+         *
+         * 1) Form numerators which compensate for the floor division errors that occurred the last time this
+         * function was called.
+         * 2) Calculate "per-unit-staked" ratios.
+         * 3) Multiply each ratio back by its denominator, to reveal the current floor division error.
+         * 4) Store these errors for use in the next correction when this function is called.
+         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
+         */
         uint ETHNumerator = _collToAdd.mul(DECIMAL_PRECISION).add(lastETHError_Offset);
 
         assert(_debtToOffset <= _totalZUSDDeposits);
         if (_debtToOffset == _totalZUSDDeposits) {
-            ZUSDLossPerUnitStaked = DECIMAL_PRECISION;  // When the Pool depletes to 0, so does each deposit 
+            ZUSDLossPerUnitStaked = DECIMAL_PRECISION; // When the Pool depletes to 0, so does each deposit
             lastZUSDLossError_Offset = 0;
         } else {
-            uint ZUSDLossNumerator = _debtToOffset.mul(DECIMAL_PRECISION).sub(lastZUSDLossError_Offset);
+            uint ZUSDLossNumerator = _debtToOffset.mul(DECIMAL_PRECISION).sub(
+                lastZUSDLossError_Offset
+            );
             /*
-            * Add 1 to make error in quotient positive. We want "slightly too much" ZUSD loss,
-            * which ensures the error in any given compoundedZUSDDeposit favors the Stability Pool.
-            */
+             * Add 1 to make error in quotient positive. We want "slightly too much" ZUSD loss,
+             * which ensures the error in any given compoundedZUSDDeposit favors the Stability Pool.
+             */
             ZUSDLossPerUnitStaked = (ZUSDLossNumerator.div(_totalZUSDDeposits)).add(1);
-            lastZUSDLossError_Offset = (ZUSDLossPerUnitStaked.mul(_totalZUSDDeposits)).sub(ZUSDLossNumerator);
+            lastZUSDLossError_Offset = (ZUSDLossPerUnitStaked.mul(_totalZUSDDeposits)).sub(
+                ZUSDLossNumerator
+            );
         }
 
         ETHGainPerUnitStaked = ETHNumerator.div(_totalZUSDDeposits);
@@ -519,15 +560,18 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     /// Update the Stability Pool reward sum S and product P
-    function _updateRewardSumAndProduct(uint _ETHGainPerUnitStaked, uint _ZUSDLossPerUnitStaked) internal {
+    function _updateRewardSumAndProduct(
+        uint _ETHGainPerUnitStaked,
+        uint _ZUSDLossPerUnitStaked
+    ) internal {
         uint currentP = P;
         uint newP;
 
         assert(_ZUSDLossPerUnitStaked <= DECIMAL_PRECISION);
         /*
-        * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool ZUSD in the liquidation.
-        * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - ZUSDLossPerUnitStaked)
-        */
+         * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool ZUSD in the liquidation.
+         * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - ZUSDLossPerUnitStaked)
+         */
         uint newProductFactor = uint(DECIMAL_PRECISION).sub(_ZUSDLossPerUnitStaked);
 
         uint128 currentScaleCached = currentScale;
@@ -535,12 +579,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint currentS = epochToScaleToSum[currentEpochCached][currentScaleCached];
 
         /*
-        * Calculate the new S first, before we update P.
-        * The ETH gain for any given depositor from a liquidation depends on the value of their deposit
-        * (and the value of totalDeposits) prior to the Stability being depleted by the debt in the liquidation.
-        *
-        * Since S corresponds to ETH gain, and P to deposit loss, we update S first.
-        */
+         * Calculate the new S first, before we update P.
+         * The ETH gain for any given depositor from a liquidation depends on the value of their deposit
+         * (and the value of totalDeposits) prior to the Stability being depleted by the debt in the liquidation.
+         *
+         * Since S corresponds to ETH gain, and P to deposit loss, we update S first.
+         */
         uint marginalETHGain = _ETHGainPerUnitStaked.mul(currentP);
         uint newS = currentS.add(marginalETHGain);
         epochToScaleToSum[currentEpochCached][currentScaleCached] = newS;
@@ -554,9 +598,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             emit ScaleUpdated(currentScale);
             newP = DECIMAL_PRECISION;
 
-        // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
+            // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
         } else if (currentP.mul(newProductFactor).div(DECIMAL_PRECISION) < SCALE_FACTOR) {
-            newP = currentP.mul(newProductFactor).mul(SCALE_FACTOR).div(DECIMAL_PRECISION); 
+            newP = currentP.mul(newProductFactor).mul(SCALE_FACTOR).div(DECIMAL_PRECISION);
             currentScale = currentScaleCached.add(1);
             emit ScaleUpdated(currentScale);
         } else {
@@ -591,14 +635,16 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- Reward calculator functions for depositor and front end ---
 
     /** Calculates the ETH gain earned by the deposit since its last snapshots were taken.
-    * Given by the formula:  E = d0 * (S - S(0))/P(0)
-    * where S(0) and P(0) are the depositor's snapshots of the sum S and product P, respectively.
-    * d0 is the last recorded deposit value.
-    */
+     * Given by the formula:  E = d0 * (S - S(0))/P(0)
+     * where S(0) and P(0) are the depositor's snapshots of the sum S and product P, respectively.
+     * d0 is the last recorded deposit value.
+     */
     function getDepositorETHGain(address _depositor) public view override returns (uint) {
         uint initialDeposit = deposits[_depositor].initialValue;
 
-        if (initialDeposit == 0) { return 0; }
+        if (initialDeposit == 0) {
+            return 0;
+        }
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
@@ -606,85 +652,109 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return ETHGain;
     }
 
-    function _getETHGainFromSnapshots(uint initialDeposit, Snapshots memory snapshots) internal view returns (uint) {
+    function _getETHGainFromSnapshots(
+        uint initialDeposit,
+        Snapshots memory snapshots
+    ) internal view returns (uint) {
         /*
-        * Grab the sum 'S' from the epoch at which the stake was made. The ETH gain may span up to one scale change.
-        * If it does, the second portion of the ETH gain is scaled by 1e9.
-        * If the gain spans no scale change, the second portion will be 0.
-        */
+         * Grab the sum 'S' from the epoch at which the stake was made. The ETH gain may span up to one scale change.
+         * If it does, the second portion of the ETH gain is scaled by 1e9.
+         * If the gain spans no scale change, the second portion will be 0.
+         */
         uint128 epochSnapshot = snapshots.epoch;
         uint128 scaleSnapshot = snapshots.scale;
         uint S_Snapshot = snapshots.S;
         uint P_Snapshot = snapshots.P;
 
         uint firstPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot].sub(S_Snapshot);
-        uint secondPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
+        uint secondPortion = epochToScaleToSum[epochSnapshot][scaleSnapshot.add(1)].div(
+            SCALE_FACTOR
+        );
 
-        uint ETHGain = initialDeposit.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
+        uint ETHGain = initialDeposit.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(
+            DECIMAL_PRECISION
+        );
 
         return ETHGain;
     }
 
     /**
-    * Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
-    * Given by the formula:  ZERO = d0 * (G - G(0))/P(0)
-    * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
-    * d0 is the last recorded deposit value.
-    */
+     * Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
+     * Given by the formula:  ZERO = d0 * (G - G(0))/P(0)
+     * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
+     * d0 is the last recorded deposit value.
+     */
     function getDepositorZEROGain(address _depositor) public view override returns (uint) {
         uint initialDeposit = deposits[_depositor].initialValue;
-        if (initialDeposit == 0) {return 0;}
+        if (initialDeposit == 0) {
+            return 0;
+        }
 
         address frontEndTag = deposits[_depositor].frontEndTag;
 
         /*
-        * If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
-        * Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
-        * which they made their deposit.
-        */
-        uint kickbackRate = frontEndTag == ADDRESS_ZERO ? DECIMAL_PRECISION : frontEnds[frontEndTag].kickbackRate;
+         * If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
+         * Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
+         * which they made their deposit.
+         */
+        uint kickbackRate = frontEndTag == ADDRESS_ZERO
+            ? DECIMAL_PRECISION
+            : frontEnds[frontEndTag].kickbackRate;
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
-        uint ZEROGain = kickbackRate.mul(_getZEROGainFromSnapshots(initialDeposit, snapshots)).div(DECIMAL_PRECISION);
+        uint ZEROGain = kickbackRate.mul(_getZEROGainFromSnapshots(initialDeposit, snapshots)).div(
+            DECIMAL_PRECISION
+        );
 
         return ZEROGain;
     }
 
     /**
-    * Return the ZERO gain earned by the front end. Given by the formula:  E = D0 * (G - G(0))/P(0)
-    * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
-    *
-    * D0 is the last recorded value of the front end's total tagged deposits.
-    */
+     * Return the ZERO gain earned by the front end. Given by the formula:  E = D0 * (G - G(0))/P(0)
+     * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
+     *
+     * D0 is the last recorded value of the front end's total tagged deposits.
+     */
     function getFrontEndZEROGain(address _frontEnd) public view override returns (uint) {
         uint frontEndStake = frontEndStakes[_frontEnd];
-        if (frontEndStake == 0) { return 0; }
+        if (frontEndStake == 0) {
+            return 0;
+        }
 
         uint kickbackRate = frontEnds[_frontEnd].kickbackRate;
         uint frontEndShare = uint(DECIMAL_PRECISION).sub(kickbackRate);
 
         Snapshots memory snapshots = frontEndSnapshots[_frontEnd];
 
-        uint ZEROGain = frontEndShare.mul(_getZEROGainFromSnapshots(frontEndStake, snapshots)).div(DECIMAL_PRECISION);
+        uint ZEROGain = frontEndShare.mul(_getZEROGainFromSnapshots(frontEndStake, snapshots)).div(
+            DECIMAL_PRECISION
+        );
         return ZEROGain;
     }
 
-    function _getZEROGainFromSnapshots(uint initialStake, Snapshots memory snapshots) internal view returns (uint) {
-       /*
-        * Grab the sum 'G' from the epoch at which the stake was made. The ZERO gain may span up to one scale change.
-        * If it does, the second portion of the ZERO gain is scaled by 1e9.
-        * If the gain spans no scale change, the second portion will be 0.
-        */
+    function _getZEROGainFromSnapshots(
+        uint initialStake,
+        Snapshots memory snapshots
+    ) internal view returns (uint) {
+        /*
+         * Grab the sum 'G' from the epoch at which the stake was made. The ZERO gain may span up to one scale change.
+         * If it does, the second portion of the ZERO gain is scaled by 1e9.
+         * If the gain spans no scale change, the second portion will be 0.
+         */
         uint128 epochSnapshot = snapshots.epoch;
         uint128 scaleSnapshot = snapshots.scale;
         uint G_Snapshot = snapshots.G;
         uint P_Snapshot = snapshots.P;
 
         uint firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot].sub(G_Snapshot);
-        uint secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
+        uint secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot.add(1)].div(
+            SCALE_FACTOR
+        );
 
-        uint ZEROGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
+        uint ZEROGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(
+            DECIMAL_PRECISION
+        );
 
         return ZEROGain;
     }
@@ -692,12 +762,14 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- Compounded deposit and compounded front end stake ---
 
     /**
-    * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)
-    * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
-    */
+     * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)
+     * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
+     */
     function getCompoundedZUSDDeposit(address _depositor) public view override returns (uint) {
         uint initialDeposit = deposits[_depositor].initialValue;
-        if (initialDeposit == 0) { return 0; }
+        if (initialDeposit == 0) {
+            return 0;
+        }
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
@@ -706,15 +778,17 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     /**
-    * Return the front end's compounded stake. Given by the formula:  D = D0 * P/P(0)
-    * where P(0) is the depositor's snapshot of the product P, taken at the last time
-    * when one of the front end's tagged deposits updated their deposit.
-    *
-    * The front end's compounded stake is equal to the sum of its depositors' compounded deposits.
-    */
+     * Return the front end's compounded stake. Given by the formula:  D = D0 * P/P(0)
+     * where P(0) is the depositor's snapshot of the product P, taken at the last time
+     * when one of the front end's tagged deposits updated their deposit.
+     *
+     * The front end's compounded stake is equal to the sum of its depositors' compounded deposits.
+     */
     function getCompoundedFrontEndStake(address _frontEnd) public view override returns (uint) {
         uint frontEndStake = frontEndStakes[_frontEnd];
-        if (frontEndStake == 0) { return 0; }
+        if (frontEndStake == 0) {
+            return 0;
+        }
 
         Snapshots memory snapshots = frontEndSnapshots[_frontEnd];
 
@@ -726,43 +800,44 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     function _getCompoundedStakeFromSnapshots(
         uint initialStake,
         Snapshots memory snapshots
-    )
-        internal
-        view
-        returns (uint)
-    {
+    ) internal view returns (uint) {
         uint snapshot_P = snapshots.P;
         uint128 scaleSnapshot = snapshots.scale;
         uint128 epochSnapshot = snapshots.epoch;
 
         // If stake was made before a pool-emptying event, then it has been fully cancelled with debt -- so, return 0
-        if (epochSnapshot < currentEpoch) { return 0; }
+        if (epochSnapshot < currentEpoch) {
+            return 0;
+        }
 
         uint compoundedStake;
         uint128 scaleDiff = currentScale.sub(scaleSnapshot);
 
         /* Compute the compounded stake. If a scale change in P was made during the stake's lifetime,
-        * account for it. If more than one scale change was made, then the stake has decreased by a factor of
-        * at least 1e-9 -- so return 0.
-        */
+         * account for it. If more than one scale change was made, then the stake has decreased by a factor of
+         * at least 1e-9 -- so return 0.
+         */
         if (scaleDiff == 0) {
             compoundedStake = initialStake.mul(P).div(snapshot_P);
         } else if (scaleDiff == 1) {
             compoundedStake = initialStake.mul(P).div(snapshot_P).div(SCALE_FACTOR);
-        } else { // if scaleDiff >= 2
+        } else {
+            // if scaleDiff >= 2
             compoundedStake = 0;
         }
 
         /*
-        * If compounded deposit is less than a billionth of the initial deposit, return 0.
-        *
-        * NOTE: originally, this line was in place to stop rounding errors making the deposit too large. However, the error
-        * corrections should ensure the error in P "favors the Pool", i.e. any given compounded deposit should slightly less
-        * than it's theoretical value.
-        *
-        * Thus it's unclear whether this line is still really needed.
-        */
-        if (compoundedStake < initialStake.div(1e9)) {return 0;}
+         * If compounded deposit is less than a billionth of the initial deposit, return 0.
+         *
+         * NOTE: originally, this line was in place to stop rounding errors making the deposit too large. However, the error
+         * corrections should ensure the error in P "favors the Pool", i.e. any given compounded deposit should slightly less
+         * than it's theoretical value.
+         *
+         * Thus it's unclear whether this line is still really needed.
+         */
+        if (compoundedStake < initialStake.div(1e9)) {
+            return 0;
+        }
 
         return compoundedStake;
     }
@@ -778,7 +853,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     function _sendETHGainToDepositor(uint _amount) internal {
-        if (_amount == 0) {return;}
+        if (_amount == 0) {
+            return;
+        }
         uint newETH = ETH.sub(_amount);
         ETH = newETH;
         emit StabilityPoolETHBalanceUpdated(newETH);
@@ -790,7 +867,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     /// Send ZUSD to user and decrease ZUSD in Pool
     function _sendZUSDToDepositor(address _depositor, uint ZUSDWithdrawal) internal {
-        if (ZUSDWithdrawal == 0) {return;}
+        if (ZUSDWithdrawal == 0) {
+            return;
+        }
 
         zusdToken.returnFromPool(address(this), _depositor, ZUSDWithdrawal);
         _decreaseZUSD(ZUSDWithdrawal);
@@ -816,7 +895,6 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         deposits[_depositor].frontEndTag = _frontEndTag;
         emit FrontEndTagSet(_depositor, _frontEndTag);
     }
-
 
     function _updateDepositAndSnapshots(address _depositor, uint _newValue) internal {
         deposits[_depositor].initialValue = _newValue;
@@ -870,7 +948,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit FrontEndSnapshotUpdated(_frontEnd, currentP, currentG);
     }
 
-    function _payOutZEROGains(ICommunityIssuance _communityIssuance, address _depositor, address _frontEnd) internal {
+    function _payOutZEROGains(
+        ICommunityIssuance _communityIssuance,
+        address _depositor,
+        address _frontEnd
+    ) internal {
         // Pay out front end's ZERO gain
         if (_frontEnd != ADDRESS_ZERO) {
             uint frontEndZEROGain = getFrontEndZEROGain(_frontEnd);
@@ -887,7 +969,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     // --- 'require' functions ---
 
     function _requireCallerIsActivePool() internal view {
-        require( msg.sender == address(activePool), "StabilityPool: Caller is not ActivePool");
+        require(msg.sender == address(activePool), "StabilityPool: Caller is not ActivePool");
     }
 
     function _requireCallerIsTroveManager() internal view {
@@ -898,24 +980,30 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint price = priceFeed.fetchPrice();
         address lowestTrove = sortedTroves.getLast();
         uint ICR = troveManager.getCurrentICR(lowestTrove, price);
-        require(ICR >= liquityBaseParams.MCR(), "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
+        require(
+            ICR >= liquityBaseParams.MCR(),
+            "StabilityPool: Cannot withdraw while there are troves with ICR < MCR"
+        );
     }
 
     function _requireUserHasDeposit(uint _initialDeposit) internal pure {
-        require(_initialDeposit > 0, 'StabilityPool: User must have a non-zero deposit');
+        require(_initialDeposit > 0, "StabilityPool: User must have a non-zero deposit");
     }
 
-     function _requireUserHasNoDeposit(address _address) internal view {
+    function _requireUserHasNoDeposit(address _address) internal view {
         uint initialDeposit = deposits[_address].initialValue;
-        require(initialDeposit == 0, 'StabilityPool: User must have no deposit');
+        require(initialDeposit == 0, "StabilityPool: User must have no deposit");
     }
 
     function _requireNonZeroAmount(uint _amount) internal pure {
-        require(_amount > 0, 'StabilityPool: Amount must be non-zero');
+        require(_amount > 0, "StabilityPool: Amount must be non-zero");
     }
 
     function _requireUserHasTrove(address _depositor) internal view {
-        require(troveManager.getTroveStatus(_depositor) == 1, "StabilityPool: caller must have an active trove to withdraw ETHGain to");
+        require(
+            troveManager.getTroveStatus(_depositor) == 1,
+            "StabilityPool: caller must have an active trove to withdraw ETHGain to"
+        );
     }
 
     function _requireUserHasETHGain(address _depositor) internal view {
@@ -924,16 +1012,24 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     function _requireFrontEndNotRegistered(address _address) internal view {
-        require(!frontEnds[_address].registered, "StabilityPool: must not already be a registered front end");
+        require(
+            !frontEnds[_address].registered,
+            "StabilityPool: must not already be a registered front end"
+        );
     }
 
-     function _requireFrontEndIsRegisteredOrZero(address _address) internal view {
-        require(frontEnds[_address].registered || _address == ADDRESS_ZERO,
-            "StabilityPool: Tag must be a registered front end, or the zero address");
+    function _requireFrontEndIsRegisteredOrZero(address _address) internal view {
+        require(
+            frontEnds[_address].registered || _address == ADDRESS_ZERO,
+            "StabilityPool: Tag must be a registered front end, or the zero address"
+        );
     }
 
-    function  _requireValidKickbackRate(uint _kickbackRate) internal pure {
-        require (_kickbackRate <= DECIMAL_PRECISION, "StabilityPool: Kickback rate must be in range [0,1]");
+    function _requireValidKickbackRate(uint _kickbackRate) internal pure {
+        require(
+            _kickbackRate <= DECIMAL_PRECISION,
+            "StabilityPool: Kickback rate must be in range [0,1]"
+        );
     }
 
     // --- Fallback function ---

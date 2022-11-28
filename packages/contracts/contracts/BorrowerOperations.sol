@@ -171,7 +171,10 @@ contract BorrowerOperations is
         require(address(masset) != address(0), "Masset address not set");
 
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, address(this));
-        require(zusdToken.transfer(address(masset), _ZUSDAmount), "Couldn't execute ZUSD transfer");
+        require(
+            zusdToken.approve(address(masset), _ZUSDAmount),
+            "Failed to approve ZUSD amount for Mynt mAsset to redeem"
+        );
         masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
     }
 
@@ -301,7 +304,8 @@ contract BorrowerOperations is
         _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
-    /// Borrow ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
+    /// Borrow (withdraw) ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
+    /// Zero Line of Credit owner can borrow a specified amount of ZUSD and convert it to DLLR via Sovryn Mynt
     function borrowZUSDAndConvertToDLLR(
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
@@ -310,7 +314,14 @@ contract BorrowerOperations is
     ) external override {
         uint256 balanceBefore = zusdToken.balanceOf(msg.sender);
         _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
-        require(zusdToken.balanceOf(msg.sender) == balanceBefore.add(_ZUSDAmount), "ZUSD is not borrowed correctly"); //TODO: check if fees are subtracted from the borrowing amount
+        require(
+            zusdToken.balanceOf(msg.sender) == balanceBefore.add(_ZUSDAmount),
+            "ZUSD is not borrowed correctly"
+        ); //TODO: check if fees are subtracted from the borrowing amount
+        require(
+            zusdToken.approve(address(masset), _ZUSDAmount),
+            "Failed to approve ZUSD amount for Mynt mAsset to redeem"
+        );
         masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
     }
 
@@ -327,10 +338,15 @@ contract BorrowerOperations is
     function repayZusdFromDLLR(
         uint256 _dllrAmount,
         address _upperHint,
-        address _lowerHint, 
+        address _lowerHint,
         IMasset.PermitParams memory _permitParams
     ) external override {
-        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(masset, _dllrAmount, address(zusdToken), _permitParams);
+        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
+            masset,
+            _dllrAmount,
+            address(zusdToken),
+            _permitParams
+        );
         _adjustTrove(msg.sender, 0, _ZUSDAmount, false, _upperHint, _lowerHint, 0);
     }
 
@@ -342,7 +358,15 @@ contract BorrowerOperations is
         address _upperHint,
         address _lowerHint
     ) external payable override {
-        _adjustTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
+        _adjustTrove(
+            msg.sender,
+            _collWithdrawal,
+            _ZUSDChange,
+            _isDebtIncrease,
+            _upperHint,
+            _lowerHint,
+            _maxFeePercentage
+        );
     }
 
     // in case of _isDebtIncrease = false masset contract must have an approval of NUE tokens
@@ -371,8 +395,8 @@ contract BorrowerOperations is
         );
         if (_isDebtIncrease && _ZUSDChange > 0) {
             require(
-                zusdToken.transfer(address(masset), _ZUSDChange),
-                "Couldn't execute ZUSD transfer"
+                zusdToken.approve(address(masset), _ZUSDChange),
+                "Failed to approve ZUSD amount for Mynt mAsset to redeem"
             );
             masset.mintTo(address(zusdToken), _ZUSDChange, msg.sender);
         }
@@ -556,7 +580,11 @@ contract BorrowerOperations is
         uint256 coll = troveManagerCached.getTroveColl(msg.sender);
         uint256 debt = troveManagerCached.getTroveDebt(msg.sender);
 
-        _requireSufficientZUSDBalance(zusdTokenCached, msg.sender, debt.sub(ZUSD_GAS_COMPENSATION));
+        _requireSufficientZUSDBalance(
+            zusdTokenCached,
+            msg.sender,
+            debt.sub(ZUSD_GAS_COMPENSATION)
+        );
 
         uint256 newTCR = _getNewTCRFromTroveChange(coll, false, debt, false, price);
         _requireNewTCRisAboveCCR(newTCR);
@@ -606,11 +634,10 @@ contract BorrowerOperations is
         return usdValue;
     }
 
-    function _getCollChange(uint256 _collReceived, uint256 _requestedCollWithdrawal)
-        internal
-        pure
-        returns (uint256 collChange, bool isCollIncrease)
-    {
+    function _getCollChange(
+        uint256 _collReceived,
+        uint256 _requestedCollWithdrawal
+    ) internal pure returns (uint256 collChange, bool isCollIncrease) {
         if (_collReceived != 0) {
             collChange = _collReceived;
             isCollIncrease = true;
@@ -664,7 +691,7 @@ contract BorrowerOperations is
 
     /// Send ETH to Active Pool and increase its recorded ETH balance
     function _activePoolAddColl(IActivePool _activePool, uint256 _amount) internal {
-        (bool success, ) = address(_activePool).call{value: _amount}("");
+        (bool success, ) = address(_activePool).call{ value: _amount }("");
         require(success, "BorrowerOps: Sending ETH to ActivePool failed");
     }
 
@@ -707,7 +734,10 @@ contract BorrowerOperations is
         );
     }
 
-    function _requireNonZeroAdjustment(uint256 _collWithdrawal, uint256 _ZUSDChange) internal view {
+    function _requireNonZeroAdjustment(
+        uint256 _collWithdrawal,
+        uint256 _ZUSDChange
+    ) internal view {
         require(
             msg.value != 0 || _collWithdrawal != 0 || _ZUSDChange != 0,
             "BorrowerOps: There must be either a collateral change or a debt change"
@@ -719,7 +749,10 @@ contract BorrowerOperations is
         require(status == 1, "BorrowerOps: Trove does not exist or is closed");
     }
 
-    function _requireTroveisNotActive(ITroveManager _troveManager, address _borrower) internal view {
+    function _requireTroveisNotActive(
+        ITroveManager _troveManager,
+        address _borrower
+    ) internal view {
         uint256 status = _troveManager.getTroveStatus(_borrower);
         require(status != 1, "BorrowerOps: Trove is active");
     }
@@ -816,7 +849,10 @@ contract BorrowerOperations is
         );
     }
 
-    function _requireValidZUSDRepayment(uint256 _currentDebt, uint256 _debtRepayment) internal pure {
+    function _requireValidZUSDRepayment(
+        uint256 _currentDebt,
+        uint256 _debtRepayment
+    ) internal pure {
         require(
             _debtRepayment <= _currentDebt.sub(ZUSD_GAS_COMPENSATION),
             "BorrowerOps: Amount repaid must not be larger than the Trove's debt"
@@ -838,10 +874,10 @@ contract BorrowerOperations is
         );
     }
 
-    function _requireValidMaxFeePercentage(uint256 _maxFeePercentage, bool _isRecoveryMode)
-        internal
-        view
-    {
+    function _requireValidMaxFeePercentage(
+        uint256 _maxFeePercentage,
+        bool _isRecoveryMode
+    ) internal view {
         if (_isRecoveryMode) {
             require(
                 _maxFeePercentage <= DECIMAL_PRECISION,

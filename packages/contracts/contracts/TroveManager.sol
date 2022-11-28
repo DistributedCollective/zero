@@ -1160,6 +1160,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         require(success, string(returndata));
     }
 
+    /// @dev    this function forwards the call to the troveManagerRedeemOps in a delegate call fashion
+    ///         so the parameters are not needed
+    ///DLLR _owner or _spender can use Sovryn Mynt to convert DLLR to ZUSD, then use the Zero redemption mechanism to redeem ZUSD for RBTC, all in a single transaction
     function redeemCollateralViaDLLR(
         uint256 _dllrAmount,
         address _firstRedemptionHint,
