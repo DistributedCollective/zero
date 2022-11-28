@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
  * @title Interface for contract governance/FeeSharingProxy.sol
  * @dev Interfaces are used to cast a contract address into a callable instance.
  * */
-interface IFeeSharingProxy {
+interface IFeeSharingCollector {
 	function withdrawFees(address _token) external;
 
 	function transferTokens(address _token, uint96 _amount) external;

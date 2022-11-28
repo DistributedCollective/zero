@@ -42,7 +42,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         checkContract(_zusdTokenAddress);
         checkContract(_activePoolAddress);
 
-        sovFeeCollector = IFeeSharingProxy(_sovFeeCollectorAddress);
+        sovFeeCollector = IFeeSharingCollector(_sovFeeCollectorAddress);
         zeroStaking = IZEROStaking(_zeroStakingAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);

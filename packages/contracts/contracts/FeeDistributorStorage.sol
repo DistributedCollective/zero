@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-import "./Interfaces/IFeeSharingProxy.sol";
+import "./Interfaces/IFeeSharingCollector.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/ITroveManager.sol";
@@ -15,7 +15,7 @@ contract FeeDistributorStorage is Ownable {
 
     // --- Connected contract declarations ---
 
-    IFeeSharingProxy public sovFeeCollector;
+    IFeeSharingCollector public sovFeeCollector;
 
     IZEROStaking public zeroStaking;
 

@@ -96,7 +96,7 @@ contract('BorrowerWrappers', async accounts => {
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     wrbtcToken = contracts.wrbtcTokenTester
-    sovFeeCollector = ZEROContracts.mockFeeSharingProxy.address
+    sovFeeCollector = ZEROContracts.mockFeeSharingCollector.address
 
     ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION()
   })
