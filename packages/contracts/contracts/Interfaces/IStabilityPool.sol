@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 
+
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
+
+import "../Dependencies/Mynt/IMasset.sol";
 
 /*
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
@@ -211,6 +215,11 @@ interface IStabilityPool {
      * @return the front end's compounded stake.
      */
     function getCompoundedFrontEndStake(address _frontEnd) external view returns (uint);
+
+    //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
+    function provideToSpFromDLLR(uint _dllrAmount, IMasset.PermitParams memory _permitParams) external;
+
+    function provideToSpFromDllrBySpender(uint _dllrAmount, IMasset.PermitParams memory _permitParams, address _dllrOwner) external; 
 
     /**
      * Fallback function

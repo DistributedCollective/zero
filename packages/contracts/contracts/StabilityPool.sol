@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
 
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
-import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IZUSDToken.sol';
 import './Interfaces/ISortedTroves.sol';
@@ -12,7 +12,7 @@ import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/LiquitySafeMath128.sol";
 import "./Dependencies/CheckContract.sol";
-import "./Dependencies/console.sol";
+import "./Dependencies/Mynt/MyntLib.sol";
 import "./StabilityPoolStorage.sol";
 
 /**
@@ -146,6 +146,7 @@ import "./StabilityPoolStorage.sol";
  */
 contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, IStabilityPool {
     using LiquitySafeMath128 for uint128;
+    address private constant ADDRESS_ZERO = address(0);
 
     // --- Events ---
 
@@ -248,6 +249,10 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
     */
     function provideToSP(uint _amount, address _frontEndTag) external override {
+        _provideToSP(_amount, _frontEndTag);
+    }
+
+    function _provideToSP(uint _amount, address _frontEndTag) internal {
         _requireFrontEndIsRegisteredOrZero(_frontEndTag);
         _requireFrontEndNotRegistered(msg.sender);
         _requireNonZeroAmount(_amount);
@@ -284,6 +289,20 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         _sendETHGainToDepositor(depositorETHGain);
      }
 
+     //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
+
+    function provideToSpFromDLLR(uint _dllrAmount, IMasset.PermitParams memory _permitParams) external override {
+        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(borrowerOperations.getMasset(), _dllrAmount, address(zusdToken), _permitParams);
+        _provideToSP(_ZUSDAmount, ADDRESS_ZERO);
+    }
+
+    function provideToSpFromDllrBySpender(uint _dllrAmount, IMasset.PermitParams memory _permitParams, address _dllrOwner) external override {
+        IERC20 dllr = IERC20(borrowerOperations.getMasset().getToken());
+        require(dllr.transferFrom(_dllrOwner, msg.sender, _dllrAmount), "SP: transferFrom DLLR failed");
+        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(borrowerOperations.getMasset(), _dllrAmount, address(zusdToken), _permitParams);
+        _provideToSP(_ZUSDAmount, ADDRESS_ZERO);
+    }
+
     /**  withdrawFromSP():
     *
     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
@@ -295,6 +314,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     * If _amount > userDeposit, the user withdraws all of their compounded deposit.
     */
     function withdrawFromSP(uint _amount) external override {
+        _withdrawFromSP(_amount);
+    }
+    function _withdrawFromSP(uint _amount) internal {
         if (_amount !=0) {_requireNoUnderCollateralizedTroves();}
         uint initialDeposit = deposits[msg.sender].initialValue;
         _requireUserHasDeposit(initialDeposit);
@@ -329,6 +351,14 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit ETHGainWithdrawn(msg.sender, depositorETHGain, ZUSDLoss);  // ZUSD Loss required for event log
 
         _sendETHGainToDepositor(depositorETHGain);
+    }
+
+     //Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
+    function withdrawFromSPAndConvertToDLLR(uint256 _zusdAmount) external {
+        IMasset masset = borrowerOperations.getMasset();
+        _withdrawFromSP(_zusdAmount);
+        require(zusdToken.approve(address(masset), _zusdAmount), "Failed to approve ZUSD amount for Mynt mAsset to redeem");
+        masset.mintTo(address(zusdToken), _zusdAmount, msg.sender);
     }
 
     /** withdrawETHGainToTrove:
@@ -612,7 +642,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         * Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
         * which they made their deposit.
         */
-        uint kickbackRate = frontEndTag == address(0) ? DECIMAL_PRECISION : frontEnds[frontEndTag].kickbackRate;
+        uint kickbackRate = frontEndTag == ADDRESS_ZERO ? DECIMAL_PRECISION : frontEnds[frontEndTag].kickbackRate;
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
@@ -842,7 +872,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     function _payOutZEROGains(ICommunityIssuance _communityIssuance, address _depositor, address _frontEnd) internal {
         // Pay out front end's ZERO gain
-        if (_frontEnd != address(0)) {
+        if (_frontEnd != ADDRESS_ZERO) {
             uint frontEndZEROGain = getFrontEndZEROGain(_frontEnd);
             _communityIssuance.sendZERO(_frontEnd, frontEndZEROGain);
             emit ZEROPaidToFrontEnd(_frontEnd, frontEndZEROGain);
@@ -898,7 +928,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
      function _requireFrontEndIsRegisteredOrZero(address _address) internal view {
-        require(frontEnds[_address].registered || _address == address(0),
+        require(frontEnds[_address].registered || _address == ADDRESS_ZERO,
             "StabilityPool: Tag must be a registered front end, or the zero address");
     }
 

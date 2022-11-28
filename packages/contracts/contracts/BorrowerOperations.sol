@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
 
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/ITroveManager.sol";
@@ -13,6 +14,7 @@ import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 import "./BorrowerOperationsStorage.sol";
+import "./Dependencies/Mynt/MyntLib.sol";
 
 contract BorrowerOperations is
     LiquityBase,
@@ -170,7 +172,7 @@ contract BorrowerOperations is
 
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, address(this));
         require(zusdToken.transfer(address(masset), _ZUSDAmount), "Couldn't execute ZUSD transfer");
-        masset.onTokensMinted(_ZUSDAmount, address(zusdToken), abi.encode(msg.sender));
+        masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
     }
 
     // --- Borrower Trove Operations ---
@@ -299,12 +301,36 @@ contract BorrowerOperations is
         _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
+    /// Borrow ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
+    function borrowZUSDAndConvertToDLLR(
+        uint256 _maxFeePercentage,
+        uint256 _ZUSDAmount,
+        address _upperHint,
+        address _lowerHint
+    ) external override {
+        uint256 balanceBefore = zusdToken.balanceOf(msg.sender);
+        _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
+        require(zusdToken.balanceOf(msg.sender) == balanceBefore.add(_ZUSDAmount), "ZUSD is not borrowed correctly"); //TODO: check if fees are subtracted from the borrowing amount
+        masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
+    }
+
     /// Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly
     function repayZUSD(
         uint256 _ZUSDAmount,
         address _upperHint,
         address _lowerHint
     ) external override {
+        _adjustTrove(msg.sender, 0, _ZUSDAmount, false, _upperHint, _lowerHint, 0);
+    }
+
+    /// Repay ZUSD tokens to a Trove by DLLR: convert DLLR to ZUSD tokens, and then reduce the trove's debt accordingly
+    function repayZusdFromDLLR(
+        uint256 _dllrAmount,
+        address _upperHint,
+        address _lowerHint, 
+        IMasset.PermitParams memory _permitParams
+    ) external override {
+        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(masset, _dllrAmount, address(zusdToken), _permitParams);
         _adjustTrove(msg.sender, 0, _ZUSDAmount, false, _upperHint, _lowerHint, 0);
     }
 
@@ -316,15 +342,7 @@ contract BorrowerOperations is
         address _upperHint,
         address _lowerHint
     ) external payable override {
-        _adjustTrove(
-            msg.sender,
-            _collWithdrawal,
-            _ZUSDChange,
-            _isDebtIncrease,
-            _upperHint,
-            _lowerHint,
-            _maxFeePercentage
-        );
+        _adjustTrove(msg.sender, _collWithdrawal, _ZUSDChange, _isDebtIncrease, _upperHint, _lowerHint, _maxFeePercentage);
     }
 
     // in case of _isDebtIncrease = false masset contract must have an approval of NUE tokens
@@ -356,7 +374,7 @@ contract BorrowerOperations is
                 zusdToken.transfer(address(masset), _ZUSDChange),
                 "Couldn't execute ZUSD transfer"
             );
-            masset.onTokensMinted(_ZUSDChange, address(zusdToken), abi.encode(msg.sender));
+            masset.mintTo(address(zusdToken), _ZUSDChange, msg.sender);
         }
     }
 
@@ -925,5 +943,9 @@ contract BorrowerOperations is
 
     function BORROWING_FEE_FLOOR() external view override returns (uint256) {
         return liquityBaseParams.BORROWING_FEE_FLOOR();
+    }
+
+    function getMasset() external view override returns (IMasset) {
+        return masset;
     }
 }

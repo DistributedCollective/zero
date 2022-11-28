@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
+
+import "../Dependencies/Mynt/IMasset.sol";
 
 /// Common interface for the Trove Manager.
 interface IBorrowerOperations {
@@ -141,6 +144,14 @@ interface IBorrowerOperations {
         address _lowerHint
     ) external;
 
+    /// Borrow (withdraw) ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
+    function borrowZUSDAndConvertToDLLR(
+        uint256 _maxFeePercentage,
+        uint256 _ZUSDAmount,
+        address _upperHint,
+        address _lowerHint
+    ) external;
+
     /// @notice repay `_amount` of ZUSD to the caller’s Trove, subject to leaving 50 debt in the Trove (which corresponds to the 50 ZUSD gas compensation).
     /// @param _amount ZUSD amount to repay
     /// @param _upperHint upper trove id hint
@@ -149,6 +160,14 @@ interface IBorrowerOperations {
         uint256 _amount,
         address _upperHint,
         address _lowerHint
+    ) external;
+
+    /// Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly
+    function repayZusdFromDLLR(
+        uint256 _dllrAmount,
+        address _upperHint,
+        address _lowerHint, 
+        IMasset.PermitParams memory _permitParams
     ) external;
 
     /**
@@ -216,4 +235,7 @@ interface IBorrowerOperations {
     function getCompositeDebt(uint256 _debt) external view returns (uint256);
 
     function BORROWING_FEE_FLOOR() external view returns (uint256);
+
+    function getMasset() external view returns (IMasset);
+
 }

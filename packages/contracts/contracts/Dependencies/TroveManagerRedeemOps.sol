@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
 
+import "../Dependencies/Mynt/MyntLib.sol";
+import "../Interfaces/IBorrowerOperations.sol";
 import "./TroveManagerBase.sol";
 
 contract TroveManagerRedeemOps is TroveManagerBase {
@@ -35,6 +38,55 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         uint256 _maxIterations,
         uint256 _maxFeePercentage
     ) external {
+        _redeemCollateral(
+            _ZUSDamount,
+            _firstRedemptionHint,
+            _upperPartialRedemptionHint,
+            _lowerPartialRedemptionHint,
+            _partialRedemptionHintNICR,
+            _maxIterations,
+            _maxFeePercentage
+        );
+    }
+
+    ///DLLR _owner or _spender can use Sovryn Mynt to convert DLLR to ZUSD, then use the Zero redemption mechanism to redeem ZUSD for RBTC, all in a single transaction
+
+    function redeemCollateralViaDLLR(
+        uint256 _dllrAmount,
+        address _firstRedemptionHint,
+        address _upperPartialRedemptionHint,
+        address _lowerPartialRedemptionHint,
+        uint256 _partialRedemptionHintNICR,
+        uint256 _maxIterations,
+        uint256 _maxFeePercentage,
+        IMasset.PermitParams memory _permitParams
+    ) external {
+        uint256 _zusdAmount = MyntLib.redeemFromDLLR(
+            IBorrowerOperations(borrowerOperationsAddress).getMasset(),
+            _dllrAmount,
+            address(_zusdToken),
+            _permitParams
+        );
+        _redeemCollateral(
+            _zusdAmount,
+            _firstRedemptionHint,
+            _upperPartialRedemptionHint,
+            _lowerPartialRedemptionHint,
+            _partialRedemptionHintNICR,
+            _maxIterations,
+            _maxFeePercentage
+        );
+    }
+
+    function _redeemCollateral(
+        uint256 _ZUSDamount,
+        address _firstRedemptionHint,
+        address _upperPartialRedemptionHint,
+        address _lowerPartialRedemptionHint,
+        uint256 _partialRedemptionHintNICR,
+        uint256 _maxIterations,
+        uint256 _maxFeePercentage
+    ) internal {
         ContractsCache memory contractsCache = ContractsCache(
             activePool,
             defaultPool,
@@ -133,7 +185,12 @@ contract TroveManagerRedeemOps is TroveManagerBase {
 
         totals.ETHToSendToRedeemer = totals.totalETHDrawn.sub(totals.ETHFee);
 
-        emit Redemption(_ZUSDamount, totals.totalZUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
+        emit Redemption(
+            _ZUSDamount,
+            totals.totalZUSDToRedeem,
+            totals.totalETHDrawn,
+            totals.ETHFee
+        );
 
         // Burn the total ZUSD that is cancelled with debt, and send the redeemed ETH to msg.sender
         contractsCache.zusdToken.burn(msg.sender, totals.totalZUSDToRedeem);
@@ -141,6 +198,28 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         contractsCache.activePool.decreaseZUSDDebt(totals.totalZUSDToRedeem);
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
+
+    /*function redeemCollateralViaDllr(
+        uint256 _dllrAmount,
+        address _firstRedemptionHint,
+        address _upperPartialRedemptionHint,
+        address _lowerPartialRedemptionHint,
+        uint256 _partialRedemptionHintNICR,
+        uint256 _maxIterations,
+        uint256 _maxFeePercentage, 
+        IMasset.PermitParams memory _permitParams
+    ) external {
+        uint256 _zusdAmount = MyntLib.redeemFromDLLR(IBorrowerOperations(borrowerOperationsAddress).getMasset(), _dllrAmount, address(_zusdToken), _permitParams);
+        _redeemCollateral(
+            _zusdAmount,
+            _firstRedemptionHint,
+            _upperPartialRedemptionHint,
+            _lowerPartialRedemptionHint,
+            _partialRedemptionHintNICR,
+            _maxIterations,
+            _maxFeePercentage
+        );
+    }*/
 
     function _isValidFirstRedemptionHint(
         ISortedTroves _sortedTroves,
@@ -156,7 +235,8 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         }
 
         address nextTrove = _sortedTroves.getNext(_firstRedemptionHint);
-        return nextTrove == address(0) || _getCurrentICR(nextTrove, _price) < liquityBaseParams.MCR();
+        return
+            nextTrove == address(0) || _getCurrentICR(nextTrove, _price) < liquityBaseParams.MCR();
     }
 
     /// Redeem as much collateral as possible from _borrower's Trove in exchange for ZUSD up to _maxZUSDamount
