@@ -4,13 +4,13 @@ import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/
 import { Contract, ethers } from "ethers";
 import {
   _connectToContracts,
-  _LiquityContractAddresses,
-  _LiquityContracts,
-  _LiquityDeploymentJSON,
+  _ZeroContractAddresses,
+  _ZeroContracts,
+  _ZeroDeploymentJSON,
   _priceFeedIsTestnet as checkPriceFeedIsTestnet
 } from "../src/contracts";
 import { PriceFeed } from "../types";
-import upgradeableProxy from "../abi/TroveManagerRedeemOps.json";
+import upgradeableProxy from "../abi/LoCManagerRedeemOps.json";
 import { Ownable } from "../types";
 
 let silent = true;
@@ -96,7 +96,7 @@ const deployContracts = async (
   isMainnet?: boolean,
   notTestnet?: boolean,
   overrides?: Overrides
-): Promise<{ addresses: Omit<_LiquityContractAddresses, "nueToken">; startBlock: number }> => {
+): Promise<{ addresses: Omit<_ZeroContractAddresses, "nueToken">; startBlock: number }> => {
   const [gasPool, startBlock] = await deployContractAndGetBlockNumber(
     deployer,
     getContractFactory,
@@ -118,13 +118,13 @@ const deployContracts = async (
         ...overrides
       }
     ),
-    troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
+    locManager: await deployContractWithProxy(deployer, getContractFactory, "LoCManager", {
       ...overrides
     }),
 
-    troveManagerRedeemOps: isMainnet || notTestnet
-      ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
-      : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
+    locManagerRedeemOps: isMainnet || notTestnet
+      ? await deployContract(deployer, getContractFactory, "LoCManagerRedeemOps", { ...overrides })
+      : await deployContract(deployer, getContractFactory, "LoCManagerRedeemOpsTestnet", {
           ...overrides
         }),
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
@@ -150,17 +150,17 @@ const deployContracts = async (
     priceFeed: priceFeedIsTestnet
       ? await deployContract(deployer, getContractFactory, "PriceFeedTestnet", { ...overrides })
       : await deployContractWithProxy(deployer, getContractFactory, "PriceFeed", { ...overrides }),
-    sortedTroves: await deployContractWithProxy(deployer, getContractFactory, "SortedTroves", {
+    sortedLoCs: await deployContractWithProxy(deployer, getContractFactory, "SortedLoCs", {
       ...overrides
     }),
     stabilityPool: await deployContractWithProxy(deployer, getContractFactory, "StabilityPool", {
       ...overrides
     }),
     gasPool: gasPool.address,
-    liquityBaseParams: await deployContractWithProxy(
+    zeroBaseParams: await deployContractWithProxy(
       deployer,
       getContractFactory,
-      "LiquityBaseParams",
+      "ZeroBaseParams",
       {
         ...overrides
       }
@@ -186,10 +186,10 @@ const deployContracts = async (
         ...overrides
       }),
 
-      multiTroveGetter: await deployContractWithProxy(
+      multiLoCGetter: await deployContractWithProxy(
         deployer,
         getContractFactory,
-        "MultiTroveGetter",
+        "MultiLoCGetter",
         {
           ...overrides
         }
@@ -204,8 +204,8 @@ const connectContracts = async (
   {
     activePool,
     borrowerOperations,
-    troveManager,
-    troveManagerRedeemOps,
+    locManager,
+    locManagerRedeemOps,
     zusdToken,
     collSurplusPool,
     communityIssuance,
@@ -213,14 +213,14 @@ const connectContracts = async (
     zeroToken,
     hintHelpers,
     zeroStaking,
-    multiTroveGetter,
+    multiLoCGetter,
     priceFeed,
-    sortedTroves,
+    sortedLoCs,
     stabilityPool,
     gasPool,
-    liquityBaseParams,
+    zeroBaseParams,
     feeDistributor
-  }: _LiquityContracts,
+  }: _ZeroContracts,
   deployer: Signer,
   governanceAddress: string,
   sovFeeCollectorAddress: string,
@@ -238,7 +238,7 @@ const connectContracts = async (
 
   let connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
     nonce =>
-      liquityBaseParams.initialize({
+      zeroBaseParams.initialize({
         ...overrides,
         nonce
       }),
@@ -255,16 +255,16 @@ const connectContracts = async (
       ),
 
     nonce =>
-      sortedTroves.setParams(1e6, troveManager.address, borrowerOperations.address, {
+      sortedLoCs.setParams(1e6, locManager.address, borrowerOperations.address, {
         ...overrides,
         nonce
       }),
 
     nonce =>
-      troveManager.setAddresses(
+      locManager.setAddresses(
         feeDistributor.address,
-        troveManagerRedeemOps.address,
-        liquityBaseParams.address,
+        locManagerRedeemOps.address,
+        zeroBaseParams.address,
         borrowerOperations.address,
         activePool.address,
         defaultPool.address,
@@ -273,7 +273,7 @@ const connectContracts = async (
         collSurplusPool.address,
         priceFeed.address,
         zusdToken.address,
-        sortedTroves.address,
+        sortedLoCs.address,
         zeroToken.address,
         zeroStaking.address,
         { ...overrides, nonce }
@@ -282,15 +282,15 @@ const connectContracts = async (
     nonce =>
       borrowerOperations.setAddresses(
         feeDistributor.address,
-        liquityBaseParams.address,
-        troveManager.address,
+        zeroBaseParams.address,
+        locManager.address,
         activePool.address,
         defaultPool.address,
         stabilityPool.address,
         gasPool.address,
         collSurplusPool.address,
         priceFeed.address,
-        sortedTroves.address,
+        sortedLoCs.address,
         zusdToken.address,
         zeroStaking.address,
         { ...overrides, nonce }
@@ -298,12 +298,12 @@ const connectContracts = async (
 
     nonce =>
       stabilityPool.setAddresses(
-        liquityBaseParams.address,
+        zeroBaseParams.address,
         borrowerOperations.address,
-        troveManager.address,
+        locManager.address,
         activePool.address,
         zusdToken.address,
-        sortedTroves.address,
+        sortedLoCs.address,
         priceFeed.address,
         communityIssuance.address,
         { ...overrides, nonce }
@@ -312,14 +312,14 @@ const connectContracts = async (
     nonce =>
       activePool.setAddresses(
         borrowerOperations.address,
-        troveManager.address,
+        locManager.address,
         stabilityPool.address,
         defaultPool.address,
         { ...overrides, nonce }
       ),
 
     nonce =>
-      defaultPool.setAddresses(troveManager.address, activePool.address, {
+      defaultPool.setAddresses(locManager.address, activePool.address, {
         ...overrides,
         nonce
       }),
@@ -327,16 +327,16 @@ const connectContracts = async (
     nonce =>
       collSurplusPool.setAddresses(
         borrowerOperations.address,
-        troveManager.address,
+        locManager.address,
         activePool.address,
         { ...overrides, nonce }
       ),
 
     nonce =>
       hintHelpers.setAddresses(
-        liquityBaseParams.address,
-        sortedTroves.address,
-        troveManager.address,
+        zeroBaseParams.address,
+        sortedLoCs.address,
+        locManager.address,
         {
           ...overrides,
           nonce
@@ -359,7 +359,7 @@ const connectContracts = async (
       }),
 
     nonce =>
-      multiTroveGetter.setAddresses(troveManager.address, sortedTroves.address, {
+      multiLoCGetter.setAddresses(locManager.address, sortedLoCs.address, {
         ...overrides,
         nonce
       }),
@@ -369,7 +369,7 @@ const connectContracts = async (
         sovFeeCollectorAddress,
         zeroStaking.address,
         borrowerOperations.address,
-        troveManager.address,
+        locManager.address,
         wrbtcAddress,
         zusdToken.address,
         activePool.address,
@@ -381,7 +381,7 @@ const connectContracts = async (
     connections = [
       nonce =>
         zusdToken.initialize(
-          troveManager.address,
+          locManager.address,
           stabilityPool.address,
           borrowerOperations.address,
           {
@@ -407,8 +407,8 @@ const transferOwnership = async (
   {
     activePool,
     borrowerOperations,
-    troveManager,
-    troveManagerRedeemOps,
+    locManager,
+    locManagerRedeemOps,
     zusdToken,
     zeroToken,
     collSurplusPool,
@@ -416,13 +416,13 @@ const transferOwnership = async (
     defaultPool,
     hintHelpers,
     zeroStaking,
-    multiTroveGetter,
+    multiLoCGetter,
     priceFeed,
-    sortedTroves,
+    sortedLoCs,
     stabilityPool,
-    liquityBaseParams,
+    zeroBaseParams,
     feeDistributor
-  }: _LiquityContracts,
+  }: _ZeroContracts,
   deployer: Signer,
   governanceAddress: string,
   priceFeedIsTestnet: boolean,
@@ -451,12 +451,12 @@ const transferOwnership = async (
         nonce
       }),
     nonce =>
-      troveManager.setOwner(governanceAddress, {
+      locManager.setOwner(governanceAddress, {
         ...overrides,
         nonce
       }),
     nonce =>
-      troveManagerRedeemOps.setOwner(governanceAddress, {
+      locManagerRedeemOps.setOwner(governanceAddress, {
         ...overrides,
         nonce
       }),
@@ -498,7 +498,7 @@ const transferOwnership = async (
         nonce
       }),
     nonce =>
-      multiTroveGetter.setOwner(governanceAddress, {
+      multiLoCGetter.setOwner(governanceAddress, {
         ...overrides,
         nonce
       }),
@@ -508,12 +508,12 @@ const transferOwnership = async (
         nonce
       }),
     nonce =>
-      sortedTroves.setOwner(governanceAddress, {
+      sortedLoCs.setOwner(governanceAddress, {
         ...overrides,
         nonce
       }),
     nonce =>
-      liquityBaseParams.setOwner(governanceAddress, {
+      zeroBaseParams.setOwner(governanceAddress, {
         ...overrides,
         nonce
       })
@@ -559,7 +559,7 @@ export const deployAndSetupContracts = async (
   isMainnet?: boolean,
   notTestnet?: boolean,
   overrides?: Overrides
-): Promise<_LiquityDeploymentJSON> => {
+): Promise<_ZeroDeploymentJSON> => {
   if (!deployer.provider) {
     throw new Error("Signer must have a provider.");
   }
@@ -592,7 +592,7 @@ export const deployAndSetupContracts = async (
 
   const _priceFeedIsTestnet = externalPriceFeeds === undefined;
 
-  const deployment: _LiquityDeploymentJSON = {
+  const deployment: _ZeroDeploymentJSON = {
     chainId: await deployer.getChainId(),
     version: "unknown",
     deploymentDate: new Date().getTime(),
@@ -614,7 +614,7 @@ export const deployAndSetupContracts = async (
       notTestnet,
       overrides
     ))
-  } as _LiquityDeploymentJSON;
+  } as _ZeroDeploymentJSON;
 
   const contracts = _connectToContracts(deployer, deployment);
 
@@ -663,7 +663,7 @@ export const deployAndSetupContracts = async (
   await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
 
   const zeroTokenDeploymentTime = await contracts.zeroToken.getDeploymentStartTime();
-  const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();
+  const bootstrapPeriod = await contracts.locManager.BOOTSTRAP_PERIOD();
 
   return {
     ...deployment,

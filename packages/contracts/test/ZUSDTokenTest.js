@@ -84,7 +84,7 @@ contract("ZUSDToken", async accounts => {
   let zusdTokenOriginal;
   let zusdTokenTester;
   let stabilityPool;
-  let troveManager;
+  let locManager;
   let borrowerOperations;
 
   let tokenName;
@@ -112,7 +112,7 @@ contract("ZUSDToken", async accounts => {
       chainId = await zusdTokenOriginal.getChainId();
 
       stabilityPool = contracts.stabilityPool;
-      troveManager = contracts.stabilityPool;
+      locManager = contracts.stabilityPool;
       borrowerOperations = contracts.borrowerOperations;
 
       tokenVersion = await zusdTokenOriginal.version();
@@ -251,7 +251,7 @@ contract("ZUSDToken", async accounts => {
     it("transfer(): transferring to a blacklisted address reverts", async () => {
       await assertRevert(zusdTokenTester.transfer(zusdTokenTester.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(troveManager.address, 1, { from: alice }));
+      await assertRevert(zusdTokenTester.transfer(locManager.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(stabilityPool.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice }));
     });
@@ -324,7 +324,7 @@ contract("ZUSDToken", async accounts => {
     it("transfer(): transferring to a blacklisted address reverts", async () => {
       await assertRevert(zusdTokenTester.transfer(zusdTokenTester.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(troveManager.address, 1, { from: alice }));
+      await assertRevert(zusdTokenTester.transfer(locManager.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(stabilityPool.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice }));
     });

@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 import "../libraries/BorrowerLib.sol";
 import "../libraries/LiquidationLib.sol";
 import "../libraries/StabilityPoolLib.sol";
-import "../libraries/TroveStatisticsLib.sol";
+import "../libraries/LoCStatisticsLib.sol";
 
 contract TestIntegration {
     address private libraryContractAddress;
@@ -68,12 +68,12 @@ contract TestIntegration {
         StabilityPoolLib.withdrawFromSP(_amount, libraryContractAddress);
     }
 
-    function testWithdrawRBTCGainToTrove() external {
-        StabilityPoolLib.withdrawRBTCGainToTrove(libraryContractAddress);
+    function testWithdrawRBTCGainToLoC() external {
+        StabilityPoolLib.withdrawRBTCGainToLoC(libraryContractAddress);
     }
 
     function testGetNominalICR(address _borrower) external view returns (uint256 collateralRatio) {
-        return TroveStatisticsLib.getNominalICR(libraryContractAddress, _borrower);
+        return LoCStatisticsLib.getNominalICR(libraryContractAddress, _borrower);
     }
 
     function testGetEntireDebtAndColl(address _borrower)
@@ -86,14 +86,14 @@ contract TestIntegration {
             uint256 pendingRBTCReward
         )
     {
-        return TroveStatisticsLib.getEntireDebtAndColl(libraryContractAddress, _borrower);
+        return LoCStatisticsLib.getEntireDebtAndColl(libraryContractAddress, _borrower);
     }
 
-    function testCalculateBorrowingFee(uint256 _ZUSDDebt)
+    function testCalculateOriginationFee(uint256 _ZUSDDebt)
         external
         view
-        returns (uint256 borrowingFee)
+        returns (uint256 originationFee)
     {
-        return TroveStatisticsLib.calculateBorrowingFee(libraryContractAddress, _ZUSDDebt);
+        return LoCStatisticsLib.calculateOriginationFee(libraryContractAddress, _ZUSDDebt);
     }
 }

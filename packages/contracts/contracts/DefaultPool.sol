@@ -9,35 +9,35 @@ import "./Dependencies/console.sol";
 import "./DefaultPoolStorage.sol";
 
 /**
- * The Default Pool holds the ETH and ZUSD debt (but not ZUSD tokens) from liquidations that have been redistributed
- * to active troves but not yet "applied", i.e. not yet recorded on a recipient active trove's struct.
+ * The Default Pool holds the BTC and ZUSD debt (but not ZUSD tokens) from liquidations that have been redistributed
+ * to active locs but not yet "applied", i.e. not yet recorded on a recipient active LoC's struct.
  *
- * When a trove makes an operation that applies its pending ETH and ZUSD debt, its pending ETH and ZUSD debt is moved
+ * When a LoC makes an operation that applies its pending BTC and ZUSD debt, its pending BTC and ZUSD debt is moved
  * from the Default Pool to the Active Pool.
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     using SafeMath for uint256;
     
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event DefaultPoolETHBalanceUpdated(uint _ETH);
+    event DefaultPoolBTCBalanceUpdated(uint _BTC);
 
     // --- Dependency setters ---
 
     function setAddresses(
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress
     )
         external
         onlyOwner
     {
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_activePoolAddress);
 
-        troveManagerAddress = _troveManagerAddress;
+        locManagerAddress = _locManagerAddress;
         activePoolAddress = _activePoolAddress;
 
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
 
         
@@ -46,12 +46,12 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     // --- Getters for public variables. Required by IPool interface ---
 
     /**
-    * @return the ETH state variable.
+    * @return the BTC state variable.
     *
-    * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
+    * Not necessarily equal to the the contract's raw BTC balance - bitcoin can be forcibly sent to contracts.
     */
-    function getETH() external view override returns (uint) {
-        return ETH;
+    function getBTC() external view override returns (uint) {
+        return BTC;
     }
 
     function getZUSDDebt() external view override returns (uint) {
@@ -60,25 +60,25 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
     // --- Pool functionality ---
 
-    function sendETHToActivePool(uint _amount) external override {
-        _requireCallerIsTroveManager();
+    function sendBTCToActivePool(uint _amount) external override {
+        _requireCallerIsLoCManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
-        ETH = ETH.sub(_amount);
-        emit DefaultPoolETHBalanceUpdated(ETH);
-        emit EtherSent(activePool, _amount);
+        BTC = BTC.sub(_amount);
+        emit DefaultPoolBTCBalanceUpdated(BTC);
+        emit BTCSent(activePool, _amount);
 
         (bool success, ) = activePool.call{ value: _amount }("");
-        require(success, "DefaultPool: sending ETH failed");
+        require(success, "DefaultPool: sending BTC failed");
     }
 
     function increaseZUSDDebt(uint _amount) external override {
-        _requireCallerIsTroveManager();
+        _requireCallerIsLoCManager();
         ZUSDDebt = ZUSDDebt.add(_amount);
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
     function decreaseZUSDDebt(uint _amount) external override {
-        _requireCallerIsTroveManager();
+        _requireCallerIsLoCManager();
         ZUSDDebt = ZUSDDebt.sub(_amount);
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
@@ -89,15 +89,15 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         require(msg.sender == activePoolAddress, "DefaultPool: Caller is not the ActivePool");
     }
 
-    function _requireCallerIsTroveManager() internal view {
-        require(msg.sender == troveManagerAddress, "DefaultPool: Caller is not the TroveManager");
+    function _requireCallerIsLoCManager() internal view {
+        require(msg.sender == locManagerAddress, "DefaultPool: Caller is not the LoCManager");
     }
 
     // --- Fallback function ---
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
-        emit DefaultPoolETHBalanceUpdated(ETH);
+        BTC = BTC.add(msg.value);
+        emit DefaultPoolBTCBalanceUpdated(BTC);
     }
 }

@@ -15,7 +15,7 @@ import "@nomiclabs/hardhat-ethers";
 import { Decimal } from "@sovryn-zero/lib-base";
 
 import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/deploy";
-import { _LiquityDeploymentJSON } from "./src/contracts";
+import { _ZeroDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
 
@@ -71,11 +71,8 @@ const wrbtcAddresses = {
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-<<<<<<< Updated upstream
   rsktestnet: "0xEF660F708AAe1041A1c871f4e3Ffb5e166437383",
-=======
-  rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d",
->>>>>>> Stashed changes
+  //rsktestnet: "0x93e58CD85406749B8F0aDE90caBB6bF6Ddb05f7d", //Stashed change?
   dev: "0x0000000000000000000000000000000000000003"
 };
 
@@ -129,7 +126,7 @@ const config: HardhatUserConfig = {
       gas: 13e6, // tx gas limit
       blockGasLimit: 13e6,
 
-      // Let Ethers throw instead of Buidler EVM
+      // Let Ethers throw instead of Hardhat EVM
       // This is closer to what will happen in production
       throwOnCallFailures: false,
       throwOnTransactionFailures: false
@@ -176,7 +173,7 @@ const config: HardhatUserConfig = {
 
 declare module "hardhat/types/runtime" {
   interface HardhatRuntimeEnvironment {
-    deployLiquity: (
+    deployZero: (
       deployer: Signer,
       governanceAddress?: string,
       sovFeeCollectorAddress?: string,
@@ -185,7 +182,7 @@ declare module "hardhat/types/runtime" {
       presaleAddress?: string,
       marketMakerAddress?: string,
       overrides?: Overrides
-    ) => Promise<_LiquityDeploymentJSON>;
+    ) => Promise<_ZeroDeploymentJSON>;
   }
 }
 
@@ -202,7 +199,7 @@ const getContractFactory: (
   : env => env.ethers.getContractFactory;
 
 extendEnvironment(env => {
-  env.deployLiquity = async (
+  env.deployZero = async (
     deployer,
     governanceAddress,
     sovFeeCollectorAddress,
@@ -303,7 +300,7 @@ task("deploy", "Deploys the contracts to the network")
         ? marketMakerAddresses[env.network.name]
         : undefined;
 
-      const deployment = await env.deployLiquity(
+      const deployment = await env.deployZero(
         deployer,
         governanceAddress,
         sovFeeCollectorAddress,

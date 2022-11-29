@@ -13,22 +13,22 @@
   "addresses": {
     "activePool": "0xf294ea272d6f8FedC08aCf8E93ff50fe99E1f7E8",
     "borrowerOperations": "0x5B9dB4B8bdeF3e57323187a9AC2639C5DEe5FD39",
-    "troveManager": "0x82B09695ee4F214f3A0803683C4AaEc332E4E0a3",
-    "troveManagerRedeemOps": "0xd3a497eC2dE882daA13a04eDFc792B3F42Db47c0",
+    "locManager": "0x82B09695ee4F214f3A0803683C4AaEc332E4E0a3",
+    "locManagerRedeemOps": "0xd3a497eC2dE882daA13a04eDFc792B3F42Db47c0",
     "collSurplusPool": "0x310ec7Fe6e4943DA773De8948255E37CC45e34bb",
     "communityIssuance": "0x9398131Dee201c7B530c5E3bAeeEB2e5B10F231c",
     "defaultPool": "0xcdbA14ca707B99afb8CA93E178aD614Db422a030",
     "hintHelpers": "0x1D7DaC5a63A35540bE9e031212ecf39584AE5595",
     "zeroStaking": "0x5369941b2a08db3feC31C4a6cD3b902f7b1468A3",
     "priceFeed": "0x6D1d9574d67e04cf35Fa1d916F763eDDae03b75d",
-    "sortedTroves": "0xdeEB95480B94f9395514Fe35CAF692A1C788DfE9",
+    "sortedLoCs": "0xdeEB95480B94f9395514Fe35CAF692A1C788DfE9",
     "stabilityPool": "0xd46C0225D1331B46700d64fF8c906709D15C9202",
     "gasPool": "0x58Aa11ED8d9C8574b5E2D201dc1A56f1E2155735",
-    "liquityBaseParams": "0xf8B04A36c36d5DbD1a9Fe7B74897c609d6A17aa2",
+    "zeroBaseParams": "0xf8B04A36c36d5DbD1a9Fe7B74897c609d6A17aa2",
     "feeDistributor": "0x1261d5872d56e2Ab61B3C68451D015b752105027",
     "zusdToken": "0xdB107FA69E33f05180a4C2cE9c2E7CB481645C2d",
     "zeroToken": "0x5815D304D67Ad9240fe273452078Bd648e75e543",
-    "multiTroveGetter": "0xF265a169191348c02829B62650B025BdeAf00AE4"
+    "multiLoCGetter": "0xF265a169191348c02829B62650B025BdeAf00AE4"
   },
   "startBlock": 4393513
 }

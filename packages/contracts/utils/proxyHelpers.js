@@ -91,8 +91,8 @@ class BorrowerOperationsProxy extends Proxy {
     super(owner, proxies, borrowerOperationsScriptAddress, borrowerOperations)
   }
 
-  async openTrove(...params) {
-    return this.forwardFunction(params, 'openTrove(uint256,uint256,address,address)')
+  async openLoC(...params) {
+    return this.forwardFunction(params, 'openLoC(uint256,uint256,address,address)')
   }
 
   async addColl(...params) {
@@ -111,24 +111,24 @@ class BorrowerOperationsProxy extends Proxy {
     return this.forwardFunction(params, 'repayZUSD(uint256,address,address)')
   }
 
-  async closeTrove(...params) {
-    return this.forwardFunction(params, 'closeTrove()')
+  async closeLoC(...params) {
+    return this.forwardFunction(params, 'closeLoC()')
   }
 
-  async adjustTrove(...params) {
-    return this.forwardFunction(params, 'adjustTrove(uint256,uint256,uint256,bool,address,address)')
+  async adjustLoC(...params) {
+    return this.forwardFunction(params, 'adjustLoC(uint256,uint256,uint256,bool,address,address)')
   }
 
   async claimRedeemedCollateral(...params) {
     return this.forwardFunction(params, 'claimRedeemedCollateral(address)')
   }
 
-  async getNewTCRFromTroveChange(...params) {
-    return this.proxyFunction('getNewTCRFromTroveChange', params)
+  async getNewTCRFromLoCChange(...params) {
+    return this.proxyFunction('getNewTCRFromLoCChange', params)
   }
 
-  async getNewICRFromTroveChange(...params) {
-    return this.proxyFunction('getNewICRFromTroveChange', params)
+  async getNewICRFromLoCChange(...params) {
+    return this.proxyFunction('getNewICRFromLoCChange', params)
   }
 
   async getCompositeDebt(...params) {
@@ -143,8 +143,8 @@ class BorrowerOperationsProxy extends Proxy {
     return this.proxyFunction('MIN_NET_DEBT', params)
   }
 
-  async BORROWING_FEE_FLOOR(...params) {
-    return this.proxyFunction('BORROWING_FEE_FLOOR', params)
+  async ORIGINATION_FEE_FLOOR(...params) {
+    return this.proxyFunction('ORIGINATION_FEE_FLOOR', params)
   }
 }
 
@@ -153,8 +153,8 @@ class BorrowerWrappersProxy extends Proxy {
     super(owner, proxies, borrowerWrappersScriptAddress, null)
   }
 
-  async claimCollateralAndOpenTrove(...params) {
-    return this.forwardFunction(params, 'claimCollateralAndOpenTrove(uint256,uint256,address,address)')
+  async claimCollateralAndOpenLoC(...params) {
+    return this.forwardFunction(params, 'claimCollateralAndOpenLoC(uint256,uint256,address,address)')
   }
 
   async claimSPRewardsAndRecycle(...params) {
@@ -165,38 +165,38 @@ class BorrowerWrappersProxy extends Proxy {
     return this.forwardFunction(params, 'claimStakingGainsAndRecycle(uint256,address,address)')
   }
 
-  async transferETH(...params) {
-    return this.forwardFunction(params, 'transferETH(address,uint256)')
+  async transferBTC(...params) {
+    return this.forwardFunction(params, 'transferBTC(address,uint256)')
   }
 }
 
-class TroveManagerProxy extends Proxy {
-  constructor(owner, proxies, troveManagerScriptAddress, troveManager) {
-    super(owner, proxies, troveManagerScriptAddress, troveManager)
+class LoCManagerProxy extends Proxy {
+  constructor(owner, proxies, locManagerScriptAddress, locManager) {
+    super(owner, proxies, locManagerScriptAddress, locManager)
   }
 
-  async Troves(user) {
-    return this.proxyFunctionWithUser('Troves', user)
+  async LoCs(user) {
+    return this.proxyFunctionWithUser('LoCs', user)
   }
 
-  async getTroveStatus(user) {
-    return this.proxyFunctionWithUser('getTroveStatus', user)
+  async getLoCStatus(user) {
+    return this.proxyFunctionWithUser('getLoCStatus', user)
   }
 
-  async getTroveDebt(user) {
-    return this.proxyFunctionWithUser('getTroveDebt', user)
+  async getLoCDebt(user) {
+    return this.proxyFunctionWithUser('getLoCDebt', user)
   }
 
-  async getTroveColl(user) {
-    return this.proxyFunctionWithUser('getTroveColl', user)
+  async getLoCColl(user) {
+    return this.proxyFunctionWithUser('getLoCColl', user)
   }
 
   async totalStakes() {
     return this.proxyFunction('totalStakes', [])
   }
 
-  async getPendingETHReward(...params) {
-    return this.proxyFunction('getPendingETHReward', params)
+  async getPendingBTCReward(...params) {
+    return this.proxyFunction('getPendingBTCReward', params)
   }
 
   async getPendingZUSDDebtReward(...params) {
@@ -219,16 +219,16 @@ class TroveManagerProxy extends Proxy {
     return this.proxyFunction('checkRecoveryMode', params)
   }
 
-  async getTroveOwnersCount() {
-    return this.proxyFunction('getTroveOwnersCount', [])
+  async getLoCOwnersCount() {
+    return this.proxyFunction('getLoCOwnersCount', [])
   }
 
   async baseRate() {
     return this.proxyFunction('baseRate', [])
   }
 
-  async L_ETH() {
-    return this.proxyFunction('L_ETH', [])
+  async L_BTC() {
+    return this.proxyFunction('L_BTC', [])
   }
 
   async L_ZUSDDebt() {
@@ -255,20 +255,20 @@ class TroveManagerProxy extends Proxy {
     return this.proxyFunction('getRedemptionFeeWithDecay', params)
   }
 
-  async getBorrowingRate() {
-    return this.proxyFunction('getBorrowingRate', [])
+  async getOriginationRate() {
+    return this.proxyFunction('getOriginationRate', [])
   }
 
-  async getBorrowingRateWithDecay() {
-    return this.proxyFunction('getBorrowingRateWithDecay', [])
+  async getOriginationRateWithDecay() {
+    return this.proxyFunction('getOriginationRateWithDecay', [])
   }
 
-  async getBorrowingFee(...params) {
-    return this.proxyFunction('getBorrowingFee', params)
+  async getOriginationFee(...params) {
+    return this.proxyFunction('getOriginationFee', params)
   }
 
-  async getBorrowingFeeWithDecay(...params) {
-    return this.proxyFunction('getBorrowingFeeWithDecay', params)
+  async getOriginationFeeWithDecay(...params) {
+    return this.proxyFunction('getOriginationFeeWithDecay', params)
   }
 
   async getEntireDebtAndColl(...params) {
@@ -293,14 +293,14 @@ class StabilityPoolProxy extends Proxy {
     return this.proxyFunctionWithUser('deposits', user)
   }
 
-  async getDepositorETHGain(user) {
-    return this.proxyFunctionWithUser('getDepositorETHGain', user)
+  async getDepositorBTCGain(user) {
+    return this.proxyFunctionWithUser('getDepositorBTCGain', user)
   }
 }
 
-class SortedTrovesProxy extends Proxy {
-  constructor(owner, proxies, sortedTroves) {
-    super(owner, proxies, null, sortedTroves)
+class SortedLoCsProxy extends Proxy {
+  constructor(owner, proxies, sortedLoCs) {
+    super(owner, proxies, null, sortedLoCs)
   }
 
   async contains(user) {
@@ -403,9 +403,9 @@ module.exports = {
   buildUserProxies,
   BorrowerOperationsProxy,
   BorrowerWrappersProxy,
-  TroveManagerProxy,
+  LoCManagerProxy,
   StabilityPoolProxy,
-  SortedTrovesProxy,
+  SortedLoCsProxy,
   TokenProxy,
   ZEROStakingProxy
 }

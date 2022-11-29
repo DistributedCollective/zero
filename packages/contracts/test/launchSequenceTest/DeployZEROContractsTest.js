@@ -10,7 +10,7 @@ const toBN = th.toBN
 const dec = th.dec
 
 contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', async accounts => {
-  const [liquityAG, A, B] = accounts;
+  const [zeroAG, A, B] = accounts;
   const multisig = accounts[999];
 
   let ZEROContracts
@@ -22,7 +22,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
 
   beforeEach(async () => {
     // Deploy all contracts from the first account
-    const coreContracts = await deploymentHelper.deployLiquityCore()
+    const coreContracts = await deploymentHelper.deployZeroCore()
     ZEROContracts = await deploymentHelper.deployZEROContracts(multisig)
     await deploymentHelper.connectZEROContracts(ZEROContracts)
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, multisig)
@@ -42,7 +42,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     it("Stores the deployer's address", async () => {
       const storedDeployerAddress = await communityIssuance.getOwner()
 
-      assert.equal(liquityAG, storedDeployerAddress)
+      assert.equal(zeroAG, storedDeployerAddress)
     })
   })
 
@@ -50,7 +50,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     it("Stores the deployer's address", async () => {
       const storedDeployerAddress = await zeroStaking.getOwner()
 
-      assert.equal(liquityAG, storedDeployerAddress)
+      assert.equal(zeroAG, storedDeployerAddress)
     })
   })
 
@@ -74,7 +74,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
 
       const storedDeployerAddress = await communityIssuance.getOwner()
 
-      assert.equal(storedDeployerAddress, liquityAG)
+      assert.equal(storedDeployerAddress, zeroAG)
     })
 
     it("ZEROSupplyCap is properly set", async () => {
@@ -84,21 +84,21 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
       assert.isTrue(balance.eq(supplyCap))
     })
 
-    it("Liquity AG can't set addresses if CI's ZERO balance hasn't been transferred ", async () => {
+    it("Zero AG can't set addresses if CI's ZERO balance hasn't been transferred ", async () => {
       const newCI = await CommunityIssuance.new()
 
       const ZEROBalance = await zeroToken.balanceOf(newCI.address)
       assert.equal(ZEROBalance, '0')
 
       // Deploy core contracts, just to get the Stability Pool address
-      const coreContracts = await deploymentHelper.deployLiquityCore()
+      const coreContracts = await deploymentHelper.deployZeroCore()
 
       try {
         const tx = await newCI.initialize(
           zeroToken.address,
           coreContracts.stabilityPool.address,
           multisig,
-          { from: liquityAG }
+          { from: zeroAG }
         );
       
         // Check it gives the expected error message for a failed Solidity 'assert'
@@ -111,7 +111,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
   describe('Connecting ZEROToken to LCF, CI and ZEROStaking', async accounts => {
     it('sets the correct ZEROToken address in ZEROStaking', async () => {
       // Deploy core contracts and set the ZEROToken address in the CI and ZEROStaking
-      const coreContracts = await deploymentHelper.deployLiquityCore()
+      const coreContracts = await deploymentHelper.deployZeroCore()
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, multisig)
 
       const zeroTokenAddress = zeroToken.address
@@ -122,7 +122,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
 
     it('sets the correct ZEROToken address in CommunityIssuance', async () => {
       // Deploy core contracts and set the ZEROToken address in the CI and ZEROStaking
-      const coreContracts = await deploymentHelper.deployLiquityCore()
+      const coreContracts = await deploymentHelper.deployZeroCore()
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, multisig)
 
       const zeroTokenAddress = zeroToken.address

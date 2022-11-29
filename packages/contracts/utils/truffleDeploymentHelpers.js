@@ -1,6 +1,6 @@
 
-const SortedTroves = artifacts.require("./SortedTroves.sol")
-const TroveManager = artifacts.require("./TroveManager.sol")
+const SortedLoCs = artifacts.require("./SortedLoCs.sol")
+const LoCManager = artifacts.require("./LoCManager.sol")
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol")
 const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
@@ -9,10 +9,10 @@ const StabilityPool = artifacts.require("./StabilityPool.sol")
 const FunctionCaller = artifacts.require("./FunctionCaller.sol")
 const BorrowerOperations = artifacts.require("./BorrowerOperations.sol")
 
-const deployLiquity = async () => {
+const deployZero = async () => {
   const priceFeedTestnet = await PriceFeedTestnet.new()
-  const sortedTroves = await SortedTroves.new()
-  const troveManager = await TroveManager.new()
+  const sortedLoCs = await SortedLoCs.new()
+  const locManager = await LoCManager.new()
   const activePool = await ActivePool.new()
   const stabilityPool = await StabilityPool.new()
   const defaultPool = await DefaultPool.new()
@@ -20,15 +20,15 @@ const deployLiquity = async () => {
   const borrowerOperations = await BorrowerOperations.new()
   const zusdToken = await ZUSDToken.new()
   await zusdToken.initialize(
-    troveManager.address,
+    locManager.address,
     stabilityPool.address,
     borrowerOperations.address
   )
   DefaultPool.setAsDeployed(defaultPool)
   PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
   ZUSDToken.setAsDeployed(zusdToken)
-  SortedTroves.setAsDeployed(sortedTroves)
-  TroveManager.setAsDeployed(troveManager)
+  SortedLoCs.setAsDeployed(sortedLoCs)
+  LoCManager.setAsDeployed(locManager)
   ActivePool.setAsDeployed(activePool)
   StabilityPool.setAsDeployed(stabilityPool)
   FunctionCaller.setAsDeployed(functionCaller)
@@ -37,8 +37,8 @@ const deployLiquity = async () => {
   const contracts = {
     priceFeedTestnet,
     zusdToken,
-    sortedTroves,
-    troveManager,
+    sortedLoCs,
+    locManager,
     activePool,
     stabilityPool,
     defaultPool,
@@ -53,8 +53,8 @@ const getAddresses = (contracts) => {
     BorrowerOperations: contracts.borrowerOperations.address,
     PriceFeedTestnet: contracts.priceFeedTestnet.address,
     ZUSDToken: contracts.zusdToken.address,
-    SortedTroves: contracts.sortedTroves.address,
-    TroveManager: contracts.troveManager.address,
+    SortedLoCs: contracts.sortedLoCs.address,
+    LoCManager: contracts.locManager.address,
     StabilityPool: contracts.stabilityPool.address,
     ActivePool: contracts.activePool.address,
     DefaultPool: contracts.defaultPool.address,
@@ -64,31 +64,31 @@ const getAddresses = (contracts) => {
 
 // Connect contracts to their dependencies
 const connectContracts = async (contracts, addresses) => {
-  // set TroveManager addr in SortedTroves
-  await contracts.sortedTroves.setTroveManager(addresses.TroveManager)
+  // set LoCManager addr in SortedLoCs
+  await contracts.sortedLoCs.setLoCManager(addresses.LoCManager)
 
   // set contract addresses in the FunctionCaller 
-  await contracts.functionCaller.setTroveManagerAddress(addresses.TroveManager)
-  await contracts.functionCaller.setSortedTrovesAddress(addresses.SortedTroves)
+  await contracts.functionCaller.setLoCManagerAddress(addresses.LoCManager)
+  await contracts.functionCaller.setSortedLoCsAddress(addresses.SortedLoCs)
 
-  // set TroveManager addr in PriceFeed
-  await contracts.priceFeedTestnet.setTroveManagerAddress(addresses.TroveManager)
+  // set LoCManager addr in PriceFeed
+  await contracts.priceFeedTestnet.setLoCManagerAddress(addresses.LoCManager)
 
-  // set contracts in the Trove Manager
-  await contracts.troveManager.setZUSDToken(addresses.ZUSDToken)
-  await contracts.troveManager.setSortedTroves(addresses.SortedTroves)
-  await contracts.troveManager.setPriceFeed(addresses.PriceFeedTestnet)
-  await contracts.troveManager.setActivePool(addresses.ActivePool)
-  await contracts.troveManager.setDefaultPool(addresses.DefaultPool)
-  await contracts.troveManager.setStabilityPool(addresses.StabilityPool)
-  await contracts.troveManager.setBorrowerOperations(addresses.BorrowerOperations)
+  // set contracts in the LoC Manager
+  await contracts.locManager.setZUSDToken(addresses.ZUSDToken)
+  await contracts.locManager.setSortedLoCs(addresses.SortedLoCs)
+  await contracts.locManager.setPriceFeed(addresses.PriceFeedTestnet)
+  await contracts.locManager.setActivePool(addresses.ActivePool)
+  await contracts.locManager.setDefaultPool(addresses.DefaultPool)
+  await contracts.locManager.setStabilityPool(addresses.StabilityPool)
+  await contracts.locManager.setBorrowerOperations(addresses.BorrowerOperations)
 
   // set contracts in BorrowerOperations 
-  await contracts.borrowerOperations.setSortedTroves(addresses.SortedTroves)
+  await contracts.borrowerOperations.setSortedLoCs(addresses.SortedLoCs)
   await contracts.borrowerOperations.setPriceFeed(addresses.PriceFeedTestnet)
   await contracts.borrowerOperations.setActivePool(addresses.ActivePool)
   await contracts.borrowerOperations.setDefaultPool(addresses.DefaultPool)
-  await contracts.borrowerOperations.setTroveManager(addresses.TroveManager)
+  await contracts.borrowerOperations.setLoCManager(addresses.LoCManager)
 
   // set contracts in the Pools
   await contracts.stabilityPool.setActivePoolAddress(addresses.ActivePool)
@@ -102,13 +102,13 @@ const connectContracts = async (contracts, addresses) => {
 }
 
 const connectEchidnaProxy = async (echidnaProxy, addresses) => {
-  echidnaProxy.setTroveManager(addresses.TroveManager)
+  echidnaProxy.setLoCManager(addresses.LoCManager)
   echidnaProxy.setBorrowerOperations(addresses.BorrowerOperations)
 }
 
 module.exports = {
   connectEchidnaProxy: connectEchidnaProxy,
   getAddresses: getAddresses,
-  deployLiquity: deployLiquity,
+  deployZero: deployZero,
   connectContracts: connectContracts
 }

@@ -5,16 +5,16 @@ import "./Dependencies/Ownable.sol";
 
 /**
  * @title Active Pool Storage
- * @dev Stores Active Pool required addresses and internal ETH and ZUSD debt states
+ * @dev Stores Active Pool required addresses and internal BTC and ZUSD debt states
  * Extends Ownable
  */
 contract ActivePoolStorage is Ownable {
     string public constant NAME = "ActivePool";
 
     address public borrowerOperationsAddress;
-    address public troveManagerAddress;
+    address public locManagerAddress;
     address public stabilityPoolAddress;
     address public defaultPoolAddress;
-    uint256 internal ETH; // deposited ether tracker
+    uint256 internal BTC; // deposited bitcoin tracker
     uint256 internal ZUSDDebt;
 }

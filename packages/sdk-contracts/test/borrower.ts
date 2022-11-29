@@ -41,7 +41,7 @@ describe("Borrower Library Operations", () => {
       await testIntegration.testOpenCreditLine(1, 100, {
         value: ethers.utils.parseEther("1.0"),
       });
-      expect(borrower.openTrove).to.have.been.calledOnceWith(
+      expect(borrower.openLoC).to.have.been.calledOnceWith(
         1,
         100,
         signers[0].address,
@@ -93,9 +93,9 @@ describe("Borrower Library Operations", () => {
     });
   });
   describe("Close Credit Line and Withdraw Collateral", async () => {
-    it("should call close trove function", async () => {
+    it("should call close LoC function", async () => {
       await testIntegration.testCloseCreditLineAndWithdrawCollateral();
-      expect(borrower.closeTrove).to.be.calledOnce;
+      expect(borrower.closeLoC).to.be.calledOnce;
     });
   });
 });

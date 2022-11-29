@@ -1,10 +1,10 @@
 // Truffle migration script for deployment to Ganache
 
-const SortedTroves = artifacts.require("./SortedTroves.sol")
+const SortedLoCs = artifacts.require("./SortedLoCs.sol")
 const ActivePool = artifacts.require("./ActivePool.sol")
 const DefaultPool = artifacts.require("./DefaultPool.sol")
 const StabilityPool = artifacts.require("./StabilityPool.sol")
-const TroveManager = artifacts.require("./TroveManager.sol")
+const LoCManager = artifacts.require("./LoCManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
 const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const FunctionCaller = artifacts.require("./FunctionCaller.sol")
@@ -18,8 +18,8 @@ const connectContracts = deploymentHelpers.connectContracts
 module.exports = function(deployer) {
   deployer.deploy(BorrowerOperations)
   deployer.deploy(PriceFeed)
-  deployer.deploy(SortedTroves)
-  deployer.deploy(TroveManager)
+  deployer.deploy(SortedLoCs)
+  deployer.deploy(LoCManager)
   deployer.deploy(ActivePool)
   deployer.deploy(StabilityPool)
   deployer.deploy(DefaultPool)
@@ -29,20 +29,20 @@ module.exports = function(deployer) {
   deployer.then(async () => {
     const borrowerOperations = await BorrowerOperations.deployed()
     const priceFeed = await PriceFeed.deployed()
-    const sortedTroves = await SortedTroves.deployed()
-    const troveManager = await TroveManager.deployed()
+    const sortedLoCs = await SortedLoCs.deployed()
+    const locManager = await LoCManager.deployed()
     const activePool = await ActivePool.deployed()
     const stabilityPool = await StabilityPool.deployed()
     const defaultPool = await DefaultPool.deployed()
     const zusdToken = await ZUSDToken.deployed()
     const functionCaller = await FunctionCaller.deployed()
 
-    const liquityContracts = {
+    const zeroContracts = {
       borrowerOperations,
       priceFeed,
       zusdToken,
-      sortedTroves,
-      troveManager,
+      sortedLoCs,
+      locManager,
       activePool,
       stabilityPool,
       defaultPool,
@@ -50,12 +50,12 @@ module.exports = function(deployer) {
     }
 
     // Grab contract addresses
-    const liquityAddresses = getAddresses(liquityContracts)
+    const zeroAddresses = getAddresses(zeroContracts)
     console.log('deploy_contracts.js - Deployed contract addresses: \n')
-    console.log(liquityAddresses)
+    console.log(zeroAddresses)
     console.log('\n')
 
     // Connect contracts to each other
-    await connectContracts(liquityContracts, liquityAddresses)
+    await connectContracts(zeroContracts, zeroAddresses)
   })
 }

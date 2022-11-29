@@ -9,7 +9,7 @@ interface IFeeDistributor {
     event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _troveManagerAddress);
+    event LoCManagerAddressChanged(address _locManagerAddress);
     event WrbtcAddressChanged(address _wrbtcAddress);
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
@@ -25,7 +25,7 @@ interface IFeeDistributor {
      * @param _sovFeeCollectorAddress SOVFeeCollector address
      * @param _zeroStakingAddress ZEROStaking contract address
      * @param _borrowerOperationsAddress borrowerOperations contract address
-     * @param _troveManagerAddress TroveManager contract address
+     * @param _locManagerAddress LoCManager contract address
      * @param _wrbtcAddress wrbtc ERC20 contract address
      * @param _zusdTokenAddress ZUSDToken contract address
      * @param _activePoolAddress ActivePool contract address
@@ -34,7 +34,7 @@ interface IFeeDistributor {
         address _sovFeeCollectorAddress,
         address _zeroStakingAddress,
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _wrbtcAddress,
         address _zusdTokenAddress,
         address _activePoolAddress

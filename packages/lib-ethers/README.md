@@ -10,23 +10,23 @@ Install in your project:
 npm install @sovryn-zero/lib-base @sovryn-zero/lib-ethers ethers@^5.0.0
 ```
 
-Connecting to an Ethereum node and sending a transaction:
+Connecting to a blockchain node and sending a transaction:
 
 ```javascript
 const { Wallet, providers } = require("ethers");
-const { EthersLiquity } = require("@sovryn-zero/lib-ethers");
+const { EthersZero } = require("@sovryn-zero/lib-ethers");
 
 async function example() {
   const provider = new providers.JsonRpcProvider("http://localhost:8545");
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
-  const zero = await EthersLiquity.connect(wallet);
+  const zero = await EthersZero.connect(wallet);
 
-  const { newTrove } = await zero.openTrove({
-    depositCollateral: 5, // ETH
+  const { newLoC } = await zero.openLoC({
+    depositCollateral: 5, // BTC
     borrowZUSD: 2000
   });
 
-  console.log(`Successfully opened a Zero Trove (${newTrove})!`);
+  console.log(`Successfully opened a Zero LoC (${newLoC})!`);
 }
 ```
 

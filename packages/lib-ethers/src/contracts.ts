@@ -14,8 +14,8 @@ import {
 
 import activePoolAbi from "../abi/ActivePool.json";
 import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
-import troveManagerAbi from "../abi/TroveManager.json";
-import troveManagerRedeemOpsAbi from "../abi/TroveManagerRedeemOps.json";
+import locManagerAbi from "../abi/LoCManager.json";
+import locManagerRedeemOpsAbi from "../abi/LoCManagerRedeemOps.json";
 import zusdTokenAbi from "../abi/ZUSDToken.json";
 import nueTokenAbi from "../abi/IERC20.json";
 import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
@@ -24,20 +24,20 @@ import defaultPoolAbi from "../abi/DefaultPool.json";
 import zeroTokenAbi from "../abi/ZEROToken.json";
 import hintHelpersAbi from "../abi/HintHelpers.json";
 import zeroStakingAbi from "../abi/ZEROStaking.json";
-import multiTroveGetterAbi from "../abi/MultiTroveGetter.json";
+import multiLoCGetterAbi from "../abi/MultiLoCGetter.json";
 import priceFeedAbi from "../abi/PriceFeed.json";
 import priceFeedTestnetAbi from "../abi/PriceFeedTestnet.json";
-import sortedTrovesAbi from "../abi/SortedTroves.json";
+import sortedLoCsAbi from "../abi/SortedLoCs.json";
 import stabilityPoolAbi from "../abi/StabilityPool.json";
 import gasPoolAbi from "../abi/GasPool.json";
-import liquityBaseParamsAbi from "../abi/LiquityBaseParams.json";
+import zeroBaseParamsAbi from "../abi/ZeroBaseParams.json";
 import feeDistributorAbi from "../abi/FeeDistributor.json";
 
 import {
   ActivePool,
   BorrowerOperations,
-  TroveManager,
-  TroveManagerRedeemOps,
+  LoCManager,
+  LoCManagerRedeemOps,
   ZUSDToken,
   CollSurplusPool,
   CommunityIssuance,
@@ -45,13 +45,13 @@ import {
   ZEROToken,
   HintHelpers,
   ZEROStaking,
-  MultiTroveGetter,
+  MultiLoCGetter,
   PriceFeed,
   PriceFeedTestnet,
-  SortedTroves,
+  SortedLoCs,
   StabilityPool,
   GasPool,
-  LiquityBaseParams,
+  ZeroBaseParams,
   IERC20,
   FeeDistributor
 } from "../types";
@@ -126,7 +126,7 @@ const buildEstimatedFunctions = <T>(
     ])
   );
 
-export class _LiquityContract extends Contract {
+export class _ZeroContract extends Contract {
   readonly estimateAndPopulate: Record<string, EstimatedContractFunction<PopulatedTransaction>>;
   
   constructor(
@@ -149,14 +149,14 @@ export class _LiquityContract extends Contract {
 }
 
 /** @internal */
-export type _TypedLiquityContract<T = unknown, U = unknown> = TypedContract<_LiquityContract, T, U>;
+export type _TypedZeroContract<T = unknown, U = unknown> = TypedContract<_ZeroContract, T, U>;
 
 /** @internal */
-export interface _LiquityContracts {
+export interface _ZeroContracts {
   activePool: ActivePool;
   borrowerOperations: BorrowerOperations;
-  troveManager: TroveManager;
-  troveManagerRedeemOps: TroveManagerRedeemOps;
+  locManager: LoCManager;
+  locManagerRedeemOps: LoCManagerRedeemOps;
   zusdToken: ZUSDToken;
   nueToken?: IERC20;
   collSurplusPool: CollSurplusPool;
@@ -165,12 +165,12 @@ export interface _LiquityContracts {
   zeroToken: ZEROToken;
   hintHelpers: HintHelpers;
   zeroStaking: ZEROStaking;
-  multiTroveGetter: MultiTroveGetter;
+  multiLoCGetter: MultiLoCGetter;
   priceFeed: PriceFeed | PriceFeedTestnet;
-  sortedTroves: SortedTroves;
+  sortedLoCs: SortedLoCs;
   stabilityPool: StabilityPool;
   gasPool: GasPool;
-  liquityBaseParams: LiquityBaseParams;
+  zeroBaseParams: ZeroBaseParams;
   feeDistributor: FeeDistributor;
 }
 
@@ -179,17 +179,17 @@ export const _priceFeedIsTestnet = (
   priceFeed: PriceFeed | PriceFeedTestnet
 ): priceFeed is PriceFeedTestnet => "setPrice" in priceFeed;
 
-type LiquityContractsKey = keyof _LiquityContracts;
+type ZeroContractsKey = keyof _ZeroContracts;
 
 /** @internal */
-export type _LiquityContractAddresses = Record<LiquityContractsKey, string>;
-type LiquityContractAbis = Record<LiquityContractsKey, JsonFragment[]>;
+export type _ZeroContractAddresses = Record<ZeroContractsKey, string>;
+type ZeroContractAbis = Record<ZeroContractsKey, JsonFragment[]>;
 
-const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
+const getAbi = (priceFeedIsTestnet: boolean): ZeroContractAbis => ({
   activePool: activePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
-  troveManager: troveManagerAbi,
-  troveManagerRedeemOps: troveManagerRedeemOpsAbi,
+  locManager: locManagerAbi,
+  locManagerRedeemOps: locManagerRedeemOpsAbi,
   zusdToken: zusdTokenAbi,
   nueToken: nueTokenAbi,
   communityIssuance: communityIssuanceAbi,
@@ -197,28 +197,28 @@ const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
   zeroToken: zeroTokenAbi,
   hintHelpers: hintHelpersAbi,
   zeroStaking: zeroStakingAbi,
-  multiTroveGetter: multiTroveGetterAbi,
+  multiLoCGetter: multiLoCGetterAbi,
   priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
-  sortedTroves: sortedTrovesAbi,
+  sortedLoCs: sortedLoCsAbi,
   stabilityPool: stabilityPoolAbi,
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,
-  liquityBaseParams: liquityBaseParamsAbi,
+  zeroBaseParams: zeroBaseParamsAbi,
   feeDistributor: feeDistributorAbi,
 });
 
-const mapLiquityContracts = <T, U>(
-  contracts: Record<LiquityContractsKey, T>,
-  f: (t: T, key: LiquityContractsKey) => U
+const mapZeroContracts = <T, U>(
+  contracts: Record<ZeroContractsKey, T>,
+  f: (t: T, key: ZeroContractsKey) => U
 ) =>
   Object.fromEntries(
-    Object.entries(contracts).map(([key, t]) => [key, f(t, key as LiquityContractsKey)])
-  ) as Record<LiquityContractsKey, U>;
+    Object.entries(contracts).map(([key, t]) => [key, f(t, key as ZeroContractsKey)])
+  ) as Record<ZeroContractsKey, U>;
 
 /** @internal */
-export interface _LiquityDeploymentJSON {
+export interface _ZeroDeploymentJSON {
   readonly chainId: number;
-  readonly addresses: _LiquityContractAddresses;
+  readonly addresses: _ZeroContractAddresses;
   readonly version: string;
   readonly deploymentDate: number;
   readonly startBlock: number;
@@ -235,13 +235,13 @@ export interface _LiquityDeploymentJSON {
 /** @internal */
 export const _connectToContracts = (
   signerOrProvider: EthersSigner | EthersProvider,
-  { addresses, _priceFeedIsTestnet }: _LiquityDeploymentJSON
-): _LiquityContracts => {
+  { addresses, _priceFeedIsTestnet }: _ZeroDeploymentJSON
+): _ZeroContracts => {
   const abi = getAbi(_priceFeedIsTestnet);
 
-  return mapLiquityContracts(
+  return mapZeroContracts(
     addresses,
     (address, key) =>
-      new _LiquityContract(address, abi[key], signerOrProvider) as _TypedLiquityContract
-  ) as _LiquityContracts;
+      new _ZeroContract(address, abi[key], signerOrProvider) as _TypedZeroContract
+  ) as _ZeroContracts;
 };

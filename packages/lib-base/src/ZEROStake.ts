@@ -13,7 +13,7 @@ export type ZEROStakeChange<T> =
  * Represents a user's ZERO stake and accrued gains.
  * 
  * @remarks
- * Returned by the {@link ReadableLiquity.getZEROStake | getZEROStake()} function.
+ * Returned by the {@link ReadableZero.getZEROStake | getZEROStake()} function.
 
  * @public
  */

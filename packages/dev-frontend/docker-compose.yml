@@ -7,7 +7,7 @@ services:
     ports:
       - 80:80
     environment:
-      # Ethereum address that shall receive ZERO rewards
+      # Address that shall receive ZERO rewards
       - FRONTEND_TAG=0x0000000000000000000000000000000000000000
       # Optional Infura API key to enable snappier blockchain events using WebSockets
       - INFURA_API_KEY=

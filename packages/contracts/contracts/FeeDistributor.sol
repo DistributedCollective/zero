@@ -4,7 +4,7 @@ pragma solidity 0.6.11;
 
 import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/CheckContract.sol";
-import "./Dependencies/LiquityMath.sol";
+import "./Dependencies/ZeroMath.sol";
 import "./FeeDistributorStorage.sol";
 import "./Dependencies/SafeMath.sol";
 
@@ -15,7 +15,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _troveManagerAddress);
+    event LoCManagerAddressChanged(address _locManagerAddress);
     event WrbtcAddressChanged(address _wrbtcAddress);
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
@@ -29,7 +29,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         address _sovFeeCollectorAddress,
         address _zeroStakingAddress,
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _wrbtcAddress,
         address _zusdTokenAddress,
         address _activePoolAddress
@@ -37,7 +37,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         checkContract(_sovFeeCollectorAddress);
         checkContract(_zeroStakingAddress);
         checkContract(_borrowerOperationsAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_wrbtcAddress);
         checkContract(_zusdTokenAddress);
         checkContract(_activePoolAddress);
@@ -45,18 +45,18 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         sovFeeCollector = IFeeSharingProxy(_sovFeeCollectorAddress);
         zeroStaking = IZEROStaking(_zeroStakingAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
-        troveManager = ITroveManager(_troveManagerAddress);
+        locManager = ILoCManager(_locManagerAddress);
         wrbtc = IWrbtc(_wrbtcAddress);
         zusdToken = IZUSDToken(_zusdTokenAddress);
         activePoolAddress = _activePoolAddress;
 
         // Not entirely removing this as per request from @light
-        FEE_TO_SOV_COLLECTOR = LiquityMath.DECIMAL_PRECISION; // 100%
+        FEE_TO_SOV_COLLECTOR = ZeroMath.DECIMAL_PRECISION; // 100%
 
         emit SOVFeeCollectorAddressChanged(_sovFeeCollectorAddress);
         emit ZeroStakingAddressChanged(_zeroStakingAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit WrbtcAddressChanged(_wrbtcAddress);
         emit ZUSDTokenAddressChanged(_zusdTokenAddress);
         emit ActivePoolAddressSet(_activePoolAddress);
@@ -68,7 +68,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
 
     function distributeFees() public override {
         require(
-            msg.sender == address(borrowerOperations) || msg.sender == address(troveManager),
+            msg.sender == address(borrowerOperations) || msg.sender == address(locManager),
             "FeeDistributor: invalid caller"
         );
         uint256 zusdtoDistribute = zusdToken.balanceOf(address(this));
@@ -84,7 +84,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     function _distributeZUSD(uint256 toDistribute) internal {
         // Send fee to the SOVFeeCollector address
         uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
-            LiquityMath.DECIMAL_PRECISION
+            ZeroMath.DECIMAL_PRECISION
         );
         zusdToken.approve(address(sovFeeCollector), feeToSovCollector);
         sovFeeCollector.transferTokens(address(zusdToken), uint96(feeToSovCollector));
@@ -104,18 +104,18 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     function _distributeRBTC(uint256 toDistribute) internal {
         // Send fee to the SOVFeeCollector address
         uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
-            LiquityMath.DECIMAL_PRECISION
+            ZeroMath.DECIMAL_PRECISION
         );
         wrbtc.deposit{value: feeToSovCollector}();
         wrbtc.approve(address(sovFeeCollector), feeToSovCollector);
         sovFeeCollector.transferTokens(address(wrbtc), uint96(feeToSovCollector));
 
-        // Send the ETH fee to the ZERO staking contract
+        // Send the BTC fee to the ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
         if (feeToZeroStaking != 0) {
             (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
-            require(success, "FeeDistributor: sending ETH failed");
-            zeroStaking.increaseF_ETH(feeToZeroStaking);
+            require(success, "FeeDistributor: sending BTC failed");
+            zeroStaking.increaseF_BTC(feeToZeroStaking);
         }
         emit RBTCistributed(toDistribute);
     }

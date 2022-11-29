@@ -5,9 +5,9 @@ pragma solidity 0.6.11;
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/ITroveManager.sol';
+import './Interfaces/ILoCManager.sol';
 import './Interfaces/IZUSDToken.sol';
-import './Interfaces/ISortedTroves.sol';
+import './Interfaces/ISortedLoCs.sol';
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/BaseMath.sol";
@@ -17,18 +17,18 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     IBorrowerOperations public borrowerOperations;
 
-    ITroveManager public troveManager;
+    ILoCManager public locManager;
 
     IZUSDToken public zusdToken;
 
     // Needed to check if there are pending liquidations
-    ISortedTroves public sortedTroves;
+    ISortedLoCs public sortedLoCs;
 
     ICommunityIssuance public communityIssuance;
 
-    uint256 internal ETH;  // deposited ether tracker
+    uint256 internal BTC;  // deposited bitcoin tracker
 
-    // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+    // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when LoC debt is offset.
     uint256 internal totalZUSDDeposits;
 
    // --- Data structures ---
@@ -74,7 +74,7 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     // With each offset that fully empties the Pool, the epoch is incremented by 1
     uint128 public currentEpoch;
 
-    /* ETH Gain sum 'S': During its lifetime, each deposit d_t earns an ETH gain of ( d_t * [S - S_t] )/P_t, where S_t
+    /* BTC Gain sum 'S': During its lifetime, each deposit d_t earns an BTC gain of ( d_t * [S - S_t] )/P_t, where S_t
     * is the depositor's snapshot of S taken at the time t when the deposit was made.
     *
     * The 'S' sums are stored in a nested mapping (epoch => scale => sum):

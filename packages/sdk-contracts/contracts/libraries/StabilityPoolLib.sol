@@ -39,11 +39,11 @@ library StabilityPoolLib {
 
     /// @notice Withdraws all gains from the stability pool and adds them as a collateral to the credit line
     /// @param _stabilityPoolAddress address of Stability Pool Contract
-    function withdrawRBTCGainToTrove(address _stabilityPoolAddress)
+    function withdrawRBTCGainToLoC(address _stabilityPoolAddress)
         internal
         isContractAddress(_stabilityPoolAddress)
     {
         IStabilityPool stabilityPool = IStabilityPool(_stabilityPoolAddress);
-        stabilityPool.withdrawETHGainToTrove(msg.sender, msg.sender);
+        stabilityPool.withdrawBTCGainToLoC(msg.sender, msg.sender);
     }
 }

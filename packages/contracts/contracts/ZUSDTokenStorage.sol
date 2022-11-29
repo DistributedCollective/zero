@@ -34,7 +34,7 @@ contract ZUSDTokenStorage is Initializable {
     mapping(address => mapping(address => uint256)) internal _allowances;
 
     // --- Addresses ---
-    address internal troveManagerAddress;
+    address internal locManagerAddress;
     address internal stabilityPoolAddress;
     address internal borrowerOperationsAddress;
 }

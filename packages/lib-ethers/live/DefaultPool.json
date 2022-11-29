@@ -39,7 +39,7 @@
           "type": "uint256"
         }
       ],
-      "name": "DefaultPoolETHBalanceUpdated",
+      "name": "DefaultPoolBTCBalanceUpdated",
       "type": "event"
     },
     {
@@ -84,7 +84,7 @@
           "type": "uint256"
         }
       ],
-      "name": "EtherSent",
+      "name": "BTCSent",
       "type": "event"
     },
     {
@@ -138,11 +138,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newTroveManagerAddress",
+          "name": "_newLoCManagerAddress",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressChanged",
+      "name": "LoCManagerAddressChanged",
       "type": "event"
     },
     {
@@ -257,7 +257,7 @@
           "type": "uint256"
         }
       ],
-      "name": "sendETHToActivePool",
+      "name": "sendBTCToActivePool",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -266,7 +266,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         },
         {
@@ -282,7 +282,7 @@
     },
     {
       "inputs": [],
-      "name": "troveManagerAddress",
+      "name": "locManagerAddress",
       "outputs": [
         {
           "internalType": "address",

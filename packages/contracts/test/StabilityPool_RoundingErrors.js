@@ -2,7 +2,7 @@
 const deploymentHelpers = require("../utils/truffleDeploymentHelpers.js")
 const testHelpers = require("../utils/testHelpers.js")
 
-const deployLiquity = deploymentHelpers.deployLiquity
+const deployZero = deploymentHelpers.deployZero
 const getAddresses = deploymentHelpers.getAddresses
 const connectContracts = deploymentHelpers.connectContracts
 
@@ -18,16 +18,16 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
   let priceFeed
   let zusdToken
   let stabilityPool
-  let troveManager
+  let locManager
   let borrowerOperations
 
   beforeEach(async () => {
-    contracts = await deployLiquity()
+    contracts = await deployZero()
     
     priceFeed = contracts.priceFeedTestnet
     zusdToken = contracts.zusdToken
     stabilityPool = contracts.stabilityPool
-    troveManager = contracts.troveManager
+    locManager = contracts.locManager
     borrowerOperations = contracts.borrowerOperations
 
     const contractAddresses = getAddresses(contracts)
@@ -41,13 +41,13 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
     const defaulters = accounts.slice(101, 301)
 
     for (let account of depositors) {
-      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
+      await openLoC({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: account } })
       await stabilityPool.provideToSP(dec(100, 18), { from: account })
     }
 
-    // Defaulter opens trove with 200% ICR
+    // Defaulter opens LoC with 200% ICR
     for (let defaulter of defaulters) {
-      await openTrove({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter } })
+      await openLoC({ ICR: toBN(dec(2, 18)), extraParams: { from: defaulter } })
       }
     const price = await priceFeed.getPrice()
 
@@ -56,17 +56,17 @@ contract('Pool Manager: Sum-Product rounding errors', async accounts => {
 
     // Defaulters liquidated
     for (let defaulter of defaulters) {
-      await troveManager.liquidate(defaulter, { from: owner });
+      await locManager.liquidate(defaulter, { from: owner });
     }
 
     const SP_TotalDeposits = await stabilityPool.getTotalZUSDDeposits()
-    const SP_ETH = await stabilityPool.getETH()
+    const SP_BTC = await stabilityPool.getBTC()
     const compoundedDeposit = await stabilityPool.getCompoundedZUSDDeposit(depositors[0])
-    const ETH_Gain = await stabilityPool.getCurrentETHGain(depositors[0])
+    const BTC_Gain = await stabilityPool.getCurrentBTCGain(depositors[0])
 
     // Check depostiors receive their share without too much error
     assert.isAtMost(th.getDifference(SP_TotalDeposits.div(th.toBN(depositors.length)), compoundedDeposit), 100000)
-    assert.isAtMost(th.getDifference(SP_ETH.div(th.toBN(depositors.length)), ETH_Gain), 100000)
+    assert.isAtMost(th.getDifference(SP_BTC.div(th.toBN(depositors.length)), BTC_Gain), 100000)
   })
 })
 

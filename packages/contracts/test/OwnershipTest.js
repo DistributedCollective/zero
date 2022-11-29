@@ -11,8 +11,8 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
 
   let contracts;
   let zusdToken;
-  let sortedTroves;
-  let troveManager;
+  let sortedLoCs;
+  let locManager;
   let activePool;
   let stabilityPool;
   let defaultPool;
@@ -24,14 +24,14 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
   let zeroToken;
 
   before(async () => {
-    contracts = await deploymentHelper.deployLiquityCore();
+    contracts = await deploymentHelper.deployZeroCore();
     contracts.borrowerOperations = await BorrowerOperationsTester.new();
     contracts = await deploymentHelper.deployZUSDToken(contracts);
     const ZEROContracts = await deploymentHelper.deployZEROContracts(multisig);
 
     zusdToken = contracts.zusdToken;
-    sortedTroves = contracts.sortedTroves;
-    troveManager = contracts.troveManager;
+    sortedLoCs = contracts.sortedLoCs;
+    locManager = contracts.locManager;
     activePool = contracts.activePool;
     stabilityPool = contracts.stabilityPool;
     defaultPool = contracts.defaultPool;
@@ -81,9 +81,9 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
     assert.isTrue(txOwner.receipt.status);
   };
 
-  describe("TroveManager", async accounts => {
+  describe("LoCManager", async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      await testSetAddresses(troveManager, 14);
+      await testSetAddresses(locManager, 14);
     });
   });
 
@@ -117,25 +117,25 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
     });
   });
 
-  describe("SortedTroves", async accounts => {
+  describe("SortedLoCs", async accounts => {
     it("setParams(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
       const dumbContract = await GasPool.new();
       const params = [10000001, dumbContract.address, dumbContract.address];
 
       // Attempt call from alice
-      await th.assertRevert(sortedTroves.setParams(...params, { from: alice }));
+      await th.assertRevert(sortedLoCs.setParams(...params, { from: alice }));
 
       // Attempt to use zero address
-      await testZeroAddress(sortedTroves, params, "setParams", 1);
+      await testZeroAddress(sortedLoCs, params, "setParams", 1);
       // Attempt to use non contract
-      await testNonContractAddress(sortedTroves, params, "setParams", 1);
+      await testNonContractAddress(sortedLoCs, params, "setParams", 1);
 
       // Owner can successfully set params
-      const txOwner = await sortedTroves.setParams(...params, { from: owner });
+      const txOwner = await sortedLoCs.setParams(...params, { from: owner });
       assert.isTrue(txOwner.receipt.status);
 
       // Owner can set any address more than once
-      const secondTxOwner = await sortedTroves.setParams(...params, { from: owner });
+      const secondTxOwner = await sortedLoCs.setParams(...params, { from: owner });
       assert.isTrue(secondTxOwner.receipt.status);
     });
   });

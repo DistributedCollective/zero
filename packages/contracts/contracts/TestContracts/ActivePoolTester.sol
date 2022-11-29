@@ -11,6 +11,6 @@ contract ActivePoolTester is ActivePool {
     }
 
     function unprotectedPayable() external payable {
-        ETH = ETH.add(msg.value);
+        BTC = BTC.add(msg.value);
     }
 }

@@ -5,11 +5,11 @@ pragma solidity 0.6.11;
 /*
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
  *
- * When a trove is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
+ * When a LoC is liquidated, then depending on system conditions, some of its ZUSD debt gets offset with
  * ZUSD in the Stability Pool:  that is, the offset debt evaporates, and an equal amount of ZUSD tokens in the Stability Pool is burned.
  *
  * Thus, a liquidation causes each depositor to receive a ZUSD loss, in proportion to their deposit as a share of total deposits.
- * They also receive an ETH gain, as the ETH collateral of the liquidated trove is distributed among Stability depositors,
+ * They also receive an BTC gain, as the BTC collateral of the liquidated LoC is distributed among Stability depositors,
  * in the same proportion.
  *
  * When a liquidation occurs, it depletes every deposit by the same fraction: for example, a liquidation that depletes 40%
@@ -18,8 +18,8 @@ pragma solidity 0.6.11;
  * A deposit that has experienced a series of liquidations is termed a "compounded deposit": each liquidation depletes the deposit,
  * multiplying it by some factor in range ]0,1[
  *
- * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / ETH gain derivations:
- * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
+ * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / BTC gain derivations:
+ * https://github.com/DistributedCollective/zero/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  * --- ZERO ISSUANCE TO STABILITY POOL DEPOSITORS ---
  *
@@ -31,21 +31,21 @@ pragma solidity 0.6.11;
  * by a given deposit, is split between the depositor and the front end through which the deposit was made, based on the front end's kickbackRate.
  *
  * Please see the system Readme for an overview:
- * https://github.com/liquity/dev/blob/main/README.md#zero-issuance-to-stability-providers
+ * TODO: add content/fix link - https://github.com/DistributedCollective/zero/blob/master/README.md#zero-issuance-to-stability-providers
  */
 interface IStabilityPool {
 
     // --- Events ---
     
-    event StabilityPoolETHBalanceUpdated(uint _newBalance);
+    event StabilityPoolBTCBalanceUpdated(uint _newBalance);
     event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
     event DefaultPoolAddressChanged(address _newDefaultPoolAddress);
     event ZUSDTokenAddressChanged(address _newZUSDTokenAddress);
-    event SortedTrovesAddressChanged(address _newSortedTrovesAddress);
+    event SortedLoCsAddressChanged(address _newSortedLoCsAddress);
     event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event CommunityIssuanceAddressChanged(address _newCommunityIssuanceAddress);
 
@@ -63,32 +63,32 @@ interface IStabilityPool {
     event UserDepositChanged(address indexed _depositor, uint _newDeposit);
     event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
 
-    event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
+    event BTCGainWithdrawn(address indexed _depositor, uint _BTC, uint _ZUSDLoss);
     event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
     event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
-    event EtherSent(address _to, uint _amount);
+    event BTCSent(address _to, uint _amount);
 
     // --- Functions ---
 
     /**
-     * @notice Called only once on init, to set addresses of other Liquity contracts. Callable only by owner
+     * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
-     * @param _liquityBaseParamsAddress LiquidityBaseParams contract address
+     * @param _zeroBaseParamsAddress LiquidityBaseParams contract address
      * @param _borrowerOperationsAddress BorrowerOperations contract address
-     * @param _troveManagerAddress TroveManager contract address
+     * @param _locManagerAddress LoCManager contract address
      * @param _activePoolAddress ActivePool contract address
      * @param _zusdTokenAddress ZUSDToken contract address
-     * @param _sortedTrovesAddress SortedTroves contract address
+     * @param _sortedLoCsAddress SortedLoCs contract address
      * @param _priceFeedAddress PriceFeed contract address
      * @param _communityIssuanceAddress CommunityIssuanceAddress
     */
     function setAddresses(
-        address _liquityBaseParamsAddress,
+        address _zeroBaseParamsAddress,
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress,
         address _zusdTokenAddress,
-        address _sortedTrovesAddress,
+        address _sortedLoCsAddress,
         address _priceFeedAddress,
         address _communityIssuanceAddress
     ) external;
@@ -101,7 +101,7 @@ interface IStabilityPool {
      *  ---
      *  - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *  - Tags the deposit with the provided front end tag param, if it's a new deposit
-     *  - Sends depositor's accumulated gains (ZERO, ETH) to depositor
+     *  - Sends depositor's accumulated gains (ZERO, BTC) to depositor
      *  - Sends the tagged front end's accumulated ZERO gains to the tagged front end
      *  - Increases deposit and tagged front end's stake, and takes new snapshots for each.
      * @param _amount amount to provide
@@ -111,12 +111,12 @@ interface IStabilityPool {
 
     /**
      * @notice Initial checks:
-     *    - _amount is zero or there are no under collateralized troves left in the system
+     *    - _amount is zero or there are no under collateralized locs left in the system
      *    - User has a non zero deposit
      *    ---
      *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *    - Removes the deposit's front end tag if it is a full withdrawal
-     *    - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
+     *    - Sends all depositor's accumulated gains (ZERO, BTC) to depositor
      *    - Sends the tagged front end's accumulated ZERO gains to the tagged front end
      *    - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
      * 
@@ -128,19 +128,19 @@ interface IStabilityPool {
     /**
      * @notice Initial checks:
      *    - User has a non zero deposit
-     *    - User has an open trove
-     *    - User has some ETH gain
+     *    - User has an open loc
+     *    - User has some BTC gain
      *    ---
      *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
      *    - Sends all depositor's ZERO gain to  depositor
      *    - Sends all tagged front end's ZERO gain to the tagged front end
-     *    - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
+     *    - Transfers the depositor's entire BTC gain from the Stability Pool to the caller's loc
      *    - Leaves their compounded deposit in the Stability Pool
      *    - Updates snapshots for deposit and tagged front end stake
-     * @param _upperHint upper trove id hint
-     * @param _lowerHint lower trove id hint
+     * @param _upperHint upper LoC id hint
+     * @param _lowerHint lower LoC id hint
      */
-    function withdrawETHGainToTrove(address _upperHint, address _lowerHint) external;
+    function withdrawBTCGainToLoC(address _upperHint, address _lowerHint) external;
 
     /**
      * @notice Initial checks:
@@ -155,40 +155,40 @@ interface IStabilityPool {
 
     /**
      * @notice Initial checks:
-     *    - Caller is TroveManager
+     *    - Caller is LoCManager
      *    ---
      *    Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
-     *    and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
-     *    Only called by liquidation functions in the TroveManager.
+     *    and transfers the LoC's BTC collateral from ActivePool to StabilityPool.
+     *    Only called by liquidation functions in the LoCManager.
      * @param _debt debt to cancel
      * @param _coll collateral to transfer
      */
     function offset(uint _debt, uint _coll) external;
 
     /**
-     * @return the total amount of ETH held by the pool, accounted in an internal variable instead of `balance`,
-     * to exclude edge cases like ETH received from a self-destruct.
+     * @return the total amount of BTC held by the pool, accounted in an internal variable instead of `balance`,
+     * to exclude edge cases like BTC received from a self-destruct.
      */
-    function getETH() external view returns (uint);
+    function getBTC() external view returns (uint);
 
     /**
-     * @return ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
+     * @return ZUSD held in the pool. Changes when users deposit/withdraw, and when LoC debt is offset.
      */
     function getTotalZUSDDeposits() external view returns (uint);
 
     /**
-     * @notice Calculates the ETH gain earned by the deposit since its last snapshots were taken.
-     * @param _depositor address to calculate ETH gain
-     * @return ETH gain from given depositor
+     * @notice Calculates the BTC gain earned by the deposit since its last snapshots were taken.
+     * @param _depositor address to calculate BTC gain
+     * @return BTC gain from given depositor
      */
-    function getDepositorETHGain(address _depositor) external view returns (uint);
+    function getDepositorBTCGain(address _depositor) external view returns (uint);
 
     /**
      * @notice Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
      *    If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
      *    Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
      *    which they made their deposit.
-     * @param _depositor address to calculate ETH gain
+     * @param _depositor address to calculate BTC gain
      * @return ZERO gain from given depositor
      */
     function getDepositorZEROGain(address _depositor) external view returns (uint);
@@ -214,7 +214,7 @@ interface IStabilityPool {
 
     /**
      * Fallback function
-     * Only callable by Active Pool, it just accounts for ETH received
+     * Only callable by Active Pool, it just accounts for BTC received
      * receive() external payable;
      */
 }

@@ -5,7 +5,7 @@ pragma solidity 0.6.11;
 import "./Interfaces/IFeeSharingProxy.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IBorrowerOperations.sol";
-import "./Interfaces/ITroveManager.sol";
+import "./Interfaces/ILoCManager.sol";
 import "./Interfaces/IWrbtc.sol";
 import "./Interfaces/IZUSDToken.sol";
 import "./Dependencies/Ownable.sol";
@@ -21,7 +21,7 @@ contract FeeDistributorStorage is Ownable {
 
     IBorrowerOperations public borrowerOperations;
 
-    ITroveManager public troveManager;
+    ILoCManager public locManager;
 
     IWrbtc public wrbtc;
 

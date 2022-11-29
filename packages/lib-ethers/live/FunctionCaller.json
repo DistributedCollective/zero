@@ -33,11 +33,11 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         }
       ],
-      "name": "setSortedTrovesAddress",
+      "name": "setSortedLoCsAddress",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -46,18 +46,18 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         }
       ],
-      "name": "setTroveManagerAddress",
+      "name": "setLoCManagerAddress",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "name": "sortedTrovesAddress",
+      "name": "sortedLoCsAddress",
       "outputs": [
         {
           "internalType": "address",
@@ -86,7 +86,7 @@
           "type": "address"
         }
       ],
-      "name": "sortedTroves_findInsertPosition",
+      "name": "sortedLoCs_findInsertPosition",
       "outputs": [
         {
           "internalType": "address",
@@ -104,7 +104,7 @@
     },
     {
       "inputs": [],
-      "name": "troveManagerAddress",
+      "name": "locManagerAddress",
       "outputs": [
         {
           "internalType": "address",
@@ -128,7 +128,7 @@
           "type": "uint256"
         }
       ],
-      "name": "troveManager_getCurrentICR",
+      "name": "locManager_getCurrentICR",
       "outputs": [
         {
           "internalType": "uint256",

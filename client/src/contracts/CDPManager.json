@@ -158,7 +158,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "redeemedETH",
+          "name": "redeemedBTC",
           "type": "uint256"
         }
       ],
@@ -316,7 +316,7 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "L_ETH",
+      "name": "L_BTC",
       "outputs": [
         {
           "internalType": "uint256",
@@ -688,7 +688,7 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "ETH",
+          "name": "BTC",
           "type": "uint256"
         },
         {

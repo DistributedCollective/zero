@@ -30,11 +30,11 @@ library BorrowerLib {
         address borrowerContract
     ) internal isValueSent isContractAddress(borrowerContract) {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
-        borrowerOperations.openTrove(_maxFeePercentage, _ZUSDAmount, msg.sender, msg.sender);
+        borrowerOperations.openLoC(_maxFeePercentage, _ZUSDAmount, msg.sender, msg.sender);
     }
 
     /// @notice Issues the specified amount of ZUSD to the caller
-    /// Executes only if the Trove's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%.
+    /// Executes only if the LoC's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%.
     /// The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee.
     /// @param _maxFeePercentage maximum fee percentage that user is wishing to pay for opening the credit line
     /// @param _amount amount of ZUSD to be withdrawn
@@ -48,8 +48,8 @@ library BorrowerLib {
         borrowerOperations.withdrawZUSD(_maxFeePercentage, _amount, msg.sender, msg.sender);
     }
 
-    /// @notice withdraws `_amount` of collateral from the caller’s Trove.
-    /// Executes only if the user has an active Trove, the withdrawal would not pull the user’s Trove below the minimum collateralization ratio,
+    /// @notice withdraws `_amount` of collateral from the caller’s LoC.
+    /// Executes only if the user has an active LoC, the withdrawal would not pull the user’s LoC below the minimum collateralization ratio,
     /// and the resulting total collateralization ratio of the system is above 150%.
     /// @param _amount collateral amount to withdraw
     /// @param borrowerContract address of BorrowerOperations contract
@@ -72,7 +72,7 @@ library BorrowerLib {
         borrowerOperations.repayZUSD(_amount, msg.sender, msg.sender);
     }
 
-    /// @notice adds the received rBTC to the caller's active Trove.
+    /// @notice adds the received rBTC to the caller's active LoC.
     /// @param borrowerContract address of BorrowerOperations contract
     function addCollateral(address borrowerContract)
         internal
@@ -90,6 +90,6 @@ library BorrowerLib {
         isContractAddress(borrowerContract)
     {
         IBorrowerOperations borrowerOperations = IBorrowerOperations(borrowerContract);
-        borrowerOperations.closeTrove();
+        borrowerOperations.closeLoC();
     }
 }

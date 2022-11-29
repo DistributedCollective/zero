@@ -5,8 +5,8 @@
 ```ts
 
 // @internal (undocumented)
-export class _CachedReadableLiquity<T extends unknown[]> implements _ReadableLiquityWithExtraParams<T> {
-    constructor(readable: _ReadableLiquityWithExtraParams<T>, cache: _LiquityReadCache<T>);
+export class _CachedReadableZero<T extends unknown[]> implements _ReadableZeroWithExtraParams<T> {
+    constructor(readable: _ReadableZeroWithExtraParams<T>, cache: _ZeroReadCache<T>);
     // (undocumented)
     getCollateralSurplusBalance(address?: string, ...extraParams: T): Promise<Decimal>;
     // (undocumented)
@@ -14,7 +14,7 @@ export class _CachedReadableLiquity<T extends unknown[]> implements _ReadableLiq
     // (undocumented)
     getFrontendStatus(address?: string, ...extraParams: T): Promise<FrontendStatus>;
     // (undocumented)
-    getNumberOfTroves(...extraParams: T): Promise<number>;
+    getNumberOfLoCs(...extraParams: T): Promise<number>;
     // (undocumented)
     getPrice(...extraParams: T): Promise<Decimal>;
     // (undocumented)
@@ -22,21 +22,21 @@ export class _CachedReadableLiquity<T extends unknown[]> implements _ReadableLiq
     // (undocumented)
     getStabilityDeposit(address?: string, ...extraParams: T): Promise<StabilityDeposit>;
     // (undocumented)
-    getTotal(...extraParams: T): Promise<Trove>;
+    getTotal(...extraParams: T): Promise<LoC>;
     // (undocumented)
-    getTotalRedistributed(...extraParams: T): Promise<Trove>;
+    getTotalRedistributed(...extraParams: T): Promise<LoC>;
     // (undocumented)
     getTotalStakedZERO(...extraParams: T): Promise<Decimal>;
     // (undocumented)
-    getTrove(address?: string, ...extraParams: T): Promise<UserTrove>;
+    getLoC(address?: string, ...extraParams: T): Promise<UserLoC>;
     // (undocumented)
-    getTroveBeforeRedistribution(address?: string, ...extraParams: T): Promise<TroveWithPendingRedistribution>;
+    getLoCBeforeRedistribution(address?: string, ...extraParams: T): Promise<LoCWithPendingRedistribution>;
     // (undocumented)
-    getTroves(params: TroveListingParams & {
+    getLoCs(params: LoCListingParams & {
         beforeRedistribution: true;
-    }, ...extraParams: T): Promise<TroveWithPendingRedistribution[]>;
+    }, ...extraParams: T): Promise<LoCWithPendingRedistribution[]>;
     // (undocumented)
-    getTroves(params: TroveListingParams, ...extraParams: T): Promise<UserTrove[]>;
+    getLoCs(params: LoCListingParams, ...extraParams: T): Promise<UserLoC[]>;
     // (undocumented)
     getZEROBalance(address?: string, ...extraParams: T): Promise<Decimal>;
     // (undocumented)
@@ -57,7 +57,7 @@ export type _CollateralDeposit<T> = {
 
 // @public
 export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdrawalDetails {
-    newTrove: Trove;
+    newLoC: LoC;
 }
 
 // @internal (undocumented)
@@ -165,7 +165,7 @@ export class Difference {
 }
 
 // @internal (undocumented)
-export const _emptyTrove: Trove;
+export const _emptyLoC: LoC;
 
 // @public
 export type FailedReceipt<R = unknown> = {
@@ -182,7 +182,7 @@ export class Fees {
     constructor(baseRateWithoutDecay: Decimalish, minuteDecayFactor: Decimalish, beta: Decimalish, lastFeeOperation: Date, timeOfLatestBlock: Date, recoveryMode: boolean);
     // @internal (undocumented)
     baseRate(when?: Date): Decimal;
-    borrowingRate(when?: Date): Decimal;
+    originationRate(when?: Date): Decimal;
     equals(that: Fees): boolean;
     redemptionRate(redeemedFractionOfSupply?: Decimalish, when?: Date): Decimal;
     // @internal (undocumented)
@@ -203,34 +203,34 @@ export type FrontendStatus = {
 export interface LiquidationDetails {
     collateralGasCompensation: Decimal;
     liquidatedAddresses: string[];
-    totalLiquidated: Trove;
+    totalLiquidated: LoC;
     zusdGasCompensation: Decimal;
 }
 
 // @internal (undocumented)
-export interface _LiquityReadCache<T extends unknown[]> extends _LiquityReadCacheBase<T> {
+export interface _ZeroReadCache<T extends unknown[]> extends _ZeroReadCacheBase<T> {
     // (undocumented)
-    getTroves(params: TroveListingParams & {
+    getLoCs(params: LoCListingParams & {
         beforeRedistribution: true;
-    }, ...extraParams: T): TroveWithPendingRedistribution[] | undefined;
+    }, ...extraParams: T): LoCWithPendingRedistribution[] | undefined;
     // (undocumented)
-    getTroves(params: TroveListingParams, ...extraParams: T): UserTrove[] | undefined;
+    getLoCs(params: LoCListingParams, ...extraParams: T): UserLoC[] | undefined;
 }
 
 // @internal (undocumented)
-export type _LiquityReadCacheBase<T extends unknown[]> = {
-    [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...args: infer A) => Promise<infer R> ? (...params: [...originalParams: A, ...extraParams: T]) => R | undefined : never;
+export type _ZeroReadCacheBase<T extends unknown[]> = {
+    [P in keyof ReadableZero]: ReadableZero[P] extends (...args: infer A) => Promise<infer R> ? (...params: [...originalParams: A, ...extraParams: T]) => R | undefined : never;
 };
 
 // @public
-export type LiquityReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
+export type ZeroReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
 
 // @public
-export abstract class LiquityStore<T = unknown> {
+export abstract class ZeroStore<T = unknown> {
     // @internal (undocumented)
     protected abstract _doStart(): () => void;
     // @internal (undocumented)
-    protected _load(baseState: LiquityStoreBaseState, extraState?: T): void;
+    protected _load(baseState: ZeroStoreBaseState, extraState?: T): void;
     // @internal (undocumented)
     protected _loaded: boolean;
     logging: boolean;
@@ -238,31 +238,31 @@ export abstract class LiquityStore<T = unknown> {
     // @internal (undocumented)
     protected abstract _reduceExtra(extraState: T, extraStateUpdate: Partial<T>): T;
     start(): () => void;
-    get state(): LiquityStoreState<T>;
-    subscribe(listener: (params: LiquityStoreListenerParams<T>) => void): () => void;
+    get state(): ZeroStoreState<T>;
+    subscribe(listener: (params: ZeroStoreListenerParams<T>) => void): () => void;
     // @internal (undocumented)
-    protected _update(baseStateUpdate?: Partial<LiquityStoreBaseState>, extraStateUpdate?: Partial<T>): void;
+    protected _update(baseStateUpdate?: Partial<ZeroStoreBaseState>, extraStateUpdate?: Partial<T>): void;
     }
 
 // @public
-export interface LiquityStoreBaseState {
+export interface ZeroStoreBaseState {
     accountBalance: Decimal;
     collateralSurplusBalance: Decimal;
     // @internal (undocumented)
     _feesInNormalMode: Fees;
     frontend: FrontendStatus;
     nueBalance: Decimal;
-    numberOfTroves: number;
+    numberOfLoCs: number;
     ownFrontend: FrontendStatus;
     price: Decimal;
     remainingStabilityPoolZEROReward: Decimal;
     // @internal (undocumented)
-    _riskiestTroveBeforeRedistribution: TroveWithPendingRedistribution;
+    _riskiestLoCBeforeRedistribution: LoCWithPendingRedistribution;
     stabilityDeposit: StabilityDeposit;
-    total: Trove;
-    totalRedistributed: Trove;
+    total: LoC;
+    totalRedistributed: LoC;
     totalStakedZERO: Decimal;
-    troveBeforeRedistribution: TroveWithPendingRedistribution;
+    locBeforeRedistribution: LoCWithPendingRedistribution;
     zeroBalance: Decimal;
     zeroStake: ZEROStake;
     zusdBalance: Decimal;
@@ -270,32 +270,32 @@ export interface LiquityStoreBaseState {
 }
 
 // @public
-export interface LiquityStoreDerivedState {
-    borrowingRate: Decimal;
+export interface ZeroStoreDerivedState {
+    originationRate: Decimal;
     fees: Fees;
-    haveUndercollateralizedTroves: boolean;
+    haveUndercollateralizedLoCs: boolean;
     redemptionRate: Decimal;
-    trove: UserTrove;
+    loc: UserLoC;
 }
 
 // @public
-export interface LiquityStoreListenerParams<T = unknown> {
-    newState: LiquityStoreState<T>;
-    oldState: LiquityStoreState<T>;
-    stateChange: Partial<LiquityStoreState<T>>;
+export interface ZeroStoreListenerParams<T = unknown> {
+    newState: ZeroStoreState<T>;
+    oldState: ZeroStoreState<T>;
+    stateChange: Partial<ZeroStoreState<T>>;
 }
 
 // @public
-export type LiquityStoreState<T = unknown> = LiquityStoreBaseState & LiquityStoreDerivedState & T;
+export type ZeroStoreState<T = unknown> = ZeroStoreBaseState & ZeroStoreDerivedState & T;
 
 // @public
-export const MAXIMUM_BORROWING_RATE: Decimal;
+export const MAXIMUM_ORIGINATION_RATE: Decimal;
 
 // @public
 export type MinedReceipt<R = unknown, D = unknown> = FailedReceipt<R> | SuccessfulReceipt<R, D>;
 
 // @public
-export const MINIMUM_BORROWING_RATE: Decimal;
+export const MINIMUM_ORIGINATION_RATE: Decimal;
 
 // @public
 export const MINIMUM_COLLATERAL_RATIO: Decimal;
@@ -316,10 +316,10 @@ export type _NoCollateralWithdrawal = Partial<_CollateralWithdrawal<undefined>>;
 export type _NoDebtChange = _NoZUSDBorrowing & _NoZUSDRepayment;
 
 // @internal (undocumented)
-export const _normalizeTroveAdjustment: (params: Record<string, Decimalish | undefined>) => TroveAdjustmentParams<Decimal>;
+export const _normalizeLoCAdjustment: (params: Record<string, Decimalish | undefined>) => LoCAdjustmentParams<Decimal>;
 
 // @internal (undocumented)
-export const _normalizeTroveCreation: (params: Record<string, Decimalish | undefined>) => TroveCreationParams<Decimal>;
+export const _normalizeLoCCreation: (params: Record<string, Decimalish | undefined>) => LoCCreationParams<Decimal>;
 
 // @internal (undocumented)
 export type _NoZUSDBorrowing = Partial<_ZUSDBorrowing<undefined>>;
@@ -328,19 +328,19 @@ export type _NoZUSDBorrowing = Partial<_ZUSDBorrowing<undefined>>;
 export type _NoZUSDRepayment = Partial<_ZUSDRepayment<undefined>>;
 
 // @alpha (undocumented)
-export interface ObservableLiquity {
+export interface ObservableZero {
     // (undocumented)
-    watchNumberOfTroves(onNumberOfTrovesChanged: (numberOfTroves: number) => void): () => void;
+    watchNumberOfLoCs(onNumberOfLoCsChanged: (numberOfLoCs: number) => void): () => void;
     // (undocumented)
     watchPrice(onPriceChanged: (price: Decimal) => void): () => void;
     // (undocumented)
     watchStabilityDeposit(onStabilityDepositChanged: (stabilityDeposit: StabilityDeposit) => void, address?: string): () => void;
     // (undocumented)
-    watchTotal(onTotalChanged: (total: Trove) => void): () => void;
+    watchTotal(onTotalChanged: (total: LoC) => void): () => void;
     // (undocumented)
-    watchTotalRedistributed(onTotalRedistributedChanged: (totalRedistributed: Trove) => void): () => void;
+    watchTotalRedistributed(onTotalRedistributedChanged: (totalRedistributed: LoC) => void): () => void;
     // (undocumented)
-    watchTroveWithoutRewards(onTroveChanged: (trove: TroveWithPendingRedistribution) => void, address?: string): () => void;
+    watchLoCWithoutRewards(onLoCChanged: (loc: LoCWithPendingRedistribution) => void, address?: string): () => void;
     // (undocumented)
     watchZUSDBalance(onZUSDBalanceChanged: (balance: Decimal) => void, address?: string): () => void;
     // (undocumented)
@@ -375,46 +375,46 @@ export class Percent<T extends {
 
 // @internal (undocumented)
 export type _PopulatableFrom<T, P> = {
-    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer U> ? U extends SentLiquityTransaction ? (...args: A) => Promise<PopulatedLiquityTransaction<P, U>> : never : never;
+    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer U> ? U extends SentZeroTransaction ? (...args: A) => Promise<PopulatedZeroTransaction<P, U>> : never : never;
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "PopulatableLiquity" is marked as @public, but its signature references "_PopulatableFrom" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "PopulatableZero" is marked as @public, but its signature references "_PopulatableFrom" which is marked as @internal
 //
 // @public
-export interface PopulatableLiquity<R = unknown, S = unknown, P = unknown> extends _PopulatableFrom<SendableLiquity<R, S>, P> {
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    claimCollateralSurplus(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    closeTrove(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>>;
-    depositCollateral(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>>;
-    liquidate(address: string | string[]): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>>;
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>>;
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>>>;
+export interface PopulatableZero<R = unknown, S = unknown, P = unknown> extends _PopulatableFrom<SendableZero<R, S>, P> {
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    claimCollateralSurplus(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    closeLoC(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCClosureDetails>>>>;
+    depositCollateral(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>>;
+    liquidate(address: string | string[]): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>>;
+    liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>>;
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
-    registerFrontend(kickbackRate: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    repayZUSD(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    sendZERO(toAddress: string, amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    sendZUSD(toAddress: string, amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
+    registerFrontend(kickbackRate: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    repayZUSD(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    sendZERO(toAddress: string, amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    sendZUSD(toAddress: string, amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
     // @internal (undocumented)
-    setPrice(price: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    stakeZERO(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    transferCollateralGainToTrove(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>>>;
-    unstakeZERO(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    withdrawCollateral(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>>;
-    withdrawGainsFromStabilityPool(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>>>;
-    withdrawGainsFromStaking(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, void>>>>;
-    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>>;
+    setPrice(price: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    stakeZERO(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    transferCollateralGainToLoC(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>>>;
+    unstakeZERO(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    withdrawCollateral(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>>;
+    withdrawGainsFromStabilityPool(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityPoolGainsWithdrawalDetails>>>>;
+    withdrawGainsFromStaking(): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, void>>>>;
+    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>>;
 }
 
 // @public
-export interface PopulatedLiquityTransaction<P = unknown, T extends SentLiquityTransaction = SentLiquityTransaction> {
+export interface PopulatedZeroTransaction<P = unknown, T extends SentZeroTransaction = SentZeroTransaction> {
     readonly rawPopulatedTransaction: P;
     send(): Promise<T>;
 }
 
 // @public
-export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> extends PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>> {
+export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> extends PopulatedZeroTransaction<P, SentZeroTransaction<S, ZeroReceipt<R, RedemptionDetails>>> {
     readonly attemptedZUSDAmount: Decimal;
     increaseAmountByMinimumNetDebt(maxRedemptionRate?: Decimalish): Promise<PopulatedRedemption<P, S, R>>;
     readonly isTruncated: boolean;
@@ -422,24 +422,24 @@ export interface PopulatedRedemption<P = unknown, S = unknown, R = unknown> exte
 }
 
 // @public
-export interface ReadableLiquity {
+export interface ReadableZero {
     getCollateralSurplusBalance(address?: string): Promise<Decimal>;
     getFees(): Promise<Fees>;
     getFrontendStatus(address?: string): Promise<FrontendStatus>;
-    getNumberOfTroves(): Promise<number>;
+    getNumberOfLoCs(): Promise<number>;
     getPrice(): Promise<Decimal>;
     getRemainingStabilityPoolZEROReward(): Promise<Decimal>;
     getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
-    getTotal(): Promise<Trove>;
-    getTotalRedistributed(): Promise<Trove>;
+    getTotal(): Promise<LoC>;
+    getTotalRedistributed(): Promise<LoC>;
     getTotalStakedZERO(): Promise<Decimal>;
-    getTrove(address?: string): Promise<UserTrove>;
-    getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistribution>;
+    getLoC(address?: string): Promise<UserLoC>;
+    getLoCBeforeRedistribution(address?: string): Promise<LoCWithPendingRedistribution>;
     // @internal (undocumented)
-    getTroves(params: TroveListingParams & {
+    getLoCs(params: LoCListingParams & {
         beforeRedistribution: true;
-    }): Promise<TroveWithPendingRedistribution[]>;
-    getTroves(params: TroveListingParams): Promise<UserTrove[]>;
+    }): Promise<LoCWithPendingRedistribution[]>;
+    getLoCs(params: LoCListingParams): Promise<UserLoC[]>;
     getZEROBalance(address?: string): Promise<Decimal>;
     getZEROStake(address?: string): Promise<ZEROStake>;
     getZUSDBalance(address?: string): Promise<Decimal>;
@@ -447,18 +447,18 @@ export interface ReadableLiquity {
 }
 
 // @internal (undocumented)
-export interface _ReadableLiquityWithExtraParams<T extends unknown[]> extends _ReadableLiquityWithExtraParamsBase<T> {
+export interface _ReadableZeroWithExtraParams<T extends unknown[]> extends _ReadableZeroWithExtraParamsBase<T> {
     // (undocumented)
-    getTroves(params: TroveListingParams & {
+    getLoCs(params: LoCListingParams & {
         beforeRedistribution: true;
-    }, ...extraParams: T): Promise<TroveWithPendingRedistribution[]>;
+    }, ...extraParams: T): Promise<LoCWithPendingRedistribution[]>;
     // (undocumented)
-    getTroves(params: TroveListingParams, ...extraParams: T): Promise<UserTrove[]>;
+    getLoCs(params: LoCListingParams, ...extraParams: T): Promise<UserLoC[]>;
 }
 
 // @internal (undocumented)
-export type _ReadableLiquityWithExtraParamsBase<T extends unknown[]> = {
-    [P in keyof ReadableLiquity]: ReadableLiquity[P] extends (...params: infer A) => infer R ? (...params: [...originalParams: A, ...extraParams: T]) => R : never;
+export type _ReadableZeroWithExtraParamsBase<T extends unknown[]> = {
+    [P in keyof ReadableZero]: ReadableZero[P] extends (...params: infer A) => infer R ? (...params: [...originalParams: A, ...extraParams: T]) => R : never;
 };
 
 // @public
@@ -471,40 +471,40 @@ export interface RedemptionDetails {
 
 // @internal (undocumented)
 export type _SendableFrom<T, R, S> = {
-    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer D> ? (...args: A) => Promise<SentLiquityTransaction<S, LiquityReceipt<R, D>>> : never;
+    [M in keyof T]: T[M] extends (...args: infer A) => Promise<infer D> ? (...args: A) => Promise<SentZeroTransaction<S, ZeroReceipt<R, D>>> : never;
 };
 
-// Warning: (ae-incompatible-release-tags) The symbol "SendableLiquity" is marked as @public, but its signature references "_SendableFrom" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "SendableZero" is marked as @public, but its signature references "_SendableFrom" which is marked as @internal
 //
 // @public
-export interface SendableLiquity<R = unknown, S = unknown> extends _SendableFrom<TransactableLiquity, R, S> {
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    claimCollateralSurplus(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    closeTrove(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>;
-    depositCollateral(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>;
-    liquidate(address: string | string[]): Promise<SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>;
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<SentLiquityTransaction<S, LiquityReceipt<R, LiquidationDetails>>>;
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveCreationDetails>>>;
-    redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, RedemptionDetails>>>;
-    registerFrontend(kickbackRate: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    repayZUSD(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    sendZERO(toAddress: string, amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    sendZUSD(toAddress: string, amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
+export interface SendableZero<R = unknown, S = unknown> extends _SendableFrom<TransactableZero, R, S> {
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    claimCollateralSurplus(): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    closeLoC(): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCClosureDetails>>>;
+    depositCollateral(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>;
+    liquidate(address: string | string[]): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
+    liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<SentZeroTransaction<S, ZeroReceipt<R, LiquidationDetails>>>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCCreationDetails>>>;
+    redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, RedemptionDetails>>>;
+    registerFrontend(kickbackRate: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    repayZUSD(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    sendZERO(toAddress: string, amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    sendZUSD(toAddress: string, amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
     // @internal (undocumented)
-    setPrice(price: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    stakeZERO(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    transferCollateralGainToTrove(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>>;
-    unstakeZERO(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    withdrawCollateral(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, TroveAdjustmentDetails>>>;
-    withdrawGainsFromStabilityPool(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
-    withdrawGainsFromStaking(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
-    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityDepositChangeDetails>>>;
+    setPrice(price: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    stakeZERO(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    transferCollateralGainToLoC(): Promise<SentZeroTransaction<S, ZeroReceipt<R, CollateralGainTransferDetails>>>;
+    unstakeZERO(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    withdrawCollateral(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, LoCAdjustmentDetails>>>;
+    withdrawGainsFromStabilityPool(): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
+    withdrawGainsFromStaking(): Promise<SentZeroTransaction<S, ZeroReceipt<R, void>>>;
+    withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<SentZeroTransaction<S, ZeroReceipt<R, StabilityDepositChangeDetails>>>;
 }
 
 // @public
-export interface SentLiquityTransaction<S = unknown, T extends LiquityReceipt = LiquityReceipt> {
+export interface SentZeroTransaction<S = unknown, T extends ZeroReceipt = ZeroReceipt> {
     getReceipt(): Promise<T>;
     readonly rawSentTransaction: S;
     waitForReceipt(): Promise<Extract<T, MinedReceipt>>;
@@ -562,27 +562,27 @@ export type SuccessfulReceipt<R = unknown, D = unknown> = {
 export const _successfulReceipt: <R, D>(rawReceipt: R, details: D, toString?: (() => string) | undefined) => SuccessfulReceipt<R, D>;
 
 // @public
-export interface TransactableLiquity {
-    adjustTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
-    borrowZUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdjustmentDetails>;
+export interface TransactableZero {
+    adjustLoC(params: LoCAdjustmentParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<LoCAdjustmentDetails>;
+    borrowZUSD(amount: Decimalish, maxOriginationRate?: Decimalish): Promise<LoCAdjustmentDetails>;
     claimCollateralSurplus(): Promise<void>;
-    closeTrove(): Promise<TroveClosureDetails>;
-    depositCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+    closeLoC(): Promise<LoCClosureDetails>;
+    depositCollateral(amount: Decimalish): Promise<LoCAdjustmentDetails>;
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string): Promise<StabilityDepositChangeDetails>;
     liquidate(address: string | string[]): Promise<LiquidationDetails>;
-    liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<LiquidationDetails>;
-    openTrove(params: TroveCreationParams<Decimalish>, maxBorrowingRate?: Decimalish): Promise<TroveCreationDetails>;
+    liquidateUpTo(maximumNumberOfLoCsToLiquidate: number): Promise<LiquidationDetails>;
+    openLoC(params: LoCCreationParams<Decimalish>, maxOriginationRate?: Decimalish): Promise<LoCCreationDetails>;
     redeemZUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<RedemptionDetails>;
     registerFrontend(kickbackRate: Decimalish): Promise<void>;
-    repayZUSD(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+    repayZUSD(amount: Decimalish): Promise<LoCAdjustmentDetails>;
     sendZERO(toAddress: string, amount: Decimalish): Promise<void>;
     sendZUSD(toAddress: string, amount: Decimalish): Promise<void>;
     // @internal (undocumented)
     setPrice(price: Decimalish): Promise<void>;
     stakeZERO(amount: Decimalish): Promise<void>;
-    transferCollateralGainToTrove(): Promise<CollateralGainTransferDetails>;
+    transferCollateralGainToLoC(): Promise<CollateralGainTransferDetails>;
     unstakeZERO(amount: Decimalish): Promise<void>;
-    withdrawCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
+    withdrawCollateral(amount: Decimalish): Promise<LoCAdjustmentDetails>;
     withdrawGainsFromStabilityPool(): Promise<StabilityPoolGainsWithdrawalDetails>;
     withdrawGainsFromStaking(): Promise<void>;
     withdrawZUSDFromStabilityPool(amount: Decimalish): Promise<StabilityDepositChangeDetails>;
@@ -597,115 +597,115 @@ export class TransactionFailedError<T extends FailedReceipt = FailedReceipt> ext
 }
 
 // @public
-export class Trove {
+export class LoC {
     // @internal
     constructor(collateral?: Decimal, debt?: Decimal);
     // (undocumented)
-    add(that: Trove): Trove;
+    add(that: LoC): LoC;
     // (undocumented)
-    addCollateral(collateral: Decimalish): Trove;
+    addCollateral(collateral: Decimalish): LoC;
     // (undocumented)
-    addDebt(debt: Decimalish): Trove;
-    adjust(params: TroveAdjustmentParams<Decimalish>, borrowingRate?: Decimalish): Trove;
-    adjustTo(that: Trove, borrowingRate?: Decimalish): TroveAdjustmentParams<Decimal>;
-    apply(change: TroveChange<Decimal> | undefined, borrowingRate?: Decimalish): Trove;
+    addDebt(debt: Decimalish): LoC;
+    adjust(params: LoCAdjustmentParams<Decimalish>, originationRate?: Decimalish): LoC;
+    adjustTo(that: LoC, originationRate?: Decimalish): LoCAdjustmentParams<Decimal>;
+    apply(change: LoCChange<Decimal> | undefined, originationRate?: Decimalish): LoC;
     readonly collateral: Decimal;
     collateralRatio(price: Decimalish): Decimal;
     collateralRatioIsBelowCritical(price: Decimalish): boolean;
     collateralRatioIsBelowMinimum(price: Decimalish): boolean;
-    static create(params: TroveCreationParams<Decimalish>, borrowingRate?: Decimalish): Trove;
+    static create(params: LoCCreationParams<Decimalish>, originationRate?: Decimalish): LoC;
     readonly debt: Decimal;
     // (undocumented)
-    equals(that: Trove): boolean;
+    equals(that: LoC): boolean;
     // (undocumented)
     get isEmpty(): boolean;
     isOpenableInRecoveryMode(price: Decimalish): boolean;
     // (undocumented)
-    multiply(multiplier: Decimalish): Trove;
+    multiply(multiplier: Decimalish): LoC;
     get netDebt(): Decimal;
     // @internal (undocumented)
     get _nominalCollateralRatio(): Decimal;
-    static recreate(that: Trove, borrowingRate?: Decimalish): TroveCreationParams<Decimal>;
+    static recreate(that: LoC, originationRate?: Decimalish): LoCCreationParams<Decimal>;
     // (undocumented)
-    setCollateral(collateral: Decimalish): Trove;
+    setCollateral(collateral: Decimalish): LoC;
     // (undocumented)
-    setDebt(debt: Decimalish): Trove;
+    setDebt(debt: Decimalish): LoC;
     // (undocumented)
-    subtract(that: Trove): Trove;
+    subtract(that: LoC): LoC;
     // (undocumented)
-    subtractCollateral(collateral: Decimalish): Trove;
+    subtractCollateral(collateral: Decimalish): LoC;
     // (undocumented)
-    subtractDebt(debt: Decimalish): Trove;
+    subtractDebt(debt: Decimalish): LoC;
     // @internal (undocumented)
     toString(): string;
-    whatChanged(that: Trove, borrowingRate?: Decimalish): TroveChange<Decimal> | undefined;
+    whatChanged(that: LoC, originationRate?: Decimalish): LoCChange<Decimal> | undefined;
 }
 
 // @public
-export interface TroveAdjustmentDetails {
+export interface LoCAdjustmentDetails {
     fee: Decimal;
-    newTrove: Trove;
-    params: TroveAdjustmentParams<Decimal>;
+    newLoC: LoC;
+    params: LoCAdjustmentParams<Decimal>;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "TroveAdjustmentParams" is marked as @public, but its signature references "_CollateralChange" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveAdjustmentParams" is marked as @public, but its signature references "_NoDebtChange" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveAdjustmentParams" is marked as @public, but its signature references "_DebtChange" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveAdjustmentParams" is marked as @public, but its signature references "_NoCollateralChange" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCAdjustmentParams" is marked as @public, but its signature references "_CollateralChange" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCAdjustmentParams" is marked as @public, but its signature references "_NoDebtChange" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCAdjustmentParams" is marked as @public, but its signature references "_DebtChange" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCAdjustmentParams" is marked as @public, but its signature references "_NoCollateralChange" which is marked as @internal
 //
 // @public
-export type TroveAdjustmentParams<T = unknown> = (_CollateralChange<T> & _NoDebtChange) | (_DebtChange<T> & _NoCollateralChange) | (_CollateralChange<T> & _DebtChange<T>);
+export type LoCAdjustmentParams<T = unknown> = (_CollateralChange<T> & _NoDebtChange) | (_DebtChange<T> & _NoCollateralChange) | (_CollateralChange<T> & _DebtChange<T>);
 
 // @public
-export type TroveChange<T> = {
+export type LoCChange<T> = {
     type: "invalidCreation";
-    invalidTrove: Trove;
-    error: TroveCreationError;
+    invalidLoC: LoC;
+    error: LoCCreationError;
 } | {
     type: "creation";
-    params: TroveCreationParams<T>;
+    params: LoCCreationParams<T>;
 } | {
     type: "closure";
-    params: TroveClosureParams<T>;
+    params: LoCClosureParams<T>;
 } | {
     type: "adjustment";
-    params: TroveAdjustmentParams<T>;
+    params: LoCAdjustmentParams<T>;
     setToZero?: "collateral" | "debt";
 };
 
 // @public
-export interface TroveClosureDetails {
-    params: TroveClosureParams<Decimal>;
+export interface LoCClosureDetails {
+    params: LoCClosureParams<Decimal>;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_CollateralWithdrawal" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_NoCollateralDeposit" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_ZUSDRepayment" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveClosureParams" is marked as @public, but its signature references "_NoZUSDBorrowing" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCClosureParams" is marked as @public, but its signature references "_CollateralWithdrawal" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCClosureParams" is marked as @public, but its signature references "_NoCollateralDeposit" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCClosureParams" is marked as @public, but its signature references "_ZUSDRepayment" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCClosureParams" is marked as @public, but its signature references "_NoZUSDBorrowing" which is marked as @internal
 //
 // @public
-export type TroveClosureParams<T> = _CollateralWithdrawal<T> & _NoCollateralDeposit & Partial<_ZUSDRepayment<T>> & _NoZUSDBorrowing;
+export type LoCClosureParams<T> = _CollateralWithdrawal<T> & _NoCollateralDeposit & Partial<_ZUSDRepayment<T>> & _NoZUSDBorrowing;
 
 // @public
-export interface TroveCreationDetails {
+export interface LoCCreationDetails {
     fee: Decimal;
-    newTrove: Trove;
-    params: TroveCreationParams<Decimal>;
+    newLoC: LoC;
+    params: LoCCreationParams<Decimal>;
 }
 
 // @public
-export type TroveCreationError = "missingLiquidationReserve";
+export type LoCCreationError = "missingLiquidationReserve";
 
-// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_CollateralDeposit" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_NoCollateralWithdrawal" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_ZUSDBorrowing" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "TroveCreationParams" is marked as @public, but its signature references "_NoZUSDRepayment" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCCreationParams" is marked as @public, but its signature references "_CollateralDeposit" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCCreationParams" is marked as @public, but its signature references "_NoCollateralWithdrawal" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCCreationParams" is marked as @public, but its signature references "_ZUSDBorrowing" which is marked as @internal
+// Warning: (ae-incompatible-release-tags) The symbol "LoCCreationParams" is marked as @public, but its signature references "_NoZUSDRepayment" which is marked as @internal
 //
 // @public
-export type TroveCreationParams<T = unknown> = _CollateralDeposit<T> & _NoCollateralWithdrawal & _ZUSDBorrowing<T> & _NoZUSDRepayment;
+export type LoCCreationParams<T = unknown> = _CollateralDeposit<T> & _NoCollateralWithdrawal & _ZUSDBorrowing<T> & _NoZUSDRepayment;
 
 // @public
-export interface TroveListingParams {
+export interface LoCListingParams {
     readonly beforeRedistribution?: boolean;
     readonly first: number;
     readonly sortedBy: "ascendingCollateralRatio" | "descendingCollateralRatio";
@@ -713,29 +713,29 @@ export interface TroveListingParams {
 }
 
 // @public
-export class TroveWithPendingRedistribution extends UserTrove {
+export class LoCWithPendingRedistribution extends UserLoC {
     // @internal
-    constructor(ownerAddress: string, status: UserTroveStatus, collateral?: Decimal, debt?: Decimal, stake?: Decimal, snapshotOfTotalRedistributed?: Trove);
+    constructor(ownerAddress: string, status: UserLoCStatus, collateral?: Decimal, debt?: Decimal, stake?: Decimal, snapshotOfTotalRedistributed?: LoC);
     // (undocumented)
-    applyRedistribution(totalRedistributed: Trove): UserTrove;
+    applyRedistribution(totalRedistributed: LoC): UserLoC;
     // (undocumented)
-    equals(that: TroveWithPendingRedistribution): boolean;
+    equals(that: LoCWithPendingRedistribution): boolean;
     }
 
 // @public
-export class UserTrove extends Trove {
+export class UserLoC extends LoC {
     // @internal
-    constructor(ownerAddress: string, status: UserTroveStatus, collateral?: Decimal, debt?: Decimal);
+    constructor(ownerAddress: string, status: UserLoCStatus, collateral?: Decimal, debt?: Decimal);
     // (undocumented)
-    equals(that: UserTrove): boolean;
+    equals(that: UserLoC): boolean;
     readonly ownerAddress: string;
-    readonly status: UserTroveStatus;
+    readonly status: UserLoCStatus;
     // @internal (undocumented)
     toString(): string;
 }
 
 // @public
-export type UserTroveStatus = "nonExistent" | "open" | "closedByOwner" | "closedByLiquidation" | "closedByRedemption";
+export type UserLoCStatus = "nonExistent" | "open" | "closedByOwner" | "closedByLiquidation" | "closedByRedemption";
 
 // @public
 export class ZEROStake {

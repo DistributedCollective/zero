@@ -15,7 +15,7 @@ import "@nomiclabs/hardhat-ethers";
 import { Decimal } from "@sovryn-zero/lib-base";
 
 import { deployAndSetupContracts, setSilent, OracleAddresses } from "./utils/deploy";
-import { _LiquityDeploymentJSON } from "./src/contracts";
+import { _ZeroDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
 import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy, Ownable } from "./types";
@@ -138,7 +138,7 @@ const config: HardhatUserConfig = {
       gas: 13e6, // tx gas limit
       blockGasLimit: 13e6,
 
-      // Let Ethers throw instead of Buidler EVM
+      // Let Ethers throw instead of Hardhat EVM
       // This is closer to what will happen in production
       throwOnCallFailures: false,
       throwOnTransactionFailures: false
@@ -185,7 +185,7 @@ const config: HardhatUserConfig = {
 
 declare module "hardhat/types/runtime" {
   interface HardhatRuntimeEnvironment {
-    deployLiquity: (
+    deployZero: (
       deployer: Signer,
       governanceAddress?: string,
       sovFeeCollectorAddress?: string,
@@ -197,14 +197,14 @@ declare module "hardhat/types/runtime" {
       isMainnet?: boolean,
       notTestnet?: boolean,
       overrides?: Overrides
-    ) => Promise<_LiquityDeploymentJSON>;
+    ) => Promise<_ZeroDeploymentJSON>;
   }
 }
 
 const getLiveArtifact = (name: string): { abi: JsonFragment[]; bytecode: string } =>
   require(`./live/${name}.json`);
 
-const getDeploymentData = (network: string, channel: string): _LiquityDeploymentJSON => {
+const getDeploymentData = (network: string, channel: string): _ZeroDeploymentJSON => {
   const addresses = fs.readFileSync(path.join("deployments", channel, `${network}.json`));
 
   return JSON.parse(String(addresses));
@@ -220,7 +220,7 @@ const getContractFactory: (
   : env => env.ethers.getContractFactory;
 
 extendEnvironment(env => {
-  env.deployLiquity = async (
+  env.deployZero = async (
     deployer,
     governanceAddress,
     sovFeeCollectorAddress,
@@ -261,7 +261,7 @@ type SetAddressParams = {
 
 const defaultChannel = process.env.CHANNEL || "default";
 
-task("setMassetAddress", "Sets address of masset contract in order to support NUE troves")
+task("setMassetAddress", "Sets address of masset contract in order to support NUE locs")
   .addParam("address", "address of deployed MassetProxy contract")
   .addParam("nuetokenaddress", "address of NUE token")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
@@ -424,7 +424,7 @@ task("deploy", "Deploys the contracts to the network")
       zusdTokenAddress ??= hasZusdToken(env.network.name)
         ? zusdTokenAddresses[env.network.name]
         : undefined;
-      const deployment = await env.deployLiquity(
+      const deployment = await env.deployZero(
         deployer,
         governanceAddress,
         sovFeeCollectorAddress,
@@ -463,7 +463,7 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     const deployment = getDeploymentData(hre.network.name, channel);
     const {
       zusdToken: zusdTokenAddress,
-      troveManager: troveManagerAddress,
+      locManager: locManagerAddress,
       stabilityPool: stabilityPoolAddress,
       borrowerOperations: borrowerOperationsAddress
     } = deployment.addresses;
@@ -489,7 +489,7 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
       deployer
     )) as unknown) as ZUSDToken;
     //call initialize on the new zusdToken by calling proxy
-    await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+    await zusdToken.initialize(locManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
 
     const oldZUSDAddress = await zusdTokenProxy.getImplementation();
     console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);

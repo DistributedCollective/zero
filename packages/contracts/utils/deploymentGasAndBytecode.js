@@ -1,6 +1,6 @@
 // Hardhat script
-const SortedTroves = artifacts.require("./SortedTroves.sol")
-const TroveManager = artifacts.require("./TroveManager.sol")
+const SortedLoCs = artifacts.require("./SortedLoCs.sol")
+const LoCManager = artifacts.require("./LoCManager.sol")
 const PriceFeed = artifacts.require("./PriceFeed.sol")
 const ZUSDToken = artifacts.require("./ZUSDToken.sol")
 const ActivePool = artifacts.require("./ActivePool.sol");
@@ -17,9 +17,9 @@ const HintHelpers = artifacts.require("./HintHelpers.sol")
 const CommunityIssuanceTester = artifacts.require("./ZERO/CommunityIssuanceTester.sol")
 const ActivePoolTester = artifacts.require("./ActivePoolTester.sol")
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol")
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol")
+const ZeroMathTester = artifacts.require("./ZeroMathTester.sol")
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol")
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
+const LoCManagerTester = artifacts.require("./LoCManagerTester.sol")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
 
 const { TestHelper: th } = require("../utils/testHelpers.js")
@@ -31,8 +31,8 @@ const coreContractABIs = [
   BorrowerOperations,
   PriceFeed,
   ZUSDToken,
-  SortedTroves,
-  TroveManager,
+  SortedLoCs,
+  LoCManager,
   ActivePool,
   StabilityPool,
   DefaultPool,
@@ -50,9 +50,9 @@ const TesterContractABIs  = [
   CommunityIssuanceTester,
   ActivePoolTester,
   DefaultPoolTester,
-  LiquityMathTester,
+  ZeroMathTester,
   BorrowerOperationsTester,
-  TroveManagerTester,
+  LoCManagerTester,
   ZUSDTokenTester,
 ]
 
@@ -72,9 +72,9 @@ const getBytecodeSize = (contractABI) => {
   // console.log(`${contractABI.contractName} deployed bytecode length: ${deployedBytecodeLength}`)
 }
 
-const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, ETHPrice) => {
-  const dollarCost = (deploymentGasTotal * gasPriceInGwei * ETHPrice) / 1e9
-  console.log(`At gas price ${gasPriceInGwei} GWei, and ETH Price $${ETHPrice} per ETH, the total cost of deployment in USD is: $${dollarCost}`)
+const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, BTCPrice) => {
+  const dollarCost = (deploymentGasTotal * gasPriceInGwei * BTCPrice) / 1e9
+  console.log(`At gas price ${gasPriceInGwei} GWei, and BTC Price $${BTCPrice} per BTC, the total cost of deployment in USD is: $${dollarCost}`)
 }
 
 const logContractDeploymentCosts = async (contracts) => {
@@ -106,7 +106,7 @@ const logContractBytecodeLengths = (contractABIs) => {
 
 // Run script: log deployment gas costs and bytecode lengths for all contracts
 async function main() {
-  const coreContracts = await dh.deployLiquityCoreHardhat()
+  const coreContracts = await dh.deployZeroCoreHardhat()
   const ZEROContracts = await dh.deployZEROContractsHardhat(ARBITRARY_ADDRESS, ARBITRARY_ADDRESS)
   const testerContracts = await dh.deployTesterContractsHardhat()
 

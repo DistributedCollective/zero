@@ -23,15 +23,15 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
   let priceFeed
   let zusdToken
-  let troveManager
+  let locManager
   let stabilityPool
-  let sortedTroves
+  let sortedLoCs
   let borrowerOperations
 
-  const skyrocketPriceAndCheckAllTrovesSafe = async () => {
+  const skyrocketPriceAndCheckAllLoCsSafe = async () => {
         // price skyrockets, therefore no undercollateralized troes
         await priceFeed.setPrice(dec(1000, 18));
-        const lowestICR = await troveManager.getCurrentICR(await sortedTroves.getLast(), dec(1000, 18))
+        const lowestICR = await locManager.getCurrentICR(await sortedLoCs.getLast(), dec(1000, 18))
         assert.isTrue(lowestICR.gt(toBN(dec(110, 16))))
   }
 
@@ -41,16 +41,16 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     const randomDefaulterIndex = Math.floor(Math.random() * (remainingDefaulters.length))
     const randomDefaulter = remainingDefaulters[randomDefaulterIndex]
 
-    const liquidatedZUSD = (await troveManager.Troves(randomDefaulter))[0]
-    const liquidatedETH = (await troveManager.Troves(randomDefaulter))[1]
+    const liquidatedZUSD = (await locManager.LoCs(randomDefaulter))[0]
+    const liquidatedBTC = (await locManager.LoCs(randomDefaulter))[1]
 
     const price = await priceFeed.getPrice()
-    const ICR = (await troveManager.getCurrentICR(randomDefaulter, price)).toString()
+    const ICR = (await locManager.getCurrentICR(randomDefaulter, price)).toString()
     const ICRPercent = ICR.slice(0, ICR.length - 16)
 
     console.log(`SP address: ${stabilityPool.address}`)
     const ZUSDinPoolBefore = await stabilityPool.getTotalZUSDDeposits()
-    const liquidatedTx = await troveManager.liquidate(randomDefaulter, { from: accounts[0] })
+    const liquidatedTx = await locManager.liquidate(randomDefaulter, { from: accounts[0] })
     const ZUSDinPoolAfter = await stabilityPool.getTotalZUSDDeposits()
 
     assert.isTrue(liquidatedTx.receipt.status)
@@ -59,9 +59,9 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       liquidatedAccountsDict[randomDefaulter] = true
       remainingDefaulters.splice(randomDefaulterIndex, 1)
     }
-    if (await troveManager.checkRecoveryMode(price)) { console.log("recovery mode: TRUE") }
+    if (await locManager.checkRecoveryMode(price)) { console.log("recovery mode: TRUE") }
 
-    console.log(`Liquidation. addr: ${th.squeezeAddr(randomDefaulter)} ICR: ${ICRPercent}% coll: ${liquidatedETH} debt: ${liquidatedZUSD} SP ZUSD before: ${ZUSDinPoolBefore} SP ZUSD after: ${ZUSDinPoolAfter} tx success: ${liquidatedTx.receipt.status}`)
+    console.log(`Liquidation. addr: ${th.squeezeAddr(randomDefaulter)} ICR: ${ICRPercent}% coll: ${liquidatedBTC} debt: ${liquidatedZUSD} SP ZUSD before: ${ZUSDinPoolBefore} SP ZUSD after: ${ZUSDinPoolAfter} tx success: ${liquidatedTx.receipt.status}`)
   }
 
   const performSPDeposit = async (depositorAccounts, currentDepositors, currentDepositorsDict) => {
@@ -101,70 +101,70 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     }
   }
 
-  const systemContainsTroveUnder110 = async (price) => {
-    const lowestICR = await troveManager.getCurrentICR(await sortedTroves.getLast(), price)
+  const systemContainsLoCUnder110 = async (price) => {
+    const lowestICR = await locManager.getCurrentICR(await sortedLoCs.getLast(), price)
     console.log(`lowestICR: ${lowestICR}, lowestICR.lt(dec(110, 16)): ${lowestICR.lt(toBN(dec(110, 16)))}`)
     return lowestICR.lt(dec(110, 16))
   }
 
-  const systemContainsTroveUnder100 = async (price) => {
-    const lowestICR = await troveManager.getCurrentICR(await sortedTroves.getLast(), price)
+  const systemContainsLoCUnder100 = async (price) => {
+    const lowestICR = await locManager.getCurrentICR(await sortedLoCs.getLast(), price)
     console.log(`lowestICR: ${lowestICR}, lowestICR.lt(dec(100, 16)): ${lowestICR.lt(toBN(dec(100, 16)))}`)
     return lowestICR.lt(dec(100, 16))
   }
 
-  const getTotalDebtFromUndercollateralizedTroves = async (n, price) => {
+  const getTotalDebtFromUndercollateralizedLoCs = async (n, price) => {
     let totalDebt = ZERO
-    let trove = await sortedTroves.getLast()
+    let loc = await sortedLoCs.getLast()
 
     for (let i = 0; i < n; i++) {
-      const ICR = await troveManager.getCurrentICR(trove, price)
-      const debt = ICR.lt(toBN(dec(110, 16))) ? (await troveManager.getEntireDebtAndColl(trove))[0] : ZERO
+      const ICR = await locManager.getCurrentICR(loc, price)
+      const debt = ICR.lt(toBN(dec(110, 16))) ? (await locManager.getEntireDebtAndColl(loc))[0] : ZERO
 
       totalDebt = totalDebt.add(debt)
-      trove = await sortedTroves.getPrev(trove)
+      loc = await sortedLoCs.getPrev(loc)
     }
 
     return totalDebt
   }
 
-  const clearAllUndercollateralizedTroves = async (price) => {
-    /* Somewhat arbitrary way to clear under-collateralized troves: 
+  const clearAllUndercollateralizedLoCs = async (price) => {
+    /* Somewhat arbitrary way to clear under-collateralized locs: 
     *
-    * - If system is in Recovery Mode and contains troves with ICR < 100, whale draws the lowest trove's debt amount 
-    * and sends to lowest trove owner, who then closes their trove.
+    * - If system is in Recovery Mode and contains locs with ICR < 100, whale draws the lowest LoC's debt amount 
+    * and sends to lowest LoC owner, who then closes their loc.
     *
-    * - If system contains troves with ICR < 110, whale simply draws and makes an SP deposit 
-    * equal to the debt of the last 50 troves, before a liquidateTroves tx hits the last 50 troves.
+    * - If system contains locs with ICR < 110, whale simply draws and makes an SP deposit 
+    * equal to the debt of the last 50 locs, before a liquidateLoCs tx hits the last 50 locs.
     *
     * The intent is to avoid the system entering an endless loop where the SP is empty and debt is being forever liquidated/recycled 
-    * between active troves, and the existence of some under-collateralized troves blocks all SP depositors from withdrawing.
+    * between active locs, and the existence of some under-collateralized locs blocks all SP depositors from withdrawing.
     * 
     * Since the purpose of the fuzz test is to see if SP depositors can indeed withdraw *when they should be able to*,
-    * we first need to put the system in a state with no under-collateralized troves (which are supposed to block SP withdrawals).
+    * we first need to put the system in a state with no under-collateralized locs (which are supposed to block SP withdrawals).
     */
-    while(await systemContainsTroveUnder100(price) && await troveManager.checkRecoveryMode()) {
-      const lowestTrove = await sortedTroves.getLast()
-      const lastTroveDebt = (await troveManager.getEntireDebtAndColl(trove))[0]
-      await borrowerOperations.adjustTrove(0, 0 , lastTroveDebt, true, whale, {from: whale})
-      await zusdToken.transfer(lowestTrove, lowestTroveDebt, {from: whale})
-      await borrowerOperations.closeTrove({from: lowestTrove})
+    while(await systemContainsLoCUnder100(price) && await locManager.checkRecoveryMode()) {
+      const lowestLoC = await sortedLoCs.getLast()
+      const lastLoCDebt = (await locManager.getEntireDebtAndColl(loc))[0]
+      await borrowerOperations.adjustLoC(0, 0 , lastLoCDebt, true, whale, {from: whale})
+      await zusdToken.transfer(lowestLoC, lowestLoCDebt, {from: whale})
+      await borrowerOperations.closeLoC({from: lowestLoC})
     }
 
-    while (await systemContainsTroveUnder110(price)) {
-      const debtLowest50Troves = await getTotalDebtFromUndercollateralizedTroves(50, price)
+    while (await systemContainsLoCUnder110(price)) {
+      const debtLowest50LoCs = await getTotalDebtFromUndercollateralizedLoCs(50, price)
       
-      if (debtLowest50Troves.gt(ZERO)) {
-        await borrowerOperations.adjustTrove(0, 0 , debtLowest50Troves, true, whale, {from: whale})
-        await stabilityPool.provideToSP(debtLowest50Troves, {from: whale})
+      if (debtLowest50LoCs.gt(ZERO)) {
+        await borrowerOperations.adjustLoC(0, 0 , debtLowest50LoCs, true, whale, {from: whale})
+        await stabilityPool.provideToSP(debtLowest50LoCs, {from: whale})
       }
       
-      await troveManager.liquidateTroves(50)
+      await locManager.liquidateLoCs(50)
     }
   }
 
   const attemptWithdrawAllDeposits = async (currentDepositors) => {
-    // First, liquidate all remaining undercollateralized troves, so that SP depositors may withdraw
+    // First, liquidate all remaining undercollateralized locs, so that SP depositors may withdraw
 
     console.log("\n")
     console.log("--- Attempt to withdraw all deposits ---")
@@ -173,14 +173,14 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     for (depositor of currentDepositors) {
       const initialDeposit = (await stabilityPool.deposits(depositor))[0]
       const finalDeposit = await stabilityPool.getCompoundedZUSDDeposit(depositor)
-      const ETHGain = await stabilityPool.getDepositorETHGain(depositor)
-      const ETHinSP = (await stabilityPool.getETH()).toString()
+      const BTCGain = await stabilityPool.getDepositorBTCGain(depositor)
+      const BTCinSP = (await stabilityPool.getBTC()).toString()
       const ZUSDinSP = (await stabilityPool.getTotalZUSDDeposits()).toString()
 
       // Attempt to withdraw
       const withdrawalTx = await stabilityPool.withdrawFromSP(dec(1, 36), { from: depositor })
 
-      const ETHinSPAfter = (await stabilityPool.getETH()).toString()
+      const BTCinSPAfter = (await stabilityPool.getBTC()).toString()
       const ZUSDinSPAfter = (await stabilityPool.getTotalZUSDDeposits()).toString()
       const ZUSDBalanceSPAfter = (await zusdToken.balanceOf(stabilityPool.address))
       const depositAfter = await stabilityPool.getCompoundedZUSDDeposit(depositor)
@@ -188,15 +188,15 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
       console.log(`--Before withdrawal--
                     withdrawer addr: ${th.squeezeAddr(depositor)}
                      initial deposit: ${initialDeposit}
-                     ETH gain: ${ETHGain}
-                     ETH in SP: ${ETHinSP}
+                     BTC gain: ${BTCGain}
+                     BTC in SP: ${BTCinSP}
                      compounded deposit: ${finalDeposit} 
                      ZUSD in SP: ${ZUSDinSP}
                     
                     --After withdrawal--
                      Withdrawal tx success: ${withdrawalTx.receipt.status} 
                      Deposit after: ${depositAfter}
-                     ETH remaining in SP: ${ETHinSPAfter}
+                     BTC remaining in SP: ${BTCinSPAfter}
                      SP ZUSD deposits tracker after: ${ZUSDinSPAfter}
                      SP ZUSD balance after: ${ZUSDBalanceSPAfter}
                      `)
@@ -213,16 +213,16 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     })
 
     beforeEach(async () => {
-      contracts = await deploymentHelper.deployLiquityCore()
+      contracts = await deploymentHelper.deployZeroCore()
       const ZEROContracts = await deploymentHelper.deployZEROContracts(bountyAddress)
 
       stabilityPool = contracts.stabilityPool
       priceFeed = contracts.priceFeedTestnet
       zusdToken = contracts.zusdToken
       stabilityPool = contracts.stabilityPool
-      troveManager = contracts.troveManager
+      locManager = contracts.locManager
       borrowerOperations = contracts.borrowerOperations
-      sortedTroves = contracts.sortedTroves
+      sortedLoCs = contracts.sortedLoCs
 
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
@@ -237,9 +237,9 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
     // ensure full offset with whale2 in S
     // ensure partial offset with whale 3 in L
 
-    it("Defaulters' Collateral in range [1, 1e8]. SP Deposits in range [100, 1e10]. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1, 1e8]. SP Deposits in range [100, 1e10]. BTC:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
-      await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
+      await borrowerOperations.openLoC(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
       const numberOfOps = 5
       const defaulterAccounts = accounts.slice(1, numberOfOps)
@@ -262,7 +262,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       // setup:
       // account set L all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(defaulterCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
@@ -271,7 +271,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
         true)
 
       // account set S all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(depositorCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
@@ -291,29 +291,29 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
           currentDepositorsDict)
       }
 
-      await skyrocketPriceAndCheckAllTrovesSafe()
+      await skyrocketPriceAndCheckAllLoCsSafe()
 
       const totalZUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsBeforeWithdrawals = await stabilityPool.getBTC()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
       const totalZUSDDepositsAfterWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsAfterWithdrawals = await stabilityPool.getBTC()
 
       console.log(`Total ZUSD deposits before any withdrawals: ${totalZUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total BTC rewards before any withdrawals: ${totalBTCRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining ZUSD deposits after withdrawals: ${totalZUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining BTC rewards after withdrawals: ${totalBTCRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)
     })
 
-    it("Defaulters' Collateral in range [1, 10]. SP Deposits in range [1e8, 1e10]. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1, 10]. SP Deposits in range [1e8, 1e10]. BTC:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
-      await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
+      await borrowerOperations.openLoC(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
       const numberOfOps = 5
       const defaulterAccounts = accounts.slice(1, numberOfOps)
@@ -336,7 +336,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       // setup:
       // account set L all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(defaulterCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
@@ -344,7 +344,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
         defaulterZUSDProportionMax)
 
       // account set S all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(depositorCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
@@ -363,29 +363,29 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
           currentDepositorsDict)
       }
 
-      await skyrocketPriceAndCheckAllTrovesSafe()
+      await skyrocketPriceAndCheckAllLoCsSafe()
 
       const totalZUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsBeforeWithdrawals = await stabilityPool.getBTC()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
       const totalZUSDDepositsAfterWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsAfterWithdrawals = await stabilityPool.getBTC()
 
       console.log(`Total ZUSD deposits before any withdrawals: ${totalZUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total BTC rewards before any withdrawals: ${totalBTCRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining ZUSD deposits after withdrawals: ${totalZUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining BTC rewards after withdrawals: ${totalBTCRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)
     })
 
-    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [100, 1000]. Every liquidation empties the Pool. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [100, 1000]. Every liquidation empties the Pool. BTC:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
-      await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
+      await borrowerOperations.openLoC(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
       const numberOfOps = 5
       const defaulterAccounts = accounts.slice(1, numberOfOps)
@@ -408,7 +408,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       // setup:
       // account set L all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(defaulterCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
@@ -416,7 +416,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
         defaulterZUSDProportionMax)
 
       // account set S all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(depositorCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
@@ -435,29 +435,29 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
           currentDepositorsDict)
       }
 
-      await skyrocketPriceAndCheckAllTrovesSafe()
+      await skyrocketPriceAndCheckAllLoCsSafe()
 
       const totalZUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsBeforeWithdrawals = await stabilityPool.getBTC()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
       const totalZUSDDepositsAfterWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsAfterWithdrawals = await stabilityPool.getBTC()
 
       console.log(`Total ZUSD deposits before any withdrawals: ${totalZUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total BTC rewards before any withdrawals: ${totalBTCRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining ZUSD deposits after withdrawals: ${totalZUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining BTC rewards after withdrawals: ${totalBTCRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)
     })
 
-    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [1e8 1e10]. ETH:USD = 100", async () => {
+    it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [1e8 1e10]. BTC:USD = 100", async () => {
       // whale adds coll that holds TCR > 150%
-      await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
+      await borrowerOperations.openLoC(0, 0, whale, whale, { from: whale, value: dec(5, 29) })
 
       // price drops, all L liquidateable
       const numberOfOps = 5
@@ -481,7 +481,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
 
       // setup:
       // account set L all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(defaulterCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(defaulterCollMin,
         defaulterCollMax,
         defaulterAccounts,
         contracts,
@@ -489,7 +489,7 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
         defaulterZUSDProportionMax)
 
       // account set S all add coll and withdraw ZUSD
-      await th.openTrove_allAccounts_randomETH_randomZUSD(depositorCollMin,
+      await th.openLoC_allAccounts_randomBTC_randomZUSD(depositorCollMin,
         depositorCollMax,
         depositorAccounts,
         contracts,
@@ -508,21 +508,21 @@ contract("PoolManager - random liquidations/deposits, then check all depositors 
           currentDepositorsDict)
       }
 
-      await skyrocketPriceAndCheckAllTrovesSafe()
+      await skyrocketPriceAndCheckAllLoCsSafe()
 
       const totalZUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsBeforeWithdrawals = await stabilityPool.getBTC()
 
       await attemptWithdrawAllDeposits(currentDepositors)
 
       const totalZUSDDepositsAfterWithdrawals = await stabilityPool.getTotalZUSDDeposits()
-      const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH()
+      const totalBTCRewardsAfterWithdrawals = await stabilityPool.getBTC()
 
       console.log(`Total ZUSD deposits before any withdrawals: ${totalZUSDDepositsBeforeWithdrawals}`)
-      console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`)
+      console.log(`Total BTC rewards before any withdrawals: ${totalBTCRewardsBeforeWithdrawals}`)
 
       console.log(`Remaining ZUSD deposits after withdrawals: ${totalZUSDDepositsAfterWithdrawals}`)
-      console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`)
+      console.log(`Remaining BTC rewards after withdrawals: ${totalBTCRewardsAfterWithdrawals}`)
 
       console.log(`current depositors length: ${currentDepositors.length}`)
       console.log(`remaining defaulters length: ${remainingDefaulters.length}`)

@@ -2,15 +2,15 @@
 
 pragma solidity 0.6.11;
 
-import "../TroveManager.sol";
+import "../LoCManager.sol";
 
-/* Tester contract inherits from TroveManager, and provides external functions 
+/* Tester contract inherits from LoCManager, and provides external functions 
 for testing the parent's internal functions. */
 
-contract TroveManagerTester is TroveManager {
+contract LoCManagerTester is LoCManager {
 
     function computeICR(uint _coll, uint _debt, uint _price) external pure returns (uint) {
-        return LiquityMath._computeCR(_coll, _debt, _price);
+        return ZeroMath._computeCR(_coll, _debt, _price);
     }
 
     function getCollGasCompensation(uint _coll) external view returns (uint) {
@@ -45,16 +45,16 @@ contract TroveManagerTester is TroveManager {
         baseRate = _baseRate;
     }
 
-    function callGetRedemptionFee(uint _ETHDrawn) external view returns (uint) {
-        _getRedemptionFee(_ETHDrawn);
+    function callGetRedemptionFee(uint _BTCDrawn) external view returns (uint) {
+        _getRedemptionFee(_BTCDrawn);
     }  
 
     function getActualDebtFromComposite(uint _debtVal) external pure returns (uint) {
         return _getNetDebt(_debtVal);
     }
 
-    function callInternalRemoveTroveOwner(address _troveOwner) external {
-        uint troveOwnersArrayLength = TroveOwners.length;
-        _removeTroveOwner(_troveOwner, troveOwnersArrayLength);
+    function callInternalRemoveLoCOwner(address _locOwner) external {
+        uint locOwnersArrayLength = LoCOwners.length;
+        _removeLoCOwner(_locOwner, locOwnersArrayLength);
     }
 }

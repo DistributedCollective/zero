@@ -95,7 +95,7 @@
           "type": "bool"
         }
       ],
-      "name": "adjustTroveExt",
+      "name": "adjustLoCExt",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -143,7 +143,7 @@
           "type": "uint256"
         }
       ],
-      "name": "adjustTroveRawExt",
+      "name": "adjustLoCRawExt",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -186,11 +186,11 @@
         },
         {
           "internalType": "address[]",
-          "name": "_troveArray",
+          "name": "_locArray",
           "type": "address[]"
         }
       ],
-      "name": "batchLiquidateTrovesExt",
+      "name": "batchLiquidateLoCsExt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -216,7 +216,7 @@
           "type": "uint256"
         }
       ],
-      "name": "closeTroveExt",
+      "name": "closeLoCExt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -297,7 +297,7 @@
     },
     {
       "inputs": [],
-      "name": "echidna_ETH_balances",
+      "name": "echidna_BTC_balances",
       "outputs": [
         {
           "internalType": "bool",
@@ -336,7 +336,7 @@
     },
     {
       "inputs": [],
-      "name": "echidna_canary_number_of_troves",
+      "name": "echidna_canary_number_of_locs",
       "outputs": [
         {
           "internalType": "bool",
@@ -362,7 +362,7 @@
     },
     {
       "inputs": [],
-      "name": "echidna_trove_properties",
+      "name": "echidna_loc_properties",
       "outputs": [
         {
           "internalType": "bool",
@@ -375,7 +375,7 @@
     },
     {
       "inputs": [],
-      "name": "echidna_troves_order",
+      "name": "echidna_locs_order",
       "outputs": [
         {
           "internalType": "bool",
@@ -459,7 +459,7 @@
           "type": "uint256"
         }
       ],
-      "name": "liquidateTrovesExt",
+      "name": "liquidateLoCsExt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -495,7 +495,7 @@
           "type": "uint256"
         }
       ],
-      "name": "openTroveExt",
+      "name": "openLoCExt",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -533,7 +533,7 @@
           "type": "uint256"
         }
       ],
-      "name": "openTroveRawExt",
+      "name": "openLoCRawExt",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -718,10 +718,10 @@
     },
     {
       "inputs": [],
-      "name": "troveManager",
+      "name": "locManager",
       "outputs": [
         {
-          "internalType": "contract TroveManager",
+          "internalType": "contract LoCManager",
           "name": "",
           "type": "address"
         }

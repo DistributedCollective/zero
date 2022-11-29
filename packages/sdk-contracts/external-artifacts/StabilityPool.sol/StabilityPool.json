@@ -108,7 +108,7 @@
           "type": "uint256"
         }
       ],
-      "name": "ETHGainWithdrawn",
+      "name": "BTCGainWithdrawn",
       "type": "event"
     },
     {
@@ -140,7 +140,7 @@
           "type": "uint256"
         }
       ],
-      "name": "EtherSent",
+      "name": "BTCSent",
       "type": "event"
     },
     {
@@ -345,11 +345,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newSortedTrovesAddress",
+          "name": "_newSortedLoCsAddress",
           "type": "address"
         }
       ],
-      "name": "SortedTrovesAddressChanged",
+      "name": "SortedLoCsAddressChanged",
       "type": "event"
     },
     {
@@ -362,7 +362,7 @@
           "type": "uint256"
         }
       ],
-      "name": "StabilityPoolETHBalanceUpdated",
+      "name": "StabilityPoolBTCBalanceUpdated",
       "type": "event"
     },
     {
@@ -384,11 +384,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_newTroveManagerAddress",
+          "name": "_newLoCManagerAddress",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressChanged",
+      "name": "LoCManagerAddressChanged",
       "type": "event"
     },
     {
@@ -869,7 +869,7 @@
           "type": "address"
         }
       ],
-      "name": "getDepositorETHGain",
+      "name": "getDepositorBTCGain",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1024,10 +1024,10 @@
     },
     {
       "inputs": [],
-      "name": "liquityBaseParams",
+      "name": "zeroBaseParams",
       "outputs": [
         {
-          "internalType": "contract ILiquityBaseParams",
+          "internalType": "contract IZeroBaseParams",
           "name": "",
           "type": "address"
         }
@@ -1101,7 +1101,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_liquityBaseParamsAddress",
+          "name": "_zeroBaseParamsAddress",
           "type": "address"
         },
         {
@@ -1111,7 +1111,7 @@
         },
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         },
         {
@@ -1126,7 +1126,7 @@
         },
         {
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         },
         {
@@ -1160,10 +1160,10 @@
     },
     {
       "inputs": [],
-      "name": "sortedTroves",
+      "name": "sortedLoCs",
       "outputs": [
         {
-          "internalType": "contract ISortedTroves",
+          "internalType": "contract ISortedLoCs",
           "name": "",
           "type": "address"
         }
@@ -1173,10 +1173,10 @@
     },
     {
       "inputs": [],
-      "name": "troveManager",
+      "name": "locManager",
       "outputs": [
         {
-          "internalType": "contract ITroveManager",
+          "internalType": "contract ILoCManager",
           "name": "",
           "type": "address"
         }
@@ -1197,7 +1197,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawETHGainToTrove",
+      "name": "withdrawBTCGainToLoC",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

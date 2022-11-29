@@ -3,8 +3,8 @@ import assert from "assert";
 import { Decimal, Decimalish } from "./Decimal";
 
 import {
-  MAXIMUM_BORROWING_RATE,
-  MINIMUM_BORROWING_RATE,
+  MAXIMUM_ORIGINATION_RATE,
+  MINIMUM_ORIGINATION_RATE,
   MINIMUM_REDEMPTION_RATE
 } from "./constants";
 
@@ -12,7 +12,7 @@ import {
  * Calculator for fees.
  *
  * @remarks
- * Returned by the {@link ReadableLiquity.getFees | getFees()} function.
+ * Returned by the {@link ReadableZero.getFees | getFees()} function.
  *
  * @public
  */
@@ -101,21 +101,21 @@ export class Fees {
    * By default, the fee is calculated at the time of the latest block. This can be overridden using
    * the `when` parameter.
    *
-   * To calculate the borrowing fee in ZUSD, multiply the borrowed ZUSD amount by the borrowing rate.
+   * To calculate the origination fee in ZUSD, multiply the borrowed ZUSD amount by the borrowing rate.
    *
    * @example
    * ```typescript
    * const fees = await zero.getFees();
    *
    * const borrowedZUSDAmount = 100;
-   * const borrowingRate = fees.borrowingRate();
-   * const borrowingFeeZUSD = borrowingRate.mul(borrowedZUSDAmount);
+   * const originationRate = fees.originationRate();
+   * const originationFeeZUSD = originationRate.mul(borrowedZUSDAmount);
    * ```
    */
-  borrowingRate(when?: Date): Decimal {
+  originationRate(when?: Date): Decimal {
     return this._recoveryMode
       ? Decimal.ZERO
-      : Decimal.min(MINIMUM_BORROWING_RATE.add(this.baseRate(when)), MAXIMUM_BORROWING_RATE);
+      : Decimal.min(MINIMUM_ORIGINATION_RATE.add(this.baseRate(when)), MAXIMUM_ORIGINATION_RATE);
   }
 
   /**

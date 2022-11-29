@@ -14,17 +14,17 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     // --- Events ---
 
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-    event TroveManagerAddressChanged(address _newTroveManagerAddress);
+    event LoCManagerAddressChanged(address _newLoCManagerAddress);
     event ActivePoolAddressChanged(address _newActivePoolAddress);
 
     event CollBalanceUpdated(address indexed _account, uint _newBalance);
-    event EtherSent(address _to, uint _amount);
+    event BTCSent(address _to, uint _amount);
     
     // --- Contract setters ---
 
     function setAddresses(
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
+        address _locManagerAddress,
         address _activePoolAddress
     )
         external
@@ -32,24 +32,24 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         onlyOwner
     {
         checkContract(_borrowerOperationsAddress);
-        checkContract(_troveManagerAddress);
+        checkContract(_locManagerAddress);
         checkContract(_activePoolAddress);
 
         borrowerOperationsAddress = _borrowerOperationsAddress;
-        troveManagerAddress = _troveManagerAddress;
+        locManagerAddress = _locManagerAddress;
         activePoolAddress = _activePoolAddress;
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-        emit TroveManagerAddressChanged(_troveManagerAddress);
+        emit LoCManagerAddressChanged(_locManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
 
         
     }
 
-    /** Returns the ETH state variable at ActivePool address.
-       Not necessarily equal to the raw ether balance - ether can be forcibly sent to contracts. */
-    function getETH() external view override returns (uint) {
-        return ETH;
+    /** Returns the BTC state variable at ActivePool address.
+       Not necessarily equal to the raw bitcoin balance - bitcoin can be forcibly sent to contracts. */
+    function getBTC() external view override returns (uint) {
+        return BTC;
     }
 
     function getCollateral(address _account) external view override returns (uint) {
@@ -59,7 +59,7 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
     // --- Pool functionality ---
 
     function accountSurplus(address _account, uint _amount) external override {
-        _requireCallerIsTroveManager();
+        _requireCallerIsLoCManager();
 
         uint newAmount = balances[_account].add(_amount);
         balances[_account] = newAmount;
@@ -75,11 +75,11 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
         balances[_account] = 0;
         emit CollBalanceUpdated(_account, 0);
 
-        ETH = ETH.sub(claimableColl);
-        emit EtherSent(_account, claimableColl);
+        BTC = BTC.sub(claimableColl);
+        emit BTCSent(_account, claimableColl);
 
         (bool success, ) = _account.call{ value: claimableColl }("");
-        require(success, "CollSurplusPool: sending ETH failed");
+        require(success, "CollSurplusPool: sending BTC failed");
     }
 
     // --- 'require' functions ---
@@ -90,10 +90,10 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
             "CollSurplusPool: Caller is not Borrower Operations");
     }
 
-    function _requireCallerIsTroveManager() internal view {
+    function _requireCallerIsLoCManager() internal view {
         require(
-            msg.sender == troveManagerAddress,
-            "CollSurplusPool: Caller is not TroveManager");
+            msg.sender == locManagerAddress,
+            "CollSurplusPool: Caller is not LoCManager");
     }
 
     function _requireCallerIsActivePool() internal view {
@@ -106,6 +106,6 @@ contract CollSurplusPool is CollSurplusPoolStorage, CheckContract, ICollSurplusP
 
     receive() external payable {
         _requireCallerIsActivePool();
-        ETH = ETH.add(msg.value);
+        BTC = BTC.add(msg.value);
     }
 }

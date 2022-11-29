@@ -8,7 +8,7 @@ const MoneyValues = {
   negative_50e18: "-" + web3.utils.toWei("50", "ether"),
   negative_100e18: "-" + web3.utils.toWei("100", "ether"),
   negative_101e18: "-" + web3.utils.toWei("101", "ether"),
-  negative_eth: amount => "-" + web3.utils.toWei(amount, "ether"),
+  negative_btc: amount => "-" + web3.utils.toWei(amount, "ether"),
 
   _zeroBN: web3.utils.toBN("0"),
   _1e18BN: web3.utils.toBN("1000000000000000000"),
@@ -169,13 +169,13 @@ class TestHelper {
     return ICR;
   }
 
-  static async ICRbetween100and110(account, troveManager, price) {
-    const ICR = await troveManager.getCurrentICR(account, price);
+  static async ICRbetween100and110(account, locManager, price) {
+    const ICR = await locManager.getCurrentICR(account, price);
     return ICR.gt(MoneyValues._ICR100) && ICR.lt(MoneyValues._MCR);
   }
 
-  static async isUndercollateralized(account, troveManager, price) {
-    const ICR = await troveManager.getCurrentICR(account, price);
+  static async isUndercollateralized(account, locManager, price) {
+    const ICR = await locManager.getCurrentICR(account, price);
     return ICR.lt(MoneyValues._MCR);
   }
 
@@ -188,8 +188,8 @@ class TestHelper {
     return gas;
   }
 
-  static applyLiquidationFee(ethAmount) {
-    return ethAmount.mul(this.toBN(this.dec(995, 15))).div(MoneyValues._1e18BN);
+  static applyLiquidationFee(btcAmount) {
+    return btcAmount.mul(this.toBN(this.dec(995, 15))).div(MoneyValues._1e18BN);
   }
   // --- Logging functions ---
 
@@ -215,13 +215,13 @@ class TestHelper {
   }
 
   static async logActiveAccounts(contracts, n) {
-    const count = await contracts.sortedTroves.getSize();
+    const count = await contracts.sortedLoCs.getSize();
     const price = await contracts.priceFeedTestnet.getPrice();
 
     n = typeof n == "undefined" ? count : n;
 
-    let account = await contracts.sortedTroves.getLast();
-    const head = await contracts.sortedTroves.getFirst();
+    let account = await contracts.sortedLoCs.getLast();
+    const head = await contracts.sortedLoCs.getFirst();
 
     console.log(`Total active accounts: ${count}`);
     console.log(`First ${n} accounts, in ascending ICR order:`);
@@ -229,9 +229,9 @@ class TestHelper {
     let i = 0;
     while (i < n) {
       const squeezedAddr = this.squeezeAddr(account);
-      const coll = (await contracts.troveManager.Troves(account))[1];
-      const debt = (await contracts.troveManager.Troves(account))[0];
-      const ICR = await contracts.troveManager.getCurrentICR(account, price);
+      const coll = (await contracts.locManager.LoCs(account))[1];
+      const debt = (await contracts.locManager.LoCs(account))[0];
+      const ICR = await contracts.locManager.getCurrentICR(account, price);
 
       console.log(`Acct: ${squeezedAddr}  coll:${coll}  debt: ${debt}  ICR: ${ICR}`);
 
@@ -239,13 +239,13 @@ class TestHelper {
         break;
       }
 
-      account = await contracts.sortedTroves.getPrev(account);
+      account = await contracts.sortedLoCs.getPrev(account);
 
       i++;
     }
   }
 
-  static async logAccountsArray(accounts, troveManager, price, n) {
+  static async logAccountsArray(accounts, locManager, price, n) {
     const length = accounts.length;
 
     n = typeof n == "undefined" ? length : n;
@@ -257,9 +257,9 @@ class TestHelper {
       const account = accounts[i];
 
       const squeezedAddr = this.squeezeAddr(account);
-      const coll = (await troveManager.Troves(account))[1];
-      const debt = (await troveManager.Troves(account))[0];
-      const ICR = await troveManager.getCurrentICR(account, price);
+      const coll = (await locManager.LoCs(account))[1];
+      const debt = (await locManager.LoCs(account))[0];
+      const ICR = await locManager.getCurrentICR(account, price);
 
       console.log(`Acct: ${squeezedAddr}  coll:${coll}  debt: ${debt}  ICR: ${ICR}`);
     }
@@ -278,16 +278,16 @@ class TestHelper {
   // the mainnet contract PriceFeed uses fetchPrice, which is non-view and writes to storage.
 
   // To checkRecoveryMode / getTCR from the Zero mainnet contracts, pass a price value - this can be the lastGoodPrice
-  // stored in Zero, or the current Chainlink ETHUSD price, etc.
+  // stored in Zero, or the current Chainlink BTCUSD price, etc.
 
   static async checkRecoveryMode(contracts) {
     const price = await contracts.priceFeedTestnet.getPrice();
-    return contracts.troveManager.checkRecoveryMode(price);
+    return contracts.locManager.checkRecoveryMode(price);
   }
 
   static async getTCR(contracts) {
     const price = await contracts.priceFeedTestnet.getPrice();
-    return contracts.troveManager.getTCR(price);
+    return contracts.locManager.getTCR(price);
   }
 
   // --- Gas compensation calculation functions ---
@@ -295,7 +295,7 @@ class TestHelper {
   // Given a composite debt, returns the actual debt  - i.e. subtracts the virtual debt.
   // Virtual debt = 50 ZUSD.
   static async getActualDebtFromComposite(compositeDebt, contracts) {
-    const issuedDebt = await contracts.troveManager.getActualDebtFromComposite(compositeDebt);
+    const issuedDebt = await contracts.locManager.getActualDebtFromComposite(compositeDebt);
     return issuedDebt;
   }
 
@@ -305,63 +305,63 @@ class TestHelper {
     return compositeDebt;
   }
 
-  static async getTroveEntireColl(contracts, trove) {
-    return this.toBN((await contracts.troveManager.getEntireDebtAndColl(trove))[1]);
+  static async getLoCEntireColl(contracts, loc) {
+    return this.toBN((await contracts.locManager.getEntireDebtAndColl(loc))[1]);
   }
 
-  static async getTroveEntireDebt(contracts, trove) {
-    return this.toBN((await contracts.troveManager.getEntireDebtAndColl(trove))[0]);
+  static async getLoCEntireDebt(contracts, loc) {
+    return this.toBN((await contracts.locManager.getEntireDebtAndColl(loc))[0]);
   }
 
-  static async getTroveStake(contracts, trove) {
-    return contracts.troveManager.getTroveStake(trove);
+  static async getLoCStake(contracts, loc) {
+    return contracts.locManager.getLoCStake(loc);
   }
 
   /*
-   * given the requested ZUSD amomunt in openTrove, returns the total debt
-   * So, it adds the gas compensation and the borrowing fee
+   * given the requested ZUSD amomunt in openLoC, returns the total debt
+   * So, it adds the gas compensation and the origination fee
    */
-  static async getOpenTroveTotalDebt(contracts, zusdAmount) {
-    const fee = await contracts.troveManager.getBorrowingFee(zusdAmount);
+  static async getOpenLoCTotalDebt(contracts, zusdAmount) {
+    const fee = await contracts.locManager.getOriginationFee(zusdAmount);
     const compositeDebt = await this.getCompositeDebt(contracts, zusdAmount);
     return compositeDebt.add(fee);
   }
 
   /*
-   * given the desired total debt, returns the ZUSD amount that needs to be requested in openTrove
-   * So, it subtracts the gas compensation and then the borrowing fee
+   * given the desired total debt, returns the ZUSD amount that needs to be requested in openLoC
+   * So, it subtracts the gas compensation and then the origination fee
    */
-  static async getOpenTroveZUSDAmount(contracts, totalDebt) {
+  static async getOpenLoCZUSDAmount(contracts, totalDebt) {
     const actualDebt = await this.getActualDebtFromComposite(totalDebt, contracts);
     return this.getNetBorrowingAmount(contracts, actualDebt);
   }
 
-  // Subtracts the borrowing fee
+  // Subtracts the origination fee
   static async getNetBorrowingAmount(contracts, debtWithFee) {
-    const borrowingRate = await contracts.troveManager.getBorrowingRateWithDecay();
+    const originationRate = await contracts.locManager.getOriginationRateWithDecay();
     return this.toBN(debtWithFee)
       .mul(MoneyValues._1e18BN)
-      .div(MoneyValues._1e18BN.add(borrowingRate));
+      .div(MoneyValues._1e18BN.add(originationRate));
   }
 
-  // Adds the borrowing fee
-  static async getAmountWithBorrowingFee(contracts, zusdAmount) {
-    const fee = await contracts.troveManager.getBorrowingFee(zusdAmount);
+  // Adds the origination fee
+  static async getAmountWithOriginationFee(contracts, zusdAmount) {
+    const fee = await contracts.locManager.getOriginationFee(zusdAmount);
     return zusdAmount.add(fee);
   }
 
   // Adds the redemption fee
   static async getRedemptionGrossAmount(contracts, expected) {
-    const redemptionRate = await contracts.troveManager.getRedemptionRate();
+    const redemptionRate = await contracts.locManager.getRedemptionRate();
     return expected.mul(MoneyValues._1e18BN).div(MoneyValues._1e18BN.add(redemptionRate));
   }
 
-  // Get's total collateral minus total gas comp, for a series of troves.
-  static async getExpectedTotalCollMinusTotalGasComp(troveList, contracts) {
+  // Get's total collateral minus total gas comp, for a series of locs.
+  static async getExpectedTotalCollMinusTotalGasComp(locList, contracts) {
     let totalCollRemainder = web3.utils.toBN("0");
 
-    for (const trove of troveList) {
-      const remainingColl = this.getCollMinusGasComp(trove, contracts);
+    for (const loc of locList) {
+      const remainingColl = this.getCollMinusGasComp(loc, contracts);
       totalCollRemainder = totalCollRemainder.add(remainingColl);
     }
     return totalCollRemainder;
@@ -372,10 +372,10 @@ class TestHelper {
       if (redemptionTx.logs[i].event === "Redemption") {
         const ZUSDAmount = redemptionTx.logs[i].args[0];
         const totalZUSDRedeemed = redemptionTx.logs[i].args[1];
-        const totalETHDrawn = redemptionTx.logs[i].args[2];
-        const ETHFee = redemptionTx.logs[i].args[3];
+        const totalBTCDrawn = redemptionTx.logs[i].args[2];
+        const BTCFee = redemptionTx.logs[i].args[3];
 
-        return [ZUSDAmount, totalZUSDRedeemed, totalETHDrawn, ETHFee];
+        return [ZUSDAmount, totalZUSDRedeemed, totalBTCDrawn, BTCFee];
       }
     }
     throw "The transaction logs do not contain a redemption event";
@@ -419,11 +419,11 @@ class TestHelper {
 
   static getZUSDFeeFromZUSDBorrowingEvent(tx) {
     for (let i = 0; i < tx.logs.length; i++) {
-      if (tx.logs[i].event === "ZUSDBorrowingFeePaid") {
+      if (tx.logs[i].event === "ZUSDOriginationFeePaid") {
         return tx.logs[i].args[1].toString();
       }
     }
-    throw "The transaction logs do not contain an ZUSDBorrowingFeePaid event";
+    throw "The transaction logs do not contain an ZUSDOriginationFeePaid event";
   }
 
   static getEventArgByIndex(tx, eventName, argIndex) {
@@ -460,8 +460,8 @@ class TestHelper {
     return events;
   }
 
-  static getDebtAndCollFromTroveUpdatedEvents(troveUpdatedEvents, address) {
-    const event = troveUpdatedEvents.filter(event => event.args[0] === address)[0];
+  static getDebtAndCollFromLoCUpdatedEvents(locUpdatedEvents, address) {
+    const event = locUpdatedEvents.filter(event => event.args[0] === address)[0];
     return [event.args[1], event.args[2]];
   }
 
@@ -473,7 +473,7 @@ class TestHelper {
     } = await contracts.hintHelpers.getApproxHint(newNICR, 5, this.latestRandomSeed);
     this.latestRandomSeed = latestRandomSeed;
 
-    const { 0: upperHint, 1: lowerHint } = await contracts.sortedTroves.findInsertPosition(
+    const { 0: upperHint, 1: lowerHint } = await contracts.sortedLoCs.findInsertPosition(
       newNICR,
       approxfullListHint,
       approxfullListHint
@@ -483,11 +483,11 @@ class TestHelper {
 
   static async getEntireCollAndDebt(contracts, account) {
     // console.log(`account: ${account}`)
-    const rawColl = (await contracts.troveManager.Troves(account))[1];
-    const rawDebt = (await contracts.troveManager.Troves(account))[0];
-    const pendingETHReward = await contracts.troveManager.getPendingETHReward(account);
-    const pendingZUSDDebtReward = await contracts.troveManager.getPendingZUSDDebtReward(account);
-    const entireColl = rawColl.add(pendingETHReward);
+    const rawColl = (await contracts.locManager.LoCs(account))[1];
+    const rawDebt = (await contracts.locManager.LoCs(account))[0];
+    const pendingBTCReward = await contracts.locManager.getPendingBTCReward(account);
+    const pendingZUSDDebtReward = await contracts.locManager.getPendingZUSDDebtReward(account);
+    const entireColl = rawColl.add(pendingBTCReward);
     const entireDebt = rawDebt.add(pendingZUSDDebtReward);
 
     return { entireColl, entireDebt };
@@ -512,7 +512,7 @@ class TestHelper {
   }
 
   static async getCollAndDebtFromWithdrawZUSD(contracts, account, amount) {
-    const fee = await contracts.troveManager.getBorrowingFee(amount);
+    const fee = await contracts.locManager.getOriginationFee(amount);
     const { entireColl, entireDebt } = await this.getEntireCollAndDebt(contracts, account);
 
     const newColl = entireColl;
@@ -530,16 +530,16 @@ class TestHelper {
     return { newColl, newDebt };
   }
 
-  static async getCollAndDebtFromAdjustment(contracts, account, ETHChange, ZUSDChange) {
+  static async getCollAndDebtFromAdjustment(contracts, account, BTCChange, ZUSDChange) {
     const { entireColl, entireDebt } = await this.getEntireCollAndDebt(contracts, account);
 
-    // const coll = (await contracts.troveManager.Troves(account))[1]
-    // const debt = (await contracts.troveManager.Troves(account))[0]
+    // const coll = (await contracts.locManager.LoCs(account))[1]
+    // const debt = (await contracts.locManager.LoCs(account))[0]
 
     const fee = ZUSDChange.gt(this.toBN("0"))
-      ? await contracts.troveManager.getBorrowingFee(ZUSDChange)
+      ? await contracts.locManager.getOriginationFee(ZUSDChange)
       : this.toBN("0");
-    const newColl = entireColl.add(ETHChange);
+    const newColl = entireColl.add(BTCChange);
     const newDebt = entireDebt.add(ZUSDChange).add(fee);
 
     return { newColl, newDebt };
@@ -547,23 +547,23 @@ class TestHelper {
 
   // --- BorrowerOperations gas functions ---
 
-  static async openTrove_allAccounts(accounts, contracts, ETHAmount, ZUSDAmount) {
+  static async openLoC_allAccounts(accounts, contracts, BTCAmount, ZUSDAmount) {
     const gasCostList = [];
-    const totalDebt = await this.getOpenTroveTotalDebt(contracts, ZUSDAmount);
+    const totalDebt = await this.getOpenLoCTotalDebt(contracts, ZUSDAmount);
 
     for (const account of accounts) {
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
-        ETHAmount,
+        BTCAmount,
         totalDebt
       );
 
-      const tx = await contracts.borrowerOperations.openTrove(
+      const tx = await contracts.borrowerOperations.openLoC(
         this._100pct,
         ZUSDAmount,
         upperHint,
         lowerHint,
-        { from: account, value: ETHAmount }
+        { from: account, value: BTCAmount }
       );
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
@@ -571,19 +571,19 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove_allAccounts_randomETH(minETH, maxETH, accounts, contracts, ZUSDAmount) {
+  static async openLoC_allAccounts_randomBTC(minBTC, maxBTC, accounts, contracts, ZUSDAmount) {
     const gasCostList = [];
-    const totalDebt = await this.getOpenTroveTotalDebt(contracts, ZUSDAmount);
+    const totalDebt = await this.getOpenLoCTotalDebt(contracts, ZUSDAmount);
 
     for (const account of accounts) {
-      const randCollAmount = this.randAmountInWei(minETH, maxETH);
+      const randCollAmount = this.randAmountInWei(minBTC, maxBTC);
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
         randCollAmount,
         totalDebt
       );
 
-      const tx = await contracts.borrowerOperations.openTrove(
+      const tx = await contracts.borrowerOperations.openLoC(
         this._100pct,
         ZUSDAmount,
         upperHint,
@@ -596,9 +596,9 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove_allAccounts_randomETH_ProportionalZUSD(
-    minETH,
-    maxETH,
+  static async openLoC_allAccounts_randomBTC_ProportionalZUSD(
+    minBTC,
+    maxBTC,
     accounts,
     contracts,
     proportion
@@ -606,9 +606,9 @@ class TestHelper {
     const gasCostList = [];
 
     for (const account of accounts) {
-      const randCollAmount = this.randAmountInWei(minETH, maxETH);
+      const randCollAmount = this.randAmountInWei(minBTC, maxBTC);
       const proportionalZUSD = web3.utils.toBN(proportion).mul(web3.utils.toBN(randCollAmount));
-      const totalDebt = await this.getOpenTroveTotalDebt(contracts, proportionalZUSD);
+      const totalDebt = await this.getOpenLoCTotalDebt(contracts, proportionalZUSD);
 
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
@@ -616,7 +616,7 @@ class TestHelper {
         totalDebt
       );
 
-      const tx = await contracts.borrowerOperations.openTrove(
+      const tx = await contracts.borrowerOperations.openLoC(
         this._100pct,
         proportionalZUSD,
         upperHint,
@@ -629,9 +629,9 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove_allAccounts_randomETH_randomZUSD(
-    minETH,
-    maxETH,
+  static async openLoC_allAccounts_randomBTC_randomZUSD(
+    minBTC,
+    maxBTC,
     accounts,
     contracts,
     minZUSDProportion,
@@ -644,13 +644,13 @@ class TestHelper {
 
     let i = 0;
     for (const account of accounts) {
-      const randCollAmount = this.randAmountInWei(minETH, maxETH);
+      const randCollAmount = this.randAmountInWei(minBTC, maxBTC);
       // console.log(`randCollAmount ${randCollAmount }`)
       const randZUSDProportion = this.randAmountInWei(minZUSDProportion, maxZUSDProportion);
       const proportionalZUSD = web3.utils
         .toBN(randZUSDProportion)
         .mul(web3.utils.toBN(randCollAmount).div(_1e18));
-      const totalDebt = await this.getOpenTroveTotalDebt(contracts, proportionalZUSD);
+      const totalDebt = await this.getOpenLoCTotalDebt(contracts, proportionalZUSD);
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
         randCollAmount,
@@ -658,7 +658,7 @@ class TestHelper {
       );
 
       const feeFloor = this.dec(5, 16);
-      const tx = await contracts.borrowerOperations.openTrove(
+      const tx = await contracts.borrowerOperations.openLoC(
         this._100pct,
         proportionalZUSD,
         upperHint,
@@ -668,8 +668,8 @@ class TestHelper {
 
       if (logging && tx.receipt.status) {
         i++;
-        const ICR = await contracts.troveManager.getCurrentICR(account, price);
-        // console.log(`${i}. Trove opened. addr: ${this.squeezeAddr(account)} coll: ${randCollAmount} debt: ${proportionalZUSD} ICR: ${ICR}`)
+        const ICR = await contracts.locManager.getCurrentICR(account, price);
+        // console.log(`${i}. LoC opened. addr: ${this.squeezeAddr(account)} coll: ${randCollAmount} debt: ${proportionalZUSD} ICR: ${ICR}`)
       }
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
@@ -677,24 +677,24 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove_allAccounts_randomZUSD(minZUSD, maxZUSD, accounts, contracts, ETHAmount) {
+  static async openLoC_allAccounts_randomZUSD(minZUSD, maxZUSD, accounts, contracts, BTCAmount) {
     const gasCostList = [];
 
     for (const account of accounts) {
       const randZUSDAmount = this.randAmountInWei(minZUSD, maxZUSD);
-      const totalDebt = await this.getOpenTroveTotalDebt(contracts, randZUSDAmount);
+      const totalDebt = await this.getOpenLoCTotalDebt(contracts, randZUSDAmount);
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
-        ETHAmount,
+        BTCAmount,
         totalDebt
       );
 
-      const tx = await contracts.borrowerOperations.openTrove(
+      const tx = await contracts.borrowerOperations.openLoC(
         this._100pct,
         randZUSDAmount,
         upperHint,
         lowerHint,
-        { from: account, value: ETHAmount }
+        { from: account, value: BTCAmount }
       );
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
@@ -702,21 +702,21 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async closeTrove_allAccounts(accounts, contracts) {
+  static async closeLoC_allAccounts(accounts, contracts) {
     const gasCostList = [];
 
     for (const account of accounts) {
-      const tx = await contracts.borrowerOperations.closeTrove({ from: account });
+      const tx = await contracts.borrowerOperations.closeLoC({ from: account });
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
     }
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove_allAccounts_decreasingZUSDAmounts(
+  static async openLoC_allAccounts_decreasingZUSDAmounts(
     accounts,
     contracts,
-    ETHAmount,
+    BTCAmount,
     maxZUSDAmount
   ) {
     const gasCostList = [];
@@ -725,19 +725,19 @@ class TestHelper {
     for (const account of accounts) {
       const ZUSDAmount = (maxZUSDAmount - i).toString();
       const ZUSDAmountWei = web3.utils.toWei(ZUSDAmount, "ether");
-      const totalDebt = await this.getOpenTroveTotalDebt(contracts, ZUSDAmountWei);
+      const totalDebt = await this.getOpenLoCTotalDebt(contracts, ZUSDAmountWei);
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
-        ETHAmount,
+        BTCAmount,
         totalDebt
       );
 
-      const tx = await contracts.borrowerOperations.openTrove(
+      const tx = await contracts.borrowerOperations.openLoC(
         this._100pct,
         ZUSDAmountWei,
         upperHint,
         lowerHint,
-        { from: account, value: ETHAmount }
+        { from: account, value: BTCAmount }
       );
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
@@ -746,7 +746,7 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove(
+  static async openLoC(
     contracts,
     { maxFeePercentage, extraZUSDAmount, upperHint, lowerHint, ICR, extraParams }
   ) {
@@ -765,7 +765,7 @@ class TestHelper {
     // 150%
     else if (typeof ICR == "string") ICR = this.toBN(ICR);
 
-    const totalDebt = await this.getOpenTroveTotalDebt(contracts, zusdAmount);
+    const totalDebt = await this.getOpenLoCTotalDebt(contracts, zusdAmount);
     const netDebt = await this.getActualDebtFromComposite(totalDebt, contracts);
 
     if (ICR) {
@@ -773,7 +773,7 @@ class TestHelper {
       extraParams.value = ICR.mul(totalDebt).div(price);
     }
 
-    const tx = await contracts.borrowerOperations.openTrove(
+    const tx = await contracts.borrowerOperations.openLoC(
       maxFeePercentage,
       zusdAmount,
       upperHint,
@@ -791,7 +791,7 @@ class TestHelper {
     };
   }
 
-  static async openNueTrove(
+  static async openNueLoC(
     contracts,
     { maxFeePercentage, extraZUSDAmount, upperHint, lowerHint, ICR, extraParams }
   ) {
@@ -810,7 +810,7 @@ class TestHelper {
     // 150%
     else if (typeof ICR == "string") ICR = this.toBN(ICR);
 
-    const totalDebt = await this.getOpenTroveTotalDebt(contracts, zusdAmount);
+    const totalDebt = await this.getOpenLoCTotalDebt(contracts, zusdAmount);
     const netDebt = await this.getActualDebtFromComposite(totalDebt, contracts);
 
     if (ICR) {
@@ -818,7 +818,7 @@ class TestHelper {
       extraParams.value = ICR.mul(totalDebt).div(price);
     }
 
-    const tx = await contracts.borrowerOperations.openNueTrove(
+    const tx = await contracts.borrowerOperations.openNueLoC(
       maxFeePercentage,
       zusdAmount,
       upperHint,
@@ -852,14 +852,14 @@ class TestHelper {
     let increasedTotalDebt;
     if (ICR) {
       assert(extraParams.from, "A from account is needed");
-      const { debt, coll } = await contracts.troveManager.getEntireDebtAndColl(extraParams.from);
+      const { debt, coll } = await contracts.locManager.getEntireDebtAndColl(extraParams.from);
       const price = await contracts.priceFeedTestnet.getPrice();
       const targetDebt = coll.mul(price).div(ICR);
       assert(targetDebt > debt, "ICR is already greater than or equal to target");
       increasedTotalDebt = targetDebt.sub(debt);
       zusdAmount = await this.getNetBorrowingAmount(contracts, increasedTotalDebt);
     } else {
-      increasedTotalDebt = await this.getAmountWithBorrowingFee(contracts, zusdAmount);
+      increasedTotalDebt = await this.getAmountWithOriginationFee(contracts, zusdAmount);
     }
 
     await contracts.borrowerOperations.withdrawZUSD(
@@ -876,19 +876,19 @@ class TestHelper {
     };
   }
 
-  static async adjustTrove_allAccounts(accounts, contracts, ETHAmount, ZUSDAmount) {
+  static async adjustLoC_allAccounts(accounts, contracts, BTCAmount, ZUSDAmount) {
     const gasCostList = [];
 
     for (const account of accounts) {
       let tx;
 
-      let ETHChangeBN = this.toBN(ETHAmount);
+      let BTCChangeBN = this.toBN(BTCAmount);
       let ZUSDChangeBN = this.toBN(ZUSDAmount);
 
       const { newColl, newDebt } = await this.getCollAndDebtFromAdjustment(
         contracts,
         account,
-        ETHChangeBN,
+        BTCChangeBN,
         ZUSDChangeBN
       );
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
@@ -902,23 +902,23 @@ class TestHelper {
       let isDebtIncrease = ZUSDChangeBN.gt(zero);
       ZUSDChangeBN = ZUSDChangeBN.abs();
 
-      // Add ETH to trove
-      if (ETHChangeBN.gt(zero)) {
-        tx = await contracts.borrowerOperations.adjustTrove(
+      // Add BTC to loc
+      if (BTCChangeBN.gt(zero)) {
+        tx = await contracts.borrowerOperations.adjustLoC(
           this._100pct,
           0,
           ZUSDChangeBN,
           isDebtIncrease,
           upperHint,
           lowerHint,
-          { from: account, value: ETHChangeBN }
+          { from: account, value: BTCChangeBN }
         );
-        // Withdraw ETH from trove
-      } else if (ETHChangeBN.lt(zero)) {
-        ETHChangeBN = ETHChangeBN.neg();
-        tx = await contracts.borrowerOperations.adjustTrove(
+        // Withdraw BTC from loc
+      } else if (BTCChangeBN.lt(zero)) {
+        BTCChangeBN = BTCChangeBN.neg();
+        tx = await contracts.borrowerOperations.adjustLoC(
           this._100pct,
-          ETHChangeBN,
+          BTCChangeBN,
           ZUSDChangeBN,
           isDebtIncrease,
           upperHint,
@@ -933,11 +933,11 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async adjustTrove_allAccounts_randomAmount(
+  static async adjustLoC_allAccounts_randomAmount(
     accounts,
     contracts,
-    ETHMin,
-    ETHMax,
+    BTCMin,
+    BTCMax,
     ZUSDMin,
     ZUSDMax
   ) {
@@ -946,13 +946,13 @@ class TestHelper {
     for (const account of accounts) {
       let tx;
 
-      let ETHChangeBN = this.toBN(this.randAmountInWei(ETHMin, ETHMax));
+      let BTCChangeBN = this.toBN(this.randAmountInWei(BTCMin, BTCMax));
       let ZUSDChangeBN = this.toBN(this.randAmountInWei(ZUSDMin, ZUSDMax));
 
       const { newColl, newDebt } = await this.getCollAndDebtFromAdjustment(
         contracts,
         account,
-        ETHChangeBN,
+        BTCChangeBN,
         ZUSDChangeBN
       );
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
@@ -966,23 +966,23 @@ class TestHelper {
       let isDebtIncrease = ZUSDChangeBN.gt(zero);
       ZUSDChangeBN = ZUSDChangeBN.abs();
 
-      // Add ETH to trove
-      if (ETHChangeBN.gt(zero)) {
-        tx = await contracts.borrowerOperations.adjustTrove(
+      // Add BTC to loc
+      if (BTCChangeBN.gt(zero)) {
+        tx = await contracts.borrowerOperations.adjustLoC(
           this._100pct,
           0,
           ZUSDChangeBN,
           isDebtIncrease,
           upperHint,
           lowerHint,
-          { from: account, value: ETHChangeBN }
+          { from: account, value: BTCChangeBN }
         );
-        // Withdraw ETH from trove
-      } else if (ETHChangeBN.lt(zero)) {
-        ETHChangeBN = ETHChangeBN.neg();
-        tx = await contracts.borrowerOperations.adjustTrove(
+        // Withdraw BTC from loc
+      } else if (BTCChangeBN.lt(zero)) {
+        BTCChangeBN = BTCChangeBN.neg();
+        tx = await contracts.borrowerOperations.adjustLoC(
           this._100pct,
-          ETHChangeBN,
+          BTCChangeBN,
           ZUSDChangeBN,
           isDebtIncrease,
           lowerHint,
@@ -992,7 +992,7 @@ class TestHelper {
       }
 
       const gas = this.gasUsed(tx);
-      // console.log(`ETH change: ${ETHChangeBN},  ZUSDChange: ${ZUSDChangeBN}, gas: ${gas} `)
+      // console.log(`BTC change: ${BTCChangeBN},  ZUSDChange: ${ZUSDChangeBN}, gas: ${gas} `)
 
       gasCostList.push(gas);
     }
@@ -1213,7 +1213,7 @@ class TestHelper {
     const price = await contracts.priceFeedTestnet.getPrice();
 
     for (const account of accounts) {
-      const tx = await functionCaller.troveManager_getCurrentICR(account, price);
+      const tx = await functionCaller.locManager_getCurrentICR(account, price);
       const gas = this.gasUsed(tx) - 21000;
       gasCostList.push(gas);
     }
@@ -1270,13 +1270,13 @@ class TestHelper {
     );
     this.latestRandomSeed = latestRandomSeed;
 
-    const exactPartialRedemptionHint = await contracts.sortedTroves.findInsertPosition(
+    const exactPartialRedemptionHint = await contracts.sortedLoCs.findInsertPosition(
       partialRedemptionNewICR,
       approxPartialRedemptionHint,
       approxPartialRedemptionHint
     );
 
-    const tx = await contracts.troveManager.redeemCollateral(
+    const tx = await contracts.locManager.redeemCollateral(
       ZUSDAmount,
       firstRedemptionHint,
       exactPartialRedemptionHint[0],
@@ -1292,13 +1292,13 @@ class TestHelper {
 
   // --- Composite functions ---
 
-  static async makeTrovesIncreasingICR(accounts, contracts) {
+  static async makeLoCsIncreasingICR(accounts, contracts) {
     let amountFinney = 2000;
 
     for (const account of accounts) {
       const coll = web3.utils.toWei(amountFinney.toString(), "finney");
 
-      await contracts.borrowerOperations.openTrove(
+      await contracts.borrowerOperations.openLoC(
         this._100pct,
         "200000000000000000000",
         account,
@@ -1356,21 +1356,21 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async withdrawETHGainToTrove_allAccounts(accounts, contracts) {
+  static async withdrawBTCGainToLoC_allAccounts(accounts, contracts) {
     const gasCostList = [];
     for (const account of accounts) {
       let { entireColl, entireDebt } = await this.getEntireCollAndDebt(contracts, account);
       console.log(`entireColl: ${entireColl}`);
       console.log(`entireDebt: ${entireDebt}`);
-      const ETHGain = await contracts.stabilityPool.getDepositorETHGain(account);
-      const newColl = entireColl.add(ETHGain);
+      const BTCGain = await contracts.stabilityPool.getDepositorBTCGain(account);
+      const newColl = entireColl.add(BTCGain);
       const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
         contracts,
         newColl,
         entireDebt
       );
 
-      const tx = await contracts.stabilityPool.withdrawETHGainToTrove(upperHint, lowerHint, {
+      const tx = await contracts.stabilityPool.withdrawBTCGainToLoC(upperHint, lowerHint, {
         from: account
       });
       const gas = this.gasUsed(tx);
@@ -1419,8 +1419,8 @@ class TestHelper {
   }
 
   static async getLatestBlockTimestamp(web3Instance) {
-    const blockNumber = await web3Instance.eth.getBlockNumber();
-    const block = await web3Instance.eth.getBlock(blockNumber);
+    const blockNumber = await web3Instance.btc.getBlockNumber();
+    const block = await web3Instance.btc.getBlock(blockNumber);
 
     return block.timestamp;
   }
@@ -1430,7 +1430,7 @@ class TestHelper {
   }
 
   static async getTimestampFromTxReceipt(txReceipt, web3Instance) {
-    const block = await web3Instance.eth.getBlock(txReceipt.blockNumber);
+    const block = await web3Instance.btc.getBlock(txReceipt.blockNumber);
     return block.timestamp;
   }
 
@@ -1475,7 +1475,7 @@ class TestHelper {
 
   // --- Misc. functions  ---
 
-  static async forceSendEth(from, receiver, value) {
+  static async forceSendBTC(from, receiver, value) {
     const destructible = await Destructible.new();
     await web3.eth.sendTransaction({ to: destructible.address, from, value });
     await destructible.destruct(receiver);

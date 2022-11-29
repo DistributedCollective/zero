@@ -28,11 +28,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         }
       ],
-      "name": "SortedTrovesAddressChanged",
+      "name": "SortedLoCsAddressChanged",
       "type": "event"
     },
     {
@@ -41,16 +41,16 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         }
       ],
-      "name": "TroveManagerAddressChanged",
+      "name": "LoCManagerAddressChanged",
       "type": "event"
     },
     {
       "inputs": [],
-      "name": "BORROWING_FEE_FLOOR",
+      "name": "ORIGINATION_FEE_FLOOR",
       "outputs": [
         {
           "internalType": "uint256",
@@ -391,12 +391,12 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_sortedTrovesAddress",
+          "name": "_sortedLoCsAddress",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_troveManagerAddress",
+          "name": "_locManagerAddress",
           "type": "address"
         }
       ],
@@ -407,10 +407,10 @@
     },
     {
       "inputs": [],
-      "name": "sortedTroves",
+      "name": "sortedLoCs",
       "outputs": [
         {
-          "internalType": "contract ISortedTroves",
+          "internalType": "contract ISortedLoCs",
           "name": "",
           "type": "address"
         }
@@ -420,10 +420,10 @@
     },
     {
       "inputs": [],
-      "name": "troveManager",
+      "name": "locManager",
       "outputs": [
         {
-          "internalType": "contract ITroveManager",
+          "internalType": "contract ILoCManager",
           "name": "",
           "type": "address"
         }

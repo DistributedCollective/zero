@@ -6,8 +6,8 @@
     {
       "inputs": [
         {
-          "internalType": "contract TroveManager",
-          "name": "_troveManager",
+          "internalType": "contract LoCManager",
+          "name": "_locManager",
           "type": "address"
         },
         {
@@ -90,7 +90,7 @@
           "type": "uint256"
         }
       ],
-      "name": "adjustTrovePrx",
+      "name": "adjustLoCPrx",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -123,18 +123,18 @@
       "inputs": [
         {
           "internalType": "address[]",
-          "name": "_troveArray",
+          "name": "_locArray",
           "type": "address[]"
         }
       ],
-      "name": "batchLiquidateTrovesPrx",
+      "name": "batchLiquidateLoCsPrx",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "name": "closeTrovePrx",
+      "name": "closeLoCPrx",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -208,7 +208,7 @@
           "type": "uint256"
         }
       ],
-      "name": "liquidateTrovesPrx",
+      "name": "liquidateLoCsPrx",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -241,7 +241,7 @@
           "type": "uint256"
         }
       ],
-      "name": "openTrovePrx",
+      "name": "openLoCPrx",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"

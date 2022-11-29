@@ -11,14 +11,14 @@ class Contracts: pass
 
 
 def setAddresses(contracts):
-    contracts.sortedTroves.setParams(
+    contracts.sortedLoCs.setParams(
         MAX_BYTES_32,
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.borrowerOperations.address,
         { 'from': accounts[0] }
     )
 
-    contracts.troveManager.setAddresses(
+    contracts.locManager.setAddresses(
         contracts.borrowerOperations.address,
         contracts.activePool.address,
         contracts.defaultPool.address,
@@ -27,21 +27,21 @@ def setAddresses(contracts):
         contracts.collSurplusPool.address,
         contracts.priceFeedTestnet.address,
         contracts.zusdToken.address,
-        contracts.sortedTroves.address,
+        contracts.sortedLoCs.address,
         contracts.zeroToken.address,
         contracts.zeroStaking.address,
         { 'from': accounts[0] }
     )
 
     contracts.borrowerOperations.setAddresses(
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.activePool.address,
         contracts.defaultPool.address,
         contracts.stabilityPool.address,
         contracts.gasPool.address,
         contracts.collSurplusPool.address,
         contracts.priceFeedTestnet.address,
-        contracts.sortedTroves.address,
+        contracts.sortedLoCs.address,
         contracts.zusdToken.address,
         contracts.zeroStaking.address,
         { 'from': accounts[0] }
@@ -49,10 +49,10 @@ def setAddresses(contracts):
 
     contracts.stabilityPool.setAddresses(
         contracts.borrowerOperations.address,
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.activePool.address,
         contracts.zusdToken.address,
-        contracts.sortedTroves.address,
+        contracts.sortedLoCs.address,
         contracts.priceFeedTestnet.address,
         contracts.communityIssuance.address,
         { 'from': accounts[0] }
@@ -60,28 +60,28 @@ def setAddresses(contracts):
 
     contracts.activePool.setAddresses(
         contracts.borrowerOperations.address,
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.stabilityPool.address,
         contracts.defaultPool.address,
         { 'from': accounts[0] }
     )
 
     contracts.defaultPool.setAddresses(
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.activePool.address,
         { 'from': accounts[0] }
     )
 
     contracts.collSurplusPool.setAddresses(
         contracts.borrowerOperations.address,
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.activePool.address,
         { 'from': accounts[0] }
     )
 
     contracts.hintHelpers.setAddresses(
-        contracts.sortedTroves.address,
-        contracts.troveManager.address,
+        contracts.sortedLoCs.address,
+        contracts.locManager.address,
         { 'from': accounts[0] }
     )
 
@@ -89,7 +89,7 @@ def setAddresses(contracts):
     contracts.zeroStaking.setAddresses(
         contracts.zeroToken.address,
         contracts.zusdToken.address,
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.borrowerOperations.address,
         contracts.activePool.address,
         { 'from': accounts[0] }
@@ -112,8 +112,8 @@ def contracts():
     contracts = Contracts()
 
     contracts.priceFeedTestnet = PriceFeedTestnet.deploy({ 'from': accounts[0] })
-    contracts.sortedTroves = SortedTroves.deploy({ 'from': accounts[0] })
-    contracts.troveManager = TroveManager.deploy({ 'from': accounts[0] })
+    contracts.sortedLoCs = SortedLoCs.deploy({ 'from': accounts[0] })
+    contracts.locManager = LoCManager.deploy({ 'from': accounts[0] })
     contracts.activePool = ActivePool.deploy({ 'from': accounts[0] })
     contracts.stabilityPool = StabilityPool.deploy({ 'from': accounts[0] })
     contracts.gasPool = GasPool.deploy({ 'from': accounts[0] })
@@ -122,7 +122,7 @@ def contracts():
     contracts.borrowerOperations = BorrowerOperationsTester.deploy({ 'from': accounts[0] })
     contracts.hintHelpers = HintHelpers.deploy({ 'from': accounts[0] })
     contracts.zusdToken = ZUSDToken.deploy(
-        contracts.troveManager.address,
+        contracts.locManager.address,
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address,
         { 'from': accounts[0] }
@@ -146,11 +146,11 @@ def contracts():
 
 @pytest.fixture
 def print_expectations():
-    # ether_price_one_year = price_ether_initial * (1 + drift_ether)**8760
-    # print("Expected ether price at the end of the year: $", ether_price_one_year)
+    # BTC_price_one_year = price_BTC_initial * (1 + drift_BTC)**8760
+    # print("Expected bitcoin price at the end of the year: $", BTC_price_one_year)
     print("Expected ZERO price at the end of first month: $", price_ZERO_initial * (1 + drift_ZERO)**720)
 
-    print("\n Open troves")
+    print("\n Open locs")
     print("E(Q_t^e)    = ", collateral_gamma_k * collateral_gamma_theta)
     print("SD(Q_t^e)   = ", collateral_gamma_k**(0.5) * collateral_gamma_theta)
     print("E(CR^*(i))  = ", (target_cr_a + target_cr_b * target_cr_chi_square_df) * 100, "%")
@@ -161,7 +161,7 @@ def print_expectations():
 
 def _test_test(contracts):
     print(len(accounts))
-    contracts.borrowerOperations.openTrove(Wei(1e18), Wei(2000e18), ZERO_ADDRESS, ZERO_ADDRESS,
+    contracts.borrowerOperations.openLoC(Wei(1e18), Wei(2000e18), ZERO_ADDRESS, ZERO_ADDRESS,
                                            { 'from': accounts[1], 'value': Wei("100 ether") })
 
     #assert False
@@ -172,14 +172,14 @@ def _test_test(contracts):
 > In each period, the following events occur sequentially
 
 
-* exogenous ether price input
-* trove liquidation
+* exogenous bitcoin price input
+* LoC liquidation
 * return of the previous period's stability pool determined (liquidation gain & airdropped ZERO gain)
-* trove closure
-* trove adjustment
-* open troves
+* LoC closure
+* LoC adjustment
+* open locs
 * issuance fee
-* trove pool formed
+* LoC pool formed
 * ZUSD supply determined
 * ZUSD stability pool demand determined
 * ZUSD liquidity pool demand determined
@@ -188,13 +188,13 @@ def _test_test(contracts):
 * ZERO pool return determined
 """
 def test_run_simulation(add_accounts, contracts, print_expectations):
-    ZUSD_GAS_COMPENSATION = contracts.troveManager.ZUSD_GAS_COMPENSATION() / 1e18
-    MIN_NET_DEBT = contracts.troveManager.MIN_NET_DEBT() / 1e18
+    ZUSD_GAS_COMPENSATION = contracts.locManager.ZUSD_GAS_COMPENSATION() / 1e18
+    MIN_NET_DEBT = contracts.locManager.MIN_NET_DEBT() / 1e18
 
-    contracts.priceFeedTestnet.setPrice(floatToWei(price_ether[0]), { 'from': accounts[0] })
+    contracts.priceFeedTestnet.setPrice(floatToWei(price_BTC[0]), { 'from': accounts[0] })
     # whale
     whale_coll = 30000.0
-    contracts.borrowerOperations.openTrove(MAX_FEE, Wei(10e24), ZERO_ADDRESS, ZERO_ADDRESS,
+    contracts.borrowerOperations.openLoC(MAX_FEE, Wei(10e24), ZERO_ADDRESS, ZERO_ADDRESS,
                                            { 'from': accounts[0], 'value': floatToWei(whale_coll) })
     contracts.stabilityPool.provideToSP(floatToWei(stability_initial), ZERO_ADDRESS, { 'from': accounts[0] })
 
@@ -216,29 +216,29 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
 
     with open('tests/simulation.csv', 'w', newline='') as csvfile:
         datawriter = csv.writer(csvfile, delimiter=',')
-        datawriter.writerow(['iteration', 'ETH_price', 'price_ZUSD', 'price_ZERO', 'num_troves', 'total_coll', 'total_debt', 'TCR', 'recovery_mode', 'last_ICR', 'SP_ZUSD', 'SP_ETH', 'total_coll_added', 'total_coll_liquidated', 'total_zusd_redempted'])
+        datawriter.writerow(['iteration', 'BTC_price', 'price_ZUSD', 'price_ZERO', 'num_locs', 'total_coll', 'total_debt', 'TCR', 'recovery_mode', 'last_ICR', 'SP_ZUSD', 'SP_BTC', 'total_coll_added', 'total_coll_liquidated', 'total_zusd_redempted'])
 
         #Simulation Process
         for index in range(1, n_sim):
             print('\n  --> Iteration', index)
             print('  -------------------\n')
-            #exogenous ether price input
-            price_ether_current = price_ether[index]
-            contracts.priceFeedTestnet.setPrice(floatToWei(price_ether_current), { 'from': accounts[0] })
+            #exogenous bitcoin price input
+            price_BTC_current = price_BTC[index]
+            contracts.priceFeedTestnet.setPrice(floatToWei(price_BTC_current), { 'from': accounts[0] })
 
-            #trove liquidation & return of stability pool
-            result_liquidation = liquidate_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, price_ZERO_current, data, index)
+            #LoC liquidation & return of stability pool
+            result_liquidation = liquidate_locs(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, price_ZERO_current, data, index)
             total_coll_liquidated = total_coll_liquidated + result_liquidation[0]
             return_stability = result_liquidation[1]
 
-            #close troves
-            result_close = close_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, index)
+            #close locs
+            result_close = close_locs(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, index)
 
-            #adjust troves
-            [coll_added_adjust, issuance_ZUSD_adjust] = adjust_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, index)
+            #adjust locs
+            [coll_added_adjust, issuance_ZUSD_adjust] = adjust_locs(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, index)
 
-            #open troves
-            [coll_added_open, issuance_ZUSD_open] = open_troves(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, index)
+            #open locs
+            [coll_added_open, issuance_ZUSD_open] = open_locs(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, index)
             total_coll_added = total_coll_added + coll_added_adjust + coll_added_open
             #active_accounts.sort(key=lambda a : a.get('CR_initial'))
 
@@ -246,7 +246,7 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             stability_update(accounts, contracts, active_accounts, return_stability, index)
 
             #Calculating Price, Liquidity Pool, and Redemption
-            [price_ZUSD, redemption_pool, redemption_fee, issuance_ZUSD_stabilizer] = price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, price_ether_current, price_ZUSD, index)
+            [price_ZUSD, redemption_pool, redemption_fee, issuance_ZUSD_stabilizer] = price_stabilizer(accounts, contracts, active_accounts, inactive_accounts, price_BTC_current, price_ZUSD, index)
             total_zusd_redempted = total_zusd_redempted + redemption_pool
             print('ZUSD price', price_ZUSD)
             print('ZERO price', price_ZERO_current)
@@ -261,13 +261,13 @@ def test_run_simulation(add_accounts, contracts, print_expectations):
             #annualized_earning = result_ZERO[1]
             #MC_ZERO_current = result_ZERO[2]
 
-            [ETH_price, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_ETH] = logGlobalState(contracts)
+            [BTC_price, num_locs, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_BTC] = logGlobalState(contracts)
             print('Total redempted ', total_zusd_redempted)
-            print('Total ETH added ', total_coll_added)
-            print('Total ETH liquid', total_coll_liquidated)
-            print(f'Ratio ETH liquid {100 * total_coll_liquidated / total_coll_added}%')
+            print('Total BTC added ', total_coll_added)
+            print('Total BTC liquid', total_coll_liquidated)
+            print(f'Ratio BTC liquid {100 * total_coll_liquidated / total_coll_added}%')
             print(' ----------------------\n')
 
-            datawriter.writerow([index, ETH_price, price_ZUSD, price_ZERO_current, num_troves, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_ETH, total_coll_added, total_coll_liquidated, total_zusd_redempted])
+            datawriter.writerow([index, BTC_price, price_ZUSD, price_ZERO_current, num_locs, total_coll, total_debt, TCR, recovery_mode, last_ICR, SP_ZUSD, SP_BTC, total_coll_added, total_coll_liquidated, total_zusd_redempted])
 
             assert price_ZUSD > 0

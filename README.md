@@ -2,7 +2,7 @@
 
 ![Tests](https://github.com/DistributedCollective/zero/actions/workflows/test-contracts.yml/badge.svg)
 
-Zero is a decentralized protocol based on [Liquity](https://github.com/liquity/dev) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "Trove", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
+Zero is a decentralized protocol based on [Zero](https://github.com/DistributedCollective/zero/main) that allows RBTC holders to obtain maximum liquidity against their collateral without paying interest. After locking up RBTC as collateral in a smart contract and creating an individual position called a "Line of Credit" aka "LoC", the user can get instant liquidity by minting ZUSD, a USD-pegged stablecoin. Each Line of Credit is required to be collateralized at a minimum collateral ratio of 110%. Any owner of ZUSD can redeem their stablecoins for the underlying collateral at any time. The redemption mechanism and algorithmically adjusted fees guarantee a minimum stablecoin value of 1 USD.
 
 An unprecedented liquidation mechanism based on incentivized stability pool deposits and a redistribution cycle from riskier to safer Lines of Credit provides stability at a much lower collateral ratio than current systems. Stability is maintained via economically-driven user interactions and arbitrage rather than by active governance or monetary interventions.
 
@@ -22,7 +22,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
       - [Liquidations in Normal Mode: TCR >= 150%](#liquidations-in-normal-mode-tcr--150)
       - [Liquidations in Recovery Mode: TCR < 150%](#liquidations-in-recovery-mode-tcr--150)
   - [Gains From Liquidations](#gains-from-liquidations)
-  - [ZUSD Token Redemption](#zusd-token-redemption)
+  - [ZUSD Redemption](#zusd-redemption)
     - [Partial redemption](#partial-redemption)
     - [Full redemption](#full-redemption)
     - [Redemptions create a price floor](#redemptions-create-a-price-floor)
@@ -38,7 +38,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [PriceFeed Logic](#pricefeed-logic)
     - [Testnet PriceFeed and PriceFeed tests](#testnet-pricefeed-and-pricefeed-tests)
     - [PriceFeed limitations and known issues](#pricefeed-limitations-and-known-issues)
-    - [Keeping a sorted list of lines of credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
+    - [Keeping a sorted list of Lines of Credit ordered by ICR](#keeping-a-sorted-list-of-lines-of-credit-ordered-by-icr)
     - [Flow of RBTC in Zero](#flow-of-rbtc-in-zero)
     - [Flow of ZUSD tokens in Zero](#flow-of-zusd-tokens-in-zero)
   - [Expected User Behaviors](#expected-user-behaviors)
@@ -51,12 +51,12 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Integer representations of decimals](#integer-representations-of-decimals)
   - [Public Data](#public-data)
   - [Public User-Facing Functions](#public-user-facing-functions)
-    - [Borrower (Trove) Operations - `BorrowerOperations.sol`](#borrower-trove-operations---borroweroperationssol)
-    - [Line of Credit Manager Functions - `TroveManager.sol`](#line-of-credit-manager-functions---trovemanagersol)
+    - [Borrower (LoC) Operations - `BorrowerOperations.sol`](#borrower-loc-operations---borroweroperationssol)
+    - [Line of Credit Manager Functions - `LoCManager.sol`](#line-of-credit-manager-functions---locmanagersol)
     - [Hint Helper Functions - `HintHelpers.sol`](#hint-helper-functions---hinthelperssol)
     - [Stability Pool Functions - `StabilityPool.sol`](#stability-pool-functions---stabilitypoolsol)
     - [ZUSD token `ZUSDToken.sol`](#zusd-token-zusdtokensol)
-  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit--operations)
+  - [Supplying Hints to Line of Credit operations](#supplying-hints-to-line-of-credit-operations)
     - [Example Borrower Operations with Hints](#example-borrower-operations-with-hints)
       - [Opening a Line of Credit](#opening-a-line-of-credit)
       - [Adjusting a Line of Credit](#adjusting-a-line-of-credit)
@@ -77,7 +77,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [How deposits and RBTC gains are tracked](#how-deposits-and-rbtc-gains-are-tracked)
   - [Zero System Fees](#zero-system-fees)
     - [Redemption Fee](#redemption-fee)
-    - [Borrowing fee](#borrowing-fee)
+    - [Origination fee](#borrowing-fee)
     - [Fee Schedule](#fee-schedule)
     - [Intuition behind fees](#intuition-behind-fees)
     - [Fee decay Implementation](#fee-decay-implementation)
@@ -102,10 +102,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
     - [Prerequisites](#prerequisites-1)
     - [Running with `docker`](#running-with-docker)
     - [Configuring a public frontend](#configuring-a-public-frontend)
-      - [FRONTEND_TAG](#frontend_tag)
       - [INFURA_API_KEY](#infura_api_key)
-    - [Setting a kickback rate](#setting-a-kickback-rate)
-    - [Setting a kickback rate with Gnosis Safe](#setting-a-kickback-rate-with-gnosis-safe)
     - [Next steps for hosting a frontend](#next-steps-for-hosting-a-frontend)
       - [Example 1: using static website hosting](#example-1-using-static-website-hosting)
       - [Example 2: wrapping the frontend container in HTTPS](#example-2-wrapping-the-frontend-container-in-https)
@@ -114,7 +111,7 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
 
 ## Zero Overview
 
-Zero is a collateralized debt platform. Users can lock up collateral (RBTC), issue stablecoins (ZUSD) to their own RSK address, and subsequently transfer those stablecoins to any other RSK address. The individual collateralized debt positions are called Lines of Credit (aka Troves).
+Zero is a collateralized debt platform. Users can lock up collateral (RBTC), issue stablecoins (ZUSD) to their own RSK address, and subsequently transfer those stablecoins to any other RSK address. The individual collateralized debt positions are called Lines of Credit (LoC).
 
 The stablecoins are economically geared towards maintaining a value of 1 ZUSD = 1 USD, due to the following properties:
 
@@ -122,7 +119,7 @@ The stablecoins are economically geared towards maintaining a value of 1 ZUSD = 
 
 2. The stablecoins are fully redeemable - users can always swap $x worth of ZUSD for $x worth of RBTC (minus fees) directly with the system.
 
-3. The system algorithmically controls the generation of ZUSD through a variable borrowing fee.
+3. The system algorithmically controls the generation of ZUSD through a variable origination fee.
 
 After opening a Line of Credit with some RBTC, users may issue ("borrow") tokens such that the collateral ratio of their Line of Credit remains above 110% e.g. a user with $1000 worth of RBTC in a Line of Credit can issue up to 909.09 ZUSD.
 
@@ -146,7 +143,7 @@ Stability Pool depositors can expect to earn net gains from liquidations. In mos
 
 Suppose the liquidated debt is higher than the amount of ZUSD in the Stability Pool. In that case, the system tries to cancel as much debt as possible with the ZUSD from the Stability Pool. Then, the system redistributes the remaining liquidated collateral and debt across all active Lines of Credit.
 
-Anyone may call the public `liquidateTroves()` function, which will check for under-collateralized Lines of Credit and liquidate them. Alternatively, they can call `batchLiquidateTroves()` with a custom list of Line of Credit addresses to attempt to liquidate.
+Anyone may call the public `liquidateLoCs()` function, which will check for under-collateralized Lines of Credit and liquidate them. Alternatively, they can call `batchLiquidateLoCs()` with a custom list of Line of Credit addresses to attempt to liquidate.
 
 ### Liquidation gas costs
 
@@ -260,21 +257,21 @@ All application logic and data are contained in these contracts - there is no ne
 
 Contract ownership is granted to the [TimelockOwner](https://github.com/DistributedCollective/Sovryn-smart-contracts/blob/development/contracts/governance/Timelock.sol) contract so that Sovryn's governance system can update the logic of the Zero contracts.
 
-The three main contracts - `BorrowerOperations.sol`, `TroveManager.sol` and `StabilityPool.sol` - hold the user-facing public functions, and contain most of the internal system logic. Together they control Line of Credit state updates and movements of RBTC and ZUSD tokens around the system.
+The three main contracts - `BorrowerOperations.sol`, `LoCManager.sol` and `StabilityPool.sol` - hold the user-facing public functions, and contain most of the internal system logic. Together they control Line of Credit state updates and movements of RBTC and ZUSD tokens around the system.
 
 ### Core Smart Contracts
 
-`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their Line of Credit: Line of Credit creation, RBTC top-up/withdrawal, stablecoin issuance, and repayment. It also sends borrowing fees to the `sovFeeCollector`. BorrowerOperations functions call into the Line of Credit Manager, telling it to update the Line of Credit state, where necessary. BorrowerOperations functions also call into the various Pools, telling them to move RBTC/Tokens between Pools or between Pool <> user, where necessary.
+`BorrowerOperations.sol` - contains the basic operations by which borrowers interact with their Line of Credit: Line of Credit creation, RBTC top-up/withdrawal, stablecoin issuance, and repayment. It also sends origination fees to the `sovFeeCollector`. BorrowerOperations functions call into the Line of Credit Manager, telling it to update the Line of Credit state, where necessary. BorrowerOperations functions also call into the various Pools, telling them to move RBTC/Tokens between Pools or between Pool <> user, where necessary.
 
-`TroveManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `sovFeeCollector`. It also contains the state of each Line of Credit  i.e. a record of the Line of Credit’s collateral and debt. The TroveManager does not hold value (i.e. RBTC / other tokens). TroveManager functions call into the various Pools to tell them to move RBTC/tokens between Pools, where necessary.
+`LoCManager.sol` - contains functionality for liquidations and redemptions. It sends redemption fees to the `sovFeeCollector`. It also contains the state of each Line of Credit  i.e. a record of the Line of Credit’s collateral and debt. The LoCManager does not hold value (i.e. RBTC / other tokens). LoCManager functions call into the various Pools to tell them to move RBTC/tokens between Pools, where necessary.
 
-`LiquityBase.sol` - Both TroveManager and BorrowerOperations inherit from the parent contract `LiquityBase`, which contains global constants and some common functions.
+`ZeroBase.sol` - Both LoCManager and BorrowerOperations inherit from the parent contract `ZeroBase`, which contains global constants and some common functions.
 
 `StabilityPool.sol` - contains functionality for Stability Pool operations: making deposits and withdrawing compounded deposits and accumulated RBTC gains. Holds the ZUSD Stability Pool deposits, and the RBTC gains from liquidations, for depositors.
 
 `ZUSDToken.sol` - the stablecoin token contract, which implements the ERC20 fungible token standard in conjunction with EIP-2612 and a mechanism that blocks (accidental) transfers to addresses like the StabilityPool and address(0) that are not supposed to receive funds through direct transfers. The contract mints, burns, and transfers ZUSD tokens.
 
-`SortedTroves.sol` - a doubly-linked list that stores addresses of the Line of Credit owners, sorted by their individual collateralization ratio (ICR). It inserts and re-inserts Lines of Credit at the correct position, based on their ICR.
+`SortedLoCs.sol` - a doubly-linked list that stores addresses of the Line of Credit owners, sorted by their individual collateralization ratio (ICR). It inserts and re-inserts Lines of Credit at the correct position, based on their ICR.
 
 `PriceFeed.sol` - Contains functionality for obtaining the current RBTC:USD price, which the system uses for calculating collateralization ratios.
 
@@ -294,7 +291,7 @@ Along with `StabilityPool.sol`, these contracts hold RBTC and/or tokens for thei
 
 ### Contract Interfaces
 
-`ITroveManager.sol`, `IPool.sol` etc. These provide a specification for a contract’s functions without implementation. They are similar to interfaces in Java or C#.
+`ILoCManager.sol`, `IPool.sol` etc. These provide a specification for a contract’s functions without implementation. They are similar to interfaces in Java or C#.
 
 ### PriceFeed and Oracle
 
@@ -322,9 +319,9 @@ The PriceFeed logic consists of automatic on-chain decision-making for obtaining
 
 Zero relies on a particular data structure: a sorted doubly-linked list of lines of credit that remains ordered by individual collateralization ratio (ICR) i.e. the amount of collateral (in USD) divided by the amount of debt (in ZUSD).
 
-This ordered list is critical for gas-efficient redemption sequences and the `liquidateTroves` sequence, both of which target Lines of Credit in ascending order of ICR.
+This ordered list is critical for gas-efficient redemption sequences and the `liquidateLoCs` sequence, both of which target Lines of Credit in ascending order of ICR.
 
-The sorted doubly-linked list is found in `SortedTroves.sol`. 
+The sorted doubly-linked list is found in `SortedLoCs.sol`. 
 
 Nodes map to active Lines of Credit in the system - the ID property is the address of a Line of Credit owner. The list accepts positional hints for efficient O(1) insertion - please see the [hints](#supplying-hints-to-cdp-operations) section for more details.
 
@@ -359,24 +356,24 @@ Likewise, the StabilityPool holds the total accumulated RBTC gains from liquidat
 
 | Function                      | RBTC quantity                       | Path                                       |
 | ----------------------------- | ----------------------------------- | ------------------------------------------ |
-| openTrove                     | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
+| openLoC                     | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
 | addColl                       | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
 | withdrawColl                  | _collWithdrawal parameter           | ActivePool->msg.sender                     |
-| adjustTrove: adding RBTC      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
-| adjustTrove: withdrawing RBTC | _collWithdrawal parameter           | ActivePool->msg.sender                     |
-| closeTrove                    | All remaining                       | ActivePool->msg.sender                     |
+| adjustLoC: adding RBTC      | msg.value                           | msg.sender->BorrowerOperations->ActivePool |
+| adjustLoC: withdrawing RBTC | _collWithdrawal parameter           | ActivePool->msg.sender                     |
+| closeLoC                    | All remaining                       | ActivePool->msg.sender                     |
 | claimCollateral               | CollSurplusPool.balance[msg.sender] | CollSurplusPool->msg.sender                |
 
-**Trove Manager**
+**LoC Manager**
 
 | Function                               | RBTC quantity                          | Path                        |
 | -------------------------------------- | -------------------------------------- | --------------------------- |
 | liquidate (offset)                     | collateral to be offset                | ActivePool->StabilityPool   |
 | liquidate (redistribution)             | collateral to be redistributed         | ActivePool->DefaultPool     |
-| liquidateTroves (offset)               | collateral to be offset                | ActivePool->StabilityPool   |
-| liquidateTroves (redistribution)       | collateral to be redistributed         | ActivePool->DefaultPool     |
-| batchLiquidateTroves (offset)          | collateral to be offset                | ActivePool->StabilityPool   |
-| batchLiquidateTroves (redistribution). | collateral to be redistributed         | ActivePool->DefaultPool     |
+| liquidateLoCs (offset)               | collateral to be offset                | ActivePool->StabilityPool   |
+| liquidateLoCs (redistribution)       | collateral to be redistributed         | ActivePool->DefaultPool     |
+| batchLiquidateLoCs (offset)          | collateral to be offset                | ActivePool->StabilityPool   |
+| batchLiquidateLoCs (redistribution). | collateral to be redistributed         | ActivePool->DefaultPool     |
 | redeemCollateral                       | collateral to be swapped with redeemer | ActivePool->msg.sender      |
 | redeemCollateral                       | redemption fee                         | ActivePool->sovFeeCollector |
 | redeemCollateral                       | Line of Credit's collateral surplus    | ActivePool->CollSurplusPool |
@@ -387,7 +384,7 @@ Likewise, the StabilityPool holds the total accumulated RBTC gains from liquidat
 | ----------------------- | --------------------------------- | ------------------------------------------------- |
 | provideToSP             | depositor's accumulated RBTC gain | StabilityPool -> msg.sender                       |
 | withdrawFromSP          | depositor's accumulated RBTC gain | StabilityPool -> msg.sender                       |
-| withdrawRBTCGainToTrove | depositor's accumulated RBTC gain | StabilityPool -> BorrowerOperations -> ActivePool |
+| withdrawRBTCGainToLoC | depositor's accumulated RBTC gain | StabilityPool -> BorrowerOperations -> ActivePool |
 
 ### Flow of ZUSD tokens in Zero
 
@@ -403,23 +400,23 @@ The only time ZUSD is transferred to/from a Zero contract, is when a user deposi
 
 | Function                      | ZUSD Quantity | ERC20 Operation                      |
 | ----------------------------- | ------------- | ------------------------------------ |
-| openTrove                     | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
+| openLoC                     | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
+|                               | Origination fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | withdrawZUSD                  | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
+|                               | Origination fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
 | repayZUSD                     | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
-| adjustTrove: withdrawing ZUSD | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
-|                               | Borrowing fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
-| adjustTrove: repaying ZUSD    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
-| closeTrove                    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
+| adjustLoC: withdrawing ZUSD | Drawn ZUSD    | ZUSD._mint(msg.sender, _ZUSDAmount)  |
+|                               | Origination fee | ZUSD._mint(FeeDistributor,  ZUSDFee) |
+| adjustLoC: repaying ZUSD    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
+| closeLoC                    | Repaid ZUSD   | ZUSD._burn(msg.sender, _ZUSDAmount)  |
 
-**Trove Manager**
+**LoC Manager**
 
 | Function                      | ZUSD Quantity            | ERC20 Operation                                  |
 | ----------------------------- | ------------------------ | ------------------------------------------------ |
 | liquidate (offset)            | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
-| liquidateTroves (offset)      | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
-| batchLiquidateTroves (offset) | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| liquidateLoCs (offset)      | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
+| batchLiquidateLoCs (offset) | ZUSD to offset with debt | ZUSD._burn(stabilityPoolAddress, _debtToOffset); |
 | redeemCollateral              | ZUSD to redeem           | ZUSD._burn(msg.sender, _ZUSD)                    |
 
 **Stability Pool**
@@ -443,7 +440,7 @@ SOV holders may stake their SOV, to earn a share of the system fee revenue, in R
 
 All the core smart contracts inherit from the OpenZeppelin `Ownable.sol` contract template. As such all contracts have a single owning address, which is the deploying address. The contract's ownership is transferred to Sovryn's governance system thorough it's TimelockOwner contract.
 
-Several public and external functions have modifiers such as `requireCallerIsTroveManager`, `requireCallerIsActivePool`, etc - ensuring they can only be called by the respective permitted contract.
+Several public and external functions have modifiers such as `requireCallerIsLoCManager`, `requireCallerIsActivePool`, etc - ensuring they can only be called by the respective permitted contract.
 
 ## Deployment to a Development Blockchain
 
@@ -537,41 +534,41 @@ etc.
 
 ## Public Data
 
-All data structures with the ‘public’ visibility specifier are ‘gettable’, with getters automatically generated by the compiler. Simply call `TroveManager::MCR()` to get the MCR, etc.
+All data structures with the ‘public’ visibility specifier are ‘gettable’, with getters automatically generated by the compiler. Simply call `LoCManager::MCR()` to get the MCR, etc.
 
 ## Public User-Facing Functions
 
-### Borrower (Trove) Operations - `BorrowerOperations.sol`
+### Borrower (LoC) Operations - `BorrowerOperations.sol`
 
-`openTrove(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint)`: payable function that creates a Line of Credit for the caller with the requested debt, and the RBTC received as collateral. Successful execution is conditional mainly on the resulting collateralization ratio which must exceed the minimum (110% in Normal Mode, 150% in Recovery Mode). In addition to the requested debt, extra debt is issued to pay the issuance fee, and cover the gas compensation. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee. 
+`openLoC(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint)`: payable function that creates a Line of Credit for the caller with the requested debt, and the RBTC received as collateral. Successful execution is conditional mainly on the resulting collateralization ratio which must exceed the minimum (110% in Normal Mode, 150% in Recovery Mode). In addition to the requested debt, extra debt is issued to pay the issuance fee, and cover the gas compensation. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage, i.e. when a redemption transaction is processed first, driving up the issuance fee. 
 
 `addColl(address _upperHint, address _lowerHint))`: payable function that adds the received RBTC to the caller's active Line of Credit.
 
 `withdrawColl(uint _amount, address _upperHint, address _lowerHint)`: withdraws `_amount` of collateral from the caller’s Line of Credit. Executes only if the user has an active Line of Credit, the withdrawal would not pull the user’s Line of Credit below the minimum collateralization ratio, and the resulting total collateralization ratio of the system is above 150%. 
 
-`function withdrawZUSD(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint)`: issues `_amount` of ZUSD from the caller’s Line of Credit to the caller. Executes only if the Line of Credit's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the borrowing fee.
+`function withdrawZUSD(uint _maxFeePercentage, uint _ZUSDAmount, address _upperHint, address _lowerHint)`: issues `_amount` of ZUSD from the caller’s Line of Credit to the caller. Executes only if the Line of Credit's collateralization ratio would remain above the minimum, and the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the origination fee.
 
 `repayZUSD(uint _amount, address _upperHint, address _lowerHint)`: repay `_amount` of ZUSD to the caller’s Line of Credit, subject to leaving 20 ZUSD debt in the Line of Credit (which corresponds to the 20 ZUSD gas compensation).
 
-`_adjustTrove(address _borrower, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage)`: enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity: if the adjustment reduces the collateralization ratio of the Line of Credit, the function only executes if the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the borrowing fee. The parameter is ignored if the debt is not increased with the transaction.
+`_adjustLoC(address _borrower, uint _collWithdrawal, uint _debtChange, bool _isDebtIncrease, address _upperHint, address _lowerHint, uint _maxFeePercentage)`: enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity: if the adjustment reduces the collateralization ratio of the Line of Credit, the function only executes if the resulting total collateralization ratio is above 150%. The borrower has to provide a `_maxFeePercentage` that they are willing to accept in case of a fee slippage i.e. when a redemption transaction is processed first, driving up the origination fee. The parameter is ignored if the debt is not increased with the transaction.
 
-`closeTrove()`: allows a borrower to repay all debt, withdraw all their collateral, and close their Line of Credit. Requires the borrower to have a ZUSD balance sufficient to repay their Line of Credit's debt, excluding gas compensation - i.e. `(debt - 20)` ZUSD.
+`closeLoC()`: allows a borrower to repay all debt, withdraw all their collateral, and close their Line of Credit. Requires the borrower to have a ZUSD balance sufficient to repay their Line of Credit's debt, excluding gas compensation - i.e. `(debt - 20)` ZUSD.
 
 `claimCollateral(address _user)`: when a borrower’s Line of Credit has been fully redeemed from and closed, or liquidated in Recovery Mode with a collateralization ratio above 110%, this function allows the borrower to claim their RBTC collateral surplus that remains in the system (collateral - debt upon redemption; collateral - 110% of the debt upon liquidation).
 
-### Line of Credit Manager Functions - `TroveManager.sol`
+### Line of Credit Manager Functions - `LoCManager.sol`
 
 `liquidate(address _borrower)`: callable by anyone, attempts to liquidate the Line of Credit of `_user`. Executes successfully if `_user`’s Line of Credit meets the conditions for liquidation (e.g. in Normal Mode, it liquidates if the Line of Credit's ICR < the system Critical Collateral Ratio [CCR]).  
 
-`liquidateTroves(uint n)`: callable by anyone, checks for under-collateralized Lines of Credit below MCR and liquidates up to `n`, starting from the Line of Credit  with the lowest collateralization ratio; subject to gas constraints and the actual number of under-collateralized Lines of Credit. The gas costs of `liquidateTroves(uint n)` mainly depend on the number of Lines of Credit that are liquidated, and whether the Lines of Credit are offset against the Stability Pool or redistributed. For n=1, the gas costs per liquidated Line of Credit are roughly between 215K-400K, for n=5 between 80K-115K, for n=10 between 70K-82K, and for n=50 between 60K-65K.
+`liquidateLoCs(uint n)`: callable by anyone, checks for under-collateralized Lines of Credit below MCR and liquidates up to `n`, starting from the Line of Credit  with the lowest collateralization ratio; subject to gas constraints and the actual number of under-collateralized Lines of Credit. The gas costs of `liquidateLoCs(uint n)` mainly depend on the number of Lines of Credit that are liquidated, and whether the Lines of Credit are offset against the Stability Pool or redistributed. For n=1, the gas costs per liquidated Line of Credit are roughly between 215K-400K, for n=5 between 80K-115K, for n=10 between 70K-82K, and for n=50 between 60K-65K.
 
-`batchLiquidateTroves(address[] calldata _troveArray)`: callable by anyone, accepts a custom list of Line of Credit addresses as an argument. Steps through the provided list and attempts to liquidate every Line of Credit, until it reaches the end or it runs out of gas. A Line of Credit is liquidated only if it meets the conditions for liquidation. For a batch of 10 Lines of Credit, the gas costs per liquidated Line of Credit are roughly between 75K-83K, for a batch of 50 Lines of Credit between 54K-69K.
+`batchLiquidateLoCs(address[] calldata _locArray)`: callable by anyone, accepts a custom list of Line of Credit addresses as an argument. Steps through the provided list and attempts to liquidate every Line of Credit, until it reaches the end or it runs out of gas. A Line of Credit is liquidated only if it meets the conditions for liquidation. For a batch of 10 Lines of Credit, the gas costs per liquidated Line of Credit are roughly between 75K-83K, for a batch of 50 Lines of Credit between 54K-69K.
 
 `redeemCollateral(uint _ZUSDAmount, address _firstRedemptionHint, address _upperPartialRedemptionHint, address _lowerPartialRedemptionHint, uint _partialRedemptionHintNICR, uint _maxIterations, uint _maxFeePercentage)`: redeems `_ZUSDamount` of ZUSD for RBTC from the system. Decreases the caller’s ZUSD balance, and sends them the corresponding amount of RBTC. Executes successfully if the caller has sufficient ZUSD to redeem. The number of Lines of Credit redeemed from is capped by `_maxIterations`. The borrower has to provide a `_maxFeePercentage` that he/she is willing to accept in case of a fee slippage i.e. when another redemption transaction is processed first, driving up the redemption fee.
 
 `getCurrentICR(address _user, uint _price)`: computes the user’s individual collateralization ratio (ICR) based on their total collateral and total ZUSD debt. Returns 2^256 -1 if they have 0 debt.
 
-`getTroveOwnersCount()`: get the number of active lines of credit in the system.
+`getLoCOwnersCount()`: get the number of active lines of credit in the system.
 
 `getPendingRBTCReward(address _borrower)`: get the pending RBTC reward from liquidation redistribution events, for the given Line of Credit .
 
@@ -605,7 +602,7 @@ The number of Lines of Credit to consider for redemption can be capped by passin
 
 `withdrawFromSP(uint _amount)`: allows a ZUSD holder to withdraw `_amount` of ZUSD from the Stability Pool, up to the value of their remaining Stability Pool deposit. It decreases their ZUSD balance by `_amount`. It sends the depositor’s accumulated RBTC gains to their address. If the user makes a partial withdrawal, their deposit remainder will earn further gains. To prevent potential loss evasion by depositors, withdrawals from the Stability Pool are suspended when there are liquidable Lines of Credit with ICR < 110% in the system.
 
-`withdrawRBTCGainToTrove(address _hint)`: sends the user's entire accumulated RBTC gain to the user's active Line of Credit, and updates their Stability Pool deposit with its accumulated loss from debt absorptions.
+`withdrawRBTCGainToLoC(address _hint)`: sends the user's entire accumulated RBTC gain to the user's active Line of Credit, and updates their Stability Pool deposit with its accumulated loss from debt absorptions.
 
 `getDepositorRBTCGain(address _depositor)`: returns the accumulated RBTC gain for a given Stability Pool depositor
 
@@ -626,9 +623,9 @@ https://eips.ethereum.org/EIPS/eip-2612
 
 ## Supplying Hints to Line of Credit operations
 
-Troves in Zero are recorded in a sorted doubly linked list, sorted by their NICR, from high to low. NICR stands for the nominal collateral ratio that is simply the amount of collateral (in RBTC) multiplied by 100e18 and divided by the amount of debt (in ZUSD), without taking the RBTC:USD price into account. Given that all Lines of Credit are equally affected by RBTC price changes, they do not need to be sorted by their real ICR.
+LoCs in Zero are recorded in a sorted doubly linked list, sorted by their NICR, from high to low. NICR stands for the nominal collateral ratio that is simply the amount of collateral (in RBTC) multiplied by 100e18 and divided by the amount of debt (in ZUSD), without taking the RBTC:USD price into account. Given that all Lines of Credit are equally affected by RBTC price changes, they do not need to be sorted by their real ICR.
 
-All Line of Credit operations that change the collateralization ratio need to either insert or reinsert the Line of Credit to the `SortedTroves` list. To reduce the computational complexity (and gas cost) of the insertion to the linked list, two ‘hints’ may be provided.
+All Line of Credit operations that change the collateralization ratio need to either insert or reinsert the Line of Credit to the `SortedLoCs` list. To reduce the computational complexity (and gas cost) of the insertion to the linked list, two ‘hints’ may be provided.
 
 A hint is the address of a Line of Credit with a position in the sorted list close to the correct insert position.
 
@@ -636,7 +633,7 @@ All Line of Credit operations take two ‘hint’ arguments: a `_lowerHint` refe
 
 The better the ‘hint’ is, the shorter the list traversal, and the cheaper the gas cost of the function call. `SortedList::findInsertPosition(uint256 _NICR, address _prevId, address _nextId)` that is called by the Line of Credit operation firsts check if `prevId` is still existant and valid (larger NICR than the provided `_NICR`) and then descends the list starting from `prevId`. If the check fails, the function further checks if `nextId` is still existant and valid (smaller NICR than the provided `_NICR`) and then ascends list starting from `nextId`. 
 
-The `HintHelpers::getApproxHint(...)` function can be used to generate a useful hint pointing to a Line of Credit relatively close to the target position, which can then be passed as an argument to the desired Line of Credit operation or to `SortedTroves::findInsertPosition(...)` to get its two direct neighbors as ‘exact‘ hints (based on the current state of the system).
+The `HintHelpers::getApproxHint(...)` function can be used to generate a useful hint pointing to a Line of Credit relatively close to the target position, which can then be passed as an argument to the desired Line of Credit operation or to `SortedLoCs::findInsertPosition(...)` to get its two direct neighbors as ‘exact‘ hints (based on the current state of the system).
 
 `getApproxHint(uint _CR, uint _numTrials, uint _inputRandomSeed)` randomly selects `numTrials` amount of Lines of Credit, and returns the one with the closest position in the list to where a Line of Credit with a nominal collateralization ratio of `_CR` should be inserted. It can be shown mathematically that for `numTrials = k * sqrt(n)`, the function's gas cost is with very high probability worst case `O(sqrt(n)) if k >= 10`. For scalability reasons (Infura is able to serve up to ~4900 trials), the function also takes a random seed `_inputRandomSeed` to make sure that calls with different seeds may lead to different results, allowing for better approximations through multiple consecutive runs.
 
@@ -645,14 +642,14 @@ The `HintHelpers::getApproxHint(...)` function can be used to generate a useful 
 1. User performs Line of Credit operation in their browser.
 2. Call the Line of Credit operation with `_lowerHint = _upperHint = userAddress`.
 
-Gas cost will be worst case `O(n)`, where n is the size of the `SortedTroves` list.
+Gas cost will be worst case `O(n)`, where n is the size of the `SortedLoCs` list.
 
 **Line of Credit operation with hints**
 
 1. User performs Line of Credit operation in their browser.
 2. The frontend computes a new collateralization ratio locally, based on the change in collateral and/or debt.
 3. Call `HintHelpers::getApproxHint(...)`, passing it the computed nominal collateralization ratio. Returns an address close to the correct insert position.
-4. Call `SortedTroves::findInsertPosition(uint256 _NICR, address _prevId, address _nextId)`, passing it the same approximate hint via both `_prevId` and `_nextId` and the new nominal collateralization ratio via `_NICR`. 
+4. Call `SortedLoCs::findInsertPosition(uint256 _NICR, address _prevId, address _nextId)`, passing it the same approximate hint via both `_prevId` and `_nextId` and the new nominal collateralization ratio via `_NICR`. 
 5. Pass the ‘exact‘ hint in the form of the two direct neighbors, i.e. `_nextId` as `_lowerHint` and `_prevId` as `_upperHint`, to the Line of Credit operation function call. (Note that the hint may become slightly inexact due to pending transactions that are processed first, though this is gracefully handled by the system that can ascend or descend the list as needed to find the right position.)
 
 Gas cost of steps 2-4 will be free, and step 5 will be `O(1)`.
@@ -669,9 +666,9 @@ Hints allow cheaper Line of Credit operations for the user, at the expense of a 
   const ZUSDAmount = toBN(toWei('2500')) // borrower wants to withdraw 2500 ZUSD
   const RBTCColl = toBN(toWei('5')) // borrower wants to lock 5 RBTC collateral
 
-  // Call deployed Line of Credit Manager contract to read the liquidation reserve and latest borrowing fee
+  // Call deployed Line of Credit Manager contract to read the liquidation reserve and latest origination fee
   const liquidationReserve = await Line of Credit Manager.ZUSD_GAS_COMPENSATION()
-  const expectedFee = await Line of Credit Manager.getBorrowingFeeWithDecay(ZUSDAmount)
+  const expectedFee = await Line of Credit Manager.getOriginationFeeWithDecay(ZUSDAmount)
   
   // Total debt of the new Line of Credit = ZUSD amount drawn, plus fee, plus the liquidation reserve
   const expectedDebt = ZUSDAmount.add(expectedFee).add(liquidationReserve)
@@ -682,16 +679,16 @@ Hints allow cheaper Line of Credit operations for the user, at the expense of a 
 
   // Get an approximate address hint from the deployed HintHelper contract. Use (15 * number of Lines of Credit) trials 
   // to get an approx. hint that is close to the right position.
-  let numTroves = await sortedTroves.getSize()
-  let numTrials = numTroves.mul(toBN('15'))
+  let numLoCs = await sortedLoCs.getSize()
+  let numTrials = numLoCs.mul(toBN('15'))
   let { 0: approxHint } = await hintHelpers.getApproxHint(NICR, numTrials, 42)  // random seed of 42
 
-  // Use the approximate hint to get the exact upper and lower hints from the deployed SortedTroves contract
-  let { 0: upperHint, 1: lowerHint } = await sortedTroves.findInsertPosition(NICR, approxHint, approxHint)
+  // Use the approximate hint to get the exact upper and lower hints from the deployed SortedLoCs contract
+  let { 0: upperHint, 1: lowerHint } = await sortedLoCs.findInsertPosition(NICR, approxHint, approxHint)
 
-  // Finally, call openTrove with the exact upperHint and lowerHint
+  // Finally, call openLoC with the exact upperHint and lowerHint
   const maxFee = '5'.concat('0'.repeat(16)) // Slippage protection: 5%
-  await borrowerOperations.openTrove(maxFee, ZUSDAmount, upperHint, lowerHint, { value: RBTCColl })
+  await borrowerOperations.openLoC(maxFee, ZUSDAmount, upperHint, lowerHint, { value: RBTCColl })
 ```
 
 #### Adjusting a Line of Credit 
@@ -709,26 +706,26 @@ Hints allow cheaper Line of Credit operations for the user, at the expense of a 
 
   // Get an approximate address hint from the deployed HintHelper contract. Use (15 * number of Lines of Credit) trials 
   // to get an approx. hint that is close to the right position.
-  numTroves = await sortedTroves.getSize()
-  numTrials = numTroves.mul(toBN('15'))
+  numLoCs = await sortedLoCs.getSize()
+  numTrials = numLoCs.mul(toBN('15'))
   ({0: approxHint} = await hintHelpers.getApproxHint(NICR, numTrials, 42))
 
-  // Use the approximate hint to get the exact upper and lower hints from the deployed SortedTroves contract
-  ({ 0: upperHint, 1: lowerHint } = await sortedTroves.findInsertPosition(NICR, approxHint, approxHint))
+  // Use the approximate hint to get the exact upper and lower hints from the deployed SortedLoCs contract
+  ({ 0: upperHint, 1: lowerHint } = await sortedLoCs.findInsertPosition(NICR, approxHint, approxHint))
 
-  // Call adjustTrove with the exact upperHint and lowerHint
-  await borrowerOperations.adjustTrove(maxFee, 0, ZUSDRepayment, false, upperHint, lowerHint, {value: collIncrease})
+  // Call adjustLoC with the exact upperHint and lowerHint
+  await borrowerOperations.adjustLoC(maxFee, 0, ZUSDRepayment, false, upperHint, lowerHint, {value: collIncrease})
 ```
 
 ### Hints for `redeemCollateral`
 
-`TroveManager::redeemCollateral` as a special case requires additional hints:
+`LoCManager::redeemCollateral` as a special case requires additional hints:
 - `_firstRedemptionHint` hints at the position of the first Line of Credit that will be redeemed from,
 - `_lowerPartialRedemptionHint` hints at the `nextId` neighbor of the last redeemed Line of Credit upon reinsertion, if it's partially redeemed,
 - `_upperPartialRedemptionHint` hints at the `prevId` neighbor of the last redeemed Line of Credit upon reinsertion, if it's partially redeemed,
 - `_partialRedemptionHintNICR` ensures that the transaction won't run out of gas if neither `_lowerPartialRedemptionHint` nor `_upperPartialRedemptionHint` are  valid anymore.
 
-`redeemCollateral` will only redeem from Lines of Credit that have an ICR >= MCR. In other words, if there are Lines of Credit at the bottom of the SortedTroves list that are below the minimum collateralization ratio (which can happen after an RBTC:USD price drop), they will be skipped. To make this more gas-efficient, the position of the first redeemable Line of Credit should be passed as `_firstRedemptionHint`.
+`redeemCollateral` will only redeem from Lines of Credit that have an ICR >= MCR. In other words, if there are Lines of Credit at the bottom of the SortedLoCs list that are below the minimum collateralization ratio (which can happen after an RBTC:USD price drop), they will be skipped. To make this more gas-efficient, the position of the first redeemable Line of Credit should be passed as `_firstRedemptionHint`.
 
 #### First redemption hint
 
@@ -759,9 +756,9 @@ If not, the redemption sequence doesn’t perform the final partial redemption, 
   const { hintAddress: approxPartialRedemptionHint } = await contracts.hintHelpers.getApproxHint(partialRedemptionNewICR, numTrials, 42)
   
   /* Use the approximate partial redemption hint to get the exact partial redemption hint from the 
-  * deployed SortedTroves contract
+  * deployed SortedLoCs contract
   */
-  const exactPartialRedemptionHint = (await sortedTroves.findInsertPosition(partialRedemptionNewICR,
+  const exactPartialRedemptionHint = (await sortedLoCs.findInsertPosition(partialRedemptionNewICR,
     approxPartialRedemptionHint,
     approxPartialRedemptionHint))
 
@@ -818,7 +815,7 @@ But if the redemption causes an amount (debt - 20) to be cancelled, the Line of 
 
 ### Gas compensation helper functions
 
-Gas compensation functions are found in the parent _LiquityBase.sol_ contract:
+Gas compensation functions are found in the parent _ZeroBase.sol_ contract:
 
 `_getCollGasCompensation(uint _entireColl)` returns the amount of RBTC to be drawn from a Line of Credit's collateral and sent as gas compensation. 
 
@@ -937,23 +934,23 @@ An SOV holder may stake their SOV, and earn a share of all system fees, proporti
 
 Zero generates revenue in two ways: redemptions, and borrowing ZUSD.
 
-Redemptions fees are paid in RBTC. Borrowing fees (when a user opens a Line of Credit, or borrows more ZUSD from their existing Line of Credit) are paid in ZUSD.
+Redemptions fees are paid in RBTC. Origination fees (when a user opens a Line of Credit, or borrows more ZUSD from their existing Line of Credit) are paid in ZUSD.
 
 ### Redemption Fee
 
 The redemption fee is taken as a cut of the total RBTC drawn from the system in a redemption. It is based on the current redemption rate.
 
-In the `TroveManager`, `redeemCollateral` calculates the RBTC fee and transfers it to the `sovFeeCollector`.
+In the `LoCManager`, `redeemCollateral` calculates the RBTC fee and transfers it to the `sovFeeCollector`.
 
-### Borrowing fee
+### Origination fee
 
-The borrowing fee is charged on the ZUSD drawn by the user and is added to the Line of Credit's ZUSD debt. It is based on the current borrowing rate.
+The origination fee is charged on the ZUSD drawn by the user and is added to the Line of Credit's ZUSD debt. It is based on the current borrowing rate.
 
-When new ZUSD are drawn via one of the `BorrowerOperations` functions `openTrove`, `withdrawZUSD` or `adjustTrove`, an extra amount `ZUSDFee` is minted, and an equal amount of debt is added to the user’s Line of Credit. The `ZUSDFee` is transferred to the `sovFeeCollector`.
+When new ZUSD are drawn via one of the `BorrowerOperations` functions `openLoC`, `withdrawZUSD` or `adjustLoC`, an extra amount `ZUSDFee` is minted, and an equal amount of debt is added to the user’s Line of Credit. The `ZUSDFee` is transferred to the `sovFeeCollector`.
 
 ### Fee Schedule
 
-Redemption and issuance fees are based on the `baseRate` state variable in TroveManager, which is dynamically updated. The `baseRate` increases with each redemption, and decays according to time passed since the last fee event i.e. the last redemption or issuance of ZUSD.
+Redemption and issuance fees are based on the `baseRate` state variable in LoCManager, which is dynamically updated. The `baseRate` increases with each redemption, and decays according to time passed since the last fee event i.e. the last redemption or issuance of ZUSD.
 
 The current fee schedule:
 
@@ -964,9 +961,9 @@ Upon each redemption:
 
 Upon each debt issuance:
 - `baseRate` is decayed based on time passed since the last fee event
-- The borrowing rate is given by `min{BORROWING_FEE_FLOOR + baseRate * newDebtIssued, MAX_BORROWING_FEE}`
+- The borrowing rate is given by `min{ORIGINATION_FEE_FLOOR + baseRate * newDebtIssued, MAX_ORIGINATION_FEE}`
 
-`REDEMPTION_FEE_FLOOR` and `BORROWING_FEE_FLOOR` are both set to 0.5%, while `MAX_BORROWING_FEE` is 5% and `DECIMAL_PRECISION` is 100%.
+`REDEMPTION_FEE_FLOOR` and `ORIGINATION_FEE_FLOOR` are both set to 0.5%, while `MAX_ORIGINATION_FEE` is 5% and `DECIMAL_PRECISION` is 100%.
 
 ### Intuition behind fees
 
@@ -1045,13 +1042,13 @@ PDFs of these can be found in https://github.com/DistributedCollective/zero/blob
 
 ## Definitions
 
-_**Line of Credit:**_ a collateralized debt position, aka "Trove", bound to a single RSK address. Also referred to as a “CDP” in similar protocols.
+_**Line of Credit:**_ a collateralized debt position, aka "LoC", bound to a single RSK address. Also referred to as a “CDP” in similar protocols.
 
 _**ZUSD**_:  The stablecoin that may be issued from a user's collateralized debt position and freely transferred/traded to any RSK address. Intended to maintain parity with the US dollar, and can always be redeemed directly with the system: 1 ZUSD is always exchangeable for 1 USD worth of RBTC, minus a redemption fee.
 
-_**Active Line of Credit:**_ an RSK address owns an “active Line of Credit” if there is a node in the `SortedTroves` list with ID equal to the address, and non-zero collateral is recorded on the Line of Credit struct for that address.
+_**Active Line of Credit:**_ an RSK address owns an “active Line of Credit” if there is a node in the `SortedLoCs` list with ID equal to the address, and non-zero collateral is recorded on the Line of Credit struct for that address.
 
-_**Closed Line of Credit:**_ a Line of Credit that was once active, but now has zero debt and zero collateral recorded on its struct, and there is no node in the `SortedTroves` list with ID equal to the owning address.
+_**Closed Line of Credit:**_ a Line of Credit that was once active, but now has zero debt and zero collateral recorded on its struct, and there is no node in the `SortedLoCs` list with ID equal to the owning address.
 
 _**Active collateral:**_ the amount of RBTC collateral recorded on a Line of Credit’s struct
 
@@ -1264,7 +1261,7 @@ Your custom built frontend can be configured by putting a file named `config.jso
 
 ## Running a frontend with Docker
 
-The quickest way to get a frontend up and running is to use the [prebuilt image](https://hub.docker.com/r/liquity/dev-frontend) available on Docker Hub.
+The quickest way to get a frontend up and running is to use the [TODO: fix link][prebuilt image](https://hub.docker.com/r/sovryn-zero/dev-frontend) available on Docker Hub.
 
 ### Prerequisites
 
@@ -1273,8 +1270,8 @@ You will need to have [Docker](https://docs.docker.com/get-docker/) installed.
 ### Running with `docker`
 
 ```
-docker pull liquity/dev-frontend
-docker run --name Zero -d --rm -p 3000:80 liquity/dev-frontend
+docker pull zero/dev-frontend
+docker run --name Zero -d --rm -p 3000:80 zero/dev-frontend
 ```
 
 This will start serving your frontend using HTTP on port 3000. If everything went well, you should be able to open http://localhost:3000/ in your browser. To use a different port, just replace 3000 with your desired port number.
@@ -1282,7 +1279,7 @@ This will start serving your frontend using HTTP on port 3000. If everything wen
 To stop the service:
 
 ```
-docker kill liquity
+docker kill zero
 ```
 
 ### Configuring a public frontend
@@ -1307,13 +1304,13 @@ To obtain the files you need to upload, you need to extract them from a frontend
 docker run --name Zero -d --rm \
   -e FRONTEND_TAG=0x2781fD154358b009abf6280db4Ec066FCC6cb435 \
   -e INFURA_API_KEY=158b6511a5c74d1ac028a8a2afe8f626 \
-  liquity/dev-frontend
+  zero/dev-frontend
 ```
 
 While the container is running, use `docker cp` to extract the frontend's files to a folder of your choosing. For example to extract them to a new folder named "devui" inside the current folder, run:
 
 ```
-docker cp liquity:/usr/share/nginx/html ./devui
+docker cp zero:/usr/share/nginx/html ./devui
 ```
 
 Upload the contents of this folder to your chosen hosting service (or serve them using your own infrastructure), and you're set!
@@ -1324,7 +1321,7 @@ If you have command line access to a server with Docker installed, hosting a fro
 
 The frontend Docker container simply serves files using plain HTTP, which is susceptible to man-in-the-middle attacks. Therefore it is highly recommended to wrap it in HTTPS using a reverse proxy. You can find an example docker-compose config [here](packages/dev-frontend/docker-compose-example/docker-compose.yml) that secures the frontend using [SWAG (Secure Web Application Gateway)](https://github.com/linuxserver/docker-swag) and uses [watchtower](https://github.com/containrrr/watchtower) for automatically updating the frontend image to the latest version on Docker Hub.
 
-Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/liquity.example.com).
+Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [TODO: fix link] [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/sovryn-zero.example.com).
 
 
 

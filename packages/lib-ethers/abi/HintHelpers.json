@@ -24,11 +24,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_sortedTrovesAddress",
+        "name": "_sortedLoCsAddress",
         "type": "address"
       }
     ],
-    "name": "SortedTrovesAddressChanged",
+    "name": "SortedLoCsAddressChanged",
     "type": "event"
   },
   {
@@ -37,11 +37,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_troveManagerAddress",
+        "name": "_locManagerAddress",
         "type": "address"
       }
     ],
-    "name": "TroveManagerAddressChanged",
+    "name": "LoCManagerAddressChanged",
     "type": "event"
   },
   {
@@ -307,10 +307,10 @@
   },
   {
     "inputs": [],
-    "name": "liquityBaseParams",
+    "name": "zeroBaseParams",
     "outputs": [
       {
-        "internalType": "contract ILiquityBaseParams",
+        "internalType": "contract IZeroBaseParams",
         "name": "",
         "type": "address"
       }
@@ -335,17 +335,17 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_liquityBaseParamsAddress",
+        "name": "_zeroBaseParamsAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_sortedTrovesAddress",
+        "name": "_sortedLoCsAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_troveManagerAddress",
+        "name": "_locManagerAddress",
         "type": "address"
       }
     ],
@@ -369,10 +369,10 @@
   },
   {
     "inputs": [],
-    "name": "sortedTroves",
+    "name": "sortedLoCs",
     "outputs": [
       {
-        "internalType": "contract ISortedTroves",
+        "internalType": "contract ISortedLoCs",
         "name": "",
         "type": "address"
       }
@@ -382,10 +382,10 @@
   },
   {
     "inputs": [],
-    "name": "troveManager",
+    "name": "locManager",
     "outputs": [
       {
-        "internalType": "contract ITroveManager",
+        "internalType": "contract ILoCManager",
         "name": "",
         "type": "address"
       }

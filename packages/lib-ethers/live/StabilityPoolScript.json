@@ -58,7 +58,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawETHGainToTrove",
+      "name": "withdrawBTCGainToLoC",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
