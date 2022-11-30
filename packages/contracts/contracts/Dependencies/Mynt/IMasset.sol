@@ -1,31 +1,20 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
-interface IMasset {
 
+interface IMasset {
     struct PermitParams {
-        uint256 deadline; 
+        uint256 deadline;
         uint8 v;
-        bytes32 r; 
+        bytes32 r;
         bytes32 s;
     }
 
-    function redeemByBridge(
-        address _bAsset,
-        uint256 _massetQuantity,
-        address _recipient
-    ) external returns (uint256 massetRedeemed);
-
-    function mintTo(
-        address _bAsset,
-        uint256 _bAssetQuantity,
-        address _recipient
-    )
-    external;
+    function mintTo(address _bAsset, uint256 _bAssetQuantity, address _recipient) external;
 
     function getToken() external view returns (address);
 
-       /**
+    /**
      * @dev Credits a recipient with a certain quantity of selected bAsset, in exchange for burning the
      *      relative mAsset quantity from the sender. Sender also incurs a small fee, if any.
      * @param _bAsset           Address of the bAsset to redeem.

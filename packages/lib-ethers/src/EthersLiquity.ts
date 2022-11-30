@@ -38,7 +38,8 @@ import {
   EthersProvider,
   EthersSigner,
   EthersTransactionOverrides,
-  EthersTransactionReceipt
+  EthersTransactionReceipt, 
+  PermitParams
 } from "./types";
 
 import { PopulatableEthersLiquity, SentEthersLiquityTransaction } from "./PopulatableEthersLiquity";
@@ -308,8 +309,8 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
-    return this.send.closeNueTrove(overrides).then(waitForSuccess);
+  closeNueTrove(permitParams: PermitParams, overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
+    return this.send.closeNueTrove(permitParams, overrides).then(waitForSuccess);
   }
 
   /**
@@ -334,10 +335,11 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    */
   adjustNueTrove(
     params: TroveAdjustmentParams<Decimalish>,
+    permitParams: PermitParams,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<TroveAdjustmentDetails> {
-    return this.send.adjustNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.adjustNueTrove(params, permitParams, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**

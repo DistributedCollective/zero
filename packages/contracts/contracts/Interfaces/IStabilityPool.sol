@@ -221,12 +221,12 @@ interface IStabilityPool {
     //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
     function provideToSpFromDLLR(
         uint _dllrAmount,
-        IMasset.PermitParams memory _permitParams
+        IMasset.PermitParams calldata _permitParams
     ) external;
 
     function provideToSpFromDllrBySpender(
         uint _dllrAmount,
-        IMasset.PermitParams memory _permitParams,
+        IMasset.PermitParams calldata _permitParams,
         address _dllrOwner
     ) external;
 

@@ -339,7 +339,7 @@ contract BorrowerOperations is
         uint256 _dllrAmount,
         address _upperHint,
         address _lowerHint,
-        IMasset.PermitParams memory _permitParams
+        IMasset.PermitParams calldata _permitParams
     ) external override {
         uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
             masset,
@@ -376,12 +376,13 @@ contract BorrowerOperations is
         uint256 _ZUSDChange,
         bool _isDebtIncrease,
         address _upperHint,
-        address _lowerHint
+        address _lowerHint,
+        IMasset.PermitParams calldata _permitParams
     ) external payable override {
         require(address(masset) != address(0), "Masset address not set");
 
         if (!_isDebtIncrease && _ZUSDChange > 0) {
-            masset.redeemByBridge(address(zusdToken), _ZUSDChange, msg.sender);
+            MyntLib.redeemFromDLLR(masset, _ZUSDChange, address(zusdToken), _permitParams);
         }
         _adjustSenderTrove(
             msg.sender,
@@ -557,12 +558,17 @@ contract BorrowerOperations is
         _closeTrove();
     }
 
-    function closeNueTrove() external override {
+    function closeNueTrove(IMasset.PermitParams calldata _permitParams) external override {
         require(address(masset) != address(0), "Masset address not set");
 
         uint256 debt = troveManager.getTroveDebt(msg.sender);
 
-        masset.redeemByBridge(address(zusdToken), debt.sub(ZUSD_GAS_COMPENSATION), msg.sender);
+        MyntLib.redeemFromDLLR(
+            masset,
+            debt.sub(ZUSD_GAS_COMPENSATION),
+            address(zusdToken),
+            _permitParams
+        );
         _closeTrove();
     }
 

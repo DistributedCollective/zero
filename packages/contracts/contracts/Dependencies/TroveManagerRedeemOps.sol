@@ -180,7 +180,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage,
-        IMasset.PermitParams memory _permitParams
+        IMasset.PermitParams calldata _permitParams
     ) external {
         uint256 _zusdAmount = MyntLib.redeemFromDLLR(
             IBorrowerOperations(borrowerOperationsAddress).getMasset(),

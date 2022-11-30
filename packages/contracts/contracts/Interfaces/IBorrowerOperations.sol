@@ -122,11 +122,7 @@ interface IBorrowerOperations {
      * @param _upperHint upper trove id hint
      * @param _lowerHint lower trove id hint
      */
-    function withdrawColl(
-        uint256 _amount,
-        address _upperHint,
-        address _lowerHint
-    ) external;
+    function withdrawColl(uint256 _amount, address _upperHint, address _lowerHint) external;
 
     /**
      * @notice issues `_amount` of ZUSD from the caller’s Trove to the caller.
@@ -156,18 +152,14 @@ interface IBorrowerOperations {
     /// @param _amount ZUSD amount to repay
     /// @param _upperHint upper trove id hint
     /// @param _lowerHint lower trove id hint
-    function repayZUSD(
-        uint256 _amount,
-        address _upperHint,
-        address _lowerHint
-    ) external;
+    function repayZUSD(uint256 _amount, address _upperHint, address _lowerHint) external;
 
     /// Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly
     function repayZusdFromDLLR(
         uint256 _dllrAmount,
         address _upperHint,
-        address _lowerHint, 
-        IMasset.PermitParams memory _permitParams
+        address _lowerHint,
+        IMasset.PermitParams calldata _permitParams
     ) external;
 
     /**
@@ -181,7 +173,7 @@ interface IBorrowerOperations {
      * Requires the borrower have a NUE balance sufficient to repay their trove's debt, excluding gas compensation - i.e. `(debt - 50)` NUE.
      * This method is identical to `closeTrove()`, but operates on NUE tokens instead of ZUSD.
      */
-    function closeNueTrove() external;
+    function closeNueTrove(IMasset.PermitParams calldata _permitParams) external;
 
     /**
      * @notice enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity:
@@ -223,7 +215,8 @@ interface IBorrowerOperations {
         uint256 _debtChange,
         bool isDebtIncrease,
         address _upperHint,
-        address _lowerHint
+        address _lowerHint,
+        IMasset.PermitParams calldata _permitParams
     ) external payable;
 
     /**
@@ -237,5 +230,4 @@ interface IBorrowerOperations {
     function BORROWING_FEE_FLOOR() external view returns (uint256);
 
     function getMasset() external view returns (IMasset);
-
 }

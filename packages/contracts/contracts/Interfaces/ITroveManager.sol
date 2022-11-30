@@ -182,7 +182,7 @@ interface ITroveManager is ILiquityBase {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage,
-        IMasset.PermitParams memory _permitParams
+        IMasset.PermitParams calldata _permitParams
     ) external;
 
     /// @notice Update borrower's stake based on their latest collateral value
