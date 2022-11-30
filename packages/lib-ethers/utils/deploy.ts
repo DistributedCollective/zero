@@ -262,21 +262,23 @@ const connectContracts = async (
 
     nonce =>
       troveManager.setAddresses(
-        feeDistributor.address,
-        troveManagerRedeemOps.address,
-        liquityBaseParams.address,
-        borrowerOperations.address,
-        activePool.address,
-        defaultPool.address,
-        stabilityPool.address,
-        gasPool.address,
-        collSurplusPool.address,
-        priceFeed.address,
-        zusdToken.address,
-        sortedTroves.address,
-        zeroToken.address,
-        zeroStaking.address,
-        { ...overrides, nonce }
+        {
+          _feeDistributorAddress: feeDistributor.address,
+          _troveManagerRedeemOps: troveManagerRedeemOps.address,
+          _liquityBaseParamsAddress: liquityBaseParams.address,
+          _borrowerOperationsAddress: borrowerOperations.address,
+          _activePoolAddress: activePool.address,
+          _defaultPoolAddress: defaultPool.address,
+          _stabilityPoolAddress: stabilityPool.address,
+          _gasPoolAddress: gasPool.address,
+          _collSurplusPoolAddress: collSurplusPool.address,
+          _priceFeedAddress: priceFeed.address,
+          _zusdTokenAddress: zusdToken.address,
+          _sortedTrovesAddress: sortedTroves.address,
+          _zeroTokenAddress: zeroToken.address,
+          _zeroStakingAddress: zeroStaking.address,
+        },
+          { ...overrides, nonce }
       ),
 
     nonce =>
