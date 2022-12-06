@@ -1,5 +1,9 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js");
 const testHelpers = require("../utils/testHelpers.js");
+const { ethers, network } = require("hardhat");
+const { EIP712Domain, Permit, domainSeparator, buildTypedPermitMessage, buildTypedPermitData, signTypedMessage, maxPermitDeadline, signPermit } = require('../utils/eip2612Permit');
+const { signERC2612Permit } = require('eth-permit');
+//const { signTypedMessage } = require("eth-sig-util");
 const timeMachine = require("ganache-time-traveler");
 
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol");
@@ -18,6 +22,11 @@ const timeValues = testHelpers.TimeValues;
 
 const ZERO_ADDRESS = th.ZERO_ADDRESS;
 const assertRevert = th.assertRevert;
+
+const accounts = require("../hardhatAccountsList2k.js");
+const accountsList = accounts.accountsList;
+
+
 
 /* NOTE: Some of the borrowing tests do not test for specific ZUSD fee values. They only test that the
  * fees are non-zero when they should occur, and that they decay over time.
@@ -50,6 +59,29 @@ contract("BorrowerOperations", async accounts => {
     frontEnd_3,
     sovFeeCollector
   ] = accounts;
+
+  const [
+    owner_pk,
+    alice_pk,
+    bob_pk,
+    carol_pk,
+    dennis_pk,
+    whale_pk,
+    A_pk,
+    B_pk,
+    C_pk,
+    D_pk,
+    E_pk,
+    F_pk,
+    G_pk,
+    H_pk,
+    // defaulter_1_pk, defaulter_2_pk,
+    frontEnd_1_pk,
+    frontEnd_2_pk,
+    frontEnd_3_pk,
+    sovFeeCollector_pk
+    //] = accountsList.map(item => Buffer.from(item.privateKey, "hex"));
+  ] = accountsList.map(item => Buffer.from((item.privateKey).replace(/^0x/, ''), "hex"));
 
   const multisig = accounts[999];
 
@@ -85,7 +117,56 @@ contract("BorrowerOperations", async accounts => {
   let MIN_NET_DEBT;
   let BORROWING_FEE_FLOOR;
 
-  before(async () => {});
+  let nueTokenName;
+  let nueTokenEIP712Version;
+
+  let chainId;
+
+  let owner_signer,
+    alice_signer,
+    bob_signer,
+    carol_signer,
+    dennis_signer,
+    whale_signer,
+    A_signer,
+    B_signer,
+    C_signer,
+    D_signer,
+    E_signer,
+    F_signer,
+    G_signer,
+    H_signer,
+    // defaulter_1_signer, defaulter_2_signer,
+    frontEnd_1_signer,
+    frontEnd_2_signer,
+    frontEnd_3_signer,
+    sovFeeCollector_signer;
+
+  before(async () => {
+    [
+      owner_signer,
+      alice_signer,
+      bob_signer,
+      carol_signer,
+      dennis_signer,
+      whale_signer,
+      A_signer,
+      B_signer,
+      C_signer,
+      D_signer,
+      E_signer,
+      F_signer,
+      G_signer,
+      H_signer,
+      // defaulter_1_signer, defaulter_2_signer,
+      frontEnd_1_signer,
+      frontEnd_2_signer,
+      frontEnd_3_signer,
+      sovFeeCollector_signer
+    ] = await ethers.getSigners();
+
+    //console.log('accountsList[1].privateKey).replace...:', accountsList[1].privateKey.replace(/^0x/, ''));
+  });
 
   const testCorpus = ({ withProxy = false }) => {
     before(async () => {
@@ -127,8 +208,12 @@ contract("BorrowerOperations", async accounts => {
       BORROWING_FEE_FLOOR = await borrowerOperations.BORROWING_FEE_FLOOR();
       const nueTokenAddress = await masset.token();
       nueToken = await NueToken.at(nueTokenAddress);
+      nueTokenName = await nueToken.name();
+      nueTokenEIP712Version = '1';
+      chainId = await nueToken.getChainId();
 
       await borrowerOperations.setMassetAddress(masset.address);
+
     });
 
     let revertToSnapshot;
@@ -3257,6 +3342,7 @@ contract("BorrowerOperations", async accounts => {
       assert.isTrue(aliceDebtBefore.eq(activePoolDebtBefore));
 
       // Alice adjusts trove. Coll change, no debt change
+      //TODO: _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }
       await borrowerOperations.adjustNueTrove(th._100pct, 0, 0, false, alice, alice, {
         from: alice,
         value: dec(1, 16)
@@ -3317,6 +3403,7 @@ contract("BorrowerOperations", async accounts => {
 
       // Alice adjusts trove. Coll and debt increase(+1 ETH, +50ZUSD)
       const increaseAmount = await getNetBorrowingAmount(dec(50, 16));
+      //TODO: _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }
       await borrowerOperations.adjustNueTrove(th._100pct, 0, increaseAmount, true, alice, alice, {
         from: alice,
         value: dec(1, 16)
@@ -3390,6 +3477,7 @@ contract("BorrowerOperations", async accounts => {
 
       const decreaseAmount = toBN(dec(50, 16));
       // Alice adjusts trove coll and debt decrease (-0.5 ETH, -50ZUSD)
+      //TODO: _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }
       await borrowerOperations.adjustNueTrove(
         th._100pct,
         dec(500, "finney"),
@@ -4101,7 +4189,7 @@ contract("BorrowerOperations", async accounts => {
       assert.equal(aliceCollAfter, "0");
     });
 
-    it("closeNueTrove(): reduces a Trove's debt to zero", async () => {
+    it.only("closeNueTrove(): reduces a Trove's debt to zero", async () => {
       const { zusdAmount } = await openNueTrove({
         extraZUSDAmount: toBN(dec(10000, 18)),
         ICR: toBN(dec(2, 18)),
@@ -4126,8 +4214,54 @@ contract("BorrowerOperations", async accounts => {
 
       const nueBalance_Before = await nueToken.balanceOf(alice);
 
+
       // Alice attempts to close trove
-      await borrowerOperations.closeNueTrove({ from: alice });
+
+      const nonceAlice = await nueToken.nonces(alice);  //th.toBN((await nueToken.nonces(alice)).toString());
+      const MAX_UINT256 = th.toBN(2).pow(th.toBN(256)).sub(th.toBN(1));
+      const deadline = MAX_UINT256;  //ethers.constants.MaxUint256.toString(); //constants.maxMAX_UINT256; //ethers.constants.MaxUint256.sub(1);
+      const value = (await troveManager.getTroveDebt(alice)).sub(await borrowerOperations.ZUSD_GAS_COMPENSATION());  //th.toBN(nueBalance_Before.toString());
+      /*
+      const permitMsg = buildTypedPermitMessage(chainId, nueToken.address, nueTokenName, nueTokenEIP712Version, alice, borrowerOperations.address, value, nonceAlice, deadline);
+
+      const DOMAIN_SEPARATOR = await domainSeparator(
+        nueTokenName,
+        nueTokenEIP712Version,
+        chainId,
+        nueToken.address
+      );
+      assert.equal(
+        await nueToken.DOMAIN_SEPARATOR(),
+        DOMAIN_SEPARATOR,
+        "eip721: invalid domain separator"
+      );
+
+      //const signedMessage = await signPermit(alice_signer, nueToken, nueTokenEIP712Version, chainId, value, deadline);
+      const permitData = await buildTypedPermitData(alice_signer, nueToken, nueTokenEIP712Version, chainId.toString(), borrowerOperations.address, value.toString(), deadline.toString());
+
+      console.log("borrowerOperations.address:", borrowerOperations.address);
+      console.log("nueToken:", nueToken.address);
+
+      console.log('value.toString():', value.toString());
+      console.log('permitData:', permitData);
+      const signedMessage = await alice_signer._signTypedData(permitData.domain, permitData.types, permitData.values);
+      console.log('signedMessage:', signedMessage);
+      //const signedMessage = signTypedMessage(alice_pk, permitMsg);
+
+      //const signedMessage = await alice_signer.sisignMessage(permitMsg);
+      //const signedMessage = await alice_signer._signTypedData(permitMsg.domain, permitMsg.types, permitMsg.message);
+      const { v, r, s } = ethers.utils.splitSignature(signedMessage); //signedMessage;
+      console.log('{ v, r, s }:', { v, r, s });
+      //console.log('ethers.utils.verifyMessage::', ethers.utils.verifyMessage( permitMsg , signedMessage ));
+      //const permitParams = { deadline: MAX_UINT256, v: v, r: r, s: s };
+      //const permitParams = [MAX_UINT256, v, r, s ];
+      const permitParams = [deadline.toString(), v, r, s];
+      console.log('permitParams', permitParams);
+      //await borrowerOperations.closeNueTrove(permitParams, { from: alice });
+      */
+      // -----------------
+      const permission = await signERC2612Permit(alice_signer, nueToken.address, alice_signer.address, borrowerOperations.address, value.toString());
+      await borrowerOperations.closeNueTrove(permission, { from: alice });
 
       const aliceCollAfter = await getTroveEntireColl(alice);
       assert.equal(aliceCollAfter, "0");
@@ -6736,7 +6870,7 @@ contract("BorrowerOperations", async accounts => {
   // })
 });
 
-contract("Reset chain state", async accounts => {});
+contract("Reset chain state", async accounts => { });
 
 /* TODO:
 
