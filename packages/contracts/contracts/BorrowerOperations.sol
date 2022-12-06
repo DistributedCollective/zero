@@ -341,7 +341,7 @@ contract BorrowerOperations is
         address _lowerHint,
         IMasset.PermitParams calldata _permitParams
     ) external override {
-        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
+        uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrByPermit(
             masset,
             _dllrAmount,
             address(zusdToken),
@@ -382,7 +382,12 @@ contract BorrowerOperations is
         require(address(masset) != address(0), "Masset address not set");
 
         if (!_isDebtIncrease && _ZUSDChange > 0) {
-            MyntLib.redeemFromDLLR(masset, _ZUSDChange, address(zusdToken), _permitParams);
+            MyntLib.redeemZusdFromDllrByPermit(
+                masset,
+                _ZUSDChange,
+                address(zusdToken),
+                _permitParams
+            );
         }
         _adjustSenderTrove(
             msg.sender,
@@ -563,7 +568,7 @@ contract BorrowerOperations is
 
         uint256 debt = troveManager.getTroveDebt(msg.sender);
 
-        MyntLib.redeemFromDLLR(
+        MyntLib.redeemZusdFromDllrByPermit(
             masset,
             debt.sub(ZUSD_GAS_COMPENSATION),
             address(zusdToken),

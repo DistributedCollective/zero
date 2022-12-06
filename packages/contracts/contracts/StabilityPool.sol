@@ -294,7 +294,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint _dllrAmount,
         IMasset.PermitParams calldata _permitParams
     ) external override {
-        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
+        uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrByPermit(
             borrowerOperations.getMasset(),
             _dllrAmount,
             address(zusdToken),
@@ -313,7 +313,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             dllr.transferFrom(_dllrOwner, msg.sender, _dllrAmount),
             "SP: transferFrom DLLR failed"
         );
-        uint256 _ZUSDAmount = MyntLib.redeemFromDLLR(
+        uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrByPermit(
             borrowerOperations.getMasset(),
             _dllrAmount,
             address(zusdToken),

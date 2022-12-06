@@ -23,7 +23,7 @@ library MyntLib {
      *        _s 32 bytes after _r in ECDSA signature.
      * @return redeemed ZUSD amount
      */
-    function redeemFromDLLR(
+    function redeemZusdFromDllrByPermit(
         IMasset _myntMAsset,
         uint256 _dllrAmount,
         address _toToken,
@@ -31,10 +31,11 @@ library MyntLib {
     ) internal returns (uint256) {
         IDLLR dllr = IDLLR(_myntMAsset.getToken());
         IERC20 dllrERC20 = IERC20(address(dllr));
-        uint256 balBefore = dllrERC20.balanceOf(address(this));
+        uint256 thisBalanceBefore = dllrERC20.balanceOf(address(this));
+        address thisAddress = address(this);
         dllr.transferWithPermit(
             msg.sender,
-            address(this),
+            thisAddress,
             _dllrAmount,
             _permitParams.deadline,
             _permitParams.v,
@@ -42,7 +43,7 @@ library MyntLib {
             _permitParams.s
         );
         require(
-            balBefore.sub(dllrERC20.balanceOf(address(this))) == _dllrAmount,
+            dllrERC20.balanceOf(thisAddress).sub(thisBalanceBefore) == _dllrAmount,
             "DLLR transferred amount validation failed"
         );
         return _myntMAsset.redeemTo(_toToken, _dllrAmount, msg.sender);
