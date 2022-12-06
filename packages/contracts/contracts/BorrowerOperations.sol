@@ -306,16 +306,25 @@ contract BorrowerOperations is
 
     /// Borrow (withdraw) ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
     /// Zero Line of Credit owner can borrow a specified amount of ZUSD and convert it to DLLR via Sovryn Mynt
-    function borrowZUSDAndConvertToDLLR(
+    function withdrawZusdAndConvertToDLLR(
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
         address _upperHint,
         address _lowerHint
     ) external override {
-        uint256 balanceBefore = zusdToken.balanceOf(msg.sender);
-        _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
+        address thisAddress = address(this);
+        uint256 balanceBefore = zusdToken.balanceOf(thisAddress);
+
+        _withdrawZusdTo(
+            msg.sender,
+            thisAddress,
+            _ZUSDAmount,
+            _upperHint,
+            _lowerHint,
+            _maxFeePercentage
+        );
         require(
-            zusdToken.balanceOf(msg.sender) == balanceBefore.add(_ZUSDAmount),
+            zusdToken.balanceOf(thisAddress) == balanceBefore.add(_ZUSDAmount),
             "ZUSD is not borrowed correctly"
         ); //TODO: check if fees are subtracted from the borrowing amount
         require(
@@ -426,6 +435,27 @@ contract BorrowerOperations is
             _lowerHint,
             _maxFeePercentage,
             msg.sender
+        );
+    }
+
+    // _withdrawZusd: _adjustTrove(msg.sender, 0, _ZUSDAmount, true, _upperHint, _lowerHint, _maxFeePercentage);
+    function _withdrawZusdTo(
+        address _borrower,
+        address _receiver,
+        uint256 _ZUSDChange,
+        address _upperHint,
+        address _lowerHint,
+        uint256 _maxFeePercentage
+    ) internal {
+        _adjustSenderTrove(
+            _borrower,
+            0,
+            _ZUSDChange,
+            true,
+            _upperHint,
+            _lowerHint,
+            _maxFeePercentage,
+            _receiver
         );
     }
 

@@ -141,7 +141,7 @@ interface IBorrowerOperations {
     ) external;
 
     /// Borrow (withdraw) ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
-    function borrowZUSDAndConvertToDLLR(
+    function withdrawZusdAndConvertToDLLR(
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
         address _upperHint,
