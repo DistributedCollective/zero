@@ -2,7 +2,10 @@
   "overrides": [
     {
       "files": [
-        "*.sol"
+        "*.sol",
+        "*.js",
+        "*.ts",
+        "*.json"
       ],
       "options": {
         "printWidth": 99,
