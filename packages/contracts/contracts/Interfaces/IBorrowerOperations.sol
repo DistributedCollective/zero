@@ -146,7 +146,7 @@ interface IBorrowerOperations {
         uint256 _ZUSDAmount,
         address _upperHint,
         address _lowerHint
-    ) external;
+    ) external returns (uint256);
 
     /// @notice repay `_amount` of ZUSD to the caller’s Trove, subject to leaving 50 debt in the Trove (which corresponds to the 50 ZUSD gas compensation).
     /// @param _amount ZUSD amount to repay

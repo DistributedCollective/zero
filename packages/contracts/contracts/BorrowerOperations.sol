@@ -306,12 +306,13 @@ contract BorrowerOperations is
 
     /// Borrow (withdraw) ZUSD tokens from a trove: mint new ZUSD tokens to the owner and convert it to DLLR in one transaction
     /// Zero Line of Credit owner can borrow a specified amount of ZUSD and convert it to DLLR via Sovryn Mynt
+    ///@return DLLR amount minted
     function withdrawZusdAndConvertToDLLR(
         uint256 _maxFeePercentage,
         uint256 _ZUSDAmount,
         address _upperHint,
         address _lowerHint
-    ) external override {
+    ) external override returns (uint256) {
         address thisAddress = address(this);
         uint256 balanceBefore = zusdToken.balanceOf(thisAddress);
 
@@ -331,7 +332,7 @@ contract BorrowerOperations is
             zusdToken.approve(address(masset), _ZUSDAmount),
             "Failed to approve ZUSD amount for Mynt mAsset to redeem"
         );
-        masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
+        return masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
     }
 
     /// Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly

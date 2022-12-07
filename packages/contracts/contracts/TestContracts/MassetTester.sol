@@ -52,9 +52,11 @@ contract MassetTester is IMasset {
         address _bAsset,
         uint256 _bAssetQuantity,
         address _recipient
-    ) external override {
+    ) external override returns (uint256) {
         IERC20(_bAsset).transferFrom(msg.sender, address(this), _bAssetQuantity);
+        uint256 balanceBefore = token.balanceOf(_recipient);
         token.mint(_recipient, _bAssetQuantity);
+        return balanceBefore - token.balanceOf(_recipient);
     }
 
     function getToken() external view override returns (address) {

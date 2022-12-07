@@ -10,7 +10,11 @@ interface IMasset {
         bytes32 s;
     }
 
-    function mintTo(address _bAsset, uint256 _bAssetQuantity, address _recipient) external;
+    function mintTo(
+        address _bAsset,
+        uint256 _bAssetQuantity,
+        address _recipient
+    ) external returns (uint256);
 
     function getToken() external view returns (address);
 
