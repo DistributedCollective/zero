@@ -18,7 +18,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
     whale,
     A, B, C, D, E, F, G, H,
     defaulter_1, defaulter_2, defaulter_3, defaulter_4, defaulter_5, defaulter_6,
-    frontEnd_1, frontEnd_2, frontEnd_3, sovFeeCollector
+    frontEnd_1, frontEnd_2, frontEnd_3, feeSharingCollector
   ] = accounts;
 
   const multisig = accounts[997];

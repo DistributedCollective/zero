@@ -15,7 +15,7 @@ contract FeeDistributorStorage is Ownable {
 
     // --- Connected contract declarations ---
 
-    IFeeSharingCollector public sovFeeCollector;
+    IFeeSharingCollector public feeSharingCollector;
 
     IZEROStaking public zeroStaking;
 
@@ -29,6 +29,6 @@ contract FeeDistributorStorage is Ownable {
 
     address public activePoolAddress;
 
-    //pct of fees sent to feeSOVCollector address
-    uint public FEE_TO_SOV_COLLECTOR;
+    //pct of fees sent to feeSharingCollector address
+    uint public FEE_TO_FEE_SHARING_COLLECTOR;
 }

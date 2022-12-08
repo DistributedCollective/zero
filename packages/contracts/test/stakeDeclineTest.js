@@ -22,7 +22,7 @@ const timeValues = testHelpers.TimeValues
 contract('TroveManager', async accounts => {
 
   const ZERO_ADDRESS = th.ZERO_ADDRESS
-  const [owner, A, B, C, D, E, F, sovFeeCollector] = accounts.slice(0, 8);
+  const [owner, A, B, C, D, E, F, feeSharingCollector] = accounts.slice(0, 8);
 
   const multisig = accounts[999];
 

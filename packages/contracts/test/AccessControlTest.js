@@ -17,7 +17,7 @@ test/launchSequenceTest/DuringLockupPeriodTest.js */
 contract(
   "Access Control: Zero functions with the caller restricted to Zero contract(s)",
   async accounts => {
-    const [owner, alice, bob, carol, sovFeeCollector] = accounts;
+    const [owner, alice, bob, carol, feeSharingCollector] = accounts;
     const multisig = accounts[999];
 
     let coreContracts;

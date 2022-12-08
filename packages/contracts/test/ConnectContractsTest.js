@@ -1,7 +1,7 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 
 contract('Deployment script - Sets correct contract addresses dependencies after deployment', async accounts => {
-  const [owner, sovFeeCollector] = accounts;
+  const [owner, feeSharingCollector] = accounts;
 
   const multisig = accounts[999];
   
