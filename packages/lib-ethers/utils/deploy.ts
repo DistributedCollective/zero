@@ -223,7 +223,7 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
-  sovFeeCollectorAddress: string,
+  feeCollectorAddress: string,
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
@@ -366,7 +366,7 @@ const connectContracts = async (
 
     nonce =>
       feeDistributor.setAddresses(
-        sovFeeCollectorAddress,
+        feeCollectorAddress,
         zeroStaking.address,
         borrowerOperations.address,
         troveManager.address,
@@ -551,7 +551,7 @@ export const deployAndSetupContracts = async (
 
   _isDev = true,
   governanceAddress?: string,
-  sovFeeCollectorAddress?: string,
+  feeCollectorAddress?: string,
   wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
@@ -565,7 +565,7 @@ export const deployAndSetupContracts = async (
   }
 
   governanceAddress ??= await deployer.getAddress();
-  sovFeeCollectorAddress ??= await deployContract(
+  feeCollectorAddress ??= await deployContract(
     deployer,
     getContractFactory,
     "MockFeeSharingProxy",
@@ -598,7 +598,7 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     governanceAddress,
-    sovFeeCollectorAddress,
+    feeCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
@@ -623,7 +623,7 @@ export const deployAndSetupContracts = async (
     contracts,
     deployer,
     governanceAddress,
-    sovFeeCollectorAddress,
+    feeCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
