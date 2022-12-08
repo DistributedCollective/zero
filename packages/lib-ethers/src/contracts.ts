@@ -224,7 +224,7 @@ export interface _LiquityDeploymentJSON {
   readonly startBlock: number;
   readonly bootstrapPeriod: number;
   readonly governanceAddress: string;
-  readonly sovFeeCollectorAddress?: string;
+  readonly feeCollectorAddress?: string;
   readonly wrbtcAddress?: string;
   readonly presaleAddress?: string;
   readonly marketMakerAddress?: string;

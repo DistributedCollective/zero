@@ -60,7 +60,7 @@ const governanceAddresses = {
   dev: "0x0000000000000000000000000000000000000003"
 };
 
-const sovFeeCollectorAddresses = {
+const feeCollectorAddresses = {
   mainnet: "",
   rsksovrynmainnet: "0x115cAF168c51eD15ec535727F64684D33B7b08D1",
   rsktestnet: "0xedD92fb7C556E4A4faf8c4f5A90f471aDCD018f4",
@@ -115,8 +115,8 @@ const hasOracles = (network: string): boolean => network in oracleAddresses;
 const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
   network in governanceAddresses;
 
-const hasSovFeeCollector = (network: string): network is keyof typeof sovFeeCollectorAddresses =>
-  network in sovFeeCollectorAddresses;
+const hasFeeCollector = (network: string): network is keyof typeof feeCollectorAddresses =>
+  network in feeCollectorAddresses;
 
 const hasWrbtc = (network: string): network is keyof typeof wrbtcAddresses =>
   network in wrbtcAddresses;
@@ -188,7 +188,7 @@ declare module "hardhat/types/runtime" {
     deployLiquity: (
       deployer: Signer,
       governanceAddress?: string,
-      sovFeeCollectorAddress?: string,
+      feeCollectorAddress?: string,
       wrbtcAddress?: string,
       externalPriceFeeds?: OracleAddresses,
       presaleAddress?: string,
@@ -223,7 +223,7 @@ extendEnvironment(env => {
   env.deployLiquity = async (
     deployer,
     governanceAddress,
-    sovFeeCollectorAddress,
+    feeCollectorAddress,
     wrbtcAddress,
     externalPriceFeeds,
     presaleAddress,
@@ -239,7 +239,7 @@ extendEnvironment(env => {
       externalPriceFeeds,
       env.network.name === "dev",
       governanceAddress,
-      sovFeeCollectorAddress,
+      feeCollectorAddress,
       wrbtcAddress,
       presaleAddress,
       marketMakerAddress,
@@ -349,7 +349,7 @@ type DeployParams = {
   gasPrice?: number;
   useRealPriceFeed?: boolean;
   governanceAddress?: string;
-  sovFeeCollectorAddress?: string;
+  feeCollectorAddress?: string;
   wrbtcAddress?: string;
   presaleAddress?: string;
   marketMakerAddress?: string;
@@ -378,7 +378,7 @@ task("deploy", "Deploys the contracts to the network")
         gasPrice,
         useRealPriceFeed,
         governanceAddress,
-        sovFeeCollectorAddress,
+        feeCollectorAddress,
         wrbtcAddress,
         presaleAddress,
         marketMakerAddress,
@@ -411,8 +411,8 @@ task("deploy", "Deploys the contracts to the network")
       governanceAddress ??= hasGovernance(env.network.name)
         ? governanceAddresses[env.network.name]
         : undefined;
-      sovFeeCollectorAddress ??= hasSovFeeCollector(env.network.name)
-        ? sovFeeCollectorAddresses[env.network.name]
+      feeCollectorAddress ??= hasFeeCollector(env.network.name)
+        ? feeCollectorAddresses[env.network.name]
         : undefined;
       wrbtcAddress ??= hasWrbtc(env.network.name) ? wrbtcAddresses[env.network.name] : undefined;
       presaleAddress ??= hasPresale(env.network.name)
@@ -427,7 +427,7 @@ task("deploy", "Deploys the contracts to the network")
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
-        sovFeeCollectorAddress,
+        feeCollectorAddress,
         wrbtcAddress,
         useRealPriceFeed ? oracleAddresses[env.network.name] : undefined,
         presaleAddress,

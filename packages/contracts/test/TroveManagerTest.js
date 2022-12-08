@@ -29,7 +29,7 @@ contract('TroveManager', async accounts => {
     owner,
     alice, bob, carol, dennis, erin, flyn, graham, harriet, ida,
     defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale,
-    A, B, C, D, E, sovFeeCollector] = accounts;
+    A, B, C, D, E, feeSharingCollector] = accounts;
 
     const multisig = accounts[999];
 

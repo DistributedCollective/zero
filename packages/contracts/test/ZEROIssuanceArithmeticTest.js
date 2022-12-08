@@ -41,7 +41,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
   let zeroToken
   let stabilityPool
 
-  const [owner, alice, frontEnd_1, sovFeeCollector] = accounts;
+  const [owner, alice, frontEnd_1, feeSharingCollector] = accounts;
 
   const multisig = accounts[999];
 

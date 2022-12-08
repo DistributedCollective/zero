@@ -22,7 +22,7 @@ const ZERO_ADDRESS = th.ZERO_ADDRESS;
 const assertRevert = th.assertRevert;
 
 contract("ZERO Token", async accounts => {
-  const [owner, A, B, C, D, sovFeeCollector] = accounts;
+  const [owner, A, B, C, D, feeSharingCollector] = accounts;
 
   const multisig = accounts[999];
 
@@ -155,7 +155,7 @@ contract("ZERO Token", async accounts => {
     chainId = await zeroTokenTester.getChainId();
 
     await deploymentHelper.connectZEROContracts(ZEROContracts);
-    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, sovFeeCollector);
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts, feeSharingCollector);
     await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
   });
 
