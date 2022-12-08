@@ -52,7 +52,7 @@ contract('BorrowerWrappers', async accounts => {
   let zeroToken
   let zeroStaking
   let wrbtcToken
-  let sovFeeCollector
+  let feeSharingCollector
 
   let contracts
 
@@ -96,7 +96,7 @@ contract('BorrowerWrappers', async accounts => {
     zeroStaking = ZEROContracts.zeroStaking
     zeroToken = ZEROContracts.zeroToken
     wrbtcToken = contracts.wrbtcTokenTester
-    sovFeeCollector = ZEROContracts.mockFeeSharingCollector.address
+    feeSharingCollector = ZEROContracts.mockFeeSharingCollector.address
 
     ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION()
   })
@@ -486,14 +486,14 @@ contract('BorrowerWrappers', async accounts => {
     // Whale opens Trove
     await openTrove({ extraZUSDAmount: toBN(dec(1850, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
 
-    const sovFeeCollectorZUSDBalanceBefore = await zusdToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorZUSDBalanceBefore = await zusdToken.balanceOf(feeSharingCollector)
   
     // Defaulter Trove opened
     const { zusdAmount, netDebt, collateral } = await openTrove({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
     const borrowingFee = netDebt.sub(zusdAmount)
-    // 100% sent to SovFeeCollector address
+    // 100% sent to feeSharingCollector address
     const borrowingFeeToSovCollector = borrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const sovFeeCollectorZUSDBalanceAfter = await zusdToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorZUSDBalanceAfter = await zusdToken.balanceOf(feeSharingCollector)
   
     // alice opens trove and provides 150 ZUSD to StabilityPool
     await openTrove({ extraZUSDAmount: toBN(dec(150, 18)), extraParams: { from: alice } })
@@ -512,13 +512,13 @@ contract('BorrowerWrappers', async accounts => {
 
     // whale redeems 100 ZUSD
     const redeemedAmount = toBN(dec(100, 18))
-    const sovFeeCollectorBalanceBefore = await wrbtcToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorBalanceBefore = await wrbtcToken.balanceOf(feeSharingCollector)
     await th.redeemCollateral(whale, contracts, redeemedAmount)
-    const sovFeeCollectorBalanceAfter = web3.utils.toBN(await web3.eth.getBalance(sovFeeCollector));
+    const feeSharingCollectorBalanceAfter = web3.utils.toBN(await web3.eth.getBalance(feeSharingCollector));
  
     // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
-    // 20% sent to SovFeeCollector address
+    // 20% sent to feeSharingCollector address
     const redemptionFeeToSovCollector = redemptionFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const expectedETHGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
 
@@ -547,7 +547,7 @@ contract('BorrowerWrappers', async accounts => {
 
     // Alice new ZUSD gain due to her own Trove adjustment: ((150/2000) * (borrowing fee over netDebtChange))
     const newBorrowingFee = await troveManagerOriginal.getBorrowingFeeWithDecay(netDebtChange)
-    // 20% sent to SovFeeCollector address
+    // 20% sent to feeSharingCollector address
     const newBorrowingFeeToSovCollector = newBorrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const newBorrowingFeeToZeroStalking = newBorrowingFee.sub(newBorrowingFeeToSovCollector)
     const expectedNewZUSDGain_A = newBorrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
@@ -580,10 +580,10 @@ contract('BorrowerWrappers', async accounts => {
     // ZERO staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e14)
 
-    // check sovFeeCollector has increased ZUSD balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
-    // check sovFeeCollector has increased ETH balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
+    // check feeSharingCollector has increased ZUSD balance
+    th.assertIsApproximatelyEqual(feeSharingCollectorZUSDBalanceAfter, feeSharingCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
+    // check feeSharingCollector has increased ETH balance
+    th.assertIsApproximatelyEqual(feeSharingCollectorBalanceAfter, feeSharingCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
@@ -608,15 +608,15 @@ contract('BorrowerWrappers', async accounts => {
     await zeroStaking.stake(dec(1850, 18), { from: whale })
     await zeroStaking.stake(dec(150, 18), { from: alice })
 
-    const sovFeeCollectorZUSDBalanceBefore = await zusdToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorZUSDBalanceBefore = await zusdToken.balanceOf(feeSharingCollector)
 
     // Defaulter Trove opened
     const { zusdAmount, netDebt, collateral } = await openTrove({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
     const borrowingFee = netDebt.sub(zusdAmount)
 
-    // 100% sent to SovFeeCollector address
+    // 100% sent to feeSharingCollector address
     const borrowingFeeToSovCollector = borrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const sovFeeCollectorZUSDBalanceAfter = await zusdToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorZUSDBalanceAfter = await zusdToken.balanceOf(feeSharingCollector)
     const borrowingFeeToZeroStalking = borrowingFee.sub(borrowingFeeToSovCollector)
 
     // Alice ZUSD gain is ((150/2000) * borrowingFee)
@@ -660,8 +660,8 @@ contract('BorrowerWrappers', async accounts => {
     th.assertIsApproximatelyEqual(depositAfter, depositBefore.add(expectedZUSDGain_A), 10000)
     // check zero balance remains the same
     th.assertIsApproximatelyEqual(zeroBalanceBefore, zeroBalanceAfter)
-    // check sovFeeCollector has increased ZUSD balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
+    // check feeSharingCollector has increased ZUSD balance
+    th.assertIsApproximatelyEqual(feeSharingCollectorZUSDBalanceAfter, feeSharingCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
@@ -686,15 +686,15 @@ contract('BorrowerWrappers', async accounts => {
     await zeroStaking.stake(dec(1850, 18), { from: whale })
     await zeroStaking.stake(dec(150, 18), { from: alice })
 
-    const sovFeeCollectorZUSDBalanceBefore = await zusdToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorZUSDBalanceBefore = await zusdToken.balanceOf(feeSharingCollector)
 
     // Defaulter Trove opened
     const { zusdAmount, netDebt, collateral } = await openTrove({ ICR: toBN(dec(210, 16)), extraParams: { from: defaulter_1 } })
     const borrowingFee = netDebt.sub(zusdAmount)
 
-    // 100% sent to SovFeeCollector address
+    // 100% sent to feeSharingCollector address
     const borrowingFeeToSovCollector = borrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
-    const sovFeeCollectorZUSDBalanceAfter = await zusdToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorZUSDBalanceAfter = await zusdToken.balanceOf(feeSharingCollector)
     const borrowingFeeToZeroStalking = borrowingFee.sub(borrowingFeeToSovCollector)
 
     // Alice ZUSD gain is ((150/2000) * borrowingFee)
@@ -705,13 +705,13 @@ contract('BorrowerWrappers', async accounts => {
 
     // whale redeems 100 ZUSD
     const redeemedAmount = toBN(dec(100, 18))
-    const sovFeeCollectorBalanceBefore = await wrbtcToken.balanceOf(sovFeeCollector)
+    const feeSharingCollectorBalanceBefore = await wrbtcToken.balanceOf(feeSharingCollector)
     await th.redeemCollateral(whale, contracts, redeemedAmount)
-    const sovFeeCollectorBalanceAfter = web3.utils.toBN(await web3.eth.getBalance(sovFeeCollector));
+    const feeSharingCollectorBalanceAfter = web3.utils.toBN(await web3.eth.getBalance(feeSharingCollector));
 
     // Alice ETH gain is ((150/2000) * (redemption fee over redeemedAmount) / price)
     const redemptionFee = await troveManager.getRedemptionFeeWithDecay(redeemedAmount)
-    // 100% sent to SovFeeCollector address
+    // 100% sent to feeSharingCollector address
     const redemptionFeeToSovCollector = redemptionFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const expectedETHGainSovCollector = redemptionFeeToSovCollector.mul(mv._1e18BN).div(price)
 
@@ -739,7 +739,7 @@ contract('BorrowerWrappers', async accounts => {
 
     // Alice new ZUSD gain due to her own Trove adjustment: ((150/2000) * (borrowing fee over netDebtChange))
     const newBorrowingFee = await troveManagerOriginal.getBorrowingFeeWithDecay(netDebtChange)
-    // 100% sent to SovFeeCollector address
+    // 100% sent to feeSharingCollector address
     const newBorrowingFeeToSovCollector = newBorrowingFee.mul(toBN(dec(100, 16))).div(mv._1e18BN)
     const newBorrowingFeeToZeroStalking = newBorrowingFee.sub(newBorrowingFeeToSovCollector)
     const expectedNewZUSDGain_A = newBorrowingFeeToZeroStalking.mul(toBN(dec(150, 18))).div(toBN(dec(2000, 18)))
@@ -772,10 +772,10 @@ contract('BorrowerWrappers', async accounts => {
     // ZERO staking
     th.assertIsApproximatelyEqual(stakeAfter, stakeBefore.add(expectedZEROGain_A), 1e14)
 
-    // check sovFeeCollector has increased ZUSD balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorZUSDBalanceAfter, sovFeeCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
-    // check sovFeeCollector has increased ETH balance
-    th.assertIsApproximatelyEqual(sovFeeCollectorBalanceAfter, sovFeeCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
+    // check feeSharingCollector has increased ZUSD balance
+    th.assertIsApproximatelyEqual(feeSharingCollectorZUSDBalanceAfter, feeSharingCollectorZUSDBalanceBefore.add(borrowingFeeToSovCollector), 10000)
+    // check feeSharingCollector has increased ETH balance
+    th.assertIsApproximatelyEqual(feeSharingCollectorBalanceAfter, feeSharingCollectorBalanceBefore.add(expectedETHGainSovCollector), 10000)
 
     // Expect Alice has withdrawn all ETH gain
     const alice_pendingETHGain = await stabilityPool.getDepositorETHGain(alice)
