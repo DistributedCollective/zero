@@ -1,5 +1,7 @@
 const BN = require("bn.js");
 const Destructible = artifacts.require("./TestContracts/Destructible.sol");
+const { signERC2612Permit } = require('eth-permit');
+const hre = require("hardhat");
 
 const MoneyValues = {
   negative_5e17: "-" + web3.utils.toWei("500", "finney"),
@@ -899,23 +901,33 @@ class TestHelper {
     } else {
       increasedTotalDebt = await this.getAmountWithBorrowingFee(contracts, zusdAmount);
     }
-    const dllrAmount = await contracts.borrowerOperations.callStatic.withdrawZusdAndConvertToDLLR(
+
+    //TODO: fix callStatic - 
+    const { ethers } = hre;
+    const ethersBorrowerOperations = await ethers.getContractAt(
+      "BorrowerOperationsTester",
+      contracts.borrowerOperations.address, (await ethers.getSigners())[1]
+    );
+    const dllrAmount = await ethersBorrowerOperations.callStatic.withdrawZusdAndConvertToDLLR(
       maxFeePercentage,
-      zusdAmount,
+      zusdAmount.toString(),
       upperHint,
       lowerHint,
       extraParams
     );
 
-    await contracts.borrowerOperations.callStatic.withdrawZusdAndConvertToDLLR(
+    await ethersBorrowerOperations.withdrawZusdAndConvertToDLLR(
       maxFeePercentage,
-      zusdAmount,
+      zusdAmount.toString(),
       upperHint,
       lowerHint,
       extraParams
     );
 
     return {
+      maxFeePercentage,
+      upperHint,
+      lowerHint,
       zusdAmount,
       increasedTotalDebt,
       dllrAmount
@@ -1316,24 +1328,30 @@ class TestHelper {
 
   // ----------------- repayZusdFromDLLR ------------------ //
 
+
+  static async repayZusdFromDLLR(account, contracts, amount, permission) {
+    const { newColl, newDebt } = await this.getCollAndDebtFromRepayZUSD(
+      contracts,
+      account,
+      amount
+    );
+    const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
+      contracts,
+      newColl,
+      newDebt
+    );
+
+    return await contracts.borrowerOperations.repayZusdFromDLLR(amount.toString(), upperHint, lowerHint, permission, {
+      from: account
+    });
+  }
+
   static async repayZusdFromDLLR_allAccounts(accounts, contracts, amount) {
     const gasCostList = [];
 
     for (const account of accounts) {
-      const { newColl, newDebt } = await this.getCollAndDebtFromRepayZUSD(
-        contracts,
-        account,
-        amount
-      );
-      const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
-        contracts,
-        newColl,
-        newDebt
-      );
-
-      const tx = await contracts.borrowerOperations.repayZusdFromDLLR(amount, upperHint, lowerHint, {
-        from: account
-      });
+      const permission = await signERC2612Permit(alice_signer, contracts.nueMockToken.address, alice_signer.address, borrowerOperations.address, decreaseAmount.toString());
+      const tx = await this.repayZusdFromDLLR(account, contracts, amount);
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
     }
@@ -1345,21 +1363,7 @@ class TestHelper {
 
     for (const account of accounts) {
       const randZUSDAmount = this.randAmountInWei(min, max);
-
-      const { newColl, newDebt } = await this.getCollAndDebtFromRepayZUSD(
-        contracts,
-        account,
-        randZUSDAmount
-      );
-      const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
-        contracts,
-        newColl,
-        newDebt
-      );
-
-      const tx = await contracts.borrowerOperations.repayZusdFromDLLR(randZUSDAmount, upperHint, lowerHint, {
-        from: account
-      });
+      const tx = await this.repayZusdFromDLLR(account, contracts, randZUSDAmount);
       const gas = this.gasUsed(tx);
       gasCostList.push(gas);
     }

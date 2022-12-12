@@ -5,9 +5,10 @@ pragma solidity 0.6.11;
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC20Permit } from "@openzeppelin/contracts/drafts/ERC20Permit.sol";
 import "../BorrowerOperationsStorage.sol";
+import "hardhat/console.sol";
 
-//TODO: rename NueToken to contract DLLRMockToken is ERC20("Sovryn Dollar", "DLLR")
-contract NueToken is ERC20("Nuestro", "NUE"), ERC20Permit("Nuestro"), Ownable {
+//TODO: rename NueMockToken to contract DLLRMockToken is ERC20("Sovryn Dollar", "DLLR")
+contract NueMockToken is ERC20("Nuestro", "NUE"), ERC20Permit("Nuestro"), Ownable {
     constructor() public {}
 
     function mint(address _account, uint256 _amount) public onlyOwner {
@@ -42,10 +43,10 @@ contract NueToken is ERC20("Nuestro", "NUE"), ERC20Permit("Nuestro"), Ownable {
 }
 
 contract MassetTester is IMasset {
-    NueToken public token;
+    NueMockToken public nueMockToken;
 
     constructor() public {
-        token = new NueToken();
+        nueMockToken = new NueMockToken();
     }
 
     function mintTo(
@@ -54,24 +55,24 @@ contract MassetTester is IMasset {
         address _recipient
     ) external override returns (uint256) {
         IERC20(_bAsset).transferFrom(msg.sender, address(this), _bAssetQuantity);
-        uint256 balanceBefore = token.balanceOf(_recipient);
-        token.mint(_recipient, _bAssetQuantity);
-        return balanceBefore - token.balanceOf(_recipient);
+        uint256 nueBalanceOfRecipientBeforeMint = nueMockToken.balanceOf(_recipient);
+        nueMockToken.mint(_recipient, _bAssetQuantity);
+        return nueMockToken.balanceOf(_recipient) - nueBalanceOfRecipientBeforeMint;
     }
 
     function getToken() external view override returns (address) {
-        return address(token);
+        return address(nueMockToken);
     }
 
-    /// @dev Transfer 'bAsset' to the recipient then burn the 'aggregator' token
+    /// @dev Transfer 'bAsset' to the recipient then burn the 'aggregator' nueMockToken
     function redeemTo(
-        address _bAsset, //ZUSD token
+        address _bAsset, //ZUSD nueMockToken
         uint256 _massetQuantity,
         address _recipient //user
     ) external override returns (uint256 massetRedeemed) {
         ERC20(_bAsset).transfer(_recipient, _massetQuantity);
-        // token.burn(_recipient, _massetQuantity); // _recipient used to be for the previous bridge-like implementation
-        token.burn(msg.sender, _massetQuantity);
+        // nueMockToken.burn(_recipient, _massetQuantity); // _recipient used to be for the previous bridge-like implementation
+        nueMockToken.burn(msg.sender, _massetQuantity);
 
         return _massetQuantity;
     }
