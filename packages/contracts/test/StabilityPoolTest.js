@@ -147,45 +147,6 @@ contract('StabilityPool', async accounts => {
       assert.equal(zusdBalance_After, 0)
     });
 
-    it("provideToSpFromDllrBySpender(): decrease allowed DLLR amount and update the user's record in StabilityPool", async () => {
-      // --- SETUP --- 
-      const spAmount = toBN(dec(2000, 18)); //await openTrove({ extraZUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
-      const nueBalance_BeforeOpenTrove = await nueMockToken.balanceOf(alice)
-      assert.equal(nueBalance_BeforeOpenTrove, 0, `${nueBalance_BeforeOpenTrove}`)
-      // open a trove to get ZUSD and deposit ZUSD to Mynt to get DLLR
-      await openNueTrove({ extraZUSDAmount: spAmount, ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
-      await nueMockToken.approve(alice, spAmount.toString(), {from: bob})
-
-      console.log("dllr address TEST:", nueMockToken.address)
-      
-      // get ERC2612 permission from alice for stability pool to spend DLLR amount
-      const permission = await signERC2612Permit(alice_signer, nueMockToken.address, alice_signer.address, stabilityPool.address, spAmount.toString());
-
-      // --- TEST ---
-      // check user's deposit record before
-      const alice_depositRecord_Before = await stabilityPool.deposits(alice)
-      assert.equal(alice_depositRecord_Before[0], 0)
-
-      const nueBalance_BeforeSP = await nueMockToken.balanceOf(alice)
-      assert(nueBalance_BeforeSP.gt(0) && nueBalance_BeforeSP.lt(toBN(dec(spAmount, 18))), `${nueBalance_BeforeSP} => ${spAmount}`)
-
-      const zusdBalance_Before = await zusdToken.balanceOf(alice)
-      assert.equal(zusdBalance_Before, 0)
-
-      // provideToSP()
-      await stabilityPool.provideToSpFromDllrBySpender(spAmount.toString(), permission, bob, { from: alice })
-
-      // check balances
-      const alice_depositRecord_After = (await stabilityPool.deposits(alice))[0]
-      assert(alice_depositRecord_After.eq(spAmount), `${alice_depositRecord_After} => ${spAmount}`)
-
-      const nueBalance_AfterSP = await nueMockToken.balanceOf(alice)
-      assert(nueBalance_AfterSP.eq(nueBalance_BeforeSP.sub(spAmount)), `${nueBalance_AfterSP} => ${nueBalance_BeforeSP.sub(spAmount)}`)
-
-      const zusdBalance_After = await zusdToken.balanceOf(alice)
-      assert.equal(zusdBalance_After, 0)
-    });
-
     // --- provideToSP() ---
     // increases recorded ZUSD at Stability Pool
     it("provideToSP(): increases the Stability Pool ZUSD balance", async () => {

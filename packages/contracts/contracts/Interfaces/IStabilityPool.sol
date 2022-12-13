@@ -224,12 +224,6 @@ interface IStabilityPool {
         IMasset.PermitParams calldata _permitParams
     ) external;
 
-    function provideToSpFromDllrBySpender(
-        uint _dllrAmount,
-        IMasset.PermitParams calldata _permitParams,
-        address _dllrOwner
-    ) external;
-
     /// Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and optionally convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
     function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmount) external;
 
