@@ -7,8 +7,13 @@ const mv = testHelpers.MoneyValues
 const timeValues = testHelpers.TimeValues
 
 const TroveManagerTester = artifacts.require("TroveManagerTester")
+const BorrowerOperationsTester = artifacts.require("BorrowerOperationsTester")
 const ZUSDToken = artifacts.require("ZUSDToken")
 const NonPayable = artifacts.require('NonPayable.sol')
+const { signERC2612Permit } = require('eth-permit');
+
+const MassetTester = artifacts.require("MassetTester");
+const NueMockToken = artifacts.require("NueMockToken");
 
 const ZERO = toBN('0')
 const ZERO_ADDRESS = th.ZERO_ADDRESS
@@ -29,6 +34,8 @@ contract('StabilityPool', async accounts => {
     sovFeeCollector,
   ] = accounts;
 
+  let alice_signer;
+
   const multisig = accounts[999];
 
   const frontEnds = [frontEnd_1, frontEnd_2, frontEnd_3]
@@ -43,22 +50,27 @@ contract('StabilityPool', async accounts => {
   let borrowerOperations
   let zeroToken
   let communityIssuance
+  let masset
+  let nueMockToken
 
   let gasPriceInWei
 
   const getOpenTroveZUSDAmount = async (totalDebt) => th.getOpenTroveZUSDAmount(contracts, totalDebt)
   const openTrove = async (params) => th.openTrove(contracts, params)
+  const openNueTrove = async (params) => th.openNueTrove(contracts, params)
   const assertRevert = th.assertRevert
 
   describe("Stability Pool Mechanisms", async () => {
 
     before(async () => {
       gasPriceInWei = await web3.eth.getGasPrice()
+      alice_signer = (await ethers.getSigners())[5]
     })
 
     beforeEach(async () => {
       contracts = await deploymentHelper.deployLiquityCore()
       contracts.troveManager = await TroveManagerTester.new()
+      contracts.borrowerOperations = await BorrowerOperationsTester.new();
       contracts.zusdToken = await ZUSDToken.new()
       await contracts.zusdToken.initialize(
         contracts.troveManager.address,
@@ -80,18 +92,99 @@ contract('StabilityPool', async accounts => {
       zeroToken = ZEROContracts.zeroToken
       communityIssuance = ZEROContracts.communityIssuance
 
+      contracts.masset = await MassetTester.new();
+      masset = contracts.masset;
+      await borrowerOperations.setMassetAddress(masset.address);
+      const nueMockTokenAddress = await masset.nueMockToken();
+      nueMockToken = await NueMockToken.at(nueMockTokenAddress);
+
       await deploymentHelper.connectZEROContracts(ZEROContracts)
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
 
       await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
       await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
-      // We are not going to use ZERO
+      // We are not going to use ZERO token and its dependencies
       // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
       // Register 3 front ends
       await th.registerFrontEnds(frontEnds, stabilityPool)
     })
+
+    // --- provideToSpFromDLLR() --- //
+    it("provideToSpFromDLLR(): decrease DLLR amount and updates the user's record in StabilityPool", async () => {
+      // --- SETUP --- 
+      const spAmount = toBN(dec(2000, 18)); //await openTrove({ extraZUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
+      const nueBalance_BeforeOpenTrove = await nueMockToken.balanceOf(alice)
+      assert.equal(nueBalance_BeforeOpenTrove, 0, `${nueBalance_BeforeOpenTrove}`)
+      // open a trove to get ZUSD and deposit ZUSD to Mynt to get DLLR
+      await openNueTrove({ extraZUSDAmount: spAmount, ICR: toBN(dec(2, 18)), extraParams: { from: alice } })
+      // get ERC2612 permission from alice for stability pool to spend DLLR amount
+      const permission = await signERC2612Permit(alice_signer, nueMockToken.address, alice_signer.address, stabilityPool.address, spAmount.toString());
+
+      // --- TEST ---
+      // check user's deposit record before
+      const alice_depositRecord_Before = await stabilityPool.deposits(alice)
+      assert.equal(alice_depositRecord_Before[0], 0)
+
+      const nueBalance_BeforeSP = await nueMockToken.balanceOf(alice)
+      assert(nueBalance_BeforeSP.gt(0) && nueBalance_BeforeSP.lt(toBN(dec(spAmount, 18))), `${nueBalance_BeforeSP} => ${spAmount}`)
+
+      const zusdBalance_Before = await zusdToken.balanceOf(alice)
+      assert.equal(zusdBalance_Before, 0)
+
+      // provideToSP()
+      await stabilityPool.provideToSpFromDLLR(spAmount.toString(), permission, { from: alice })
+
+      // check balances
+      const alice_depositRecord_After = (await stabilityPool.deposits(alice))[0]
+      assert(alice_depositRecord_After.eq(spAmount), `${alice_depositRecord_After} => ${spAmount}`)
+
+      const nueBalance_AfterSP = await nueMockToken.balanceOf(alice)
+      assert(nueBalance_AfterSP.eq(nueBalance_BeforeSP.sub(spAmount)), `${nueBalance_AfterSP} => ${nueBalance_BeforeSP.sub(spAmount)}`)
+
+      const zusdBalance_After = await zusdToken.balanceOf(alice)
+      assert.equal(zusdBalance_After, 0)
+    });
+
+    it("provideToSpFromDllrBySpender(): decrease allowed DLLR amount and update the user's record in StabilityPool", async () => {
+      // --- SETUP --- 
+      const spAmount = toBN(dec(2000, 18)); //await openTrove({ extraZUSDAmount: toBN(dec(2000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: whale } })
+      const nueBalance_BeforeOpenTrove = await nueMockToken.balanceOf(alice)
+      assert.equal(nueBalance_BeforeOpenTrove, 0, `${nueBalance_BeforeOpenTrove}`)
+      // open a trove to get ZUSD and deposit ZUSD to Mynt to get DLLR
+      await openNueTrove({ extraZUSDAmount: spAmount, ICR: toBN(dec(2, 18)), extraParams: { from: bob } })
+      await nueMockToken.approve(alice, spAmount.toString(), {from: bob})
+
+      console.log("dllr address TEST:", nueMockToken.address)
+      
+      // get ERC2612 permission from alice for stability pool to spend DLLR amount
+      const permission = await signERC2612Permit(alice_signer, nueMockToken.address, alice_signer.address, stabilityPool.address, spAmount.toString());
+
+      // --- TEST ---
+      // check user's deposit record before
+      const alice_depositRecord_Before = await stabilityPool.deposits(alice)
+      assert.equal(alice_depositRecord_Before[0], 0)
+
+      const nueBalance_BeforeSP = await nueMockToken.balanceOf(alice)
+      assert(nueBalance_BeforeSP.gt(0) && nueBalance_BeforeSP.lt(toBN(dec(spAmount, 18))), `${nueBalance_BeforeSP} => ${spAmount}`)
+
+      const zusdBalance_Before = await zusdToken.balanceOf(alice)
+      assert.equal(zusdBalance_Before, 0)
+
+      // provideToSP()
+      await stabilityPool.provideToSpFromDllrBySpender(spAmount.toString(), permission, bob, { from: alice })
+
+      // check balances
+      const alice_depositRecord_After = (await stabilityPool.deposits(alice))[0]
+      assert(alice_depositRecord_After.eq(spAmount), `${alice_depositRecord_After} => ${spAmount}`)
+
+      const nueBalance_AfterSP = await nueMockToken.balanceOf(alice)
+      assert(nueBalance_AfterSP.eq(nueBalance_BeforeSP.sub(spAmount)), `${nueBalance_AfterSP} => ${nueBalance_BeforeSP.sub(spAmount)}`)
+
+      const zusdBalance_After = await zusdToken.balanceOf(alice)
+      assert.equal(zusdBalance_After, 0)
+    });
 
     // --- provideToSP() ---
     // increases recorded ZUSD at Stability Pool
