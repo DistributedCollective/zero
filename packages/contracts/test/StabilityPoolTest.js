@@ -120,51 +120,7 @@ contract('StabilityPool', async accounts => {
     afterEach(async () => {
       await revertToSnapshot();
     });
-
-    /*beforeEach(async () => {
-      contracts = await deploymentHelper.deployLiquityCore()
-      contracts.troveManager = await TroveManagerTester.new()
-      contracts.borrowerOperations = await BorrowerOperationsTester.new();
-      contracts.zusdToken = await ZUSDToken.new()
-      await contracts.zusdToken.initialize(
-        contracts.troveManager.address,
-        contracts.stabilityPool.address,
-        contracts.borrowerOperations.address
-      )
-      const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
-
-      priceFeed = contracts.priceFeedTestnet
-      zusdToken = contracts.zusdToken
-      sortedTroves = contracts.sortedTroves
-      troveManager = contracts.troveManager
-      activePool = contracts.activePool
-      stabilityPool = contracts.stabilityPool
-      defaultPool = contracts.defaultPool
-      borrowerOperations = contracts.borrowerOperations
-      hintHelpers = contracts.hintHelpers
-
-      zeroToken = ZEROContracts.zeroToken
-      communityIssuance = ZEROContracts.communityIssuance
-
-      contracts.masset = await MassetTester.new();
-      masset = contracts.masset;
-      await borrowerOperations.setMassetAddress(masset.address);
-      const nueMockTokenAddress = await masset.nueMockToken();
-      nueMockToken = await NueMockToken.at(nueMockTokenAddress);
-
-      await deploymentHelper.connectZEROContracts(ZEROContracts)
-      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
-
-      await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
-      await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
-      // We are not going to use ZERO token and its dependencies
-      // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
-
-      // Register 3 front ends
-      await th.registerFrontEnds(frontEnds, stabilityPool)
-    })*/
-
+    
     // --- provideToSpFromDLLR() --- //
     it("provideToSpFromDLLR(): decrease DLLR amount and updates the user's record in StabilityPool", async () => {
       // --- SETUP --- 
