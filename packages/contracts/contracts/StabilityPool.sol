@@ -314,10 +314,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
      * If _amount > userDeposit, the user withdraws all of their compounded deposit.
      */
     function withdrawFromSP(uint256 _amount) external override {
-        _withdrawFromSP(_amount);
+        _withdrawFromSpTo(_amount, msg.sender);
     }
 
-    function _withdrawFromSP(uint256 _amount) internal {
+    ///@return actual ZUSD amount withdrawn
+    function _withdrawFromSpTo(uint256 _amount, address _receiver) internal returns (uint256) {
+        require(_receiver != address(0), "SP::_withdrawFromSpTo: _receiver is zero address");
         if (_amount != 0) {
             _requireNoUnderCollateralizedTroves();
         }
@@ -344,7 +346,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         _updateFrontEndStakeAndSnapshots(frontEnd, newFrontEndStake);
         emit FrontEndStakeChanged(frontEnd, newFrontEndStake, msg.sender);
 
-        _sendZUSDToDepositor(msg.sender, ZUSDtoWithdraw);
+        _sendZUSDToDepositor(_receiver, ZUSDtoWithdraw);
 
         // Update deposit
         uint256 newDeposit = compoundedZUSDDeposit.sub(ZUSDtoWithdraw);
@@ -353,18 +355,21 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         emit ETHGainWithdrawn(msg.sender, depositorETHGain, ZUSDLoss); // ZUSD Loss required for event log
 
-        _sendETHGainToDepositor(depositorETHGain);
+        _sendETHGainTo(depositorETHGain, msg.sender);
+
+        return ZUSDtoWithdraw;
     }
 
     ///Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
-    function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmount) external override {
+    function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmountRequested) external override {
         IMasset masset = borrowerOperations.getMasset();
-        _withdrawFromSP(_zusdAmount);
+        uint256 amountWithdrawn = _withdrawFromSpTo(_zusdAmountRequested, address(this));
         require(
-            zusdToken.approve(address(masset), _zusdAmount),
+            zusdToken.approve(address(masset), amountWithdrawn),
             "Failed to approve ZUSD amount for Mynt mAsset to redeem"
         );
-        masset.mintTo(address(zusdToken), _zusdAmount, msg.sender);
+        masset.mintTo(address(zusdToken), amountWithdrawn, msg.sender);
+        emit WithdrawFromSpAndConvertToDLLR(msg.sender, _zusdAmountRequested, amountWithdrawn);
     }
 
     /** withdrawETHGainToTrove:
@@ -836,6 +841,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     function _sendETHGainToDepositor(uint256 _amount) internal {
+        _sendETHGainTo(_amount, msg.sender);
+    }
+
+    function _sendETHGainTo(uint256 _amount, address _receiver) internal {
+        require(_receiver != address(0), "SP::_sendETHGainTo: _receiver is zero address");
         if (_amount == 0) {
             return;
         }

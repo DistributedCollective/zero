@@ -12,6 +12,8 @@ const ZUSDToken = artifacts.require("ZUSDToken")
 const NonPayable = artifacts.require('NonPayable.sol')
 const { signERC2612Permit } = require('eth-permit');
 
+const timeMachine = require("ganache-time-traveler");
+
 const MassetTester = artifacts.require("MassetTester");
 const NueMockToken = artifacts.require("NueMockToken");
 
@@ -61,13 +63,12 @@ contract('StabilityPool', async accounts => {
   const assertRevert = th.assertRevert
 
   describe("Stability Pool Mechanisms", async () => {
+    let revertToSnapshot;
 
     before(async () => {
       gasPriceInWei = await web3.eth.getGasPrice()
       alice_signer = (await ethers.getSigners())[5]
-    })
 
-    beforeEach(async () => {
       contracts = await deploymentHelper.deployLiquityCore()
       contracts.troveManager = await TroveManagerTester.new()
       contracts.borrowerOperations = await BorrowerOperationsTester.new();
@@ -111,6 +112,59 @@ contract('StabilityPool', async accounts => {
       await th.registerFrontEnds(frontEnds, stabilityPool)
     })
 
+    beforeEach(async () => {
+      let snapshot = await timeMachine.takeSnapshot();
+      revertToSnapshot = () => timeMachine.revertToSnapshot(snapshot["result"]);
+    });
+
+    afterEach(async () => {
+      await revertToSnapshot();
+    });
+
+    /*beforeEach(async () => {
+      contracts = await deploymentHelper.deployLiquityCore()
+      contracts.troveManager = await TroveManagerTester.new()
+      contracts.borrowerOperations = await BorrowerOperationsTester.new();
+      contracts.zusdToken = await ZUSDToken.new()
+      await contracts.zusdToken.initialize(
+        contracts.troveManager.address,
+        contracts.stabilityPool.address,
+        contracts.borrowerOperations.address
+      )
+      const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig)
+
+      priceFeed = contracts.priceFeedTestnet
+      zusdToken = contracts.zusdToken
+      sortedTroves = contracts.sortedTroves
+      troveManager = contracts.troveManager
+      activePool = contracts.activePool
+      stabilityPool = contracts.stabilityPool
+      defaultPool = contracts.defaultPool
+      borrowerOperations = contracts.borrowerOperations
+      hintHelpers = contracts.hintHelpers
+
+      zeroToken = ZEROContracts.zeroToken
+      communityIssuance = ZEROContracts.communityIssuance
+
+      contracts.masset = await MassetTester.new();
+      masset = contracts.masset;
+      await borrowerOperations.setMassetAddress(masset.address);
+      const nueMockTokenAddress = await masset.nueMockToken();
+      nueMockToken = await NueMockToken.at(nueMockTokenAddress);
+
+      await deploymentHelper.connectZEROContracts(ZEROContracts)
+      await deploymentHelper.connectCoreContracts(contracts, ZEROContracts)
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner)
+
+      await zeroToken.unprotectedMint(owner,toBN(dec(30,24)))
+      await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
+      // We are not going to use ZERO token and its dependencies
+      // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
+
+      // Register 3 front ends
+      await th.registerFrontEnds(frontEnds, stabilityPool)
+    })*/
+
     // --- provideToSpFromDLLR() --- //
     it("provideToSpFromDLLR(): decrease DLLR amount and updates the user's record in StabilityPool", async () => {
       // --- SETUP --- 
@@ -146,6 +200,41 @@ contract('StabilityPool', async accounts => {
       const zusdBalance_After = await zusdToken.balanceOf(alice)
       assert.equal(zusdBalance_After, 0)
     });
+
+    // --- withdrawFromSpAndConvertToDLLR(uint256 _zusdAmount) --- //
+    it("withdrawFromSpAndConvertToDLLR(): increase DLLR, decrease ZUSD amount and updates the user's record in StabilityPool", async () => {
+
+      const amount = toBN(dec(1000, 18))
+      // A opens trove and makes Stability Pool deposits
+      await openTrove({ extraZUSDAmount: amount, ICR: toBN(dec(2, 18)), extraParams: { from: A } })
+
+      // A provides to SP
+      await stabilityPool.provideToSP(amount.toString(), ZERO_ADDRESS, { from: A })
+
+      const zusd_balance_after_sp_Deposit = await zusdToken.balanceOf(A)
+      
+      // check ZUSD balances after
+      const stabilityPool_ZUSD_After = await stabilityPool.getTotalZUSDDeposits()
+      assert(stabilityPool_ZUSD_After.eq(amount))
+
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider)
+
+      // A withdraws
+      const tx = await stabilityPool.withdrawFromSpAndConvertToDLLR(amount.toString(), { from: A })
+
+      // Values check
+      const eventAmount = th.getEventArgByName(tx, "WithdrawFromSpAndConvertToDLLR", "_dllrAmountReceived")
+      assert(eventAmount.eq(amount), `amount: ${amount} => eventAmount: ${eventAmount}`)
+
+      const zusd_balance_after_sp_Withdraw = await zusdToken.balanceOf(A)
+      assert(zusd_balance_after_sp_Deposit.eq(zusd_balance_after_sp_Withdraw))
+
+      const nue_balance_After = await nueMockToken.balanceOf(A)
+      assert.equal(nue_balance_After.toString(), amount.toString())
+      // Check SP is empty
+      assert.equal((await stabilityPool.getTotalZUSDDeposits()), '0')
+    });
+
 
     // --- provideToSP() ---
     // increases recorded ZUSD at Stability Pool

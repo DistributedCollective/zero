@@ -74,6 +74,12 @@ interface IStabilityPool {
     event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
     event EtherSent(address _to, uint _amount);
 
+    event WithdrawFromSpAndConvertToDLLR(
+        address _depositor,
+        uint256 _zusdAmountRequested,
+        uint256 _dllrAmountReceived
+    );
+
     // --- Functions ---
 
     /**
