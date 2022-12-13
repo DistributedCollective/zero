@@ -2054,8 +2054,6 @@ contract("BorrowerOperations", async accounts => {
     // Full repayment of ZUSD reverts when it would leave trove with net debt < minimum net debt
     // Use borrowerOperations.closeNueTrove(permission)
     it("repayZusdFromDLLR(): repays partial ZUSD debt - decreases user's ZUSDToken balance by correct amount", async () => {
-
-
       await openNueTrove({
         extraZUSDAmount: toBN(dec(10000, 18)),
         ICR: toBN(dec(10, 18)),
