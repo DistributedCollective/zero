@@ -1,9 +1,13 @@
 const deploymentHelper = require("../utils/deploymentHelpers.js")
 const testHelpers = require("../utils/testHelpers.js")
 const timeMachine = require('ganache-time-traveler');
+const { signERC2612Permit } = require('eth-permit');
 
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol")
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester.sol")
+
+const MassetTester = artifacts.require("MassetTester");
+const NueMockToken = artifacts.require("NueMockToken");
 
 const th = testHelpers.TestHelper
 const dec = th.dec
@@ -43,6 +47,10 @@ contract('TroveManager', async accounts => {
   let defaultPool
   let borrowerOperations
   let hintHelpers
+  let masset
+  let nueMockToken
+
+  let dennis_signer
 
   let contracts
 
@@ -51,6 +59,7 @@ contract('TroveManager', async accounts => {
   const getActualDebtFromComposite = async (compositeDebt) => th.getActualDebtFromComposite(compositeDebt, contracts)
   const getNetBorrowingAmount = async (debtWithFee) => th.getNetBorrowingAmount(contracts, debtWithFee)
   const openTrove = async (params) => th.openTrove(contracts, params)
+  const openNueTrove = async (params) => th.openNueTrove(contracts, params)
   const withdrawZUSD = async (params) => th.withdrawZUSD(contracts, params)
 
   before(async () => {
@@ -87,7 +96,13 @@ contract('TroveManager', async accounts => {
     await zeroToken.approve(communityIssuance.address, toBN(dec(30,24)))
     // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
-    
+    contracts.masset = await MassetTester.new();
+    masset = contracts.masset;
+    await borrowerOperations.setMassetAddress(masset.address);
+    const nueMockTokenAddress = await masset.nueMockToken();
+    nueMockToken = await NueMockToken.at(nueMockTokenAddress);
+
+    dennis_signer = (await ethers.getSigners())[4]
   })
 
   let revertToSnapshot;
@@ -2345,6 +2360,97 @@ contract('TroveManager', async accounts => {
     } = await hintHelpers.getRedemptionHints('210' + _18_zeros, price, 2) // limit _maxIterations to 2
 
     assert.equal(partialRedemptionHintNICR, '0')
+  });
+
+  it('redeemCollateralViaDLLR(): converts DLLR to ZUSD and cancels Troves debt with the lowest ICRs and sends an equivalent amount of Ether', async () => {
+
+    // --- SETUP ---
+    const { totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(310, 16)), extraZUSDAmount: dec(10, 18), extraParams: { from: alice } })
+    const { netDebt: B_netDebt } = await openTrove({ ICR: toBN(dec(290, 16)), extraZUSDAmount: dec(8, 18), extraParams: { from: bob } })
+    const { netDebt: C_netDebt } = await openTrove({ ICR: toBN(dec(250, 16)), extraZUSDAmount: dec(10, 18), extraParams: { from: carol } })
+    const partialRedemptionAmount = toBN(2)
+    const redemptionAmount = C_netDebt.add(B_netDebt).add(partialRedemptionAmount)
+
+    // start Dennis with a high ICR
+    await openNueTrove({ ICR: toBN(dec(100, 18)), extraZUSDAmount: redemptionAmount, extraParams: { from: dennis } })
+
+    const dennis_NUEBalance_Before = await nueMockToken.balanceOf(dennis)
+    const dennis_BTCBalance_Before = toBN(await web3.eth.getBalance(dennis))
+    const dennis_ZUSDBalance_Before = await zusdToken.balanceOf(dennis)
+    assert.equal(dennis_ZUSDBalance_Before, 0, `dennis_ZUSDBalance_Before: ${dennis_ZUSDBalance_Before}`)
+
+    const price = await priceFeed.getPrice()
+    assert.equal(price, dec(200, 18), `price: ${price}`)
+
+    // --- TEST ---
+
+    // Find hints for redeeming 20 ZUSD
+    const {
+      firstRedemptionHint,
+      partialRedemptionHintNICR
+    } = await hintHelpers.getRedemptionHints(redemptionAmount, price, 0)
+
+    // We don't need to use getApproxHint for this test, since it's not the subject of this
+    // test case, and the list is very small, so the correct position is quickly found
+    const { 0: upperPartialRedemptionHint, 1: lowerPartialRedemptionHint } = await sortedTroves.findInsertPosition(
+      partialRedemptionHintNICR,
+      dennis,
+      dennis
+    )
+
+    // skip bootstrapping phase
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
+
+     // get ERC2612 permission from alice for stability pool to spend DLLR amount
+     const permission = await signERC2612Permit(dennis_signer, nueMockToken.address, dennis_signer.address, troveManager.address, redemptionAmount.toString());
+
+    // Dennis redeems 20 ZUSD
+    // Don't pay for gas, as it makes it easier to calculate the received Ether
+    const redemptionTx = await troveManager.redeemCollateralViaDLLR(
+      redemptionAmount.toString(),
+      firstRedemptionHint,
+      upperPartialRedemptionHint,
+      lowerPartialRedemptionHint,
+      partialRedemptionHintNICR,
+      0, th._100pct, 
+      permission,
+      {
+        from: dennis,
+        gasPrice: 0
+      }
+    )
+
+    const BTCFee = th.getEmittedRedemptionValues(redemptionTx)[3]
+
+    const alice_Trove_After = await troveManager.Troves(alice)
+    const bob_Trove_After = await troveManager.Troves(bob)
+    const carol_Trove_After = await troveManager.Troves(carol)
+
+    const alice_debt_After = alice_Trove_After[0].toString()
+    const bob_debt_After = bob_Trove_After[0].toString()
+    const carol_debt_After = carol_Trove_After[0].toString()
+
+    /* check that Dennis' redeemed 20 ZUSD has been cancelled with debt from Bobs's Trove (8) and Carol's Trove (10).
+    The remaining lot (2) is sent to Alice's Trove, who had the best ICR.
+    It leaves her with (3) ZUSD debt + 50 for gas compensation. */
+    th.assertIsApproximatelyEqual(alice_debt_After, A_totalDebt.sub(partialRedemptionAmount))
+    assert.equal(bob_debt_After, '0')
+    assert.equal(carol_debt_After, '0')
+
+    const dennis_BTCBalance_After = toBN(await web3.eth.getBalance(dennis))
+    const receivedBTC = dennis_BTCBalance_After.sub(dennis_BTCBalance_Before)
+
+    const expectedTotalBTCDrawn = redemptionAmount.div(toBN(200)) // convert redemptionAmount ZUSD to BTC, at BTC:USD price 200
+    const expectedReceivedBTC = expectedTotalBTCDrawn.sub(toBN(BTCFee))
+
+    th.assertIsApproximatelyEqual(expectedReceivedBTC, receivedBTC)
+
+    const dennis_NUEBalance_After = (await nueMockToken.balanceOf(dennis))
+    assert((dennis_NUEBalance_Before.sub(dennis_NUEBalance_After)).eq(redemptionAmount), `${dennis_NUEBalance_Before.sub(dennis_NUEBalance_After)} => ${redemptionAmount}`)
+    
+    const dennis_ZUSDBalance_After = (await zusdToken.balanceOf(dennis))
+    assert(dennis_ZUSDBalance_After.eq(dennis_ZUSDBalance_Before) && dennis_ZUSDBalance_Before.eq(toBN(0)), `${dennis_ZUSDBalance_After} =>${dennis_ZUSDBalance_Before}`)
+
   });
 
   it('redeemCollateral(): cancels the provided ZUSD with debt from Troves with the lowest ICRs and sends an equivalent amount of Ether', async () => {

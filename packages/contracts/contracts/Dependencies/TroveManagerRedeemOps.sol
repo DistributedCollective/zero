@@ -171,7 +171,7 @@ contract TroveManagerRedeemOps is TroveManagerBase {
         contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
     }
 
-    ///DLLR _owner or _spender can use Sovryn Mynt to convert DLLR to ZUSD, then use the Zero redemption mechanism to redeem ZUSD for RBTC, all in a single transaction
+    ///DLLR _owner can use Sovryn Mynt to convert DLLR to ZUSD, then use the Zero redemption mechanism to redeem ZUSD for RBTC, all in a single transaction
     function redeemCollateralViaDLLR(
         uint256 _dllrAmount,
         address _firstRedemptionHint,
