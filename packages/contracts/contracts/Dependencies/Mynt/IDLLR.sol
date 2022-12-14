@@ -4,32 +4,22 @@ pragma solidity 0.6.11;
 
 /// Public interface for Sovryn Dollar DLLR (Meta Asset Token of Sovryn Mynt) exposing specific functions
 interface IDLLR {
-
     /**
-     * @notice Only owner who can transfer the token.
+     * @notice Only owner can transfer the token.
      * @notice destination cannot be:
-     * - Zero address.
-     * - DLLR contract address.
-     * - Sovryn mAsset proxy & implementation address.
-     * - Sovryn Basket Manager proxy & implementation address.
+     * - zero (0x0) address.
      *
      * @param _recipient Recipient of the token.
      * @param _amount The amount of token that will be transferred.
      *
      * @return true / false.
      */
-    function transfer(
-        address _recipient, 
-        uint256 _amount
-    ) external returns (bool);
+    function transfer(address _recipient, uint256 _amount) external returns (bool);
 
     /**
      * @notice Only owner who can transfer the token.
      * @notice destination cannot be:
-     * - Zero address.
-     * - DLLR contract address.
-     * - Sovryn mAsset proxy & implementation address.
-     * - Sovryn Basket Manager proxy & implementation address.
+     * - zero (0x0) address.
      *
      * @param _from Sender of the token.
      * @param _to Recipient of the token.
@@ -37,20 +27,13 @@ interface IDLLR {
      *
      * @return true / false.
      */
-    function transferFrom(
-        address _from, 
-        address _to, 
-        uint256 _amount
-    ) external returns (bool); 
+    function transferFrom(address _from, address _to, uint256 _amount) external returns (bool);
 
     /**
      * @notice transfer utilizing EIP-2612, to reduce the additional sending transaction for doing the approval to the spender.
      *
      * @notice destination cannot be:
-     * - Zero address.
-     * - DLLR contract address.
-     * - Sovryn mAsset proxy & implementation address.
-     * - Sovryn Basket Manager proxy & implementation address.
+     * - zero (0x0) address.
      *
      * @dev By calling this function, the allowance will be overwritten by the total amount.
      *
@@ -63,12 +46,12 @@ interface IDLLR {
      * @param _s 32 bytes after _r in ECDSA signature.
      */
     function transferWithPermit(
-        address _from, 
-        address _to, 
-        uint256 _amount, 
-        uint256 _deadline, 
-        uint8 _v, 
-        bytes32 _r, 
+        address _from,
+        address _to,
+        uint256 _amount,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
         bytes32 _s
     ) external;
 
@@ -81,9 +64,5 @@ interface IDLLR {
      * @param _amount The amount of tokens to be sent.
      * @param _data Parameters for the contract call, such as endpoint signature.
      */
-    function approveAndCall(
-        address _spender,
-        uint256 _amount,
-        bytes calldata _data
-    ) external;
+    function approveAndCall(address _spender, uint256 _amount, bytes calldata _data) external;
 }

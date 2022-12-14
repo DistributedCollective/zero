@@ -11,7 +11,7 @@ import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/Ownable.sol";
-import "./Dependencies/Mynt/IMasset.sol";
+import "./Dependencies/Mynt/IMassetManager.sol";
 
 contract BorrowerOperationsStorage is Ownable {
     string constant public NAME = "BorrowerOperations";
@@ -34,6 +34,6 @@ contract BorrowerOperationsStorage is Ownable {
     // A doubly linked list of Troves, sorted by their collateral ratios
     ISortedTroves public sortedTroves;
 
-    IMasset public masset;
+    IMassetManager public massetManager;
     IFeeDistributor public feeDistributor;
 }

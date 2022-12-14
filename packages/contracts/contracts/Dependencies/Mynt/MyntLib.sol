@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-import "./IMasset.sol";
+import "./IMassetManager.sol";
 import "./IDLLR.sol";
 import "../IERC20.sol";
 import "../SafeMath.sol";
@@ -24,12 +24,12 @@ library MyntLib {
      * @return redeemed ZUSD amount
      */
     function redeemZusdFromDllrByPermit(
-        IMasset _myntMAsset,
+        IMassetManager _myntMassetManager,
         uint256 _dllrAmount,
         address _toToken,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) internal returns (uint256) {
-        IDLLR dllr = IDLLR(_myntMAsset.getToken());
+        IDLLR dllr = IDLLR(_myntMassetManager.getToken());
         IERC20 dllrERC20 = IERC20(address(dllr));
         uint256 thisBalanceBefore = dllrERC20.balanceOf(address(this));
         address thisAddress = address(this);
@@ -46,6 +46,6 @@ library MyntLib {
             dllrERC20.balanceOf(thisAddress).sub(thisBalanceBefore) == _dllrAmount,
             "DLLR transferred amount validation failed"
         );
-        return _myntMAsset.redeemTo(_toToken, _dllrAmount, msg.sender);
+        return _myntMassetManager.redeemTo(_toToken, _dllrAmount, msg.sender);
     }
 }

@@ -292,10 +292,10 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     ///DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
     function provideToSpFromDLLR(
         uint256 _dllrAmount,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external override {
         uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrByPermit(
-            borrowerOperations.getMasset(),
+            borrowerOperations.getMassetManager(),
             _dllrAmount,
             address(zusdToken),
             _permitParams
@@ -362,13 +362,13 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     ///Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
     function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmountRequested) external override {
-        IMasset masset = borrowerOperations.getMasset();
+        IMassetManager massetManager = borrowerOperations.getMassetManager();
         uint256 amountWithdrawn = _withdrawFromSpTo(_zusdAmountRequested, address(this));
         require(
-            zusdToken.approve(address(masset), amountWithdrawn),
+            zusdToken.approve(address(massetManager), amountWithdrawn),
             "Failed to approve ZUSD amount for Mynt mAsset to redeem"
         );
-        masset.mintTo(address(zusdToken), amountWithdrawn, msg.sender);
+        massetManager.mintTo(address(zusdToken), amountWithdrawn, msg.sender);
         emit WithdrawFromSpAndConvertToDLLR(msg.sender, _zusdAmountRequested, amountWithdrawn);
     }
 

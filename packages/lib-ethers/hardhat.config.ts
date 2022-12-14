@@ -261,8 +261,8 @@ type SetAddressParams = {
 
 const defaultChannel = process.env.CHANNEL || "default";
 
-task("setMassetAddress", "Sets address of masset contract in order to support NUE troves")
-  .addParam("address", "address of deployed MassetProxy contract")
+task("setMassetManagerAddress", "Sets address of massetManager contract in order to support NUE troves")
+  .addParam("address", "address of deployed MassetManagerProxy contract")
   .addParam("nuetokenaddress", "address of NUE token")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ address, channel, nuetokenaddress }: SetAddressParams, hre) => {
@@ -276,14 +276,14 @@ task("setMassetAddress", "Sets address of masset contract in order to support NU
       deployer
     )) as unknown) as BorrowerOperations;
 
-    const currentMassetAddress = await borrowerOperations.masset();
-    console.log("Current masset address: ", currentMassetAddress);
+    const currentMassetAddress = await borrowerOperations.massetManager();
+    console.log("Current massetManager address: ", currentMassetAddress);
 
-    const tx = await borrowerOperations.setMassetAddress(address);
+    const tx = await borrowerOperations.setMassetManagerAddress(address);
     await tx.wait();
 
-    const newMassetAddress = await borrowerOperations.masset();
-    console.log("New masset address: ", newMassetAddress);
+    const newMassetAddress = await borrowerOperations.massetManager();
+    console.log("New massetManager address: ", newMassetAddress);
 
     deployment.addresses.nueToken = nuetokenaddress;
 

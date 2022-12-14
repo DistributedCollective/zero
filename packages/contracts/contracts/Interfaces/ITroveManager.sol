@@ -8,7 +8,7 @@ import "./IStabilityPool.sol";
 import "./IZUSDToken.sol";
 import "./IZEROToken.sol";
 import "./IZEROStaking.sol";
-import "../Dependencies/Mynt/IMasset.sol";
+import "../Dependencies/Mynt/IMassetManager.sol";
 
 /// Common interface for the Trove Manager.
 interface ITroveManager is ILiquityBase {
@@ -182,7 +182,7 @@ interface ITroveManager is ILiquityBase {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external;
 
     /// @notice Update borrower's stake based on their latest collateral value

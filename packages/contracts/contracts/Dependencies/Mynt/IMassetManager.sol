@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-interface IMasset {
+interface IMassetManager {
     struct PermitParams {
         uint256 deadline;
         uint8 v;

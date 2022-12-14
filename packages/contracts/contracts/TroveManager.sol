@@ -1171,7 +1171,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external override {
         (bool success, bytes memory returndata) = troveManagerRedeemOps.delegatecall(msg.data);
         require(success, string(returndata));

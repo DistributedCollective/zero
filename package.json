@@ -72,7 +72,7 @@
     "do-pack:contracts": "yarn workspace @sovryn-zero/contracts do-pack",
     "do-pack:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts do-pack",
     "save-live-version": "yarn workspace @sovryn-zero/lib-ethers save-live-version",
-    "set-masset": "yarn workspace @sovryn-zero/lib-ethers hardhat setMassetAddress",
+    "set-massetManager": "yarn workspace @sovryn-zero/lib-ethers hardhat setMassetManagerAddress",
     "start-dev-chain": "run-s start-dev-chain:*",
     "start-dev-chain:rsk": "node dev-chain/start.js",
     "start-dev-chain:prepare-providers": "yarn prepare:providers",

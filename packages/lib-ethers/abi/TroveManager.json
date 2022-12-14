@@ -1666,7 +1666,7 @@
             "type": "bytes32"
           }
         ],
-        "internalType": "struct IMasset.PermitParams",
+        "internalType": "struct IMassetManager.PermitParams",
         "name": "_permitParams",
         "type": "tuple"
       }

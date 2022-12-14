@@ -8,7 +8,7 @@ const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.s
 const NonPayable = artifacts.require("NonPayable.sol");
 const TroveManagerTester = artifacts.require("TroveManagerTester");
 const ZUSDTokenTester = artifacts.require("./ZUSDTokenTester");
-const MassetTester = artifacts.require("MassetTester");
+const MassetManagerTester = artifacts.require("MassetManagerTester");
 const NueMockToken = artifacts.require("NueMockToken");
 
 const th = testHelpers.TestHelper;
@@ -67,7 +67,7 @@ contract("BorrowerOperations", async accounts => {
   let borrowerOperations;
   let zeroStaking;
   let zeroToken;
-  let masset;
+  let massetManager;
   let nueMockToken;
 
   let contracts;
@@ -137,7 +137,7 @@ contract("BorrowerOperations", async accounts => {
     before(async () => {
       contracts = await deploymentHelper.deployLiquityCore();
       contracts.borrowerOperations = await BorrowerOperationsTester.new();
-      contracts.masset = await MassetTester.new();
+      contracts.massetManager = await MassetManagerTester.new();
       contracts.troveManager = await TroveManagerTester.new();
       contracts = await deploymentHelper.deployZUSDTokenTester(contracts);
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig);
@@ -161,7 +161,7 @@ contract("BorrowerOperations", async accounts => {
       stabilityPool = contracts.stabilityPool;
       defaultPool = contracts.defaultPool;
       borrowerOperations = contracts.borrowerOperations;
-      masset = contracts.masset;
+      massetManager = contracts.massetManager;
       hintHelpers = contracts.hintHelpers;
 
       zeroStaking = ZEROContracts.zeroStaking;
@@ -171,10 +171,10 @@ contract("BorrowerOperations", async accounts => {
       ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION();
       MIN_NET_DEBT = await borrowerOperations.MIN_NET_DEBT();
       BORROWING_FEE_FLOOR = await borrowerOperations.BORROWING_FEE_FLOOR();
-      const nueMockTokenAddress = await masset.nueMockToken();
+      const nueMockTokenAddress = await massetManager.nueMockToken();
       nueMockToken = await NueMockToken.at(nueMockTokenAddress);
 
-      await borrowerOperations.setMassetAddress(masset.address);
+      await borrowerOperations.setMassetManagerAddress(massetManager.address);
     });
 
     let revertToSnapshot;

@@ -149,8 +149,8 @@ contract BorrowerOperations is
         emit ZEROStakingAddressChanged(_zeroStakingAddress);
     }
 
-    function setMassetAddress(address _massetAddress) external onlyOwner {
-        masset = IMasset(_massetAddress);
+    function setMassetManagerAddress(address _massetManagerAddress) external onlyOwner {
+        massetManager = IMassetManager(_massetManagerAddress);
     }
 
     function openTrove(
@@ -168,14 +168,14 @@ contract BorrowerOperations is
         address _upperHint,
         address _lowerHint
     ) external payable override {
-        require(address(masset) != address(0), "Masset address not set");
+        require(address(massetManager) != address(0), "Masset address not set");
 
         _openTrove(_maxFeePercentage, _ZUSDAmount, _upperHint, _lowerHint, address(this));
         require(
-            zusdToken.approve(address(masset), _ZUSDAmount),
+            zusdToken.approve(address(massetManager), _ZUSDAmount),
             "Failed to approve ZUSD amount for Mynt mAsset to redeem"
         );
-        masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
+        massetManager.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
     }
 
     // --- Borrower Trove Operations ---
@@ -330,10 +330,10 @@ contract BorrowerOperations is
             "ZUSD is not borrowed correctly"
         );
         require(
-            zusdToken.approve(address(masset), _ZUSDAmount),
+            zusdToken.approve(address(massetManager), _ZUSDAmount),
             "Failed to approve ZUSD amount for Mynt mAsset to redeem"
         );
-        return masset.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
+        return massetManager.mintTo(address(zusdToken), _ZUSDAmount, msg.sender);
     }
 
     /// Repay ZUSD tokens to a Trove: Burn the repaid ZUSD tokens, and reduce the trove's debt accordingly
@@ -350,16 +350,8 @@ contract BorrowerOperations is
         uint256 _dllrAmount,
         address _upperHint,
         address _lowerHint,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external override {
-        //TODO: remove if _adjustNueTrove works fine
-        /*uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrByPermit(
-            masset,
-            _dllrAmount,
-            address(zusdToken),
-            _permitParams
-        );
-        _adjustTrove(msg.sender, 0, _ZUSDAmount, false, _upperHint, _lowerHint, 0);*/
         _adjustNueTrove(0, 0, _dllrAmount, false, _upperHint, _lowerHint, _permitParams);
     }
 
@@ -382,7 +374,7 @@ contract BorrowerOperations is
         );
     }
 
-    // in case of _isDebtIncrease = false masset contract must have an approval of NUE tokens
+    // in case of _isDebtIncrease = false MassetManager contract must have an approval of NUE tokens
     function adjustNueTrove(
         uint256 _maxFeePercentage,
         uint256 _collWithdrawal,
@@ -390,7 +382,7 @@ contract BorrowerOperations is
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external payable override {
         _adjustNueTrove(
             _maxFeePercentage,
@@ -403,7 +395,7 @@ contract BorrowerOperations is
         );
     }
 
-    // in case of _isDebtIncrease = false masset contract must have an approval of NUE tokens
+    // in case of _isDebtIncrease = false Masset Manager contract must have an approval of NUE tokens
     function _adjustNueTrove(
         uint256 _maxFeePercentage,
         uint256 _collWithdrawal,
@@ -411,13 +403,13 @@ contract BorrowerOperations is
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) internal {
-        require(address(masset) != address(0), "Masset address not set");
+        require(address(massetManager) != address(0), "Masset address not set");
 
         if (!_isDebtIncrease && _ZUSDChange > 0) {
             MyntLib.redeemZusdFromDllrByPermit(
-                masset,
+                massetManager,
                 _ZUSDChange,
                 address(zusdToken),
                 _permitParams
@@ -435,10 +427,10 @@ contract BorrowerOperations is
         );
         if (_isDebtIncrease && _ZUSDChange > 0) {
             require(
-                zusdToken.approve(address(masset), _ZUSDChange),
+                zusdToken.approve(address(massetManager), _ZUSDChange),
                 "Failed to approve ZUSD amount for Mynt mAsset to redeem"
             );
-            masset.mintTo(address(zusdToken), _ZUSDChange, msg.sender);
+            massetManager.mintTo(address(zusdToken), _ZUSDChange, msg.sender);
         }
     }
 
@@ -618,13 +610,13 @@ contract BorrowerOperations is
         _closeTrove();
     }
 
-    function closeNueTrove(IMasset.PermitParams calldata _permitParams) external override {
-        require(address(masset) != address(0), "Masset address not set");
+    function closeNueTrove(IMassetManager.PermitParams calldata _permitParams) external override {
+        require(address(massetManager) != address(0), "Masset address not set");
 
         uint256 debt = troveManager.getTroveDebt(msg.sender);
 
         MyntLib.redeemZusdFromDllrByPermit(
-            masset,
+            massetManager,
             debt.sub(ZUSD_GAS_COMPENSATION),
             address(zusdToken),
             _permitParams
@@ -1063,7 +1055,7 @@ contract BorrowerOperations is
         return liquityBaseParams.BORROWING_FEE_FLOOR();
     }
 
-    function getMasset() external view override returns (IMasset) {
-        return masset;
+    function getMassetManager() external view override returns (IMassetManager) {
+        return massetManager;
     }
 }

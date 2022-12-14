@@ -3,7 +3,7 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import "../Dependencies/Mynt/IMasset.sol";
+import "../Dependencies/Mynt/IMassetManager.sol";
 
 /*
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
@@ -227,7 +227,7 @@ interface IStabilityPool {
     //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
     function provideToSpFromDLLR(
         uint _dllrAmount,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external;
 
     /// Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and optionally convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction

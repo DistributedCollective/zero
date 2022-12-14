@@ -3,7 +3,7 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import "../Dependencies/Mynt/IMasset.sol";
+import "../Dependencies/Mynt/IMassetManager.sol";
 
 /// Common interface for the Trove Manager.
 interface IBorrowerOperations {
@@ -159,7 +159,7 @@ interface IBorrowerOperations {
         uint256 _dllrAmount,
         address _upperHint,
         address _lowerHint,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external;
 
     /**
@@ -173,7 +173,7 @@ interface IBorrowerOperations {
      * Requires the borrower have a NUE balance sufficient to repay their trove's debt, excluding gas compensation - i.e. `(debt - 50)` NUE.
      * This method is identical to `closeTrove()`, but operates on NUE tokens instead of ZUSD.
      */
-    function closeNueTrove(IMasset.PermitParams calldata _permitParams) external;
+    function closeNueTrove(IMassetManager.PermitParams calldata _permitParams) external;
 
     /**
      * @notice enables a borrower to simultaneously change both their collateral and debt, subject to all the restrictions that apply to individual increases/decreases of each quantity with the following particularity:
@@ -216,7 +216,7 @@ interface IBorrowerOperations {
         bool isDebtIncrease,
         address _upperHint,
         address _lowerHint,
-        IMasset.PermitParams calldata _permitParams
+        IMassetManager.PermitParams calldata _permitParams
     ) external payable;
 
     /**
@@ -229,5 +229,5 @@ interface IBorrowerOperations {
 
     function BORROWING_FEE_FLOOR() external view returns (uint256);
 
-    function getMasset() external view returns (IMasset);
+    function getMassetManager() external view returns (IMassetManager);
 }

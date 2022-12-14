@@ -42,7 +42,7 @@ contract NueMockToken is ERC20("Nuestro", "NUE"), ERC20Permit("Nuestro"), Ownabl
     //TODO: add EIP-2612 Permit functionality
 }
 
-contract MassetTester is IMasset {
+contract MassetManagerTester is IMassetManager {
     NueMockToken public nueMockToken;
 
     constructor() public {
