@@ -88,7 +88,6 @@ interface BorrowerOperationsTransactions {
   addColl(_upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
   adjustNueTrove(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _ZUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }, _overrides?: PayableOverrides): Promise<void>;
   adjustTrove(_maxFeePercentage: BigNumberish, _collWithdrawal: BigNumberish, _ZUSDChange: BigNumberish, _isDebtIncrease: boolean, _upperHint: string, _lowerHint: string, _overrides?: PayableOverrides): Promise<void>;
-  borrowZUSDAndConvertToDLLR(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   claimCollateral(_overrides?: Overrides): Promise<void>;
   closeNueTrove(_permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }, _overrides?: Overrides): Promise<void>;
   closeTrove(_overrides?: Overrides): Promise<void>;
@@ -102,6 +101,7 @@ interface BorrowerOperationsTransactions {
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   withdrawColl(_collWithdrawal: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawZUSD(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
+  withdrawZusdAndConvertToDLLR(_maxFeePercentage: BigNumberish, _ZUSDAmount: BigNumberish, _upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<BigNumber>;
 }
 
 export interface BorrowerOperations
@@ -260,11 +260,9 @@ export interface DefaultPool
   extractEvents(logs: Log[], name: "ZUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface GasPoolCalls {
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface GasPoolTransactions {
 }
 
@@ -651,13 +649,12 @@ interface StabilityPoolTransactions {
   offset(_debtToOffset: BigNumberish, _collToAdd: BigNumberish, _overrides?: Overrides): Promise<void>;
   provideToSP(_amount: BigNumberish, _frontEndTag: string, _overrides?: Overrides): Promise<void>;
   provideToSpFromDLLR(_dllrAmount: BigNumberish, _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }, _overrides?: Overrides): Promise<void>;
-  provideToSpFromDllrBySpender(_dllrAmount: BigNumberish, _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }, _dllrOwner: string, _overrides?: Overrides): Promise<void>;
   registerFrontEnd(_kickbackRate: BigNumberish, _overrides?: Overrides): Promise<void>;
   setAddresses(_liquityBaseParamsAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _priceFeedAddress: string, _communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   withdrawETHGainToTrove(_upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawFromSP(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  withdrawFromSpAndConvertToDLLR(_zusdAmount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  withdrawFromSpAndConvertToDLLR(_zusdAmountRequested: BigNumberish, _overrides?: Overrides): Promise<void>;
 }
 
 export interface StabilityPool
@@ -687,6 +684,7 @@ export interface StabilityPool
     StabilityPoolZUSDBalanceUpdated(_newBalance?: null): EventFilter;
     TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
     UserDepositChanged(_depositor?: string | null, _newDeposit?: null): EventFilter;
+    WithdrawFromSpAndConvertToDLLR(_depositor?: null, _zusdAmountRequested?: null, _dllrAmountReceived?: null): EventFilter;
     ZEROPaidToDepositor(_depositor?: string | null, _ZERO?: null): EventFilter;
     ZEROPaidToFrontEnd(_frontEnd?: string | null, _ZERO?: null): EventFilter;
     ZUSDTokenAddressChanged(_newZUSDTokenAddress?: null): EventFilter;
@@ -714,6 +712,7 @@ export interface StabilityPool
   extractEvents(logs: Log[], name: "StabilityPoolZUSDBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
   extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "UserDepositChanged"): _TypedLogDescription<{ _depositor: string; _newDeposit: BigNumber }>[];
+  extractEvents(logs: Log[], name: "WithdrawFromSpAndConvertToDLLR"): _TypedLogDescription<{ _depositor: string; _zusdAmountRequested: BigNumber; _dllrAmountReceived: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZEROPaidToDepositor"): _TypedLogDescription<{ _depositor: string; _ZERO: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZEROPaidToFrontEnd"): _TypedLogDescription<{ _frontEnd: string; _ZERO: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _newZUSDTokenAddress: string }>[];
