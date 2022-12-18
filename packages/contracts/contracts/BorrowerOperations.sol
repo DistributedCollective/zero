@@ -408,7 +408,7 @@ contract BorrowerOperations is
         require(address(massetManager) != address(0), "Masset address not set");
 
         if (!_isDebtIncrease && _ZUSDChange > 0) {
-            MyntLib.redeemZusdFromDllrByPermit(
+            MyntLib.redeemZusdFromDllrWithPermit(
                 massetManager,
                 _ZUSDChange,
                 address(zusdToken),
@@ -615,7 +615,7 @@ contract BorrowerOperations is
 
         uint256 debt = troveManager.getTroveDebt(msg.sender);
 
-        MyntLib.redeemZusdFromDllrByPermit(
+        MyntLib.redeemZusdFromDllrWithPermit(
             massetManager,
             debt.sub(ZUSD_GAS_COMPENSATION),
             address(zusdToken),

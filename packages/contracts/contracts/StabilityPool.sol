@@ -294,7 +294,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint256 _dllrAmount,
         IMassetManager.PermitParams calldata _permitParams
     ) external override {
-        uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrByPermit(
+        uint256 _ZUSDAmount = MyntLib.redeemZusdFromDllrWithPermit(
             borrowerOperations.getMassetManager(),
             _dllrAmount,
             address(zusdToken),

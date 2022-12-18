@@ -23,7 +23,7 @@ library MyntLib {
      *        _s 32 bytes after _r in ECDSA signature.
      * @return redeemed ZUSD amount
      */
-    function redeemZusdFromDllrByPermit(
+    function redeemZusdFromDllrWithPermit(
         IMassetManager _myntMassetManager,
         uint256 _dllrAmount,
         address _toToken,
