@@ -13,7 +13,7 @@ export const fromWei = (value: BigNumberish | undefined, decimals = 2) => {
 export const toWei = (value: Decimal | BigNumberish | undefined) =>
   ethers.utils.parseEther((value || "0").toString()).toString();
 
-export const isMainnet = true;
+export const isMainnet = process.env.REACT_APP_NETWORK === "mainnet";
 
 export const isZero = (value: string) => new BigNumber(value).isZero();
 
