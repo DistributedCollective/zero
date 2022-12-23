@@ -4,7 +4,6 @@ pragma solidity 0.6.11;
 
 import "./IMassetManager.sol";
 import "./IDLLR.sol";
-import "../IERC20.sol";
 import "../SafeMath.sol";
 
 library MyntLib {
@@ -14,6 +13,7 @@ library MyntLib {
      * @notice Convert DLLR _dllrAmount to _toToken utilizing EIP-2612 permit
      * to reduce the additional sending transaction for doing the approval to the spender.
      *
+     * @param _myntMassetManager Mynt protocol MassetManager contract address - needed for integration
      * @param _dllrAmount The amount of the DLLR (mAsset) token that will be burned in exchange for _toToken
      * @param _toToken bAsset token address to wothdraw from DLLR
      * @param _permitParams EIP-2612 permit params:
@@ -30,8 +30,7 @@ library MyntLib {
         IMassetManager.PermitParams calldata _permitParams
     ) internal returns (uint256) {
         IDLLR dllr = IDLLR(_myntMassetManager.getToken());
-        IERC20 dllrERC20 = IERC20(address(dllr));
-        uint256 thisBalanceBefore = dllrERC20.balanceOf(address(this));
+        uint256 thisBalanceBefore = dllr.balanceOf(address(this));
         address thisAddress = address(this);
         dllr.transferWithPermit(
             msg.sender,
@@ -43,7 +42,7 @@ library MyntLib {
             _permitParams.s
         );
         require(
-            dllrERC20.balanceOf(thisAddress).sub(thisBalanceBefore) == _dllrAmount,
+            dllr.balanceOf(thisAddress).sub(thisBalanceBefore) == _dllrAmount,
             "DLLR transferred amount validation failed"
         );
         return _myntMassetManager.redeemTo(_toToken, _dllrAmount, msg.sender);

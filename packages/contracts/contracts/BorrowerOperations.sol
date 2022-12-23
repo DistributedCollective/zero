@@ -79,6 +79,7 @@ contract BorrowerOperations is
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
     event ZUSDTokenAddressChanged(address _zusdTokenAddress);
     event ZEROStakingAddressChanged(address _zeroStakingAddress);
+    event MassetManagerAddressChanged(address _massetManagerAddress);
 
     event TroveCreated(address indexed _borrower, uint256 arrayIndex);
     event TroveUpdated(
@@ -151,6 +152,7 @@ contract BorrowerOperations is
 
     function setMassetManagerAddress(address _massetManagerAddress) external onlyOwner {
         massetManager = IMassetManager(_massetManagerAddress);
+        emit MassetManagerAddressChanged(_massetManagerAddress);
     }
 
     function openTrove(

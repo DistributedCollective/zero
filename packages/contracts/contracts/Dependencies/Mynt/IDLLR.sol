@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+import "../IERC20.sol";
 
 /// Public interface for Sovryn Dollar DLLR (Meta Asset Token of Sovryn Mynt) exposing specific functions
-interface IDLLR {
+interface IDLLR is IERC20 {
     /**
      * @notice Only owner can transfer the token.
      * @notice destination cannot be:
@@ -14,7 +15,7 @@ interface IDLLR {
      *
      * @return true / false.
      */
-    function transfer(address _recipient, uint256 _amount) external returns (bool);
+    function transfer(address _recipient, uint256 _amount) external override returns (bool);
 
     /**
      * @notice Only owner who can transfer the token.
@@ -27,7 +28,11 @@ interface IDLLR {
      *
      * @return true / false.
      */
-    function transferFrom(address _from, address _to, uint256 _amount) external returns (bool);
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) external override returns (bool);
 
     /**
      * @notice transfer utilizing EIP-2612, to reduce the additional sending transaction for doing the approval to the spender.
