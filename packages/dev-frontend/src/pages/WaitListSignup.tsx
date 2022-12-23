@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useCallback } from "react";
 import { useState } from "react";
 import {
@@ -19,23 +19,27 @@ import { validateEmail } from "../utils/helpers";
 import { registerEmail } from "../utils/whitelist";
 import { useLocation } from "react-router-dom";
 import { sovrynLink } from "src/contracts/config";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { captchaSiteKey } from "src/utils";
 
 export const WaitListSignup: React.FC = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState("");
   const [success, setSuccess] = useState(false);
   const [sovrynMail, setSovrylMail] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
+  const captchaRef = useRef<HCaptcha>(null);
 
   const location = useLocation();
 
   const isValidEmail = useMemo(() => validateEmail(email), [email]);
 
   const resetStatus = useCallback(() => {
-    if (!errorMessage && !success) return;
-    setErrorMessage("");
+    if (!error && !success) return;
+    setError("");
     setSuccess(false);
-  }, [errorMessage, success]);
+  }, [error, success]);
 
   const handleEmailChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,28 +56,43 @@ export const WaitListSignup: React.FC = ({ children }) => {
 
       const ref = params.get("r") || "";
       resetStatus();
-      if (!isValidEmail) {
+      if (!isValidEmail || !token) {
         return;
       }
       try {
         setIsLoading(true);
-        await registerEmail(email, ref, sovrynMail);
+        await registerEmail(email, ref, sovrynMail, token);
 
         setEmail("");
-        setErrorMessage("");
+        setError("");
         setSuccess(true);
         setIsLoading(false);
       } catch (error: any) {
         if (error?.response?.data?.message) {
-          setErrorMessage(error?.response?.data?.message);
+          setError(error?.response?.data?.message);
         } else {
-          setErrorMessage("An error has occurred");
+          setError("An error has occurred");
         }
         setIsLoading(false);
       }
+      setToken("");
+      captchaRef.current?.resetCaptcha();
     },
-    [email, isValidEmail, location.search, resetStatus, sovrynMail]
+    [email, isValidEmail, location.search, resetStatus, sovrynMail, token]
   );
+
+  const errorMessage = useMemo(() => {
+    if (error) {
+      return error;
+    }
+    if (email && !isValidEmail) {
+      return "Please enter a valid email address.";
+    }
+    if (email && !token) {
+      return "Please compelete recaptcha";
+    }
+    return null;
+  }, [email, error, isValidEmail, token]);
 
   return (
     <Box
@@ -169,6 +188,16 @@ export const WaitListSignup: React.FC = ({ children }) => {
             />
             Add me to the general Sovryn mailing list
           </Label>
+
+          <Box sx={{ my: 1 }}>
+            <HCaptcha
+              theme="dark"
+              sitekey={captchaSiteKey || ""}
+              onVerify={setToken}
+              ref={captchaRef}
+            />
+          </Box>
+
           <Button
             sx={{
               width: 285,
@@ -177,13 +206,13 @@ export const WaitListSignup: React.FC = ({ children }) => {
               alignItems: "center"
             }}
             variant="secondary"
-            disabled={!isValidEmail || isLoading}
+            disabled={!isValidEmail || isLoading || !token}
             data-action-id="zero-landing-signUp"
           >
             Sign Up
             {isLoading && <Spinner sx={{ ml: 1 }} color={"cardBackground"} size={24} />}
           </Button>
-          {((email && !isValidEmail) || errorMessage) && (
+          {errorMessage && (
             <Paragraph
               sx={{
                 fontSize: 1,
@@ -198,7 +227,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
                 textAlign: "center"
               }}
             >
-              {errorMessage ? errorMessage : "Please enter a valid email address."}
+              {errorMessage}
             </Paragraph>
           )}
         </form>

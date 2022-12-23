@@ -12,12 +12,14 @@ const whitelistClient = axios.create({
 export const registerEmail = (
   email: string,
   ref: string,
-  sovrynMail: boolean
+  sovrynMail: boolean,
+  token: string
 ): Promise<AxiosResponse<any>> =>
   whitelistClient.post("register/" + WhitelistType.ZERO, {
     email,
     ref,
-    sovrynMail: !!sovrynMail
+    sovrynMail: !!sovrynMail,
+    token
   });
 
 export const checkAccountAccess = (account: string): Promise<AxiosResponse<any>> =>
