@@ -68,6 +68,10 @@ ZERO contracts consist of only those contracts related to the ZERO Token:
 const ZERO_ADDRESS = "0x" + "0".repeat(40);
 const maxBytes32 = "0x" + "f".repeat(64);
 
+const ONE_DAY_IN_SECONDS = 86400;
+const ONE_MINUTE = 60;
+const TWO_WEEKS = 14 * ONE_DAY_IN_SECONDS;
+
 class DeploymentHelper {
   static async deployLiquityCore() {
     const cmdLineArgs = process.argv;
@@ -97,8 +101,8 @@ class DeploymentHelper {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const sortedTroves = await SortedTroves.new();
     const liquityBaseParams = await LiquityBaseParams.new();
-    const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    const troveManager = await TroveManager.new();
+    const troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
+    const troveManager = await TroveManager.new(TWO_WEEKS);
     const activePool = await ActivePool.new();
     const stabilityPool = await StabilityPool.new();
     const gasPool = await GasPool.new();
@@ -170,8 +174,8 @@ class DeploymentHelper {
     testerContracts.collSurplusPool = await CollSurplusPool.new();
     testerContracts.math = await LiquityMathTester.new();
     testerContracts.borrowerOperations = await BorrowerOperationsTester.new();
-    testerContracts.troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    testerContracts.troveManager = await TroveManagerTester.new();
+    testerContracts.troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
+    testerContracts.troveManager = await TroveManagerTester.new(TWO_WEEKS);
     testerContracts.functionCaller = await FunctionCaller.new();
     testerContracts.hintHelpers = await HintHelpers.new();
     testerContracts.zusdToken = await ZUSDTokenTester.new(
@@ -254,8 +258,8 @@ class DeploymentHelper {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const sortedTroves = await SortedTroves.new();
     const liquityBaseParams = await LiquityBaseParams.new();
-    const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    const troveManager = await TroveManager.new();
+    const troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
+    const troveManager = await TroveManager.new(TWO_WEEKS);
     const activePool = await ActivePool.new();
     const stabilityPool = await StabilityPool.new();
     const gasPool = await GasPool.new();

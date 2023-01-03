@@ -20,7 +20,6 @@ import { _LiquityDeploymentJSON } from "./src/contracts";
 import accounts from "./accounts.json";
 import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy, Ownable } from "./types";
 
-
 dotenv.config();
 
 const numAccounts = 100;
@@ -50,7 +49,16 @@ const generateRandomAccounts = (numberOfAccounts: number) => {
 
   return accounts;
 };
-const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey;
+
+// const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey;
+const deployerPrivateKeys: { [key: string]: string | undefined } = {
+  dev: process.env.DEPLOYER_PK_TESTNET,
+  rsktestnet: process.env.DEPLOYER_PK_TESTNET,
+  rskforkedtestnet: process.env.DEPLOYER_PK_TESTNET,
+  rsksovrynmainnet: process.env.DEPLOYER_PK_MAINNET,
+  rskforkedmainnet: process.env.DEPLOYER_PK_MAINNET,
+};
+
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
 
 const governanceAddresses = {
@@ -76,13 +84,17 @@ const wrbtcAddresses = {
 
 const marketMakerAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x572b8990067785d1c601aDE6359c05C296deC718",
+  rskforkedmainnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0x0000000000000000000000000000000000000001",
+  rskforkedtestnet: "0x0000000000000000000000000000000000000001",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
 const presaleAddresses = {
   mainnet: "0x0000000000000000000000000000000000000001",
-  rsktestnet: "0x25E79f651e85da501706514358640b96d8b07Db6",
+  rskforkedmainnet: "0x0000000000000000000000000000000000000001",
+  rsktestnet: "0x0000000000000000000000000000000000000001",
+  rskforkedtestnet: "0x0000000000000000000000000000000000000001",
   dev: ""
 };
 
@@ -100,7 +112,15 @@ const oracleAddresses: Record<string, OracleAddresses> = {
     mocOracleAddress: "0x972a21C61B436354C0F35836195D7B67f54E482C",
     rskOracleAddress: "0x99eD262dbd8842442cd22d4c6885936DB38245E6"
   },
+  rskforkedmainnet: {
+    mocOracleAddress: "0x972a21C61B436354C0F35836195D7B67f54E482C",
+    rskOracleAddress: "0x99eD262dbd8842442cd22d4c6885936DB38245E6"
+  },
   rsktestnet: {
+    mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
+    rskOracleAddress: "0xE00243Bc6912BF148302e8478996c98c22fE8739"
+  },
+  rskforkedtestnet: {
     mocOracleAddress: "0xb76c405Dfd042D88FD7b8dd2e5d66fe7974A1458",
     rskOracleAddress: "0xE00243Bc6912BF148302e8478996c98c22fE8739"
   },
@@ -130,6 +150,10 @@ const hasMarketMaker = (network: string): network is keyof typeof marketMakerAdd
 const hasZusdToken = (network: string): network is keyof typeof zusdTokenAddresses =>
   network in zusdTokenAddresses;
 
+const getDeployerAccount = (network: string) => {
+  return deployerPrivateKeys[network];
+}
+
 const config: HardhatUserConfig = {
   networks: {
     hardhat: {
@@ -137,6 +161,7 @@ const config: HardhatUserConfig = {
 
       gas: 13e6, // tx gas limit
       blockGasLimit: 13e6,
+      initialBaseFeePerGas: 0,
 
       // Let Ethers throw instead of Buidler EVM
       // This is closer to what will happen in production
@@ -146,33 +171,55 @@ const config: HardhatUserConfig = {
 
     dev: {
       url: "http://localhost:4444",
-      accounts: [deployerAccount, devChainRichAccount, ...generateRandomAccounts(numAccounts - 2)]
+      accounts: [getDeployerAccount("dev") || Wallet.createRandom().privateKey, devChainRichAccount, ...generateRandomAccounts(numAccounts - 2)]
     },
 
     rskdev: {
-      url: "http://localhost:4444",
+      url: "http://127.0.0.1:8545/",
+      accounts: [getDeployerAccount("dev") || Wallet.createRandom().privateKey],
       // regtest default prefunded account
-      from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+      //from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+      from: "0xeb19817335e5565cf9c4a791d58c2bfa0ce032c7",
+      chainId: 30
     },
-
+    
     rsktestnet: {
       url: "https://public-node.testnet.rsk.co",
-      accounts: [deployerAccount]
+      accounts: [getDeployerAccount("rsktestnet") || ""],
+      chainId: 31,
+      gasMultiplier: 1.25
     },
     rsksovryntestnet: {
       url: "https://testnet.sovryn.app/rpc",
-      accounts: { mnemonic: "brownie", count: 10 },
+      accounts: [getDeployerAccount("rsktestnet") || ""],
       chainId: 31,
       gasMultiplier: 1.25
       //timeout: 20000, // increase if needed; 20000 is the default value
       //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
     },
+    rskforkedtestnet: {
+      url: "http://127.0.0.1:8545/",
+      accounts: [getDeployerAccount("rsktestnet") || Wallet.createRandom().privateKey],
+      // regtest default prefunded account
+      //from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+      from: "0xeb19817335e5565cf9c4a791d58c2bfa0ce032c7",
+      chainId: 31337,
+      gasMultiplier: 1.25
+    },
     rsksovrynmainnet: {
       url: "https://mainnet.sovryn.app/rpc",
       chainId: 30,
-      accounts: [deployerAccount]
+      accounts: [getDeployerAccount("rsksovrynmainnet") || ""]
       //timeout: 20000, // increase if needed; 20000 is the default value
-    }
+    },
+    rskforkedmainnet: {
+      url: "http://localhost:4444/",
+      accounts: [getDeployerAccount("rsksovrynmainnet") || Wallet.createRandom().privateKey],
+      // regtest default prefunded account
+      //from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
+      from: "0xeb19817335e5565cf9c4a791d58c2bfa0ce032c7",
+      chainId: 31337
+    },
   },
   paths: {
     artifacts,
@@ -395,8 +442,8 @@ task("deploy", "Deploys the contracts to the network")
         balanceBefore: balBefore.toString()
       });
 
-      const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet"];
-      const testnets = ["rsksovryntestnet", "rsktestnet"];
+      const mainnets = ["mainnet", "rsksovrynmainnet", "rskmainnet", "rskforkedmainnet"];
+      const testnets = ["rsksovryntestnet", "rsktestnet", "rskforkedtestnet"];
 
       const isMainnet: boolean = mainnets.indexOf(env.network.name) !== -1;
       useRealPriceFeed ??= isMainnet;
@@ -453,12 +500,14 @@ task("deploy", "Deploys the contracts to the network")
   );
 
 type DeployZUSDToken = {
+  doInitialize: boolean;
   channel: string;
 };
 
 task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous deployment")
+  .addFlag("doInitialize", "Will use ZUSDTokenTestnet contract to allow reinitialization which otherwise is invalid")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
-  .setAction(async ({ channel }: DeployZUSDToken, hre) => {
+  .setAction(async ({ doInitialize, channel }: DeployZUSDToken, hre) => {
     const [deployer] = await hre.ethers.getSigners();
     const deployment = getDeploymentData(hre.network.name, channel);
     const {
@@ -470,7 +519,8 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
 
     console.log("Deploying new ZUSD token logic for testnet");
     // NOTE this script should only be executed on testnet
-    const zusdTokenFactory = await hre.ethers.getContractFactory("ZUSDTokenTestnet");
+    const tokenContractName = doInitialize ? "ZUSDTokenTestnet" : "ZUSDToken";
+    const zusdTokenFactory = await hre.ethers.getContractFactory(tokenContractName);
     const zusdTokenContract = await(await zusdTokenFactory.deploy()).deployed();
 
     const zusdTokenProxy = (await hre.ethers.getContractAt(
@@ -480,20 +530,21 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     ) as unknown) as UpgradableProxy;
 
     //set new implementation
+    const oldZUSDAddress = await zusdTokenProxy.getImplementation();
     await zusdTokenProxy.setImplementation(zusdTokenContract.address);
     console.log("Initializing new ZUSD token with the correct dependencies");
 
     const zusdToken = ((await hre.ethers.getContractAt(
-      "ZUSDTokenTestnet",
+      tokenContractName,
       zusdTokenAddress,
       deployer
     )) as unknown) as ZUSDToken;
-    //call initialize on the new zusdToken by calling proxy
-    await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+    //call initialize on the new zusdToken by calling proxy - not possible
 
-    const oldZUSDAddress = await zusdTokenProxy.getImplementation();
+    if (doInitialize)
+      await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+
     console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
-
     const newZUSDAddress = await zusdTokenProxy.getImplementation();
     console.log("Implementation address changed to " + newZUSDAddress);
   });
@@ -533,9 +584,10 @@ task("getCurrentZUSDImplementation", "Logs to console current ZUSD implementatio
       zusdTokenAddress,
       deployer
     )) as unknown) as UpgradableProxy;
+    console.log("ZUSD Proxy adddress: " + zusdTokenProxy.address);
 
     const zusdImplementationAddress = await zusdTokenProxy.getImplementation();
-    console.log("Current implelentation address is: " + zusdImplementationAddress);
+    console.log("ZUSD implelentation address: " + zusdImplementationAddress);
 
     const zusdToken = ((await hre.ethers.getContractAt(
       "ZUSDToken",
@@ -549,8 +601,6 @@ task("getCurrentZUSDImplementation", "Logs to console current ZUSD implementatio
       deployer
     )) as unknown) as ZEROToken;
 
-    const address = await zusdToken.address;
-    console.log("Address ZUSD: " + address);
     /*await zeroToken.mint("0x0", 100);
     await zeroToken.mint(deployer.address, 100);
     console.log("Try mint ZERO");*/

@@ -38,7 +38,15 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
-    ) public initializer onlyOwner {
+    ) public virtual initializer onlyOwner {
+        _initialize(_troveManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress);
+    }
+
+    function _initialize(
+        address _troveManagerAddress,
+        address _stabilityPoolAddress,
+        address _borrowerOperationsAddress
+    ) internal {
         checkContract(_troveManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_borrowerOperationsAddress);

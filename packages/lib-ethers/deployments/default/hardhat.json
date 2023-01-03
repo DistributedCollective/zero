@@ -1,7 +1,7 @@
 {
   "chainId": 31337,
-  "version": "ad6b5567ba07bfc25dda7c5355faa090dbaf92f6",
-  "deploymentDate": 1637363626000,
+  "version": "a7adb932e73b8af5c84a708dcb81b19335b6d8f7",
+  "deploymentDate": 1672709236000,
   "bootstrapPeriod": 1209600,
   "governanceAddress": "0x31c57298578f7508B5982062cfEc5ec8BD346247",
   "sovFeeCollectorAddress": "0x3B22f0466d98bE3040d2c51dE89b0479FDD48910",

@@ -2,6 +2,7 @@ import assert from "assert";
 import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
 import { Contract, ethers } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
 import {
   _connectToContracts,
   _LiquityContractAddresses,
@@ -14,6 +15,11 @@ import upgradeableProxy from "../abi/TroveManagerRedeemOps.json";
 import { Ownable } from "../types";
 
 let silent = true;
+
+const ONE_DAY_IN_SECONDS = 86400;
+const ONE_MINUTE = 60;
+const TWO_WEEKS = 14 * ONE_DAY_IN_SECONDS;
+
 
 export type OracleAddresses =
   | {
@@ -65,8 +71,10 @@ const deployContractWithProxy: (
 ) => Promise<string> = async (...p) => {
   const [contract] = await deployContractAndGetBlockNumber(...p);
 
+  log('p: ', p);
+
   log(`Deploying Proxy for ${p[2]} ...`);
-  const proxyContract = await (await p[1]("UpgradableProxy", p[0])).deploy(p[3]);
+  const proxyContract = await (await p[1]("UpgradableProxy", p[0])).deploy(p[p.length - 1]);
 
   log(`Waiting for transaction ${proxyContract.deployTransaction.hash} ...`);
   const receipt = await proxyContract.deployTransaction.wait();
@@ -106,6 +114,8 @@ const deployContracts = async (
     }
   );
 
+  const BOOTSTRAP_PERIOD = BigNumber.from((isMainnet || notTestnet ? TWO_WEEKS : ONE_MINUTE).toString());
+
   const addresses = {
     activePool: await deployContractWithProxy(deployer, getContractFactory, "ActivePool", {
       ...overrides
@@ -118,15 +128,11 @@ const deployContracts = async (
         ...overrides
       }
     ),
-    troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
-      ...overrides
-    }),
+    
+    troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", BOOTSTRAP_PERIOD, {  ...overrides }),
 
-    troveManagerRedeemOps: isMainnet || notTestnet
-      ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
-      : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
-          ...overrides
-        }),
+    troveManagerRedeemOps: await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", BOOTSTRAP_PERIOD , {  ...overrides }),
+    
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),

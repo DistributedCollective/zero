@@ -8,6 +8,7 @@ import "../Interfaces/IBorrowerOperations.sol";
 import "./TroveManagerBase.sol";
 
 /// This contract is designed to be used via delegatecall from the TroveManager contract
+/// TroveManagerBase constructor param is bootsrap period when redemptions are not allowed
 contract TroveManagerRedeemOps is TroveManagerBase {
     /** Send _ZUSDamount ZUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
       request.  Applies pending rewards to a Trove before reducing its debt and coll.
@@ -30,6 +31,9 @@ contract TroveManagerRedeemOps is TroveManagerBase {
       redemption will stop after the last completely redeemed Trove and the sender will keep the remaining ZUSD amount, which they can attempt
       to redeem later.
      */
+
+    constructor(uint256 _bootstrapPeriod) public TroveManagerBase(_bootstrapPeriod) {}
+
     function redeemCollateral(
         uint256 _ZUSDamount,
         address _firstRedemptionHint,

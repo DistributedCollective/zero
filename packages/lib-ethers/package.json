@@ -31,7 +31,8 @@
     "test": "hardhat test",
     "test-live": "run-s test-live:*",
     "test-live:check-version": "run-s check-live-version",
-    "test-live:run": "cross-env USE_LIVE_VERSION=true hardhat test"
+    "test-live:run": "cross-env USE_LIVE_VERSION=true hardhat test",
+    "postinstall": "patch-package"
   },
   "peerDependencies": {
     "@sovryn-zero/lib-base": "^3.0.0",
@@ -58,8 +59,9 @@
     "eslint-plugin-tsdoc": "0.2.11",
     "ethers": "5.0.32",
     "fs-extra": "9.1.0",
-    "hardhat": "2.1.1",
+    "hardhat": "^2.12.5",
     "npm-run-all": "4.1.5",
+    "patch-package": "^6.5.0",
     "ts-node": "9.1.1",
     "typescript": "4.1.5"
   }

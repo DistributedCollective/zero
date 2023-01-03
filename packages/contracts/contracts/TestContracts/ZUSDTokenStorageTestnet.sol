@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
-contract ZUSDTokenStorageTestnet {
+import "../Dependencies/Initializable.sol";
+
+contract ZUSDTokenStorageTestnet is Initializable {
     uint256 internal _totalSupply;
     string internal constant _NAME = "ZUSD Stablecoin";
     string internal constant _SYMBOL = "ZUSD";

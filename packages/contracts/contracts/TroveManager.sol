@@ -33,6 +33,9 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     event ZEROTokenAddressChanged(address _zeroTokenAddress);
     event ZEROStakingAddressChanged(address _zeroStakingAddress);
 
+    ///@param _bootstrapPeriod During bootsrap period redemptions are not allowed
+    constructor(uint256 _bootstrapPeriod) public TroveManagerBase(_bootstrapPeriod) {}
+
     // --- Dependency setter ---
     function setAddresses(
         TroveManagerInitAddressesParams memory _troveManagerInitAddressesParams

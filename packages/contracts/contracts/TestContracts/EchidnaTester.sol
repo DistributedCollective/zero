@@ -53,8 +53,8 @@ contract EchidnaTester {
 
     constructor() public payable {
         liquityBaseParams = new LiquityBaseParams();
-        troveManagerRedeemOps = new TroveManagerRedeemOps();
-        troveManager = new TroveManager();
+        troveManagerRedeemOps = new TroveManagerRedeemOps(14 * 86400);
+        troveManager = new TroveManager(14 days);
         borrowerOperations = new BorrowerOperations();
         activePool = new ActivePool();
         defaultPool = new DefaultPool();
