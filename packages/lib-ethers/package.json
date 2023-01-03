@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "7.13.2",
-    "@nomiclabs/hardhat-ethers": "2.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@types/chai": "4.2.15",
     "@types/chai-as-promised": "7.1.3",
     "@types/chai-spies": "1.0.3",
