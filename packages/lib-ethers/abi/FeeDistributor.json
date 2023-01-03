@@ -63,11 +63,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_sovFeeCollectorAddress",
+        "name": "_feeCollectorAddress",
         "type": "address"
       }
     ],
-    "name": "SOVFeeCollectorAddressChanged",
+    "name": "FeeCollectorAddressChanged",
     "type": "event"
   },
   {
@@ -211,7 +211,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_sovFeeCollectorAddress",
+        "name": "_feeCollectorAddress",
         "type": "address"
       },
       {

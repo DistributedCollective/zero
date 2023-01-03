@@ -12,7 +12,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     using SafeMath for uint256;
     // --- Events ---
 
-    event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
+    event FeeCollectorAddressChanged(address _feeCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
     event TroveManagerAddressChanged(address _troveManagerAddress);
@@ -26,7 +26,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     // --- Dependency setters ---
 
     function setAddresses(
-        address _sovFeeCollectorAddress,
+        address _feeCollectorAddress,
         address _zeroStakingAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
@@ -34,7 +34,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         address _zusdTokenAddress,
         address _activePoolAddress
     ) external override onlyOwner {
-        checkContract(_sovFeeCollectorAddress);
+        checkContract(_feeCollectorAddress);
         checkContract(_zeroStakingAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
@@ -42,7 +42,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         checkContract(_zusdTokenAddress);
         checkContract(_activePoolAddress);
 
-        sovFeeCollector = IFeeSharingProxy(_sovFeeCollectorAddress);
+        sovFeeCollector = IFeeSharingProxy(_feeCollectorAddress);
         zeroStaking = IZEROStaking(_zeroStakingAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
@@ -53,7 +53,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         // Not entirely removing this as per request from @light
         FEE_TO_SOV_COLLECTOR = LiquityMath.DECIMAL_PRECISION; // 100%
 
-        emit SOVFeeCollectorAddressChanged(_sovFeeCollectorAddress);
+        emit FeeCollectorAddressChanged(_feeCollectorAddress);
         emit ZeroStakingAddressChanged(_zeroStakingAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);

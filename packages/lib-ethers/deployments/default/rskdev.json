@@ -4,7 +4,7 @@
   "deploymentDate": 1637757544000,
   "bootstrapPeriod": 1209600,
   "governanceAddress": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-  "sovFeeCollectorAddress": "0x77045E71a7A2c50903d88e564cD72fab11e82051",
+  "feeCollectorAddress": "0x77045E71a7A2c50903d88e564cD72fab11e82051",
   "wrbtcAddress": "0xDA7Ce79725418F4F6E13Bf5F520C89Cec5f6A974",
   "presaleAddress": "0x83C5541A6c8D2dBAD642f385d8d06Ca9B6C731ee",
   "marketMakerAddress": "0xE0825f57Dd05Ef62FF731c27222A86E104CC4Cad",

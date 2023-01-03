@@ -28,6 +28,13 @@ export type OracleAddresses =
     }
   | undefined;
 
+export type MyntAddresses =
+  {
+      massetManagerAddress: string;
+      nueTokenAddress: string; // DLLR (mynt token) address 
+  }
+  | undefined;
+
 export const log = (...args: unknown[]): void => {
   if (!silent) {
     console.log(...args);
@@ -229,7 +236,7 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
-  sovFeeCollectorAddress: string,
+  feeCollectorAddress: string,
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
@@ -374,7 +381,7 @@ const connectContracts = async (
 
     nonce =>
       feeDistributor.setAddresses(
-        sovFeeCollectorAddress,
+        feeCollectorAddress,
         zeroStaking.address,
         borrowerOperations.address,
         troveManager.address,
@@ -556,10 +563,9 @@ export const deployAndSetupContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   externalPriceFeeds: OracleAddresses = undefined,
-
   _isDev = true,
   governanceAddress?: string,
-  sovFeeCollectorAddress?: string,
+  feeCollectorAddress?: string,
   wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
@@ -573,7 +579,7 @@ export const deployAndSetupContracts = async (
   }
 
   governanceAddress ??= await deployer.getAddress();
-  sovFeeCollectorAddress ??= await deployContract(
+  feeCollectorAddress ??= await deployContract(
     deployer,
     getContractFactory,
     "MockFeeSharingProxy",
@@ -606,7 +612,7 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     governanceAddress,
-    sovFeeCollectorAddress,
+    feeCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
@@ -631,7 +637,7 @@ export const deployAndSetupContracts = async (
     contracts,
     deployer,
     governanceAddress,
-    sovFeeCollectorAddress,
+    feeCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
