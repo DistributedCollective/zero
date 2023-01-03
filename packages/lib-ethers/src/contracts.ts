@@ -228,6 +228,8 @@ export interface _LiquityDeploymentJSON {
   readonly wrbtcAddress?: string;
   readonly presaleAddress?: string;
   readonly marketMakerAddress?: string;
+  readonly myntMassetManagerAddress?: string;
+  readonly myntNueTokenAddress?: string;
   readonly _priceFeedIsTestnet: boolean;
   readonly _isDev: boolean;
 }

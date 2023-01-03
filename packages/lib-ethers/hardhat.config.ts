@@ -130,7 +130,7 @@ const oracleAddresses: Record<string, OracleAddresses> = {
   }
 };
 
-const MyntAddresses: Record<string, MyntAddresses> = {
+const myntAddresses: Record<string, MyntAddresses> = {
   rsksovrynmainnet: {
     massetManagerAddress: "",
     nueTokenAddress: ""
@@ -154,7 +154,7 @@ const hasOracles = (network: string): boolean => network in oracleAddresses;
 const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
   network in governanceAddresses;
 
-const hasSovFeeCollector = (network: string): network is keyof typeof feeCollectorAddresses =>
+const hasFeeCollector = (network: string): network is keyof typeof feeCollectorAddresses =>
   network in feeCollectorAddresses;
 
 const hasWrbtc = (network: string): network is keyof typeof wrbtcAddresses =>
@@ -168,6 +168,8 @@ const hasMarketMaker = (network: string): network is keyof typeof marketMakerAdd
 
 const hasZusdToken = (network: string): network is keyof typeof zusdTokenAddresses =>
   network in zusdTokenAddresses;
+
+const hasMyntAddresses = (network: string): boolean => network in myntAddresses;
 
 const getDeployerAccount = (network: string) => {
   return deployerPrivateKeys[network];
@@ -249,6 +251,22 @@ const config: HardhatUserConfig = {
   }
 };
 
+type DeployLiquityParams = {
+    deployer: Signer,
+    governanceAddress?: string;
+    feeCollectorAddress?: string;
+    wrbtcAddress?: string;
+    externalPriceFeeds?: OracleAddresses;
+    presaleAddress?: string;
+    marketMakerAddress?: string;
+    zusdTokenAddress?: string;
+    massetManagerAddress?: string;
+    nueTokenAddress?: string;
+    isMainnet?: boolean;
+    notTestnet?: boolean;
+    overrides?: Overrides;
+}
+
 declare module "hardhat/types/runtime" {
   interface HardhatRuntimeEnvironment {
     deployLiquity: (
@@ -260,6 +278,8 @@ declare module "hardhat/types/runtime" {
       presaleAddress?: string,
       marketMakerAddress?: string,
       zusdTokenAddress?: string,
+      myntMassetManagerAddress?: string,
+      myntNueTokenAddress?: string,
       isMainnet?: boolean,
       notTestnet?: boolean,
       overrides?: Overrides
@@ -295,24 +315,28 @@ extendEnvironment(env => {
     presaleAddress,
     marketMakerAddress,
     zusdTokenAddress,
+    myntMassetManagerAddress,
+    myntNueTokenAddress,
     isMainnet?: boolean,
     notTestnet?: boolean,
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
-      deployer,
-      getContractFactory(env),
-      externalPriceFeeds,
-      env.network.name === "dev",
-      governanceAddress,
-      feeCollectorAddress,
-      wrbtcAddress,
-      presaleAddress,
-      marketMakerAddress,
-      zusdTokenAddress,
-      isMainnet,
-      notTestnet,
-      overrides
+        deployer,
+        getContractFactory(env),
+        externalPriceFeeds,
+        env.network.name === "dev",
+        governanceAddress,
+        feeCollectorAddress,
+        wrbtcAddress,
+        presaleAddress,
+        marketMakerAddress,
+        zusdTokenAddress,
+        myntMassetManagerAddress,
+        myntNueTokenAddress,
+        isMainnet,
+        notTestnet,
+        overrides
     );
 
     return { ...deployment, version: contractsVersion };
@@ -477,7 +501,7 @@ task("deploy", "Deploys the contracts to the network")
       governanceAddress ??= hasGovernance(env.network.name)
         ? governanceAddresses[env.network.name]
         : undefined;
-      feeCollectorAddress ??= hasSovFeeCollector(env.network.name)
+      feeCollectorAddress ??= hasFeeCollector(env.network.name)
         ? feeCollectorAddresses[env.network.name]
         : undefined;
       wrbtcAddress ??= hasWrbtc(env.network.name) ? wrbtcAddresses[env.network.name] : undefined;
@@ -490,6 +514,13 @@ task("deploy", "Deploys the contracts to the network")
       zusdTokenAddress ??= hasZusdToken(env.network.name)
         ? zusdTokenAddresses[env.network.name]
         : undefined;
+      const myntMassetManagerAddress = hasMyntAddresses(env.network.name) && myntAddresses[env.network.name]?.massetManagerAddress
+        ? myntAddresses[env.network.name]?.massetManagerAddress
+        : undefined;
+      const myntNueTokenAddress = hasMyntAddresses(env.network.name) && myntAddresses[env.network.name]?.nueTokenAddress
+        ? myntAddresses[env.network.name]?.nueTokenAddress
+        : undefined;
+      
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
@@ -499,6 +530,8 @@ task("deploy", "Deploys the contracts to the network")
         presaleAddress,
         marketMakerAddress,
         zusdTokenAddress,
+        myntMassetManagerAddress,
+        myntNueTokenAddress,
         isMainnet,
         notTestnet,
         overrides

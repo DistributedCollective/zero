@@ -14,3 +14,4 @@ then run prepare script in the contracts folder
 then run tests from the lib-ethers and contracts folders
 if all good then run the deployment for rsktestnet network
 
+hh task deploy -> deployLiquity -> deploy.ts[deployAndSetupContracts]
