@@ -78,8 +78,6 @@ const deployContractWithProxy: (
 ) => Promise<string> = async (...p) => {
   const [contract] = await deployContractAndGetBlockNumber(...p);
 
-  log('p: ', p);
-
   log(`Deploying Proxy for ${p[2]} ...`);
   const proxyContract = await (await p[1]("UpgradableProxy", p[0])).deploy(p[p.length - 1]);
 
@@ -240,6 +238,7 @@ const connectContracts = async (
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
+  myntMassetManagerAddress?: string,
   zusdTokenAddress?: string,
   overrides?: Overrides
 ) => {
@@ -310,7 +309,6 @@ const connectContracts = async (
         zeroStaking.address,
         { ...overrides, nonce }
       ),
-
     nonce =>
       stabilityPool.setAddresses(
         liquityBaseParams.address,
@@ -391,7 +389,7 @@ const connectContracts = async (
         { ...overrides, nonce }
       )
   ];
-  // Initialize zero token if no address in config file for this network context
+  // Initialize ZUSD token if no address in config file for this network context
   if (!zusdTokenAddress) {
     connections = [
       nonce =>
@@ -406,6 +404,15 @@ const connectContracts = async (
         ),
       ...connections
     ];
+  }
+
+  if (myntMassetManagerAddress) {
+    connections = [
+      nonce =>
+        borrowerOperations.setMassetManagerAddress(myntMassetManagerAddress, { ...overrides, nonce }),
+      ...connections
+    ];
+   
   }
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
@@ -570,6 +577,8 @@ export const deployAndSetupContracts = async (
   presaleAddress?: string,
   marketMakerAddress?: string,
   zusdTokenAddress?: string,
+  myntMassetManagerAddress?: string,
+  myntNueTokenAddress?: string,
   isMainnet?: boolean,
   notTestnet?: boolean,
   overrides?: Overrides
@@ -578,7 +587,12 @@ export const deployAndSetupContracts = async (
     throw new Error("Signer must have a provider.");
   }
 
+  if (isMainnet && !(feeCollectorAddress && wrbtcAddress)) {
+    throw new Error("Mainnet requires feeCollectorAddress and wrbtcAddress.")
+  }
+
   governanceAddress ??= await deployer.getAddress();
+  
   feeCollectorAddress ??= await deployContract(
     deployer,
     getContractFactory,
@@ -616,6 +630,8 @@ export const deployAndSetupContracts = async (
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
+    myntMassetManagerAddress,
+    myntNueTokenAddress,
     _priceFeedIsTestnet,
     _isDev,
 
@@ -641,6 +657,7 @@ export const deployAndSetupContracts = async (
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
+    myntMassetManagerAddress,
     zusdTokenAddress,
     overrides
   );

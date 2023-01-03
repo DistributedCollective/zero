@@ -109,7 +109,7 @@ const hasOracles = (network: string): boolean => network in oracleAddresses;
 const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
   network in governanceAddresses;
 
-const hasSovFeeCollector = (network: string): network is keyof typeof feeCollectorAddresses =>
+const hasFeeCollector = (network: string): network is keyof typeof feeCollectorAddresses =>
   network in feeCollectorAddresses;
 
 const hasWrbtc = (network: string): network is keyof typeof wrbtcAddresses =>
@@ -290,7 +290,7 @@ task("deploy", "Deploys the contracts to the network")
       governanceAddress ??= hasGovernance(env.network.name)
         ? governanceAddresses[env.network.name]
         : undefined;
-      feeCollectorAddress ??= hasSovFeeCollector(env.network.name)
+      feeCollectorAddress ??= hasFeeCollector(env.network.name)
         ? feeCollectorAddresses[env.network.name]
         : undefined;
         wrbtcAddress ??= hasWrbtc(env.network.name)

@@ -1043,9 +1043,9 @@ export interface FeeDistributor
   readonly filters: {
     ActivePoolAddressSet(_activePoolAddress?: null): EventFilter;
     BorrowerOperationsAddressChanged(_borrowerOperationsAddress?: null): EventFilter;
+    FeeCollectorAddressChanged(_feeCollectorAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     RBTCistributed(_rbtcDistributedAmount?: null): EventFilter;
-    FeeCollectorAddressChanged(_feeCollectorAddress?: null): EventFilter;
     TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
     WrbtcAddressChanged(_wrbtcAddress?: null): EventFilter;
     ZUSDDistributed(_zusdDistributedAmount?: null): EventFilter;
@@ -1054,9 +1054,9 @@ export interface FeeDistributor
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressSet"): _TypedLogDescription<{ _activePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _borrowerOperationsAddress: string }>[];
+  extractEvents(logs: Log[], name: "FeeCollectorAddressChanged"): _TypedLogDescription<{ _feeCollectorAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "RBTCistributed"): _TypedLogDescription<{ _rbtcDistributedAmount: BigNumber }>[];
-  extractEvents(logs: Log[], name: "FeeCollectorAddressChanged"): _TypedLogDescription<{ _feeCollectorAddress: string }>[];
   extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "WrbtcAddressChanged"): _TypedLogDescription<{ _wrbtcAddress: string }>[];
   extractEvents(logs: Log[], name: "ZUSDDistributed"): _TypedLogDescription<{ _zusdDistributedAmount: BigNumber }>[];

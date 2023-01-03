@@ -29,6 +29,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_feeCollectorAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FeeCollectorAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -55,19 +68,6 @@
       }
     ],
     "name": "RBTCistributed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_feeCollectorAddress",
-        "type": "address"
-      }
-    ],
-    "name": "FeeCollectorAddressChanged",
     "type": "event"
   },
   {
