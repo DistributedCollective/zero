@@ -64,7 +64,6 @@ const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eef
 const governanceAddresses = {
   mainnet: "",
   rsksovrynmainnet: "0x967c84b731679E36A344002b8E3CE50620A7F69f",
-  rsktestnet: "0xaC0784a1a3eB5AE6b39F6264C94CD490c6D225D7",
   dev: "0x0000000000000000000000000000000000000003"
 };
 
@@ -99,7 +98,7 @@ const presaleAddresses = {
 };
 
 const zusdTokenAddresses = {
-  rsktestnet: "0x6b41566353d6C7B8C2a7931d498F11489DacAc29",
+  rsktestnet: "0xe67cbA98C183A1693fC647d63AeeEC4053656dBB",
   dev: ""
 };
 
