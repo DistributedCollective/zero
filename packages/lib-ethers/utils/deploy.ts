@@ -690,8 +690,18 @@ export const deployAndSetupContracts = async (
     await tx.wait();
   }
 
-  log("Transferring Ownership...");
-  await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
+  if (governanceAddress && governanceAddress != await deployer.getAddress()) {
+    log("Transferring Ownership...");
+    try {
+      await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
+    } catch (error) {
+      console.log("Not all contracts ownership has been transferred:");
+      console.error(error);
+    }
+  } else {
+    console.log(`No governance address set for this network ${(await (deployer.provider.getNetwork())).name} #${deployment.chainId}. No ownership transferred.`);
+  }
+  
 
   const zeroTokenDeploymentTime = await contracts.zeroToken.getDeploymentStartTime();
   const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();
