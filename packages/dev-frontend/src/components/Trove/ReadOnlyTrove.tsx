@@ -29,6 +29,7 @@ export const ReadOnlyTrove: React.FC = () => {
             label="Collateral"
             inputId="trove-collateral"
             amount={trove.collateral.prettify(4)}
+            value={trove.collateral}
             unit="RBTC"
           />
 
@@ -36,6 +37,7 @@ export const ReadOnlyTrove: React.FC = () => {
             label="Debt"
             inputId="trove-debt"
             amount={trove.debt.prettify()}
+            value={trove.debt}
             unit={COIN}
           />
         </Flex>

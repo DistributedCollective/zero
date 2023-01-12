@@ -97,6 +97,7 @@ export const Convert: React.FC = () => {
             label="&nbsp;"
             inputId="convert-from-zusd"
             amount={zusdAmount.prettify()}
+            value={zusdAmount}
             unit={COIN}
             {...{ editingState: editingStateZUSD }}
             editedAmount={zusdAmount.toString(18)}
@@ -129,6 +130,7 @@ export const Convert: React.FC = () => {
             label={`Aggregator Balance: ${zusdAggregatorBalance.prettify()} ${COIN}`}
             inputId="convert-from-xusd"
             amount={xusdAmount.prettify()}
+            value={xusdAmount}
             unit={XUSD}
             {...{ editingState: editingStateXUSD }}
             editedAmount={xusdAmount.toString(18)}

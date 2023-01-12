@@ -206,7 +206,7 @@ The partially redeemed Line of Credit is re-inserted into the sorted list of Lin
 
 ### Full redemption
 
-A Line of Credit is defined as "fully redeemed from" when the redemption has caused (debt-200) of its debt to absorb (debt-200) ZUSD. Then, its 200 ZUSD Liquidation Reserve is canceled with its remaining 200 debt: the Liquidation Reserve is burned from the gas address, and the 200 debt is zeroed.
+A Line of Credit is defined as "fully redeemed from" when the redemption has caused (debt-20) of its debt to absorb (debt-20) ZUSD. Then, its 20 ZUSD Liquidation Reserve is canceled with its remaining 20 debt: the Liquidation Reserve is burned from the gas address, and the 20 debt is zeroed.
 
 Before closing, we must handle the Line of Credit **collateral surplus**: that is, the excess RBTC collateral remaining after redemption due to its initial over-collateralization.
 
@@ -786,7 +786,7 @@ However, gas costs in RSK can be substantial. If the gas costs of our public liq
 
 The protocol thus directly compensates liquidators for their gas costs, to incentivize prompt liquidations in both normal and extreme periods of high gas prices. Liquidators should be confident that they will at least break even by making liquidation transactions.
 
-Gas compensation is paid in a mix of ZUSD and RBTC. While the RBTC is taken from the liquidated Line of Credit , the ZUSD is provided by the borrower. When a borrower first issues debt, some ZUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws RBTC from the Line(s) of Credit it liquidates, and sends the both the reserved ZUSD and the compensation in RBTC to the caller, and liquidates the remainder.
+Gas compensation is paid in a mix of ZUSD and RBTC. While the RBTC is taken from the liquidated Line of Credit, the ZUSD is provided by the borrower. When a borrower first issues debt, some ZUSD is reserved as a Liquidation Reserve. A liquidation transaction thus draws RBTC from the Line(s) of Credit it liquidates, and sends both the reserved ZUSD and the compensation in RBTC to the caller, and liquidates the remainder.
 
 When a liquidation transaction liquidates multiple Lines of Credit, each Line of Credit contributes ZUSD and RBTC towards the total compensation for the transaction.
 
@@ -795,7 +795,7 @@ Gas compensation per liquidated Line of Credit is given by the formula:
 Gas compensation = `20 ZUSD + 0.5% of Line of Credit’s collateral (RBTC)`
 
 The intentions behind this formula are:
-- To ensure that smaller Lines of Credit are liquidated promptly in normal times, at least
+- To ensure that smaller Lines of Credit are liquidated promptly in normal times, at least.
 - To ensure that larger Lines of Credit are liquidated promptly even in extreme high gas price periods. The larger the Line of Credit, the stronger the incentive to liquidate it.
 
 ### Gas compensation schedule

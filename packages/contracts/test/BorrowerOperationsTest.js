@@ -48,7 +48,7 @@ contract("BorrowerOperations", async accounts => {
     frontEnd_1,
     frontEnd_2,
     frontEnd_3,
-    sovFeeCollector
+    feeSharingCollector
   ] = accounts;
 
   const multisig = accounts[999];

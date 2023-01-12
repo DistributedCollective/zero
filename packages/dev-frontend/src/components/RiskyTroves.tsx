@@ -22,6 +22,7 @@ import { LoadingOverlay } from "./LoadingOverlay";
 import { Transaction } from "./Transaction";
 import { Tooltip } from "./Tooltip";
 import { Abbreviation } from "./Abbreviation";
+import { Amount } from "./ActionDescription";
 
 const liquidatableInNormalMode = (trove: UserTrove, price: Decimal) =>
   [trove.collateralRatioIsBelowMinimum(price), "Collateral ratio not low enough"] as const;
@@ -298,14 +299,14 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                       </Flex>
                     </td>
                     <td>
-                      <Abbreviation short={trove.collateral.shorten()}>
+                      <Amount sx={{ whiteSpace: "nowrap" }} value={trove.collateral}>
                         {trove.collateral.prettify(4)}
-                      </Abbreviation>
+                      </Amount>
                     </td>
                     <td>
-                      <Abbreviation short={trove.debt.shorten()}>
-                        {trove.debt.prettify()}
-                      </Abbreviation>
+                      <Amount sx={{ whiteSpace: "nowrap" }} value={trove.debt}>
+                        {trove.debt.prettify(4)}
+                      </Amount>
                     </td>
                     <td>
                       {(collateralRatio => (
@@ -318,7 +319,9 @@ export const RiskyTroves: React.FC<RiskyTrovesProps> = ({ pageSize }) => {
                               : "danger"
                           }
                         >
-                          {new Percent(collateralRatio).prettify()}
+                          <Amount sx={{ whiteSpace: "nowrap" }} value={collateralRatio}>
+                            {new Percent(collateralRatio).prettify()}
+                          </Amount>
                         </Text>
                       ))(trove.collateralRatio(price))}
                     </td>

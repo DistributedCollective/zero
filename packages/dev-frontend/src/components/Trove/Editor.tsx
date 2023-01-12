@@ -1,6 +1,7 @@
 import { Decimal } from "@sovryn-zero/lib-base";
 import React, { useMemo, useState } from "react";
 import { Text, Flex, Label, Input, SxProp, Button, ThemeUICSSProperties } from "theme-ui";
+import { Amount } from "../ActionDescription";
 
 import { Icon } from "../Icon";
 
@@ -65,6 +66,7 @@ type StaticAmountsProps = {
   inputId: string;
   labelledBy?: string;
   amount: string;
+  value?: Decimal;
   unit?: string;
   color?: string;
   pendingAmount?: string;
@@ -84,7 +86,8 @@ export const StaticAmounts: React.FC<StaticAmountsProps & SxProp> = ({
   pendingColor,
   showTilde,
   onClick,
-  children
+  children,
+  value
 }) => {
   return (
     <Flex
@@ -103,9 +106,14 @@ export const StaticAmounts: React.FC<StaticAmountsProps & SxProp> = ({
     >
       <Flex sx={{ alignItems: "center", width: "100%", pr: 2 }}>
         {showTilde && <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0 }}>~&nbsp;</Text>}
-        <Text sx={{ color, fontWeight: "medium", textOverflow: "ellipsis", overflow: "hidden" }}>
+        <Amount
+          value={value}
+          sx={{ color, fontWeight: "medium", textOverflow: "ellipsis", overflow: "hidden" }}
+          hideTilde={showTilde}
+        >
           {amount}
-        </Text>
+        </Amount>
+
         {unit && (
           <Text sx={{ fontWeight: "light", opacity: 0.8, flexShrink: 0, flexGrow: 0 }}>
             &nbsp;{unit}
@@ -178,7 +186,8 @@ export const DisabledEditableRow: React.FC<DisabledEditableRowProps> = ({
   amount,
   color,
   pendingAmount,
-  pendingColor
+  pendingColor,
+  value
 }) => (
   <Row labelId={`${inputId}-label`} {...{ label, labelFor: inputId, unit }} sx={{ flex: 1, px: 2 }}>
     <Flex sx={{ alignItems: "center", position: "relative", mt: "4px" }}>
@@ -188,7 +197,7 @@ export const DisabledEditableRow: React.FC<DisabledEditableRowProps> = ({
           borderRadius: 8
         }}
         labelledBy={`${inputId}-label`}
-        {...{ inputId, amount, unit, color, pendingAmount, pendingColor }}
+        {...{ inputId, amount, unit, color, pendingAmount, pendingColor, value }}
       />
     </Flex>
   </Row>
@@ -216,7 +225,8 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   setEditedAmount,
   maxAmount,
   maxedOut,
-  hideMaxBtn = false
+  hideMaxBtn = false,
+  value
 }) => {
   const [editing, setEditing] = editingState;
   const [invalid, setInvalid] = useState(false);
@@ -277,7 +287,17 @@ export const EditableRow: React.FC<EditableRowProps> = ({
           }}
           labelledBy={`${inputId}-label`}
           onClick={() => setEditing(inputId)}
-          {...{ inputId, amount, unit, color, pendingAmount, pendingColor, invalid, showTilde }}
+          {...{
+            inputId,
+            amount,
+            unit,
+            color,
+            pendingAmount,
+            pendingColor,
+            invalid,
+            showTilde,
+            value
+          }}
         >
           {maxAmount && !hideMaxBtn && (
             <Button

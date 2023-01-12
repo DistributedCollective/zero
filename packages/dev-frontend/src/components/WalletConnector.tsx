@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 import { ConfirmPage } from "../pages/ConfirmPage";
 import { AccessPage } from "../pages/AccessPage";
 import { useConnectorContext } from "./Connector";
+
 interface MaybeHasMetaMask {
   ethereum?: {
     isMetaMask?: boolean;

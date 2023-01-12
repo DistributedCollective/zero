@@ -6,7 +6,7 @@ pragma solidity 0.6.11;
 interface IFeeDistributor {
     // --- Events ---
 
-    event SOVFeeCollectorAddressChanged(address _sovFeeCollectorAddress);
+    event FeeSharingCollectorAddressChanged(address _feeSharingCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
     event TroveManagerAddressChanged(address _troveManagerAddress);
@@ -22,7 +22,7 @@ interface IFeeDistributor {
     /**
      * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
-     * @param _sovFeeCollectorAddress SOVFeeCollector address
+     * @param _feeSharingCollectorAddress FeeSharingCollector address
      * @param _zeroStakingAddress ZEROStaking contract address
      * @param _borrowerOperationsAddress borrowerOperations contract address
      * @param _troveManagerAddress TroveManager contract address
@@ -31,7 +31,7 @@ interface IFeeDistributor {
      * @param _activePoolAddress ActivePool contract address
      */
     function setAddresses(
-        address _sovFeeCollectorAddress,
+        address _feeSharingCollectorAddress,
         address _zeroStakingAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
