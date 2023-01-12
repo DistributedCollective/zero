@@ -1,8 +1,12 @@
 # PUBLISH SDK PACKAGES GUIDELINES
 ## **Typescript SDK** 
-Currently semantic-versioning is used for publishing automation for `lib-ethers` (typescript SDK).  
-Git Actions CI runs `semantic-release` to publish `lib-base`, `lib-ethers`, `contracts` and `sdk-contracts`  packages.  
-
+Currently `semantic-versioning` is setup but disabled for publishing automation for `lib-ethers` (typescript SDK).  
+If enabled Git Actions CI runs `semantic-release` to publish `lib-base`, `lib-ethers`, `contracts` and `sdk-contracts`  packages.  
+Most likely we will be using semi-manual publishing to mitigate human factor.  
+Untill then we are using manual packages publishing:
+- merge a branch to be published into `sdk-early-access` (to be renamed to to `sdk-publish`)  
+- bump packages versions to publish in `package.json` 
+- follow the instructions below  
 
 
 ## **Solidity contracts (libraries)**  
@@ -25,5 +29,14 @@ Import SDK libraries in contracts like this
 ```javascript
 import "@sovryn-zero/contracts/libraries/BorrowerLib.sol";
 ```  
-#TODO:  
-[ ] Add detailed explanation of semantic-release publishing process
+
+## typescript library `lib-ethers`
+### lib-ethers
+from the lib-ethers package:  
+- run CLI `yarn do-prepare`
+- remove unwanted for this release changes as needed
+- run `yarn  publish`
+- check package is successfully published
+- create a tag e.g. lib-ethers/v1.0.0-earl.access.2 with -m "expose private _findHints -> public findHints"
+
+

@@ -29,6 +29,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_feeSharingCollectorAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FeeSharingCollectorAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -55,19 +68,6 @@
       }
     ],
     "name": "RBTCistributed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_feeCollectorAddress",
-        "type": "address"
-      }
-    ],
-    "name": "FeeCollectorAddressChanged",
     "type": "event"
   },
   {
@@ -137,7 +137,7 @@
   },
   {
     "inputs": [],
-    "name": "FEE_TO_SOV_COLLECTOR",
+    "name": "FEE_TO_FEE_SHARING_COLLECTOR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -196,6 +196,19 @@
   },
   {
     "inputs": [],
+    "name": "feeSharingCollector",
+    "outputs": [
+      {
+        "internalType": "contract IFeeSharingCollector",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getOwner",
     "outputs": [
       {
@@ -211,7 +224,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_feeCollectorAddress",
+        "name": "_feeSharingCollectorAddress",
         "type": "address"
       },
       {
@@ -254,11 +267,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "FEE_TO_SOV_COLLECTOR_",
+        "name": "FEE_TO_FEE_SHARING_COLLECTOR_",
         "type": "uint256"
       }
     ],
-    "name": "setFeeToSOVCollector",
+    "name": "setFeeToFeeSharingCollector",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -274,19 +287,6 @@
     "name": "setOwner",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "feeCollector",
-    "outputs": [
-      {
-        "internalType": "contract IFeeSharingProxy",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
