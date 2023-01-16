@@ -54,6 +54,7 @@ const generateRandomAccounts = (numberOfAccounts: number) => {
 const deployerPrivateKeys: { [key: string]: string | undefined } = {
   dev: process.env.DEPLOYER_PK_TESTNET,
   rsktestnet: process.env.DEPLOYER_PK_TESTNET,
+  rsksovryntestnet: process.env.DEPLOYER_PK_TESTNET,
   rskforkedtestnet: process.env.DEPLOYER_PK_TESTNET,
   rsksovrynmainnet: process.env.DEPLOYER_PK_MAINNET,
   rskforkedmainnet: process.env.DEPLOYER_PK_MAINNET,
@@ -616,6 +617,38 @@ task("getDeployedContractsOwners", "Prints the deployed contracts owner address"
       try {
           const owned = (await hre.ethers.getContractAt("Ownable", item[1]) as unknown) as Ownable;
           console.log(`${await owned.getOwner()} is owner of ${item[0]} (${item[1]})`);
+      } catch(e) {
+        console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
+      }
+    }
+  });
+
+// hh transferOwnership --new-owner 0xcf311e7375083b9513566a47b9f3e93f1fcdcfbf --network rsksovryntestnet
+task("transferOwnership", "Transfers contracts ownership from EOA")
+  .addParam("newOwner", "New owner of the contracts", undefined, types.string, false)
+  .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
+  .setAction(async ({ newOwner, channel }, hre) => {
+    const liveNets = ["mainnet", "rsksovrynmainnet", "rskmainnet", "testnet", "rsktestnet", "rsksovryntestnet"];
+    const [deployer] = await hre.ethers.getSigners();
+    if (liveNets.indexOf(hre.network.name) === -1)
+    {
+      console.log("===========================================================");
+      console.log("ALERT! Make sure the script is running on a proper network:", liveNets);
+      console.log("===========================================================");
+    }
+    const deployment = getDeploymentData(hre.network.name, channel);
+    const obj = Object.entries(deployment.addresses);
+    for await (const item of obj) {
+      try {
+        const owned = (await hre.ethers.getContractAt("Ownable", item[1], deployer) as unknown) as Ownable;
+        const owner = await owned.getOwner();
+        if (owner == deployer.address) {
+          await (await owned.setOwner(newOwner)).wait();
+          const _newOwner = await owned.getOwner();
+          console.log(`${_newOwner} is the new owner of ${item[0]} (${item[1]})`);
+        } else {
+          console.log(`Deployer ${deployer.address} must be the current owner ${owner} of ${item[0]} (${item[1]})`);
+        }
       } catch(e) {
         console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
       }
