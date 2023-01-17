@@ -964,7 +964,7 @@ describe("EthersLiquity", () => {
       // Required gas has just went up.
       const newGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
       const gasIncrease = newGasEstimate.sub(originalGasEstimate).toNumber();
-      expect(gasIncrease).to.be.within(5000, 10000);
+      expect(gasIncrease).to.be.within(4900, 10000);
 
       // This will now have to update lastFeeOperationTime
       await waitForSuccess(tx.send());

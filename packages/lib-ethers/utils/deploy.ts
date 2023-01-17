@@ -596,7 +596,7 @@ export const deployAndSetupContracts = async (
   feeCollectorAddress ??= await deployContract(
     deployer,
     getContractFactory,
-    "MockFeeSharingProxy",
+    "MockFeeSharingCollector",
     { ...overrides }
   );
   wrbtcAddress ??= await deployContract(deployer, getContractFactory, "WRBTCTokenTester", {
