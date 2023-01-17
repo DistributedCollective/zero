@@ -17,10 +17,10 @@
   To install early access releases (pre-releases) - use a specific version to install:  
 
   ```
-  npm install @sovryn-zero/lib-ethers@1.0.0-early.access.4
+  npm install @sovryn-zero/lib-ethers@1.0.0-early.access.0
   ```  
 
-  The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-early-access/packages/lib-ethers/package.json#L3).  
+  The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-publish/packages/lib-ethers/package.json#L3).  
 
 
 ### Connecting to an Ethereum node and sending a transaction:

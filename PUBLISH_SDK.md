@@ -10,7 +10,7 @@ Untill then we are using manual packages publishing:
 
 
 ## **Solidity contracts (libraries)**  
-To publish solidity contracts (libraries) SDK, from the project root run   
+To publish sdk-contracts package, from the package root run   
 
 ```
 yarn do-publish

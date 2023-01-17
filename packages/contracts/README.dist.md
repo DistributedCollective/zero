@@ -19,7 +19,7 @@
   npm install @sovryn-zero/contracts@1.0.0-early.access.0
   ```  
 
-  The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-early-access/packages/contracts/package.json#L3).  
+  The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-publish/packages/contracts/package.json#L3).  
 
 ## **Project Description**  
 
@@ -38,5 +38,5 @@ import "@sovryn-zero/contracts/contracts/ActivePool.sol";
 import "@sovryn-zero/contracts/contracts/BorrowerOperations.sol";
 ```  
 
-## [**Readme**](https://github.com/DistributedCollective/zero/blob/sdk-early-access/packages/contracts/README.md)  
+## [**Readme**](https://github.com/DistributedCollective/zero/blob/sdk-publish/packages/contracts/README.md)  
 
