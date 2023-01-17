@@ -1,5 +1,7 @@
 const BN = require("bn.js");
 const Destructible = artifacts.require("./TestContracts/Destructible.sol");
+const { signERC2612Permit } = require('eth-permit');
+const hre = require("hardhat");
 
 const MoneyValues = {
   negative_5e17: "-" + web3.utils.toWei("500", "finney"),
@@ -876,6 +878,62 @@ class TestHelper {
     };
   }
 
+  static async withdrawZusdAndConvertToDLLR(contracts, { maxFeePercentage, zusdAmount, ICR, upperHint, lowerHint, extraParams }) {
+    //TODO: implement
+    if (!maxFeePercentage) maxFeePercentage = this._100pct;
+    if (!upperHint) upperHint = this.ZERO_ADDRESS;
+    if (!lowerHint) lowerHint = this.ZERO_ADDRESS;
+
+    assert(
+      !(zusdAmount && ICR) && (zusdAmount || ICR),
+      "Specify either zusd amount or target ICR, but not both"
+    );
+
+    let increasedTotalDebt;
+    if (ICR) {
+      assert(extraParams.from, "A 'from' account is needed");
+      const { debt, coll } = await contracts.troveManager.getEntireDebtAndColl(extraParams.from);
+      const price = await contracts.priceFeedTestnet.getPrice();
+      const targetDebt = coll.mul(price).div(ICR);
+      assert(targetDebt > debt, "ICR is already greater than or equal to target");
+      increasedTotalDebt = targetDebt.sub(debt);
+      zusdAmount = await this.getNetBorrowingAmount(contracts, increasedTotalDebt);
+    } else {
+      increasedTotalDebt = await this.getAmountWithBorrowingFee(contracts, zusdAmount);
+    }
+
+    //TODO: fix callStatic - 
+    const { ethers } = hre;
+    const ethersBorrowerOperations = await ethers.getContractAt(
+      "BorrowerOperationsTester",
+      contracts.borrowerOperations.address, (await ethers.getSigners())[1]
+    );
+    const dllrAmount = await ethersBorrowerOperations.callStatic.withdrawZusdAndConvertToDLLR(
+      maxFeePercentage,
+      zusdAmount.toString(),
+      upperHint,
+      lowerHint,
+      extraParams
+    );
+
+    await ethersBorrowerOperations.withdrawZusdAndConvertToDLLR(
+      maxFeePercentage,
+      zusdAmount.toString(),
+      upperHint,
+      lowerHint,
+      extraParams
+    );
+
+    return {
+      maxFeePercentage,
+      upperHint,
+      lowerHint,
+      zusdAmount,
+      increasedTotalDebt,
+      dllrAmount
+    };
+  }
+
   static async adjustTrove_allAccounts(accounts, contracts, ETHAmount, ZUSDAmount) {
     const gasCostList = [];
 
@@ -1207,6 +1265,112 @@ class TestHelper {
     }
     return this.getGasMetrics(gasCostList);
   }
+
+  // ----------- withdrawZusdAndConvertToDLLR -------------- //
+
+  static async withdrawZusdAndConvertToDLLR_allAccounts(accounts, contracts, amount) {
+    const gasCostList = [];
+
+    for (const account of accounts) {
+      const { newColl, newDebt } = await this.getCollAndDebtFromWithdrawZUSD(
+        contracts,
+        account,
+        amount
+      );
+      const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
+        contracts,
+        newColl,
+        newDebt
+      );
+
+      const tx = await contracts.borrowerOperations.withdrawZusdAndConvertToDLLR(
+        this._100pct,
+        amount,
+        upperHint,
+        lowerHint,
+        { from: account }
+      );
+      const gas = this.gasUsed(tx);
+      gasCostList.push(gas);
+    }
+    return this.getGasMetrics(gasCostList);
+  }
+
+  static async withdrawZusdAndConvertToDLLR_allAccounts_randomAmount(min, max, accounts, contracts) {
+    const gasCostList = [];
+
+    for (const account of accounts) {
+      const randZUSDAmount = this.randAmountInWei(min, max);
+
+      const { newColl, newDebt } = await this.getCollAndDebtFromWithdrawZUSD(
+        contracts,
+        account,
+        randZUSDAmount
+      );
+      const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
+        contracts,
+        newColl,
+        newDebt
+      );
+
+      const tx = await contracts.borrowerOperations.withdrawZusdAndConvertToDLLR(
+        this._100pct,
+        randZUSDAmount,
+        upperHint,
+        lowerHint,
+        { from: account }
+      );
+      const gas = this.gasUsed(tx);
+      gasCostList.push(gas);
+    }
+    return this.getGasMetrics(gasCostList);
+  }
+
+  // ----------------- repayZusdFromDLLR ------------------ //
+
+
+  static async repayZusdFromDLLR(account, contracts, amount, permission) {
+    const { newColl, newDebt } = await this.getCollAndDebtFromRepayZUSD(
+      contracts,
+      account,
+      amount
+    );
+    const { upperHint, lowerHint } = await this.getBorrowerOpsListHint(
+      contracts,
+      newColl,
+      newDebt
+    );
+
+    return await contracts.borrowerOperations.repayZusdFromDLLR(amount.toString(), upperHint, lowerHint, permission, {
+      from: account
+    });
+  }
+
+  static async repayZusdFromDLLR_allAccounts(accounts, contracts, amount) {
+    const gasCostList = [];
+
+    for (const account of accounts) {
+      const permission = await signERC2612Permit(alice_signer, contracts.nueMockToken.address, alice_signer.address, borrowerOperations.address, decreaseAmount.toString());
+      const tx = await this.repayZusdFromDLLR(account, contracts, amount);
+      const gas = this.gasUsed(tx);
+      gasCostList.push(gas);
+    }
+    return this.getGasMetrics(gasCostList);
+  }
+
+  static async repayZusdFromDLLR_allAccounts_randomAmount(min, max, accounts, contracts) {
+    const gasCostList = [];
+
+    for (const account of accounts) {
+      const randZUSDAmount = this.randAmountInWei(min, max);
+      const tx = await this.repayZusdFromDLLR(account, contracts, randZUSDAmount);
+      const gas = this.gasUsed(tx);
+      gasCostList.push(gas);
+    }
+    return this.getGasMetrics(gasCostList);
+  }
+
+
 
   static async getCurrentICR_allAccounts(accounts, contracts, functionCaller) {
     const gasCostList = [];

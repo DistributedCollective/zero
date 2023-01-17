@@ -8,13 +8,14 @@
 <b>Signature:</b>
 
 ```typescript
-closeNueTrove(overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>>;
+closeNueTrove(_permitParams: PermitParams, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  \_permitParams | [PermitParams](./lib-ethers.permitparams.md) |  |
 |  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 
 <b>Returns:</b>

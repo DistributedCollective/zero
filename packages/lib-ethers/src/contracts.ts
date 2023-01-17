@@ -224,10 +224,12 @@ export interface _LiquityDeploymentJSON {
   readonly startBlock: number;
   readonly bootstrapPeriod: number;
   readonly governanceAddress: string;
-  readonly feeCollectorAddress?: string;
+  readonly feeSharingCollectorAddress?: string;
   readonly wrbtcAddress?: string;
   readonly presaleAddress?: string;
   readonly marketMakerAddress?: string;
+  readonly myntMassetManagerAddress?: string;
+  readonly myntNueTokenAddress?: string;
   readonly _priceFeedIsTestnet: boolean;
   readonly _isDev: boolean;
 }

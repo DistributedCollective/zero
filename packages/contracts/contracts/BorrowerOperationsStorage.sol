@@ -11,20 +11,7 @@ import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/IZEROStaking.sol";
 import "./Interfaces/IFeeDistributor.sol";
 import "./Dependencies/Ownable.sol";
-
-interface IMasset {
-    function onTokensMinted(
-        uint256 _orderAmount,
-        address _tokenAddress,
-        bytes calldata _userData
-    ) external;
-
-    function redeemByBridge(
-        address _bAsset,
-        uint256 _massetQuantity,
-        address _recipient
-    ) external returns (uint256 massetRedeemed);
-}
+import "./Dependencies/Mynt/IMassetManager.sol";
 
 contract BorrowerOperationsStorage is Ownable {
     string constant public NAME = "BorrowerOperations";
@@ -47,7 +34,6 @@ contract BorrowerOperationsStorage is Ownable {
     // A doubly linked list of Troves, sorted by their collateral ratios
     ISortedTroves public sortedTroves;
 
-    IMasset public masset;
+    IMassetManager public massetManager;
     IFeeDistributor public feeDistributor;
-
 }

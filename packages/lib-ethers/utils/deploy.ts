@@ -2,6 +2,7 @@ import assert from "assert";
 import { Signer } from "@ethersproject/abstract-signer";
 import { ContractFactory, ContractTransaction, Overrides } from "@ethersproject/contracts";
 import { Contract, ethers } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
 import {
   _connectToContracts,
   _LiquityContractAddresses,
@@ -15,11 +16,23 @@ import { Ownable } from "../types";
 
 let silent = true;
 
+const ONE_DAY_IN_SECONDS = 86400;
+const ONE_MINUTE = 60;
+const TWO_WEEKS = 14 * ONE_DAY_IN_SECONDS;
+
+
 export type OracleAddresses =
   | {
       mocOracleAddress: string;
       rskOracleAddress: string;
     }
+  | undefined;
+
+export type MyntAddresses =
+  {
+      massetManagerAddress: string;
+      nueTokenAddress: string; // DLLR (mynt token) address 
+  }
   | undefined;
 
 export const log = (...args: unknown[]): void => {
@@ -66,7 +79,7 @@ const deployContractWithProxy: (
   const [contract] = await deployContractAndGetBlockNumber(...p);
 
   log(`Deploying Proxy for ${p[2]} ...`);
-  const proxyContract = await (await p[1]("UpgradableProxy", p[0])).deploy(p[3]);
+  const proxyContract = await (await p[1]("UpgradableProxy", p[0])).deploy(p[p.length - 1]);
 
   log(`Waiting for transaction ${proxyContract.deployTransaction.hash} ...`);
   const receipt = await proxyContract.deployTransaction.wait();
@@ -106,6 +119,8 @@ const deployContracts = async (
     }
   );
 
+  const BOOTSTRAP_PERIOD = BigNumber.from((isMainnet || notTestnet ? TWO_WEEKS : ONE_MINUTE).toString());
+
   const addresses = {
     activePool: await deployContractWithProxy(deployer, getContractFactory, "ActivePool", {
       ...overrides
@@ -118,15 +133,11 @@ const deployContracts = async (
         ...overrides
       }
     ),
-    troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", {
-      ...overrides
-    }),
+    
+    troveManager: await deployContractWithProxy(deployer, getContractFactory, "TroveManager", BOOTSTRAP_PERIOD, {  ...overrides }),
 
-    troveManagerRedeemOps: isMainnet || notTestnet
-      ? await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", { ...overrides })
-      : await deployContract(deployer, getContractFactory, "TroveManagerRedeemOpsTestnet", {
-          ...overrides
-        }),
+    troveManagerRedeemOps: await deployContract(deployer, getContractFactory, "TroveManagerRedeemOps", BOOTSTRAP_PERIOD , {  ...overrides }),
+    
     collSurplusPool: await deployContractWithProxy(deployer, getContractFactory, "CollSurplusPool", {
       ...overrides
     }),
@@ -223,10 +234,11 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
-  feeCollectorAddress: string,
+  feeSharingCollectorAddress: string,
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
+  myntMassetManagerAddress?: string,
   zusdTokenAddress?: string,
   overrides?: Overrides
 ) => {
@@ -262,21 +274,23 @@ const connectContracts = async (
 
     nonce =>
       troveManager.setAddresses(
-        feeDistributor.address,
-        troveManagerRedeemOps.address,
-        liquityBaseParams.address,
-        borrowerOperations.address,
-        activePool.address,
-        defaultPool.address,
-        stabilityPool.address,
-        gasPool.address,
-        collSurplusPool.address,
-        priceFeed.address,
-        zusdToken.address,
-        sortedTroves.address,
-        zeroToken.address,
-        zeroStaking.address,
-        { ...overrides, nonce }
+        {
+          _feeDistributorAddress: feeDistributor.address,
+          _troveManagerRedeemOps: troveManagerRedeemOps.address,
+          _liquityBaseParamsAddress: liquityBaseParams.address,
+          _borrowerOperationsAddress: borrowerOperations.address,
+          _activePoolAddress: activePool.address,
+          _defaultPoolAddress: defaultPool.address,
+          _stabilityPoolAddress: stabilityPool.address,
+          _gasPoolAddress: gasPool.address,
+          _collSurplusPoolAddress: collSurplusPool.address,
+          _priceFeedAddress: priceFeed.address,
+          _zusdTokenAddress: zusdToken.address,
+          _sortedTrovesAddress: sortedTroves.address,
+          _zeroTokenAddress: zeroToken.address,
+          _zeroStakingAddress: zeroStaking.address,
+        },
+          { ...overrides, nonce }
       ),
 
     nonce =>
@@ -295,7 +309,6 @@ const connectContracts = async (
         zeroStaking.address,
         { ...overrides, nonce }
       ),
-
     nonce =>
       stabilityPool.setAddresses(
         liquityBaseParams.address,
@@ -366,7 +379,7 @@ const connectContracts = async (
 
     nonce =>
       feeDistributor.setAddresses(
-        feeCollectorAddress,
+        feeSharingCollectorAddress,
         zeroStaking.address,
         borrowerOperations.address,
         troveManager.address,
@@ -376,7 +389,7 @@ const connectContracts = async (
         { ...overrides, nonce }
       )
   ];
-  // Initialize zero token if no address in config file for this network context
+  // Initialize ZUSD token if no address in config file for this network context
   if (!zusdTokenAddress) {
     connections = [
       nonce =>
@@ -391,6 +404,15 @@ const connectContracts = async (
         ),
       ...connections
     ];
+  }
+
+  if (myntMassetManagerAddress) {
+    connections = [
+      nonce =>
+        borrowerOperations.setMassetManagerAddress(myntMassetManagerAddress, { ...overrides, nonce }),
+      ...connections
+    ];
+   
   }
 
   // RSK node cannot accept more than 4 pending txs so we cannot send all the
@@ -548,14 +570,15 @@ export const deployAndSetupContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   externalPriceFeeds: OracleAddresses = undefined,
-
   _isDev = true,
   governanceAddress?: string,
-  feeCollectorAddress?: string,
+  feeSharingCollectorAddress?: string,
   wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
   zusdTokenAddress?: string,
+  myntMassetManagerAddress?: string,
+  myntNueTokenAddress?: string,
   isMainnet?: boolean,
   notTestnet?: boolean,
   overrides?: Overrides
@@ -564,11 +587,16 @@ export const deployAndSetupContracts = async (
     throw new Error("Signer must have a provider.");
   }
 
+  if (isMainnet && !(feeSharingCollectorAddress && wrbtcAddress)) {
+    throw new Error("Mainnet requires feeSharingCollectorAddress and wrbtcAddress.")
+  }
+
   governanceAddress ??= await deployer.getAddress();
-  feeCollectorAddress ??= await deployContract(
+  
+  feeSharingCollectorAddress ??= await deployContract(
     deployer,
     getContractFactory,
-    "MockFeeSharingProxy",
+    "MockFeeSharingCollector",
     { ...overrides }
   );
   wrbtcAddress ??= await deployContract(deployer, getContractFactory, "WRBTCTokenTester", {
@@ -598,10 +626,12 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     governanceAddress,
-    feeCollectorAddress,
+    feeSharingCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
+    myntMassetManagerAddress,
+    myntNueTokenAddress,
     _priceFeedIsTestnet,
     _isDev,
 
@@ -623,10 +653,11 @@ export const deployAndSetupContracts = async (
     contracts,
     deployer,
     governanceAddress,
-    feeCollectorAddress,
+    feeSharingCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
+    myntMassetManagerAddress,
     zusdTokenAddress,
     overrides
   );
@@ -659,8 +690,18 @@ export const deployAndSetupContracts = async (
     await tx.wait();
   }
 
-  log("Transferring Ownership...");
-  await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
+  if (governanceAddress && governanceAddress != await deployer.getAddress()) {
+    log("Transferring Ownership...");
+    try {
+      await transferOwnership(contracts, deployer, governanceAddress, _priceFeedIsTestnet, overrides);
+    } catch (error) {
+      console.log("Not all contracts ownership has been transferred:");
+      console.error(error);
+    }
+  } else {
+    console.log(`No governance address set for this network ${(await (deployer.provider.getNetwork())).name} #${deployment.chainId}. No ownership transferred.`);
+  }
+  
 
   const zeroTokenDeploymentTime = await contracts.zeroToken.getDeploymentStartTime();
   const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();

@@ -37,7 +37,8 @@ import {
   EthersPopulatedTransaction,
   EthersTransactionOverrides,
   EthersTransactionReceipt,
-  EthersTransactionResponse
+  EthersTransactionResponse,
+  PermitParams
 } from "./types";
 
 import {
@@ -668,13 +669,14 @@ export class PopulatableEthersLiquity
 
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.closeNueTrove} */
   async closeNueTrove(
+    _permitParams: PermitParams,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<TroveClosureDetails>> {
     const { borrowerOperations } = _getContracts(this._readable.connection);
 
     return this._wrapTroveClosure(
       await borrowerOperations.estimateAndPopulate.closeNueTrove({ ...overrides }, gas =>
-        gas.mul(125).div(100)
+        gas.mul(125).div(100), _permitParams
       )
     );
   }
@@ -757,6 +759,7 @@ export class PopulatableEthersLiquity
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.adjustNueTrove} */
   async adjustNueTrove(
     params: TroveAdjustmentParams<Decimalish>,
+    permitParams: PermitParams,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersLiquityTransaction<TroveAdjustmentDetails>> {
@@ -791,7 +794,8 @@ export class PopulatableEthersLiquity
         (withdrawCollateral ?? Decimal.ZERO).hex,
         (borrowZUSD ?? repayZUSD ?? Decimal.ZERO).hex,
         !!borrowZUSD,
-        ...(await this._findHints(finalTrove))
+        ...(await this._findHints(finalTrove)),
+        permitParams
       )
     );
   }
