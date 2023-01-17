@@ -4,7 +4,7 @@ Currently `semantic-versioning` is setup but disabled for publishing automation 
 If enabled Git Actions CI runs `semantic-release` to publish `lib-base`, `lib-ethers`, `contracts` and `sdk-contracts`  packages.  
 Most likely we will be using semi-manual publishing to mitigate human factor.  
 Untill then we are using manual packages publishing:
-- merge a branch to be published into `sdk-early-access` (to be renamed to to `sdk-publish`)  
+- merge a branch to be published into `sdk-publish`
 - bump packages versions to publish in `package.json` 
 - follow the instructions below  
 
