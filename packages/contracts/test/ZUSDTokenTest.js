@@ -72,7 +72,7 @@ const getPermitDigest = (
 };
 
 contract("ZUSDToken", async accounts => {
-  const [owner, alice, bob, carol, dennis, sovFeeCollector] = accounts;
+  const [owner, alice, bob, carol, dennis, feeSharingCollector] = accounts;
 
   const multisig = accounts[999];
 

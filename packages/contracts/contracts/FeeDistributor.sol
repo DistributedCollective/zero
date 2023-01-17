@@ -12,7 +12,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     using SafeMath for uint256;
     // --- Events ---
 
-    event FeeCollectorAddressChanged(address _feeCollectorAddress);
+    event FeeSharingCollectorAddressChanged(address _feeSharingCollectorAddress);
     event ZeroStakingAddressChanged(address _zeroStakingAddress);
     event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
     event TroveManagerAddressChanged(address _troveManagerAddress);
@@ -26,7 +26,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     // --- Dependency setters ---
 
     function setAddresses(
-        address _feeCollectorAddress,
+        address _feeSharingCollectorAddress,
         address _zeroStakingAddress,
         address _borrowerOperationsAddress,
         address _troveManagerAddress,
@@ -34,7 +34,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         address _zusdTokenAddress,
         address _activePoolAddress
     ) external override onlyOwner {
-        checkContract(_feeCollectorAddress);
+        checkContract(_feeSharingCollectorAddress);
         checkContract(_zeroStakingAddress);
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
@@ -42,7 +42,7 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         checkContract(_zusdTokenAddress);
         checkContract(_activePoolAddress);
 
-        sovFeeCollector = IFeeSharingProxy(_feeCollectorAddress);
+        feeSharingCollector = IFeeSharingCollector(_feeSharingCollectorAddress);
         zeroStaking = IZEROStaking(_zeroStakingAddress);
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
@@ -51,9 +51,9 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         activePoolAddress = _activePoolAddress;
 
         // Not entirely removing this as per request from @light
-        FEE_TO_SOV_COLLECTOR = LiquityMath.DECIMAL_PRECISION; // 100%
+        FEE_TO_FEE_SHARING_COLLECTOR = LiquityMath.DECIMAL_PRECISION; // 100%
 
-        emit FeeCollectorAddressChanged(_feeCollectorAddress);
+        emit FeeSharingCollectorAddressChanged(_feeSharingCollectorAddress);
         emit ZeroStakingAddressChanged(_zeroStakingAddress);
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit TroveManagerAddressChanged(_troveManagerAddress);
@@ -62,8 +62,8 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
         emit ActivePoolAddressSet(_activePoolAddress);
     }
 
-    function setFeeToSOVCollector(uint256 FEE_TO_SOV_COLLECTOR_) public onlyOwner {
-        FEE_TO_SOV_COLLECTOR = FEE_TO_SOV_COLLECTOR_;
+    function setFeeToFeeSharingCollector(uint256 FEE_TO_FEE_SHARING_COLLECTOR_) public onlyOwner {
+        FEE_TO_FEE_SHARING_COLLECTOR = FEE_TO_FEE_SHARING_COLLECTOR_;
     }
 
     function distributeFees() public override {
@@ -82,15 +82,15 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     }
 
     function _distributeZUSD(uint256 toDistribute) internal {
-        // Send fee to the SOVFeeCollector address
-        uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
+        // Send fee to the FeeSharingCollector address
+        uint256 feeToFeeSharingCollector = toDistribute.mul(FEE_TO_FEE_SHARING_COLLECTOR).div(
             LiquityMath.DECIMAL_PRECISION
         );
-        zusdToken.approve(address(sovFeeCollector), feeToSovCollector);
-        sovFeeCollector.transferTokens(address(zusdToken), uint96(feeToSovCollector));
+        zusdToken.approve(address(feeSharingCollector), feeToFeeSharingCollector);
 
+        feeSharingCollector.transferTokens(address(zusdToken), uint96(feeToFeeSharingCollector));
         // Send fee to ZERO staking contract
-        uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
+        uint256 feeToZeroStaking = toDistribute.sub(feeToFeeSharingCollector);
         if (feeToZeroStaking != 0) {
             require(
                 zusdToken.transfer(address(zeroStaking), feeToZeroStaking),
@@ -102,18 +102,17 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
     }
 
     function _distributeRBTC(uint256 toDistribute) internal {
-        // Send fee to the SOVFeeCollector address
-        uint256 feeToSovCollector = toDistribute.mul(FEE_TO_SOV_COLLECTOR).div(
+        // Send fee to the feeSharingCollector address
+        uint256 feeToFeeSharingCollector = toDistribute.mul(FEE_TO_FEE_SHARING_COLLECTOR).div(
             LiquityMath.DECIMAL_PRECISION
         );
-        wrbtc.deposit{value: feeToSovCollector}();
-        wrbtc.approve(address(sovFeeCollector), feeToSovCollector);
-        sovFeeCollector.transferTokens(address(wrbtc), uint96(feeToSovCollector));
+
+        feeSharingCollector.transferRBTC{ value: feeToFeeSharingCollector }();
 
         // Send the ETH fee to the ZERO staking contract
-        uint256 feeToZeroStaking = toDistribute.sub(feeToSovCollector);
+        uint256 feeToZeroStaking = toDistribute.sub(feeToFeeSharingCollector);
         if (feeToZeroStaking != 0) {
-            (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
+            (bool success, ) = address(zeroStaking).call{ value: feeToZeroStaking }("");
             require(success, "FeeDistributor: sending ETH failed");
             zeroStaking.increaseF_ETH(feeToZeroStaking);
         }

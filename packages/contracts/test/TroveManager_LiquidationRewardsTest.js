@@ -17,7 +17,7 @@ contract('TroveManager - Redistribution reward calculations', async accounts => 
     owner,
     alice, bob, carol, dennis, erin, freddy, greta, harry, ida,
     A, B, C, D, E,
-    whale, defaulter_1, defaulter_2, defaulter_3, defaulter_4, sovFeeCollector] = accounts;
+    whale, defaulter_1, defaulter_2, defaulter_3, defaulter_4, feeSharingCollector] = accounts;
 
     const multisig = accounts[999];
 

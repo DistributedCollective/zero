@@ -15,7 +15,7 @@ const rskTestnet = {
 export const addresses = isMainnet ? rskMainnet : rskTestnet;
 
 export const RPC_URL = {
-  30: "https://mainnet.sovryn.app/rpc",
+  30: "https://rsk-zero.sovryn.app",
   31: "https://testnet.sovryn.app/rpc"
 };
 

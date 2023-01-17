@@ -1018,12 +1018,12 @@ export interface MockBalanceRedirectPresale
 }
 
 interface FeeDistributorCalls {
-  FEE_TO_SOV_COLLECTOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  FEE_TO_FEE_SHARING_COLLECTOR(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
   activePoolAddress(_overrides?: CallOverrides): Promise<string>;
   borrowerOperations(_overrides?: CallOverrides): Promise<string>;
+  feeSharingCollector(_overrides?: CallOverrides): Promise<string>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
-  sovFeeCollector(_overrides?: CallOverrides): Promise<string>;
   troveManager(_overrides?: CallOverrides): Promise<string>;
   wrbtc(_overrides?: CallOverrides): Promise<string>;
   zeroStaking(_overrides?: CallOverrides): Promise<string>;
@@ -1032,8 +1032,8 @@ interface FeeDistributorCalls {
 
 interface FeeDistributorTransactions {
   distributeFees(_overrides?: Overrides): Promise<void>;
-  setAddresses(_feeCollectorAddress: string, _zeroStakingAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _wrbtcAddress: string, _zusdTokenAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
-  setFeeToSOVCollector(FEE_TO_SOV_COLLECTOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setAddresses(_feeSharingCollectorAddress: string, _zeroStakingAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _wrbtcAddress: string, _zusdTokenAddress: string, _activePoolAddress: string, _overrides?: Overrides): Promise<void>;
+  setFeeToFeeSharingCollector(FEE_TO_FEE_SHARING_COLLECTOR_: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
 }
 
@@ -1043,7 +1043,7 @@ export interface FeeDistributor
   readonly filters: {
     ActivePoolAddressSet(_activePoolAddress?: null): EventFilter;
     BorrowerOperationsAddressChanged(_borrowerOperationsAddress?: null): EventFilter;
-    FeeCollectorAddressChanged(_feeCollectorAddress?: null): EventFilter;
+    FeeSharingCollectorAddressChanged(_feeSharingCollectorAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     RBTCistributed(_rbtcDistributedAmount?: null): EventFilter;
     TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
@@ -1054,7 +1054,7 @@ export interface FeeDistributor
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressSet"): _TypedLogDescription<{ _activePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _borrowerOperationsAddress: string }>[];
-  extractEvents(logs: Log[], name: "FeeCollectorAddressChanged"): _TypedLogDescription<{ _feeCollectorAddress: string }>[];
+  extractEvents(logs: Log[], name: "FeeSharingCollectorAddressChanged"): _TypedLogDescription<{ _feeSharingCollectorAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "RBTCistributed"): _TypedLogDescription<{ _rbtcDistributedAmount: BigNumber }>[];
   extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];

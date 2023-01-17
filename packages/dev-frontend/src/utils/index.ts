@@ -22,3 +22,5 @@ export const parseBalance = (
   decimals = 18,
   decimalsToDisplay = 2
 ) => new BigNumber(formatUnits(value || 0, decimals)).toFixed(decimalsToDisplay);
+
+export const captchaSiteKey = process.env.REACT_APP_HCAPTCHA;

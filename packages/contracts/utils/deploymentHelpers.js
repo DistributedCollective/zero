@@ -21,7 +21,7 @@ const CommunityIssuance = artifacts.require("./CommunityIssuance.sol");
 
 const ZEROTokenTester = artifacts.require("./ZEROTokenTester.sol");
 const CommunityIssuanceTester = artifacts.require("./CommunityIssuanceTester.sol");
-const MockFeeSharingProxy = artifacts.require("./MockFeeSharingProxy.sol");
+const MockFeeSharingCollector = artifacts.require("./MockFeeSharingCollector.sol");
 const StabilityPoolTester = artifacts.require("./StabilityPoolTester.sol");
 const ActivePoolTester = artifacts.require("./ActivePoolTester.sol");
 const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol");
@@ -192,7 +192,7 @@ class DeploymentHelper {
   static async deployZEROContractsHardhat(multisigAddress) {
     const zeroStaking = await ZEROStaking.new();
     const communityIssuance = await CommunityIssuance.new();
-    const mockFeeSharingProxy = await MockFeeSharingProxy.new();
+    const mockFeeSharingCollector = await MockFeeSharingCollector.new();
     const presale = await MockBalanceRedirectPresale.new();
     // FIXME: replace with market maker contract address
     const marketMaker = await NonPayable.new();
@@ -200,7 +200,7 @@ class DeploymentHelper {
     ZEROStaking.setAsDeployed(zeroStaking);
     CommunityIssuance.setAsDeployed(communityIssuance);
     MockBalanceRedirectPresale.setAsDeployed(presale);
-    MockFeeSharingProxy.setAsDeployed(mockFeeSharingProxy);
+    MockFeeSharingCollector.setAsDeployed(mockFeeSharingCollector);
 
     await presale.closePresale();
 
@@ -212,7 +212,7 @@ class DeploymentHelper {
     const ZEROContracts = {
       zeroStaking,
       communityIssuance,
-      mockFeeSharingProxy,
+      mockFeeSharingCollector,
       zeroToken,
       marketMaker,
       presale
@@ -223,14 +223,14 @@ class DeploymentHelper {
   static async deployZEROTesterContractsHardhat(multisigAddress) {
     const zeroStaking = await ZEROStaking.new();
     const communityIssuance = await CommunityIssuanceTester.new();
-    const mockFeeSharingProxy = await MockFeeSharingProxy.new();
+    const mockFeeSharingCollector = await MockFeeSharingCollector.new();
     const presale = await MockBalanceRedirectPresale.new();
     // FIXME: replace with market maker contract address
     const marketMaker = await NonPayable.new();
 
     ZEROStaking.setAsDeployed(zeroStaking);
     CommunityIssuanceTester.setAsDeployed(communityIssuance);
-    MockFeeSharingProxy.setAsDeployed(mockFeeSharingProxy);
+    MockFeeSharingCollector.setAsDeployed(mockFeeSharingCollector);
     MockBalanceRedirectPresale.setAsDeployed(presale);
 
     await presale.closePresale();
@@ -246,7 +246,7 @@ class DeploymentHelper {
     const ZEROContracts = {
       zeroStaking,
       communityIssuance,
-      mockFeeSharingProxy,
+      mockFeeSharingCollector,
       zeroToken,
       marketMaker,
       presale
@@ -459,7 +459,7 @@ class DeploymentHelper {
 
     // set contracts in FeeDistributor
     await contracts.feeDistributor.setAddresses(
-      ZEROContracts.mockFeeSharingProxy.address,
+      ZEROContracts.mockFeeSharingCollector.address,
       ZEROContracts.zeroStaking.address,
       contracts.borrowerOperations.address,
       contracts.troveManager.address,

@@ -31,7 +31,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
 
     const multisig = accounts[999];
     
-    const [owner, A, B, C, D, E, F, G, whale, sovFeeCollector] = accounts;
+    const [owner, A, B, C, D, E, F, G, whale, feeSharingCollector] = accounts;
   
     let priceFeed
     let zusdToken
@@ -137,9 +137,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const F_ETH_After = await zeroStaking.F_ETH()
   
       // Expect fee per unit staked = fee/100, since there is 100 ZUSD totalStaked
-      // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector = emittedETHFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking = emittedETHFee.sub(ethFeeToSovCollector)
+      // 20% sent to feeSharingCollector address
+      const ethFeeToFeeSharingCollector = emittedETHFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking = emittedETHFee.sub(ethFeeToFeeSharingCollector)
       const expected_F_ETH_After = ethFeeToZeroStalking.div(toBN('100')) 
   
       assert.isTrue(expected_F_ETH_After.eq(F_ETH_After))
@@ -221,9 +221,9 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const F_ZUSD_After = await zeroStaking.F_ZUSD()
   
       // Expect fee per unit staked = fee/100, since there is 100 ZUSD totalStaked
-      // 20% sent to SovFeeCollector address
-      const zusdFeeToSovCollector = emittedZUSDFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking = emittedZUSDFee.sub(zusdFeeToSovCollector)
+      // 20% sent to feeSharingCollector address
+      const zusdFeeToFeeSharingCollector = emittedZUSDFee.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking = emittedZUSDFee.sub(zusdFeeToFeeSharingCollector)
       const expected_F_ZUSD_After = zusdFeeToZeroStalking.div(toBN('100')) 
   
       assert.isTrue(expected_F_ZUSD_After.eq(F_ZUSD_After))
@@ -322,18 +322,18 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const emittedZUSDFee_2 = toBN(th.getZUSDFeeFromZUSDBorrowingEvent(borrowingTx_2))
       assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
   
-      // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const rethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+      // 20% sent to feeSharingCollector address
+      const ethFeeToFeeSharingCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToFeeSharingCollector_1)
+      const ethFeeToFeeSharingCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const rethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToFeeSharingCollector_2)
       const expectedTotalETHGain = ethFeeToZeroStalking_1.add(rethFeeToZeroStalking_2)
   
-      // 20% sent to SovFeeCollector address
-      const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
-      const zusdFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToSovCollector_2)
+      // 20% sent to feeSharingCollector address
+      const zusdFeeToFeeSharingCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToFeeSharingCollector_1)
+      const zusdFeeToFeeSharingCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToFeeSharingCollector_2)
       const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
   
       const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
@@ -407,18 +407,18 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
   
   
-      // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+      // 20% sent to feeSharingCollector address
+      const ethFeeToFeeSharingCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToFeeSharingCollector_1)
+      const ethFeeToFeeSharingCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToFeeSharingCollector_2)
       const expectedTotalETHGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
   
-      // 20% sent to SovFeeCollector address
-      const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
-      const zusdDFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToSovCollector_2)
+      // 20% sent to feeSharingCollector address
+      const zusdFeeToFeeSharingCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToFeeSharingCollector_1)
+      const zusdDFeeToFeeSharingCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToFeeSharingCollector_2)
       const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
   
       const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A))
@@ -476,11 +476,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
        const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3])
        assert.isTrue(emittedETHFee_2.gt(toBN('0')))
   
-      // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
+      // 20% sent to feeSharingCollector address
+      const ethFeeToFeeSharingCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToFeeSharingCollector_1)
+      const ethFeeToFeeSharingCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToFeeSharingCollector_2)
       const expectedTotalETHGain = ethFeeToZeroStalking_1.add(ethFeeToZeroStalking_2)
   
       const A_ETHGain = await zeroStaking.getPendingETHGain(A)
@@ -541,11 +541,11 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
       const emittedZUSDFee_2 = toBN(th.getZUSDFeeFromZUSDBorrowingEvent(borrowingTx_2))
       assert.isTrue(emittedZUSDFee_2.gt(toBN('0')))
   
-      // 20% sent to SovFeeCollector address
-      const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
-      const zusdDFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToSovCollector_2)
+      // 20% sent to feeSharingCollector address
+      const zusdFeeToFeeSharingCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToFeeSharingCollector_1)
+      const zusdDFeeToFeeSharingCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdDFeeToFeeSharingCollector_2)
       const expectedTotalZUSDGain = zusdFeeToZeroStalking_1.add(zusdFeeToZeroStalking_2)
       const A_ZUSDGain = await zeroStaking.getPendingZUSDGain(A)
   
@@ -639,13 +639,13 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
       // Expected ETH gains
   
-      // 20% sent to SovFeeCollector address
-      const ethFeeToSovCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToSovCollector_1)
-      const ethFeeToSovCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToSovCollector_2)
-      const ethFeeToSovCollector_3 = emittedETHFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const ethFeeToZeroStalking_3 = emittedETHFee_3.sub(ethFeeToSovCollector_3)
+      // 20% sent to feeSharingCollector address
+      const ethFeeToFeeSharingCollector_1 = emittedETHFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_1 = emittedETHFee_1.sub(ethFeeToFeeSharingCollector_1)
+      const ethFeeToFeeSharingCollector_2 = emittedETHFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_2 = emittedETHFee_2.sub(ethFeeToFeeSharingCollector_2)
+      const ethFeeToFeeSharingCollector_3 = emittedETHFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const ethFeeToZeroStalking_3 = emittedETHFee_3.sub(ethFeeToFeeSharingCollector_3)
       const expectedETHGain_A = toBN('100').mul(ethFeeToZeroStalking_1).div( toBN('600'))
                               .add(toBN('100').mul(ethFeeToZeroStalking_2).div( toBN('600')))
                               .add(toBN('100').mul(ethFeeToZeroStalking_3).div( toBN('650')))
@@ -662,13 +662,13 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function()
   
       // Expected ZUSD gains:
   
-      // 20% sent to SovFeeCollector address
-      const zusdFeeToSovCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToSovCollector_1)
-      const zusdFeeToSovCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToSovCollector_2)
-      const zusdFeeToSovCollector_3 = emittedZUSDFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
-      const zusdFeeToZeroStalking_3 = emittedZUSDFee_3.sub(zusdFeeToSovCollector_3)
+      // 20% sent to feeSharingCollector address
+      const zusdFeeToFeeSharingCollector_1 = emittedZUSDFee_1.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_1 = emittedZUSDFee_1.sub(zusdFeeToFeeSharingCollector_1)
+      const zusdFeeToFeeSharingCollector_2 = emittedZUSDFee_2.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_2 = emittedZUSDFee_2.sub(zusdFeeToFeeSharingCollector_2)
+      const zusdFeeToFeeSharingCollector_3 = emittedZUSDFee_3.mul(toBN(dec(20, 16))).div(mv._1e18BN)
+      const zusdFeeToZeroStalking_3 = emittedZUSDFee_3.sub(zusdFeeToFeeSharingCollector_3)
       const expectedZUSDGain_A = toBN('100').mul(zusdFeeToZeroStalking_1).div( toBN('600'))
                               .add(toBN('100').mul(zusdFeeToZeroStalking_2).div( toBN('600')))
                               .add(toBN('100').mul(zusdFeeToZeroStalking_3).div( toBN('650')))
