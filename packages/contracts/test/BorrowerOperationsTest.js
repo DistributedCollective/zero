@@ -105,7 +105,7 @@ contract("BorrowerOperations", async accounts => {
     frontEnd_1_signer,
     frontEnd_2_signer,
     frontEnd_3_signer,
-    sovFeeCollector_signer;
+    feeSharingCollector_signer;
 
   before(async () => {
     [
@@ -127,7 +127,7 @@ contract("BorrowerOperations", async accounts => {
       frontEnd_1_signer,
       frontEnd_2_signer,
       frontEnd_3_signer,
-      sovFeeCollector_signer
+      feeSharingCollector_signer
     ] = await ethers.getSigners();
 
     //console.log('accountsList[1].privateKey).replace...:', accountsList[1].privateKey.replace(/^0x/, ''));

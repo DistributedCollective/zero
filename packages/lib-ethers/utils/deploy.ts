@@ -234,7 +234,7 @@ const connectContracts = async (
   }: _LiquityContracts,
   deployer: Signer,
   governanceAddress: string,
-  feeCollectorAddress: string,
+  feeSharingCollectorAddress: string,
   wrbtcAddress: string,
   presaleAddress: string,
   marketMakerAddress?: string,
@@ -379,7 +379,7 @@ const connectContracts = async (
 
     nonce =>
       feeDistributor.setAddresses(
-        feeCollectorAddress,
+        feeSharingCollectorAddress,
         zeroStaking.address,
         borrowerOperations.address,
         troveManager.address,
@@ -572,7 +572,7 @@ export const deployAndSetupContracts = async (
   externalPriceFeeds: OracleAddresses = undefined,
   _isDev = true,
   governanceAddress?: string,
-  feeCollectorAddress?: string,
+  feeSharingCollectorAddress?: string,
   wrbtcAddress?: string,
   presaleAddress?: string,
   marketMakerAddress?: string,
@@ -587,13 +587,13 @@ export const deployAndSetupContracts = async (
     throw new Error("Signer must have a provider.");
   }
 
-  if (isMainnet && !(feeCollectorAddress && wrbtcAddress)) {
-    throw new Error("Mainnet requires feeCollectorAddress and wrbtcAddress.")
+  if (isMainnet && !(feeSharingCollectorAddress && wrbtcAddress)) {
+    throw new Error("Mainnet requires feeSharingCollectorAddress and wrbtcAddress.")
   }
 
   governanceAddress ??= await deployer.getAddress();
   
-  feeCollectorAddress ??= await deployContract(
+  feeSharingCollectorAddress ??= await deployContract(
     deployer,
     getContractFactory,
     "MockFeeSharingCollector",
@@ -626,7 +626,7 @@ export const deployAndSetupContracts = async (
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
     governanceAddress,
-    feeCollectorAddress,
+    feeSharingCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
@@ -653,7 +653,7 @@ export const deployAndSetupContracts = async (
     contracts,
     deployer,
     governanceAddress,
-    feeCollectorAddress,
+    feeSharingCollectorAddress,
     wrbtcAddress,
     presaleAddress,
     marketMakerAddress,
