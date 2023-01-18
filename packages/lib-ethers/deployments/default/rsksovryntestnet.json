@@ -8,7 +8,7 @@
   "wrbtcAddress": "0x69FE5cEC81D5eF92600c1A0dB1F11986AB3758Ab",
   "presaleAddress": "0x0000000000000000000000000000000000000001",
   "marketMakerAddress": "0x0000000000000000000000000000000000000001",
-  "myntMassetManagerAddress": "0x5a42EF62CE3f49888284a604833466A94fd9fc36",
+  "myntMassetManagerAddress": "0xac2d05A148aB512EDEDc7280c00292ED33d31f1A",
   "myntNueTokenAddress": "0x007b3AA69A846cB1f76b60b3088230A52D2A83AC",
   "_priceFeedIsTestnet": true,
   "_isDev": false,

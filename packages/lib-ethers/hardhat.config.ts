@@ -140,11 +140,11 @@ const myntAddresses: Record<string, MyntAddresses> = {
     nueTokenAddress: ""
   },
   rsktestnet: {
-    massetManagerAddress: "0x5a42EF62CE3f49888284a604833466A94fd9fc36",
+    massetManagerAddress: "0xac2d05A148aB512EDEDc7280c00292ED33d31f1A",
     nueTokenAddress: "0x007b3AA69A846cB1f76b60b3088230A52D2A83AC"
   },
   rskforkedtestnet: {
-    massetManagerAddress: "0x5a42EF62CE3f49888284a604833466A94fd9fc36",
+    massetManagerAddress: "0xac2d05A148aB512EDEDc7280c00292ED33d31f1A",
     nueTokenAddress: "0x007b3AA69A846cB1f76b60b3088230A52D2A83AC"
   },
 }
