@@ -90,7 +90,15 @@ export const Convert: React.FC = () => {
         </>
       }
     >
-      <Flex sx={{ alignItems: "start", justifyContent: "space-around", py: 4 }}>
+      <Flex
+        sx={{
+          flexDirection: ["column", "row"],
+          alignItems: "start",
+          justifyContent: "space-around",
+          py: 4,
+          gap: 2
+        }}
+      >
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300, flex: 1 }}>
           <Text sx={{ fontWeight: 600, px: 2 }}>Convert ZUSD</Text>
           {showConvertFromZUSD ? (

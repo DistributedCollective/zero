@@ -22,14 +22,19 @@ export const Dashboard: React.FC = () => {
   const { data } = useTokenBalance(walletAddress!, addresses.xusd);
   const usdBalanceIsZero = zusdBalance.isZero && isZero((data || "")?.toString());
   return (
-    <Container variant="columns">
+    <Container
+      sx={{
+        padding: [2, 0]
+      }}
+      variant="columns"
+    >
       <Flex
         sx={{
           justifyContent: "center",
           flexDirection: "row",
           width: "100%",
-          mt: 4,
-          mx: 4
+          mt: [2, 4],
+          mx: [0, 4]
         }}
       >
         <Flex
