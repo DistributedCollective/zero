@@ -9,7 +9,7 @@ import { PriceManager } from "../components/PriceManager";
 import { Convert } from "../components/Aggregator/Convert";
 import useTokenBalance from "../hooks/useTokenBalance";
 import { addresses } from "../contracts/config";
-import { isZero, isMainnet } from "../utils";
+import { isZero } from "../utils";
 import { useConnectorContext } from "src/components/Connector";
 
 const select = ({ zusdBalance }: LiquityStoreState) => ({
@@ -51,7 +51,7 @@ export const Dashboard: React.FC = () => {
             ZUSD to XUSD conversions are currently paused to preserve BabelFish stability and
             liquidity. You can find more information{" "}
             <Link
-              href={`https://${!isMainnet ? "live" : "test"}.sovryn.app/zero`}
+              href="https://babelfish-money.medium.com/zusd-deposits-temporarily-paused-e8da1dd9ef5"
               variant="redemption"
             >
               here
