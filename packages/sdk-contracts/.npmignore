@@ -1,3 +1,6 @@
 hardhat.config.ts
 scripts
 test
+.env
+tmp
+cache
