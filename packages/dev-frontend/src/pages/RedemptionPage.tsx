@@ -10,12 +10,12 @@ export const RedemptionPage: React.FC = () => {
     <Container variant="columns">
       <Container variant="left">
         <Card>
-          <InfoMessage title="Bot functionality">
+          <InfoMessage title="Important information">
             <Paragraph>
               Redemptions are expected to be carried out by bots when arbitrage opportunities emerge.
             </Paragraph>
             <Paragraph sx={{ mt: 2 }}>
-              Most of the time you will get a better rate for converting ZUSD to RBTC on{" "}
+              Most of the time you will get a better rate for converting ZUSD (via XUSD) to RBTC on{" "}
               <Link variant="redemption" href="https://live.sovryn.app/swap" target="_blank">
                 Sovryn
               </Link>{" "}
