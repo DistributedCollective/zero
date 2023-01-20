@@ -50,7 +50,7 @@
     "postinstall": "patch-package"
   },
   "peerDependencies": {
-    "@sovryn-zero/lib-base": ">=1.0.0-early.access.0 <1.0.0",
+    "@sovryn-zero/lib-base": "<1.0.0",
     "ethers": "^5.0.0"
   },
   "devDependencies": {
@@ -76,8 +76,10 @@
     "fs-extra": "9.1.0",
     "hardhat": "^2.12.5",
     "npm-run-all": "4.1.5",
-    "patch-package": "^6.5.0",
     "ts-node": "9.1.1",
     "typescript": "4.1.5"
+  },
+  "dependencies": {
+    "patch-package": "^6.5.1"
   }
 }
