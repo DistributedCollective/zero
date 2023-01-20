@@ -47,7 +47,7 @@
     "do-prepare": "run-s prepare:*",
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-lib-ethers-package.tgz",
     "do-publish": "yarn prepare && yarn publish",
-    "postinstall": "patch-package"
+    "do-patch-package": "patch-package"
   },
   "peerDependencies": {
     "@sovryn-zero/lib-base": "<1.0.0",
@@ -76,10 +76,8 @@
     "fs-extra": "9.1.0",
     "hardhat": "^2.12.5",
     "npm-run-all": "4.1.5",
+    "patch-package": "^6.5.1",
     "ts-node": "9.1.1",
     "typescript": "4.1.5"
-  },
-  "dependencies": {
-    "patch-package": "^6.5.1"
   }
 }

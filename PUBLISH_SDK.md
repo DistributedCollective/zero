@@ -38,5 +38,6 @@ from the lib-ethers package:
 - run `yarn  publish`
 - check package is successfully published
 - create a tag e.g. lib-ethers/v1.0.0-earl.access.2 with -m "expose private _findHints -> public findHints"
+- `yarn do-patch` if running scripts on forked chains causes issues
 
 
