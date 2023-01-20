@@ -29,7 +29,7 @@
     "hardhat": "hardhat",
     "check-live-version": "ts-node scripts/check-live-version.ts",
     "delete-dev-deployments": "ts-node scripts/delete-dev-deployments.ts",
-    "prepare": "echo Skipping default `prepare: run-s prepare:*`. Run `do-prepare` and remove superfluous changes for this release as needed",
+    "prepare": "echo 'Skipping default `prepare: run-s prepare:*`. Run `do-prepare` and remove superfluous changes for this release as needed'",
     "prepare:deployments": "ts-node scripts/copy-deployments.ts",
     "prepare:types": "ts-node scripts/generate-types.ts",
     "prepare:eslint": "eslint src",
