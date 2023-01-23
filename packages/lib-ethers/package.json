@@ -46,7 +46,7 @@
     "do-pack": "yarn prepare && yarn pack",
     "do-prepare": "run-s prepare:*",
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-lib-ethers-package.tgz",
-    "do-publish": "yarn prepare && yarn publish",
+    "do-publish": "yarn do-prepare && yarn publish",
     "do-patch-package": "patch-package"
   },
   "peerDependencies": {
