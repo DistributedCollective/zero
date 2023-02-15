@@ -56,6 +56,7 @@ export const WaitListSignup: React.FC = ({ children }) => {
 
       const ref = params.get("r") || "";
       resetStatus();
+      
       if (!isValidEmail || !token) {
         return;
       }

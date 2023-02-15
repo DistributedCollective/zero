@@ -10,7 +10,6 @@ gasReporterOutput.json
 !.solhint.json
 abi/
 artifacts/
-external-artifacts/
 reports/
 node_modules/
 typechain/
@@ -23,3 +22,7 @@ cache
 *.yaml
 abi
 ignore/
+tmp/
+dist/
+build/
+hardhatAccountsList*.*

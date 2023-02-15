@@ -83,7 +83,82 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
 
   describe("TroveManager", async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      await testSetAddresses(troveManager, 14);
+      const dumbContract = await GasPool.new();
+      const tmParamKeys = Array(
+        "_feeDistributorAddress",
+        "_troveManagerRedeemOps",
+        "_liquityBaseParamsAddress",
+        "_borrowerOperationsAddress",
+        "_activePoolAddress",
+        "_defaultPoolAddress",
+        "_stabilityPoolAddress",
+        "_gasPoolAddress",
+        "_collSurplusPoolAddress",
+        "_priceFeedAddress",
+        "_zusdTokenAddress",
+        "_sortedTrovesAddress",
+        "_zeroTokenAddress",
+        "_zeroStakingAddress"
+      );
+
+      const dumbAddresses = {
+        _feeDistributorAddress: dumbContract.address,
+        _troveManagerRedeemOps: dumbContract.address,
+        _liquityBaseParamsAddress: dumbContract.address,
+        _borrowerOperationsAddress: dumbContract.address,
+        _activePoolAddress: dumbContract.address,
+        _defaultPoolAddress: dumbContract.address,
+        _stabilityPoolAddress: dumbContract.address,
+        _gasPoolAddress: dumbContract.address,
+        _collSurplusPoolAddress: dumbContract.address,
+        _priceFeedAddress: dumbContract.address,
+        _zusdTokenAddress: dumbContract.address,
+        _sortedTrovesAddress: dumbContract.address,
+        _zeroTokenAddress: dumbContract.address,
+        _zeroStakingAddress: dumbContract.address
+      };
+
+      const localTestZeroAddress = async (contract, params, tmParamKeys, method = "setAddresses", skip = 0) => {
+        await localTestWrongAddress(
+          contract,
+          params,
+          tmParamKeys,
+          th.ZERO_ADDRESS,
+          method,
+          skip,
+          "Account cannot be zero address"
+        );
+      };
+      const localTestNonContractAddress = async (contract, params, tmParamKeys, method = "setAddresses", skip = 0) => {
+        await localTestWrongAddress(contract, params, tmParamKeys, bob, method, skip, "Account code size cannot be zero");
+      };
+      const localTestWrongAddress = async (contract, params, tmParamKeys, address, method, skip, message) => {
+        for (let i = skip; i < params.length; i++) {
+          const newParams = [...params];
+          newParams[i] = address;
+          const paramObj = {};
+          tmParamKeys.forEach((element, index) => {
+            paramObj[element] = newParams[index];
+          });
+          await th.assertRevert(contract[method](paramObj, { from: owner }), message);
+        }
+      };
+
+      const numAddressParams = 14;
+      const params = Array(numAddressParams).fill(dumbContract.address);
+      await th.assertRevert(troveManager.setAddresses(
+        dumbAddresses, { from: alice })
+      );
+
+      // Attempt to use zero address
+      await localTestZeroAddress(troveManager, params, tmParamKeys);
+      // Attempt to use non contract
+      await localTestNonContractAddress(troveManager, params, tmParamKeys);
+
+      // Owner can successfully set any address
+      const txOwner = await troveManager.setAddresses(dumbAddresses, { from: owner });
+      assert.isTrue(txOwner.receipt.status);
+
     });
   });
 

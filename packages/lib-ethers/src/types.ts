@@ -3,6 +3,7 @@ import { Provider } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 import { BlockTag, TransactionResponse, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { PopulatedTransaction } from "@ethersproject/contracts";
+import { BytesLike } from "@ethersproject/bytes";
 
 /**
  * Optional parameters taken by {@link EthersLiquity} transaction functions.
@@ -14,6 +15,18 @@ export interface EthersTransactionOverrides {
   nonce?: BigNumberish;
   gasLimit?: BigNumberish;
   gasPrice?: BigNumberish;
+}
+
+/**
+ * EIP-2612 permit parameters.
+ *
+ * @public
+ */
+export type PermitParams = {
+    deadline: BigNumberish;
+    v: BigNumberish;
+    r: BytesLike;
+    s: BytesLike;
 }
 
 /**

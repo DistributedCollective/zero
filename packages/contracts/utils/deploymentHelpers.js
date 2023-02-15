@@ -68,6 +68,10 @@ ZERO contracts consist of only those contracts related to the ZERO Token:
 const ZERO_ADDRESS = "0x" + "0".repeat(40);
 const maxBytes32 = "0x" + "f".repeat(64);
 
+const ONE_DAY_IN_SECONDS = 86400;
+const ONE_MINUTE = 60;
+const TWO_WEEKS = 14 * ONE_DAY_IN_SECONDS;
+
 class DeploymentHelper {
   static async deployLiquityCore() {
     const cmdLineArgs = process.argv;
@@ -97,8 +101,8 @@ class DeploymentHelper {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const sortedTroves = await SortedTroves.new();
     const liquityBaseParams = await LiquityBaseParams.new();
-    const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    const troveManager = await TroveManager.new();
+    const troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
+    const troveManager = await TroveManager.new(TWO_WEEKS);
     const activePool = await ActivePool.new();
     const stabilityPool = await StabilityPool.new();
     const gasPool = await GasPool.new();
@@ -170,8 +174,8 @@ class DeploymentHelper {
     testerContracts.collSurplusPool = await CollSurplusPool.new();
     testerContracts.math = await LiquityMathTester.new();
     testerContracts.borrowerOperations = await BorrowerOperationsTester.new();
-    testerContracts.troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    testerContracts.troveManager = await TroveManagerTester.new();
+    testerContracts.troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
+    testerContracts.troveManager = await TroveManagerTester.new(TWO_WEEKS);
     testerContracts.functionCaller = await FunctionCaller.new();
     testerContracts.hintHelpers = await HintHelpers.new();
     testerContracts.zusdToken = await ZUSDTokenTester.new(
@@ -254,8 +258,8 @@ class DeploymentHelper {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const sortedTroves = await SortedTroves.new();
     const liquityBaseParams = await LiquityBaseParams.new();
-    const troveManagerRedeemOps = await TroveManagerRedeemOps.new();
-    const troveManager = await TroveManager.new();
+    const troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
+    const troveManager = await TroveManager.new(TWO_WEEKS);
     const activePool = await ActivePool.new();
     const stabilityPool = await StabilityPool.new();
     const gasPool = await GasPool.new();
@@ -419,20 +423,22 @@ class DeploymentHelper {
 
     // set contracts in the Trove Manager
     await contracts.troveManager.setAddresses(
-      contracts.feeDistributor.address,
-      contracts.troveManagerRedeemOps.address,
-      contracts.liquityBaseParams.address,
-      contracts.borrowerOperations.address,
-      contracts.activePool.address,
-      contracts.defaultPool.address,
-      contracts.stabilityPool.address,
-      contracts.gasPool.address,
-      contracts.collSurplusPool.address,
-      contracts.priceFeedTestnet.address,
-      contracts.zusdToken.address,
-      contracts.sortedTroves.address,
-      ZEROContracts.zeroToken.address,
-      ZEROContracts.zeroStaking.address
+      {
+        _feeDistributorAddress: contracts.feeDistributor.address,
+        _troveManagerRedeemOps: contracts.troveManagerRedeemOps.address,
+        _liquityBaseParamsAddress: contracts.liquityBaseParams.address,
+        _borrowerOperationsAddress: contracts.borrowerOperations.address,
+        _activePoolAddress: contracts.activePool.address,
+        _defaultPoolAddress: contracts.defaultPool.address,
+        _stabilityPoolAddress: contracts.stabilityPool.address,
+        _gasPoolAddress: contracts.gasPool.address,
+        _collSurplusPoolAddress: contracts.collSurplusPool.address,
+        _priceFeedAddress: contracts.priceFeedTestnet.address,
+        _zusdTokenAddress: contracts.zusdToken.address,
+        _sortedTrovesAddress: contracts.sortedTroves.address,
+        _zeroTokenAddress: ZEROContracts.zeroToken.address,
+        _zeroStakingAddress: ZEROContracts.zeroStaking.address
+      }
     );
 
     // set contracts in BorrowerOperations

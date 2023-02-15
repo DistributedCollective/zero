@@ -1,0 +1,20 @@
+{
+  "overrides": [
+    {
+      "files": [
+        "*.sol",
+        "*.js",
+        "*.ts",
+        "*.json"
+      ],
+      "options": {
+        "printWidth": 99,
+        "tabWidth": 4,
+        "useTabs": false,
+        "singleQuote": false,
+        "bracketSpacing": true,
+        "explicitTypes": "always"
+      }
+    }
+  ]
+}

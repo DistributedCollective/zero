@@ -593,6 +593,21 @@ contract("Gas cost tests", async accounts => {
     th.appendData(gasResults, message, data);
   });
 
+  it("", async () => {
+    const message =
+      "repayZUSDFromDLLR(), partial repayment, 30 accounts, repay random amount of ZUSD (of 100 ZUSD)";
+    await th.openTrove_allAccounts(_30_Accounts, contracts, dec(10, "ether"), 0);
+    // TODO: gas calc for withdrawal and repayment ZUSD from DLLR
+    await th.withdrawZusdAndConvertToDLLR_allAccounts(_30_Accounts, contracts, dec(100, 18));
+
+    // TODO: repayZUSDFromDLLR_allAccounts_randomAmount
+    const gasResults = await th.repayZusdFromDLLR_allAccounts_randomAmount(1, 99, _30_Accounts, contracts);
+    th.logGasMetrics(gasResults, message);
+    th.logAllGasCosts(gasResults);
+
+    th.appendData(gasResults, message, data);
+  });
+
   // it("", async () => {
   //   const message = 'repayZUSD(), first repayment, 10 accounts, repay in full (100 of 100 ZUSD)'
   //   await th.openTrove_allAccounts(_10_Accounts, contracts, dec(10, 'ether'), 0)

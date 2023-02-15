@@ -19,6 +19,7 @@ def setAddresses(contracts):
     )
 
     contracts.troveManager.setAddresses(
+        [
         contracts.borrowerOperations.address,
         contracts.activePool.address,
         contracts.defaultPool.address,
@@ -29,7 +30,8 @@ def setAddresses(contracts):
         contracts.zusdToken.address,
         contracts.sortedTroves.address,
         contracts.zeroToken.address,
-        contracts.zeroStaking.address,
+        contracts.zeroStaking.address
+        ],
         { 'from': accounts[0] }
     )
 

@@ -22,7 +22,9 @@
     "prepack:prepare-dist": "yarn prepare-dist",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "coveralls": "cat coverage/lcov.info | coveralls"
+    "coveralls": "cat coverage/lcov.info | coveralls",
+    "prettier:check": "yarn prettier --check .",
+    "prettier:write": "yarn prettier --write ."
   },
   "keywords": [
     "sovryn",
@@ -35,6 +37,7 @@
   "dependencies": {
     "decimal.js": "^10.2.0",
     "eth-mutants": "^0.1.1",
+    "eth-permit": "^0.2.3",
     "ethereumjs-util": "^7.0.9",
     "ethers": "^5.0.32",
     "solc": "^0.6.11",
@@ -50,6 +53,7 @@
     "@primitivefi/hardhat-dodoc": "^0.2.3",
     "chai-bn": "0.2.2",
     "eth-gas-reporter": "^0.2.22",
+    "eth-sig-util": "^3.0.1",
     "ganache-time-traveler": "1.0.15",
     "hardhat": "^2.1.1",
     "hardhat-contract-sizer": "^2.0.3",

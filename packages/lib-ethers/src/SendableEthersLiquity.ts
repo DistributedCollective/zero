@@ -16,7 +16,8 @@ import {
 import {
   EthersTransactionOverrides,
   EthersTransactionReceipt,
-  EthersTransactionResponse
+  EthersTransactionResponse,
+  PermitParams
 } from "./types";
 
 import {
@@ -67,9 +68,10 @@ export class SendableEthersLiquity
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.closeNueTrove} */
   closeNueTrove(
+    permitParams: PermitParams,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersLiquityTransaction<TroveClosureDetails>> {
-    return this._populate.closeNueTrove(overrides).then(sendTransaction);
+    return this._populate.closeNueTrove(permitParams, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.adjustTrove} */
@@ -84,10 +86,11 @@ export class SendableEthersLiquity
   /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.adjustNueTrove} */
   adjustNueTrove(
     params: TroveAdjustmentParams<Decimalish>,
+    permitParams: PermitParams,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>> {
-    return this._populate.adjustNueTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
+    return this._populate.adjustNueTrove(params, permitParams, maxBorrowingRate, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.depositCollateral} */

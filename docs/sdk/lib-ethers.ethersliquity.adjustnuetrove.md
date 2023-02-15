@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
+adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, permitParams: PermitParams, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails>;
 ```
 
 ## Parameters
@@ -15,6 +15,7 @@ adjustNueTrove(params: TroveAdjustmentParams<Decimalish>, maxBorrowingRate?: Dec
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  params | [TroveAdjustmentParams](./lib-base.troveadjustmentparams.md)<!-- -->&lt;[Decimalish](./lib-base.decimalish.md)<!-- -->&gt; |  |
+|  permitParams | [PermitParams](./lib-ethers.permitparams.md) |  |
 |  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) |  |
 |  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
 

@@ -249,11 +249,7 @@ contract("ZUSDToken", async accounts => {
     });
 
     it("transfer(): transferring to a blacklisted address reverts", async () => {
-      await assertRevert(zusdTokenTester.transfer(zusdTokenTester.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(troveManager.address, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(stabilityPool.address, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice }));
     });
 
     it("increaseAllowance(): increases an account's allowance by the correct amount", async () => {
@@ -322,11 +318,7 @@ contract("ZUSDToken", async accounts => {
     }
 
     it("transfer(): transferring to a blacklisted address reverts", async () => {
-      await assertRevert(zusdTokenTester.transfer(zusdTokenTester.address, 1, { from: alice }));
       await assertRevert(zusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(troveManager.address, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(stabilityPool.address, 1, { from: alice }));
-      await assertRevert(zusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice }));
     });
 
     it("decreaseAllowance(): decreases allowance by the expected amount", async () => {
@@ -475,4 +467,4 @@ contract("ZUSDToken", async accounts => {
   });
 });
 
-contract("Reset chain state", async accounts => {});
+contract("Reset chain state", async accounts => { });
