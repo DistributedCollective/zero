@@ -218,7 +218,7 @@ const config: HardhatUserConfig = {
       //timeout: 20000, // increase if needed; 20000 is the default value
       //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
     },
-    rskforkedtestnet: {
+    rskforkedtestnet: { // run in CLI: npx hardhat node --fork https://testnet.sovryn.app/rpc --no-deploy
       url: "http://127.0.0.1:8545/",
       accounts: [getDeployerAccount("rsktestnet") || Wallet.createRandom().privateKey],
       // regtest default prefunded account
@@ -227,13 +227,13 @@ const config: HardhatUserConfig = {
       chainId: 31337,
       gasMultiplier: 1.25
     },
-    rsksovrynmainnet: {
+    rsksovrynmainnet: { 
       url: "https://mainnet.sovryn.app/rpc",
       chainId: 30,
       accounts: [getDeployerAccount("rsksovrynmainnet") || ""]
       //timeout: 20000, // increase if needed; 20000 is the default value
     },
-    rskforkedmainnet: {
+    rskforkedmainnet: { // run in CLI: npx hardhat node --fork https://mainnet4.sovryn.app/rpc --no-deploy --port 4444
       url: "http://localhost:4444/",
       accounts: [getDeployerAccount("rsksovrynmainnet") || Wallet.createRandom().privateKey],
       // regtest default prefunded account
