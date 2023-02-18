@@ -12,7 +12,7 @@ abi/
 artifacts/
 reports/
 node_modules/
-typechain/
+types/
 package-lock.json
 coverage
 coverage.json
