@@ -1,5 +1,5 @@
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/deploymentHelpers.js");
+const testHelpers = require("../../utils/testHelpers.js");
 const { ethers } = require("hardhat");
 const { signERC2612Permit } = require('eth-permit');
 const timeMachine = require("ganache-time-traveler");

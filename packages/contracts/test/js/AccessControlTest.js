@@ -1,5 +1,5 @@
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/deploymentHelpers.js");
+const testHelpers = require("../../utils/testHelpers.js");
 const TroveManagerTester = artifacts.require("TroveManagerTester");
 
 const th = testHelpers.TestHelper;
@@ -66,7 +66,7 @@ contract(
       await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts);
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
 
-      for (account of accounts.slice(0, 10)) {
+      for (let account of accounts.slice(0, 10)) {
         await th.openTrove(coreContracts, {
           extraZUSDAmount: toBN(dec(20000, 18)),
           ICR: toBN(dec(2, 18)),

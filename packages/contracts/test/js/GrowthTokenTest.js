@@ -1,5 +1,5 @@
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/deploymentHelpers.js");
+const testHelpers = require("../../utils/testHelpers.js");
 const timeMachine = require("ganache-time-traveler");
 
 const { keccak256 } = require("@ethersproject/keccak256");

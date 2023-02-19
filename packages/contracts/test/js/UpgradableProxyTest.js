@@ -1,7 +1,7 @@
 const ProxiableContract = artifacts.require('ProxiableContract');
 const ProxiableContract2 = artifacts.require('ProxiableContract2');
 const UpgradableProxyTester = artifacts.require('UpgradableProxyTester');
-const testHelpers = require('../utils/testHelpers.js');
+const testHelpers = require('../../utils/testHelpers.js');
 const th = testHelpers.TestHelper;
 const BN = require('bn.js');
 require('chai').use(require('chai-bn')(BN)).should();
@@ -60,7 +60,7 @@ contract('UpgradableProxy', async (accounts) => {
       await proxyControl.setSomeVar(20);
       const someVar = await proxyControl.getSomeVar();
       assert.equal(someVar, 20);
-      
+
       // simulate upgrade
       const newProxiableContractContract = await ProxiableContract2.new();
       await proxy.setImplementation(newProxiableContractContract.address);

@@ -2,7 +2,7 @@ const ExternalPriceFeedTester = artifacts.require("./ExternalPriceFeedTester.sol
 const PriceFeed = artifacts.require("./PriceFeed.sol");
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
 
-const testHelpers = require("../utils/testHelpers.js");
+const testHelpers = require("../../utils/testHelpers.js");
 const timeMachine = require('ganache-time-traveler');
 const th = testHelpers.TestHelper;
 
@@ -24,8 +24,8 @@ contract("PriceFeed", async accounts => {
   };
 
   before(async () => {
-    priceFeedTestnet = await PriceFeedTestnet.new()
-    PriceFeedTestnet.setAsDeployed(priceFeedTestnet)
+    priceFeedTestnet = await PriceFeedTestnet.new();
+    PriceFeedTestnet.setAsDeployed(priceFeedTestnet);
 
     priceFeed = await PriceFeed.new();
     PriceFeed.setAsDeployed(priceFeed);
@@ -49,12 +49,12 @@ contract("PriceFeed", async accounts => {
 
   let revertToSnapshot;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     let snapshot = await timeMachine.takeSnapshot();
-    revertToSnapshot = () => timeMachine.revertToSnapshot(snapshot['result'])
+    revertToSnapshot = () => timeMachine.revertToSnapshot(snapshot['result']);
   });
 
-  afterEach(async() => {
+  afterEach(async () => {
     await revertToSnapshot();
   });
 
@@ -145,7 +145,7 @@ contract("PriceFeed", async accounts => {
       price = await priceFeed.lastGoodPrice();
       assert.equal(price, dec(14, 18));
     });
-    
+
 
     it("should set the price when setting the main price feed oracle", async () => {
       await mockedMoCPriceFeed.setLatestAnswer(dec(10, 18), true);
