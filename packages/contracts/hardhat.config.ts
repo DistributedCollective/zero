@@ -1,8 +1,4 @@
-import {
-    HardhatNetworkAccountsUserConfig,
-    HardhatUserConfig,
-    HttpNetworkAccountsUserConfig,
-} from "hardhat/types";
+import { HardhatNetworkAccountsUserConfig, HardhatUserConfig } from "hardhat/types";
 import { task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
@@ -15,7 +11,7 @@ import "tsconfig-paths/register";
 import "@typechain/hardhat";
 /// import "hardhat-docgen";
 /// import "@openzeppelin/hardhat-upgrades";
-/// import "@nomiclabs/hardhat-solhint";
+import "@nomiclabs/hardhat-solhint";
 
 // import "tasks/contractsInteraction";
 
