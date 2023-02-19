@@ -26,3 +26,8 @@ tmp/
 dist/
 build/
 hardhatAccountsList*.*
+test/js/**/*.js
+errorAccumulationTest/
+eth-mutants-custom/
+fuzzTests/js
+gasTest/js
