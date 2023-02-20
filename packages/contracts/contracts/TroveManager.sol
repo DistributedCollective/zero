@@ -37,9 +37,11 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     constructor(uint256 _bootstrapPeriod) public TroveManagerBase(_bootstrapPeriod) {}
 
     // --- Dependency setter ---
-    function setAddresses(
-        TroveManagerInitAddressesParams memory _troveManagerInitAddressesParams
-    ) external override onlyOwner {
+    function setAddresses(TroveManagerInitAddressesParams memory _troveManagerInitAddressesParams)
+        external
+        override
+        onlyOwner
+    {
         {
             checkContract(_troveManagerInitAddressesParams._feeDistributorAddress);
             checkContract(_troveManagerInitAddressesParams._troveManagerRedeemOps);
@@ -111,9 +113,12 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return TroveOwners.length;
     }
 
-    function getTroveFromTroveOwnersArray(
-        uint256 _index
-    ) external view override returns (address) {
+    function getTroveFromTroveOwnersArray(uint256 _index)
+        external
+        view
+        override
+        returns (address)
+    {
         return TroveOwners[_index];
     }
 
@@ -845,9 +850,7 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
     }
 
     /// Return the Troves entire debt and coll, including pending rewards from redistributions.
-    function getEntireDebtAndColl(
-        address _borrower
-    )
+    function getEntireDebtAndColl(address _borrower)
         public
         view
         override
@@ -1006,9 +1009,12 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _calcRedemptionRate(_calcDecayedBaseRate());
     }
 
-    function getRedemptionFeeWithDecay(
-        uint256 _ETHDrawn
-    ) external view override returns (uint256) {
+    function getRedemptionFeeWithDecay(uint256 _ETHDrawn)
+        external
+        view
+        override
+        returns (uint256)
+    {
         return _calcRedemptionFee(getRedemptionRateWithDecay(), _ETHDrawn);
     }
 
@@ -1038,10 +1044,11 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         return _calcBorrowingFee(getBorrowingRateWithDecay(), _ZUSDDebt);
     }
 
-    function _calcBorrowingFee(
-        uint256 _borrowingRate,
-        uint256 _ZUSDDebt
-    ) internal pure returns (uint256) {
+    function _calcBorrowingFee(uint256 _borrowingRate, uint256 _ZUSDDebt)
+        internal
+        pure
+        returns (uint256)
+    {
         return _borrowingRate.mul(_ZUSDDebt).div(DECIMAL_PRECISION);
     }
 
@@ -1085,50 +1092,56 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         Troves[_borrower].status = Status(_num);
     }
 
-    function increaseTroveColl(
-        address _borrower,
-        uint256 _collIncrease
-    ) external override returns (uint256) {
+    function increaseTroveColl(address _borrower, uint256 _collIncrease)
+        external
+        override
+        returns (uint256)
+    {
         _requireCallerIsBorrowerOperations();
         uint256 newColl = Troves[_borrower].coll.add(_collIncrease);
         Troves[_borrower].coll = newColl;
         return newColl;
     }
 
-    function decreaseTroveColl(
-        address _borrower,
-        uint256 _collDecrease
-    ) external override returns (uint256) {
+    function decreaseTroveColl(address _borrower, uint256 _collDecrease)
+        external
+        override
+        returns (uint256)
+    {
         _requireCallerIsBorrowerOperations();
         uint256 newColl = Troves[_borrower].coll.sub(_collDecrease);
         Troves[_borrower].coll = newColl;
         return newColl;
     }
 
-    function increaseTroveDebt(
-        address _borrower,
-        uint256 _debtIncrease
-    ) external override returns (uint256) {
+    function increaseTroveDebt(address _borrower, uint256 _debtIncrease)
+        external
+        override
+        returns (uint256)
+    {
         _requireCallerIsBorrowerOperations();
         uint256 newDebt = Troves[_borrower].debt.add(_debtIncrease);
         Troves[_borrower].debt = newDebt;
         return newDebt;
     }
 
-    function decreaseTroveDebt(
-        address _borrower,
-        uint256 _debtDecrease
-    ) external override returns (uint256) {
+    function decreaseTroveDebt(address _borrower, uint256 _debtDecrease)
+        external
+        override
+        returns (uint256)
+    {
         _requireCallerIsBorrowerOperations();
         uint256 newDebt = Troves[_borrower].debt.sub(_debtDecrease);
         Troves[_borrower].debt = newDebt;
         return newDebt;
     }
 
-    function getCurrentICR(
-        address _borrower,
-        uint256 _price
-    ) external view override returns (uint256) {
+    function getCurrentICR(address _borrower, uint256 _price)
+        external
+        view
+        override
+        returns (uint256)
+    {
         return _getCurrentICR(_borrower, _price);
     }
 

@@ -2,18 +2,18 @@
 
 pragma solidity 0.6.11;
 
-import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/IStabilityPool.sol';
-import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/ITroveManager.sol';
-import './Interfaces/IZUSDToken.sol';
-import './Interfaces/ISortedTroves.sol';
+import "./Interfaces/IBorrowerOperations.sol";
+import "./Interfaces/IStabilityPool.sol";
+import "./Interfaces/IBorrowerOperations.sol";
+import "./Interfaces/ITroveManager.sol";
+import "./Interfaces/IZUSDToken.sol";
+import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/BaseMath.sol";
 
 contract StabilityPoolStorage is Ownable, BaseMath {
-    string constant public NAME = "StabilityPool";
+    string public constant NAME = "StabilityPool";
 
     IBorrowerOperations public borrowerOperations;
 
@@ -26,47 +26,47 @@ contract StabilityPoolStorage is Ownable, BaseMath {
 
     ICommunityIssuance public communityIssuance;
 
-    uint256 internal ETH;  // deposited ether tracker
+    uint256 internal ETH; // deposited ether tracker
 
     // Tracker for ZUSD held in the pool. Changes when users deposit/withdraw, and when Trove debt is offset.
     uint256 internal totalZUSDDeposits;
 
-   // --- Data structures ---
+    // --- Data structures ---
 
     struct FrontEnd {
-        uint kickbackRate;
+        uint256 kickbackRate;
         bool registered;
     }
 
     struct Deposit {
-        uint initialValue;
+        uint256 initialValue;
         address frontEndTag;
     }
 
     struct Snapshots {
-        uint S;
-        uint P;
-        uint G;
+        uint256 S;
+        uint256 P;
+        uint256 G;
         uint128 scale;
         uint128 epoch;
     }
 
-    mapping (address => Deposit) public deposits;  // depositor address -> Deposit struct
-    mapping (address => Snapshots) public depositSnapshots;  // depositor address -> snapshots struct
+    mapping(address => Deposit) public deposits; // depositor address -> Deposit struct
+    mapping(address => Snapshots) public depositSnapshots; // depositor address -> snapshots struct
 
-    mapping (address => FrontEnd) public frontEnds;  // front end address -> FrontEnd struct
-    mapping (address => uint) public frontEndStakes; // front end address -> last recorded total deposits, tagged with that front end
-    mapping (address => Snapshots) public frontEndSnapshots; // front end address -> snapshots struct
+    mapping(address => FrontEnd) public frontEnds; // front end address -> FrontEnd struct
+    mapping(address => uint256) public frontEndStakes; // front end address -> last recorded total deposits, tagged with that front end
+    mapping(address => Snapshots) public frontEndSnapshots; // front end address -> snapshots struct
 
     /*  Product 'P': Running product by which to multiply an initial deposit, in order to find the current compounded deposit,
-    * after a series of liquidations have occurred, each of which cancel some ZUSD debt with the deposit.
-    *
-    * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
-    * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
-    */
-    uint public P;
+     * after a series of liquidations have occurred, each of which cancel some ZUSD debt with the deposit.
+     *
+     * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
+     * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
+     */
+    uint256 public P;
 
-    uint public constant SCALE_FACTOR = 1e9;
+    uint256 public constant SCALE_FACTOR = 1e9;
 
     // Each time the scale of P shifts by SCALE_FACTOR, the scale is incremented by 1
     uint128 public currentScale;
@@ -75,28 +75,27 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     uint128 public currentEpoch;
 
     /* ETH Gain sum 'S': During its lifetime, each deposit d_t earns an ETH gain of ( d_t * [S - S_t] )/P_t, where S_t
-    * is the depositor's snapshot of S taken at the time t when the deposit was made.
-    *
-    * The 'S' sums are stored in a nested mapping (epoch => scale => sum):
-    *
-    * - The inner mapping records the sum S at different scales
-    * - The outer mapping records the (scale => sum) mappings, for different epochs.
-    */
-    mapping (uint128 => mapping(uint128 => uint)) public epochToScaleToSum;
+     * is the depositor's snapshot of S taken at the time t when the deposit was made.
+     *
+     * The 'S' sums are stored in a nested mapping (epoch => scale => sum):
+     *
+     * - The inner mapping records the sum S at different scales
+     * - The outer mapping records the (scale => sum) mappings, for different epochs.
+     */
+    mapping(uint128 => mapping(uint128 => uint256)) public epochToScaleToSum;
 
     /*
-    * Similarly, the sum 'G' is used to calculate ZERO gains. During it's lifetime, each deposit d_t earns a ZERO gain of
-    *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when  the deposit was made.
-    *
-    *  ZERO reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
-    *  In each case, the ZERO reward is issued (i.e. G is updated), before other state changes are made.
-    */
-    mapping (uint128 => mapping(uint128 => uint)) public epochToScaleToG;
+     * Similarly, the sum 'G' is used to calculate ZERO gains. During it's lifetime, each deposit d_t earns a ZERO gain of
+     *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when  the deposit was made.
+     *
+     *  ZERO reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
+     *  In each case, the ZERO reward is issued (i.e. G is updated), before other state changes are made.
+     */
+    mapping(uint128 => mapping(uint128 => uint256)) public epochToScaleToG;
 
     // Error tracker for the error correction in the ZERO issuance calculation
-    uint public lastZEROError;
+    uint256 public lastZEROError;
     // Error trackers for the error correction in the offset calculation
-    uint public lastETHError_Offset;
-    uint public lastZUSDLossError_Offset;
-
+    uint256 public lastETHError_Offset;
+    uint256 public lastZUSDLossError_Offset;
 }

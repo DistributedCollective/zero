@@ -14,7 +14,7 @@ import "./Dependencies/Ownable.sol";
 import "./Dependencies/Mynt/IMassetManager.sol";
 
 contract BorrowerOperationsStorage is Ownable {
-    string constant public NAME = "BorrowerOperations";
+    string public constant NAME = "BorrowerOperations";
 
     // --- Connected contract declarations ---
 

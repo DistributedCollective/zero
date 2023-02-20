@@ -451,10 +451,10 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
 
-    function _computeZEROPerUnitStaked(
-        uint256 _ZEROIssuance,
-        uint256 _totalZUSDDeposits
-    ) internal returns (uint256) {
+    function _computeZEROPerUnitStaked(uint256 _ZEROIssuance, uint256 _totalZUSDDeposits)
+        internal
+        returns (uint256)
+    {
         /*
          * Calculate the ZERO-per-unit staked.  Division uses a "feedback" error correction, to keep the
          * cumulative error low in the running total G:
@@ -637,10 +637,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return ETHGain;
     }
 
-    function _getETHGainFromSnapshots(
-        uint256 initialDeposit,
-        Snapshots memory snapshots
-    ) internal view returns (uint256) {
+    function _getETHGainFromSnapshots(uint256 initialDeposit, Snapshots memory snapshots)
+        internal
+        view
+        returns (uint256)
+    {
         /*
          * Grab the sum 'S' from the epoch at which the stake was made. The ETH gain may span up to one scale change.
          * If it does, the second portion of the ETH gain is scaled by 1e9.
@@ -718,10 +719,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return ZEROGain;
     }
 
-    function _getZEROGainFromSnapshots(
-        uint256 initialStake,
-        Snapshots memory snapshots
-    ) internal view returns (uint256) {
+    function _getZEROGainFromSnapshots(uint256 initialStake, Snapshots memory snapshots)
+        internal
+        view
+        returns (uint256)
+    {
         /*
          * Grab the sum 'G' from the epoch at which the stake was made. The ZERO gain may span up to one scale change.
          * If it does, the second portion of the ZERO gain is scaled by 1e9.
@@ -785,10 +787,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     // Internal function, used to calculcate compounded deposits and compounded front end stakes.
-    function _getCompoundedStakeFromSnapshots(
-        uint256 initialStake,
-        Snapshots memory snapshots
-    ) internal view returns (uint256) {
+    function _getCompoundedStakeFromSnapshots(uint256 initialStake, Snapshots memory snapshots)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 snapshot_P = snapshots.P;
         uint128 scaleSnapshot = snapshots.scale;
         uint128 epochSnapshot = snapshots.epoch;

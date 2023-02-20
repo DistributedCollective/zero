@@ -6,8 +6,6 @@ import "./SortedTroves.sol";
 import "./Dependencies/Ownable.sol";
 
 contract MultiTroveGetterStorage is Ownable {
-
     TroveManager public troveManager; // XXX Troves missing from ITroveManager?
     ISortedTroves public sortedTroves;
-
 }

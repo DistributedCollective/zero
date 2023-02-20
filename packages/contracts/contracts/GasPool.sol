@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.11;
 
-
 /**
  * The purpose of this contract is to hold ZUSD tokens for gas compensation:
  * https://github.com/DistributedCollective/zero#gas-compensation

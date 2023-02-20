@@ -704,10 +704,11 @@ contract BorrowerOperations is
         return usdValue;
     }
 
-    function _getCollChange(
-        uint256 _collReceived,
-        uint256 _requestedCollWithdrawal
-    ) internal pure returns (uint256 collChange, bool isCollIncrease) {
+    function _getCollChange(uint256 _collReceived, uint256 _requestedCollWithdrawal)
+        internal
+        pure
+        returns (uint256 collChange, bool isCollIncrease)
+    {
         if (_collReceived != 0) {
             collChange = _collReceived;
             isCollIncrease = true;
@@ -810,10 +811,10 @@ contract BorrowerOperations is
         );
     }
 
-    function _requireNonZeroAdjustment(
-        uint256 _collWithdrawal,
-        uint256 _ZUSDChange
-    ) internal view {
+    function _requireNonZeroAdjustment(uint256 _collWithdrawal, uint256 _ZUSDChange)
+        internal
+        view
+    {
         require(
             msg.value != 0 || _collWithdrawal != 0 || _ZUSDChange != 0,
             "BorrowerOps: There must be either a collateral change or a debt change"
@@ -825,10 +826,10 @@ contract BorrowerOperations is
         require(status == 1, "BorrowerOps: Trove does not exist or is closed");
     }
 
-    function _requireTroveisNotActive(
-        ITroveManager _troveManager,
-        address _borrower
-    ) internal view {
+    function _requireTroveisNotActive(ITroveManager _troveManager, address _borrower)
+        internal
+        view
+    {
         uint256 status = _troveManager.getTroveStatus(_borrower);
         require(status != 1, "BorrowerOps: Trove is active");
     }
@@ -925,10 +926,10 @@ contract BorrowerOperations is
         );
     }
 
-    function _requireValidZUSDRepayment(
-        uint256 _currentDebt,
-        uint256 _debtRepayment
-    ) internal pure {
+    function _requireValidZUSDRepayment(uint256 _currentDebt, uint256 _debtRepayment)
+        internal
+        pure
+    {
         require(
             _debtRepayment <= _currentDebt.sub(ZUSD_GAS_COMPENSATION),
             "BorrowerOps: Amount repaid must not be larger than the Trove's debt"
@@ -950,10 +951,10 @@ contract BorrowerOperations is
         );
     }
 
-    function _requireValidMaxFeePercentage(
-        uint256 _maxFeePercentage,
-        bool _isRecoveryMode
-    ) internal view {
+    function _requireValidMaxFeePercentage(uint256 _maxFeePercentage, bool _isRecoveryMode)
+        internal
+        view
+    {
         if (_isRecoveryMode) {
             require(
                 _maxFeePercentage <= DECIMAL_PRECISION,
