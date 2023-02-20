@@ -2,10 +2,8 @@
   "overrides": [
     {
       "files": [
-        "*.sol",
-        "*.js",
-        "*.ts",
-        "*.json"
+        "*.js", 
+        "*.ts"
       ],
       "options": {
         "printWidth": 99,
@@ -18,10 +16,22 @@
     },
     {
       "files": [
-        "*.json"
+        "*.sol"
       ],
       "options": {
         "printWidth": 99,
+        "tabWidth": 4,
+        "useTabs": false,
+        "singleQuote": false,
+        "bracketSpacing": true
+      }
+    },
+    {
+      "files": [
+        "*.json"
+      ],
+      "options": {
+        "printWidth": 15,
         "tabWidth": 4,
         "useTabs": false,
         "singleQuote": false,

@@ -27,7 +27,11 @@ dist/
 build/
 hardhatAccountsList*.*
 test/js/**/*.js
-errorAccumulationTest/
+test/js/
+errorAccumulationTest/js/
 eth-mutants-custom/
-fuzzTests/js
-gasTest/js
+fuzzTests/js/
+gasTest/js/
+migrations/
+utils/js/
+# see the root .prettierignore

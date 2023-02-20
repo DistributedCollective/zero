@@ -1,6 +1,6 @@
 const fs = require("fs");
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
 const LiquityMathTester = artifacts.require("./LiquityMathTester.sol");
 

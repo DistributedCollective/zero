@@ -1,6 +1,6 @@
 
-const deploymentHelpers = require("../../utils/truffleDeploymentHelpers.js");
-const testHelpers = require("../../utils/testHelpers.js");
+const deploymentHelpers = require("../../utils/js/truffleDeploymentHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 
 const deployLiquity = deploymentHelpers.deployLiquity;
 const getAddresses = deploymentHelpers.getAddresses;

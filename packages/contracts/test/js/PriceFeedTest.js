@@ -2,7 +2,7 @@ const ExternalPriceFeedTester = artifacts.require("./ExternalPriceFeedTester.sol
 const PriceFeed = artifacts.require("./PriceFeed.sol");
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
 
-const testHelpers = require("../../utils/testHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 const timeMachine = require('ganache-time-traveler');
 const th = testHelpers.TestHelper;
 

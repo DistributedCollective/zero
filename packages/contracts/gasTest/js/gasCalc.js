@@ -2,8 +2,8 @@
   Note: uses Mocha testing structure, but simply prints gas costs of transactions. No assertions.
 */
 const fs = require("fs");
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 
 const { TestHelper: th, TimeValues: timeValues } = testHelpers;
 const dec = th.dec;

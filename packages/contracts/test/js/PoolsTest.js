@@ -3,7 +3,7 @@ const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
 const NonPayable = artifacts.require("./NonPayable.sol");
 
-const testHelpers = require("../../utils/testHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 const timeMachine = require('ganache-time-traveler');
 
 const th = testHelpers.TestHelper;

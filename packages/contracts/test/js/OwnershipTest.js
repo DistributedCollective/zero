@@ -1,5 +1,5 @@
-const deploymentHelper = require("../../utils/deploymentHelpers.js");
-const { TestHelper: th, MoneyValues: mv } = require("../../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
+const { TestHelper: th, MoneyValues: mv } = require("../../utils/js/testHelpers.js");
 
 const GasPool = artifacts.require("./GasPool.sol");
 const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol");

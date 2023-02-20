@@ -1,4 +1,4 @@
-const { TestHelper: th } = require("../utils/testHelpers.js")
+const { TestHelper: th } = require("./testHelpers.js")
 
 const DSProxyFactory = artifacts.require('DSProxyFactory')
 const DSProxy = artifacts.require('DSProxy')

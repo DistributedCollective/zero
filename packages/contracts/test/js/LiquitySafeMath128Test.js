@@ -1,4 +1,4 @@
-const testHelpers = require("../../utils/testHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 const th = testHelpers.TestHelper;
 
 const LiquitySafeMath128Tester = artifacts.require("LiquitySafeMath128Tester");

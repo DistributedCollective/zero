@@ -6,8 +6,8 @@
 */
 const fs = require("fs");
 
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 
 const th = testHelpers.TestHelper;
 const dec = th.dec;

@@ -5,6 +5,6 @@ dist
 # don't lint nyc coverage output
 coverage
 # no generated types
-types/generated
+types/generated/
 test-utils/env_setup.ts
-test/js
+test/js/

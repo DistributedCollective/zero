@@ -54,7 +54,7 @@ const {
   TokenProxy,
   ZEROStakingProxy,
   FeeDistributorProxy
-} = require("../utils/proxyHelpers.js");
+} = require("./proxyHelpers.js");
 
 /* "Zero core" consists of all contracts in the core Zero system.
 

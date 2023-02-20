@@ -1,7 +1,7 @@
 const ProxiableContract = artifacts.require('ProxiableContract');
 const ProxiableContract2 = artifacts.require('ProxiableContract2');
 const UpgradableProxyTester = artifacts.require('UpgradableProxyTester');
-const testHelpers = require('../../utils/testHelpers.js');
+const testHelpers = require('../../utils/js/testHelpers.js');
 const th = testHelpers.TestHelper;
 const BN = require('bn.js');
 require('chai').use(require('chai-bn')(BN)).should();

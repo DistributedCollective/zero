@@ -1,5 +1,5 @@
-const deploymentHelper = require("../../utils/deploymentHelpers.js");
-const testHelpers = require("../../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 const timeMachine = require('ganache-time-traveler');
 
 const TroveManagerTester = artifacts.require("TroveManagerTester");
@@ -24,7 +24,7 @@ const {
   SortedTrovesProxy,
   TokenProxy,
   ZEROStakingProxy
-} = require('../../utils/proxyHelpers.js');
+} = require('../../utils/js/proxyHelpers.js');
 
 contract('BorrowerWrappers', async accounts => {
 

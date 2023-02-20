@@ -1,5 +1,5 @@
-const deploymentHelper = require("../../utils/deploymentHelpers.js");
-const testHelpers = require("../../utils/testHelpers.js");
+const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
+const testHelpers = require("../../utils/js/testHelpers.js");
 const { ethers } = require("hardhat");
 const { signERC2612Permit } = require('eth-permit');
 const timeMachine = require("ganache-time-traveler");
@@ -162,11 +162,11 @@ contract("BorrowerOperations", async accounts => {
       defaultPool = contracts.defaultPool;
       borrowerOperations = contracts.borrowerOperations;
       massetManager = contracts.massetManager;
-      hintHelpers = contracts.hintHelpers;
+      //hintHelpers = contracts.hintHelpers;
 
       zeroStaking = ZEROContracts.zeroStaking;
       zeroToken = ZEROContracts.zeroToken;
-      communityIssuance = ZEROContracts.communityIssuance;
+      //communityIssuance = ZEROContracts.communityIssuance;
 
       ZUSD_GAS_COMPENSATION = await borrowerOperations.ZUSD_GAS_COMPENSATION();
       MIN_NET_DEBT = await borrowerOperations.MIN_NET_DEBT();
