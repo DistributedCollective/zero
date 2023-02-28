@@ -10,14 +10,28 @@
         "outDir": "dist",
         "sourceMap": true,
         "noImplicitAny": false,
-        "lib": ["dom", "es2015", "es2016", "es2017"],
+        "lib": [
+            "dom",
+            "es2015",
+            "es2016",
+            "es2017"
+        ],
         "baseUrl": ".",
         "rootDir": ".",
         "paths": {
-            "@utils/*": ["test-utils/*"]
+            "@utils/*": [
+                "test-utils/*"
+            ]
         },
         "allowJs": false
     },
-    "include": ["./scripts", "./test", "./typechain-types", "./tasks"],
-    "files": ["./hardhat.config.ts"]
+    "include": [
+        "./scripts",
+        "./tests",
+        "./typechain-types",
+        "./tasks"
+    ],
+    "files": [
+        "./hardhat.config.ts"
+    ]
 }
