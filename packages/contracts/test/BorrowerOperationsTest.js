@@ -886,15 +886,15 @@ contract("BorrowerOperations", async accounts => {
 
       await assertRevert(
         borrowerOperations.withdrawZUSD(dec(2, 18), dec(1, 16), A, A, { from: A }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
         borrowerOperations.withdrawZUSD("1000000000000000001", dec(1, 16), A, A, { from: A }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
     });
 
-    it("withdrawZUSD(): reverts if max fee < 0.5% in Normal mode", async () => {
+    it("withdrawZUSD(): reverts if max fee < 2.5% in Normal mode", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10, 16)),
         ICR: toBN(dec(2, 18)),
@@ -918,15 +918,15 @@ contract("BorrowerOperations", async accounts => {
 
       await assertRevert(
         borrowerOperations.withdrawZUSD(0, dec(1, 16), A, A, { from: A }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
         borrowerOperations.withdrawZUSD(1, dec(1, 16), A, A, { from: A }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
-        borrowerOperations.withdrawZUSD("4999999999999999", dec(1, 16), A, A, { from: A }),
-        "Max fee percentage must be between 0.5% and 100%"
+        borrowerOperations.withdrawZUSD("24999999999999999", dec(1, 16), A, A, { from: A }),
+        "Max fee percentage must be between 2.5% and 100%"
       );
     });
 
@@ -1000,9 +1000,9 @@ contract("BorrowerOperations", async accounts => {
 
       baseRate = await troveManager.baseRate(); // expect 5% base rate
       assert.equal(baseRate, dec(5, 16));
-      // Attempt with maxFee 0.5%%
+      // Attempt with maxFee 2.5%%
       await assertRevert(
-        borrowerOperations.withdrawZUSD(dec(5, 15), dec(1, 16), A, A, { from: D }),
+        borrowerOperations.withdrawZUSD(dec(25, 15), dec(1, 16), A, A, { from: D }),
         "Fee exceeded provided maximum"
       );
     });
@@ -2028,7 +2028,7 @@ contract("BorrowerOperations", async accounts => {
       );
     });
 
-    it("adjustTrove(): reverts if max fee < 0.5% in Normal mode", async () => {
+    it("adjustTrove(): reverts if max fee < 2.5% in Normal mode", async () => {
       await openTrove({
         extraZUSDAmount: toBN(dec(10000, 18)),
         ICR: toBN(dec(2, 18)),
@@ -2037,22 +2037,22 @@ contract("BorrowerOperations", async accounts => {
 
       await assertRevert(
         borrowerOperations.adjustTrove(0, 0, dec(1, 16), true, A, A, { from: A, value: dec(2, 16) }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
         borrowerOperations.adjustTrove(1, 0, dec(1, 16), true, A, A, { from: A, value: dec(2, 16) }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
-        borrowerOperations.adjustTrove("4999999999999999", 0, dec(1, 18), true, A, A, {
+        borrowerOperations.adjustTrove("24999999999999999", 0, dec(1, 18), true, A, A, {
           from: A,
           value: dec(2, 16)
         }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
     });
 
-    it("adjustTrove(): allows max fee < 0.5% in Recovery mode", async () => {
+    it("adjustTrove(): allows max fee < 2.5% in Recovery mode", async () => {
       await openTrove({
         ICR: toBN(dec(2, 18)),
         extraParams: { from: whale, value: toBN(dec(100, 16)) }
@@ -2079,7 +2079,7 @@ contract("BorrowerOperations", async accounts => {
       });
       await priceFeed.setPrice(dec(1, 16));
       assert.isTrue(await th.checkRecoveryMode(contracts));
-      await borrowerOperations.adjustTrove("4999999999999999", 0, dec(1, 9), true, A, A, {
+      await borrowerOperations.adjustTrove("24999999999999999", 0, dec(1, 9), true, A, A, {
         from: A,
         value: dec(3000000, 16)
       });
@@ -4966,42 +4966,42 @@ contract("BorrowerOperations", async accounts => {
           from: A,
           value: dec(1000, "ether")
         }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
         borrowerOperations.openTrove("1000000000000000001", dec(20000, 18), B, B, {
           from: B,
           value: dec(1000, "ether")
         }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
     });
 
-    it("openTrove(): reverts if max fee < 0.5% in Normal mode", async () => {
+    it("openTrove(): reverts if max fee < 2.5% in Normal mode", async () => {
       await assertRevert(
         borrowerOperations.openTrove(0, dec(195000, 18), A, A, {
           from: A,
           value: dec(1200, "ether")
         }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
         borrowerOperations.openTrove(1, dec(195000, 18), A, A, {
           from: A,
           value: dec(1000, "ether")
         }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
       await assertRevert(
-        borrowerOperations.openTrove("4999999999999999", dec(195000, 18), B, B, {
+        borrowerOperations.openTrove("24999999999999999", dec(195000, 18), B, B, {
           from: B,
           value: dec(1200, "ether")
         }),
-        "Max fee percentage must be between 0.5% and 100%"
+        "Max fee percentage must be between 2.5% and 100%"
       );
     });
 
-    it("openTrove(): allows max fee < 0.5% in Recovery Mode", async () => {
+    it("openTrove(): allows max fee < 2.5% in Recovery Mode", async () => {
       await borrowerOperations.openTrove(th._100pct, dec(195000, 16), A, A, {
         from: A,
         value: dec(2000, 16)
@@ -5016,7 +5016,7 @@ contract("BorrowerOperations", async accounts => {
       await borrowerOperations.openTrove(1, dec(19500, 16), C, C, { from: C, value: dec(3100, 16) });
       await priceFeed.setPrice(dec(25, 18));
       assert.isTrue(await th.checkRecoveryMode(contracts));
-      await borrowerOperations.openTrove("4999999999999999", dec(19500, 16), D, D, {
+      await borrowerOperations.openTrove("24999999999999999", dec(19500, 16), D, D, {
         from: D,
         value: dec(3100, 16)
       });

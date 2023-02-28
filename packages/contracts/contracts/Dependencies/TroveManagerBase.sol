@@ -450,7 +450,7 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         require(
             _maxFeePercentage >= liquityBaseParams.REDEMPTION_FEE_FLOOR() &&
                 _maxFeePercentage <= DECIMAL_PRECISION,
-            "Max fee percentage must be between 0.5% and 100%"
+            "Max fee percentage must be between 2.5% and 100%"
         );
     }
 }

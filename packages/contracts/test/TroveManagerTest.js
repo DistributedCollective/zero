@@ -845,7 +845,7 @@ contract('TroveManager', async accounts => {
 
     // Note: The difference was 1000000 but it's it got a little bit bigger after changing system parameters.
     //       I'm not sure why but the difference is way deep into the decimals
-    assert.isAtMost(th.getDifference(alice_Deposit_After, A_spDeposit.sub(B_debt.mul(A_spDeposit).div(totalDeposits))), 2000000)
+    assert.isAtMost(th.getDifference(alice_Deposit_After, A_spDeposit.sub(B_debt.mul(A_spDeposit).div(totalDeposits))), 3000000)
     assert.isAtMost(th.getDifference(alice_ETHGain_After, th.applyLiquidationFee(B_collateral).mul(A_spDeposit).div(totalDeposits)), 3000000)
 
     const bob_Deposit_After = await stabilityPool.getCompoundedZUSDDeposit(bob)
@@ -3123,11 +3123,11 @@ contract('TroveManager', async accounts => {
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
-    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), dec(2, 18)), "Max fee percentage must be between 0.5% and 100%")
-    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), '1000000000000000001'), "Max fee percentage must be between 0.5% and 100%")
+    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), dec(2, 18)), "Max fee percentage must be between 2.5% and 100%")
+    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), '1000000000000000001'), "Max fee percentage must be between 2.5% and 100%")
   })
 
-  it("redeemCollateral(): reverts if max fee < 0.5%", async () => { 
+  it("redeemCollateral(): reverts if max fee < 2.5%", async () => { 
     await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(10, 18), extraParams: { from: A } })
     await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(20, 18), extraParams: { from: B } })
     await openTrove({ ICR: toBN(dec(400, 16)), extraZUSDAmount: dec(30, 18), extraParams: { from: C } })
@@ -3136,9 +3136,9 @@ contract('TroveManager', async accounts => {
     // skip bootstrapping phase
     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_WEEK * 2, web3.currentProvider)
 
-    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), 0), "Max fee percentage must be between 0.5% and 100%")
-    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), 1), "Max fee percentage must be between 0.5% and 100%")
-    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), '4999999999999999'), "Max fee percentage must be between 0.5% and 100%")
+    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), 0), "Max fee percentage must be between 2.5% and 100%")
+    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), 1), "Max fee percentage must be between 2.5% and 100%")
+    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, dec(10, 18), '24999999999999999'), "Max fee percentage must be between 2.5% and 100%")
   })
 
   it("redeemCollateral(): reverts if fee exceeds max fee percentage", async () => {
@@ -3175,8 +3175,8 @@ contract('TroveManager', async accounts => {
   
     await troveManager.setBaseRate(0)
 
-    // Max fee is 0.5%
-    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, attemptedZUSDRedemption, dec(5, 15)), "Fee exceeded provided maximum")
+    // Max fee is 2.5%
+    await assertRevert(th.redeemCollateralAndGetTxObject(A, contracts, attemptedZUSDRedemption, dec(25, 15)), "Fee exceeded provided maximum")
   })
 
   it("redeemCollateral(): succeeds if fee is less than max fee percentage", async () => {
@@ -4052,7 +4052,7 @@ contract('TroveManager', async accounts => {
     th.assertIsApproximatelyEqual(
       A_balanceAfter.sub(A_balanceBefore),
       ETHDrawn.sub(
-        toBN(dec(5, 15)).add(redemptionAmount.mul(mv._1e18BN).div(totalDebt).div(toBN(2)))
+        toBN(dec(25, 15)).add(redemptionAmount.mul(mv._1e18BN).div(totalDebt).div(toBN(2)))
           .mul(ETHDrawn).div(mv._1e18BN)
       ),
       100000
