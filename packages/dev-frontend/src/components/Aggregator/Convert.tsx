@@ -47,7 +47,7 @@ export const Convert: React.FC = () => {
   const editingStateZUSD = useState<string>();
   const editingStateXUSD = useState<string>();
   const xusdEdited = useRef(false);
-
+  const showConvertFromZUSD = false; //hardcoded whilst ZUSD deposits to XUSD aggregator are paused, can be switched for contract call check in future
   const handleXusdAmount = useCallback(amount => {
     setXUSDAmount(Decimal.from(amount));
     xusdEdited.current = true;
@@ -90,38 +90,52 @@ export const Convert: React.FC = () => {
         </>
       }
     >
-      <Flex sx={{ alignItems: "start", justifyContent: "space-around", py: 4 }}>
+      <Flex
+        sx={{
+          flexDirection: ["column", "row"],
+          alignItems: "start",
+          justifyContent: "space-around",
+          py: 4,
+          gap: 2
+        }}
+      >
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300, flex: 1 }}>
           <Text sx={{ fontWeight: 600, px: 2 }}>Convert ZUSD</Text>
-          <EditableRow
-            label="&nbsp;"
-            inputId="convert-from-zusd"
-            amount={zusdAmount.prettify()}
-            value={zusdAmount}
-            unit={COIN}
-            {...{ editingState: editingStateZUSD }}
-            editedAmount={zusdAmount.toString(18)}
-            setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
-            maxAmount={zusdBalance.toString()}
-            maxedOut={zusdAmount.gte(zusdBalance)}
-          />
-          {zusdAmount.gt(zusdBalance) && (
-            <Flex sx={{ mt: 3 }}>
-              <ErrorDescription>Amount exceeds address balance.</ErrorDescription>
-            </Flex>
+          {showConvertFromZUSD ? (
+            <>
+              <EditableRow
+                label="&nbsp;"
+                inputId="convert-from-zusd"
+                amount={zusdAmount.prettify()}
+                value={zusdAmount}
+                unit={COIN}
+                editingState={editingStateZUSD}
+                editedAmount={zusdAmount.toString(18)}
+                setEditedAmount={amount => setZUSDAmount(Decimal.from(amount))}
+                maxAmount={zusdBalance.toString()}
+                maxedOut={zusdAmount.gte(zusdBalance)}
+              />
+              {zusdAmount.gt(zusdBalance) && (
+                <Flex sx={{ mt: 3 }}>
+                  <ErrorDescription>Amount exceeds address balance.</ErrorDescription>
+                </Flex>
+              )}
+              <Button
+                onClick={handleMintClick}
+                disabled={zusdAmount.isZero || zusdAmount.gt(zusdBalance)}
+                sx={{
+                  mt: 3,
+                  ml: 2,
+                  alignSelf: "self-start"
+                }}
+                data-action-id="zero-convert-ZUSD"
+              >
+                Convert
+              </Button>
+            </>
+          ) : (
+            <Text sx={{ pt: 1, px: 2 }}>This feature is currently disabled.</Text>
           )}
-          <Button
-            onClick={handleMintClick}
-            disabled={zusdAmount.isZero || zusdAmount.gt(zusdBalance)}
-            sx={{
-              mt: 3,
-              ml: 2,
-              alignSelf: "self-start"
-            }}
-            data-action-id="zero-convert-ZUSD"
-          >
-            Convert
-          </Button>
         </Flex>
 
         <Flex sx={{ ml: 3, flexDirection: "column", fontWeight: 300, flex: 1 }}>

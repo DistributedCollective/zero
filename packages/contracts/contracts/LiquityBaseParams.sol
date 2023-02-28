@@ -34,8 +34,8 @@ contract LiquityBaseParams is ILiquityBaseParams, Ownable, Initializable, BaseMa
         MCR = 1100000000000000000; // 110%
         CCR = 1500000000000000000; // 150%
         PERCENT_DIVISOR = 200; // dividing by 200 yields 0.5%
-        BORROWING_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
-        REDEMPTION_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
+        BORROWING_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 25; // 2.5%
+        REDEMPTION_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 25; // 2.5%
         MAX_BORROWING_FEE = (DECIMAL_PRECISION / 100) * 5; // 5%
     }
 

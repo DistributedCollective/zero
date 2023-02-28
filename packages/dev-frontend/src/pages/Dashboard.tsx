@@ -1,6 +1,6 @@
 import { LiquityStoreState } from "@sovryn-zero/lib-base";
 import { useLiquitySelector } from "@sovryn-zero/lib-react";
-import { Container } from "theme-ui";
+import { Container, Flex, Text, Link } from "theme-ui";
 
 import { Trove } from "../components/Trove/Trove";
 import { Stability } from "../components/Stability/Stability";
@@ -22,7 +22,45 @@ export const Dashboard: React.FC = () => {
   const { data } = useTokenBalance(walletAddress!, addresses.xusd);
   const usdBalanceIsZero = zusdBalance.isZero && isZero((data || "")?.toString());
   return (
-    <Container variant="columns">
+    <Container
+      sx={{
+        padding: [2, 0]
+      }}
+      variant="columns"
+    >
+      <Flex
+        sx={{
+          justifyContent: "center",
+          flexDirection: "row",
+          width: "100%",
+          mt: [2, 4],
+          mx: [0, 4]
+        }}
+      >
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            py: 2,
+            px: 4,
+            borderRadius: 15,
+            backgroundColor: "cardBackground"
+          }}
+        >
+          <Text sx={{ fontWeight: 400, px: 2 }}>
+            ZUSD to XUSD conversions are currently paused to preserve BabelFish stability and
+            liquidity. You can find more information{" "}
+            <Link
+              href="https://babelfish-money.medium.com/zusd-deposits-temporarily-paused-e8da1dd9ef5"
+              variant="redemption"
+            >
+              here
+            </Link>
+            .
+          </Text>
+        </Flex>
+      </Flex>
+
       <Container variant="left">
         {!usdBalanceIsZero && <Convert />}
         <Trove />

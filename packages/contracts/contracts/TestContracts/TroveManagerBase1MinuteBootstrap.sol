@@ -9,15 +9,15 @@ import "../Interfaces/IZEROStaking.sol";
 import "../Interfaces/ISortedTroves.sol";
 import "../Interfaces/ICollSurplusPool.sol";
 import "../TroveManagerStorage.sol";
-import "./LiquityBase.sol";
+import "../Dependencies/LiquityBase.sol";
 
-contract TroveManagerBase is LiquityBase, TroveManagerStorage {
+contract TroveManagerBase1MinuteBootstrap is LiquityBase, TroveManagerStorage {
     uint256 public constant SECONDS_IN_ONE_MINUTE = 60;
 
     uint256 public constant MINUTE_DECAY_FACTOR = 999037758833783000;
 
     /// During bootsrap period redemptions are not allowed
-    uint256 public immutable BOOTSTRAP_PERIOD;
+    uint256 public constant BOOTSTRAP_PERIOD = 1 minutes;
 
     /**
       BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
@@ -148,10 +148,6 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         liquidateInNormalMode,
         liquidateInRecoveryMode,
         redeemCollateral
-    }
-
-    constructor(uint256 _bootstrapPeriod) public {
-        BOOTSTRAP_PERIOD = _bootstrapPeriod;
     }
 
     /// Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
@@ -347,15 +343,13 @@ contract TroveManagerBase is LiquityBase, TroveManagerStorage {
         }
     }
 
-    function _calcRedemptionFee(
-        uint256 _redemptionRate,
-        uint256 _ETHDrawn
-    ) internal pure returns (uint256) {
+    function _calcRedemptionFee(uint256 _redemptionRate, uint256 _ETHDrawn)
+        internal
+        pure
+        returns (uint256)
+    {
         uint256 redemptionFee = _redemptionRate.mul(_ETHDrawn).div(DECIMAL_PRECISION);
-        require(
-            redemptionFee < _ETHDrawn,
-            "TroveManager: Fee would eat up all returned collateral"
-        );
+        require(redemptionFee < _ETHDrawn, "TroveManager: Fee would eat up all returned collateral");
         return redemptionFee;
     }
 
