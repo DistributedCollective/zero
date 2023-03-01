@@ -27,9 +27,9 @@ export const Nav: React.FC = () => {
         <Link to="/zero/liquidation" data-action-id="zero-menu-liquidation">
           Liquidation
         </Link>
-        <Link to="/zero/redemption" data-action-id="zero-menu-redemption">
+        {/* <Link to="/zero/redemption" data-action-id="zero-menu-redemption">
           Redemption
-        </Link>
+        </Link> */}
       </Flex>
       <Flex sx={{ alignItems: "center", flexDirection: ["column", "row"] }}>
         <NavLink

@@ -40,7 +40,7 @@ export const SideNav: React.FC = () => {
           <Link to="/zero">Dashboard</Link>
           <NavLink href="https://live.sovryn.app/swap" target="_blank">Trade</NavLink>
           <Link to="/zero/liquidation">Liquidation</Link>
-          <Link to="/zero/redemption">Redemption</Link>
+          {/* <Link to="/zero/redemption">Redemption</Link> */}
         </Box>
       </Flex>
     </Container>
