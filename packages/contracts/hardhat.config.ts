@@ -1,5 +1,31 @@
 import { HardhatNetworkAccountsUserConfig, HardhatUserConfig } from "hardhat/types";
-import { task } from "hardhat/config";
+import { task, /*HardhatUserConfig,*/ types, extendEnvironment } from "hardhat/config";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import "@nomiclabs/hardhat-ethers";
+
+import "@nomicfoundation/hardhat-toolbox";
+import "@nomiclabs/hardhat-ethers";
+
+import "hardhat-gas-reporter";
+import "solidity-coverage";
+import "@nomiclabs/hardhat-web3";
+import "@nomicfoundation/hardhat-chai-matchers";
+import "@nomiclabs/hardhat-truffle5";
+
+import "hardhat-deploy";
+// import "tsconfig-paths/register";
+import "@typechain/hardhat";
+/// import "hardhat-docgen";
+import "hardhat-contract-sizer";
+/// import "@openzeppelin/hardhat-upgrades";
+// import "@nomiclabs/hardhat-solhint";
+
+// import "tasks/contractsInteraction";
+// import "tasks/metaAssetTokenInteraction";
+// import "tasks/upgradeContract";
+// import "tasks/transferOwnership";
+// import "tasks/sips/createSIP";
+
 import "@nomicfoundation/hardhat-toolbox";
 
 import * as dotenv from "dotenv";
@@ -51,6 +77,7 @@ const alchemyUrlRinkeby = () => {
 const mnemonic = {
     mnemonic: "buzz buzz buzz buzz buzz buzz buzz buzz buzz buzz buzz word",
 };
+dotenv.config();
 const testnetPKs = [
     process.env.TESTNET_DEPLOYER_PRIVATE_KEY ?? "",
     process.env.TESTNET_SIGNER_PRIVATE_KEY ?? "",
@@ -62,10 +89,6 @@ const mainnetAccounts = process.env.MAINNET_DEPLOYER_PRIVATE_KEY
     : mnemonic;
 
 const config: HardhatUserConfig = {
-    paths: {
-        // contracts: "./contracts",
-        // artifacts: "./artifacts"
-    },
     solidity: {
         compilers: [
             {
@@ -96,6 +119,12 @@ const config: HardhatUserConfig = {
                 },
             },
         ],
+    },
+    paths: {
+        sources: "./contracts",
+        tests: "./tests",
+        deploy: "./deployment/deploy",
+        deployments: "./deployment/deployments",
     },
     networks: {
         hardhat: {
@@ -239,10 +268,24 @@ const config: HardhatUserConfig = {
       }, */
         ],
         deployments: {
-            rskTestnet: ["external/deployments/rskTestnet"],
-            rskForkedTestnet: ["external/deployments/rskTestnet", "deployments/rskTestnet"],
-            rskMainnet: ["external/deployments/rskMainnet"],
-            rskForkedMainnet: ["external/deployments/rskMainnet", "deployments/rskMainnet"],
+            rskSovrynTestnet: ["external/deployments/rskTestnet"],
+            rskTestnet: [
+                "external/deployments/rskTestnet",
+                "deployment/deployments/rskSovrynTestnet",
+            ],
+            rskForkedTestnet: [
+                "external/deployments/rskTestnet",
+                "deployment/deployments/rskSovrynTestnet",
+            ],
+            rskMainnet: [
+                "external/deployments/rskMainnet",
+                "deployment/deployments/rskSovrynMainnet",
+            ],
+            rskSovrynMainnet: ["external/deployments/rskMainnet"],
+            rskForkedMainnet: [
+                "external/deployments/rskMainnet",
+                "deployment/deployments/rskSovrynMainnet",
+            ],
         },
     },
 };

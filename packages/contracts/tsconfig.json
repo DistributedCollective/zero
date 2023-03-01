@@ -29,7 +29,8 @@
         "./scripts",
         "./tests",
         "./typechain-types",
-        "./tasks"
+        "./tasks",
+        "./deployment/deploy"
     ],
     "files": [
         "./hardhat.config.ts"
