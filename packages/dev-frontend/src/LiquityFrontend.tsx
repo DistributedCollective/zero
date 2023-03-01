@@ -11,6 +11,7 @@ import { TransactionMonitor } from "./components/Transaction";
 import { Header } from "./components/Header";
 
 import { RiskyTrovesPage } from "./pages/RiskyTrovesPage";
+import { RedemptionPage } from "./pages/RedemptionPage";
 
 import { TroveViewProvider } from "./components/Trove/context/TroveViewProvider";
 import { StabilityViewProvider } from "./components/Stability/context/StabilityViewProvider";
@@ -65,9 +66,9 @@ export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
                 <Route path="/zero/liquidation">
                   <RiskyTrovesPage />
                 </Route>
-                {/* <Route path="/zero/redemption">
+                <Route path="/zero/redemption">
                   <RedemptionPage />
-                </Route> */}
+                </Route>
               </Container>
             </Flex>
           </StabilityViewProvider>
