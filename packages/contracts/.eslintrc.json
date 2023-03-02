@@ -1,7 +1,9 @@
 {
     "env": {
         "browser": true,
+        //"commonjs": true,
         "es2021": true,
+        //"mocha": true, // for test files
         "node": true
     },
     "extends": [
@@ -22,5 +24,7 @@
         "@typescript-eslint/no-empty-interface": [
             "warn"
         ],
+        "no-unused-vars": "warn",
+        "no-undef": "warn"
     }
 }

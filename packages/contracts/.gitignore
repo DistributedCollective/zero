@@ -1,5 +1,6 @@
 # Buidler contract JSONs
 artifacts/
+!/external/artifacts/
 
 # Truffle contract JSONs
 /build/contracts
@@ -37,3 +38,6 @@ yarn-error.log
 
 #typechain
 types/generated/*
+
+#hh deployments
+*/deployments/rskForked*/

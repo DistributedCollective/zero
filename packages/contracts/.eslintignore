@@ -8,3 +8,7 @@ coverage
 types/generated/
 test-utils/env_setup.ts
 test/js/
+contracts/
+*/js/*.js
+**/*.js
+*.js
