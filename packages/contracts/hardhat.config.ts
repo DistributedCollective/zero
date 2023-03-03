@@ -212,7 +212,7 @@ const config: HardhatUserConfig = {
 
         /// MAINNETS
         rskSovrynMainnet: {
-            url: "https://mainnet.sovryn.app/rpc",
+            url: "https://mainnet-dev.sovryn.app/rpc",
             chainId: 30,
             accounts: mainnetAccounts,
             tags: ["mainnet"],
