@@ -7,19 +7,8 @@ const deploymentName = getContractNameFromScriptFileName(path.basename(__filenam
 const func: DeployFunction = async (hre) => {
     const { getNamedAccounts } = hre;
     const { deployer } = await getNamedAccounts();
-    console.log("deployer", deployer);
     injectHre(hre);
     await deployWithCustomProxy(deployer, deploymentName, "UpgradableProxy");
-
-    /*    await deployments.execute(
-            "MassetManager",
-            { from: deployer },
-            "initialize",
-            deployedBasketManager.address,
-            deployedToken.address,
-            false
-        );
-        */
 };
 
 func.tags = [deploymentName];

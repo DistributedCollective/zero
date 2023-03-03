@@ -41,3 +41,5 @@ types/generated/*
 
 #hh deployments
 */deployments/rskForked*/
+
+/tmp

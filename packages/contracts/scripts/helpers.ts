@@ -1,7 +1,14 @@
 /* eslint-disable no-plusplus */
 import { Interface } from "@ethersproject/abi/lib/interface";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { BytesLike, Contract, Signer, TransactionReceipt, TransactionResponse } from "ethers";
+import {
+    BigNumberish,
+    BytesLike,
+    Contract,
+    Signer,
+    TransactionReceipt,
+    TransactionResponse,
+} from "ethers";
 import { Address } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { GovernorAlpha, MultiSigWallet } from "types/generated";
@@ -167,8 +174,8 @@ const deployWithCustomProxy = async (
     isOwnerMultisig = false,
     multisigName = "MultiSigWallet",
     proxyOwner = "",
-    args = [],
-    proxyArgs = []
+    args: any[] = [],
+    proxyArgs: any[] = []
 ) => {
     const {
         deployments: { deploy, get, getOrNull, log, save: deploymentsSave },
@@ -206,14 +213,20 @@ const deployWithCustomProxy = async (
 
     //const proxy = await ethers.getContract(proxyDeployedName);
     const prevImpl = await proxy.getImplementation();
-    log(`Current ${logicDeployedName} implementation: ${prevImpl}`);
+    log(`Current ${logicDeployedName}: ${prevImpl}`);
 
     if (tx.newlyDeployed || tx.address != prevImpl) {
-        log(`New ${logicDeployedName} implementation: ${tx.address}`);
+        log(`New ${logicDeployedName}: ${tx.address}`);
+        if (tx.address != prevImpl) {
+            logger.information(
+                `${logicDeployedName} is not re-deployed but not upgraded yet in the proxy`
+            );
+        }
         const proxyDeployment = await get(proxyDeployedName);
         await deploymentsSave(logicName, {
-            address: proxy.address,
-            abi: proxyDeployment.abi,
+            abi: tx.abi,
+            address: proxy.address, // used to override receipt.contractAddress (useful for proxies)
+            receipt: tx.receipt,
             bytecode: tx.bytecode,
             deployedBytecode: tx.deployedBytecode,
             implementation: tx.address,
@@ -235,7 +248,6 @@ const deployWithCustomProxy = async (
             );
         } else if (hre.network.tags["mainnet"]) {
             // log(">>> Create a Bitocracy proposal via a SIP <<<");
-            logger.information(">>> Create a Bitocracy proposal via a SIP <<<");
             logger.information(">>> Create a Bitocracy proposal via a SIP <<<");
             logger.information(
                 ">>> DON'T PUSH DEPLOYMENTS TO THE REPO UNTIL THE SIP IS SUCCESSFULLY EXECUTED <<<`"
