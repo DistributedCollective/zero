@@ -32,32 +32,6 @@ const sampleSIP01 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument
     return args;
 };
 
-const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
-    const {
-        ethers,
-        deployments: { get },
-    } = hre;
-    const zeroBaseParams = await get("LiquityBaseParams");
-    const newFeeValue = ethers.utils.parseEther("0.025");
-    const iSetFeesFloor = new ethers.utils.Interface([
-        "function setBorrowingFeeFloor(uint256)",
-        "function setRedemptionFeeFloor(uint256)",
-    ]);
-    const args: ISipArgument = {
-        targets: [zeroBaseParams.address, zeroBaseParams.address],
-        values: [0, 0],
-        signatures: ["setBorrowingFeeFloor(uint256)", "setRedemptionFeeFloor(uint256)"],
-        data: [
-            iSetFeesFloor.encodeFunctionData("setBorrowingFeeFloor", [newFeeValue.toString()]),
-            iSetFeesFloor.encodeFunctionData("setRedemptionFeeFloor", [newFeeValue.toString()]),
-        ],
-        description:
-            "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/d47da5f/SIP-0055.md, sha256: b9967c703b6ef102067a9d170940f46d414d7f9dd259d606ecedca8bd14ebfdf",
-    };
-
-    return args;
-};
-
 const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
     const {
         ethers,
@@ -143,6 +117,32 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
         data: datas,
         description:
             "SIP-0054: Integrate Mynt with Zero, Details: https://github.com/DistributedCollective/SIPS/blob/8e000bb/SIP-0054.md, sha256: 2fb11199c6e6314760d88f55dc41df159367053f7f32c4b3897028c72a562b63",
+    };
+
+    return args;
+};
+
+const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const zeroBaseParams = await get("LiquityBaseParams");
+    const newFeeValue = ethers.utils.parseEther("0.025");
+    const iSetFeesFloor = new ethers.utils.Interface([
+        "function setBorrowingFeeFloor(uint256)",
+        "function setRedemptionFeeFloor(uint256)",
+    ]);
+    const args: ISipArgument = {
+        targets: [zeroBaseParams.address, zeroBaseParams.address],
+        values: [0, 0],
+        signatures: ["setBorrowingFeeFloor(uint256)", "setRedemptionFeeFloor(uint256)"],
+        data: [
+            iSetFeesFloor.encodeFunctionData("setBorrowingFeeFloor", [newFeeValue.toString()]),
+            iSetFeesFloor.encodeFunctionData("setRedemptionFeeFloor", [newFeeValue.toString()]),
+        ],
+        description:
+            "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/d47da5f/SIP-0055.md, sha256: b9967c703b6ef102067a9d170940f46d414d7f9dd259d606ecedca8bd14ebfdf",
     };
 
     return args;
