@@ -7,11 +7,11 @@ const logger = new Logs().showInConsole(true);
 
 task("sips:verify-sip-agrs", "Verify SIP Args")
     .addParam(
-        "moduleName",
-        "module name that is located in tasks/sips/args folder which and returning the sip arguments"
+        "sipArgsFunction",
+        "SIP args construction function that is located in and exported from tasks/sips/args/SIPArgs.ts which returns SIP args"
     )
-    .setAction(async ({ moduleName }, hre) => {
-        const sipArgs: ISipArgument = await SIPArgs[moduleName](hre);
+    .setAction(async ({ sipArgsFunction }, hre) => {
+        const sipArgs: ISipArgument = await SIPArgs[sipArgsFunction](hre);
         logger.information(sipArgs);
     });
 

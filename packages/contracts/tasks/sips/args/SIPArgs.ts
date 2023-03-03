@@ -1,6 +1,8 @@
+import { Contract } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import Logs from "node-logs";
-import { TroveManager } from "types/generated";
+import { LiquityBaseParams, TroveManager } from "types/generated";
+import { LiquityBaseInterface } from "types/generated/artifacts/contracts/Dependencies/LiquityBase";
 const logger = new Logs().showInConsole(true);
 
 export interface ISipArgument {
@@ -11,7 +13,7 @@ export interface ISipArgument {
     description: string;
 }
 
-const SampleSIP01 = async (hre): Promise<ISipArgument> => {
+const sampleSIP01 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
     const { ethers } = hre;
     const SampleToken = await ethers.getContractFactory("ERC20");
     const args: ISipArgument = {
@@ -30,7 +32,32 @@ const SampleSIP01 = async (hre): Promise<ISipArgument> => {
     return args;
 };
 
-const ZeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const zeroBaseParams = await get("LiquityBaseParams");
+    const newFeeValue = ethers.utils.parseEther("0.025");
+    const iSetFeesFloor = new ethers.utils.Interface([
+        "function setBorrowingFeeFloor(uint256)",
+        "function setRedemptionFeeFloor(uint256)",
+    ]);
+    const args: ISipArgument = {
+        targets: [zeroBaseParams.address, zeroBaseParams.address],
+        values: [0, 0],
+        signatures: ["setBorrowingFeeFloor(uint256)", "setRedemptionFeeFloor(uint256)"],
+        data: [
+            iSetFeesFloor.encodeFunctionData("setBorrowingFeeFloor", [newFeeValue.toString()]),
+            iSetFeesFloor.encodeFunctionData("setRedemptionFeeFloor", [newFeeValue.toString()]),
+        ],
+        description: "SIP-XX: Update Redemption Fees. SHA256: ",
+    };
+
+    return args;
+};
+
+const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
     const {
         ethers,
         deployments: { get },
@@ -120,8 +147,9 @@ const ZeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
 };
 
 const SIPArgs = {
-    SampleSIP01,
-    ZeroMyntIntegrationSIP,
+    sampleSIP01,
+    zeroMyntIntegrationSIP,
+    zeroFeesUpdate,
 };
 
 export default SIPArgs;
