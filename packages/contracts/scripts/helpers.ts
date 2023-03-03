@@ -179,10 +179,8 @@ const deployWithCustomProxy = async (
 ) => {
     const {
         deployments: { deploy, get, getOrNull, log, save: deploymentsSave },
-        // getNamedAccounts,
         ethers,
     } = hre;
-    // const { deployer } = await getNamedAccounts();
 
     const proxyDeployedName = logicName + "_Proxy";
     const logicDeployedName = logicName + "_Implementation";
@@ -211,13 +209,12 @@ const deployWithCustomProxy = async (
         log: true,
     });
 
-    //const proxy = await ethers.getContract(proxyDeployedName);
     const prevImpl = await proxy.getImplementation();
     log(`Current ${logicDeployedName}: ${prevImpl}`);
 
     if (tx.newlyDeployed || tx.address != prevImpl) {
         log(`New ${logicDeployedName}: ${tx.address}`);
-        if (tx.address != prevImpl) {
+        if (!tx.newlyDeployed) {
             logger.information(
                 `${logicDeployedName} is not re-deployed but not upgraded yet in the proxy`
             );
@@ -244,13 +241,13 @@ const deployWithCustomProxy = async (
             await sendWithMultisig(multisigDeployment.address, proxy.address, data, deployer);
             log(
                 `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<
-                 >>> DON'T PUSH DEPLOYMENTS TO THE REPO UNTIL THE MULTISIG TX SUCCESSFULLY SIGNED & EXECUTED <<<`
+                 >>> DON'T PUSH/MERGE ${logicName} TO THE DEVELOPMENT BRANCH REPO UNTIL THE MULTISIG TX SUCCESSFULLY SIGNED & EXECUTED <<<`
             );
         } else if (hre.network.tags["mainnet"]) {
             // log(">>> Create a Bitocracy proposal via a SIP <<<");
             logger.information(">>> Create a Bitocracy proposal via a SIP <<<");
             logger.information(
-                ">>> DON'T PUSH DEPLOYMENTS TO THE REPO UNTIL THE SIP IS SUCCESSFULLY EXECUTED <<<`"
+                `>>> DON'T MERGE ${logicName} TO THE MAIN BRANCH UNTIL THE SIP IS SUCCESSFULLY EXECUTED <<<`
             );
             // governance is the owner - need a SIP to register
             // alternatively can use brownie sip_interaction scripts to create proposal
