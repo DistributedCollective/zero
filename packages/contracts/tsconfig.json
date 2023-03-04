@@ -28,9 +28,10 @@
     "include": [
         "./scripts",
         "./tests",
-        "./typechain-types",
+        "./types",
         "./tasks",
-        "./deployment/deploy"
+        "./deployment/deploy",
+        "./tests-onchain"
     ],
     "files": [
         "./hardhat.config.ts"

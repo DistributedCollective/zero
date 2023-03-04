@@ -18,7 +18,6 @@ import "@typechain/hardhat";
 /// import "hardhat-docgen";
 import "hardhat-contract-sizer";
 /// import "@openzeppelin/hardhat-upgrades";
-// import "@nomiclabs/hardhat-solhint";
 
 // import "tasks/contractsInteraction";
 // import "tasks/metaAssetTokenInteraction";
@@ -26,13 +25,9 @@ import "hardhat-contract-sizer";
 // import "tasks/transferOwnership";
 // import "tasks/sips/createSIP";
 
-import "@nomicfoundation/hardhat-toolbox";
-
 import * as dotenv from "dotenv";
-import "@nomiclabs/hardhat-web3";
 // import "@nomicfoundation/hardhat-chai-matchers";
 // import "@tenderly/hardhat-tenderly";
-import "hardhat-deploy";
 import "tsconfig-paths/register";
 import "@typechain/hardhat";
 /// import "hardhat-docgen";
@@ -41,20 +36,18 @@ import "@nomiclabs/hardhat-solhint";
 
 // import "tasks/contractsInteraction";
 
-import "@nomiclabs/hardhat-truffle5";
 import "@typechain/ethers-v5";
-import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
-import "hardhat-gas-reporter";
-import "hardhat-contract-sizer";
 import "@primitivefi/hardhat-dodoc";
 
 import "./tasks/sips/createSIP";
 
-const accounts = require("./hardhatAccountsList2k.js");
+const accounts =
+    process.env.ACC_QTY === "20"
+        ? require("./hardhatAccountsList20.js")
+        : require("./hardhatAccountsList2k.js");
 const accountsList: HardhatNetworkAccountsUserConfig = accounts.accountsList;
-
 import fs from "fs";
 const getSecret = (secretKey: string, defaultValue = "") => {
     const SECRETS_FILE = "./secrets.js";
@@ -89,6 +82,29 @@ const testnetAccounts = testnetPKs.length > 0 ? testnetPKs : mnemonic;
 const mainnetAccounts = process.env.MAINNET_DEPLOYER_PRIVATE_KEY
     ? [process.env.MAINNET_DEPLOYER_PRIVATE_KEY]
     : mnemonic;
+
+task("check-fork-patch", "Check Hardhat Fork Patch by Rainer").setAction(async (taskArgs, hre) => {
+    await hre.network.provider.request({
+        method: "hardhat_reset",
+        params: [
+            {
+                forking: {
+                    jsonRpcUrl: "https://mainnet-dev.sovryn.app/rpc",
+                    blockNumber: 4272658,
+                },
+            },
+        ],
+    });
+    //const xusd = await IERC20.at("0xb5999795BE0EbB5bAb23144AA5FD6A02D080299F");
+    const xusd = await hre.ethers.getContractAt(
+        "ERC20",
+        "0xb5999795BE0EbB5bAb23144AA5FD6A02D080299F"
+    );
+    const totalSupply = await xusd.totalSupply();
+    if (totalSupply.toString() === "12346114443582774719512874")
+        console.log("Hardhat mainnet forking works properly!");
+    else console.log("Hardhat mainnet forking does NOT work properly!");
+});
 
 const config: HardhatUserConfig = {
     solidity: {
@@ -140,8 +156,8 @@ const config: HardhatUserConfig = {
         hardhat: {
             accounts: accountsList,
             allowUnlimitedContractSize: true,
-            //gasPrice: 66000000,
-            //blockGasLimit: 6800000,
+            gasPrice: 66000000,
+            blockGasLimit: 6800000,
             initialBaseFeePerGas: 0,
         },
         /*localhost: {
@@ -238,6 +254,24 @@ const config: HardhatUserConfig = {
             //timeout: 20000, // increase if needed; 20000 is the default value
             timeout: 100000,
         },
+        rskForkedTestnetFlashback: {
+            chainId: 31337,
+            accounts: testnetAccounts,
+            url: "http://127.0.0.1:8545/",
+            blockGasLimit: 6800000,
+            live: true,
+            tags: ["testnet", "forked"],
+            timeout: 100000,
+        },
+        rskForkedMainnetFlashback: {
+            chainId: 31337,
+            accounts: mainnetAccounts,
+            url: "http://127.0.0.1:8545",
+            blockGasLimit: 6800000,
+            live: true,
+            tags: ["mainnet", "forked"],
+            timeout: 100000,
+        },
     },
     mocha: { timeout: 12000000 },
     /*rpc: {
@@ -296,6 +330,8 @@ const config: HardhatUserConfig = {
                 "external/deployments/rskMainnet",
                 "deployment/deployments/rskSovrynMainnet",
             ],
+            rskForkedTestnetFlashback: ["external/deployments/rskForkedTestnetFlashback"],
+            rskForkedMainnetFlashback: ["external/deployments/rskForkedMainnetFlashback"],
         },
     },
 };
