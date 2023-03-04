@@ -2,7 +2,6 @@ import { task, types } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import Logs from "node-logs";
 import * as helpers from "../scripts/helpers";
-import { _createSIP } from "./sips/createSIP";
 
 const logger = new Logs().showInConsole(true);
 

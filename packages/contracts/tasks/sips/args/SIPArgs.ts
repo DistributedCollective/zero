@@ -1,3 +1,4 @@
+import { ParamType } from "@ethersproject/abi";
 import { Contract } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import Logs from "node-logs";
@@ -78,11 +79,18 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
     const iSetImplementationInterface = new ethers.utils.Interface([
         "function setImplementation(address _implementation)",
     ]);
+    /*
+    const encodeParameters = (types, values) => {
+        const abi = new ethers.utils.AbiCoder();
+        return abi.encode(types, values);
+    };*/
 
     const datas = targetsContractProxies.map((val, index) => {
-        return iSetImplementationInterface.encodeFunctionData("setImplementation", [
-            contractsImplementations[index],
-        ]);
+        return iSetImplementationInterface._abiCoder.encode(
+            ["address"],
+            [contractsImplementations[index]]
+        );
+        //return encodeParameters(["address"], [contractsImplementations[index]]);
     });
     const signatures = Array(targetsContractProxies.length).fill("setImplementation(address)");
 
@@ -96,9 +104,10 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
     const troveManagerRedeemOpsDeployment = await get("TroveManagerRedeemOps");
     targetsContractProxies.push(troveManagerDeployment.address);
     datas.push(
-        iSetTroveManagerRedeemOps.encodeFunctionData("setTroveManagerRedeemOps", [
-            troveManagerRedeemOpsDeployment.address,
-        ])
+        iSetTroveManagerRedeemOps._abiCoder.encode(
+            ["address"],
+            [troveManagerRedeemOpsDeployment.address]
+        )
     );
 
     // validate TroveManagerRedeemOps
@@ -129,6 +138,7 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
     } = hre;
     const zeroBaseParams = await get("LiquityBaseParams");
     const newFeeValue = ethers.utils.parseEther("0.025");
+    console.log(newFeeValue.toString());
     const iSetFeesFloor = new ethers.utils.Interface([
         "function setBorrowingFeeFloor(uint256)",
         "function setRedemptionFeeFloor(uint256)",
@@ -138,8 +148,8 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
         values: [0, 0],
         signatures: ["setBorrowingFeeFloor(uint256)", "setRedemptionFeeFloor(uint256)"],
         data: [
-            iSetFeesFloor.encodeFunctionData("setBorrowingFeeFloor", [newFeeValue.toString()]),
-            iSetFeesFloor.encodeFunctionData("setRedemptionFeeFloor", [newFeeValue.toString()]),
+            iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
+            iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
         ],
         description:
             "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/d47da5f/SIP-0055.md, sha256: b9967c703b6ef102067a9d170940f46d414d7f9dd259d606ecedca8bd14ebfdf",
@@ -149,7 +159,6 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
 };
 
 const SIPArgs = {
-    sampleSIP01,
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
 };

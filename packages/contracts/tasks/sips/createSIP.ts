@@ -22,10 +22,10 @@ task("sips:create-sip", "Create SIP to Sovryn Governance")
     )
     .setAction(async ({ sipArgsFunction }, hre) => {
         const sipArgs: ISipArgument = await SIPArgs[sipArgsFunction](hre);
-        await _createSIP(hre, sipArgs);
+        await createSIP(hre, sipArgs);
     });
 
-export const _createSIP = async (hre, sipArgs: ISipArgument) => {
+export const createSIP = async (hre, sipArgs: ISipArgument) => {
     const {
         ethers,
         deployments: { get },
