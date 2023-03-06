@@ -156,8 +156,8 @@ const config: HardhatUserConfig = {
         hardhat: {
             accounts: accountsList,
             allowUnlimitedContractSize: true,
-            gasPrice: 66000000,
-            blockGasLimit: 6800000,
+            //gasPrice: 66000000, // setting the gasPrice and blockGasLimit breaks some gas estimation tests
+            //blockGasLimit: 6800000,
             initialBaseFeePerGas: 0,
         },
         /*localhost: {
