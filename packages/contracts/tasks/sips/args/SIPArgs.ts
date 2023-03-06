@@ -125,7 +125,7 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
         signatures: signatures,
         data: datas,
         description:
-            "SIP-0054: Integrate Mynt with Zero, Details: https://github.com/DistributedCollective/SIPS/blob/8e000bb/SIP-0054.md, sha256: 2fb11199c6e6314760d88f55dc41df159367053f7f32c4b3897028c72a562b63",
+            "SIP-0054: Integrate Mynt with Zero, Details: https://github.com/DistributedCollective/SIPS/blob/98ef848/SIP-0054.md, sha256: f623ab973a6fa175cc2bd1ebc50cf79699de2f88b84d98535288dba150a4ff4b",
     };
 
     return args;
@@ -152,7 +152,7 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
             iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
         ],
         description:
-            "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/d47da5f/SIP-0055.md, sha256: b9967c703b6ef102067a9d170940f46d414d7f9dd259d606ecedca8bd14ebfdf",
+            "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/b7efe43/SIP-0055.md, sha256: 0f193ed8589e8ef0e8db3b66ef2c23a6b139245d3a9335b67851421cbd73d53c",
     };
 
     return args;
