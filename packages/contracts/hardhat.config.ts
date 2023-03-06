@@ -41,6 +41,9 @@ import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "@primitivefi/hardhat-dodoc";
 
+import * as tdly from "@tenderly/hardhat-tenderly";
+tdly.setup();
+
 import "./tasks/sips/createSIP";
 
 const accounts =
