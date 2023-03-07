@@ -119,7 +119,7 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
         throw Error();
     }
 
-    // set MassetManager in BorrowerOperations
+    // set MassetManager address in BorrowerOperations
     const iSetMassetManagerAddress = new ethers.utils.Interface([
         "function setMassetManagerAddress(address _massetManagerAddress)",
     ]);
@@ -162,7 +162,6 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
     } = hre;
     const zeroBaseParams = await get("LiquityBaseParams");
     const newFeeValue = ethers.utils.parseEther("0.025");
-    console.log(newFeeValue.toString());
     const iSetFeesFloor = new ethers.utils.Interface([
         "function setBorrowingFeeFloor(uint256)",
         "function setRedemptionFeeFloor(uint256)",
