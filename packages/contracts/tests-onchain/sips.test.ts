@@ -227,6 +227,16 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
                 ethers.utils.getAddress(await borrowerOperationsProxy.getImplementation())
             ).to.equal(ethers.utils.getAddress(borrowerOperationsImpl.address));
 
+            const borrowerOperations = await ethers.getContract("BorrowerOperations");
+            console.log(`borrowerOperations.address: ${borrowerOperations.address}`);
+            console.log(
+                `borrowerOperations.massetManager(): ${await borrowerOperations.massetManager()}`
+            );
+            const massetManager = await get("MassetManager");
+            expect(
+                ethers.utils.getAddress(await borrowerOperations.massetManager())
+            ).to.equal(ethers.utils.getAddress(massetManager.address));
+
             const stabilityPoolProxy = await ethers.getContract("StabilityPool_Proxy");
             const stabilityPool = await ethers.getContract("StabilityPool_Implementation");
             expect(ethers.utils.getAddress(await stabilityPoolProxy.getImplementation())).to.equal(

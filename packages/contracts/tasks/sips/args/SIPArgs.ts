@@ -114,10 +114,34 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
     const troveManager = (await ethers.getContract("TroveManager")) as unknown as TroveManager;
     if ((await troveManager.troveManagerRedeemOps()) === troveManagerRedeemOpsDeployment.address) {
         logger.error(
-            `TroveManagerRedeemOps has not changed: ${troveManagerRedeemOpsDeployment.address}`
+            `TroveManagerRedeemOps is not changed: ${troveManagerRedeemOpsDeployment.address}. Either deployment address is wrong or should be excluded from the SIP.`
         );
-        //throw Error();
+        throw Error();
     }
+
+    // set MassetManager in BorrowerOperations
+    const iSetMassetManagerAddress = new ethers.utils.Interface([
+        "function setMassetManagerAddress(address _massetManagerAddress)",
+    ]);
+    signatures.push("setMassetManagerAddress(address)");
+    const borrowerOperations = await ethers.getContract("BorrowerOperations");
+    targetsContractProxies.push(borrowerOperations.address);
+    const massetManagerDeployment = await get("MassetManager");
+    datas.push(
+        iSetMassetManagerAddress._abiCoder.encode(["address"], [massetManagerDeployment.address])
+    );
+
+    /*
+    there is no IMassetManager yet
+    if (
+        ethers.utils.getAddress(await borrowerOperations.massetManager()) ===
+        massetManagerDeployment.address
+    ) {
+        logger.error(
+            `MassetManager is not changed: ${troveManagerRedeemOpsDeployment.address}. Either deployment address is wrong or should be excluded from the SIP.`
+        );
+        throw Error();
+    }*/
 
     const args: ISipArgument = {
         targets: targetsContractProxies,
