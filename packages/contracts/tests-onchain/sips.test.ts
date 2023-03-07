@@ -186,9 +186,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgs: ISipArgument = await SIPArgs.zeroMyntIntegrationSIP(hre);
-            console.log("... before SIP creating");
+            console.log("... before SIP creation");
             await createSIP(hre, sipArgs);
-            console.log("... after SIP creating");
+            console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
                 proposalId.toString(),
@@ -202,12 +202,8 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
 
             // QUEUE PROPOSAL
             let proposal = await governorOwner.proposals(proposalId);
-            console.log(proposal);
-            console.log(proposal.endBlock);
-            console.log("block before timetravel:", await ethers.provider.getBlockNumber());
             await mineUpTo(proposal.endBlock);
             await mine();
-            console.log("current block:", await ethers.provider.getBlockNumber());
 
             await governorOwner.queue(proposalId);
 
@@ -228,10 +224,6 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             ).to.equal(ethers.utils.getAddress(borrowerOperationsImpl.address));
 
             const borrowerOperations = await ethers.getContract("BorrowerOperations");
-            console.log(`borrowerOperations.address: ${borrowerOperations.address}`);
-            console.log(
-                `borrowerOperations.massetManager(): ${await borrowerOperations.massetManager()}`
-            );
             const massetManager = await get("MassetManager");
             expect(
                 ethers.utils.getAddress(await borrowerOperations.massetManager())
@@ -330,7 +322,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgs: ISipArgument = await SIPArgs.zeroFeesUpdate(hre);
             await createSIP(hre, sipArgs);
-            console.log("... after SIP creating");
+            console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
                 proposalId.toString(),
@@ -344,12 +336,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
 
             // QUEUE PROPOSAL
             let proposal = await governorOwner.proposals(proposalId);
-            console.log(proposal);
-            console.log(proposal.endBlock);
-            console.log("block before timetravel:", await ethers.provider.getBlockNumber());
+            
             await mineUpTo(proposal.endBlock);
             await mine();
-            console.log("current block:", await ethers.provider.getBlockNumber());
 
             await governorOwner.queue(proposalId);
 
@@ -371,6 +360,142 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             expect(await zeroBaseParams.BORROWING_FEE_FLOOR())
                 .to.equal(await zeroBaseParams.REDEMPTION_FEE_FLOOR())
                 .to.equal(newFeeValue);
+        });
+
+        it("Combo SIP-0054 and SIP-0055 is executable", async () => {
+            if (!hre.network.tags["forked"]) return;
+
+            const {
+                deployer,
+                deployerSigner,
+                stakingProxy,
+                stakingModulesProxy,
+                governorOwner,
+                governorOwnerSigner,
+                timelockOwner,
+                timelockOwnerSigner,
+                multisigSigner,
+            } = await setupTest();
+            // loadFixtureAfterEach = true;
+
+            // CREATE PROPOSAL
+            const sov = await ethers.getContract("SOV", timelockOwnerSigner);
+            //const whaleAmount = await sov.balanceOf(multisigSigner._address);
+            //await sov.transfer(deployerSigner.address, whaleAmount);
+            const whaleAmount = (await sov.totalSupply()).mul(ethers.BigNumber.from(5));
+
+            await sov.mint(deployerSigner.address, whaleAmount);
+
+            /*
+            const quorumVotes = await governorOwner.quorumVotes();
+            console.log('quorumVotes:', quorumVotes);
+            */
+            await sov.connect(deployerSigner).approve(stakingProxy.address, whaleAmount);
+            //const stakeABI = (await hre.artifacts.readArtifact("IStaking")).abi;
+            const stakeABI = (await deployments.getArtifact("IStaking")).abi;
+            // const stakeABI = (await ethers.getContractFactory("IStaking")).interface;
+            // alternatively for stakeABI can be used human readable ABI:
+            /*const stakeABI = [
+                'function stake(uint96 amount,uint256 until,address stakeFor,address delegatee)',
+                'function pauseUnpause(bool _pause)',
+                'function paused() view returns (bool)'
+            ];*/
+            const staking = await ethers.getContractAt(
+                stakeABI,
+                stakingProxy.address,
+                deployerSigner
+            );
+            /*const multisigSigner = await getImpersonatedSignerFromJsonRpcProvider(
+                (
+                    await get("MultiSigWallet")
+                ).address
+            );*/
+            if (await staking.paused()) await staking.connect(multisigSigner).pauseUnpause(false);
+            const kickoffTS = await stakingProxy.kickoffTS();
+            await staking.stake(whaleAmount, kickoffTS.add(MAX_DURATION), deployer, deployer);
+            await mine();
+
+            // CREATE PROPOSAL AND VERIFY
+            console.log("creating proposal");
+            const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
+            const sipArgs: ISipArgument = await SIPArgs.sip0054And0055Combo(hre);
+            await createSIP(hre, sipArgs);
+            console.log("... after SIP creating");
+            const proposalId = await governorOwner.latestProposalIds(deployer);
+            expect(
+                proposalId.toString(),
+                "Proposal was not created. Check the SIP creation is not commented out."
+            ).not.equal(proposalIdBeforeSIP.toString());
+
+            // VOTE FOR PROPOSAL
+            console.log("voting for proposal");
+            await mine();
+            await governorOwner.connect(deployerSigner).castVote(proposalId, true);
+
+            // QUEUE PROPOSAL
+            let proposal = await governorOwner.proposals(proposalId);
+
+            await mineUpTo(proposal.endBlock);
+            await mine();
+
+            await governorOwner.queue(proposalId);
+
+            // EXECUTE PROPOSAL
+            proposal = await governorOwner.proposals(proposalId);
+            await time.increaseTo(proposal.eta);
+            await expect(governorOwner.execute(proposalId))
+                .to.emit(governorOwner, "ProposalExecuted")
+                .withArgs(proposalId);
+
+            // VALIDATE EXECUTION
+
+            const borrowerOperationsProxy = await ethers.getContract("BorrowerOperations_Proxy");
+            const borrowerOperationsImpl = await get("BorrowerOperations_Implementation"); //await ethers.getContract("BorrowerOperations");
+            expect(
+                ethers.utils.getAddress(await borrowerOperationsProxy.getImplementation())
+            ).to.equal(ethers.utils.getAddress(borrowerOperationsImpl.address));
+
+            const borrowerOperations = await ethers.getContract("BorrowerOperations");
+           
+            const massetManager = await get("MassetManager");
+            expect(
+                ethers.utils.getAddress(await borrowerOperations.massetManager())
+            ).to.equal(ethers.utils.getAddress(massetManager.address));
+
+            const stabilityPoolProxy = await ethers.getContract("StabilityPool_Proxy");
+            const stabilityPool = await ethers.getContract("StabilityPool_Implementation");
+            expect(ethers.utils.getAddress(await stabilityPoolProxy.getImplementation())).to.equal(
+                ethers.utils.getAddress(stabilityPool.address)
+            );
+
+            const troveManagerProxy = await ethers.getContract("TroveManager_Proxy");
+            const troveManagerImpl = await get("TroveManager_Implementation");
+            const troveManager = await ethers.getContract("TroveManager");
+            const troveManagerRedeemOps = await ethers.getContract("TroveManagerRedeemOps");
+            expect(ethers.utils.getAddress(await troveManagerProxy.getImplementation())).to.equal(
+                ethers.utils.getAddress(troveManagerImpl.address)
+            ); // should not change
+            expect(ethers.utils.getAddress(await troveManager.troveManagerRedeemOps())).to.equal(
+                ethers.utils.getAddress(troveManagerRedeemOps.address)
+            );
+
+            const zusdTokenProxy = await ethers.getContract("ZUSDToken_Proxy");
+            const zusdToken = await ethers.getContract("ZUSDToken_Implementation");
+            expect(ethers.utils.getAddress(await zusdTokenProxy.getImplementation())).to.equal(
+                ethers.utils.getAddress(zusdToken.address)
+            );
+
+            expect((await governorOwner.proposals(proposalId)).executed).to.be.true;
+
+            const zeroBaseParams: LiquityBaseParams = <LiquityBaseParams>(
+                (<unknown>await ethers.getContract("LiquityBaseParams"))
+            );
+            const newFeeValue = ethers.utils.parseEther("0.025");
+
+            expect(await zeroBaseParams.BORROWING_FEE_FLOOR())
+                .to.equal(await zeroBaseParams.REDEMPTION_FEE_FLOOR())
+                .to.equal(newFeeValue);
+            
         });
     });
 });

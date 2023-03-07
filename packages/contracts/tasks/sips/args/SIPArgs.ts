@@ -181,9 +181,27 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
     return args;
 };
 
+const sip0054And0055Combo = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const args0054: ISipArgument = await zeroMyntIntegrationSIP(hre);
+    const args0055: ISipArgument = await zeroFeesUpdate(hre);
+    let argsCombo: ISipArgument = {
+        targets: [],
+        values: [],
+        signatures: [],
+        data: [],
+        description: ""
+    }; 
+    for (const prop in args0054) {
+        argsCombo[prop] = args0054[prop].concat(prop!=="description" ? args0055[prop]: (' and ').concat(args0055[prop]));
+      }
+    return argsCombo;
+};
+
+
 const SIPArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
+    sip0054And0055Combo,
 };
 
 export default SIPArgs;
