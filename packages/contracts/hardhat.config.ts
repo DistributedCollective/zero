@@ -41,8 +41,8 @@ import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "@primitivefi/hardhat-dodoc";
 
-import * as tdly from "@tenderly/hardhat-tenderly";
-tdly.setup();
+// import * as tdly from "@tenderly/hardhat-tenderly";
+// tdly.setup();
 
 import "./tasks/sips/createSIP";
 
@@ -236,6 +236,8 @@ const config: HardhatUserConfig = {
             accounts: mainnetAccounts,
             tags: ["mainnet"],
             timeout: 100000,
+            gasPrice: 66000000,
+            blockGasLimit: 6800000,
             //timeout: 20000, // increase if needed; 20000 is the default value
         },
         rskForkedMainnet: {
