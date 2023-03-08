@@ -192,7 +192,8 @@ const sip0054And0055Combo = async (hre: HardhatRuntimeEnvironment): Promise<ISip
         description: ""
     }; 
     for (const prop in args0054) {
-        argsCombo[prop] = args0054[prop].concat(prop!=="description" ? args0055[prop]: (' and ').concat(args0055[prop]));
+        argsCombo[prop] = prop!=="description" ? args0054[prop].concat(args0055[prop]) : 
+        `Unified SIP-0054 and SIP-0055. ${args0054[prop]}. ${args0055[prop]}`;
       }
     return argsCombo;
 };
