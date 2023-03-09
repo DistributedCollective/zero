@@ -568,6 +568,26 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
   registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<void> {
     return this.send.registerFrontend(kickbackRate, overrides).then(waitForSuccess);
   }
+
+  repayZusdFromDLLR(zusdAmount: Decimalish, permitParams: PermitParams, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails> {
+    return this.send.repayZusdFromDLLR(zusdAmount, permitParams, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  withdrawZusdAndConvertToDLLR(zusdAmount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<void> {
+    return this.send.withdrawZusdAndConvertToDLLR(zusdAmount, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  provideToSpFromDLLR(dllrAmount: Decimalish, permitParams: PermitParams, overrides?: EthersTransactionOverrides): Promise<void> {
+    return this.send.provideToSpFromDLLR(dllrAmount, permitParams, overrides).then(waitForSuccess);
+  }
+
+  withdrawFromSpAndConvertToDLLR(spAmount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void> {
+    return this.send.withdrawFromSpAndConvertToDLLR(spAmount, overrides).then(waitForSuccess);
+  }
+
+  redeemCollateralViaDLLR(dllrAmount: Decimalish, permitParams: PermitParams, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<RedemptionDetails> {
+    return this.send.redeemCollateralViaDLLR(dllrAmount, permitParams, maxRedemptionRate, overrides).then(waitForSuccess);
+  }
 }
 
 /**
