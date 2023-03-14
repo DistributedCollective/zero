@@ -14,6 +14,8 @@ type TroveActionProps = {
   dataActionId?: string;
 };
 
+const FAKE_PERMIT_PARAMS = {} as any;
+
 export const TroveAction: React.FC<TroveActionProps> = ({
   children,
   transactionId,
@@ -37,14 +39,14 @@ export const TroveAction: React.FC<TroveActionProps> = ({
 
       case "closure": {
         action = useNueToken
-          ? liquity.send.closeNueTrove.bind(liquity.send)
+          ? liquity.send.closeNueTrove.bind(liquity.send, FAKE_PERMIT_PARAMS)
           : liquity.send.closeTrove.bind(liquity.send);
         break;
       }
 
       case "adjustment": {
         action = useNueToken
-          ? liquity.send.adjustNueTrove.bind(liquity.send, change.params, maxBorrowingRate)
+          ? liquity.send.adjustNueTrove.bind(liquity.send, change.params, FAKE_PERMIT_PARAMS, maxBorrowingRate)
           : liquity.send.adjustTrove.bind(liquity.send, change.params, maxBorrowingRate);
         break;
       }

@@ -82,6 +82,26 @@ export class SendableEthersLiquity
   ): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>> {
     return this._populate.adjustTrove(params, maxBorrowingRate, overrides).then(sendTransaction);
   }
+  
+  /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.repayZusdFromDLLR} */
+  repayZusdFromDLLR(
+      zusdAmount: Decimalish,
+      permitParams: PermitParams,
+      maxBorrowingRate?: Decimalish,
+      overrides?: EthersTransactionOverrides
+    ): Promise<SentEthersLiquityTransaction<TroveAdjustmentDetails>> {
+      return this._populate.adjustNueTrove({
+        repayZUSD: zusdAmount,
+      }, permitParams, maxBorrowingRate, overrides).then(sendTransaction);
+  }
+
+  withdrawZusdAndConvertToDLLR(
+    zusdAmount: Decimalish,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<void>> {
+    return this._populate.withdrawZusdAndConvertToDLLR(zusdAmount, maxBorrowingRate, overrides).then(sendTransaction);
+  }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.adjustNueTrove} */
   adjustNueTrove(
@@ -150,6 +170,30 @@ export class SendableEthersLiquity
     return this._populate
       .liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides)
       .then(sendTransaction);
+  }
+
+  redeemCollateralViaDLLR(
+    dllrAmount: Decimalish,
+    permitParams: PermitParams,
+    maxRedemptionRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<RedemptionDetails>> {
+    return this._populate.redeemCollateralViaDLLR(dllrAmount, permitParams, maxRedemptionRate, overrides).then(sendTransaction);
+  }
+
+  provideToSpFromDLLR(
+    dllrAmount: Decimalish,
+    permitParams: PermitParams,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<void>> {
+    return this._populate.provideToSpFromDLLR(dllrAmount, permitParams, overrides).then(sendTransaction);
+  }
+
+  withdrawFromSpAndConvertToDLLR(
+    zusdAmountRequested: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<SentEthersLiquityTransaction<void>> {
+    return this._populate.withdrawFromSpAndConvertToDLLR(zusdAmountRequested, overrides).then(sendTransaction);
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#SendableLiquity.depositZUSDInStabilityPool} */
