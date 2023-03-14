@@ -18,7 +18,14 @@ import { deployAndSetupContracts, setSilent, OracleAddresses, MyntAddresses } fr
 import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
-import { BorrowerOperations, CommunityIssuance, ZEROToken, ZUSDToken, UpgradableProxy, Ownable } from "./types";
+import {
+  BorrowerOperations,
+  CommunityIssuance,
+  ZEROToken,
+  ZUSDToken,
+  UpgradableProxy,
+  Ownable
+} from "./types";
 
 dotenv.config();
 
@@ -57,7 +64,7 @@ const deployerPrivateKeys: { [key: string]: string | undefined } = {
   rsksovryntestnet: process.env.DEPLOYER_PK_TESTNET,
   rskforkedtestnet: process.env.DEPLOYER_PK_TESTNET,
   rsksovrynmainnet: process.env.DEPLOYER_PK_MAINNET,
-  rskforkedmainnet: process.env.DEPLOYER_PK_MAINNET,
+  rskforkedmainnet: process.env.DEPLOYER_PK_MAINNET
 };
 
 const devChainRichAccount = "0x4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
@@ -146,16 +153,17 @@ const myntAddresses: Record<string, MyntAddresses> = {
   rskforkedtestnet: {
     massetManagerAddress: "0xac2d05A148aB512EDEDc7280c00292ED33d31f1A",
     nueTokenAddress: "0x007b3AA69A846cB1f76b60b3088230A52D2A83AC"
-  },
-}
+  }
+};
 
 const hasOracles = (network: string): boolean => network in oracleAddresses;
 
 const hasGovernance = (network: string): network is keyof typeof governanceAddresses =>
   network in governanceAddresses;
 
-const hasFeeSharingCollector = (network: string): network is keyof typeof feeSharingCollectorAddresses =>
-  network in feeSharingCollectorAddresses;
+const hasFeeSharingCollector = (
+  network: string
+): network is keyof typeof feeSharingCollectorAddresses => network in feeSharingCollectorAddresses;
 
 const hasWrbtc = (network: string): network is keyof typeof wrbtcAddresses =>
   network in wrbtcAddresses;
@@ -173,7 +181,7 @@ const hasMyntAddresses = (network: string): boolean => network in myntAddresses;
 
 const getDeployerAccount = (network: string) => {
   return deployerPrivateKeys[network];
-}
+};
 
 const config: HardhatUserConfig = {
   networks: {
@@ -192,7 +200,11 @@ const config: HardhatUserConfig = {
 
     dev: {
       url: "http://localhost:4444",
-      accounts: [getDeployerAccount("dev") || Wallet.createRandom().privateKey, devChainRichAccount, ...generateRandomAccounts(numAccounts - 2)]
+      accounts: [
+        getDeployerAccount("dev") || Wallet.createRandom().privateKey,
+        devChainRichAccount,
+        ...generateRandomAccounts(numAccounts - 2)
+      ]
     },
 
     rskdev: {
@@ -203,24 +215,25 @@ const config: HardhatUserConfig = {
       from: "0xeb19817335e5565cf9c4a791d58c2bfa0ce032c7",
       chainId: 30
     },
-    
+
     rsktestnet: {
       url: "https://public-node.testnet.rsk.co",
-      accounts: [getDeployerAccount("rsktestnet") || ""],
+      accounts: [getDeployerAccount("rsktestnet") ?? Wallet.createRandom().privateKey],
       chainId: 31,
       gasMultiplier: 1.25
     },
     rsksovryntestnet: {
       url: "https://testnet.sovryn.app/rpc",
-      accounts: [getDeployerAccount("rsktestnet") || ""],
+      accounts: [getDeployerAccount("rsktestnet") ?? Wallet.createRandom().privateKey],
       chainId: 31,
       gasMultiplier: 1.25
       //timeout: 20000, // increase if needed; 20000 is the default value
       //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
     },
-    rskforkedtestnet: { // run in CLI: npx hardhat node --fork https://testnet.sovryn.app/rpc --no-deploy
+    rskforkedtestnet: {
+      // run in CLI: npx hardhat node --fork https://testnet.sovryn.app/rpc --no-deploy
       url: "http://127.0.0.1:8545/",
-      accounts: [getDeployerAccount("rsktestnet") || Wallet.createRandom().privateKey],
+      accounts: [getDeployerAccount("rsktestnet") ?? Wallet.createRandom().privateKey],
       // regtest default prefunded account
       //from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
       from: "0xeb19817335e5565cf9c4a791d58c2bfa0ce032c7",
@@ -230,17 +243,18 @@ const config: HardhatUserConfig = {
     rsksovrynmainnet: { 
       url: "https://mainnet.sovryn.app/rpc",
       chainId: 30,
-      accounts: [getDeployerAccount("rsksovrynmainnet") || ""]
+      accounts: [getDeployerAccount("rsksovrynmainnet") ?? Wallet.createRandom().privateKey]
       //timeout: 20000, // increase if needed; 20000 is the default value
     },
-    rskforkedmainnet: { // run in CLI: npx hardhat node --fork https://mainnet4.sovryn.app/rpc --no-deploy --port 4444
+    rskforkedmainnet: {
+      // run in CLI: npx hardhat node --fork https://mainnet-dev.sovryn.app/rpc --no-deploy --port 4444
       url: "http://localhost:4444/",
-      accounts: [getDeployerAccount("rsksovrynmainnet") || Wallet.createRandom().privateKey],
+      accounts: [getDeployerAccount("rsksovrynmainnet") ?? Wallet.createRandom().privateKey],
       // regtest default prefunded account
       //from: "0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826"
       from: "0xeb19817335e5565cf9c4a791d58c2bfa0ce032c7",
       chainId: 31337
-    },
+    }
   },
   paths: {
     artifacts,
@@ -252,20 +266,20 @@ const config: HardhatUserConfig = {
 };
 
 type DeployLiquityParams = {
-    deployer: Signer,
-    governanceAddress?: string;
-    feeSharingCollectorAddress?: string;
-    wrbtcAddress?: string;
-    externalPriceFeeds?: OracleAddresses;
-    presaleAddress?: string;
-    marketMakerAddress?: string;
-    zusdTokenAddress?: string;
-    massetManagerAddress?: string;
-    nueTokenAddress?: string;
-    isMainnet?: boolean;
-    notTestnet?: boolean;
-    overrides?: Overrides;
-}
+  deployer: Signer;
+  governanceAddress?: string;
+  feeSharingCollectorAddress?: string;
+  wrbtcAddress?: string;
+  externalPriceFeeds?: OracleAddresses;
+  presaleAddress?: string;
+  marketMakerAddress?: string;
+  zusdTokenAddress?: string;
+  massetManagerAddress?: string;
+  nueTokenAddress?: string;
+  isMainnet?: boolean;
+  notTestnet?: boolean;
+  overrides?: Overrides;
+};
 
 declare module "hardhat/types/runtime" {
   interface HardhatRuntimeEnvironment {
@@ -322,21 +336,21 @@ extendEnvironment(env => {
     overrides?: Overrides
   ) => {
     const deployment = await deployAndSetupContracts(
-        deployer,
-        getContractFactory(env),
-        externalPriceFeeds,
-        env.network.name === "dev",
-        governanceAddress,
-        feeSharingCollectorAddress,
-        wrbtcAddress,
-        presaleAddress,
-        marketMakerAddress,
-        zusdTokenAddress,
-        myntMassetManagerAddress,
-        myntNueTokenAddress,
-        isMainnet,
-        notTestnet,
-        overrides
+      deployer,
+      getContractFactory(env),
+      externalPriceFeeds,
+      env.network.name === "dev",
+      governanceAddress,
+      feeSharingCollectorAddress,
+      wrbtcAddress,
+      presaleAddress,
+      marketMakerAddress,
+      zusdTokenAddress,
+      myntMassetManagerAddress,
+      myntNueTokenAddress,
+      isMainnet,
+      notTestnet,
+      overrides
     );
 
     return { ...deployment, version: contractsVersion };
@@ -351,7 +365,10 @@ type SetMassetManagerAddressParams = {
 
 const defaultChannel = process.env.CHANNEL || "default";
 
-task("setMassetManagerAddress", "Sets address of massetManager contract in order to support NUE troves")
+task(
+  "setMassetManagerAddress",
+  "Sets address of massetManager contract in order to support NUE troves"
+)
   .addParam("address", "address of deployed MassetManagerProxy contract")
   .addParam("nuetokenaddress", "address of NUE token")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
@@ -514,13 +531,15 @@ task("deploy", "Deploys the contracts to the network")
       zusdTokenAddress ??= hasZusdToken(env.network.name)
         ? zusdTokenAddresses[env.network.name]
         : undefined;
-      const myntMassetManagerAddress = hasMyntAddresses(env.network.name) && myntAddresses[env.network.name]?.massetManagerAddress
-        ? myntAddresses[env.network.name]?.massetManagerAddress
-        : undefined;
-      const myntNueTokenAddress = hasMyntAddresses(env.network.name) && myntAddresses[env.network.name]?.nueTokenAddress
-        ? myntAddresses[env.network.name]?.nueTokenAddress
-        : undefined;
-      
+      const myntMassetManagerAddress =
+        hasMyntAddresses(env.network.name) && myntAddresses[env.network.name]?.massetManagerAddress
+          ? myntAddresses[env.network.name]?.massetManagerAddress
+          : undefined;
+      const myntNueTokenAddress =
+        hasMyntAddresses(env.network.name) && myntAddresses[env.network.name]?.nueTokenAddress
+          ? myntAddresses[env.network.name]?.nueTokenAddress
+          : undefined;
+
       const deployment = await env.deployLiquity(
         deployer,
         governanceAddress,
@@ -557,7 +576,10 @@ type DeployZUSDToken = {
 };
 
 task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous deployment")
-  .addFlag("doInitialize", "Will use ZUSDTokenTestnet contract to allow reinitialization which otherwise is invalid")
+  .addFlag(
+    "doInitialize",
+    "Will use ZUSDTokenTestnet contract to allow reinitialization which otherwise is invalid"
+  )
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ doInitialize, channel }: DeployZUSDToken, hre) => {
     const [deployer] = await hre.ethers.getSigners();
@@ -573,13 +595,13 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     // NOTE this script should only be executed on testnet
     const tokenContractName = doInitialize ? "ZUSDTokenTestnet" : "ZUSDToken";
     const zusdTokenFactory = await hre.ethers.getContractFactory(tokenContractName);
-    const zusdTokenContract = await(await zusdTokenFactory.deploy()).deployed();
+    const zusdTokenContract = await (await zusdTokenFactory.deploy()).deployed();
 
-    const zusdTokenProxy = (await hre.ethers.getContractAt(
+    const zusdTokenProxy = ((await hre.ethers.getContractAt(
       "UpgradableProxy",
       zusdTokenAddress,
       deployer
-    ) as unknown) as UpgradableProxy;
+    )) as unknown) as UpgradableProxy;
 
     //set new implementation
     const oldZUSDAddress = await zusdTokenProxy.getImplementation();
@@ -594,7 +616,11 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     //call initialize on the new zusdToken by calling proxy - not possible
 
     if (doInitialize)
-      await zusdToken.initialize(troveManagerAddress, stabilityPoolAddress, borrowerOperationsAddress);
+      await zusdToken.initialize(
+        troveManagerAddress,
+        stabilityPoolAddress,
+        borrowerOperationsAddress
+      );
 
     console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
     const newZUSDAddress = await zusdTokenProxy.getImplementation();
@@ -604,9 +630,15 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
 task("getDeployedContractsOwners", "Prints the deployed contracts owner address")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ channel }, hre) => {
-    const liveNets = ["mainnet", "rsksovrynmainnet", "rskmainnet", "testnet", "rsktestnet", "rsksovryntestnet"];
-    if (liveNets.indexOf(hre.network.name) === -1)
-    {
+    const liveNets = [
+      "mainnet",
+      "rsksovrynmainnet",
+      "rskmainnet",
+      "testnet",
+      "rsktestnet",
+      "rsksovryntestnet"
+    ];
+    if (liveNets.indexOf(hre.network.name) === -1) {
       console.log("===========================================================");
       console.log("ALERT! Make sure the script is running on a proper network!");
       console.log("===========================================================");
@@ -615,9 +647,9 @@ task("getDeployedContractsOwners", "Prints the deployed contracts owner address"
     const obj = Object.entries(deployment.addresses);
     for await (const item of obj) {
       try {
-          const owned = (await hre.ethers.getContractAt("Ownable", item[1]) as unknown) as Ownable;
-          console.log(`${await owned.getOwner()} is owner of ${item[0]} (${item[1]})`);
-      } catch(e) {
+        const owned = ((await hre.ethers.getContractAt("Ownable", item[1])) as unknown) as Ownable;
+        console.log(`${await owned.getOwner()} is owner of ${item[0]} (${item[1]})`);
+      } catch (e) {
         console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
       }
     }
@@ -628,10 +660,16 @@ task("transferOwnership", "Transfers contracts ownership from EOA")
   .addParam("newOwner", "New owner of the contracts", undefined, types.string, false)
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ newOwner, channel }, hre) => {
-    const liveNets = ["mainnet", "rsksovrynmainnet", "rskmainnet", "testnet", "rsktestnet", "rsksovryntestnet"];
+    const liveNets = [
+      "mainnet",
+      "rsksovrynmainnet",
+      "rskmainnet",
+      "testnet",
+      "rsktestnet",
+      "rsksovryntestnet"
+    ];
     const [deployer] = await hre.ethers.getSigners();
-    if (liveNets.indexOf(hre.network.name) === -1)
-    {
+    if (liveNets.indexOf(hre.network.name) === -1) {
       console.log("===========================================================");
       console.log("ALERT! Make sure the script is running on a proper network:", liveNets);
       console.log("===========================================================");
@@ -640,16 +678,22 @@ task("transferOwnership", "Transfers contracts ownership from EOA")
     const obj = Object.entries(deployment.addresses);
     for await (const item of obj) {
       try {
-        const owned = (await hre.ethers.getContractAt("Ownable", item[1], deployer) as unknown) as Ownable;
+        const owned = ((await hre.ethers.getContractAt(
+          "Ownable",
+          item[1],
+          deployer
+        )) as unknown) as Ownable;
         const owner = await owned.getOwner();
         if (owner == deployer.address) {
           await (await owned.setOwner(newOwner)).wait();
           const _newOwner = await owned.getOwner();
           console.log(`${_newOwner} is the new owner of ${item[0]} (${item[1]})`);
         } else {
-          console.log(`Deployer ${deployer.address} must be the current owner ${owner} of ${item[0]} (${item[1]})`);
+          console.log(
+            `Deployer ${deployer.address} must be the current owner ${owner} of ${item[0]} (${item[1]})`
+          );
         }
-      } catch(e) {
+      } catch (e) {
         console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
       }
     }
@@ -658,7 +702,6 @@ task("transferOwnership", "Transfers contracts ownership from EOA")
 task("getCurrentZUSDImplementation", "Logs to console current ZUSD implementation address")
   .addOptionalParam("channel", "Deployment channel to deploy into", defaultChannel, types.string)
   .setAction(async ({ channel }: DeployZUSDToken, hre) => {
-
     const [deployer] = await hre.ethers.getSigners();
     const deployment = getDeploymentData(hre.network.name, channel);
     const { zusdToken: zusdTokenAddress, zeroToken: zeroTokenAddress } = deployment.addresses;
