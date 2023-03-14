@@ -7,31 +7,15 @@ import { LiquityBaseInterface } from "types/generated/artifacts/contracts/Depend
 const logger = new Logs().showInConsole(true);
 
 export interface ISipArgument {
-    targets: string[];
-    values: number[];
-    signatures: string[];
-    data: string[];
-    description: string;
-}
-
-const sampleSIP01 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
-    const { ethers } = hre;
-    const SampleToken = await ethers.getContractFactory("ERC20");
-    const args: ISipArgument = {
-        targets: ["0x95a1CA72Df913f14Dc554a5D14E826B64Bd049FD"],
-        values: [0],
-        signatures: ["transfer(address,uint256)"],
-        data: [
-            SampleToken.interface.encodeFunctionData("transfer", [
-                "0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5",
-                ethers.utils.parseEther("1"),
-            ]),
-        ],
-        description: "SIP-0001: Transfer token. SHA256: ",
+    args: {
+        targets: string[];
+        values: number[];
+        signatures: string[];
+        data: string[];
+        description: string;
     };
-
-    return args;
-};
+    governorName: string;
+}
 
 const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
     const {
@@ -144,12 +128,15 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
     }*/
 
     const args: ISipArgument = {
-        targets: targetsContractProxies,
-        values: Array(targetsContractProxies.length).fill(0),
-        signatures: signatures,
-        data: datas,
-        description:
-            "SIP-0054: Integrate Mynt with Zero, Details: https://github.com/DistributedCollective/SIPS/blob/98ef848/SIP-0054.md, sha256: f623ab973a6fa175cc2bd1ebc50cf79699de2f88b84d98535288dba150a4ff4b",
+        args: {
+            targets: targetsContractProxies,
+            values: Array(targetsContractProxies.length).fill(0),
+            signatures: signatures,
+            data: datas,
+            description:
+                "SIP-0054: Integrate Mynt with Zero, Details: https://github.com/DistributedCollective/SIPS/blob/98ef848/SIP-0054.md, sha256: f623ab973a6fa175cc2bd1ebc50cf79699de2f88b84d98535288dba150a4ff4b",
+        },
+        governorName: "GovernorOwner",
     };
 
     return args;
@@ -167,15 +154,18 @@ const zeroFeesUpdate = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgum
         "function setRedemptionFeeFloor(uint256)",
     ]);
     const args: ISipArgument = {
-        targets: [zeroBaseParams.address, zeroBaseParams.address],
-        values: [0, 0],
-        signatures: ["setBorrowingFeeFloor(uint256)", "setRedemptionFeeFloor(uint256)"],
-        data: [
-            iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
-            iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
-        ],
-        description:
-            "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/b7efe43/SIP-0055.md, sha256: 0f193ed8589e8ef0e8db3b66ef2c23a6b139245d3a9335b67851421cbd73d53c",
+        args: {
+            targets: [zeroBaseParams.address, zeroBaseParams.address],
+            values: [0, 0],
+            signatures: ["setBorrowingFeeFloor(uint256)", "setRedemptionFeeFloor(uint256)"],
+            data: [
+                iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
+                iSetFeesFloor._abiCoder.encode(["uint256"], [newFeeValue]),
+            ],
+            description:
+                "SIP-0055: Zero Fee Floor Update, Details: https://github.com/DistributedCollective/SIPS/blob/b7efe43/SIP-0055.md, sha256: 0f193ed8589e8ef0e8db3b66ef2c23a6b139245d3a9335b67851421cbd73d53c",
+        },
+        governorName: "GovernorOwner",
     };
 
     return args;
@@ -185,24 +175,28 @@ const sip0054And0055Combo = async (hre: HardhatRuntimeEnvironment): Promise<ISip
     const args0054: ISipArgument = await zeroMyntIntegrationSIP(hre);
     const args0055: ISipArgument = await zeroFeesUpdate(hre);
     let argsCombo: ISipArgument = {
-        targets: [],
-        values: [],
-        signatures: [],
-        data: [],
-        description: ""
-    }; 
-    for (const prop in args0054) {
-        argsCombo[prop] = prop!=="description" ? args0054[prop].concat(args0055[prop]) : 
-        `Unified SIP-0054 and SIP-0055. ${args0054[prop]}. ${args0055[prop]}`;
-      }
+        args: {
+            targets: [],
+            values: [],
+            signatures: [],
+            data: [],
+            description: "",
+        },
+        governorName: "GovernorOwner",
+    };
+    for (const prop in args0054.args) {
+        argsCombo.args[prop] =
+            prop !== "description"
+                ? args0054.args[prop].concat(args0055.args[prop])
+                : `Unified SIP-0054 and SIP-0055. ${args0054.args[prop]}. ${args0055.args[prop]}`;
+    }
     return argsCombo;
 };
 
-
-const SIPArgs = {
+const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
     sip0054And0055Combo,
 };
 
-export default SIPArgs;
+export default sipArgs;

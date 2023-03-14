@@ -205,7 +205,7 @@ const config: HardhatUserConfig = {
             gasMultiplier: 1.25,
             tags: ["testnet"],
             timeout: 100000,
-            gasPrice: 66000000, 
+            gasPrice: 66000000,
             blockGasLimit: 6800000,
             //timeout: 20000, // increase if needed; 20000 is the default value
             //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround

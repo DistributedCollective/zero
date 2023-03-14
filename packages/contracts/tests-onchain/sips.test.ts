@@ -25,7 +25,7 @@ const {
     deployments: { createFixture, get },
 } = hre;
 
-import SIPArgs, { ISipArgument } from "../tasks/sips/args/SIPArgs";
+import SIPArgs, { ISipArgument } from "../tasks/sips/args/sipArgs";
 
 import { createSIP } from "../tasks/sips/createSIP";
 import { GovernorAlpha, LiquityBaseParams } from "types/generated";
@@ -187,7 +187,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgs: ISipArgument = await SIPArgs.zeroMyntIntegrationSIP(hre);
             console.log("... before SIP creation");
-            await createSIP(hre, sipArgs);
+            await createSIP(hre, sipArgs, "GovernorOwner");
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
@@ -225,9 +225,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
 
             const borrowerOperations = await ethers.getContract("BorrowerOperations");
             const massetManager = await get("MassetManager");
-            expect(
-                ethers.utils.getAddress(await borrowerOperations.massetManager())
-            ).to.equal(ethers.utils.getAddress(massetManager.address));
+            expect(ethers.utils.getAddress(await borrowerOperations.massetManager())).to.equal(
+                ethers.utils.getAddress(massetManager.address)
+            );
 
             const stabilityPoolProxy = await ethers.getContract("StabilityPool_Proxy");
             const stabilityPool = await ethers.getContract("StabilityPool_Implementation");
@@ -321,7 +321,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgs: ISipArgument = await SIPArgs.zeroFeesUpdate(hre);
-            await createSIP(hre, sipArgs);
+            await createSIP(hre, sipArgs, "GovernorOwner");
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
@@ -336,7 +336,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
 
             // QUEUE PROPOSAL
             let proposal = await governorOwner.proposals(proposalId);
-            
+
             await mineUpTo(proposal.endBlock);
             await mine();
 
@@ -418,8 +418,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             // CREATE PROPOSAL AND VERIFY
             console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
-            const sipArgs: ISipArgument = await SIPArgs.sip0054And0055Combo(hre);
-            await createSIP(hre, sipArgs);
+            //const sipArgs: ISipArgument = await SIPArgs.sip0054And0055Combo(hre);
+            //await createSIP(hre, sipArgs, "GovernorOwner");
+            await hre.run("sips:create-sip", { argsFunc: "sip0054And0055Combo" });
             console.log("... after SIP creating");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
@@ -456,11 +457,11 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             ).to.equal(ethers.utils.getAddress(borrowerOperationsImpl.address));
 
             const borrowerOperations = await ethers.getContract("BorrowerOperations");
-           
+
             const massetManager = await get("MassetManager");
-            expect(
-                ethers.utils.getAddress(await borrowerOperations.massetManager())
-            ).to.equal(ethers.utils.getAddress(massetManager.address));
+            expect(ethers.utils.getAddress(await borrowerOperations.massetManager())).to.equal(
+                ethers.utils.getAddress(massetManager.address)
+            );
 
             const stabilityPoolProxy = await ethers.getContract("StabilityPool_Proxy");
             const stabilityPool = await ethers.getContract("StabilityPool_Implementation");
@@ -495,7 +496,6 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             expect(await zeroBaseParams.BORROWING_FEE_FLOOR())
                 .to.equal(await zeroBaseParams.REDEMPTION_FEE_FLOOR())
                 .to.equal(newFeeValue);
-            
         });
     });
 });

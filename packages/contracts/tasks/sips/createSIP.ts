@@ -1,27 +1,27 @@
 /* eslint-disable no-console */
 import { task } from "hardhat/config";
 import Logs from "node-logs";
-import SIPArgs, { ISipArgument } from "./args/SIPArgs";
+import sipArgsList, { ISipArgument } from "./args/sipArgs";
 
 const logger = new Logs().showInConsole(true);
 
 task("sips:verify-sip-agrs", "Verify SIP Args")
     .addParam(
-        "sipArgsFunction",
+        "argsFunc",
         "SIP args construction function that is located in and exported from tasks/sips/args/SIPArgs.ts which returns SIP args"
     )
-    .setAction(async ({ sipArgsFunction }, hre) => {
-        const sipArgs: ISipArgument = await SIPArgs[sipArgsFunction](hre);
+    .setAction(async ({ argsFunc }, hre) => {
+        const sipArgs: ISipArgument = await sipArgsList[argsFunc](hre);
         logger.information(sipArgs);
     });
 
 task("sips:create-sip", "Create SIP to Sovryn Governance")
     .addParam(
-        "sipArgsFunction",
-        "SIP args construction function that is located in and exported from tasks/sips/args/SIPArgs.ts which returns SIP args"
+        "argsFunc",
+        "Function name from tasks/sips/args/sipArgs.ts that returns the sip arguments"
     )
-    .setAction(async ({ sipArgsFunction }, hre) => {
-        const sipArgs: ISipArgument = await SIPArgs[sipArgsFunction](hre);
+    .setAction(async ({ argsFunc }, hre) => {
+        const sipArgs: ISipArgument = await sipArgsList[argsFunc](hre);
         await createSIP(hre, sipArgs);
     });
 
@@ -30,25 +30,38 @@ export const createSIP = async (hre, sipArgs: ISipArgument) => {
         ethers,
         deployments: { get },
     } = hre;
-    const Governor = await get("GovernorOwner");
+    const Governor = await get(sipArgs.governorName);
     const governor = await ethers.getContractAt(Governor.abi, Governor.address);
-
+    const args = sipArgs.args;
     logger.info("=== Creating SIP ===");
     logger.info(`Governor Address:    ${governor.address}`);
-    logger.info(`Targets:             ${sipArgs.targets}`);
-    logger.info(`Values:              ${sipArgs.values}`);
-    logger.info(`Signatures:          ${sipArgs.signatures}`);
-    logger.info(`Data:                ${sipArgs.data}`);
-    logger.info(`Description:         ${sipArgs.description}`);
+    logger.info(`Targets:             ${args.targets}`);
+    logger.info(`Values:              ${args.values}`);
+    logger.info(`Signatures:          ${args.signatures}`);
+    logger.info(`Data:                ${args.data}`);
+    logger.info(`Description:         ${args.description}`);
     logger.info(`============================================================='`);
 
     const tx = await governor.propose(
-        sipArgs.targets,
-        sipArgs.values,
-        sipArgs.signatures,
-        sipArgs.data,
-        sipArgs.description
+        args.targets,
+        args.values,
+        args.signatures,
+        args.data,
+        args.description
     );
+
+    /*
+    const tx = await governor.populateTransaction.propose(
+        args.targets,
+        args.values,
+        args.signatures,
+        args.data,
+        args.description
+    );
+    console.log("Populated SIP tx:");
+    console.log(tx);
+    */
+
     const receipt = await tx.wait();
 
     const eventData = governor.interface.parseLog(receipt.logs[0])["args"];
