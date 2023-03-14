@@ -35,6 +35,8 @@ export declare class PopulatableEthersLiquity implements PopulatableLiquity<Ethe
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides)](./lib-ethers.populatableethersliquity.liquidateupto.md) |  | Liquidate the least collateralized Troves up to a maximum number. |
 |  [openNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.opennuetrove.md) |  |  |
 |  [openTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.opentrove.md) |  | Open a new Trove by depositing collateral and borrowing ZUSD. |
+|  [provideToSpFromDLLR(dllrAmount, permitParams, overrides)](./lib-ethers.populatableethersliquity.providetospfromdllr.md) |  |  |
+|  [redeemCollateralViaDLLR(amount, permitParams, maxRedemptionRate, overrides)](./lib-ethers.populatableethersliquity.redeemcollateralviadllr.md) |  |  |
 |  [redeemZUSD(amount, maxRedemptionRate, overrides)](./lib-ethers.populatableethersliquity.redeemzusd.md) |  | Redeem ZUSD to native currency (e.g. Ether) at face value. |
 |  [registerFrontend(kickbackRate, overrides)](./lib-ethers.populatableethersliquity.registerfrontend.md) |  | Register current wallet address as a Zero frontend. |
 |  [repayZUSD(amount, overrides)](./lib-ethers.populatableethersliquity.repayzusd.md) |  | Adjust existing Trove by repaying some of its debt. |
@@ -44,7 +46,9 @@ export declare class PopulatableEthersLiquity implements PopulatableLiquity<Ethe
 |  [transferCollateralGainToTrove(overrides)](./lib-ethers.populatableethersliquity.transfercollateralgaintotrove.md) |  | Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from Stability Deposit to Trove. |
 |  [unstakeZERO(amount, overrides)](./lib-ethers.populatableethersliquity.unstakezero.md) |  | Withdraw ZERO from staking. |
 |  [withdrawCollateral(amount, overrides)](./lib-ethers.populatableethersliquity.withdrawcollateral.md) |  | Adjust existing Trove by withdrawing some of its collateral. |
+|  [withdrawFromSpAndConvertToDLLR(zusdAmountRequested, overrides)](./lib-ethers.populatableethersliquity.withdrawfromspandconverttodllr.md) |  |  |
 |  [withdrawGainsFromStabilityPool(overrides)](./lib-ethers.populatableethersliquity.withdrawgainsfromstabilitypool.md) |  | Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [ZERO reward](./lib-base.stabilitydeposit.zeroreward.md) from Stability Deposit. |
 |  [withdrawGainsFromStaking(overrides)](./lib-ethers.populatableethersliquity.withdrawgainsfromstaking.md) |  | Withdraw [collateral gain](./lib-base.zerostake.collateralgain.md) and [ZUSD gain](./lib-base.zerostake.zusdgain.md) from ZERO stake. |
+|  [withdrawZusdAndConvertToDLLR(zusdAmount, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.withdrawzusdandconverttodllr.md) |  |  |
 |  [withdrawZUSDFromStabilityPool(amount, overrides)](./lib-ethers.populatableethersliquity.withdrawzusdfromstabilitypool.md) |  | Withdraw ZUSD from Stability Deposit. |
 
