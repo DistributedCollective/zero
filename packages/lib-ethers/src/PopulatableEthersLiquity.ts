@@ -769,7 +769,7 @@ export class PopulatableEthersLiquity
     const normalized = _normalizeTroveAdjustment(params);
     const { depositCollateral, withdrawCollateral, borrowZUSD, repayZUSD } = normalized;
 
-    const [trove, fees] = await Promise.all([
+    const [trove, fees] = await Promise.all([ 
       this._readable.getTrove(address),
       borrowZUSD && this._readable.getFees()
     ]);
@@ -797,6 +797,64 @@ export class PopulatableEthersLiquity
         ...(await this._findHints(finalTrove)),
         permitParams
       )
+    );
+  }
+
+  async withdrawZusdAndConvertToDLLR(
+    zusdAmount: Decimalish,
+    maxBorrowingRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+    const address = _requireAddress(this._readable.connection, overrides);
+    const { borrowerOperations } = _getContracts(this._readable.connection);
+
+    const normalized = _normalizeTroveAdjustment({
+      repayZUSD: zusdAmount,
+    });
+    const { borrowZUSD, repayZUSD } = normalized;
+
+    const [trove, fees] = await Promise.all([ 
+      this._readable.getTrove(address),
+      borrowZUSD && this._readable.getFees()
+    ]);
+
+    const borrowingRate = fees?.borrowingRate();
+    const finalTrove = trove.adjust(normalized, borrowingRate);
+
+    maxBorrowingRate =
+      maxBorrowingRate !== undefined
+        ? Decimal.from(maxBorrowingRate)
+        : borrowingRate?.add(defaultBorrowingRateSlippageTolerance) ?? Decimal.ZERO;
+
+    return this._wrapSimpleTransaction(
+      await borrowerOperations.estimateAndPopulate.withdrawZusdAndConvertToDLLR(
+        { ...overrides },
+        id,
+        maxBorrowingRate.hex,
+        (repayZUSD ?? Decimal.ZERO).hex,
+        ...(await this._findHints(finalTrove)),
+      )
+    );
+  }
+
+  async provideToSpFromDLLR(
+    dllrAmount: Decimalish,
+    permitParams: PermitParams,
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+    const { stabilityPool } = _getContracts(this._readable.connection);
+    return this._wrapSimpleTransaction(
+      await stabilityPool.estimateAndPopulate.provideToSpFromDLLR({ ...overrides }, id, Decimal.from(dllrAmount).hex, permitParams)
+    );
+  }
+
+  async withdrawFromSpAndConvertToDLLR(
+    zusdAmountRequested: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersLiquityTransaction<void>> {
+    const { stabilityPool } = _getContracts(this._readable.connection);
+    return this._wrapSimpleTransaction(
+      await stabilityPool.estimateAndPopulate.withdrawFromSpAndConvertToDLLR({ ...overrides }, id, Decimal.from(zusdAmountRequested).hex)
     );
   }
 
@@ -982,6 +1040,76 @@ export class PopulatableEthersLiquity
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.redeemZUSD} */
   async redeemZUSD(
     amount: Decimalish,
+    maxRedemptionRate?: Decimalish,
+    overrides?: EthersTransactionOverrides
+  ): Promise<PopulatedEthersRedemption> {
+    const { troveManager } = _getContracts(this._readable.connection);
+    const attemptedZUSDAmount = Decimal.from(amount);
+
+    const [
+      fees,
+      total,
+      [truncatedAmount, firstRedemptionHint, ...partialHints]
+    ] = await Promise.all([
+      this._readable.getFees(),
+      this._readable.getTotal(),
+      this._findRedemptionHints(attemptedZUSDAmount)
+    ]);
+
+    if (truncatedAmount.isZero) {
+      throw new Error(
+        `redeemZUSD: amount too low to redeem (try at least ${ZUSD_MINIMUM_NET_DEBT})`
+      );
+    }
+
+    const defaultMaxRedemptionRate = (amount: Decimal) =>
+      Decimal.min(
+        fees.redemptionRate(amount.div(total.debt)).add(defaultRedemptionRateSlippageTolerance),
+        Decimal.ONE
+      );
+
+    const populateRedemption = async (
+      attemptedZUSDAmount: Decimal,
+      maxRedemptionRate?: Decimalish,
+      truncatedAmount: Decimal = attemptedZUSDAmount,
+      partialHints: [string, string, BigNumberish] = [AddressZero, AddressZero, 0]
+    ): Promise<PopulatedEthersRedemption> => {
+      const maxRedemptionRateOrDefault =
+        maxRedemptionRate !== undefined
+          ? Decimal.from(maxRedemptionRate)
+          : defaultMaxRedemptionRate(truncatedAmount);
+
+      return new PopulatedEthersRedemption(
+        await troveManager.estimateAndPopulate.redeemCollateral(
+          { ...overrides },
+          addGasForPotentialLastFeeOperationTimeUpdate,
+          truncatedAmount.hex,
+          firstRedemptionHint,
+          ...partialHints,
+          _redeemMaxIterations,
+          maxRedemptionRateOrDefault.hex
+        ),
+
+        this._readable.connection,
+        attemptedZUSDAmount,
+        truncatedAmount,
+
+        truncatedAmount.lt(attemptedZUSDAmount)
+          ? newMaxRedemptionRate =>
+              populateRedemption(
+                truncatedAmount.add(ZUSD_MINIMUM_NET_DEBT),
+                newMaxRedemptionRate ?? maxRedemptionRate
+              )
+          : undefined
+      );
+    };
+
+    return populateRedemption(attemptedZUSDAmount, maxRedemptionRate, truncatedAmount, partialHints);
+  }
+
+  async redeemCollateralViaDLLR(
+    amount: Decimalish,
+    permitParams: PermitParams,
     maxRedemptionRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<PopulatedEthersRedemption> {

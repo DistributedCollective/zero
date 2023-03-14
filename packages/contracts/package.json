@@ -26,7 +26,9 @@
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-contracts-package.tgz",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "coveralls": "cat coverage/lcov.info | coveralls"
+    "coveralls": "cat coverage/lcov.info | coveralls",
+    "prettier:check": "yarn prettier --check .",
+    "prettier:write": "yarn prettier --write ."
   },
   "keywords": [
     "Sovryn",
