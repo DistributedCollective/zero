@@ -240,7 +240,7 @@ const config: HardhatUserConfig = {
       chainId: 31337,
       gasMultiplier: 1.25
     },
-    rsksovrynmainnet: {
+    rsksovrynmainnet: { 
       url: "https://mainnet.sovryn.app/rpc",
       chainId: 30,
       accounts: [getDeployerAccount("rsksovrynmainnet") ?? Wallet.createRandom().privateKey]
