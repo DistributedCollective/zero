@@ -18,7 +18,7 @@ import { StabilityViewProvider } from "./components/Stability/context/StabilityV
 import { Nav } from "./components/Nav";
 import { AccessPage } from "./pages/AccessPage";
 import { Dashboard } from "./pages/Dashboard";
-import { ConfirmPage } from './pages/ConfirmPage';
+import { ConfirmPage } from "./pages/ConfirmPage";
 
 type LiquityFrontendProps = {
   loader?: React.ReactNode;

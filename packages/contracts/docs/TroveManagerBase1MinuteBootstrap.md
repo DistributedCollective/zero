@@ -1031,7 +1031,7 @@ tion _requireValidMaxFeePercentage(uint256 _maxFeePercentage) internal view {
         require(
             _maxFeePercentage >= liquityBaseParams.REDEMPTION_FEE_FLOOR() &&
                 _maxFeePercentage <= DECIMAL_PRECISION,
-            "Max fee percentage must be between 0.5% and 100%"
+            "Max fee percentage must be between 2.5% and 100%"
         );
     }
 }
