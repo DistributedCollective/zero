@@ -10,7 +10,8 @@ node_modules
 /packages/*/dist
 
 # api-extractor temp files
-/packages/*/temp
+/packages/**/temp
+/packages/**/tmp
 
 /temp
 .env
