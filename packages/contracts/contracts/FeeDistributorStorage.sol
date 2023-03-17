@@ -11,7 +11,7 @@ import "./Interfaces/IZUSDToken.sol";
 import "./Dependencies/Ownable.sol";
 
 contract FeeDistributorStorage is Ownable {
-    string constant public NAME = "FeeDistributor";
+    string public constant NAME = "FeeDistributor";
 
     // --- Connected contract declarations ---
 
@@ -30,5 +30,5 @@ contract FeeDistributorStorage is Ownable {
     address public activePoolAddress;
 
     //pct of fees sent to feeSharingCollector address
-    uint public FEE_TO_FEE_SHARING_COLLECTOR;
+    uint256 public FEE_TO_FEE_SHARING_COLLECTOR;
 }

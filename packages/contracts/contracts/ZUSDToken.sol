@@ -81,7 +81,11 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         _burn(_account, _amount);
     }
 
-    function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
+    function sendToPool(
+        address _sender,
+        address _poolAddress,
+        uint256 _amount
+    ) external override {
         _requireCallerIsStabilityPool();
         _transfer(_sender, _poolAddress, _amount);
     }
@@ -135,18 +139,20 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         return true;
     }
 
-    function increaseAllowance(
-        address spender,
-        uint256 addedValue
-    ) external override returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue)
+        external
+        override
+        returns (bool)
+    {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
         return true;
     }
 
-    function decreaseAllowance(
-        address spender,
-        uint256 subtractedValue
-    ) external override returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        external
+        override
+        returns (bool)
+    {
         _approve(
             msg.sender,
             spender,
@@ -223,7 +229,11 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
     // --- Internal operations ---
     // Warning: sanity checks (for sender and recipient) should have been done before calling these internal functions
 
-    function _transfer(address sender, address recipient, uint256 amount) internal {
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal {
         assert(sender != address(0));
         assert(recipient != address(0));
 
@@ -251,7 +261,11 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         emit Transfer(account, address(0), amount);
     }
 
-    function _approve(address owner, address spender, uint256 amount) internal {
+    function _approve(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal {
         assert(owner != address(0));
         assert(spender != address(0));
 

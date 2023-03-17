@@ -103,6 +103,8 @@ interface ITroveManager is ILiquityBase {
         TroveManagerInitAddressesParams memory _troveManagerInitAddresses
     ) external;
 
+    function setTroveManagerRedeemOps(address _troveManagerRedeemOps) external;
+
     /// @return Trove owners count
     function getTroveOwnersCount() external view returns (uint256);
 

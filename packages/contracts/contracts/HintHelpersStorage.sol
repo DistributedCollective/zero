@@ -7,9 +7,8 @@ import "./Interfaces/ISortedTroves.sol";
 import "./Dependencies/Ownable.sol";
 
 contract HintHelpersStorage is Ownable {
-    string constant public NAME = "HintHelpers";
+    string public constant NAME = "HintHelpers";
 
     ISortedTroves public sortedTroves;
     ITroveManager public troveManager;
-
 }

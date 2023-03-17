@@ -804,6 +804,7 @@ interface TroveManagerTransactions {
   removeStake(_borrower: string, _overrides?: Overrides): Promise<void>;
   setAddresses(_troveManagerInitAddressesParams: { _feeDistributorAddress: string; _troveManagerRedeemOps: string; _liquityBaseParamsAddress: string; _borrowerOperationsAddress: string; _activePoolAddress: string; _defaultPoolAddress: string; _stabilityPoolAddress: string; _gasPoolAddress: string; _collSurplusPoolAddress: string; _priceFeedAddress: string; _zusdTokenAddress: string; _sortedTrovesAddress: string; _zeroTokenAddress: string; _zeroStakingAddress: string }, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
+  setTroveManagerRedeemOps(_troveManagerRedeemOps: string, _overrides?: Overrides): Promise<void>;
   setTroveStatus(_borrower: string, _num: BigNumberish, _overrides?: Overrides): Promise<void>;
   updateStakeAndTotalStakes(_borrower: string, _overrides?: Overrides): Promise<BigNumber>;
   updateTroveRewardSnapshots(_borrower: string, _overrides?: Overrides): Promise<void>;

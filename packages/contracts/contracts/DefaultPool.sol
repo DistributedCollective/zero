@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.11;
 
-import './Interfaces/IDefaultPool.sol';
+import "./Interfaces/IDefaultPool.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
@@ -17,17 +17,14 @@ import "./DefaultPoolStorage.sol";
  */
 contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
     using SafeMath for uint256;
-    
+
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event DefaultPoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event DefaultPoolETHBalanceUpdated(uint _ETH);
+    event DefaultPoolZUSDDebtUpdated(uint256 _ZUSDDebt);
+    event DefaultPoolETHBalanceUpdated(uint256 _ETH);
 
     // --- Dependency setters ---
 
-    function setAddresses(
-        address _troveManagerAddress,
-        address _activePoolAddress
-    )
+    function setAddresses(address _troveManagerAddress, address _activePoolAddress)
         external
         onlyOwner
     {
@@ -39,28 +36,26 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
 
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
-
-        
     }
 
     // --- Getters for public variables. Required by IPool interface ---
 
     /**
-    * @return the ETH state variable.
-    *
-    * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
-    */
-    function getETH() external view override returns (uint) {
+     * @return the ETH state variable.
+     *
+     * Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
+     */
+    function getETH() external view override returns (uint256) {
         return ETH;
     }
 
-    function getZUSDDebt() external view override returns (uint) {
+    function getZUSDDebt() external view override returns (uint256) {
         return ZUSDDebt;
     }
 
     // --- Pool functionality ---
 
-    function sendETHToActivePool(uint _amount) external override {
+    function sendETHToActivePool(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         address activePool = activePoolAddress; // cache to save an SLOAD
         ETH = ETH.sub(_amount);
@@ -71,13 +66,13 @@ contract DefaultPool is DefaultPoolStorage, CheckContract, IDefaultPool {
         require(success, "DefaultPool: sending ETH failed");
     }
 
-    function increaseZUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         ZUSDDebt = ZUSDDebt.add(_amount);
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);
     }
 
-    function decreaseZUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsTroveManager();
         ZUSDDebt = ZUSDDebt.sub(_amount);
         emit DefaultPoolZUSDDebtUpdated(ZUSDDebt);

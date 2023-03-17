@@ -64,7 +64,9 @@ contract CommunityIssuance is
     t:  time passed since last ZERO issuance event  */
     function _getCumulativeIssuanceFraction() internal view returns (uint256) {
         // Get the time passed since deployment
-        uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
+        uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(
+            SECONDS_IN_ONE_MINUTE
+        );
 
         // f^t
         uint256 power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
