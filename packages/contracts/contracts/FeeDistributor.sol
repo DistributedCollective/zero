@@ -107,12 +107,12 @@ contract FeeDistributor is CheckContract, FeeDistributorStorage, IFeeDistributor
             LiquityMath.DECIMAL_PRECISION
         );
 
-        feeSharingCollector.transferRBTC{value: feeToFeeSharingCollector}();
+        feeSharingCollector.transferRBTC{ value: feeToFeeSharingCollector }();
 
         // Send the ETH fee to the ZERO staking contract
         uint256 feeToZeroStaking = toDistribute.sub(feeToFeeSharingCollector);
         if (feeToZeroStaking != 0) {
-            (bool success, ) = address(zeroStaking).call{value: feeToZeroStaking}("");
+            (bool success, ) = address(zeroStaking).call{ value: feeToZeroStaking }("");
             require(success, "FeeDistributor: sending ETH failed");
             zeroStaking.increaseF_ETH(feeToZeroStaking);
         }

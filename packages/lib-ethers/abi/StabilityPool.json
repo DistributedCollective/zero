@@ -410,6 +410,31 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_depositor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_zusdAmountRequested",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_dllrAmountReceived",
+        "type": "uint256"
+      }
+    ],
+    "name": "WithdrawFromSpAndConvertToDLLR",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "_depositor",
@@ -1084,6 +1109,46 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_dllrAmount",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "deadline",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "v",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "r",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "s",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct IMassetManager.PermitParams",
+        "name": "_permitParams",
+        "type": "tuple"
+      }
+    ],
+    "name": "provideToSpFromDLLR",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "_kickbackRate",
         "type": "uint256"
       }
@@ -1207,6 +1272,19 @@
       }
     ],
     "name": "withdrawFromSP",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_zusdAmountRequested",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawFromSpAndConvertToDLLR",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

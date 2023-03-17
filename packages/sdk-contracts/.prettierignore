@@ -10,6 +10,7 @@ gasReporterOutput.json
 !.solhint.json
 abi/
 artifacts/
+external-artifacts/
 reports/
 node_modules/
 typechain/

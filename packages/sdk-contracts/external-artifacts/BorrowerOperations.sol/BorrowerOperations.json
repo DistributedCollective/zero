@@ -545,10 +545,10 @@
     },
     {
       "inputs": [],
-      "name": "masset",
+      "name": "massetManager",
       "outputs": [
         {
-          "internalType": "contract IMasset",
+          "internalType": "contract IMassetManager",
           "name": "",
           "type": "address"
         }
@@ -743,11 +743,11 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_massetAddress",
+          "name": "_massetManagerAddress",
           "type": "address"
         }
       ],
-      "name": "setMassetAddress",
+      "name": "setMassetManagerAddress",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

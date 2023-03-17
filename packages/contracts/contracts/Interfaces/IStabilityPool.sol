@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
+
+import "../Dependencies/Mynt/IMassetManager.sol";
 
 /*
  * The Stability Pool holds ZUSD tokens deposited by Stability Pool depositors.
@@ -34,9 +37,8 @@ pragma solidity 0.6.11;
  * https://github.com/liquity/dev/blob/main/README.md#zero-issuance-to-stability-providers
  */
 interface IStabilityPool {
-
     // --- Events ---
-    
+
     event StabilityPoolETHBalanceUpdated(uint _newBalance);
     event StabilityPoolZUSDBalanceUpdated(uint _newBalance);
 
@@ -61,12 +63,22 @@ interface IStabilityPool {
     event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S, uint _G);
     event FrontEndSnapshotUpdated(address indexed _frontEnd, uint _P, uint _G);
     event UserDepositChanged(address indexed _depositor, uint _newDeposit);
-    event FrontEndStakeChanged(address indexed _frontEnd, uint _newFrontEndStake, address _depositor);
+    event FrontEndStakeChanged(
+        address indexed _frontEnd,
+        uint _newFrontEndStake,
+        address _depositor
+    );
 
     event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
     event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
     event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
     event EtherSent(address _to, uint _amount);
+
+    event WithdrawFromSpAndConvertToDLLR(
+        address _depositor,
+        uint256 _zusdAmountRequested,
+        uint256 _dllrAmountReceived
+    );
 
     // --- Functions ---
 
@@ -81,7 +93,7 @@ interface IStabilityPool {
      * @param _sortedTrovesAddress SortedTroves contract address
      * @param _priceFeedAddress PriceFeed contract address
      * @param _communityIssuanceAddress CommunityIssuanceAddress
-    */
+     */
     function setAddresses(
         address _liquityBaseParamsAddress,
         address _borrowerOperationsAddress,
@@ -119,7 +131,7 @@ interface IStabilityPool {
      *    - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
      *    - Sends the tagged front end's accumulated ZERO gains to the tagged front end
      *    - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
-     * 
+     *
      *    If _amount > userDeposit, the user withdraws all of their compounded deposit.
      * @param _amount amount to withdraw
      */
@@ -211,6 +223,15 @@ interface IStabilityPool {
      * @return the front end's compounded stake.
      */
     function getCompoundedFrontEndStake(address _frontEnd) external view returns (uint);
+
+    //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
+    function provideToSpFromDLLR(
+        uint _dllrAmount,
+        IMassetManager.PermitParams calldata _permitParams
+    ) external;
+
+    /// Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and optionally convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
+    function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmount) external;
 
     /**
      * Fallback function

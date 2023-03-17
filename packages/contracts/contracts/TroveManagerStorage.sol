@@ -14,7 +14,7 @@ import "./Dependencies/BaseMath.sol";
 import "./Dependencies/console.sol";
 
 contract TroveManagerStorage is Ownable, BaseMath {
-    string constant public NAME = "TroveManager";
+    string public constant NAME = "TroveManager";
 
     // --- Connected contract declarations ---
 
@@ -41,10 +41,10 @@ contract TroveManagerStorage is Ownable, BaseMath {
 
     // --- Data structures ---
 
-    uint public baseRate;
+    uint256 public baseRate;
 
     // The timestamp of the latest fee operation (redemption or new ZUSD issuance)
-    uint public lastFeeOperationTime;
+    uint256 public lastFeeOperationTime;
 
     enum Status {
         nonExistent,
@@ -56,44 +56,47 @@ contract TroveManagerStorage is Ownable, BaseMath {
 
     // Store the necessary data for a trove
     struct Trove {
-        uint debt;
-        uint coll;
-        uint stake;
+        uint256 debt;
+        uint256 coll;
+        uint256 stake;
         Status status;
         uint128 arrayIndex;
     }
 
-    mapping (address => Trove) public Troves;
+    mapping(address => Trove) public Troves;
 
-    uint public totalStakes;
+    uint256 public totalStakes;
 
     // Snapshot of the value of totalStakes, taken immediately after the latest liquidation
-    uint public totalStakesSnapshot;
+    uint256 public totalStakesSnapshot;
 
     // Snapshot of the total collateral across the ActivePool and DefaultPool, immediately after the latest liquidation.
-    uint public totalCollateralSnapshot;
+    uint256 public totalCollateralSnapshot;
 
     /*
-    * L_ETH and L_ZUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
-    *
-    * An ETH gain of ( stake * [L_ETH - L_ETH(0)] )
-    * A ZUSDDebt increase  of ( stake * [L_ZUSDDebt - L_ZUSDDebt(0)] )
-    *
-    * Where L_ETH(0) and L_ZUSDDebt(0) are snapshots of L_ETH and L_ZUSDDebt for the active Trove taken at the instant the stake was made
-    */
-    uint public L_ETH;
-    uint public L_ZUSDDebt;
+     * L_ETH and L_ZUSDDebt track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
+     *
+     * An ETH gain of ( stake * [L_ETH - L_ETH(0)] )
+     * A ZUSDDebt increase  of ( stake * [L_ZUSDDebt - L_ZUSDDebt(0)] )
+     *
+     * Where L_ETH(0) and L_ZUSDDebt(0) are snapshots of L_ETH and L_ZUSDDebt for the active Trove taken at the instant the stake was made
+     */
+    uint256 public L_ETH;
+    uint256 public L_ZUSDDebt;
 
     // Map addresses with active troves to their RewardSnapshot
-    mapping (address => RewardSnapshot) public rewardSnapshots;
+    mapping(address => RewardSnapshot) public rewardSnapshots;
 
     // Object containing the ETH and ZUSD snapshots for a given active trove
-    struct RewardSnapshot { uint ETH; uint ZUSDDebt;}
+    struct RewardSnapshot {
+        uint256 ETH;
+        uint256 ZUSDDebt;
+    }
 
     // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
     address[] public TroveOwners;
 
     // Error trackers for the trove redistribution calculation
-    uint public lastETHError_Redistribution;
-    uint public lastZUSDDebtError_Redistribution;
+    uint256 public lastETHError_Redistribution;
+    uint256 public lastZUSDDebtError_Redistribution;
 }

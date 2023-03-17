@@ -38,7 +38,8 @@ import {
   EthersProvider,
   EthersSigner,
   EthersTransactionOverrides,
-  EthersTransactionReceipt
+  EthersTransactionReceipt, 
+  PermitParams
 } from "./types";
 
 import { PopulatableEthersLiquity, SentEthersLiquityTransaction } from "./PopulatableEthersLiquity";
@@ -308,8 +309,8 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    * @throws
    * Throws {@link EthersTransactionFailedError} in case of transaction failure.
    */
-  closeNueTrove(overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
-    return this.send.closeNueTrove(overrides).then(waitForSuccess);
+  closeNueTrove(permitParams: PermitParams, overrides?: EthersTransactionOverrides): Promise<TroveClosureDetails> {
+    return this.send.closeNueTrove(permitParams, overrides).then(waitForSuccess);
   }
 
   /**
@@ -334,10 +335,11 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    */
   adjustNueTrove(
     params: TroveAdjustmentParams<Decimalish>,
+    permitParams: PermitParams,
     maxBorrowingRate?: Decimalish,
     overrides?: EthersTransactionOverrides
   ): Promise<TroveAdjustmentDetails> {
-    return this.send.adjustNueTrove(params, maxBorrowingRate, overrides).then(waitForSuccess);
+    return this.send.adjustNueTrove(params, permitParams, maxBorrowingRate, overrides).then(waitForSuccess);
   }
 
   /**
@@ -565,6 +567,26 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
    */
   registerFrontend(kickbackRate: Decimalish, overrides?: EthersTransactionOverrides): Promise<void> {
     return this.send.registerFrontend(kickbackRate, overrides).then(waitForSuccess);
+  }
+
+  repayZusdFromDLLR(zusdAmount: Decimalish, permitParams: PermitParams, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<TroveAdjustmentDetails> {
+    return this.send.repayZusdFromDLLR(zusdAmount, permitParams, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  withdrawZusdAndConvertToDLLR(zusdAmount: Decimalish, maxBorrowingRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<void> {
+    return this.send.withdrawZusdAndConvertToDLLR(zusdAmount, maxBorrowingRate, overrides).then(waitForSuccess);
+  }
+
+  provideToSpFromDLLR(dllrAmount: Decimalish, permitParams: PermitParams, overrides?: EthersTransactionOverrides): Promise<void> {
+    return this.send.provideToSpFromDLLR(dllrAmount, permitParams, overrides).then(waitForSuccess);
+  }
+
+  withdrawFromSpAndConvertToDLLR(spAmount: Decimalish, overrides?: EthersTransactionOverrides): Promise<void> {
+    return this.send.withdrawFromSpAndConvertToDLLR(spAmount, overrides).then(waitForSuccess);
+  }
+
+  redeemCollateralViaDLLR(dllrAmount: Decimalish, permitParams: PermitParams, maxRedemptionRate?: Decimalish, overrides?: EthersTransactionOverrides): Promise<RedemptionDetails> {
+    return this.send.redeemCollateralViaDLLR(dllrAmount, permitParams, maxRedemptionRate, overrides).then(waitForSuccess);
   }
 }
 

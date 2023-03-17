@@ -50,7 +50,7 @@
     "docs:collect-sdk-apis": "node scripts/collect-sdk-apis.js",
     "docs:api-documenter": "api-documenter generate -i temp/sdk-apis -o docs/sdk",
     "fuzzer": "yarn workspace @sovryn-zero/fuzzer fuzzer",
-    "prepare": "run-s prepare:*",
+    "prepare": "run-s prepare:* && husky install",
     "do-release": "run-s do-release:*",
     "do-pack": "echo 'creates .tgz packages for manual verification in corresponding package folders' && run-s do-pack:*",
     "prepare:contracts": "yarn workspace @sovryn-zero/contracts prepare",
@@ -72,7 +72,7 @@
     "do-pack:contracts": "yarn workspace @sovryn-zero/contracts do-pack",
     "do-pack:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts do-pack",
     "save-live-version": "yarn workspace @sovryn-zero/lib-ethers save-live-version",
-    "set-masset": "yarn workspace @sovryn-zero/lib-ethers hardhat setMassetAddress",
+    "set-massetManager": "yarn workspace @sovryn-zero/lib-ethers hardhat setMassetManagerAddress",
     "start-dev-chain": "run-s start-dev-chain:*",
     "start-dev-chain:rsk": "node dev-chain/start.js",
     "start-dev-chain:prepare-providers": "yarn prepare:providers",
@@ -93,11 +93,13 @@
     "test-deprecated:dev-frontend:stop-dev-chain": "yarn stop-dev-chain",
     "test:contracts": "yarn workspace @sovryn-zero/contracts test",
     "test:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts test",
-    "format-lint-sdk-contracts": "yarn workspace @soryn-zero/sdk-contracts lint && yarn workspace @soryn-zero/sdk-contracts prettier",
+    "format-lint:contracts": "yarn workspace @sovryn-zero/contracts lint && yarn workspace @sovryn-zero/contracts prettier:write",
+    "format-lint:sdk-contracts": "yarn workspace @sovryn-zero/sdk-contracts lint && yarn workspace @soryn-zero/sdk-contracts prettier:write",
     "test-live": "run-s test-live:*",
     "test-live:lib-ethers": "yarn workspace @sovryn-zero/lib-ethers test-live",
     "coverage": "run-s coverage:*",
-    "coverage:contracts": "yarn workspace @sovryn-zero/contracts coverage"
+    "coverage:contracts": "yarn workspace @sovryn-zero/contracts coverage",
+    "postinstall": "yarn workspace @sovryn-zero/lib-ethers postinstall"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.0.1",
@@ -107,6 +109,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "semantic-release": "^17.4.2",
-    "semantic-release-monorepo": "^7.0.4"
+    "semantic-release-monorepo": "^7.0.4",
+    "husky": "^8.0.0"
   }
 }

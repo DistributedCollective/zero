@@ -59,8 +59,8 @@
     "lint": "yarn lint-sol && yarn lint-js",
     "lint-sol": "solhint contracts/{*,**/*,**/**/*,**/**/**/*,**/**/**/**/*}.sol",
     "lint-js": "eslint . --ext .js --no-error-on-unmatched-pattern",
-    "prettier": "prettier --write .",
-    "prettier-check": "prettier --check ."
+    "prettier:write": "prettier --write .",
+    "prettier:check": "prettier --check ."
   },
   "peerDependencies": {
     "@sovryn-zero/contracts": "^1.0.0-early.access"

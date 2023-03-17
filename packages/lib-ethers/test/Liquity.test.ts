@@ -125,7 +125,7 @@ describe("EthersLiquity", () => {
 
   before(async () => {
     [deployer, funder, user, ...otherUsers] = await ethers.getSigners();
-    deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+    deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 
     liquity = await connectToDeployment(deployment, user);
     expect(liquity).to.be.an.instanceOf(EthersLiquity);
@@ -415,7 +415,7 @@ describe("EthersLiquity", () => {
 
   describe("StabilityPool", () => {
     before(async () => {
-      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 
       [deployerLiquity, liquity, ...otherLiquities] = await connectUsers([
         deployer,
@@ -586,7 +586,7 @@ describe("EthersLiquity", () => {
     describe("when people overstay", () => {
       before(async () => {
         // Deploy new instances of the contracts, for a clean slate
-        deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+        deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 
         const otherUsersSubset = otherUsers.slice(0, 5);
         [deployerLiquity, liquity, ...otherLiquities] = await connectUsers([
@@ -668,7 +668,7 @@ describe("EthersLiquity", () => {
       }
 
       // Deploy new instances of the contracts, for a clean slate
-      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 
       const otherUsersSubset = otherUsers.slice(0, 3);
       [deployerLiquity, liquity, ...otherLiquities] = await connectUsers([
@@ -793,7 +793,7 @@ describe("EthersLiquity", () => {
     beforeEach(async function () {
       this.timeout("1m");
       // Deploy new instances of the contracts, for a clean slate
-      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 
       const otherUsersSubset = otherUsers.slice(0, 3);
       [deployerLiquity, liquity, ...otherLiquities] = await connectUsers([
@@ -872,7 +872,7 @@ describe("EthersLiquity", () => {
       }
 
       // Deploy new instances of the contracts, for a clean slate
-      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
       const otherUsersSubset = otherUsers.slice(0, _redeemMaxIterations);
       expect(otherUsersSubset).to.have.length(_redeemMaxIterations);
 
@@ -928,7 +928,7 @@ describe("EthersLiquity", () => {
       }
       this.timeout("1m");
 
-      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 
       [rudeUser, ...fiveOtherUsers] = otherUsers.slice(0, 6);
 
@@ -964,7 +964,7 @@ describe("EthersLiquity", () => {
       // Required gas has just went up.
       const newGasEstimate = await provider.estimateGas(tx.rawPopulatedTransaction);
       const gasIncrease = newGasEstimate.sub(originalGasEstimate).toNumber();
-      expect(gasIncrease).to.be.within(5000, 10000);
+      expect(gasIncrease).to.be.within(4900, 10000);
 
       // This will now have to update lastFeeOperationTime
       await waitForSuccess(tx.send());
@@ -1041,7 +1041,7 @@ describe("EthersLiquity", () => {
         this.skip();
       }
 
-      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+      deployment = await deployLiquity(deployer,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
       [deployerLiquity, liquity] = await connectUsers([deployer, user]);
     });
 

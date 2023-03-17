@@ -135,4 +135,4 @@ function getTestFilePaths() {
   return paths
 }
 
-module.exports = { test: test, preflight, preflight }
+module.exports = { test: test, preflight }

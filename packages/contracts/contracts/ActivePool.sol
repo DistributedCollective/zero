@@ -11,7 +11,7 @@ import "./ActivePoolStorage.sol";
 /**
  * @title Active Pool
  * @notice The Active Pool holds the ETH collateral and ZUSD debt (but not ZUSD tokens) for all active troves.
- * 
+ *
  * When a trove is liquidated, it's ETH and ZUSD debt are transferred from the Active Pool, to either the
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  */
@@ -20,8 +20,8 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     // --- Events ---
     event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
-    event ActivePoolZUSDDebtUpdated(uint _ZUSDDebt);
-    event ActivePoolETHBalanceUpdated(uint _ETH);
+    event ActivePoolZUSDDebtUpdated(uint256 _ZUSDDebt);
+    event ActivePoolETHBalanceUpdated(uint256 _ETH);
 
     // --- Contract setters ---
     /// @notice initializer function that sets required addresses
@@ -50,21 +50,18 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
-
-        
     }
 
     // --- Getters for public variables. Required by IPool interface ---
 
-    
     /// @notice Not necessarily equal to the the contract's raw ETH balance - ether can be forcibly sent to contracts.
     /// @return the ETH state variable.
-    function getETH() external view override returns (uint) {
+    function getETH() external view override returns (uint256) {
         return ETH;
     }
 
     /// @return the ZUSD debt state variable
-    function getZUSDDebt() external view override returns (uint) {
+    function getZUSDDebt() external view override returns (uint256) {
         return ZUSDDebt;
     }
 
@@ -73,19 +70,19 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
     /// @notice Send ETH amount to given account. Updates ActivePool balance. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _account account to receive the ETH amount
     /// @param _amount ETH amount to send
-    function sendETH(address _account, uint _amount) external override {
+    function sendETH(address _account, uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         ETH = ETH.sub(_amount);
         emit ActivePoolETHBalanceUpdated(ETH);
         emit EtherSent(_account, _amount);
 
-        (bool success, ) = _account.call{value: _amount}("");
+        (bool success, ) = _account.call{ value: _amount }("");
         require(success, "ActivePool: sending ETH failed");
     }
 
     /// @notice Increases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _amount ZUSD amount to add to the pool debt
-    function increaseZUSDDebt(uint _amount) external override {
+    function increaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveM();
         ZUSDDebt = ZUSDDebt.add(_amount);
         ActivePoolZUSDDebtUpdated(ZUSDDebt);
@@ -93,7 +90,7 @@ contract ActivePool is CheckContract, IActivePool, ActivePoolStorage {
 
     /// @notice Decreases ZUSD debt of the active pool. Only callable by BorrowerOperations, TroveManager or StabilityPool.
     /// @param _amount ZUSD amount to sub to the pool debt
-    function decreaseZUSDDebt(uint _amount) external override {
+    function decreaseZUSDDebt(uint256 _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         ZUSDDebt = ZUSDDebt.sub(_amount);
         ActivePoolZUSDDebtUpdated(ZUSDDebt);

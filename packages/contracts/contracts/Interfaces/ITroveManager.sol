@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
 
 import "./ILiquityBase.sol";
 import "./IStabilityPool.sol";
 import "./IZUSDToken.sol";
 import "./IZEROToken.sol";
 import "./IZEROStaking.sol";
+import "../Dependencies/Mynt/IMassetManager.sol";
 
 /// Common interface for the Trove Manager.
 interface ITroveManager is ILiquityBase {
@@ -46,7 +48,12 @@ interface ITroveManager is ILiquityBase {
         uint256 stake,
         uint8 operation
     );
-    event TroveLiquidated(address indexed _borrower, uint256 _debt, uint256 _coll, uint8 operation);
+    event TroveLiquidated(
+        address indexed _borrower,
+        uint256 _debt,
+        uint256 _coll,
+        uint8 operation
+    );
     event BaseRateUpdated(uint256 _baseRate);
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event TotalStakesUpdated(uint256 _newTotalStakes);
@@ -55,41 +62,48 @@ interface ITroveManager is ILiquityBase {
     event TroveSnapshotsUpdated(uint256 _L_ETH, uint256 _L_ZUSDDebt);
     event TroveIndexUpdated(address _borrower, uint256 _newIndex);
 
+    struct TroveManagerInitAddressesParams {
+        address _feeDistributorAddress;
+        address _troveManagerRedeemOps;
+        address _liquityBaseParamsAddress;
+        address _borrowerOperationsAddress;
+        address _activePoolAddress;
+        address _defaultPoolAddress;
+        address _stabilityPoolAddress;
+        address _gasPoolAddress;
+        address _collSurplusPoolAddress;
+        address _priceFeedAddress;
+        address _zusdTokenAddress;
+        address _sortedTrovesAddress;
+        address _zeroTokenAddress;
+        address _zeroStakingAddress;
+    }
+
     // --- Functions ---
     /**
      * @notice Called only once on init, to set addresses of other Zero contracts. Callable only by owner
      * @dev initializer function, checks addresses are contracts
-     * @param _feeDistributorAddress feeDistributor contract address
-     * @param _troveManagerRedeemOps TroveManagerRedeemOps contract address
-     * @param _liquityBaseParamsAddress LiquityBaseParams contract address
-     * @param _borrowerOperationsAddress BorrowerOperations contract address
-     * @param _activePoolAddress ActivePool contract address
-     * @param _defaultPoolAddress DefaultPool contract address
-     * @param _stabilityPoolAddress StabilityPool contract address
-     * @param _gasPoolAddress GasPool contract address
-     * @param _collSurplusPoolAddress CollSurplusPool contract address
-     * @param _priceFeedAddress PriceFeed contract address
-     * @param _zusdTokenAddress ZUSDToken contract address
-     * @param _sortedTrovesAddress SortedTroves contract address
-     * @param _zeroTokenAddress ZEROToken contract address
-     * @param _zeroStakingAddress ZEROStaking contract address
+     * @param _troveManagerInitAddresses addresses list to intialize TroveManager with _
+     *        _feeDistributorAddress feeDistributor contract address
+     *        _troveManagerRedeemOps TroveManagerRedeemOps contract address
+     *        _liquityBaseParamsAddress LiquityBaseParams contract address
+     *        _borrowerOperationsAddress BorrowerOperations contract address
+     *        _activePoolAddress ActivePool contract address
+     *        _defaultPoolAddress DefaultPool contract address
+     *        _stabilityPoolAddress StabilityPool contract address
+     *        _gasPoolAddress GasPool contract address
+     *        _collSurplusPoolAddress CollSurplusPool contract address
+     *        _priceFeedAddress PriceFeed contract address
+     *        _zusdTokenAddress ZUSDToken contract address
+     *        _sortedTrovesAddress SortedTroves contract address
+     *        _zeroTokenAddress ZEROToken contract address
+     *        _zeroStakingAddress ZEROStaking contract address
      */
     function setAddresses(
-        address _feeDistributorAddress,
-        address _troveManagerRedeemOps,
-        address _liquityBaseParamsAddress,
-        address _borrowerOperationsAddress,
-        address _activePoolAddress,
-        address _defaultPoolAddress,
-        address _stabilityPoolAddress,
-        address _gasPoolAddress,
-        address _collSurplusPoolAddress,
-        address _priceFeedAddress,
-        address _zusdTokenAddress,
-        address _sortedTrovesAddress,
-        address _zeroTokenAddress,
-        address _zeroStakingAddress
+        TroveManagerInitAddressesParams memory _troveManagerInitAddresses
     ) external;
+
+    function setTroveManagerRedeemOps(address _troveManagerRedeemOps) external;
 
     /// @return Trove owners count
     function getTroveOwnersCount() external view returns (uint256);
@@ -162,6 +176,17 @@ interface ITroveManager is ILiquityBase {
         uint256 _maxFee
     ) external;
 
+    function redeemCollateralViaDLLR(
+        uint256 _dllrAmount,
+        address _firstRedemptionHint,
+        address _upperPartialRedemptionHint,
+        address _lowerPartialRedemptionHint,
+        uint256 _partialRedemptionHintNICR,
+        uint256 _maxIterations,
+        uint256 _maxFeePercentage,
+        IMassetManager.PermitParams calldata _permitParams
+    ) external;
+
     /// @notice Update borrower's stake based on their latest collateral value
     /// @param _borrower borrower address
     function updateStakeAndTotalStakes(address _borrower) external returns (uint256);
@@ -199,7 +224,9 @@ interface ITroveManager is ILiquityBase {
 
     /// @notice returns the Troves entire debt and coll, including pending rewards from redistributions.
     /// @param _borrower borrower address
-    function getEntireDebtAndColl(address _borrower)
+    function getEntireDebtAndColl(
+        address _borrower
+    )
         external
         view
         returns (
@@ -267,22 +294,34 @@ interface ITroveManager is ILiquityBase {
     /// @param _borrower borrower address
     /// @param _collIncrease amount of collateral to increase
     /// @return new trove collateral
-    function increaseTroveColl(address _borrower, uint256 _collIncrease) external returns (uint256);
+    function increaseTroveColl(
+        address _borrower,
+        uint256 _collIncrease
+    ) external returns (uint256);
 
     /// @param _borrower borrower address
     /// @param _collDecrease amount of collateral to decrease
     /// @return new trove collateral
-    function decreaseTroveColl(address _borrower, uint256 _collDecrease) external returns (uint256);
+    function decreaseTroveColl(
+        address _borrower,
+        uint256 _collDecrease
+    ) external returns (uint256);
 
     /// @param _borrower borrower address
     /// @param _debtIncrease amount of debt to increase
     /// @return new trove debt
-    function increaseTroveDebt(address _borrower, uint256 _debtIncrease) external returns (uint256);
+    function increaseTroveDebt(
+        address _borrower,
+        uint256 _debtIncrease
+    ) external returns (uint256);
 
     /// @param _borrower borrower address
     /// @param _debtDecrease amount of debt to decrease
     /// @return new trove debt
-    function decreaseTroveDebt(address _borrower, uint256 _debtDecrease) external returns (uint256);
+    function decreaseTroveDebt(
+        address _borrower,
+        uint256 _debtDecrease
+    ) external returns (uint256);
 
     /**
      * @param _price ETH price

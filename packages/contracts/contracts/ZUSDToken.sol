@@ -38,7 +38,15 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _borrowerOperationsAddress
-    ) public initializer onlyOwner {
+    ) public virtual initializer onlyOwner {
+        _initialize(_troveManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress);
+    }
+
+    function _initialize(
+        address _troveManagerAddress,
+        address _stabilityPoolAddress,
+        address _borrowerOperationsAddress
+    ) internal {
         checkContract(_troveManagerAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_borrowerOperationsAddress);
@@ -181,7 +189,14 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
                 "\x19\x01",
                 domainSeparator(),
                 keccak256(
-                    abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner]++, deadline)
+                    abi.encode(
+                        _PERMIT_TYPEHASH,
+                        owner,
+                        spender,
+                        amount,
+                        _nonces[owner]++,
+                        deadline
+                    )
                 )
             )
         );
@@ -222,7 +237,10 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         assert(sender != address(0));
         assert(recipient != address(0));
 
-        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
+        _balances[sender] = _balances[sender].sub(
+            amount,
+            "ERC20: transfer amount exceeds balance"
+        );
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
@@ -261,12 +279,6 @@ contract ZUSDToken is ZUSDTokenStorage, CheckContract, IZUSDToken, Ownable {
         require(
             _recipient != address(0) && _recipient != address(this),
             "ZUSD: Cannot transfer tokens directly to the ZUSD token contract or the zero address"
-        );
-        require(
-            _recipient != stabilityPoolAddress &&
-                _recipient != troveManagerAddress &&
-                _recipient != borrowerOperationsAddress,
-            "ZUSD: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
         );
     }
 
