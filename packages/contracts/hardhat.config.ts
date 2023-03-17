@@ -109,6 +109,27 @@ task("check-fork-patch", "Check Hardhat Fork Patch by Rainer").setAction(async (
     else console.log("Hardhat mainnet forking does NOT work properly!");
 });
 
+task("check-redemption-hints", "Check redemption hints").setAction(async (taskAgrs, hre) => {
+    const { ethers } = hre;
+    const priceFeed = await hre.ethers.getContractAt(
+        "PriceFeed",
+        "0x6D1d9574d67e04cf35Fa1d916F763eDDae03b75d"
+    );
+    const latestPrice = await priceFeed.lastGoodPrice();
+    const hintHelpers = await ethers.getContractAt(
+        "HintHelpers",
+        "0x1D7DaC5a63A35540bE9e031212ecf39584AE5595"
+    );
+    for (let i = 100; i <= 1000; i += 10) {
+        const { truncatedZUSDamount } = await hintHelpers.getRedemptionHints(
+            ethers.utils.parseEther(i.toString()),
+            latestPrice,
+            0
+        );
+        console.log(i, "-", (truncatedZUSDamount / 1e18).toString());
+    }
+});
+
 const config: HardhatUserConfig = {
     solidity: {
         compilers: [
