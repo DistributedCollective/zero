@@ -232,7 +232,7 @@ const config: HardhatUserConfig = {
             //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
         },
         rskForkedTestnet: {
-            // e.g. hh node --fork https://testnet.sovryn.app/rpc --no-deploy --gasprice 66000000 --fork-block-number 5018378
+            // e.g. set ACC_QTY=20 && hh node --fork https://testnet.sovryn.app/rpc --no-deploy --gasprice 66000000 --fork-block-number 5018378
             chainId: 31337,
             accounts: testnetAccounts,
             url: "http://127.0.0.1:8545/",
@@ -254,6 +254,7 @@ const config: HardhatUserConfig = {
 
         /// MAINNETS
         rskSovrynMainnet: {
+            // e.g. set ACC_QTY=20 && hh node --fork https://mainnet-dev.sovryn.app/rpc --no-deploy --gasprice 66000000 --fork-block-number 5018378
             url: "https://mainnet-dev.sovryn.app/rpc",
             chainId: 30,
             accounts: mainnetAccounts,

@@ -5,7 +5,7 @@ import sipArgsList, { ISipArgument } from "./args/sipArgs";
 
 const logger = new Logs().showInConsole(true);
 
-task("sips:verify-sip-agrs", "Verify SIP Args")
+task("sips:verify-agrs", "Verify SIP Args")
     .addParam(
         "argsFunc",
         "SIP args construction function that is located in and exported from tasks/sips/args/SIPArgs.ts which returns SIP args"
@@ -15,7 +15,7 @@ task("sips:verify-sip-agrs", "Verify SIP Args")
         logger.information(sipArgs);
     });
 
-task("sips:create-sip", "Create SIP to Sovryn Governance")
+task("sips:create", "Create SIP to Sovryn Governance")
     .addParam(
         "argsFunc",
         "Function name from tasks/sips/args/sipArgs.ts that returns the sip arguments"
