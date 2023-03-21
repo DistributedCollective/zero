@@ -187,7 +187,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgs: ISipArgument = await SIPArgs.zeroMyntIntegrationSIP(hre);
             console.log("... before SIP creation");
-            await createSIP(hre, sipArgs, "GovernorOwner");
+            await createSIP(hre, sipArgs);
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
@@ -321,7 +321,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgs: ISipArgument = await SIPArgs.zeroFeesUpdate(hre);
-            await createSIP(hre, sipArgs, "GovernorOwner");
+            await createSIP(hre, sipArgs);
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
