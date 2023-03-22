@@ -2,10 +2,10 @@
 
 pragma solidity 0.6.11;
 
-import './Dependencies/Ownable.sol';
+import "./Dependencies/Ownable.sol";
 
 contract CollSurplusPoolStorage is Ownable {
-    string public constant NAME = 'CollSurplusPool';
+    string public constant NAME = "CollSurplusPool";
 
     address public borrowerOperationsAddress;
     address public troveManagerAddress;

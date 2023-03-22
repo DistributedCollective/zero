@@ -105,6 +105,12 @@ contract TroveManager is TroveManagerBase, CheckContract, ITroveManager {
         emit ZEROStakingAddressChanged(_troveManagerInitAddressesParams._zeroStakingAddress);
     }
 
+    function setTroveManagerRedeemOps(address _troveManagerRedeemOps) external override onlyOwner {
+        checkContract(_troveManagerRedeemOps);
+        troveManagerRedeemOps = _troveManagerRedeemOps;
+        emit TroveManagerRedeemOpsAddressChanged(_troveManagerRedeemOps);
+    }
+
     // --- Getters ---
 
     function getTroveOwnersCount() external view override returns (uint256) {

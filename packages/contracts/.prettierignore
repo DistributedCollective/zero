@@ -12,7 +12,7 @@ abi/
 artifacts/
 reports/
 node_modules/
-typechain/
+types/
 package-lock.json
 coverage
 coverage.json
@@ -26,3 +26,12 @@ tmp/
 dist/
 build/
 hardhatAccountsList*.*
+test/js/**/*.js
+test/js/
+errorAccumulationTest/js/
+eth-mutants-custom/
+fuzzTests/js/
+gasTest/js/
+migrations/
+utils/js/
+# see the root .prettierignore
