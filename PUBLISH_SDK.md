@@ -8,6 +8,9 @@ Untill then we are using manual packages publishing:
 - bump packages versions to publish in `package.json` 
 - follow the instructions below  
 
+## Prepare SDK for publishing
+- merge from the `develop` branch
+- run `yarn prepare` form the root - it will compile contracts and update typechain typings in `lib-base` and `lib-ethers`
 
 ## **Solidity contracts (libraries)**  
 To publish sdk-contracts package, from the package root run   
