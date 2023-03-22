@@ -50,8 +50,7 @@ export const createSIP = async (hre, sipArgs: ISipArgument) => {
         args.description
     );
 
-    /*
-    const tx = await governor.populateTransaction.propose(
+    const txp = await governor.populateTransaction.propose(
         args.targets,
         args.values,
         args.signatures,
@@ -59,8 +58,7 @@ export const createSIP = async (hre, sipArgs: ISipArgument) => {
         args.description
     );
     console.log("Populated SIP tx:");
-    console.log(tx);
-    */
+    console.log(txp);
 
     const receipt = await tx.wait();
 

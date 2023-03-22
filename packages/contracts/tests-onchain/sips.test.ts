@@ -591,9 +591,11 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             );
             const newBorrowingFeeFloor = ethers.utils.parseEther("0.05");
             const newMaxBorrowingFee = ethers.utils.parseEther("0.075");
+            const newRedemptionFeeFloor = ethers.utils.parseEther("0.019");
 
             expect(await zeroBaseParams.BORROWING_FEE_FLOOR()).to.equal(newBorrowingFeeFloor);
             expect(await zeroBaseParams.MAX_BORROWING_FEE()).to.equal(newMaxBorrowingFee);
+            expect(await zeroBaseParams.REDEMPTION_FEE_FLOOR()).to.equal(newRedemptionFeeFloor);
         });
     });
 });
