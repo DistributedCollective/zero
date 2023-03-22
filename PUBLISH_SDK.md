@@ -30,14 +30,22 @@ Import SDK libraries in contracts like this
 import "@sovryn-zero/contracts/libraries/BorrowerLib.sol";
 ```  
 
-## typescript library `lib-ethers`
+## typescript libraries
+
+### lib-base
+From the root tun `do-publish:lib-base` or if you want more control:
+- cd to the package dir 
+  - run CLI `yarn do-prepare`
+  - run CLI `yarn publish`
+  - check package is successfully published
+  - create a release tag `lib-ethers/[release-version]` e.g. lib-base/v0.2.0 with -m "expose private _findHints -> public findHints"
 ### lib-ethers
-from the lib-ethers package:  
-- run CLI `yarn do-prepare`
-- remove unwanted for this release changes as needed
-- run `yarn  publish`
-- check package is successfully published
-- create a tag e.g. lib-ethers/v1.0.0-earl.access.2 with -m "expose private _findHints -> public findHints"
-- `yarn do-patch` if running scripts on forked chains causes issues
+From the root tun `do-publish:lib-base` or if you want more control
+- cd to the package dir  
+  - run CLI `yarn do-prepare`
+  - remove unwanted for this release changes as needed
+  - run `yarn  publish`
+  - check package is successfully published
+  - create a tag `lib-ethers/[release-version]` e.g. lib-ethers/v0.2.0 with -m "expose private _findHints -> public findHints"
 
 
