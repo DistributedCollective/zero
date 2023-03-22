@@ -65,4 +65,4 @@ export const MAXIMUM_BORROWING_RATE = Decimal.from(0.05);
  *
  * @public
  */
-export const MINIMUM_REDEMPTION_RATE = Decimal.from(0.005);
+export const MINIMUM_REDEMPTION_RATE = Decimal.from(0.025);
