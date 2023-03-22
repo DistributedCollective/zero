@@ -1,34 +1,34 @@
 {
-  "name": "@sovryn-zero/contracts",
-  "version": "1.0.0-early.access.3",
-  "description": "Sovryn Zero solidity contracts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DistributedCollective/zero.git"
-  },
-  "private": false,
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "keywords": [
-    "Sovryn",
-    "Zero",
-    "DeFi",
-    "blockchain",
-    "finance",
-    "BTC",
-    "bitcoin",
-    "RSK",
-    "rootstock",
-    "solidity",
-    "contracts",
-    "SDK"
-  ],
-  "author": "Sovryn",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/DistributedCollective/zero"
-  },
-  "homepage": "https://github.com/DistributedCollective/zero#readme"
+    "name": "@sovryn-zero/contracts",
+    "version": "0.1.0",
+    "description": "Sovryn Zero solidity contracts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DistributedCollective/zero.git"
+    },
+    "private": false,
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "keywords": [
+        "Sovryn",
+        "Zero",
+        "DeFi",
+        "blockchain",
+        "finance",
+        "BTC",
+        "bitcoin",
+        "RSK",
+        "rootstock",
+        "solidity",
+        "contracts",
+        "SDK"
+    ],
+    "author": "Sovryn",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/DistributedCollective/zero"
+    },
+    "homepage": "https://github.com/DistributedCollective/zero#readme"
 }

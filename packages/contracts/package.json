@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/contracts",
-  "version": "1.0.0-early.access.3",
+  "version": "0.1.0",
   "description": "Sovryn Zero solidity contracts",
   "main": "truffle-config.js",
   "directories": {
