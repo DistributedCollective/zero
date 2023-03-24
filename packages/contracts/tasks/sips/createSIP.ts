@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { task } from "hardhat/config";
 import Logs from "node-logs";
-import sipArgsList, { ISipArgument } from "./args/sipArgs";
+import sipArgsList, { ISipArgument } from "./args/SIPArgs";
 
 const logger = new Logs().showInConsole(true);
 
