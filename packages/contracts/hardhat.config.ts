@@ -1,6 +1,6 @@
+require("cryptoenv").parse();
 import { HardhatNetworkAccountsUserConfig, HardhatUserConfig } from "hardhat/types";
-import { task, /*HardhatUserConfig,*/ types, extendEnvironment } from "hardhat/config";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { task, /*HardhatUserConfig,*/ } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 
 import "@nomicfoundation/hardhat-toolbox";

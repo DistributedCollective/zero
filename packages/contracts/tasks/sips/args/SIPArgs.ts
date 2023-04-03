@@ -221,7 +221,6 @@ const zeroFeesUpdateSip0059 = async (hre: HardhatRuntimeEnvironment): Promise<IS
                 iSetFeesFloor._abiCoder.encode(["uint256"], [newMaxBorrowingFee]),
                 iSetFeesFloor._abiCoder.encode(["uint256"], [newRedemptionFeeFloor]),
             ],
-            //@todo set new SIP values!!!
             description:
                 "SIP-0059: Zero Fee Floor Update: March 22, Details: https://github.com/DistributedCollective/SIPS/blob/b22933f/SIP-0059.md, sha256: cf432a01b302b0c21b35f55c423d36233cf2f536a96a4d6cc97b2c5b5bb1fbda",
         },
