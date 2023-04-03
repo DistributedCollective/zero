@@ -3982,6 +3982,36 @@ contract('StabilityPool', async accounts => {
       const txD = await stabilityPool.registerFrontEnd(dec(1, 18), { from: D });
       assert.isTrue(txD.receipt.status);
     });
+    
+    it("setCommunityIssuanceAddress(): reverts if address is invalid", async() => {
+      // zero address
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(ZERO_ADDRESS, {from: owner}), "Account cannot be zero address");
+
+      // non-contract address
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(C, {from: owner}), "Account code size cannot be zero");
+    })
+
+    it("setCommunityIssuanceAddress(): reverts if initiate by non-authorized user", async() => {
+      // non-owner
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(contracts.defaultPool.address, {from: E}), "Ownable:: access denied");
+    })
+
+    it("setCommunityIssuanceAddress(): should set the new community issuance contract", async() => {
+      const oldCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let tx = await stabilityPool.setCommunityIssuanceAddress(contracts.defaultPool.address, {from: owner})
+      let newCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
+      assert.equal(newCommunityIssuanceAddress, contracts.defaultPool.address);
+      assert.equal(eventData, contracts.defaultPool.address);
+      
+
+      // set back the community issuance to the old address
+      tx = await stabilityPool.setCommunityIssuanceAddress(oldCommunityIssuanceAddress, {from: owner})
+      newCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
+      assert.equal(newCommunityIssuanceAddress, oldCommunityIssuanceAddress);
+      assert.equal(eventData, oldCommunityIssuanceAddress);
+    })
   });
 });
 

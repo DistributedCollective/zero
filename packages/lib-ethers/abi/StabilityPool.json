@@ -1210,6 +1210,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_communityIssuanceAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setCommunityIssuanceAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_owner",
         "type": "address"
       }
