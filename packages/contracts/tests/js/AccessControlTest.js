@@ -64,7 +64,7 @@ contract(
 
       await deploymentHelper.connectZEROContracts(ZEROContracts);
       await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts);
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts);
 
       for (let account of accounts.slice(0, 10)) {
         await th.openTrove(coreContracts, {

@@ -59,7 +59,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
 
     await deploymentHelper.connectZEROContracts(ZEROContracts);
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
 
     await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
     await zeroToken.approve(communityIssuanceTester.address, toBN(dec(30, 24)));

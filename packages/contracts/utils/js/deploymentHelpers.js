@@ -511,7 +511,7 @@ class DeploymentHelper {
     // FIXME
   }
 
-  static async connectZEROContractsToCore(ZEROContracts, coreContracts, walletAddress) {
+  static async connectZEROContractsToCore(ZEROContracts, coreContracts, apr = 0) {
     await ZEROContracts.zeroStaking.setAddresses(
       ZEROContracts.zeroToken.address,
       coreContracts.zusdToken.address,
@@ -522,7 +522,8 @@ class DeploymentHelper {
     await ZEROContracts.communityIssuance.initialize(
       ZEROContracts.zeroToken.address,
       coreContracts.stabilityPool.address,
-      walletAddress
+      coreContracts.priceFeedTestnet.address,
+      apr
     );
   }
 }

@@ -40,7 +40,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
 
     await deploymentHelper.connectZEROContracts(ZEROContracts);
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts);
   });
 
   it('Sets the correct PriceFeed address in TroveManager', async () => {

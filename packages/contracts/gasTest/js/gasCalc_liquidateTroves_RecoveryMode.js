@@ -53,7 +53,7 @@ contract("Gas cost tests", async accounts => {
 
     await deploymentHelper.connectZEROContracts(ZEROContracts);
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
   });
 
   // --- liquidateTroves RECOVERY MODE - pure redistribution ---

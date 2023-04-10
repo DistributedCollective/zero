@@ -1,8 +1,4 @@
-/**
- * Copyright 2017-2020, bZeroX, LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0.
- */
-
+// SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
 import "../Dependencies/IERC20.sol";

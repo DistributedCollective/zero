@@ -6,9 +6,11 @@ interface ICommunityIssuance {
     
     // --- Events ---
     
-    event ZEROTokenAddressSet(address _zeroTokenAddress);
-    event CommunityPotAddressSet(address _communityPotAddress);
-    event TotalZEROIssuedUpdated(uint _totalZEROIssued);
+    event SOVTokenAddressSet(address _zeroTokenAddress);
+    event StabilityPoolAddressSet(address _stabilityPoolAddress);
+    event PriceFeedAddressSet(address _priceFeed);
+    event RewardManagerAddressSet(address _rewardManagerAddress);
+    event APRSet(uint256 _APR);
 
     // --- Functions ---
 
@@ -24,6 +26,27 @@ interface ICommunityIssuance {
         address _communityPotAddress,
         address _fundingWalletAddress
     ) external;
+
+    /**
+     * @dev setter function to set the APR value in basis points.
+     * can only be called by reward manager.
+     * @param _APR apr value in basis points.
+     */
+    function setAPR(uint256 _APR) external;
+
+    /**
+     * @dev setter function to set the price feed.
+     * can only be called by the owner.
+     * @param _priceFeedAddress price feed address.
+     */
+    function setPriceFeed(address _priceFeedAddress) external;
+
+    /**
+     * @dev setter function to set reward manager.
+     * can only be called by the owner.
+     * @param _rewardManagerAddress reward manager address.
+     */
+    function setRewardManager(address _rewardManagerAddress) external;
 
     /// @notice issues ZERO tokens corresponding to time in issuance curve
     /// @return ZERO tokens issuance 

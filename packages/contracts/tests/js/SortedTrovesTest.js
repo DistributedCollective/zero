@@ -77,7 +77,7 @@ contract('SortedTroves', async accounts => {
 
       await deploymentHelper.connectZEROContracts(ZEROContracts);
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
     });
 
     let revertToSnapshot;

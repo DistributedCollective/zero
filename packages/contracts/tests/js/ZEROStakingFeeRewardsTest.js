@@ -58,7 +58,7 @@ describe.skip("There are no longer fees being shared to ZeroStaking", function (
 
       await deploymentHelper.connectZEROContracts(ZEROContracts);
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
 
       nonPayable = await NonPayable.new();
       priceFeed = contracts.priceFeedTestnet;

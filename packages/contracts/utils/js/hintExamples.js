@@ -20,7 +20,7 @@ async function main() {
 
   await dh.connectCoreContracts(coreContracts, ZEROContracts);
   await dh.connectZEROContracts(ZEROContracts);
-  await dh.connectZEROContractsToCore(ZEROContracts, coreContracts, borrower);
+  await dh.connectZEROContractsToCore(ZEROContracts, coreContracts);
 
   // Examples of off-chain hint calculation for Open Trove
 

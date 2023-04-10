@@ -89,7 +89,7 @@ contract('TroveManager', async accounts => {
 
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
     await deploymentHelper.connectZEROContracts(ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
 
     await zeroToken.unprotectedMint(multisig, toBN(dec(20, 24)));
     await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
