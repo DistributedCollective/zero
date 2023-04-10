@@ -10,6 +10,7 @@ const TroveManagerTester = artifacts.require("TroveManagerTester");
 const BorrowerOperationsTester = artifacts.require("BorrowerOperationsTester");
 const ZUSDToken = artifacts.require("ZUSDToken");
 const NonPayable = artifacts.require('NonPayable.sol');
+const CommunityIssuance = artifacts.require("./CommunityIssuance.sol");
 const { signERC2612Permit } = require('eth-permit');
 
 const timeMachine = require("ganache-time-traveler");
@@ -3998,18 +3999,19 @@ contract('StabilityPool', async accounts => {
 
     it("setCommunityIssuanceAddress(): should set the new community issuance contract", async() => {
       const oldCommunityIssuanceAddress = await stabilityPool.communityIssuance();
-      let tx = await stabilityPool.setCommunityIssuanceAddress(contracts.defaultPool.address, {from: owner})
-      let newCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let newCommunityIssuanceAddress = (await CommunityIssuance.new()).address;
+      let tx = await stabilityPool.setCommunityIssuanceAddress(newCommunityIssuanceAddress, {from: owner})
+      let latestCommunityIssuanceAddress = await stabilityPool.communityIssuance();
       let eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
-      assert.equal(newCommunityIssuanceAddress, contracts.defaultPool.address);
-      assert.equal(eventData, contracts.defaultPool.address);
+      assert.equal(latestCommunityIssuanceAddress, newCommunityIssuanceAddress);
+      assert.equal(eventData, newCommunityIssuanceAddress);
       
 
       // set back the community issuance to the old address
       tx = await stabilityPool.setCommunityIssuanceAddress(oldCommunityIssuanceAddress, {from: owner})
-      newCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      latestCommunityIssuanceAddress = await stabilityPool.communityIssuance();
       eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
-      assert.equal(newCommunityIssuanceAddress, oldCommunityIssuanceAddress);
+      assert.equal(latestCommunityIssuanceAddress, oldCommunityIssuanceAddress);
       assert.equal(eventData, oldCommunityIssuanceAddress);
     })
   });
