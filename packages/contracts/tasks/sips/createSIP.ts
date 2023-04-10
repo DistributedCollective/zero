@@ -5,10 +5,10 @@ import sipArgsList, { ISipArgument } from "./args/sipArgs";
 
 const logger = new Logs().showInConsole(true);
 
-task("sips:verify-sip-agrs", "Verify SIP Args")
+task("sips:verify-sip-args", "Verify SIP Args")
     .addParam(
         "argsFunc",
-        "SIP args construction function that is located in and exported from tasks/sips/args/SIPArgs.ts which returns SIP args"
+        "SIP args construction function that is located in and exported from tasks/sips/args/sipArgs.ts which returns SIP args"
     )
     .setAction(async ({ argsFunc }, hre) => {
         const sipArgs: ISipArgument = await sipArgsList[argsFunc](hre);
