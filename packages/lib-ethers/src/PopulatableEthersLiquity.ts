@@ -588,6 +588,10 @@ export class PopulatableEthersLiquity
     ];
   }
 
+  async findHints(trove: Trove): Promise<[string, string]> {
+    return this._findHints(trove);
+  }
+
   /** {@inheritDoc @sovryn-zero/lib-base#PopulatableLiquity.openTrove} */
   async openTrove(
     params: TroveCreationParams<Decimalish>,

@@ -51,18 +51,18 @@ export const ZUSD_MINIMUM_DEBT = ZUSD_LIQUIDATION_RESERVE.add(ZUSD_MINIMUM_NET_D
  *
  * @public
  */
-export const MINIMUM_BORROWING_RATE = Decimal.from(0.025);
+export const MINIMUM_BORROWING_RATE = Decimal.from(0.05);
 
 /**
  * Value that the {@link Fees.borrowingRate | borrowing rate} will never exceed.
  *
  * @public
  */
-export const MAXIMUM_BORROWING_RATE = Decimal.from(0.05);
+export const MAXIMUM_BORROWING_RATE = Decimal.from(0.075);
 
 /**
  * Value that the {@link Fees.redemptionRate | redemption rate} will never decay below.
  *
  * @public
  */
-export const MINIMUM_REDEMPTION_RATE = Decimal.from(0.025);
+export const MINIMUM_REDEMPTION_RATE = Decimal.from(0.019);
