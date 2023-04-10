@@ -653,6 +653,7 @@ interface StabilityPoolTransactions {
   provideToSpFromDLLR(_dllrAmount: BigNumberish, _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }, _overrides?: Overrides): Promise<void>;
   registerFrontEnd(_kickbackRate: BigNumberish, _overrides?: Overrides): Promise<void>;
   setAddresses(_liquityBaseParamsAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _priceFeedAddress: string, _communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
+  setCommunityIssuanceAddress(_communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   withdrawETHGainToTrove(_upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawFromSP(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
