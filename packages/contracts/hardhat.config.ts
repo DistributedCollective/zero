@@ -86,7 +86,10 @@ const mainnetAccounts = process.env.MAINNET_DEPLOYER_PRIVATE_KEY
     ? [process.env.MAINNET_DEPLOYER_PRIVATE_KEY]
     : mnemonic;
 
-task("check-fork-patch", "Check Hardhat Fork Patch by Rainer").setAction(async (taskArgs, hre) => {
+task(
+    "check-fork-patch",
+    "Check Hardhat Fork Patch by Rainer: run `export ACC_QTY=20 && yarn hardhat check-fork-patch`"
+).setAction(async (taskArgs, hre) => {
     await hre.network.provider.request({
         method: "hardhat_reset",
         params: [
