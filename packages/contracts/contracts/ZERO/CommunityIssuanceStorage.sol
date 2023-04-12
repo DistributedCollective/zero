@@ -4,8 +4,10 @@ pragma solidity 0.6.11;
 
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/IERC20.sol";
+import "../Interfaces/IPriceFeedSovryn.sol";
+import "../Dependencies/Initializable.sol";
 
-contract CommunityIssuanceStorage is Ownable {
+contract CommunityIssuanceStorage is Ownable, Initializable {
     // --- Data ---
 
     string constant public NAME = "CommunityIssuance";
@@ -13,6 +15,8 @@ contract CommunityIssuanceStorage is Ownable {
     uint256 constant MAX_BPS = 10000;
 
     IERC20 public sovToken;
+
+    IERC20 public zusdToken;
 
     address public stabilityPoolAddress;
 
@@ -24,5 +28,5 @@ contract CommunityIssuanceStorage is Ownable {
 
     address public rewardManager;
 
-    address public priceFeed;
+    IPriceFeedSovryn public priceFeed;
 }

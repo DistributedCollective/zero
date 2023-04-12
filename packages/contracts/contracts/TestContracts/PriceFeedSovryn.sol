@@ -3,33 +3,25 @@
 pragma solidity 0.6.11;
 
 import "../Interfaces/IPriceFeedSovryn.sol";
+import "../Dependencies/SafeMath.sol";
 
 /*
 * PriceFeed placeholder for testnet and development. The price is simply set manually and saved in a state 
 * variable. The contract does not connect to a live Chainlink price feed. 
 */
-contract PriceFeedSovryn is IPriceFeedSovryn {
-    
-    uint256 private _price = 200 * 1e18;
+contract PriceFeedSovryn {
+    using SafeMath for uint256;
+
+    mapping(address => mapping(address => uint256)) public prices;
 
     // --- Functions ---
-
-    // View price getter for simplicity in tests
-    function getPrice() external view returns (uint256) {
-        return _price;
-    }
-
-    function fetchPrice() external override returns (uint256) {
-        // Fire an event just like the mainnet version would.
-        // This lets the subgraph rely on events to get the latest price even when developing locally.
-        emit LastGoodPriceUpdated(_price);
-        return _price;
-    }
-
     // Manual external price setter.
-    function setPrice(uint256 price) external returns (bool) {
-        _price = price;
-        return true;
+    function setPrice(address sourceToken, address destToken, uint256 price) external {
+        prices[sourceToken][destToken] = price;
+    }
+
+    function queryRate(address sourceToken, address destToken) public view returns(uint256 rate, uint256 precision) {
+        return (prices[sourceToken][destToken], 1e18);
     }
 
     function queryReturn(
@@ -37,12 +29,7 @@ contract PriceFeedSovryn is IPriceFeedSovryn {
         address destToken,
         uint256 sourceAmount
     ) public view returns (uint256 destAmount) {
-        (uint256 rate, uint256 precision) = _queryRate(sourceToken, destToken);
-
-        destAmount = sourceAmount.mul(rate).div(precision);
-    }
-
-    function _queryRate(address sourceToken, address destTOken) public view returns(uint256, uint256) {
-      
+        (uint256 rate, uint256 precision) = queryRate(sourceToken, destToken);
+        return sourceAmount.mul(rate).div(precision);
     }
 }

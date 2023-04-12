@@ -18,7 +18,8 @@ contract CommunityIssuance is
 
     // --- Events ---
 
-    event SOVTokenAddressSet(address _zeroTokenAddress);
+    event SOVTokenAddressSet(address _sovTokenAddress);
+    event ZUSDTokenAddressSet(address _zusdTokenAddress);
     event StabilityPoolAddressSet(address _stabilityPoolAddress);
     event PriceFeedAddressSet(address _priceFeed);
     event RewardManagerAddressSet(address _rewardManagerAddress);
@@ -37,25 +38,29 @@ contract CommunityIssuance is
      * @dev initialization function to set configs.
      * can only be initialized by owner.
      * @param _sovTokenAddress sov token address.
+     * @param _zusdTokenAddress zero token address.
      * @param _stabilityPoolAddress stability pool address.
      * @param _priceFeed price feed address.
      * @param _APR apr in basis points.
      */
     function initialize(
         address _sovTokenAddress,
+        address _zusdTokenAddress,
         address _stabilityPoolAddress,
         address _priceFeed,
         uint256 _APR
-    ) external onlyOwner {
+    ) external initializer onlyOwner {
         checkContract(_sovTokenAddress);
+        checkContract(_zusdTokenAddress);
         checkContract(_stabilityPoolAddress);
         checkContract(_priceFeed);
 
         _validateAPR(_APR);
 
         sovToken = IERC20(_sovTokenAddress);
+        zusdToken = IERC20(_zusdTokenAddress);
         stabilityPoolAddress = _stabilityPoolAddress;
-        priceFeed = _priceFeed;
+        priceFeed = IPriceFeedSovryn(_priceFeed);
         APR = _APR;
         deploymentTime = block.timestamp;
 
@@ -86,7 +91,7 @@ contract CommunityIssuance is
     function setPriceFeed(address _priceFeedAddress) external onlyOwner {
         checkContract(_priceFeedAddress);
 
-        priceFeed = _priceFeedAddress;
+        priceFeed = IPriceFeedSovryn(_priceFeedAddress);
 
         emit PriceFeedAddressSet(_priceFeedAddress);
     }
@@ -113,13 +118,13 @@ contract CommunityIssuance is
     }
 
 
-    function issueSOV(uint256 totalZUSDDeposits) public override returns (uint256) {
+    function issueSOV(uint256 _totalZUSDDeposits) public returns (uint256) {
         _requireCallerIsStabilityPool();
 
-        uint256 latestTotalSOVIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(
-            DECIMAL_PRECISION
-        );
-        uint256 issuance = latestTotalZEROIssued.sub(totalZEROIssued);
+        uint256 timePassedInYears = block.timestamp.sub(deploymentTime).div(365 days);
+        uint256 latestTotalSOVIssued = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedInYears));
+        
+        uint256 issuance = latestTotalSOVIssued.sub(totalSOVIssued);
 
         totalSOVIssued = latestTotalSOVIssued;
         emit TotalSOVIssuedUpdated(latestTotalSOVIssued);
@@ -127,53 +132,23 @@ contract CommunityIssuance is
         return issuance;
     }
 
-    /** Gets 1-f^t    where: f < 1
-
-    f: issuance factor that determines the shape of the curve
-    t:  time passed since last ZERO issuance event  */
-    function _getCumulativeIssuanceFraction() internal view returns (uint256) {
-        return 0;
-        // // Get the time passed since deployment
-        // uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(
-        //     SECONDS_IN_ONE_MINUTE
-        // );
-
-        // // f^t
-        // uint256 power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
-
-        // //  (1 - f^t)
-        // uint256 cumulativeIssuanceFraction = (uint256(DECIMAL_PRECISION).sub(power));
-        // assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
-
-        // return cumulativeIssuanceFraction;
-    }
-
-    function sendSOV(address _account, uint256 _SOVamount) public override {
+    function sendSOV(address _account, uint256 _SOVamount) public {
         _requireCallerIsStabilityPool();
 
         bool success = sovToken.transfer(_account, _SOVamount);
         require(success, "Failed to send ZERO");
     }
 
-    // /// @notice This function allows depositing tokens into the community pot for the community to use.
-    // ///         and configures the deploymentTime if it's the first time this function is called.
-    // ///         Allowance must be set before calling this function.
-    // ///
-    // /// @param _account The account that is depositing the ZERO.
-    // /// @param _ZEROamount The amount of ZERO to deposit into the community pot.
-    // /// @dev   We are relying upon the fact that ZeroToken is a safe contract and there will be no
-    // ///        reentrancy risk.
-    // function receiveZero(address _account, uint256 _ZEROamount) external override {
-    //     require(_account == fundingWalletAddress, "Only the funding wallet can deposit ZERO");
-    //     require(ZEROSupplyCap == 0, "Community pot already funded");
-
-    //     require(zeroToken.transferFrom(_account, address(this), _ZEROamount), "Transfer failed");
-
-    //     ZEROSupplyCap = _ZEROamount;
-    //     deploymentTime = block.timestamp;
-    // }
-
     function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == communityPotAddress, "CommunityIssuance: caller is not SP");
+        require(msg.sender == stabilityPoolAddress, "CommunityIssuance: caller is not SP");
+    }
+
+    /**
+     * @dev get the ZUSD to SOV rate conversion. Mostly will be using Sovryn's PriceFeed.
+     * @param _zusdAmount zusd amount to get the rate conversion
+     * @return the total SOV will be returned.
+     */
+    function _ZUSDToSOV(uint256 _zusdAmount) internal view returns (uint256) {
+        return priceFeed.queryReturn(address(zusdToken), address(sovToken), _zusdAmount);
     }
 }
