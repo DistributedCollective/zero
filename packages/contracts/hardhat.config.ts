@@ -114,6 +114,16 @@ task(
 
 task("check-redemption-hints", "Check redemption hints").setAction(async (taskAgrs, hre) => {
     const { ethers } = hre;
+    await hre.network.provider.request({
+        method: "hardhat_reset",
+        params: [
+            {
+                forking: {
+                    jsonRpcUrl: "https://mainnet-dev.sovryn.app/rpc",
+                },
+            },
+        ],
+    });
     const priceFeed = await hre.ethers.getContractAt(
         "PriceFeed",
         "0x6D1d9574d67e04cf35Fa1d916F763eDDae03b75d"
