@@ -2,7 +2,7 @@
   "_format": "hh-sol-artifact-1",
   "contractName": "UpgradableProxy",
   "sourceName": "contracts/Proxy/UpgradableProxy.sol",
-  "address": "0x8B1cB2Ffc9aFe4344503824898098d2E4c883873",
+  "address": "0xd8aB7EC3bd20A0Ce3084e124bFBC9Aa96a6D7FdD",
   "abi": [
     {
       "anonymous": false,

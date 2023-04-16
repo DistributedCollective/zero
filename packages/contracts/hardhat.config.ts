@@ -228,7 +228,7 @@ const config: HardhatUserConfig = {
             chainId: 31,
             gasMultiplier: 1.25,
             tags: ["testnet"],
-            timeout: 100000,
+            timeout: 1e9,
             gasPrice: 66000000,
             blockGasLimit: 6800000,
             //timeout: 20000, // increase if needed; 20000 is the default value
@@ -242,7 +242,7 @@ const config: HardhatUserConfig = {
             gas: 6800000,
             live: true,
             tags: ["testnet", "forked"],
-            timeout: 100000,
+            timeout: 1e9,
         },
         rskTestnet: {
             url: "https://public-node.testnet.rsk.co/",
@@ -250,7 +250,7 @@ const config: HardhatUserConfig = {
             chainId: 31,
             gasMultiplier: 1.25,
             tags: ["testnet"],
-            timeout: 100000,
+            timeout: 1e9,
             //timeout: 20000, // increase if needed; 20000 is the default value
             //allowUnlimitedContractSize, //EIP170 contrtact size restriction temporal testnet workaround
         },
@@ -261,7 +261,7 @@ const config: HardhatUserConfig = {
             chainId: 30,
             accounts: mainnetAccounts,
             tags: ["mainnet"],
-            timeout: 100000,
+            timeout: 1e9,
             gasPrice: 66000000,
             blockGasLimit: 6800000,
             //timeout: 20000, // increase if needed; 20000 is the default value
@@ -275,7 +275,7 @@ const config: HardhatUserConfig = {
             blockGasLimit: 6800000,
             live: true,
             tags: ["mainnet", "forked"],
-            timeout: 100000,
+            timeout: 1e9,
         },
         rskMainnet: {
             url: "https://public-node.rsk.co/",
@@ -283,7 +283,7 @@ const config: HardhatUserConfig = {
             accounts: mainnetAccounts,
             tags: ["mainnet"],
             //timeout: 20000, // increase if needed; 20000 is the default value
-            timeout: 100000,
+            timeout: 1e9,
         },
         rskForkedTestnetFlashback: {
             chainId: 31337,
@@ -292,7 +292,7 @@ const config: HardhatUserConfig = {
             blockGasLimit: 6800000,
             live: true,
             tags: ["testnet", "forked"],
-            timeout: 100000,
+            timeout: 1e9,
         },
         rskForkedMainnetFlashback: {
             chainId: 31337,
@@ -301,7 +301,7 @@ const config: HardhatUserConfig = {
             blockGasLimit: 6800000,
             live: true,
             tags: ["mainnet", "forked"],
-            timeout: 100000,
+            timeout: 1e9,
         },
     },
     mocha: { timeout: 12000000 },
