@@ -29,6 +29,7 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
 
     zeroStaking = ZEROContracts.zeroStaking;
     zeroToken = ZEROContracts.zeroToken;
+    sovToken = ZEROContracts.zeroToken;
     communityIssuance = ZEROContracts.communityIssuance;
     marketMaker = ZEROContracts.marketMaker;
     presale = ZEROContracts.presale;
@@ -77,13 +78,6 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
       assert.equal(storedDeployerAddress, liquityAG);
     });
 
-    it("ZEROSupplyCap is properly set", async () => {
-      const balance = await zeroToken.balanceOf(communityIssuance.address);
-      const supplyCap = await communityIssuance.ZEROSupplyCap();
-
-      assert.isTrue(balance.eq(supplyCap));
-    });
-
     it("Liquity AG can't set addresses if CI's ZERO balance hasn't been transferred ", async () => {
       const newCI = await CommunityIssuance.new();
 
@@ -95,9 +89,11 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
 
       try {
         const tx = await newCI.initialize(
-          zeroToken.address,
+          sovToken.address,
+          coreContracts.zusdToken.address,
           coreContracts.stabilityPool.address,
-          multisig,
+          coreContracts.priceFeedSovryn.address,
+          10000,
           { from: liquityAG }
         );
 
@@ -112,6 +108,10 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
     it('sets the correct ZEROToken address in ZEROStaking', async () => {
       // Deploy core contracts and set the ZEROToken address in the CI and ZEROStaking
       const coreContracts = await deploymentHelper.deployLiquityCore();
+      const newCI = await CommunityIssuance.new();
+
+      ZEROContracts.communityIssuance = newCI;
+
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts);
 
       const zeroTokenAddress = zeroToken.address;
@@ -120,15 +120,20 @@ contract('Deploying the ZERO contracts: LCF, CI, ZEROStaking, and ZEROToken ', a
       assert.equal(zeroTokenAddress, recordedZEROTokenAddress);
     });
 
-    it('sets the correct ZEROToken address in CommunityIssuance', async () => {
+    it('sets the correct SOVToken address in CommunityIssuance', async () => {
       // Deploy core contracts and set the ZEROToken address in the CI and ZEROStaking
       const coreContracts = await deploymentHelper.deployLiquityCore();
+
+      const newCI = await CommunityIssuance.new();
+
+      ZEROContracts.communityIssuance = newCI;
+
       await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts);
 
-      const zeroTokenAddress = zeroToken.address;
+      const sovTokenAddress = sovToken.address;
 
-      const recordedZEROTokenAddress = await communityIssuance.zeroToken();
-      assert.equal(zeroTokenAddress, recordedZEROTokenAddress);
+      const recordedSOVTokenAddress = await newCI.sovToken();
+      assert.equal(sovTokenAddress, recordedSOVTokenAddress);
     });
   });
 });

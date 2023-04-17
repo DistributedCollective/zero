@@ -9,24 +9,18 @@ contract CommunityIssuanceTester is CommunityIssuance {
       sovToken.transfer(msg.sender, _amount);
     }
 
-    function obtainZero(uint _amount) external {
-      sovToken.transfer(msg.sender, _amount);
-    }
-
-    function getCumulativeIssuanceFraction() external view returns (uint) {
-      // return _getCumulativeIssuanceFraction();
-      return 0;
-    }
-
-    function unprotectedIssueZERO() external returns (uint) {
-      // // No checks on caller address
+    function unprotectedIssueSOV(uint256 _totalZUSDDeposits) external returns (uint) {
+      // No checks on caller address
       
-      // uint latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-      // uint issuance = latestTotalZEROIssued.sub(totalZEROIssued);
-    
-      // totalZEROIssued = latestTotalZEROIssued;
-      // return issuance;
+      uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
+      uint256 latestTotalSOVIssued = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedSinceLastIssuance).div(365 days));
+      
+      uint256 issuance = latestTotalSOVIssued.sub(totalSOVIssued);
 
-      return 0;
+      totalSOVIssued = latestTotalSOVIssued;
+      lastIssuanceTime = block.timestamp;
+      emit TotalSOVIssuedUpdated(latestTotalSOVIssued);
+
+      return issuance;
     }
 }

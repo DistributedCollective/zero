@@ -62,7 +62,7 @@ contract CommunityIssuance is
         stabilityPoolAddress = _stabilityPoolAddress;
         priceFeed = IPriceFeedSovryn(_priceFeed);
         APR = _APR;
-        deploymentTime = block.timestamp;
+        lastIssuanceTime = block.timestamp;
 
         emit SOVTokenAddressSet(_sovTokenAddress);
         emit StabilityPoolAddressSet(_stabilityPoolAddress);
@@ -102,7 +102,7 @@ contract CommunityIssuance is
      * @param _rewardManagerAddress reward manager address.
      */
     function setRewardManager(address _rewardManagerAddress) external onlyOwner {
-        checkContract(_rewardManagerAddress);
+        require(_rewardManagerAddress != address(0), "Account cannot be zero address");
 
         rewardManager = _rewardManagerAddress;
 
@@ -121,12 +121,13 @@ contract CommunityIssuance is
     function issueSOV(uint256 _totalZUSDDeposits) public returns (uint256) {
         _requireCallerIsStabilityPool();
 
-        uint256 timePassedInYears = block.timestamp.sub(deploymentTime).div(365 days);
-        uint256 latestTotalSOVIssued = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedInYears));
+        uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
+        uint256 latestTotalSOVIssued = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedSinceLastIssuance).div(365 days));
         
         uint256 issuance = latestTotalSOVIssued.sub(totalSOVIssued);
 
         totalSOVIssued = latestTotalSOVIssued;
+        lastIssuanceTime = block.timestamp;
         emit TotalSOVIssuedUpdated(latestTotalSOVIssued);
 
         return issuance;

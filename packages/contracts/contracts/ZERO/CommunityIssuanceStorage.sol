@@ -22,7 +22,7 @@ contract CommunityIssuanceStorage is Ownable, Initializable {
 
     uint256 public totalSOVIssued;
 
-    uint256 public deploymentTime;
+    uint256 public lastIssuanceTime;
 
     uint256 public APR; //in basis points
 

@@ -228,9 +228,6 @@ contract EchidnaTester {
         uint ETH = getAdjustedETH(actorBalance, _ETH, CCR);
         uint ZUSDAmount = getAdjustedZUSD(ETH, _ZUSDAmount, CCR);
 
-        //console.log('ETH', ETH);
-        //console.log('ZUSDAmount', ZUSDAmount);
-
         echidnaProxy.openTrovePrx(ETH, ZUSDAmount, address(0), address(0), 0);
 
         numberOfTroves = troveManager.getTroveOwnersCount();
