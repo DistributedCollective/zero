@@ -10,6 +10,7 @@ const TroveManagerTester = artifacts.require("TroveManagerTester");
 const BorrowerOperationsTester = artifacts.require("BorrowerOperationsTester");
 const ZUSDToken = artifacts.require("ZUSDToken");
 const NonPayable = artifacts.require('NonPayable.sol');
+const CommunityIssuance = artifacts.require("./CommunityIssuance.sol");
 const { signERC2612Permit } = require('eth-permit');
 
 const timeMachine = require("ganache-time-traveler");
@@ -3920,6 +3921,37 @@ contract('StabilityPool', async accounts => {
       const txD = await stabilityPool.registerFrontEnd(dec(1, 18), { from: D });
       assert.isTrue(txD.receipt.status);
     });
+    
+    it("setCommunityIssuanceAddress(): reverts if address is invalid", async() => {
+      // zero address
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(ZERO_ADDRESS, {from: owner}), "Account cannot be zero address");
+
+      // non-contract address
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(C, {from: owner}), "Account code size cannot be zero");
+    })
+
+    it("setCommunityIssuanceAddress(): reverts if initiate by non-authorized user", async() => {
+      // non-owner
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(contracts.defaultPool.address, {from: E}), "Ownable:: access denied");
+    })
+
+    it("setCommunityIssuanceAddress(): should set the new community issuance contract", async() => {
+      const oldCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let newCommunityIssuanceAddress = (await CommunityIssuance.new()).address;
+      let tx = await stabilityPool.setCommunityIssuanceAddress(newCommunityIssuanceAddress, {from: owner})
+      let latestCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
+      assert.equal(latestCommunityIssuanceAddress, newCommunityIssuanceAddress);
+      assert.equal(eventData, newCommunityIssuanceAddress);
+      
+
+      // set back the community issuance to the old address
+      tx = await stabilityPool.setCommunityIssuanceAddress(oldCommunityIssuanceAddress, {from: owner})
+      latestCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
+      assert.equal(latestCommunityIssuanceAddress, oldCommunityIssuanceAddress);
+      assert.equal(eventData, oldCommunityIssuanceAddress);
+    })
   });
 });
 

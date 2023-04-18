@@ -226,6 +226,16 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
     }
 
+    /**
+     * @dev setter function specific for community issuance contract.
+     * @param _communityIssuanceAddress address of new community issuance contract.
+     */
+    function setCommunityIssuanceAddress(address _communityIssuanceAddress) external onlyOwner {
+        checkContract(_communityIssuanceAddress);
+        communityIssuance = ICommunityIssuance(_communityIssuanceAddress);
+        emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
+    }
+
     // --- Getters for public variables. Required by IPool interface ---
 
     function getETH() external view override returns (uint256) {
