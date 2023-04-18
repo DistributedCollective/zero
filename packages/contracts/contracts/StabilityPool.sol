@@ -259,7 +259,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
-        _triggerSOVIssuance(communityIssuanceCached, _amount);
+        _triggerSOVIssuance(communityIssuanceCached);
 
         if (initialDeposit == 0) {
             _setFrontEndTag(msg.sender, _frontEndTag);
@@ -329,7 +329,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
-        _triggerSOVIssuance(communityIssuanceCached, 0);
+        _triggerSOVIssuance(communityIssuanceCached);
 
         uint256 depositorETHGain = getDepositorETHGain(msg.sender);
 
@@ -388,7 +388,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
-        _triggerSOVIssuance(communityIssuanceCached, 0);
+        _triggerSOVIssuance(communityIssuanceCached);
 
         uint256 depositorETHGain = getDepositorETHGain(msg.sender);
 
@@ -426,8 +426,8 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     // --- SOV issuance functions ---
 
-    function _triggerSOVIssuance(ICommunityIssuance _communityIssuance, uint256 _totalZUSDDeposits) internal {
-        uint256 SOVIssuance = _communityIssuance.issueSOV(_totalZUSDDeposits);
+    function _triggerSOVIssuance(ICommunityIssuance _communityIssuance) internal {
+        uint256 SOVIssuance = _communityIssuance.issueSOV(totalZUSDDeposits);
         _updateG(SOVIssuance);
     }
 
@@ -489,7 +489,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             return;
         }
 
-        _triggerSOVIssuance(communityIssuance, 0);
+        _triggerSOVIssuance(communityIssuance);
 
         (
             uint256 ETHGainPerUnitStaked,
