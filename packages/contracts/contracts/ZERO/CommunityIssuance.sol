@@ -8,6 +8,7 @@ import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
 import "./CommunityIssuanceStorage.sol";
+import "../Interfaces/IStabilityPool.sol";
 
 contract CommunityIssuance is
     CommunityIssuanceStorage,
@@ -78,6 +79,11 @@ contract CommunityIssuance is
     function setAPR(uint256 _APR) external onlyRewardManager {
         _validateAPR(_APR);
 
+        // We need to trigger issueSOV function before set the new APR
+        // because otherwise, we will change the APR retrospectively for the time passed since last issuance.
+        uint256 _totalZUSDDeposits = IStabilityPool(stabilityPoolAddress).getTotalZUSDDeposits();
+        _issueSOV(_totalZUSDDeposits);
+
         APR = _APR;
 
         emit APRSet(_APR);
@@ -121,14 +127,16 @@ contract CommunityIssuance is
     function issueSOV(uint256 _totalZUSDDeposits) public returns (uint256) {
         _requireCallerIsStabilityPool();
 
-        uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
-        uint256 latestTotalSOVIssued = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedSinceLastIssuance).div(365 days));
-        
-        uint256 issuance = latestTotalSOVIssued.sub(totalSOVIssued);
+        return _issueSOV(_totalZUSDDeposits);
+    }
 
-        totalSOVIssued = latestTotalSOVIssued;
+    function _issueSOV(uint256 _totalZUSDDeposits) private returns (uint256) {
+        uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
+        uint256 issuance = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedSinceLastIssuance).div(365 days));
+
+        totalSOVIssued = totalSOVIssued + issuance;
         lastIssuanceTime = block.timestamp;
-        emit TotalSOVIssuedUpdated(latestTotalSOVIssued);
+        emit TotalSOVIssuedUpdated(totalSOVIssued);
 
         return issuance;
     }
