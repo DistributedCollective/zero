@@ -121,19 +121,33 @@ contract CommunityIssuance is
      * the value must be >= 0 <= MAX_BPS (10000)
      */
     function _validateAPR(uint256 _APR) private {
-        require(_APR <= MAX_BPS, "APR must be less than 10000");
+        require(_APR <= MAX_BPS, "APR must be less than MAX_BPS");
     }
 
-
-    function issueSOV(uint256 _totalZUSDDeposits) public returns (uint256) {
+    /**
+     * @dev public function to record SOV issuance
+     * @dev can only be called by stabilityPool contract
+     *
+     * @param _totalZUSDDeposits total zusd deposited to record the latest of sov issuance.
+     *
+     * @return total issuance of SOV.
+     */
+    function issueSOV(uint256 _totalZUSDDeposits) external returns (uint256) {
         _requireCallerIsStabilityPool();
 
         return _issueSOV(_totalZUSDDeposits);
     }
 
-    function _issueSOV(uint256 _totalZUSDDeposits) private returns (uint256) {
+    /**
+     * @dev private function to record SOV issuance
+     *
+     * @param _totalZUSDDeposits total zusd deposited to record the latest of sov issuance.
+     *
+     * @return total issuance of SOV.
+     */
+    function _issueSOV(uint256 _totalZUSDDeposits) internal returns (uint256) {
         uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
-        uint256 issuance = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedSinceLastIssuance).div(365 days));
+        uint256 issuance = _getZUSDToSOV(_totalZUSDDeposits.mul(APR).mul(timePassedSinceLastIssuance).div(365 days).div(MAX_BPS));
 
         totalSOVIssued = totalSOVIssued + issuance;
         lastIssuanceTime = block.timestamp;
@@ -158,7 +172,7 @@ contract CommunityIssuance is
      * @param _zusdAmount zusd amount to get the rate conversion
      * @return the total SOV will be returned.
      */
-    function _ZUSDToSOV(uint256 _zusdAmount) internal view returns (uint256) {
+    function _getZUSDToSOV(uint256 _zusdAmount) internal view returns (uint256) {
         return priceFeed.queryReturn(address(zusdToken), address(sovToken), _zusdAmount);
     }
 }

@@ -12,15 +12,6 @@ contract CommunityIssuanceTester is CommunityIssuance {
     function unprotectedIssueSOV(uint256 _totalZUSDDeposits) external returns (uint) {
       // No checks on caller address
       
-      uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
-      uint256 latestTotalSOVIssued = _ZUSDToSOV(_totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(timePassedSinceLastIssuance).div(365 days));
-      
-      uint256 issuance = latestTotalSOVIssued.sub(totalSOVIssued);
-
-      totalSOVIssued = latestTotalSOVIssued;
-      lastIssuanceTime = block.timestamp;
-      emit TotalSOVIssuedUpdated(latestTotalSOVIssued);
-
-      return issuance;
+      return _issueSOV(_totalZUSDDeposits);
     }
 }

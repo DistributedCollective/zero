@@ -95,7 +95,7 @@ import "./StabilityPoolStorage.sol";
  *
  * In the current epoch, the latest value of S is stored upon each scale change, and the mapping (scale -> S) is stored for each epoch.
  *
- * This allows us to calculate a deposit's accumulated ETH gain, during the epoch in which the deposit was non-sov and earned ETH.
+ * This allows us to calculate a deposit's accumulated ETH gain, during the epoch in which the deposit was non-zero and earned ETH.
  *
  * We calculate the depositor's accumulated ETH gain for the scale at which they made the deposit, using the ETH gain formula:
  * e_1 = d_t * (S - S_t) / P_t
@@ -299,7 +299,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         _sendETHGainToDepositor(depositorETHGain);
     }
 
-    ///DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the SOV Stability Pool, all in a single transaction
+    ///DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
     function provideToSpFromDLLR(
         uint256 _dllrAmount,
         IMassetManager.PermitParams calldata _permitParams
@@ -371,7 +371,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return ZUSDtoWithdraw;
     }
 
-    ///Stability Pool depositor can withdraw a specified amount of ZUSD from the SOV Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
+    ///Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
     function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmountRequested) external override {
         IMassetManager massetManager = borrowerOperations.getMassetManager();
         uint256 amountWithdrawn = _withdrawFromSpTo(_zusdAmountRequested, address(this));
@@ -594,7 +594,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             emit ScaleUpdated(currentScale);
             newP = DECIMAL_PRECISION;
 
-            // If multiplying P by a non-sov product factor would reduce P below the scale boundary, increment the scale
+            // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
         } else if (currentP.mul(newProductFactor).div(DECIMAL_PRECISION) < SCALE_FACTOR) {
             newP = currentP.mul(newProductFactor).mul(SCALE_FACTOR).div(DECIMAL_PRECISION);
             currentScale = currentScaleCached.add(1);

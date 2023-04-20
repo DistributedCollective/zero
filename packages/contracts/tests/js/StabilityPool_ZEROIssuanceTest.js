@@ -76,7 +76,6 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
       await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
       await zeroToken.approve(communityIssuanceTester.address, toBN(dec(30, 24)));
-      // await communityIssuanceTester.receiveZero(owner, toBN(dec(30, 24)));
 
       // Check community issuance starts with 30 million ZERO
       communityZEROSupply = toBN(await zeroToken.balanceOf(communityIssuanceTester.address));
@@ -148,7 +147,6 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
       // Check ZERO has been issued
       const totalSOVIssued_1 = await communityIssuanceTester.totalSOVIssued();
-      // assert.isTrue(totalSOVIssued_1.gt(toBN('0')));
 
       await troveManager.liquidate(B);
       const blockTimestamp_2 = th.toBN(await th.getLatestBlockTimestamp(web3));

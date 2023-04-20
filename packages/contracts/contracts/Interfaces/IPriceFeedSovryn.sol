@@ -2,6 +2,16 @@
 
 pragma solidity 0.6.11;
 
+/**
+ * @title Interface of The Price Feeds Sovryn contract.
+ *
+ * @notice This contract is the interface of priceFeed that is being used as PriceFeed registry in sovryn protocol.
+ *
+ * This contract queries the price feeds contracts where
+ * oracles updates token prices computing relative token prices.
+ * And besides it includes some calculations about loans such as
+ * drawdown, margin and collateral.
+ * */
 interface IPriceFeedSovryn {
     function queryRate(address sourceToken, address destToken)
         external
