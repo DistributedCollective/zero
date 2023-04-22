@@ -10,6 +10,8 @@ const getDifference = th.getDifference;
 
 const TroveManagerTester = artifacts.require("TroveManagerTester");
 const ZUSDToken = artifacts.require("ZUSDToken");
+let APR;
+let mockPrice;
 
 contract('StabilityPool - ZERO Rewards', async accounts => {
 
@@ -80,6 +82,13 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       // Check community issuance starts with 30 million ZERO
       communityZEROSupply = toBN(await zeroToken.balanceOf(communityIssuanceTester.address));
 
+      APR = toBN(300);
+      mockPrice = toBN(dec(105, 18));
+      // Set APR & mock price feed for ZUSD <> SOV
+      await communityIssuanceTester.setRewardManager(owner);
+      await communityIssuanceTester.setAPR(APR.toString()); // 3%
+      await contracts.priceFeedSovryn.setPrice(zusdToken.address, zeroToken.address, mockPrice.toString());
+
       // disabled as zero token is not used in beta
       //assert.isAtMost(getDifference(communityZEROSupply, '30000000000000000000000000'), 1000)
 
@@ -127,8 +136,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       await revertToSnapshot();
     });
 
-    it("liquidation < 1 minute after a deposit does not change totalSOVIssued", async () => {
-
+    it("liquidation < 1 minute after a deposit does change totalSOVIssued", async () => {
 
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } });
       await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } });
@@ -147,6 +155,7 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
       // Check ZERO has been issued
       const totalSOVIssued_1 = await communityIssuanceTester.totalSOVIssued();
+      assert.isTrue(totalSOVIssued_1.gt(toBN('0')));
 
       await troveManager.liquidate(B);
       const blockTimestamp_2 = th.toBN(await th.getLatestBlockTimestamp(web3));
@@ -162,12 +171,13 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
       const timestampDiff = blockTimestamp_2.sub(blockTimestamp_1);
       assert.isTrue(timestampDiff.lt(toBN(60)));
 
-      // Check that the liquidation did not alter total ZERO issued
-      assert.isTrue(totalSOVIssued_2.eq(totalSOVIssued_1));
+      // Check that the liquidation did alter total ZERO issued
+      assert.isFalse(totalSOVIssued_2.eq(totalSOVIssued_1));
 
-      // Check that depositor B has no ZERO gain
+      // Check that depositor B will have SOV gain
+      // Because at this point there is totalSOVIssued accrual
       const B_pendingZEROGain = await stabilityPool.getDepositorSOVGain(B);
-      assert.equal(B_pendingZEROGain, '0');
+      assert.isTrue(B_pendingZEROGain.gt(toBN('0')));
 
       // Check depositor B has a pending ETH gain
       const B_pendingETHGain = await stabilityPool.getDepositorETHGain(B);
