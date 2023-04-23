@@ -21,6 +21,8 @@ const NueMockToken = artifacts.require("NueMockToken");
 const ZERO = toBN('0');
 const ZERO_ADDRESS = th.ZERO_ADDRESS;
 const maxBytes32 = th.maxBytes32;
+let APR;
+let mockPrice;
 
 const getFrontEndTag = async (stabilityPool, depositor) => {
   return (await stabilityPool.deposits(depositor))[1];
@@ -106,11 +108,16 @@ contract('StabilityPool', async accounts => {
 
       await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
       await zeroToken.approve(communityIssuance.address, toBN(dec(30, 24)));
-      // We are not going to use ZERO token and its dependencies
-      // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
       // Register 3 front ends
       await th.registerFrontEnds(frontEnds, stabilityPool);
+
+      APR = toBN(300);
+      mockPrice = toBN(dec(105, 18));
+      // Set APR & mock price feed for ZUSD <> SOV
+      await communityIssuance.setRewardManager(owner);
+      await communityIssuance.setAPR(APR.toString()); // 3%
+      // await contracts.priceFeedSovryn.setPrice(zusdToken.address, zeroToken.address, mockPrice.toString());
     });
 
     beforeEach(async () => {
@@ -270,9 +277,6 @@ contract('StabilityPool', async accounts => {
 
       // price drops: defaulter's Troves fall below MCR, whale doesn't
       await priceFeed.setPrice(dec(105, 18));
-
-      // Set price for mock price feed sovryn
-      // await priceFeed.setPrice(contracts.zusdToken.address, zeroToken.address, dec(105, 18));
 
       const SPZUSD_Before = await stabilityPool.getTotalZUSDDeposits();
 
@@ -1296,6 +1300,70 @@ contract('StabilityPool', async accounts => {
       assert.isTrue(A_ZEROBalance_After.eq(A_ZEROBalance_Before));
       assert.isTrue(B_ZEROBalance_After.eq(B_ZEROBalance_Before));
       assert.isTrue(C_ZEROBalance_After.eq(C_ZEROBalance_Before));
+    });
+
+    it("provideToSP(), topup: depositor receives ZERO rewards", async () => {
+      await openTrove({ extraZUSDAmount: toBN(dec(10000, 18)), ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
+
+      // A, B, C open troves 
+      await openTrove({ extraZUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: A } });
+      await openTrove({ extraZUSDAmount: toBN(dec(200, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: B } });
+      await openTrove({ extraZUSDAmount: toBN(dec(300, 18)), ICR: toBN(dec(2, 18)), extraParams: { from: C } });
+
+      // A, B, C, provide to SP
+      await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A });
+      await stabilityPool.provideToSP(dec(20, 18), frontEnd_2, { from: B });
+      await stabilityPool.provideToSP(dec(30, 18), ZERO_ADDRESS, { from: C });
+
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider);
+
+      // Get A, B, C ZERO balance before
+      const A_ZEROBalance_Before = await zeroToken.balanceOf(A);
+      const B_ZEROBalance_Before = await zeroToken.balanceOf(B);
+      const C_ZEROBalance_Before = await zeroToken.balanceOf(C);
+
+      // A, B, C top up
+      await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A });
+      await stabilityPool.provideToSP(dec(20, 18), frontEnd_2, { from: B });
+      await stabilityPool.provideToSP(dec(30, 18), ZERO_ADDRESS, { from: C });
+
+      // Get ZERO balance after
+      const A_ZEROBalance_After = await zeroToken.balanceOf(A);
+      const B_ZEROBalance_After = await zeroToken.balanceOf(B);
+      const C_ZEROBalance_After = await zeroToken.balanceOf(C);
+
+      // Check ZERO Balance of A, B, C hasn't increased as there were no Zero tokens
+      assert.isTrue(A_ZEROBalance_After.eq(A_ZEROBalance_Before));
+      assert.isTrue(B_ZEROBalance_After.eq(B_ZEROBalance_Before));
+      assert.isTrue(C_ZEROBalance_After.eq(C_ZEROBalance_Before));
+
+      // await communityIssuance.receiveZero(owner, toBN(dec(30, 24)));
+
+      // A, B, C top up again
+      await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A });
+      await stabilityPool.provideToSP(dec(20, 18), frontEnd_2, { from: B });
+      await stabilityPool.provideToSP(dec(30, 18), ZERO_ADDRESS, { from: C });
+
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_HOUR, web3.currentProvider);
+
+      // A, B, C top up again
+      await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A });
+      await stabilityPool.provideToSP(dec(20, 18), frontEnd_2, { from: B });
+      await stabilityPool.provideToSP(dec(30, 18), ZERO_ADDRESS, { from: C });
+
+      // Get ZERO balance after to trigger reward payments
+      const A_ZEROBalance_AfterReceiving = await zeroToken.balanceOf(A);
+      const B_ZEROBalance_AfterReceiving = await zeroToken.balanceOf(B);
+      const C_ZEROBalance_AfterReceiving = await zeroToken.balanceOf(C);
+
+      // Gains should be sent
+      /* disabled as zero token is not used in beta 
+      close presale right after the deployment
+      assert.isTrue(A_ZEROBalance_AfterReceiving.gt(A_ZEROBalance_Before))
+      assert.isTrue(B_ZEROBalance_AfterReceiving.gt(B_ZEROBalance_Before))
+      assert.isTrue(C_ZEROBalance_AfterReceiving.gt(C_ZEROBalance_Before))
+      */
+
     });
 
     it("provideToSP(), topup: tagged front end receives ZERO rewards", async () => {
