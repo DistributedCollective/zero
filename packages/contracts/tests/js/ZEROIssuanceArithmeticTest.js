@@ -39,7 +39,7 @@ const repeatedlyIssueSOV = async (stabilityPool, timeBetweenIssuances, duration)
 
 const calculateSOVAccrual = (initialLastIssuanceTime, latestLastIssuanceTime, totalZUSDDeposits) => {
   const decimalNormalizer = toBN(dec(1,18));
-  return totalZUSDDeposits.mul(APR).div(MAX_BPS).mul(latestLastIssuanceTime.sub(initialLastIssuanceTime)).div(toBN(31536000)).mul(mockPrice).div(decimalNormalizer) // 31536000 = 1 Year
+  return totalZUSDDeposits.mul(APR).mul(latestLastIssuanceTime.sub(initialLastIssuanceTime)).div(toBN(31536000)).div(MAX_BPS).mul(mockPrice).div(decimalNormalizer) // 31536000 = 1 Year
 }
 
 contract('ZERO community issuance arithmetic tests', async accounts => {
@@ -399,6 +399,142 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
 
     await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
     await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
+  });
+
+  // Error tolerance: 1e-3, i.e. 1/1000th of a token
+  it("should issue the expected SOV based on pre-defined params (1)", async () => {
+    /**
+     * Total ZUSD Deposit = 100k
+     * APR 5% in 1 year
+     * ZUSD <> SOV price = 1:1
+     * Expect to return ~5k of SOV after a year
+     */
+    const APR = toBN(500);
+    const mockPrice = toBN(dec(1, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(100, 21))
+
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
+
+    await assert.equal(initialTotalSOVIssued, 0);
+
+    // Fast forward time
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
+
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
+
+    // const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '5000000000000000000000';
+
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
+  });
+
+  // Error tolerance: 1e-3, i.e. 1/1000th of a token
+  it("should issue the expected SOV based on pre-defined params (2)", async () => {
+    /**
+     * Total ZUSD Deposit = 50k
+     * APR 10% in 1 year
+     * ZUSD <> SOV price = 1:2
+     * Expect to return ~10k of SOV after a year
+     */
+    const APR = toBN(1000);
+    const mockPrice = toBN(dec(2, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(50, 21))
+
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
+
+    await assert.equal(initialTotalSOVIssued, 0);
+
+    // Fast forward time
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
+
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
+
+    // const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '10000000000000000000000';
+
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
+  });
+
+  it("should issue the expected SOV based on pre-defined params (3)", async () => {
+    /**
+     * Total ZUSD Deposit = 100k
+     * APR 5% in 1 year
+     * ZUSD <> SOV price = 1:1
+     * Expect to return ~2.5k of SOV after half a year
+     */
+    const APR = toBN(500);
+    const mockPrice = toBN(dec(1, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR / 2;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(100, 21))
+
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
+
+    await assert.equal(initialTotalSOVIssued, 0);
+
+    // Fast forward time
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
+
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
+
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '2500000000000000000000';
+
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
+  });
+
+  it("should issue the expected SOV based on pre-defined params with APR updates", async () => {
+    /**
+     * Total ZUSD Deposit = 100k
+     * APR 5%, after half a year, set the APR to 10%
+     * ZUSD <> SOV price = 1:1
+     * Expect to return ~2.5k of SOV after half a year + ~5.5k of SOV the rest half of year
+     */
+    let APR = toBN(500);
+    const mockPrice = toBN(dec(1, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR / 2;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(100, 21))
+
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
+
+    await assert.equal(initialTotalSOVIssued, 0);
+
+    // Fast forward time
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
+
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
+
+    // Update APR to 10%
+    APR = toBN(1000);
+    await communityIssuanceTester.setAPR(APR);
+
+    await assert.isTrue(initialTotalSOVIssued.gte('0'));
+
+    // Fast forward time 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
+
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
+
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '7500000000000000000000';
+
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
   });
 
   /* ---  
