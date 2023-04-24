@@ -101,13 +101,6 @@ export class _CachedReadableLiquity<T extends unknown[]>
     );
   }
 
-  async getRemainingStabilityPoolZEROReward(...extraParams: T): Promise<Decimal> {
-    return (
-      this._cache.getRemainingStabilityPoolZEROReward(...extraParams) ??
-      this._readable.getRemainingStabilityPoolZEROReward(...extraParams)
-    );
-  }
-
   async getZUSDInStabilityPool(...extraParams: T): Promise<Decimal> {
     return (
       this._cache.getZUSDInStabilityPool(...extraParams) ??

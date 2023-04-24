@@ -102,11 +102,6 @@ export interface ReadableLiquity {
   getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
 
   /**
-   * Get the remaining ZERO that will be collectively rewarded to stability depositors.
-   */
-  getRemainingStabilityPoolZEROReward(): Promise<Decimal>;
-
-  /**
    * Get the total amount of ZUSD currently deposited in the Stability Pool.
    */
   getZUSDInStabilityPool(): Promise<Decimal>;

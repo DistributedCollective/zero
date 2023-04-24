@@ -270,7 +270,7 @@ export class ReadableEthersLiquity implements ReadableLiquity {
       stabilityPool.deposits(address, { ...overrides }),
       stabilityPool.getCompoundedZUSDDeposit(address, { ...overrides }),
       stabilityPool.getDepositorETHGain(address, { ...overrides }),
-      stabilityPool.getDepositorZEROGain(address, { ...overrides })
+      stabilityPool.getDepositorSOVGain(address, { ...overrides })
     ]);
 
     return new StabilityDeposit(
@@ -280,20 +280,6 @@ export class ReadableEthersLiquity implements ReadableLiquity {
       decimalify(zeroReward),
       frontEndTag
     );
-  }
-
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getRemainingStabilityPoolZEROReward} */
-  async getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal> {
-    const { communityIssuance } = _getContracts(this.connection);
-
-    const issuanceCap = decimalify(await communityIssuance.ZEROSupplyCap());
-    const totalZEROIssued = decimalify(await communityIssuance.totalZEROIssued({ ...overrides }));
-
-    const remaining = issuanceCap.gt(totalZEROIssued)
-      ? issuanceCap.sub(totalZEROIssued)
-      : Decimal.from(0);
-
-    return remaining;
   }
 
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZUSDInStabilityPool} */
@@ -546,12 +532,6 @@ class BlockPolledLiquityStoreBasedCache
   ): StabilityDeposit | undefined {
     if (this._userHit(address, overrides)) {
       return this._store.state.stabilityDeposit;
-    }
-  }
-
-  getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Decimal | undefined {
-    if (this._blockHit(overrides)) {
-      return this._store.state.remainingStabilityPoolZEROReward;
     }
   }
 
