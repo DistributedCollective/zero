@@ -206,18 +206,18 @@ contract('StabilityPool - ZERO Rewards', async accounts => {
 
       // Get G and communityIssuance before
       const G_Before = await stabilityPool.epochToScaleToG(0, 0);
-      const ZEROIssuedBefore = await communityIssuanceTester.totalSOVIssued();
+      const SOVIssuedBefore = await communityIssuanceTester.totalSOVIssued();
 
       //  A withdraws some deposit. Triggers issuance.
       const tx = await stabilityPool.withdrawFromSP(1000, { from: A, gasPrice: 0 });
       assert.isTrue(tx.receipt.status);
 
-      // Check G and ZEROIssued do not increase, since <1 minute has passed between issuance triggers
+      // Since there was no SOV issued after we capture the G_Before, we should expect there is no changes for the G_After.
       const G_After = await stabilityPool.epochToScaleToG(0, 0);
-      const ZEROIssuedAfter = await communityIssuanceTester.totalSOVIssued();
+      const SOVIssuedAfter = await communityIssuanceTester.totalSOVIssued();
 
       assert.isTrue(G_After.eq(G_Before));
-      assert.isTrue(ZEROIssuedAfter.eq(ZEROIssuedBefore));
+      assert.isTrue(SOVIssuedAfter.eq(SOVIssuedBefore));
     });
 
     // using the result of this to advance time by the desired amount from the issuance time, whether or not some extra time has passed in the meanwhile
