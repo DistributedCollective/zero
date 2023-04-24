@@ -3,45 +3,30 @@
 pragma solidity 0.6.11;
 
 import "../Dependencies/Ownable.sol";
-import "../Interfaces/IZEROToken.sol";
+import "../Dependencies/IERC20.sol";
+import "../Interfaces/IPriceFeedSovryn.sol";
+import "../Dependencies/Initializable.sol";
 
-contract CommunityIssuanceStorage is Ownable {
+contract CommunityIssuanceStorage is Ownable, Initializable {
     // --- Data ---
 
     string constant public NAME = "CommunityIssuance";
 
-    uint constant public SECONDS_IN_ONE_MINUTE = 60;
+    uint256 constant MAX_BPS = 10000;
 
-   /** The issuance factor F determines the curvature of the issuance curve.
-    *
-    * Minutes in one year: 60*24*365 = 525600
-    *
-    * For 50% of remaining tokens issued each year, with minutes as time units, we have:
-    * 
-    * F ** 525600 = 0.5
-    * 
-    * Re-arranging:
-    * 
-    * 525600 * ln(F) = ln(0.5)
-    * F = 0.5 ** (1/525600)
-    * F = 0.999998681227695000 
-    */
-    uint public constant ISSUANCE_FACTOR = 999998681227695000;
+    IERC20 public sovToken;
 
-    /** 
-    * The community ZERO supply cap is the starting balance of the Community Issuance contract.
-    * It should be minted to this contract by ZEROToken, when the token is deployed.
-    */
-    uint public ZEROSupplyCap = 0;
+    IERC20 public zusdToken;
 
-    IZEROToken public zeroToken;
+    address public stabilityPoolAddress;
 
-    address public communityPotAddress;
+    uint256 public totalSOVIssued;
 
-    // Address that will send the Zero tokens to distribute funds
-    address public fundingWalletAddress;
+    uint256 public lastIssuanceTime;
 
-    uint public totalZEROIssued;
-    uint public deploymentTime;
+    uint256 public APR; //in basis points
 
+    address public rewardManager;
+
+    IPriceFeedSovryn public priceFeed;
 }

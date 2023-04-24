@@ -112,9 +112,6 @@ export class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStor
       zusdInStabilityPool: this._readable.getZUSDInStabilityPool({ blockTag }),
       totalStakedZERO: this._readable.getTotalStakedZERO({ blockTag }),
       _riskiestTroveBeforeRedistribution: this._getRiskiestTroveBeforeRedistribution({ blockTag }),
-      remainingStabilityPoolZEROReward: this._readable.getRemainingStabilityPoolZEROReward({
-        blockTag
-      }),
 
       frontend: frontendTag
         ? this._readable.getFrontendStatus(frontendTag, { blockTag })

@@ -10,6 +10,7 @@ const TroveManagerTester = artifacts.require("TroveManagerTester");
 const BorrowerOperationsTester = artifacts.require("BorrowerOperationsTester");
 const ZUSDToken = artifacts.require("ZUSDToken");
 const NonPayable = artifacts.require('NonPayable.sol');
+const CommunityIssuance = artifacts.require("./CommunityIssuance.sol");
 const { signERC2612Permit } = require('eth-permit');
 
 const timeMachine = require("ganache-time-traveler");
@@ -20,6 +21,8 @@ const NueMockToken = artifacts.require("NueMockToken");
 const ZERO = toBN('0');
 const ZERO_ADDRESS = th.ZERO_ADDRESS;
 const maxBytes32 = th.maxBytes32;
+let APR;
+let mockPrice;
 
 const getFrontEndTag = async (stabilityPool, depositor) => {
   return (await stabilityPool.deposits(depositor))[1];
@@ -101,15 +104,20 @@ contract('StabilityPool', async accounts => {
 
       await deploymentHelper.connectZEROContracts(ZEROContracts);
       await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
 
       await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
       await zeroToken.approve(communityIssuance.address, toBN(dec(30, 24)));
-      // We are not going to use ZERO token and its dependencies
-      // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
 
       // Register 3 front ends
       await th.registerFrontEnds(frontEnds, stabilityPool);
+
+      APR = toBN(300);
+      mockPrice = toBN(dec(105, 18));
+      // Set APR & mock price feed for ZUSD <> SOV
+      await communityIssuance.setRewardManager(owner);
+      await communityIssuance.setAPR(APR.toString()); // 3%
+      // await contracts.priceFeedSovryn.setPrice(zusdToken.address, zeroToken.address, mockPrice.toString());
     });
 
     beforeEach(async () => {
@@ -266,7 +274,6 @@ contract('StabilityPool', async accounts => {
 
       // Alice makes Trove and withdraws 100 ZUSD
       await openTrove({ extraZUSDAmount: toBN(dec(100, 18)), ICR: toBN(dec(5, 18)), extraParams: { from: alice, value: dec(50, 'ether') } });
-
 
       // price drops: defaulter's Troves fall below MCR, whale doesn't
       await priceFeed.setPrice(dec(105, 18));
@@ -1330,7 +1337,7 @@ contract('StabilityPool', async accounts => {
       assert.isTrue(B_ZEROBalance_After.eq(B_ZEROBalance_Before));
       assert.isTrue(C_ZEROBalance_After.eq(C_ZEROBalance_Before));
 
-      await communityIssuance.receiveZero(owner, toBN(dec(30, 24)));
+      // await communityIssuance.receiveZero(owner, toBN(dec(30, 24)));
 
       // A, B, C top up again
       await stabilityPool.provideToSP(dec(10, 18), frontEnd_1, { from: A });
@@ -2217,7 +2224,7 @@ contract('StabilityPool', async accounts => {
 
       // Check Alice doesn't have gains to withdraw
       const A_pendingETHGain = await stabilityPool.getDepositorETHGain(A);
-      const A_pendingZEROGain = await stabilityPool.getDepositorZEROGain(A);
+      const A_pendingZEROGain = await stabilityPool.getDepositorSOVGain(A);
       assert.isTrue(A_pendingETHGain.gt(toBN('0')));
       assert.isTrue(A_pendingZEROGain.eq(toBN('0')));
 
@@ -3982,6 +3989,37 @@ contract('StabilityPool', async accounts => {
       const txD = await stabilityPool.registerFrontEnd(dec(1, 18), { from: D });
       assert.isTrue(txD.receipt.status);
     });
+    
+    it("setCommunityIssuanceAddress(): reverts if address is invalid", async() => {
+      // zero address
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(ZERO_ADDRESS, {from: owner}), "Account cannot be zero address");
+
+      // non-contract address
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(C, {from: owner}), "Account code size cannot be zero");
+    })
+
+    it("setCommunityIssuanceAddress(): reverts if initiate by non-authorized user", async() => {
+      // non-owner
+      await th.assertRevert(stabilityPool.setCommunityIssuanceAddress(contracts.defaultPool.address, {from: E}), "Ownable:: access denied");
+    })
+
+    it("setCommunityIssuanceAddress(): should set the new community issuance contract", async() => {
+      const oldCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let newCommunityIssuanceAddress = (await CommunityIssuance.new()).address;
+      let tx = await stabilityPool.setCommunityIssuanceAddress(newCommunityIssuanceAddress, {from: owner})
+      let latestCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      let eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
+      assert.equal(latestCommunityIssuanceAddress, newCommunityIssuanceAddress);
+      assert.equal(eventData, newCommunityIssuanceAddress);
+      
+
+      // set back the community issuance to the old address
+      tx = await stabilityPool.setCommunityIssuanceAddress(oldCommunityIssuanceAddress, {from: owner})
+      latestCommunityIssuanceAddress = await stabilityPool.communityIssuance();
+      eventData = th.getEventArgByName(tx, "CommunityIssuanceAddressChanged", "_newCommunityIssuanceAddress");
+      assert.equal(latestCommunityIssuanceAddress, oldCommunityIssuanceAddress);
+      assert.equal(eventData, oldCommunityIssuanceAddress);
+    })
   });
 });
 

@@ -88,7 +88,7 @@
     "eth-sig-util": "^3.0.1",
     "ethers": "^6.0.8",
     "ganache-time-traveler": "1.0.15",
-    "hardhat": "^2.13.0",
+    "hardhat": "^2.13.1",
     "hardhat-contract-sizer": "^2.0.3",
     "hardhat-deploy": "^0.11.24",
     "hardhat-gas-reporter": "^1.0.9",

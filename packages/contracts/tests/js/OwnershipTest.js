@@ -22,6 +22,7 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
   let zeroStaking;
   let communityIssuance;
   let zeroToken;
+  let sovToken;
 
   before(async () => {
     contracts = await deploymentHelper.deployLiquityCore();
@@ -41,6 +42,7 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
     zeroStaking = ZEROContracts.zeroStaking;
     communityIssuance = ZEROContracts.communityIssuance;
     zeroToken = ZEROContracts.zeroToken;
+    sovToken = ZEROContracts.zeroToken;
   });
 
   const testZeroAddress = async (contract, params, method = "setAddresses", skip = 0) => {
@@ -217,21 +219,54 @@ contract("All Zero functions with onlyOwner modifier", async accounts => {
 
   describe("CommunityIssuance", async accounts => {
     it("setAddresses(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
-      const params = [zeroToken.address, stabilityPool.address, owner];
+      const dumbContract = await GasPool.new();
+      const params = [sovToken.address, zusdToken.address, stabilityPool.address, dumbContract.address, 10000];
       await th.assertRevert(communityIssuance.initialize(...params, { from: alice }));
 
       // Attempt to use zero address
-      await testZeroAddress(communityIssuance, params, "initialize", 3);
+      await testZeroAddress(communityIssuance, params, "initialize", 5);
       // Attempt to use non contract
-      await testNonContractAddress(communityIssuance, params, "initialize", 3);
+      await testNonContractAddress(communityIssuance, params, "initialize", 5);
+    });
+
+    it("initialize(): reverts when initiated twice", async () => {
+      const dumbContract = await GasPool.new();
+      const params = [sovToken.address, zusdToken.address, stabilityPool.address, dumbContract.address, 10000];
+      await th.assertRevert(communityIssuance.initialize(...params, { from: alice }));
+
+      // Attempt to use zero address
+      await testZeroAddress(communityIssuance, params, "initialize", 5);
+      // Attempt to use non contract
+      await testNonContractAddress(communityIssuance, params, "initialize", 5);
 
       // Owner can successfully set any address
       const txOwner = await communityIssuance.initialize(...params, { from: owner });
       assert.isTrue(txOwner.receipt.status);
 
-      // Owner can set any address more than once
-      const secondTxOwner = await communityIssuance.initialize(...params, { from: owner });
-      assert.isTrue(secondTxOwner.receipt.status);
+      // revert if tried to initialize twice
+      await th.assertRevert(communityIssuance.initialize(...params, { from: owner }), "Contract instance has already been initialized");
+    });
+
+    it("setPriceFeed(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
+      const dumbContract = await GasPool.new();
+      const params = [dumbContract.address];
+
+      await th.assertRevert(communityIssuance.setPriceFeed(...params, { from: alice }));
+
+      // Attempt to use zero address
+      await testZeroAddress(communityIssuance, params, "setPriceFeed");
+      // Attempt to use non contract
+      await testNonContractAddress(communityIssuance, params, "setPriceFeed");
+    });
+
+    it("setRewardManager(): reverts when called by non-owner, with wrong addresses, or twice", async () => {
+      const dumbContract = await GasPool.new();
+      const params = [dumbContract.address];
+
+      await th.assertRevert(communityIssuance.setRewardManager(...params, { from: alice }));
+
+      // Attempt to use zero address
+      await testZeroAddress(communityIssuance, params, "setRewardManager");
     });
   });
 

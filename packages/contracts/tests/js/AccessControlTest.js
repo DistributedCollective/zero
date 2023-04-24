@@ -1,6 +1,7 @@
 const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
 const testHelpers = require("../../utils/js/testHelpers.js");
 const TroveManagerTester = artifacts.require("TroveManagerTester");
+const PriceFeedSovryn = artifacts.require("PriceFeedSovryn");
 
 const th = testHelpers.TestHelper;
 const timeValues = testHelpers.TimeValues;
@@ -43,7 +44,7 @@ contract(
       coreContracts = await deploymentHelper.deployZUSDTokenTester(coreContracts);
       const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig);
 
-      priceFeed = coreContracts.priceFeed;
+      priceFeed = coreContracts.priceFeedSovryn;
       zusdToken = coreContracts.zusdToken;
       sortedTroves = coreContracts.sortedTroves;
       troveManager = coreContracts.troveManager;
@@ -64,7 +65,7 @@ contract(
 
       await deploymentHelper.connectZEROContracts(ZEROContracts);
       await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts);
-      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
+      await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts);
 
       for (let account of accounts.slice(0, 10)) {
         await th.openTrove(coreContracts, {
@@ -476,19 +477,60 @@ contract(
 
     describe("CommunityIssuance", async accounts => {
       it("sendZERO(): reverts when caller is not the StabilityPool", async () => {
-        const tx1 = communityIssuance.sendZERO(alice, dec(100, 18), { from: alice });
-        const tx2 = communityIssuance.sendZERO(bob, dec(100, 18), { from: alice });
-        const tx3 = communityIssuance.sendZERO(stabilityPool.address, dec(100, 18), { from: alice });
+        const tx1 = communityIssuance.sendSOV(alice, dec(100, 18), { from: alice });
+        const tx2 = communityIssuance.sendSOV(bob, dec(100, 18), { from: alice });
+        const tx3 = communityIssuance.sendSOV(stabilityPool.address, dec(100, 18), { from: alice });
 
-        assertRevert(tx1);
-        assertRevert(tx2);
-        assertRevert(tx3);
+        await assertRevert(tx1);
+        await assertRevert(tx2);
+        await assertRevert(tx3);
       });
 
       it("issueZERO(): reverts when caller is not the StabilityPool", async () => {
-        const tx1 = communityIssuance.issueZERO({ from: alice });
+        const tx1 = communityIssuance.issueSOV(100, { from: alice });
 
-        assertRevert(tx1);
+        await assertRevert(tx1);
+      });
+
+      it("setPriceFeed(): reverts when caller is not the owner", async () => {
+        const initialPriceFeed = await communityIssuance.priceFeed();
+        const tx1 = communityIssuance.setPriceFeed(priceFeed.address, { from: alice });
+
+        await assertRevert(tx1);
+
+        let recordedPriceFeed = await communityIssuance.priceFeed();
+        assert.equal(recordedPriceFeed, initialPriceFeed);
+
+        const newPriceFeed = await PriceFeedSovryn.new();
+        await communityIssuance.setPriceFeed(newPriceFeed.address, { from: owner });
+
+        recordedPriceFeed = await communityIssuance.priceFeed();
+        assert.equal(recordedPriceFeed, newPriceFeed.address);
+      });
+
+      it("setRewardManager(): reverts when caller is not the owner", async () => {
+        const tx1 = communityIssuance.setRewardManager(alice, { from: alice });
+
+        await assertRevert(tx1);
+
+        const recordedRewardManager = await communityIssuance.rewardManager();
+        assert.equal(recordedRewardManager, th.ZERO_ADDRESS);
+      });
+
+      it("setAPR(): reverts when caller is not the rewardManager", async () => {
+        const newAPR = 5000;
+        await communityIssuance.setRewardManager(alice, { from: owner });
+
+        const recordedRewardManager = await communityIssuance.rewardManager();
+        assert.equal(recordedRewardManager, alice);
+
+        const tx1 = communityIssuance.setAPR(newAPR, {from: owner});
+        await assertRevert(tx1);
+
+        await communityIssuance.setAPR(newAPR, {from: alice});
+        
+        const recordedAPR = await communityIssuance.APR()
+        assert.equal(recordedAPR.toString(), newAPR);
       });
     });
   }

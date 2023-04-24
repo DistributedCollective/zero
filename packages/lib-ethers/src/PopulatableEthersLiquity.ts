@@ -417,8 +417,8 @@ export class PopulatableEthersLiquity
       .map(({ args: { _ETH, _ZUSDLoss } }) => [decimalify(_ETH), decimalify(_ZUSDLoss)]);
 
     const [zeroReward] = stabilityPool
-      .extractEvents(logs, "ZEROPaidToDepositor")
-      .map(({ args: { _ZERO } }) => decimalify(_ZERO));
+      .extractEvents(logs, "SOVPaidToDepositor")
+      .map(({ args: { _SOV } }) => decimalify(_SOV));
 
     return {
       zusdLoss,

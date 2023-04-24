@@ -23,9 +23,152 @@ const timeValues = testHelpers.TimeValues;
  * the parameter BETA in the TroveManager, which is still TBD based on economic modelling.
  *
  */
-contract("TroveManager", async (accounts) => {
-    const _18_zeros = "000000000000000000";
-    const ZERO_ADDRESS = th.ZERO_ADDRESS;
+contract('TroveManager', async accounts => {
+
+  const _18_zeros = '000000000000000000';
+  const ZERO_ADDRESS = th.ZERO_ADDRESS;
+
+  const [
+    owner,
+    alice, bob, carol, dennis, erin, flyn, graham, harriet, ida,
+    defaulter_1, defaulter_2, defaulter_3, defaulter_4, whale,
+    A, B, C, D, E, feeSharingCollector] = accounts;
+
+  const multisig = accounts[999];
+
+  let priceFeed;
+  let zusdToken;
+  let sortedTroves;
+  let troveManager;
+  let activePool;
+  let stabilityPool;
+  let collSurplusPool;
+  let defaultPool;
+  let borrowerOperations;
+  let hintHelpers;
+  let massetManager;
+  let nueMockToken;
+
+  let dennis_signer;
+
+  let contracts;
+
+  const getOpenTroveTotalDebt = async (zusdAmount) => th.getOpenTroveTotalDebt(contracts, zusdAmount);
+  const getOpenTroveZUSDAmount = async (totalDebt) => th.getOpenTroveZUSDAmount(contracts, totalDebt);
+  const getActualDebtFromComposite = async (compositeDebt) => th.getActualDebtFromComposite(compositeDebt, contracts);
+  const getNetBorrowingAmount = async (debtWithFee) => th.getNetBorrowingAmount(contracts, debtWithFee);
+  const openTrove = async (params) => th.openTrove(contracts, params);
+  const openNueTrove = async (params) => th.openNueTrove(contracts, params);
+  const withdrawZUSD = async (params) => th.withdrawZUSD(contracts, params);
+
+  before(async () => {
+    contracts = await deploymentHelper.deployLiquityCore();
+    contracts.troveManager = await TroveManagerTester.new();
+    contracts.zusdToken = await ZUSDTokenTester.new(
+      contracts.troveManager.address,
+      contracts.stabilityPool.address,
+      contracts.borrowerOperations.address
+    );
+    const ZEROContracts = await deploymentHelper.deployZEROTesterContractsHardhat(multisig);
+
+    priceFeed = contracts.priceFeedTestnet;
+    zusdToken = contracts.zusdToken;
+    sortedTroves = contracts.sortedTroves;
+    troveManager = contracts.troveManager;
+    activePool = contracts.activePool;
+    stabilityPool = contracts.stabilityPool;
+    defaultPool = contracts.defaultPool;
+    collSurplusPool = contracts.collSurplusPool;
+    borrowerOperations = contracts.borrowerOperations;
+    hintHelpers = contracts.hintHelpers;
+
+    zeroStaking = ZEROContracts.zeroStaking;
+    zeroToken = ZEROContracts.zeroToken;
+    communityIssuance = ZEROContracts.communityIssuance;
+
+    await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
+    await deploymentHelper.connectZEROContracts(ZEROContracts);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
+
+    await zeroToken.unprotectedMint(multisig, toBN(dec(20, 24)));
+    await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
+    await zeroToken.approve(communityIssuance.address, toBN(dec(30, 24)));
+    // await communityIssuance.receiveZero(owner, toBN(dec(30,24)))
+
+    contracts.massetManager = await MassetManagerTester.new();
+    massetManager = contracts.massetManager;
+    await borrowerOperations.setMassetManagerAddress(massetManager.address);
+    const nueMockTokenAddress = await massetManager.nueMockToken();
+    nueMockToken = await NueMockToken.at(nueMockTokenAddress);
+
+    dennis_signer = (await ethers.getSigners())[4];
+  });
+
+  let revertToSnapshot;
+
+  beforeEach(async () => {
+    let snapshot = await timeMachine.takeSnapshot();
+    revertToSnapshot = () => timeMachine.revertToSnapshot(snapshot['result']);
+  });
+
+  afterEach(async () => {
+    await revertToSnapshot();
+  });
+
+  it('liquidate(): closes a Trove that has ICR < MCR', async () => {
+    await openTrove({ ICR: toBN(dec(20, 18)), extraParams: { from: whale } });
+    await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: alice } });
+
+    const price = await priceFeed.getPrice();
+    const ICR_Before = await troveManager.getCurrentICR(alice, price);
+    assert.equal(ICR_Before, dec(4, 18));
+
+    const MCR = (await troveManager.MCR()).toString();
+    assert.equal(MCR.toString(), '1100000000000000000');
+
+    // Alice increases debt to 180 ZUSD, lowering her ICR to 1.11
+    const A_ZUSDWithdrawal = await getNetBorrowingAmount(dec(130, 18));
+
+    const targetICR = toBN('1111111111111111111');
+    await withdrawZUSD({ ICR: targetICR, extraParams: { from: alice } });
+
+    const ICR_AfterWithdrawal = await troveManager.getCurrentICR(alice, price);
+    assert.isAtMost(th.getDifference(ICR_AfterWithdrawal, targetICR), 100);
+
+    // price drops to 1ETH:100ZUSD, reducing Alice's ICR below MCR
+    await priceFeed.setPrice('100000000000000000000');
+
+    // Confirm system is not in Recovery Mode
+    assert.isFalse(await th.checkRecoveryMode(contracts));
+
+    // close Trove
+    await troveManager.liquidate(alice, { from: owner });
+
+    // check the Trove is successfully closed, and removed from sortedList
+    const status = (await troveManager.Troves(alice))[3];
+    assert.equal(status, 3);  // status enum 3 corresponds to "Closed by liquidation"
+    const alice_Trove_isInSortedList = await sortedTroves.contains(alice);
+    assert.isFalse(alice_Trove_isInSortedList);
+  });
+
+  it("liquidate(): decreases ActivePool ETH and ZUSDDebt by correct amounts", async () => {
+    // --- SETUP ---
+    const { collateral: A_collateral, totalDebt: A_totalDebt } = await openTrove({ ICR: toBN(dec(4, 18)), extraParams: { from: alice } });
+    const { collateral: B_collateral, totalDebt: B_totalDebt } = await openTrove({ ICR: toBN(dec(21, 17)), extraParams: { from: bob } });
+
+    // --- TEST ---
+
+    // check ActivePool ETH and ZUSD debt before
+    const activePool_ETH_Before = (await activePool.getETH()).toString();
+    const activePool_RawEther_Before = (await web3.eth.getBalance(activePool.address)).toString();
+    const activePool_ZUSDDebt_Before = (await activePool.getZUSDDebt()).toString();
+
+    assert.equal(activePool_ETH_Before, A_collateral.add(B_collateral));
+    assert.equal(activePool_RawEther_Before, A_collateral.add(B_collateral));
+    th.assertIsApproximatelyEqual(activePool_ZUSDDebt_Before, A_totalDebt.add(B_totalDebt));
+
+    // price drops to 1ETH:100ZUSD, reducing Bob's ICR below MCR
+    await priceFeed.setPrice('100000000000000000000');
 
     const [
         owner,

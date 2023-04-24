@@ -18,8 +18,6 @@ export class _CachedReadableLiquity<T extends unknown[]> implements _ReadableLiq
     // (undocumented)
     getPrice(...extraParams: T): Promise<Decimal>;
     // (undocumented)
-    getRemainingStabilityPoolZEROReward(...extraParams: T): Promise<Decimal>;
-    // (undocumented)
     getStabilityDeposit(address?: string, ...extraParams: T): Promise<StabilityDeposit>;
     // (undocumented)
     getTotal(...extraParams: T): Promise<Trove>;
@@ -255,7 +253,6 @@ export interface LiquityStoreBaseState {
     numberOfTroves: number;
     ownFrontend: FrontendStatus;
     price: Decimal;
-    remainingStabilityPoolZEROReward: Decimal;
     // @internal (undocumented)
     _riskiestTroveBeforeRedistribution: TroveWithPendingRedistribution;
     stabilityDeposit: StabilityDeposit;
@@ -428,7 +425,6 @@ export interface ReadableLiquity {
     getFrontendStatus(address?: string): Promise<FrontendStatus>;
     getNumberOfTroves(): Promise<number>;
     getPrice(): Promise<Decimal>;
-    getRemainingStabilityPoolZEROReward(): Promise<Decimal>;
     getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
     getTotal(): Promise<Trove>;
     getTotalRedistributed(): Promise<Trove>;

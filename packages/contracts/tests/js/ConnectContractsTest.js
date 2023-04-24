@@ -16,6 +16,7 @@ contract('Deployment script - Sets correct contract addresses dependencies after
   let borrowerOperations;
   let zeroStaking;
   let zeroToken;
+  let sovToken;
   let communityIssuance;
   let feeDistributor;
 
@@ -36,11 +37,12 @@ contract('Deployment script - Sets correct contract addresses dependencies after
 
     zeroStaking = ZEROContracts.zeroStaking;
     zeroToken = ZEROContracts.zeroToken;
+    sovToken = ZEROContracts.zeroToken;
     communityIssuance = ZEROContracts.communityIssuance;
 
     await deploymentHelper.connectZEROContracts(ZEROContracts);
     await deploymentHelper.connectCoreContracts(coreContracts, ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, coreContracts);
   });
 
   it('Sets the correct PriceFeed address in TroveManager', async () => {
@@ -345,18 +347,32 @@ contract('Deployment script - Sets correct contract addresses dependencies after
 
   // --- CI ---
 
-  // Sets ZEROToken in CommunityIssuance
-  it('Sets the correct ZEROToken address in CommunityIssuance', async () => {
-    const zeroTokenAddress = zeroToken.address;
+  // Sets SOVToken in CommunityIssuance
+  it('Sets the correct SOVToken address in CommunityIssuance', async () => {
+    const sovTokenAddress = zeroToken.address;
 
-    const recordedZEROTokenAddress = await communityIssuance.zeroToken();
-    assert.equal(zeroTokenAddress, recordedZEROTokenAddress);
+    const recordedSOVTokenAddress = await communityIssuance.sovToken();
+    assert.equal(sovTokenAddress, recordedSOVTokenAddress);
+  });
+
+  it('Sets the correct SOVToken address in CommunityIssuance', async () => {
+    const sovTokenAddress = sovToken.address;
+
+    const recordedSOVTokenAddress = await communityIssuance.sovToken();
+    assert.equal(sovTokenAddress, recordedSOVTokenAddress);
+  });
+
+  it('Sets the correct ZUSDToken address in CommunityIssuance', async () => {
+    const zusdTokenAddress = zusdToken.address;
+
+    const recordedZUSDTokenAddress = await communityIssuance.zusdToken();
+    assert.equal(zusdTokenAddress, recordedZUSDTokenAddress);
   });
 
   it('Sets the correct StabilityPool address in CommunityIssuance', async () => {
     const stabilityPoolAddress = stabilityPool.address;
 
-    const recordedStabilityPoolAddress = await communityIssuance.communityPotAddress();
+    const recordedStabilityPoolAddress = await communityIssuance.stabilityPoolAddress();
     assert.equal(stabilityPoolAddress, recordedStabilityPoolAddress);
   });
 });

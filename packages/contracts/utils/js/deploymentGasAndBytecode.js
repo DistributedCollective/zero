@@ -112,7 +112,7 @@ async function main() {
 
   await dh.connectCoreContracts(coreContracts, ZEROContracts);
   await dh.connectZEROContracts(ZEROContracts);
-  await dh.connectZEROContractsToCore(ZEROContracts, coreContracts, owner);
+  await dh.connectZEROContractsToCore(ZEROContracts, coreContracts);
 
 
   console.log(`\n`);
