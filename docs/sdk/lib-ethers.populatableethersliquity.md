@@ -31,6 +31,7 @@ export declare class PopulatableEthersLiquity implements PopulatableLiquity<Ethe
 |  [closeTrove(overrides)](./lib-ethers.populatableethersliquity.closetrove.md) |  | Close existing Trove by repaying all debt and withdrawing all collateral. |
 |  [depositCollateral(amount, overrides)](./lib-ethers.populatableethersliquity.depositcollateral.md) |  | Adjust existing Trove by depositing more collateral. |
 |  [depositZUSDInStabilityPool(amount, frontendTag, overrides)](./lib-ethers.populatableethersliquity.depositzusdinstabilitypool.md) |  | Make a new Stability Deposit, or top up existing one. |
+|  [findHints(trove)](./lib-ethers.populatableethersliquity.findhints.md) |  |  |
 |  [liquidate(address, overrides)](./lib-ethers.populatableethersliquity.liquidate.md) |  | Liquidate one or more undercollateralized Troves. |
 |  [liquidateUpTo(maximumNumberOfTrovesToLiquidate, overrides)](./lib-ethers.populatableethersliquity.liquidateupto.md) |  | Liquidate the least collateralized Troves up to a maximum number. |
 |  [openNueTrove(params, maxBorrowingRate, overrides)](./lib-ethers.populatableethersliquity.opennuetrove.md) |  |  |
