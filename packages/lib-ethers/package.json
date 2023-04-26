@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/lib-ethers",
-  "version": "1.0.1-early.access.0",
+  "version": "1.0.1-early.access.1",
   "description": "Sovryn Zero SDK Ethers-based implementation",
   "keywords": [
     "Sovryn",
