@@ -193,10 +193,48 @@ const sip0054And0055Combo = async (hre: HardhatRuntimeEnvironment): Promise<ISip
     return argsCombo;
 };
 
+const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+
+    // @TODO Need to upgrade the stability pool implementation to the mainnet first
+    const newStabilityPoolImplementation = (await get("StabilityPool_Implementation")).address;
+
+    // @TODO Need to deploy the communitIssuance to the mainnet first
+    const communityIssuanceAddress = (await get("CommunityIssuance_Proxy")).address;
+
+    console.log(`New stability pool implementation: ${newStabilityPoolImplementation}`);
+    console.log(`Community issuance address: ${communityIssuanceAddress}`);
+
+    const args: ISipArgument = {
+        args: {
+            targets: [
+                (await get("StabilityPool_Proxy")).address,
+                (await get("StabilityPool_Proxy")).address,
+            ],
+            values: [0, 0],
+            signatures: ["setImplementation(address)", "setCommunityIssuanceAddress(address)"],
+            data: [
+                ethers.utils.defaultAbiCoder.encode(
+                    ["address", "address"],
+                    [newStabilityPoolImplementation, communityIssuanceAddress]
+                ),
+            ],
+            description: "SIP-0061: Update stability pool subsidies : , sha256: ",
+        },
+        governorName: "GovernorOwner",
+    };
+
+    return args;
+};
+
 const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
     sip0054And0055Combo,
+    sip0061,
 };
 
 export default sipArgs;
