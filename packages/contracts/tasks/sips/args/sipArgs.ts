@@ -218,8 +218,12 @@ const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> =>
             signatures: ["setImplementation(address)", "setCommunityIssuanceAddress(address)"],
             data: [
                 ethers.utils.defaultAbiCoder.encode(
-                    ["address", "address"],
-                    [newStabilityPoolImplementation, communityIssuanceAddress]
+                    ["address"],
+                    [newStabilityPoolImplementation]
+                ),
+                ethers.utils.defaultAbiCoder.encode(
+                    ["address"],
+                    [communityIssuanceAddress]
                 ),
             ],
             description: "SIP-0061: Update stability pool subsidies : , sha256: ",

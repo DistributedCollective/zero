@@ -224,13 +224,13 @@ interface IStabilityPool {
      */
     function getCompoundedFrontEndStake(address _frontEnd) external view returns (uint);
 
-    //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the SOV Stability Pool, all in a single transaction
+    //DLLR _owner or _spender can convert a specified amount of DLLR into ZUSD via Sovryn Mynt and deposit the ZUSD into the Zero Stability Pool, all in a single transaction
     function provideToSpFromDLLR(
         uint _dllrAmount,
         IMassetManager.PermitParams calldata _permitParams
     ) external;
 
-    /// Stability Pool depositor can withdraw a specified amount of ZUSD from the SOV Stability Pool and optionally convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
+    /// Stability Pool depositor can withdraw a specified amount of ZUSD from the Zero Stability Pool and optionally convert the ZUSD to DLLR via Sovryn Mynt, all in a single transaction
     function withdrawFromSpAndConvertToDLLR(uint256 _zusdAmount) external;
 
     /**

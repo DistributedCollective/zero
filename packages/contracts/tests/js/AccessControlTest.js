@@ -1,7 +1,7 @@
 const deploymentHelper = require("../../utils/js/deploymentHelpers.js");
 const testHelpers = require("../../utils/js/testHelpers.js");
 const TroveManagerTester = artifacts.require("TroveManagerTester");
-const PriceFeedSovryn = artifacts.require("PriceFeedSovryn");
+const PriceFeedSovryn = artifacts.require("PriceFeedSovrynTester");
 
 const th = testHelpers.TestHelper;
 const timeValues = testHelpers.TimeValues;

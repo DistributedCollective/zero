@@ -18,14 +18,18 @@ interface ICommunityIssuance {
     /**
      * @notice Called only once on init, to set addresses of other contracts. Callable only by owner.
      * @dev initializer function, checks addresses are contracts
-     * @param _zeroTokenAddress ZEROToken contract address
-     * @param _communityPotAddress CommunityPot contract address
+     * @param _sovTokenAddress sov token address.
+     * @param _zusdTokenAddress zero token address.
+     * @param _stabilityPoolAddress stability pool address.
+     * @param _priceFeed price feed address.
+     * @param _APR apr in basis points.
      */
-    function initialize
-    (
-        address _zeroTokenAddress, 
-        address _communityPotAddress,
-        address _fundingWalletAddress
+    function initialize(
+        address _sovTokenAddress,
+        address _zusdTokenAddress,
+        address _stabilityPoolAddress,
+        address _priceFeed,
+        uint256 _APR
     ) external;
 
     /**
