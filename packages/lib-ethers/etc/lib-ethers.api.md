@@ -323,6 +323,8 @@ export class PopulatableEthersLiquity implements PopulatableLiquity<EthersTransa
     // (undocumented)
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>>;
     // (undocumented)
+    findHints(trove: Trove): Promise<[string, string]>;
+    // (undocumented)
     liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>>;
     // (undocumented)
     liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>>;
