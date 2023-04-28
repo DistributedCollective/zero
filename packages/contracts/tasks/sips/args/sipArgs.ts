@@ -208,23 +208,16 @@ const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> =>
     console.log(`New stability pool implementation: ${newStabilityPoolImplementation}`);
     console.log(`Community issuance address: ${communityIssuanceAddress}`);
 
+    const stabilityPoolProxyAddress = (await get("StabilityPool_Proxy")).address;
+
     const args: ISipArgument = {
         args: {
-            targets: [
-                (await get("StabilityPool_Proxy")).address,
-                (await get("StabilityPool_Proxy")).address,
-            ],
+            targets: [stabilityPoolProxyAddress, stabilityPoolProxyAddress],
             values: [0, 0],
             signatures: ["setImplementation(address)", "setCommunityIssuanceAddress(address)"],
             data: [
-                ethers.utils.defaultAbiCoder.encode(
-                    ["address"],
-                    [newStabilityPoolImplementation]
-                ),
-                ethers.utils.defaultAbiCoder.encode(
-                    ["address"],
-                    [communityIssuanceAddress]
-                ),
+                ethers.utils.defaultAbiCoder.encode(["address"], [newStabilityPoolImplementation]),
+                ethers.utils.defaultAbiCoder.encode(["address"], [communityIssuanceAddress]),
             ],
             description: "SIP-0061: Update stability pool subsidies : , sha256: ",
         },

@@ -497,8 +497,8 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
                 .to.equal(await zeroBaseParams.REDEMPTION_FEE_FLOOR())
                 .to.equal(newFeeValue);
         });
-        
-        it("SIP-0061 is executable", async () => {
+
+        it.only("SIP-0061 is executable", async () => {
             if (!hre.network.tags["forked"]) return;
 
             const {
@@ -556,6 +556,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgsZFU: ISipArgument = await sipArgs.sip0061(hre);
             await createSIP(hre, sipArgsZFU);
+            // await hre.run("sips:create-sip", { argsFunc: "sip0061" });
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
@@ -569,6 +570,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             await governorOwner.connect(deployerSigner).castVote(proposalId, true);
 
             // QUEUE PROPOSAL
+            console.log("queueing proposal");
             let proposal = await governorOwner.proposals(proposalId);
 
             await mineUpTo(proposal.endBlock);
@@ -577,7 +579,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             await governorOwner.queue(proposalId);
 
             // EXECUTE PROPOSAL
+            console.log("executing proposal");
             proposal = await governorOwner.proposals(proposalId);
+            console.log("proposal:", proposal);
             await time.increaseTo(proposal.eta);
             await expect(governorOwner.execute(proposalId))
                 .to.emit(governorOwner, "ProposalExecuted")

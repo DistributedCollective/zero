@@ -7,13 +7,13 @@ const deploymentName = getContractNameFromScriptFileName(path.basename(__filenam
 const logger = new Logs().showInConsole(true);
 
 const func: DeployFunction = async (hre) => {
-    const { getNamedAccounts, ethers, deployments: { get }} = hre;
+    const {
+        getNamedAccounts,
+        ethers,
+        deployments: { get },
+    } = hre;
     const { deployer } = await getNamedAccounts();
     injectHre(hre);
-    await deployWithCustomProxy(deployer, deploymentName, "UpgradableProxy");
-
-    const communityIssuanceDeployment = await get(deploymentName);
-    const communityIssuance = await ethers.getContractAt(communityIssuanceDeployment.abi, communityIssuanceDeployment.address);
 
     // Initialize community issuance address
     let sovTokenAddress: string;
@@ -36,12 +36,20 @@ const func: DeployFunction = async (hre) => {
         ownerAddress = "0x189ecD23E9e34CFC07bFC3b7f5711A23F43F8a57"; // exchequer for testnet
     }
 
+    await deployWithCustomProxy(deployer, deploymentName, "UpgradableProxy");
+
+    const communityIssuanceDeployment = await get(deploymentName);
+    const communityIssuance = await ethers.getContractAt(
+        communityIssuanceDeployment.abi,
+        communityIssuanceDeployment.address
+    );
+
     const tx1 = await communityIssuance.initialize(
         sovTokenAddress,
         zusdTokenAddress,
         stabilityPoolAddress,
         priceFeedsAddress,
-        APR,
+        APR
     );
 
     logger.info("=== Initializing Community Issuance ===");
@@ -57,7 +65,7 @@ const func: DeployFunction = async (hre) => {
 
     // Set reward manager
     const tx2 = await communityIssuance.setRewardManager(rewardManagerAddress);
-    
+
     logger.info(`=== Setting Reward Manager ${rewardManagerAddress} ===`);
     const receipt2 = await tx2.wait();
     logger.success(`=== Reward manger has been set to ${rewardManagerAddress} ===`);
@@ -65,7 +73,7 @@ const func: DeployFunction = async (hre) => {
 
     // Transfer ownership
     const tx3 = await communityIssuance.setOwner(ownerAddress);
-    
+
     logger.info(`=== Transferring ownership to TimelockOwner ${ownerAddress} ===`);
     const receipt3 = await tx3.wait();
     logger.success(`=== Ownership has been transferred to ${ownerAddress} ===`);
