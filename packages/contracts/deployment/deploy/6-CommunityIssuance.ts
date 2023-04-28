@@ -31,11 +31,15 @@ const func: DeployFunction = async (hre) => {
         priceFeedsAddress = "0x437AC62769f386b2d238409B7f0a7596d36506e4";
         rewardManagerAddress = "0x6c94c8aa97C08fC31fb06fbFDa90e1E09529FB13"; // timelockAdmin for mainnet
         ownerAddress = "0x967c84b731679E36A344002b8E3CE50620A7F69f"; // timelockOwner for mainnet
-    } else {
+    } else if (hre.network.tags["testnet"]) {
         sovTokenAddress = "0x6a9A07972D07e58F0daf5122d11E069288A375fb";
         priceFeedsAddress = "0x7f38c422b99075f63C9c919ECD200DF8d2Cf5BD4";
         rewardManagerAddress = "0x189ecD23E9e34CFC07bFC3b7f5711A23F43F8a57"; // exchequer for testnet
         ownerAddress = "0x189ecD23E9e34CFC07bFC3b7f5711A23F43F8a57"; // exchequer for testnet
+    } else {
+        logger.error(
+            "Current deployment is designed to work only on the testnet/mainnet or forked testnet/mainnet"
+        );
     }
 
     const newlyDeployedProxy = (await getOrNull("CommunityIssuance_Proxy")) ? false : true;

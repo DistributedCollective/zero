@@ -199,10 +199,9 @@ const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> =>
         deployments: { get },
     } = hre;
 
-    // @TODO Need to upgrade the stability pool implementation to the mainnet first
+    // @todo for the mainnet deployment first run `yarn deploy --tags 'StabilityPool,CommunityIssuance' --network rskSovrynMainnet`
     const newStabilityPoolImplementation = (await get("StabilityPool_Implementation")).address;
 
-    // @TODO Need to deploy the communitIssuance to the mainnet first
     const communityIssuanceAddress = (await get("CommunityIssuance_Proxy")).address;
 
     console.log(`New stability pool implementation: ${newStabilityPoolImplementation}`);
@@ -219,7 +218,8 @@ const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> =>
                 ethers.utils.defaultAbiCoder.encode(["address"], [newStabilityPoolImplementation]),
                 ethers.utils.defaultAbiCoder.encode(["address"], [communityIssuanceAddress]),
             ],
-            description: "SIP-0061: Update stability pool subsidies : , sha256: ",
+            description:
+                "SIP-0061: Update stability pool subsidies: https://github.com/DistributedCollective/SIPS/blob/7a115c3/SIP-0061.md, sha256: 5b9a77a3225c46de874aba4f30b66af8981bf71cc2e13373f8a44488f6aba8ec",
         },
         governorName: "GovernorOwner",
     };
