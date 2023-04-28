@@ -108,7 +108,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
     let loadFixtureAfterEach = false;
     let snapshot: SnapshotRestorer;
     before(async () => {
-        await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
+        // await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
     });
     beforeEach(async () => {
         snapshot = await takeSnapshot();
