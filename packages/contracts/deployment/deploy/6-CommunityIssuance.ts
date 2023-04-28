@@ -2,6 +2,8 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { deployWithCustomProxy, injectHre } from "../../scripts/helpers";
 import { getContractNameFromScriptFileName } from "../../scripts/utils";
 import Logs from "node-logs";
+import { CommunityIssuance } from "types/generated";
+import { CommunityIssuanceInterface } from "types/generated/artifacts/contracts/ZERO/CommunityIssuance";
 const path = require("path");
 const deploymentName = getContractNameFromScriptFileName(path.basename(__filename));
 const logger = new Logs().showInConsole(true);
@@ -10,7 +12,7 @@ const func: DeployFunction = async (hre) => {
     const {
         getNamedAccounts,
         ethers,
-        deployments: { get },
+        deployments: { get, getOrNull },
     } = hre;
     const { deployer } = await getNamedAccounts();
     injectHre(hre);
@@ -36,6 +38,7 @@ const func: DeployFunction = async (hre) => {
         ownerAddress = "0x189ecD23E9e34CFC07bFC3b7f5711A23F43F8a57"; // exchequer for testnet
     }
 
+    const newlyDeployedProxy = (await getOrNull("CommunityIssuance_Proxy")) ? false : true;
     await deployWithCustomProxy(deployer, deploymentName, "UpgradableProxy");
 
     const communityIssuanceDeployment = await get(deploymentName);
@@ -44,40 +47,44 @@ const func: DeployFunction = async (hre) => {
         communityIssuanceDeployment.address
     );
 
-    const tx1 = await communityIssuance.initialize(
-        sovTokenAddress,
-        zusdTokenAddress,
-        stabilityPoolAddress,
-        priceFeedsAddress,
-        APR
-    );
+    if (newlyDeployedProxy) {
+        logger.info("=== Initializing Community Issuance ===");
+        logger.info(`SOV Token Address: ${sovTokenAddress}`);
+        logger.info(`ZUSD Token Address: ${zusdTokenAddress}`);
+        logger.info(`Stability Pool Address: ${stabilityPoolAddress}`);
+        logger.info(`PriceFeeds Address: ${priceFeedsAddress}`);
+        logger.info(`APR: ${APR}`);
 
-    logger.info("=== Initializing Community Issuance ===");
-    logger.info(`SOV Token Address: ${sovTokenAddress}`);
-    logger.info(`ZUSD Token Address: ${zusdTokenAddress}`);
-    logger.info(`Stability Pool Address: ${stabilityPoolAddress}`);
-    logger.info(`PriceFeeds Address: ${priceFeedsAddress}`);
-    logger.info(`APR: ${APR}`);
+        const receipt1 = await (
+            await communityIssuance.initialize(
+                sovTokenAddress,
+                zusdTokenAddress,
+                stabilityPoolAddress,
+                priceFeedsAddress,
+                APR
+            )
+        ).wait();
+        logger.success("=== Community Issuance has been initialized ===");
+        logger.success(receipt1);
+    }
 
-    const receipt1 = await tx1.wait();
-    logger.success("=== Community Issuance has been initialized ===");
-    logger.success(receipt1);
+    if ((await communityIssuance.rewardManager()) !== rewardManagerAddress) {
+        // Set reward manager
+        logger.info(`=== Setting Reward Manager ${rewardManagerAddress} ===`);
+        const receipt2 = await (
+            await communityIssuance.setRewardManager(rewardManagerAddress)
+        ).wait();
+        logger.success(`=== Reward manger has been set to ${rewardManagerAddress} ===`);
+        logger.success(receipt2);
+    }
 
-    // Set reward manager
-    const tx2 = await communityIssuance.setRewardManager(rewardManagerAddress);
-
-    logger.info(`=== Setting Reward Manager ${rewardManagerAddress} ===`);
-    const receipt2 = await tx2.wait();
-    logger.success(`=== Reward manger has been set to ${rewardManagerAddress} ===`);
-    logger.success(receipt2);
-
-    // Transfer ownership
-    const tx3 = await communityIssuance.setOwner(ownerAddress);
-
-    logger.info(`=== Transferring ownership to TimelockOwner ${ownerAddress} ===`);
-    const receipt3 = await tx3.wait();
-    logger.success(`=== Ownership has been transferred to ${ownerAddress} ===`);
-    logger.success(receipt3);
+    if ((await communityIssuance.getOwner()) !== ownerAddress) {
+        // Transfer ownership
+        logger.info(`=== Transferring ownership to TimelockOwner ${ownerAddress} ===`);
+        const receipt3 = await (await communityIssuance.setOwner(ownerAddress)).wait();
+        logger.success(`=== Ownership has been transferred to ${ownerAddress} ===`);
+        logger.success(receipt3);
+    }
 };
 
 func.tags = [deploymentName];

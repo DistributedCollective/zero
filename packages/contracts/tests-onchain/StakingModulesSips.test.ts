@@ -108,7 +108,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
     let loadFixtureAfterEach = false;
     let snapshot: SnapshotRestorer;
     before(async () => {
-        // await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
+        await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
     });
     beforeEach(async () => {
         snapshot = await takeSnapshot();
@@ -120,7 +120,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
     describe("Staking Modules Onchain Testing", () => {
         it("SIP-0054 is executable", async () => {
             if (!hre.network.tags["forked"]) return;
-            /*await hre.network.provider.request({
+            await hre.network.provider.request({
                 method: "hardhat_reset",
                 params: [
                     {
@@ -130,7 +130,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
                         },
                     },
                 ],
-            });*/
+            });
 
             const {
                 deployer,
@@ -496,111 +496,6 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             expect(await zeroBaseParams.BORROWING_FEE_FLOOR())
                 .to.equal(await zeroBaseParams.REDEMPTION_FEE_FLOOR())
                 .to.equal(newFeeValue);
-        });
-
-        it.only("SIP-0061 is executable", async () => {
-            if (!hre.network.tags["forked"]) return;
-
-            const {
-                deployer,
-                deployerSigner,
-                stakingProxy,
-                stakingModulesProxy,
-                governorOwner,
-                governorOwnerSigner,
-                timelockOwner,
-                timelockOwnerSigner,
-                multisigSigner,
-            } = await setupTest();
-            // loadFixtureAfterEach = true;
-
-            // CREATE PROPOSAL
-            const sov = await ethers.getContract("SOV", timelockOwnerSigner);
-            //const whaleAmount = await sov.balanceOf(multisigSigner._address);
-            //await sov.transfer(deployerSigner.address, whaleAmount);
-            const whaleAmount = (await sov.totalSupply()).mul(ethers.BigNumber.from(5));
-
-            await sov.mint(deployerSigner.address, whaleAmount);
-
-            /*
-            const quorumVotes = await governorOwner.quorumVotes();
-            console.log('quorumVotes:', quorumVotes);
-            */
-            await sov.connect(deployerSigner).approve(stakingProxy.address, whaleAmount);
-            //const stakeABI = (await hre.artifacts.readArtifact("IStaking")).abi;
-            const stakeABI = (await deployments.getArtifact("IStaking")).abi;
-            // const stakeABI = (await ethers.getContractFactory("IStaking")).interface;
-            // alternatively for stakeABI can be used human readable ABI:
-            /*const stakeABI = [
-                'function stake(uint96 amount,uint256 until,address stakeFor,address delegatee)',
-                'function pauseUnpause(bool _pause)',
-                'function paused() view returns (bool)'
-            ];*/
-            const staking = await ethers.getContractAt(
-                stakeABI,
-                stakingProxy.address,
-                deployerSigner
-            );
-            /*const multisigSigner = await getImpersonatedSignerFromJsonRpcProvider(
-                (
-                    await get("MultiSigWallet")
-                ).address
-            );*/
-            if (await staking.paused()) await staking.connect(multisigSigner).pauseUnpause(false);
-            const kickoffTS = await stakingProxy.kickoffTS();
-            await staking.stake(whaleAmount, kickoffTS.add(MAX_DURATION), deployer, deployer);
-            await mine();
-
-            // CREATE PROPOSAL AND VERIFY
-            console.log("creating proposal");
-            const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
-            const sipArgsZFU: ISipArgument = await sipArgs.sip0061(hre);
-            await createSIP(hre, sipArgsZFU);
-            // await hre.run("sips:create-sip", { argsFunc: "sip0061" });
-            console.log("... after SIP creation");
-            const proposalId = await governorOwner.latestProposalIds(deployer);
-            expect(
-                proposalId.toString(),
-                "Proposal was not created. Check the SIP creation is not commented out."
-            ).not.equal(proposalIdBeforeSIP.toString());
-
-            // VOTE FOR PROPOSAL
-            console.log("voting for proposal");
-            await mine();
-            await governorOwner.connect(deployerSigner).castVote(proposalId, true);
-
-            // QUEUE PROPOSAL
-            console.log("queueing proposal");
-            let proposal = await governorOwner.proposals(proposalId);
-
-            await mineUpTo(proposal.endBlock);
-            await mine();
-
-            await governorOwner.queue(proposalId);
-
-            // EXECUTE PROPOSAL
-            console.log("executing proposal");
-            proposal = await governorOwner.proposals(proposalId);
-            console.log("proposal:", proposal);
-            await time.increaseTo(proposal.eta);
-            await expect(governorOwner.execute(proposalId))
-                .to.emit(governorOwner, "ProposalExecuted")
-                .withArgs(proposalId);
-
-            // VALIDATE EXECUTION
-            expect((await governorOwner.proposals(proposalId)).executed).to.be.true;
-
-            const stabilityPoolProxy = await ethers.getContract("StabilityPool_Proxy");
-            const stabilityPoolImpl = await ethers.getContract("StabilityPool_Implementation");
-            const stabilityPool = await ethers.getContract("StabilityPool");
-            const communityIssuance = await ethers.getContract("CommunityIssuance");
-
-            expect(ethers.utils.getAddress(await stabilityPoolProxy.getImplementation())).to.equal(
-                ethers.utils.getAddress(stabilityPoolImpl.address)
-            );
-            expect(ethers.utils.getAddress(await stabilityPool.communityIssuance())).to.equal(
-                ethers.utils.getAddress(communityIssuance.address)
-            );
         });
     });
 });
