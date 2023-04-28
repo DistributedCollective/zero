@@ -40,6 +40,7 @@ const func: DeployFunction = async (hre) => {
         logger.error(
             "Current deployment is designed to work only on the testnet/mainnet or forked testnet/mainnet"
         );
+        return;
     }
 
     const newlyDeployedProxy = (await getOrNull("CommunityIssuance_Proxy")) ? false : true;
