@@ -275,6 +275,7 @@ const config: HardhatUserConfig = {
             timeout: 100000,
             gasPrice: 66000000,
             blockGasLimit: 6800000,
+            gas: "auto",
             //timeout: 20000, // increase if needed; 20000 is the default value
         },
         rskForkedMainnet: {
