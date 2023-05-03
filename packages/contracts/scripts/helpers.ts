@@ -169,92 +169,99 @@ const defaultValueMultisigOrSipFlag = (
 
 const deployWithCustomProxy = async (
     deployer,
-    logicName,
-    proxyName,
-    isOwnerMultisig = false,
+    logicArtifactName, //logic contract artifact name
+    proxyArtifactName, // proxy deployment name
+    logicInstanceName = undefined, // save logic implementation as
+    proxyInstanceName = undefined, // save proxy implementation as
+    isOwnerMultisig = false, // overrides network dependency
+    args: any = [],
+    proxyArgs: any[] = [],
     multisigName = "MultiSigWallet",
-    proxyOwner = "",
-    args: any[] = [],
-    proxyArgs: any[] = []
+    proxyOwner = "" // new proxy owner address, used for new proxy deployments and only if there are no post-deployment func calls from the creator address
 ) => {
     const {
-        deployments: { deploy, get, getOrNull, log, save: deploymentsSave },
+        deployments: { deploy, get, getOrNull, log, save },
         ethers,
     } = hre;
 
-    const proxyDeployedName = logicName + "_Proxy";
-    const logicDeployedName = logicName + "_Implementation";
+    proxyInstanceName = proxyInstanceName == "" ? undefined : proxyInstanceName;
+    logicInstanceName = logicInstanceName == "" ? undefined : logicInstanceName;
 
-    let proxyDeployment = await getOrNull(proxyDeployedName);
+    const proxyName = proxyInstanceName ?? proxyArtifactName; // support multiple deployments of the same artifact
+    let proxyDeployment = await getOrNull(proxyName);
+    let isNewProxy = false;
     if (!proxyDeployment) {
-        await deploy(proxyDeployedName, {
-            contract: proxyName,
+        await deploy(proxyName, {
+            contract: proxyArtifactName,
             from: deployer,
             args: proxyArgs,
             log: true,
         });
-    }
-    const proxy = await ethers.getContract(proxyDeployedName);
-    if (ethers.utils.isAddress(proxyOwner) && (await proxy.getOwner()) !== proxyOwner) {
-        await proxy.transferOwnership(proxyOwner);
-        logger.success(
-            `Proxy ${proxyDeployedName} ownership transferred to ${await proxy.getOwner()}`
-        );
+        isNewProxy = true;
     }
 
-    const tx = await deploy(logicDeployedName, {
-        contract: logicName,
+    const logicName = logicInstanceName ?? logicArtifactName;
+    const logicImplName = logicName + "_Implementation"; // naming convention like in hh deployment
+    const logicDeploymentTx = await deploy(logicImplName, {
+        contract: logicArtifactName,
         from: deployer,
         args: args,
         log: true,
     });
 
+    const proxy = await ethers.getContract(proxyName);
     const prevImpl = await proxy.getImplementation();
-    log(`Current ${logicDeployedName}: ${prevImpl}`);
+    log(`Current ${proxyName} implementation: ${prevImpl}`);
 
-    if (tx.newlyDeployed || tx.address != prevImpl) {
-        log(`New ${logicDeployedName}: ${tx.address}`);
-        if (!tx.newlyDeployed) {
-            logger.information(
-                `${logicDeployedName} is not re-deployed but not upgraded yet in the proxy`
-            );
-        }
-        const proxyDeployment = await get(proxyDeployedName);
-        await deploymentsSave(logicName, {
-            abi: tx.abi,
-            address: proxy.address, // used to override receipt.contractAddress (useful for proxies)
-            receipt: tx.receipt,
-            bytecode: tx.bytecode,
-            deployedBytecode: tx.deployedBytecode,
-            implementation: tx.address,
+    if (logicDeploymentTx.newlyDeployed || logicDeploymentTx.address != prevImpl) {
+        log(`New ${proxyName} implementation: ${logicImplName} @ ${logicDeploymentTx.address}`);
+        await save(logicName, {
+            address: proxy.address,
+            implementation: logicDeploymentTx.address,
+            abi: logicDeploymentTx.abi,
+            bytecode: logicDeploymentTx.bytecode,
+            deployedBytecode: logicDeploymentTx.deployedBytecode,
+            devdoc: logicDeploymentTx.devdoc,
+            userdoc: logicDeploymentTx.userdoc,
+            storageLayout: logicDeploymentTx.storageLayout,
         });
-        if (hre.network.tags["testnet"] || isOwnerMultisig) {
+
+        const proxyDeployment = await get(proxyName);
+        if ((hre.network.tags["testnet"] || isOwnerMultisig) && !isNewProxy) {
             //multisig is the owner
             const multisigDeployment = await get(multisigName);
             //@todo wrap getting ms tx data into a helper
             let proxyInterface = new ethers.utils.Interface(proxyDeployment.abi);
-            let data = proxyInterface.encodeFunctionData("setImplementation", [tx.address]);
-            log(
-                `Creating multisig tx to set ${logicDeployedName} (${tx.address}) as implementation for ${logicDeployedName} (${proxyDeployment.address}...`
+            let data = proxyInterface.encodeFunctionData("setImplementation", [
+                logicDeploymentTx.address,
+            ]);
+            logger.warn(
+                `Creating multisig tx to set ${logicArtifactName} (${logicDeploymentTx.address}) as implementation for ${proxyName} (${proxyDeployment.address}...`
             );
             log();
             await sendWithMultisig(multisigDeployment.address, proxy.address, data, deployer);
-            log(
+            logger.info(
                 `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<
-                 >>> DON'T PUSH/MERGE ${logicName} TO THE DEVELOPMENT BRANCH REPO UNTIL THE MULTISIG TX SUCCESSFULLY SIGNED & EXECUTED <<<`
+                 >>> DON'T PUSH DEPLOYMENTS TO THE REPO UNTIL THE MULTISIG TX SUCCESSFULLY SIGNED & EXECUTED <<<`
             );
-        } else if (hre.network.tags["mainnet"]) {
-            // log(">>> Create a Bitocracy proposal via a SIP <<<");
-            logger.information(">>> Create a Bitocracy proposal via a SIP <<<");
-            logger.information(
-                `>>> DON'T MERGE ${logicName} TO THE MAIN BRANCH UNTIL THE SIP IS SUCCESSFULLY EXECUTED <<<`
+        } else if (hre.network.tags["mainnet"] && !isNewProxy) {
+            logger.warn(">>> Create a Bitocracy proposal via SIP <<<");
+            logger.error(
+                ">>> DON'T PUSH DEPLOYMENTS TO THE REPO UNTIL THE SIP IS SUCCESSFULLY EXECUTED <<<`"
             );
             // governance is the owner - need a SIP to register
-            // alternatively can use brownie sip_interaction scripts to create proposal
+            // TODO: implementation ; meanwhile use brownie sip_interaction scripts to create proposal
         } else {
-            await proxy.setImplementation(tx.address);
-            logger.information(
+            const proxy = await ethers.getContractAt(proxyName, proxyDeployment.address);
+            await proxy.setImplementation(logicDeploymentTx.address);
+            log(
                 `>>> New implementation ${await proxy.getImplementation()} is set to the proxy <<<`
+            );
+        }
+        if (ethers.utils.isAddress(proxyOwner) && (await proxy.getOwner()) !== proxyOwner) {
+            await proxy.transferOwnership(proxyOwner);
+            logger.success(
+                `Proxy ${proxyName} ownership transferred to ${await proxy.getOwner()}`
             );
         }
         log();

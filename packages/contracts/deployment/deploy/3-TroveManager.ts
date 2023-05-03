@@ -8,9 +8,15 @@ const func: DeployFunction = async (hre) => {
     const { getNamedAccounts } = hre;
     const { deployer } = await getNamedAccounts();
     injectHre(hre);
-    await deployWithCustomProxy(deployer, deploymentName, "UpgradableProxy", false, "", "", [
-        "1209600",
-    ]);
+    await deployWithCustomProxy(
+        deployer,
+        deploymentName,
+        "UpgradableProxy",
+        undefined,
+        undefined,
+        false,
+        ["1209600"]
+    );
 };
 
 func.tags = [deploymentName];
