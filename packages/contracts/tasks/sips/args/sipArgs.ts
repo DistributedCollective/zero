@@ -219,7 +219,7 @@ const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> =>
                 ethers.utils.defaultAbiCoder.encode(["address"], [communityIssuanceAddress]),
             ],
             description:
-                "SIP-0061: Update stability pool subsidies: https://github.com/DistributedCollective/SIPS/blob/7a115c3/SIP-0061.md, sha256: 5b9a77a3225c46de874aba4f30b66af8981bf71cc2e13373f8a44488f6aba8ec",
+                "SIP-0061: Update stability pool subsidies: https://github.com/DistributedCollective/SIPS/blob/cc1a368/SIP-0061.md, sha256: 9c38bb9e30855ef7fc2fba8a3a6b731182577ed8f5d5f5b18773ca528bde532b",
         },
         governorName: "GovernorOwner",
     };
