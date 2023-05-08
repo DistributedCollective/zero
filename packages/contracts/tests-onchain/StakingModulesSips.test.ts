@@ -120,7 +120,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
     describe("Staking Modules Onchain Testing", () => {
         it("SIP-0054 is executable", async () => {
             if (!hre.network.tags["forked"]) return;
-            /*await hre.network.provider.request({
+            await hre.network.provider.request({
                 method: "hardhat_reset",
                 params: [
                     {
@@ -130,7 +130,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
                         },
                     },
                 ],
-            });*/
+            });
 
             const {
                 deployer,

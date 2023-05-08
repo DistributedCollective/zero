@@ -26,6 +26,7 @@ import "hardhat-contract-sizer";
 // import "tasks/sips/createSIP";
 
 import * as dotenv from "dotenv";
+// require("cryptoenv").parse(); //doesn't work with yarn workspaces
 // import "@nomicfoundation/hardhat-chai-matchers";
 // import "@tenderly/hardhat-tenderly";
 import "tsconfig-paths/register";
@@ -274,6 +275,7 @@ const config: HardhatUserConfig = {
             timeout: 100000,
             gasPrice: 66000000,
             blockGasLimit: 6800000,
+            gas: "auto",
             //timeout: 20000, // increase if needed; 20000 is the default value
         },
         rskForkedMainnet: {
@@ -361,6 +363,7 @@ const config: HardhatUserConfig = {
             rskForkedTestnet: [
                 "external/deployments/rskTestnet",
                 "deployment/deployments/rskSovrynTestnet",
+                "deployment/deployments/rskForkedTestnet",
             ],
             rskMainnet: [
                 "external/deployments/rskMainnet",
@@ -370,6 +373,7 @@ const config: HardhatUserConfig = {
             rskForkedMainnet: [
                 "external/deployments/rskMainnet",
                 "deployment/deployments/rskSovrynMainnet",
+                "deployment/deployments/rskForkedMainnet",
             ],
             rskForkedTestnetFlashback: ["external/deployments/rskForkedTestnetFlashback"],
             rskForkedMainnetFlashback: ["external/deployments/rskForkedMainnetFlashback"],

@@ -193,10 +193,45 @@ const sip0054And0055Combo = async (hre: HardhatRuntimeEnvironment): Promise<ISip
     return argsCombo;
 };
 
+const sip0061 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+
+    // @todo for the mainnet deployment first run `yarn deploy --tags 'StabilityPool,CommunityIssuance' --network rskSovrynMainnet`
+    const newStabilityPoolImplementation = (await get("StabilityPool_Implementation")).address;
+
+    const communityIssuanceAddress = (await get("CommunityIssuance_Proxy")).address;
+
+    console.log(`New stability pool implementation: ${newStabilityPoolImplementation}`);
+    console.log(`Community issuance address: ${communityIssuanceAddress}`);
+
+    const stabilityPoolProxyAddress = (await get("StabilityPool_Proxy")).address;
+
+    const args: ISipArgument = {
+        args: {
+            targets: [stabilityPoolProxyAddress, stabilityPoolProxyAddress],
+            values: [0, 0],
+            signatures: ["setImplementation(address)", "setCommunityIssuanceAddress(address)"],
+            data: [
+                ethers.utils.defaultAbiCoder.encode(["address"], [newStabilityPoolImplementation]),
+                ethers.utils.defaultAbiCoder.encode(["address"], [communityIssuanceAddress]),
+            ],
+            description:
+                "SIP-0061: Zero stability pool subsidies: https://github.com/DistributedCollective/SIPS/blob/cc1a368/SIP-0061.md, sha256: 9c38bb9e30855ef7fc2fba8a3a6b731182577ed8f5d5f5b18773ca528bde532b",
+        },
+        governorName: "GovernorOwner",
+    };
+
+    return args;
+};
+
 const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
     sip0054And0055Combo,
+    sip0061,
 };
 
 export default sipArgs;

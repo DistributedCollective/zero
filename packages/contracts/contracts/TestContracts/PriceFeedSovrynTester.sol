@@ -9,7 +9,7 @@ import "../Dependencies/SafeMath.sol";
 * PriceFeed placeholder for testnet and development. The price is simply set manually and saved in a state 
 * variable. The contract does not connect to a live Chainlink price feed. 
 */
-contract PriceFeedSovryn {
+contract PriceFeedSovrynTester {
     using SafeMath for uint256;
 
     mapping(address => mapping(address => uint256)) public prices;

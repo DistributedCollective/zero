@@ -250,7 +250,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     /**  provideToSP():
      *
-     * - Triggers a SOV issuance, based on time passed since the last issuance and total amount of ZUSD is deposited. The SOV issuance is shared between *all* depositors and front ends
+     * - Triggers a SOV issuance, based on time passed since the last issuance and total amount of deposited ZUSD. The SOV issuance is shared between *all* depositors and front ends
      * - Tags the deposit with the provided front end tag param, if it's a new deposit
      * - Sends depositor's accumulated gains (SOV, ETH) to depositor
      * - Sends the tagged front end's accumulated SOV gains to the tagged front end

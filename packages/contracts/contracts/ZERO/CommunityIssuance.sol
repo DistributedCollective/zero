@@ -13,6 +13,7 @@ import "../Interfaces/IStabilityPool.sol";
 
 contract CommunityIssuance is
     CommunityIssuanceStorage,
+    ICommunityIssuance,
     CheckContract,
     BaseMath
 {
@@ -51,7 +52,7 @@ contract CommunityIssuance is
         address _stabilityPoolAddress,
         address _priceFeed,
         uint256 _APR
-    ) external initializer onlyOwner {
+    ) external override initializer onlyOwner {
         checkContract(_sovTokenAddress);
         checkContract(_zusdTokenAddress);
         checkContract(_stabilityPoolAddress);
@@ -77,7 +78,7 @@ contract CommunityIssuance is
      * can only be called by reward manager.
      * @param _APR apr value in basis points.
      */
-    function setAPR(uint256 _APR) external onlyRewardManager {
+    function setAPR(uint256 _APR) external override onlyRewardManager {
         _validateAPR(_APR);
 
         // We need to trigger issueSOV function before set the new APR
@@ -95,7 +96,7 @@ contract CommunityIssuance is
      * can only be called by the owner.
      * @param _priceFeedAddress price feed address.
      */
-    function setPriceFeed(address _priceFeedAddress) external onlyOwner {
+    function setPriceFeed(address _priceFeedAddress) external override onlyOwner {
         checkContract(_priceFeedAddress);
 
         priceFeed = IPriceFeedSovryn(_priceFeedAddress);
@@ -108,7 +109,7 @@ contract CommunityIssuance is
      * can only be called by the owner.
      * @param _rewardManagerAddress reward manager address.
      */
-    function setRewardManager(address _rewardManagerAddress) external onlyOwner {
+    function setRewardManager(address _rewardManagerAddress) external override onlyOwner {
         require(_rewardManagerAddress != address(0), "Account cannot be zero address");
 
         rewardManager = _rewardManagerAddress;
@@ -132,7 +133,7 @@ contract CommunityIssuance is
      *
      * @return total issuance of SOV.
      */
-    function issueSOV(uint256 _totalZUSDDeposits) external returns (uint256) {
+    function issueSOV(uint256 _totalZUSDDeposits) external override returns (uint256) {
         _requireCallerIsStabilityPool();
 
         return _issueSOV(_totalZUSDDeposits);
@@ -156,7 +157,7 @@ contract CommunityIssuance is
         return issuance;
     }
 
-    function sendSOV(address _account, uint256 _SOVamount) public {
+    function sendSOV(address _account, uint256 _SOVamount) public override {
         _requireCallerIsStabilityPool();
 
         bool success = sovToken.transfer(_account, _SOVamount);
