@@ -230,11 +230,36 @@ const zeroFeesUpdateSip0059 = async (hre: HardhatRuntimeEnvironment): Promise<IS
     return args;
 };
 
+const sip0062 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    // Updating REDEMPTION_FEE_FLOOR from 1.9% to 1%
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const zeroBaseParams = await get("LiquityBaseParams");
+    const newRedemptionFeeFloor = ethers.utils.parseEther("0.01");
+    const iSetFeesFloor = new ethers.utils.Interface(["function setRedemptionFeeFloor(uint256)"]);
+    const args: ISipArgument = {
+        args: {
+            targets: [zeroBaseParams.address],
+            values: [0],
+            signatures: ["setRedemptionFeeFloor(uint256)"],
+            data: [iSetFeesFloor._abiCoder.encode(["uint256"], [newRedemptionFeeFloor])],
+            description:
+                "SIP-0062: Zero Fee Floor Update, May 12, Details: https://github.com/DistributedCollective/SIPS/blob/4fed4b8/SIP-0062.md, sha256: 566e57c2e98c848395b1b6b2d3718175ed592014a33e81c305947e5017b5925e",
+        },
+        governorName: "GovernorOwner",
+    };
+
+    return args;
+};
+
 const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
     sip0054And0055Combo,
     zeroFeesUpdateSip0059,
+    sip0062,
 };
 
 export default sipArgs;
