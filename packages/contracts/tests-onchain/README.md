@@ -1,5 +1,7 @@
 # Running onchain tests
 The onchain tests are supposed to run on a forked chains - mainnet or testnet.  
+Pre-requisites: set ACC_QTY node env var to 20 before ruuning hardhat node:   
+`export ACC_QTY=20 && npx hardhat node ... `
 1. `npx hardhat node --fork https://mainnet-dev.sovryn.app/rpc --no-deploy --fork-block-number 5103312`
     where `--fork-block-number` is optional - use to time travel back to a needed state
 2. run the test `npx hardhat test tests-onchain/test-file-name.js --network X`
