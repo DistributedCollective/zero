@@ -108,13 +108,13 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
     let loadFixtureAfterEach = false;
     let snapshot: SnapshotRestorer;
     before(async () => {
-        // await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
+        await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
     });
     beforeEach(async () => {
-        // snapshot = await takeSnapshot();
+        snapshot = await takeSnapshot();
     });
     afterEach(async () => {
-        //await snapshot.restore();
+        await snapshot.restore();
     });
 
     describe("Staking Modules Onchain Testing", () => {
