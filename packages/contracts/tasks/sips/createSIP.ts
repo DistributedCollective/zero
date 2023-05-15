@@ -5,7 +5,7 @@ import sipArgsList, { ISipArgument } from "./args/sipArgs";
 
 const logger = new Logs().showInConsole(true);
 
-task("sips:verify-sip-args", "Verify SIP Args")
+task("sips:verify-agrs", "Verify SIP Args")
     .addParam(
         "argsFunc",
         "SIP args construction function that is located in and exported from tasks/sips/args/sipArgs.ts which returns SIP args"
@@ -15,7 +15,7 @@ task("sips:verify-sip-args", "Verify SIP Args")
         logger.information(sipArgs);
     });
 
-task("sips:create-sip", "Create SIP to Sovryn Governance")
+task("sips:create", "Create SIP to Sovryn Governance")
     .addParam(
         "argsFunc",
         "Function name from tasks/sips/args/sipArgs.ts that returns the sip arguments"
@@ -50,8 +50,7 @@ export const createSIP = async (hre, sipArgs: ISipArgument) => {
         args.description
     );
 
-    /*
-    const tx = await governor.populateTransaction.propose(
+    const txp = await governor.populateTransaction.propose(
         args.targets,
         args.values,
         args.signatures,
@@ -59,8 +58,8 @@ export const createSIP = async (hre, sipArgs: ISipArgument) => {
         args.description
     );
     console.log("Populated SIP tx:");
-    console.log(tx);
-    */
+    console.log(txp);
+
     const receipt = await tx.wait();
     const eventData = governor.interface.parseLog(receipt.logs[0])["args"];
 
