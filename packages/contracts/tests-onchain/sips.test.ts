@@ -25,15 +25,15 @@ const {
     deployments: { createFixture, get },
 } = hre;
 
-import SIPArgs, { ISipArgument } from "../tasks/sips/args/sipArgs";
+import sipArgs, { ISipArgument } from "../tasks/sips/args/sipArgs";
 
 import { createSIP } from "../tasks/sips/createSIP";
 import { GovernorAlpha, LiquityBaseParams } from "types/generated";
 import { ERC20 } from "types/generated/external/artifacts";
 // import { SOV } from "hardhat-deploy/types";
-//import zeroMyntIntegrationSIP from "../../tasks/sips/args/SIPArgs";
-//import zeroMyntIntegrationSIP from "../../tasks/sips/args/SIPArgs";
-//import zeroFeesUpdate from "../../tasks/sips/args/SIPArgs";
+//import zeroMyntIntegrationSIP from "../../tasks/sips/args/sipArgs";
+//import zeroMyntIntegrationSIP from "../../tasks/sips/args/sipArgs";
+//import zeroFeesUpdate from "../../tasks/sips/args/sipArgs";
 
 // const GovernorAlpha = artifacts.require("GovernorAlphaMockup");
 
@@ -185,9 +185,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             // CREATE PROPOSAL AND VERIFY
             console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
-            const sipArgs: ISipArgument = await SIPArgs.zeroMyntIntegrationSIP(hre);
+            const sipArgsMyntIntegration: ISipArgument = await sipArgs.zeroMyntIntegrationSIP(hre);
             console.log("... before SIP creation");
-            await createSIP(hre, sipArgs);
+            await createSIP(hre, sipArgsMyntIntegration);
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
