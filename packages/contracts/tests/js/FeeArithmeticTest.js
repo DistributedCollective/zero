@@ -343,7 +343,7 @@ contract('Fee arithmetic tests', async accounts => {
 
     await deploymentHelper.connectZEROContracts(ZEROContracts);
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, multisig);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
   });
 
   let revertToSnapshot;

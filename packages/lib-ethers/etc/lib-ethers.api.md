@@ -132,8 +132,6 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     // (undocumented)
     getPrice(overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
-    getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal>;
-    // (undocumented)
     getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<StabilityDeposit>;
     // (undocumented)
     getTotal(overrides?: EthersCallOverrides): Promise<Trove>;
@@ -323,6 +321,8 @@ export class PopulatableEthersLiquity implements PopulatableLiquity<EthersTransa
     // (undocumented)
     depositZUSDInStabilityPool(amount: Decimalish, frontendTag?: string, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<StabilityDepositChangeDetails>>;
     // (undocumented)
+    findHints(trove: Trove): Promise<[string, string]>;
+    // (undocumented)
     liquidate(address: string | string[], overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>>;
     // (undocumented)
     liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransactionOverrides): Promise<PopulatedEthersLiquityTransaction<LiquidationDetails>>;
@@ -423,8 +423,6 @@ export class ReadableEthersLiquity implements ReadableLiquity {
     getNumberOfTroves(overrides?: EthersCallOverrides): Promise<number>;
     // (undocumented)
     getPrice(overrides?: EthersCallOverrides): Promise<Decimal>;
-    // (undocumented)
-    getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal>;
     // (undocumented)
     getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<StabilityDeposit>;
     // (undocumented)

@@ -85,16 +85,16 @@ contract StabilityPoolStorage is Ownable, BaseMath {
     mapping(uint128 => mapping(uint128 => uint256)) public epochToScaleToSum;
 
     /*
-     * Similarly, the sum 'G' is used to calculate ZERO gains. During it's lifetime, each deposit d_t earns a ZERO gain of
+     * Similarly, the sum 'G' is used to calculate SOV gains. During it's lifetime, each deposit d_t earns a SOV gain of
      *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when  the deposit was made.
      *
-     *  ZERO reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
-     *  In each case, the ZERO reward is issued (i.e. G is updated), before other state changes are made.
+     *  SOV reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
+     *  In each case, the SOV reward is issued (i.e. G is updated), before other state changes are made.
      */
     mapping(uint128 => mapping(uint128 => uint256)) public epochToScaleToG;
 
-    // Error tracker for the error correction in the ZERO issuance calculation
-    uint256 public lastZEROError;
+    // Error tracker for the error correction in the SOV issuance calculation
+    uint256 public lastSOVError;
     // Error trackers for the error correction in the offset calculation
     uint256 public lastETHError_Offset;
     uint256 public lastZUSDLossError_Offset;

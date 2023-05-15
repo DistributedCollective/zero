@@ -200,11 +200,6 @@ export class EthersLiquity implements ReadableEthersLiquity, TransactableLiquity
     return this._readable.getStabilityDeposit(address, overrides);
   }
 
-  /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getRemainingStabilityPoolZEROReward} */
-  getRemainingStabilityPoolZEROReward(overrides?: EthersCallOverrides): Promise<Decimal> {
-    return this._readable.getRemainingStabilityPoolZEROReward(overrides);
-  }
-
   /** {@inheritDoc @sovryn-zero/lib-base#ReadableLiquity.getZUSDInStabilityPool} */
   getZUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal> {
     return this._readable.getZUSDInStabilityPool(overrides);

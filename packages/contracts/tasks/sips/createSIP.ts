@@ -61,7 +61,6 @@ export const createSIP = async (hre, sipArgs: ISipArgument) => {
     console.log(txp);
 
     const receipt = await tx.wait();
-
     const eventData = governor.interface.parseLog(receipt.logs[0])["args"];
 
     logger.info(eventData);

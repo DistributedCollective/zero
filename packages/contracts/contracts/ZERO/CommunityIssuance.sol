@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IZEROToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
 import "../Dependencies/BaseMath.sol";
 import "../Dependencies/LiquityMath.sol";
@@ -10,6 +9,7 @@ import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
 import "./CommunityIssuanceStorage.sol";
+import "../Interfaces/IStabilityPool.sol";
 
 contract CommunityIssuance is
     CommunityIssuanceStorage,
@@ -21,89 +21,159 @@ contract CommunityIssuance is
 
     // --- Events ---
 
-    event ZEROTokenAddressSet(address _zeroTokenAddress);
-    event CommunityPotAddressSet(address _communityPotAddress);
-    event FundingWalletAddressSet(address _zeroTokenAddress);
-    event TotalZEROIssuedUpdated(uint256 _fundingWalletAddress);
+    event SOVTokenAddressSet(address _sovTokenAddress);
+    event ZUSDTokenAddressSet(address _zusdTokenAddress);
+    event StabilityPoolAddressSet(address _stabilityPoolAddress);
+    event PriceFeedAddressSet(address _priceFeed);
+    event RewardManagerAddressSet(address _rewardManagerAddress);
+    event TotalSOVIssuedUpdated(uint256 _latestSOVIssued);
+    event APRSet(uint256 _APR);
+
+    // --- Modifier ---
+    modifier onlyRewardManager() {
+        require(msg.sender == rewardManager, "Permission::rewardManager: access denied");
+        _;
+    }
 
     // --- Functions ---
 
+    /**
+     * @dev initialization function to set configs.
+     * can only be initialized by owner.
+     * @param _sovTokenAddress sov token address.
+     * @param _zusdTokenAddress zero token address.
+     * @param _stabilityPoolAddress stability pool address.
+     * @param _priceFeed price feed address.
+     * @param _APR apr in basis points.
+     */
     function initialize(
-        address _zeroTokenAddress,
-        address _communityPotAddress,
-        address _fundingWalletAddress
-    ) external override onlyOwner {
-        checkContract(_zeroTokenAddress);
-        checkContract(_communityPotAddress);
+        address _sovTokenAddress,
+        address _zusdTokenAddress,
+        address _stabilityPoolAddress,
+        address _priceFeed,
+        uint256 _APR
+    ) external override initializer onlyOwner {
+        checkContract(_sovTokenAddress);
+        checkContract(_zusdTokenAddress);
+        checkContract(_stabilityPoolAddress);
+        checkContract(_priceFeed);
 
-        zeroToken = IZEROToken(_zeroTokenAddress);
-        communityPotAddress = _communityPotAddress;
-        fundingWalletAddress = _fundingWalletAddress;
+        _validateAPR(_APR);
 
-        emit ZEROTokenAddressSet(_zeroTokenAddress);
-        emit CommunityPotAddressSet(_communityPotAddress);
+        sovToken = IERC20(_sovTokenAddress);
+        zusdToken = IERC20(_zusdTokenAddress);
+        stabilityPoolAddress = _stabilityPoolAddress;
+        priceFeed = IPriceFeedSovryn(_priceFeed);
+        APR = _APR;
+        lastIssuanceTime = block.timestamp;
+
+        emit SOVTokenAddressSet(_sovTokenAddress);
+        emit StabilityPoolAddressSet(_stabilityPoolAddress);
+        emit PriceFeedAddressSet(_priceFeed);
+        emit APRSet(_APR);
     }
 
-    function issueZERO() public override returns (uint256) {
+    /**
+     * @dev setter function to set the APR value in basis points.
+     * can only be called by reward manager.
+     * @param _APR apr value in basis points.
+     */
+    function setAPR(uint256 _APR) external override onlyRewardManager {
+        _validateAPR(_APR);
+
+        // We need to trigger issueSOV function before set the new APR
+        // because otherwise, we will change the APR retrospectively for the time passed since last issuance.
+        uint256 _totalZUSDDeposits = IStabilityPool(stabilityPoolAddress).getTotalZUSDDeposits();
+        _issueSOV(_totalZUSDDeposits);
+
+        APR = _APR;
+
+        emit APRSet(_APR);
+    }
+
+    /**
+     * @dev setter function to set the price feed.
+     * can only be called by the owner.
+     * @param _priceFeedAddress price feed address.
+     */
+    function setPriceFeed(address _priceFeedAddress) external override onlyOwner {
+        checkContract(_priceFeedAddress);
+
+        priceFeed = IPriceFeedSovryn(_priceFeedAddress);
+
+        emit PriceFeedAddressSet(_priceFeedAddress);
+    }
+
+    /**
+     * @dev setter function to set reward manager.
+     * can only be called by the owner.
+     * @param _rewardManagerAddress reward manager address.
+     */
+    function setRewardManager(address _rewardManagerAddress) external override onlyOwner {
+        require(_rewardManagerAddress != address(0), "Account cannot be zero address");
+
+        rewardManager = _rewardManagerAddress;
+
+        emit RewardManagerAddressSet(_rewardManagerAddress);
+    }
+
+    /**
+     * @dev validate the APR value.
+     * the value must be >= 0 <= MAX_BPS (10000)
+     */
+    function _validateAPR(uint256 _APR) private {
+        require(_APR <= MAX_BPS, "APR must be less than MAX_BPS");
+    }
+
+    /**
+     * @dev public function to record SOV issuance
+     * @dev can only be called by stabilityPool contract
+     *
+     * @param _totalZUSDDeposits total zusd deposited to record the latest of sov issuance.
+     *
+     * @return total issuance of SOV.
+     */
+    function issueSOV(uint256 _totalZUSDDeposits) external override returns (uint256) {
         _requireCallerIsStabilityPool();
 
-        uint256 latestTotalZEROIssued = ZEROSupplyCap.mul(_getCumulativeIssuanceFraction()).div(
-            DECIMAL_PRECISION
-        );
-        uint256 issuance = latestTotalZEROIssued.sub(totalZEROIssued);
+        return _issueSOV(_totalZUSDDeposits);
+    }
 
-        totalZEROIssued = latestTotalZEROIssued;
-        emit TotalZEROIssuedUpdated(latestTotalZEROIssued);
+    /**
+     * @dev private function to record SOV issuance
+     *
+     * @param _totalZUSDDeposits total zusd deposited to record the latest of sov issuance.
+     *
+     * @return total issuance of SOV.
+     */
+    function _issueSOV(uint256 _totalZUSDDeposits) internal returns (uint256) {
+        uint256 timePassedSinceLastIssuance = (block.timestamp.sub(lastIssuanceTime));
+        uint256 issuance = _getZUSDToSOV(_totalZUSDDeposits.mul(APR).mul(timePassedSinceLastIssuance).div(365 days).div(MAX_BPS));
+
+        totalSOVIssued = totalSOVIssued + issuance;
+        lastIssuanceTime = block.timestamp;
+        emit TotalSOVIssuedUpdated(totalSOVIssued);
 
         return issuance;
     }
 
-    /** Gets 1-f^t    where: f < 1
-
-    f: issuance factor that determines the shape of the curve
-    t:  time passed since last ZERO issuance event  */
-    function _getCumulativeIssuanceFraction() internal view returns (uint256) {
-        // Get the time passed since deployment
-        uint256 timePassedInMinutes = block.timestamp.sub(deploymentTime).div(
-            SECONDS_IN_ONE_MINUTE
-        );
-
-        // f^t
-        uint256 power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
-
-        //  (1 - f^t)
-        uint256 cumulativeIssuanceFraction = (uint256(DECIMAL_PRECISION).sub(power));
-        assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
-
-        return cumulativeIssuanceFraction;
-    }
-
-    function sendZERO(address _account, uint256 _ZEROamount) public override {
+    function sendSOV(address _account, uint256 _SOVamount) public override {
         _requireCallerIsStabilityPool();
 
-        bool success = zeroToken.transfer(_account, _ZEROamount);
+        bool success = sovToken.transfer(_account, _SOVamount);
         require(success, "Failed to send ZERO");
     }
 
-    /// @notice This function allows depositing tokens into the community pot for the community to use.
-    ///         and configures the deploymentTime if it's the first time this function is called.
-    ///         Allowance must be set before calling this function.
-    ///
-    /// @param _account The account that is depositing the ZERO.
-    /// @param _ZEROamount The amount of ZERO to deposit into the community pot.
-    /// @dev   We are relying upon the fact that ZeroToken is a safe contract and there will be no
-    ///        reentrancy risk.
-    function receiveZero(address _account, uint256 _ZEROamount) external override {
-        require(_account == fundingWalletAddress, "Only the funding wallet can deposit ZERO");
-        require(ZEROSupplyCap == 0, "Community pot already funded");
-
-        require(zeroToken.transferFrom(_account, address(this), _ZEROamount), "Transfer failed");
-
-        ZEROSupplyCap = _ZEROamount;
-        deploymentTime = block.timestamp;
+    function _requireCallerIsStabilityPool() internal view {
+        require(msg.sender == stabilityPoolAddress, "CommunityIssuance: caller is not SP");
     }
 
-    function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == communityPotAddress, "CommunityIssuance: caller is not SP");
+    /**
+     * @dev get the ZUSD to SOV rate conversion. Mostly will be using Sovryn's PriceFeed.
+     * @param _zusdAmount zusd amount to get the rate conversion
+     * @return the total SOV will be returned.
+     */
+    function _getZUSDToSOV(uint256 _zusdAmount) internal view returns (uint256) {
+        return priceFeed.queryReturn(address(zusdToken), address(sovToken), _zusdAmount);
     }
 }

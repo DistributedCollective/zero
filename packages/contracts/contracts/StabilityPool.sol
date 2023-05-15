@@ -128,19 +128,19 @@ import "./StabilityPoolStorage.sol";
  * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
  *
- * --- ZERO ISSUANCE TO STABILITY POOL DEPOSITORS ---
+ * --- SOV ISSUANCE TO STABILITY POOL DEPOSITORS ---
  *
- * An ZERO issuance event occurs at every deposit operation, and every liquidation.
+ * An SOV issuance event occurs at every deposit operation, and every liquidation.
  *
  * Each deposit is tagged with the address of the front end through which it was made.
  *
- * All deposits earn a share of the issued ZERO in proportion to the deposit as a share of total deposits. The ZERO earned
+ * All deposits earn a share of the issued SOV in proportion to the deposit as a share of total deposits. The SOV earned
  * by a given deposit, is split between the depositor and the front end through which the deposit was made, based on the front end's kickbackRate.
  *
  * Please see the system Readme for an overview:
  * https://github.com/liquity/dev/blob/main/README.md#zero-issuance-to-stability-providers
  *
- * We use the same mathematical product-sum approach to track ZERO gains for depositors, where 'G' is the sum corresponding to ZERO gains.
+ * We use the same mathematical product-sum approach to track SOV gains for depositors, where 'G' is the sum corresponding to SOV gains.
  * The product P (and snapshot P_t) is re-used, as the ratio P/P_t tracks a deposit's depletion due to liquidations.
  *
  */
@@ -181,8 +181,8 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     );
 
     event ETHGainWithdrawn(address indexed _depositor, uint256 _ETH, uint256 _ZUSDLoss);
-    event ZEROPaidToDepositor(address indexed _depositor, uint256 _ZERO);
-    event ZEROPaidToFrontEnd(address indexed _frontEnd, uint256 _ZERO);
+    event SOVPaidToDepositor(address indexed _depositor, uint256 _SOV);
+    event SOVPaidToFrontEnd(address indexed _frontEnd, uint256 _SOV);
     event EtherSent(address _to, uint256 _amount);
 
     // --- Contract setters ---
@@ -250,10 +250,10 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
     /**  provideToSP():
      *
-     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     * - Triggers a SOV issuance, based on time passed since the last issuance and total amount of deposited ZUSD. The SOV issuance is shared between *all* depositors and front ends
      * - Tags the deposit with the provided front end tag param, if it's a new deposit
-     * - Sends depositor's accumulated gains (ZERO, ETH) to depositor
-     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     * - Sends depositor's accumulated gains (SOV, ETH) to depositor
+     * - Sends the tagged front end's accumulated SOV gains to the tagged front end
      * - Increases deposit and tagged front end's stake, and takes new snapshots for each.
      */
     function provideToSP(uint256 _amount, address _frontEndTag) external override {
@@ -269,7 +269,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
-        _triggerZEROIssuance(communityIssuanceCached);
+        _triggerSOVIssuance(communityIssuanceCached);
 
         if (initialDeposit == 0) {
             _setFrontEndTag(msg.sender, _frontEndTag);
@@ -278,9 +278,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint256 compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
         uint256 ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
 
-        // First pay out any ZERO gains
+        // First pay out any SOV gains
         address frontEnd = deposits[msg.sender].frontEndTag;
-        _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
+        _payOutSOVGains(communityIssuanceCached, msg.sender, frontEnd);
 
         // Update front end stake
         uint256 compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
@@ -310,15 +310,16 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             address(zusdToken),
             _permitParams
         );
+
         _provideToSP(_ZUSDAmount, ADDRESS_ZERO);
     }
 
     /**  withdrawFromSP():
      *
-     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     * - Triggers a SOV issuance, based on time passed since the last issuance and total amount of ZUSD is deposited. The SOV issuance is shared between *all* depositors and front ends
      * - Removes the deposit's front end tag if it is a full withdrawal
-     * - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
-     * - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     * - Sends all depositor's accumulated gains (SOV, ETH) to depositor
+     * - Sends the tagged front end's accumulated SOV gains to the tagged front end
      * - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
      *
      * If _amount > userDeposit, the user withdraws all of their compounded deposit.
@@ -338,7 +339,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
-        _triggerZEROIssuance(communityIssuanceCached);
+        _triggerSOVIssuance(communityIssuanceCached);
 
         uint256 depositorETHGain = getDepositorETHGain(msg.sender);
 
@@ -346,9 +347,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         uint256 ZUSDtoWithdraw = LiquityMath._min(_amount, compoundedZUSDDeposit);
         uint256 ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
 
-        // First pay out any ZERO gains
+        // First pay out any SOV gains
         address frontEnd = deposits[msg.sender].frontEndTag;
-        _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
+        _payOutSOVGains(communityIssuanceCached, msg.sender, frontEnd);
 
         // Update front end stake
         uint256 compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
@@ -383,9 +384,9 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     /** withdrawETHGainToTrove:
-     * - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-     * - Sends all depositor's ZERO gain to  depositor
-     * - Sends all tagged front end's ZERO gain to the tagged front end
+     * - Triggers a SOV issuance, based on time passed since the last issuance. The SOV issuance is shared between *all* depositors and front ends
+     * - Sends all depositor's SOV gain to  depositor
+     * - Sends all tagged front end's SOV gain to the tagged front end
      * - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
      * - Leaves their compounded deposit in the Stability Pool
      * - Updates snapshots for deposit and tagged front end stake */
@@ -397,16 +398,16 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         ICommunityIssuance communityIssuanceCached = communityIssuance;
 
-        _triggerZEROIssuance(communityIssuanceCached);
+        _triggerSOVIssuance(communityIssuanceCached);
 
         uint256 depositorETHGain = getDepositorETHGain(msg.sender);
 
         uint256 compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
         uint256 ZUSDLoss = initialDeposit.sub(compoundedZUSDDeposit); // Needed only for event log
 
-        // First pay out any ZERO gains
+        // First pay out any SOV gains
         address frontEnd = deposits[msg.sender].frontEndTag;
-        _payOutZEROGains(communityIssuanceCached, msg.sender, frontEnd);
+        _payOutSOVGains(communityIssuanceCached, msg.sender, frontEnd);
 
         // Update front end stake
         uint256 compoundedFrontEndStake = getCompoundedFrontEndStake(frontEnd);
@@ -433,40 +434,40 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         );
     }
 
-    // --- ZERO issuance functions ---
+    // --- SOV issuance functions ---
 
-    function _triggerZEROIssuance(ICommunityIssuance _communityIssuance) internal {
-        uint256 ZEROIssuance = _communityIssuance.issueZERO();
-        _updateG(ZEROIssuance);
+    function _triggerSOVIssuance(ICommunityIssuance _communityIssuance) internal {
+        uint256 SOVIssuance = _communityIssuance.issueSOV(totalZUSDDeposits);
+        _updateG(SOVIssuance);
     }
 
-    function _updateG(uint256 _ZEROIssuance) internal {
+    function _updateG(uint256 _SOVIssuance) internal {
         uint256 totalZUSD = totalZUSDDeposits; // cached to save an SLOAD
         /*
-         * When total deposits is 0, G is not updated. In this case, the ZERO issued can not be obtained by later
+         * When total deposits is 0, G is not updated. In this case, the SOV issued can not be obtained by later
          * depositors - it is missed out on, and remains in the balanceof the CommunityIssuance contract.
          *
          */
-        if (totalZUSD == 0 || _ZEROIssuance == 0) {
+        if (totalZUSD == 0 || _SOVIssuance == 0) {
             return;
         }
 
-        uint256 ZEROPerUnitStaked;
-        ZEROPerUnitStaked = _computeZEROPerUnitStaked(_ZEROIssuance, totalZUSD);
+        uint256 SOVPerUnitStaked;
+        SOVPerUnitStaked = _computeSOVPerUnitStaked(_SOVIssuance, totalZUSD);
 
-        uint256 marginalZEROGain = ZEROPerUnitStaked.mul(P);
+        uint256 marginalSOVGain = SOVPerUnitStaked.mul(P);
         epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale]
-            .add(marginalZEROGain);
+            .add(marginalSOVGain);
 
         emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
     }
 
-    function _computeZEROPerUnitStaked(uint256 _ZEROIssuance, uint256 _totalZUSDDeposits)
+    function _computeSOVPerUnitStaked(uint256 _SOVIssuance, uint256 _totalZUSDDeposits)
         internal
         returns (uint256)
     {
         /*
-         * Calculate the ZERO-per-unit staked.  Division uses a "feedback" error correction, to keep the
+         * Calculate the SOV-per-unit staked.  Division uses a "feedback" error correction, to keep the
          * cumulative error low in the running total G:
          *
          * 1) Form a numerator which compensates for the floor division error that occurred the last time this
@@ -476,12 +477,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
          * 4) Store this error for use in the next correction when this function is called.
          * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
          */
-        uint256 ZERONumerator = _ZEROIssuance.mul(DECIMAL_PRECISION).add(lastZEROError);
+        uint256 SOVNumerator = _SOVIssuance.mul(DECIMAL_PRECISION).add(lastSOVError);
 
-        uint256 ZEROPerUnitStaked = ZERONumerator.div(_totalZUSDDeposits);
-        lastZEROError = ZERONumerator.sub(ZEROPerUnitStaked.mul(_totalZUSDDeposits));
+        uint256 SOVPerUnitStaked = SOVNumerator.div(_totalZUSDDeposits);
+        lastSOVError = SOVNumerator.sub(SOVPerUnitStaked.mul(_totalZUSDDeposits));
 
-        return ZEROPerUnitStaked;
+        return SOVPerUnitStaked;
     }
 
     // --- Liquidation functions ---
@@ -498,7 +499,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             return;
         }
 
-        _triggerZEROIssuance(communityIssuance);
+        _triggerSOVIssuance(communityIssuance);
 
         (
             uint256 ETHGainPerUnitStaked,
@@ -675,12 +676,12 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
     }
 
     /**
-     * Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
-     * Given by the formula:  ZERO = d0 * (G - G(0))/P(0)
+     * Calculate the SOV gain earned by a deposit since its last snapshots were taken.
+     * Given by the formula:  SOV = d0 * (G - G(0))/P(0)
      * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
      * d0 is the last recorded deposit value.
      */
-    function getDepositorZEROGain(address _depositor) public view override returns (uint256) {
+    function getDepositorSOVGain(address _depositor) public view override returns (uint256) {
         uint256 initialDeposit = deposits[_depositor].initialValue;
         if (initialDeposit == 0) {
             return 0;
@@ -699,20 +700,20 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         Snapshots memory snapshots = depositSnapshots[_depositor];
 
-        uint256 ZEROGain = kickbackRate
-            .mul(_getZEROGainFromSnapshots(initialDeposit, snapshots))
+        uint256 SOVGain = kickbackRate
+            .mul(_getSOVGainFromSnapshots(initialDeposit, snapshots))
             .div(DECIMAL_PRECISION);
 
-        return ZEROGain;
+        return SOVGain;
     }
 
     /**
-     * Return the ZERO gain earned by the front end. Given by the formula:  E = D0 * (G - G(0))/P(0)
+     * Return the SOV gain earned by the front end. Given by the formula:  E = D0 * (G - G(0))/P(0)
      * where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
      *
      * D0 is the last recorded value of the front end's total tagged deposits.
      */
-    function getFrontEndZEROGain(address _frontEnd) public view override returns (uint256) {
+    function getFrontEndSOVGain(address _frontEnd) public view override returns (uint256) {
         uint256 frontEndStake = frontEndStakes[_frontEnd];
         if (frontEndStake == 0) {
             return 0;
@@ -723,20 +724,20 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
 
         Snapshots memory snapshots = frontEndSnapshots[_frontEnd];
 
-        uint256 ZEROGain = frontEndShare
-            .mul(_getZEROGainFromSnapshots(frontEndStake, snapshots))
+        uint256 SOVGain = frontEndShare
+            .mul(_getSOVGainFromSnapshots(frontEndStake, snapshots))
             .div(DECIMAL_PRECISION);
-        return ZEROGain;
+        return SOVGain;
     }
 
-    function _getZEROGainFromSnapshots(uint256 initialStake, Snapshots memory snapshots)
+    function _getSOVGainFromSnapshots(uint256 initialStake, Snapshots memory snapshots)
         internal
         view
         returns (uint256)
     {
         /*
-         * Grab the sum 'G' from the epoch at which the stake was made. The ZERO gain may span up to one scale change.
-         * If it does, the second portion of the ZERO gain is scaled by 1e9.
+         * Grab the sum 'G' from the epoch at which the stake was made. The SOV gain may span up to one scale change.
+         * If it does, the second portion of the SOV gain is scaled by 1e9.
          * If the gain spans no scale change, the second portion will be 0.
          */
         uint128 epochSnapshot = snapshots.epoch;
@@ -749,11 +750,11 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
             SCALE_FACTOR
         );
 
-        uint256 ZEROGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(
+        uint256 SOVGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(
             DECIMAL_PRECISION
         );
 
-        return ZEROGain;
+        return SOVGain;
     }
 
     // --- Compounded deposit and compounded front end stake ---
@@ -843,7 +844,7 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         return compoundedStake;
     }
 
-    // --- Sender functions for ZUSD deposit, ETH gains and ZERO gains ---
+    // --- Sender functions for ZUSD deposit, ETH gains and SOV gains ---
 
     /// Transfer the ZUSD tokens from the user to the Stability Pool's address, and update its recorded ZUSD
     function _sendZUSDtoStabilityPool(address _address, uint256 _amount) internal {
@@ -954,22 +955,22 @@ contract StabilityPool is LiquityBase, StabilityPoolStorage, CheckContract, ISta
         emit FrontEndSnapshotUpdated(_frontEnd, currentP, currentG);
     }
 
-    function _payOutZEROGains(
+    function _payOutSOVGains(
         ICommunityIssuance _communityIssuance,
         address _depositor,
         address _frontEnd
     ) internal {
-        // Pay out front end's ZERO gain
+        // Pay out front end's SOV gain
         if (_frontEnd != ADDRESS_ZERO) {
-            uint256 frontEndZEROGain = getFrontEndZEROGain(_frontEnd);
-            _communityIssuance.sendZERO(_frontEnd, frontEndZEROGain);
-            emit ZEROPaidToFrontEnd(_frontEnd, frontEndZEROGain);
+            uint256 frontEndSOVGain = getFrontEndSOVGain(_frontEnd);
+            _communityIssuance.sendSOV(_frontEnd, frontEndSOVGain);
+            emit SOVPaidToFrontEnd(_frontEnd, frontEndSOVGain);
         }
 
-        // Pay out depositor's ZERO gain
-        uint256 depositorZEROGain = getDepositorZEROGain(_depositor);
-        _communityIssuance.sendZERO(_depositor, depositorZEROGain);
-        emit ZEROPaidToDepositor(_depositor, depositorZEROGain);
+        // Pay out depositor's SOV gain
+        uint256 depositorSOVGain = getDepositorSOVGain(_depositor);
+        _communityIssuance.sendSOV(_depositor, depositorSOVGain);
+        emit SOVPaidToDepositor(_depositor, depositorSOVGain);
     }
 
     // --- 'require' functions ---

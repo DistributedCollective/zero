@@ -120,17 +120,6 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
         it("SIP-0054 is executable", async () => {
             if (!hre.network.tags["forked"]) return;
             await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
-            /*await hre.network.provider.request({
-                method: "hardhat_reset",
-                params: [
-                    {
-                        forking: {
-                            jsonRpcUrl: "https://mainnet-dev.sovryn.app/rpc",
-                            blockNumber: 5103227,
-                        },
-                    },
-                ],
-            });*/
 
             const {
                 deployer,

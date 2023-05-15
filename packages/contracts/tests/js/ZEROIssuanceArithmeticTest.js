@@ -9,6 +9,9 @@ const th = testHelpers.TestHelper;
 const timeValues = testHelpers.TimeValues;
 const dec = th.dec;
 const toBN = th.toBN;
+const MAX_BPS = toBN(10000);
+let APR;
+let mockPrice;
 
 
 const logZEROBalanceAndError = (ZEROBalance_A, expectedZEROBalance_A) => {
@@ -19,7 +22,7 @@ const logZEROBalanceAndError = (ZEROBalance_A, expectedZEROBalance_A) => {
   );
 };
 
-const repeatedlyIssueZERO = async (stabilityPool, timeBetweenIssuances, duration) => {
+const repeatedlyIssueSOV = async (stabilityPool, timeBetweenIssuances, duration) => {
   const startTimestamp = th.toBN(await th.getLatestBlockTimestamp(web3));
   let timePassed = 0;
 
@@ -33,6 +36,11 @@ const repeatedlyIssueZERO = async (stabilityPool, timeBetweenIssuances, duration
     timePassed = currentTimestamp.sub(startTimestamp);
   }
 };
+
+const calculateSOVAccrual = (initialLastIssuanceTime, latestLastIssuanceTime, totalZUSDDeposits) => {
+  const decimalNormalizer = toBN(dec(1,18));
+  return totalZUSDDeposits.mul(APR).mul(latestLastIssuanceTime.sub(initialLastIssuanceTime)).div(toBN(31536000)).div(MAX_BPS).mul(mockPrice).div(decimalNormalizer) // 31536000 = 1 Year
+}
 
 contract('ZERO community issuance arithmetic tests', async accounts => {
   let contracts;
@@ -57,15 +65,19 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     zeroToken = ZEROContracts.zeroToken;
     communityIssuanceTester = ZEROContracts.communityIssuance;
 
+    APR = toBN(300);
+    mockPrice = toBN(dec(105, 18));
+
     await deploymentHelper.connectZEROContracts(ZEROContracts);
     await deploymentHelper.connectCoreContracts(contracts, ZEROContracts);
-    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts, owner);
+    await deploymentHelper.connectZEROContractsToCore(ZEROContracts, contracts);
 
     await zeroToken.unprotectedMint(owner, toBN(dec(30, 24)));
     await zeroToken.approve(communityIssuanceTester.address, toBN(dec(30, 24)));
-    await communityIssuanceTester.receiveZero(owner, toBN(dec(30, 24)));
-
-
+    // await communityIssuanceTester.receiveZero(owner, toBN(dec(30, 24)));
+    await communityIssuanceTester.setRewardManager(owner);
+    await communityIssuanceTester.setAPR(APR.toString()); // 3%
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
   });
 
   let revertToSnapshot;
@@ -80,704 +92,449 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
   });
 
   // Accuracy tests
-  it("getCumulativeIssuanceFraction(): fraction doesn't increase if less than a minute has passed", async () => {
+  it("correct state after a week", async () => {
+    const timeAccrual = timeValues.MINUTES_IN_ONE_WEEK;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
+
+    await assert.equal(initialTotalSOVIssued, 0);
+
     // progress time 1 week 
-    await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider);
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    await communityIssuanceTester.unprotectedIssueZERO();
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    const issuanceFractionBefore = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.isTrue(issuanceFractionBefore.gt(th.toBN('0')));
-    console.log(`issuance fraction before: ${issuanceFractionBefore}`);
-    const blockTimestampBefore = th.toBN(await th.getLatestBlockTimestamp(web3));
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
 
-    // progress time 10 seconds
-    await th.fastForwardTime(10, web3.currentProvider);
-
-    const issuanceFractionAfter = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const blockTimestampAfter = th.toBN(await th.getLatestBlockTimestamp(web3));
-
-    const timestampDiff = blockTimestampAfter.sub(blockTimestampBefore);
-    // check blockTimestamp diff < 60s
-    assert.isTrue(timestampDiff.lt(th.toBN(60)));
-
-    console.log(`issuance fraction after: ${issuanceFractionBefore}`);
-    assert.isTrue(issuanceFractionBefore.eq(issuanceFractionAfter));
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
-
-  /*--- Issuance tests for "Yearly halving" schedule.
-
-  Total issuance year 1: 50%, year 2: 75%, year 3:   0.875, etc   
-  
-  Error tolerance: 1e-9
-  
-  ---*/
 
   // using the result of this to advance time by the desired amount from the deployment time, whether or not some extra time has passed in the meanwhile
   const getDuration = async (expectedDuration) => {
-    const deploymentTime = (await communityIssuanceTester.deploymentTime()).toNumber();
+    const deploymentTime = (await communityIssuanceTester.lastIssuanceTime()).toNumber();
     const currentTime = await th.getLatestBlockTimestamp(web3);
     const duration = Math.max(expectedDuration - (currentTime - deploymentTime), 0);
 
     return duration;
   };
 
-  it("Cumulative issuance fraction is 0.0000013 after a minute", async () => {
-    // console.log(`supply cap: ${await communityIssuanceTester.ZEROSupplyCap()}`)
+  it("correct state after a minute", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_MINUTE;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MINUTE);
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '1318772305025';
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 100000000);
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.000079 after an hour", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after an hour", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_HOUR;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_HOUR);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '79123260066094';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.0019 after a day", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after a day", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_DAY;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_DAY);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '1897231348441660';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.013 after a week", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after a week", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_WEEK;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_WEEK);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '13205268780628400';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.055 after a month", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after a month", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_MONTH;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '55378538087966600';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.16 after 3 months", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 3 months", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_MONTH * 3;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 3);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '157105100752037000';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.29 after 6 months", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 6 months", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_MONTH * 6;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 6);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = 289528188821766000;
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.5 after a year", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after a year", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = dec(5, 17);
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();    
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.75 after 2 years", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 2 years", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR * 2;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 2);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = dec(75, 16);
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();    
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.875 after 3 years", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 3 years", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR * 3;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 3);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = dec(875, 15);
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.9375 after 4 years", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 4 years", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR * 4;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 4);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '937500000000000000';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.999 after 10 years", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 10 years", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR * 10;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 10);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '999023437500000000';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.999999 after 20 years", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 20 years", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR * 20;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 20);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '999999046325684000';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
 
-  it("Cumulative issuance fraction is 0.999999999 after 30 years", async () => {
-    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    assert.equal(initialIssuanceFraction, 0);
+  it("correct state after 30 years", async () => {
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR * 30;
+    const initialLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(30, 18))
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await assert.equal(initialTotalSOVIssued, 0);
 
-    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
-    const expectedIssuanceFraction = '999999999068677000';
+    // progress time 1 week 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    issuanceFraction: ${issuanceFraction},  
-    //    expectedIssuanceFraction: ${expectedIssuanceFraction},
-    //    abs. error: ${absError}`
-    // )
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
+    const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+
+    await assert.isTrue(latestLastIssuanceTime.gte(initialLastIssuanceTime.add(toBN(timeAccrual))));
+    await assert.equal(latestTotalSOVIssued.toString(), calculateSOVAccrual(initialLastIssuanceTime, latestLastIssuanceTime, zusdDeposits).toString())
   });
-
-  // --- Token issuance for yearly halving ---
 
   // Error tolerance: 1e-3, i.e. 1/1000th of a token
+  it("should issue the expected SOV based on pre-defined params (1)", async () => {
+    /**
+     * Total ZUSD Deposit = 100k
+     * APR 5% in 1 year
+     * ZUSD <> SOV price = 1:1
+     * Expect to return ~5k of SOV after a year
+     */
+    const APR = toBN(500);
+    const mockPrice = toBN(dec(1, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(100, 21))
 
-  it("Total ZERO tokens issued is 39.56 after a minute", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MINUTE);
+    await assert.equal(initialTotalSOVIssued, 0);
+
     // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    // 30,000,000 * (1 – 0.5 ^ 0.00000190258) where 1 minute is 0.00000190258 years 
-    const expectedTotalZEROIssued = '39563012795800000000';
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
+    // const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '5000000000000000000000';
 
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
   });
 
-  it("Total ZERO tokens issued is 2,373.69 after an hour", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
+  // Error tolerance: 1e-3, i.e. 1/1000th of a token
+  it("should issue the expected SOV based on pre-defined params (2)", async () => {
+    /**
+     * Total ZUSD Deposit = 50k
+     * APR 10% in 1 year
+     * ZUSD <> SOV price = 1:2
+     * Expect to return ~10k of SOV after a year
+     */
+    const APR = toBN(1000);
+    const mockPrice = toBN(dec(2, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(50, 21))
 
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_HOUR);
+    await assert.equal(initialTotalSOVIssued, 0);
+
     // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '2373697801938210000000';
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
+    // const latestLastIssuanceTime = await communityIssuanceTester.lastIssuanceTime();
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '10000000000000000000000';
 
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
   });
 
-  it("Total ZERO tokens issued is 56,916.94 after a day", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
+  it("should issue the expected SOV based on pre-defined params (3)", async () => {
+    /**
+     * Total ZUSD Deposit = 100k
+     * APR 5% in 1 year
+     * ZUSD <> SOV price = 1:1
+     * Expect to return ~2.5k of SOV after half a year
+     */
+    const APR = toBN(500);
+    const mockPrice = toBN(dec(1, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR / 2;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(100, 21))
 
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_DAY);
+    await assert.equal(initialTotalSOVIssued, 0);
+
     // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '56916940452158250000000';
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    console.log(
-      `time since deployment: ${duration}, 
-       totalZEROIssued: ${totalZEROIssued},  
-       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-       abs. error: ${absError}`
-    );
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '2500000000000000000000';
 
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
   });
 
-  it("Total ZERO tokens issued is 396,158.063411 after a week", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
+  it("should issue the expected SOV based on pre-defined params with APR updates", async () => {
+    /**
+     * Total ZUSD Deposit = 100k
+     * APR 5%, after half a year, set the APR to 10%
+     * ZUSD <> SOV price = 1:1
+     * Expect to return ~2.5k of SOV after half a year + ~5.5k of SOV the rest half of year
+     */
+    let APR = toBN(500);
+    const mockPrice = toBN(dec(1, 18));
+    const timeAccrual = timeValues.SECONDS_IN_ONE_YEAR / 2;
+    const initialTotalSOVIssued = await communityIssuanceTester.totalSOVIssued()
+    const zusdDeposits = toBN(dec(100, 21))
 
+    await communityIssuanceTester.setAPR(APR);
+    await contracts.priceFeedSovryn.setPrice(contracts.zusdToken.address, zeroToken.address, mockPrice.toString());
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_WEEK);
+    await assert.equal(initialTotalSOVIssued, 0);
+
     // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '396158063411293080000000';
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    console.log(
-      `time since deployment: ${duration}, 
-       totalZEROIssued: ${totalZEROIssued},  
-       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-       abs. error: ${absError}`
-    );
+    // Update APR to 10%
+    APR = toBN(1000);
+    await communityIssuanceTester.setAPR(APR);
 
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
+    await assert.isTrue(initialTotalSOVIssued.gte('0'));
 
-  it("Total ZERO tokens issued is 1,661,356.14260 after a month", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
+    // Fast forward time 
+    await th.fastForwardTime(timeAccrual, web3.currentProvider);
 
+    // Issue SOV
+    await communityIssuanceTester.unprotectedIssueSOV(zusdDeposits);
 
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
+    const latestTotalSOVIssued = await communityIssuanceTester.totalSOVIssued();
+    const expectedTotalSOVIssued = '7500000000000000000000';
 
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    // 35,000,000 * (1 – 0.5 ^ (30 / 365)) where 1 month is 30 days
-    const expectedTotalZEROIssued = '1661356142607978180000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    console.log(
-      `time since deployment: ${duration}, 
-       totalZEROIssued: ${totalZEROIssued},  
-       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-       abs. error: ${absError}`
-    );
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 4,713,153.02247 after 3 months", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 3);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    // 35,000,000 * (1 – 0.5 ^ (90 / 365)) where 1 month is 30 days
-    const expectedTotalZEROIssued = '4713153022478071950000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    console.log(
-      `time since deployment: ${duration}, 
-       totalZEROIssued: ${totalZEROIssued},  
-       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-       abs. error: ${absError}`
-    );
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 8,685,845.6645 after 6 months", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 6);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '8685845664513004410000000';
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    console.log(
-      `time since deployment: ${duration}, 
-       totalZEROIssued: ${totalZEROIssued},  
-       expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-       abs. error: ${absError}`
-    );
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 15,000,000 after a year", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '15000000000000000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 22,500,000 after 2 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 2);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '22500000000000000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 26,250,000 after 3 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 3);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '26250000000000000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 28,125,000 after 4 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 4);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '28125000000000000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 29,970,703.125 after 10 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 10);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '29970703125000000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 29,999,971.3898 after 20 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 20);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '29999971389800000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
-  });
-
-  it("Total ZERO tokens issued is 29,999,999.9721 after 30 years", async () => {
-    const initialIssuance = await communityIssuanceTester.totalZEROIssued();
-    assert.equal(initialIssuance, 0);
-
-    const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30);
-    // Fast forward time
-    await th.fastForwardTime(duration, web3.currentProvider);
-
-    // Issue ZERO
-    await communityIssuanceTester.unprotectedIssueZERO();
-    const totalZEROIssued = await communityIssuanceTester.totalZEROIssued();
-    const expectedTotalZEROIssued = '29999999972100000000000000';
-
-    const absError = th.toBN(expectedTotalZEROIssued).sub(totalZEROIssued);
-    // console.log(
-    //   `time since deployment: ${duration}, 
-    //    totalZEROIssued: ${totalZEROIssued},  
-    //    expectedTotalZEROIssued: ${expectedTotalZEROIssued},
-    //    abs. error: ${absError}`
-    // )
-
-    assert.isAtMost(th.getDifference(totalZEROIssued, expectedTotalZEROIssued), 1000000000000000);
+    assert.isAtMost(th.getDifference(latestTotalSOVIssued, expectedTotalSOVIssued), 1000000000000000);
   });
 
   /* ---  
@@ -800,7 +557,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_YEAR;
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30);
 
-    await repeatedlyIssueZERO(stabilityPool, timeBetweenIssuances, duration);
+    await repeatedlyIssueSOV(stabilityPool, timeBetweenIssuances, duration);
 
     // Depositor withdraws their deposit and accumulated ZERO
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice });
@@ -835,7 +592,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_DAY;
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30);
 
-    await repeatedlyIssueZERO(stabilityPool, timeBetweenIssuances, duration);
+    await repeatedlyIssueSOV(stabilityPool, timeBetweenIssuances, duration);
 
     // Depositor withdraws their deposit and accumulated ZERO
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice });
@@ -869,7 +626,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_MINUTE;
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH);
 
-    await repeatedlyIssueZERO(stabilityPool, timeBetweenIssuances, duration);
+    await repeatedlyIssueSOV(stabilityPool, timeBetweenIssuances, duration);
 
     // Depositor withdraws their deposit and accumulated ZERO
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice });
@@ -904,7 +661,7 @@ contract('ZERO community issuance arithmetic tests', async accounts => {
     const timeBetweenIssuances = timeValues.SECONDS_IN_ONE_MINUTE;
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR);
 
-    await repeatedlyIssueZERO(stabilityPool, timeBetweenIssuances, duration);
+    await repeatedlyIssueSOV(stabilityPool, timeBetweenIssuances, duration);
 
     // Depositor withdraws their deposit and accumulated ZERO
     await stabilityPool.withdrawFromSP(dec(1, 18), { from: alice });

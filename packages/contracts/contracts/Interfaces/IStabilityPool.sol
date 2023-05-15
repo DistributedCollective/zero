@@ -24,13 +24,13 @@ import "../Dependencies/Mynt/IMassetManager.sol";
  * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / ETH gain derivations:
  * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
- * --- ZERO ISSUANCE TO STABILITY POOL DEPOSITORS ---
+ * --- SOV ISSUANCE TO STABILITY POOL DEPOSITORS ---
  *
- * An ZERO issuance event occurs at every deposit operation, and every liquidation.
+ * An SOV issuance event occurs at every deposit operation, and every liquidation.
  *
  * Each deposit is tagged with the address of the front end through which it was made.
  *
- * All deposits earn a share of the issued ZERO in proportion to the deposit as a share of total deposits. The ZERO earned
+ * All deposits earn a share of the issued SOV in proportion to the deposit as a share of total deposits. The SOV earned
  * by a given deposit, is split between the depositor and the front end through which the deposit was made, based on the front end's kickbackRate.
  *
  * Please see the system Readme for an overview:
@@ -70,8 +70,8 @@ interface IStabilityPool {
     );
 
     event ETHGainWithdrawn(address indexed _depositor, uint _ETH, uint _ZUSDLoss);
-    event ZEROPaidToDepositor(address indexed _depositor, uint _ZERO);
-    event ZEROPaidToFrontEnd(address indexed _frontEnd, uint _ZERO);
+    event SOVPaidToDepositor(address indexed _depositor, uint _SOV);
+    event SOVPaidToFrontEnd(address indexed _frontEnd, uint _SOV);
     event EtherSent(address _to, uint _amount);
 
     event WithdrawFromSpAndConvertToDLLR(
@@ -111,13 +111,13 @@ interface IStabilityPool {
      *  - Sender is not a registered frontend
      *  - _amount is not zero
      *  ---
-     *  - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     *  - Triggers a SOV issuance, based on time passed since the last issuance. The SOV issuance is shared between *all* depositors and front ends
      *  - Tags the deposit with the provided front end tag param, if it's a new deposit
-     *  - Sends depositor's accumulated gains (ZERO, ETH) to depositor
-     *  - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     *  - Sends depositor's accumulated gains (SOV, ETH) to depositor
+     *  - Sends the tagged front end's accumulated SOV gains to the tagged front end
      *  - Increases deposit and tagged front end's stake, and takes new snapshots for each.
      * @param _amount amount to provide
-     * @param _frontEndTag frontend address to receive accumulated ZERO gains
+     * @param _frontEndTag frontend address to receive accumulated SOV gains
      */
     function provideToSP(uint _amount, address _frontEndTag) external;
 
@@ -126,10 +126,10 @@ interface IStabilityPool {
      *    - _amount is zero or there are no under collateralized troves left in the system
      *    - User has a non zero deposit
      *    ---
-     *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
+     *    - Triggers a SOV issuance, based on time passed since the last issuance. The SOV issuance is shared between *all* depositors and front ends
      *    - Removes the deposit's front end tag if it is a full withdrawal
-     *    - Sends all depositor's accumulated gains (ZERO, ETH) to depositor
-     *    - Sends the tagged front end's accumulated ZERO gains to the tagged front end
+     *    - Sends all depositor's accumulated gains (SOV, ETH) to depositor
+     *    - Sends the tagged front end's accumulated SOV gains to the tagged front end
      *    - Decreases deposit and tagged front end's stake, and takes new snapshots for each.
      *
      *    If _amount > userDeposit, the user withdraws all of their compounded deposit.
@@ -143,9 +143,9 @@ interface IStabilityPool {
      *    - User has an open trove
      *    - User has some ETH gain
      *    ---
-     *    - Triggers a ZERO issuance, based on time passed since the last issuance. The ZERO issuance is shared between *all* depositors and front ends
-     *    - Sends all depositor's ZERO gain to  depositor
-     *    - Sends all tagged front end's ZERO gain to the tagged front end
+     *    - Triggers a SOV issuance, based on time passed since the last issuance. The SOV issuance is shared between *all* depositors and front ends
+     *    - Sends all depositor's SOV gain to  depositor
+     *    - Sends all tagged front end's SOV gain to the tagged front end
      *    - Transfers the depositor's entire ETH gain from the Stability Pool to the caller's trove
      *    - Leaves their compounded deposit in the Stability Pool
      *    - Updates snapshots for deposit and tagged front end stake
@@ -196,20 +196,20 @@ interface IStabilityPool {
     function getDepositorETHGain(address _depositor) external view returns (uint);
 
     /**
-     * @notice Calculate the ZERO gain earned by a deposit since its last snapshots were taken.
+     * @notice Calculate the SOV gain earned by a deposit since its last snapshots were taken.
      *    If not tagged with a front end, the depositor gets a 100% cut of what their deposit earned.
      *    Otherwise, their cut of the deposit's earnings is equal to the kickbackRate, set by the front end through
      *    which they made their deposit.
      * @param _depositor address to calculate ETH gain
-     * @return ZERO gain from given depositor
+     * @return SOV gain from given depositor
      */
-    function getDepositorZEROGain(address _depositor) external view returns (uint);
+    function getDepositorSOVGain(address _depositor) external view returns (uint);
 
     /**
      * @param _frontEnd front end address
-     * @return the ZERO gain earned by the front end.
+     * @return the SOV gain earned by the front end.
      */
-    function getFrontEndZEROGain(address _frontEnd) external view returns (uint);
+    function getFrontEndSOVGain(address _frontEnd) external view returns (uint);
 
     /**
      * @param _depositor depositor address

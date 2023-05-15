@@ -72,9 +72,6 @@ export interface LiquityStoreBaseState {
   /** User's stability deposit. */
   stabilityDeposit: StabilityDeposit;
 
-  /** Remaining ZERO that will be collectively rewarded to stability depositors. */
-  remainingStabilityPoolZEROReward: Decimal;
-
   /** @internal */
   _feesInNormalMode: Fees;
 
@@ -395,12 +392,6 @@ export abstract class LiquityStore<T = unknown> {
         "stabilityDeposit",
         baseState.stabilityDeposit,
         baseStateUpdate.stabilityDeposit
-      ),
-
-      remainingStabilityPoolZEROReward: this._silentlyUpdateIfChanged(
-        eq,
-        baseState.remainingStabilityPoolZEROReward,
-        baseStateUpdate.remainingStabilityPoolZEROReward
       ),
 
       _feesInNormalMode: this._silentlyUpdateIfChanged(

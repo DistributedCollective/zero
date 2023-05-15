@@ -4,6 +4,7 @@ const LiquityBaseParams = artifacts.require("./LiquityBaseParams.sol");
 const TroveManagerRedeemOps = artifacts.require("./Dependencies/TroveManagerRedeemOps.sol");
 const TroveManager = artifacts.require("./TroveManager.sol");
 const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
+const PriceFeedSovryn = artifacts.require("./PriceFeedSovrynTester.sol");
 const ZUSDToken = artifacts.require("./ZUSDToken.sol");
 const ActivePool = artifacts.require("./ActivePool.sol");
 const DefaultPool = artifacts.require("./DefaultPool.sol");
@@ -99,6 +100,7 @@ class DeploymentHelper {
 
   static async deployLiquityCoreHardhat() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
+    const priceFeedSovryn = await PriceFeedSovryn.new();
     const sortedTroves = await SortedTroves.new();
     const liquityBaseParams = await LiquityBaseParams.new();
     const troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
@@ -123,6 +125,7 @@ class DeploymentHelper {
     ZUSDToken.setAsDeployed(zusdToken);
     DefaultPool.setAsDeployed(defaultPool);
     PriceFeedTestnet.setAsDeployed(priceFeedTestnet);
+    PriceFeedSovryn.setAsDeployed(priceFeedSovryn);
     SortedTroves.setAsDeployed(sortedTroves);
     LiquityBaseParams.setAsDeployed(liquityBaseParams);
     TroveManagerRedeemOps.setAsDeployed(troveManagerRedeemOps);
@@ -139,6 +142,7 @@ class DeploymentHelper {
 
     const coreContracts = {
       priceFeedTestnet,
+      priceFeedSovryn,
       zusdToken,
       sortedTroves,
       liquityBaseParams,
@@ -164,6 +168,7 @@ class DeploymentHelper {
     // Contract without testers (yet)
     testerContracts.liquityBaseParams = await LiquityBaseParams.new();
     testerContracts.priceFeedTestnet = await PriceFeedTestnet.new();
+    testerContracts.priceFeedSovryn = await PriceFeedSovryn.new();
     testerContracts.sortedTroves = await SortedTroves.new();
     // Actual tester contracts
     testerContracts.communityIssuance = await CommunityIssuanceTester.new();
@@ -256,6 +261,7 @@ class DeploymentHelper {
 
   static async deployLiquityCoreTruffle() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
+    const priceFeedSovryn = await PriceFeedSovryn.new();
     const sortedTroves = await SortedTroves.new();
     const liquityBaseParams = await LiquityBaseParams.new();
     const troveManagerRedeemOps = await TroveManagerRedeemOps.new(TWO_WEEKS);
@@ -278,6 +284,7 @@ class DeploymentHelper {
     await liquityBaseParams.initialize();
     const coreContracts = {
       priceFeedTestnet,
+      priceFeedSovryn,
       zusdToken,
       sortedTroves,
       liquityBaseParams,
@@ -511,7 +518,7 @@ class DeploymentHelper {
     // FIXME
   }
 
-  static async connectZEROContractsToCore(ZEROContracts, coreContracts, walletAddress) {
+  static async connectZEROContractsToCore(ZEROContracts, coreContracts, apr = 0) {
     await ZEROContracts.zeroStaking.setAddresses(
       ZEROContracts.zeroToken.address,
       coreContracts.zusdToken.address,
@@ -519,10 +526,14 @@ class DeploymentHelper {
       coreContracts.activePool.address
     );
 
+    console.log(coreContracts.priceFeedSovryn.address);
+
     await ZEROContracts.communityIssuance.initialize(
       ZEROContracts.zeroToken.address,
+      coreContracts.zusdToken.address,
       coreContracts.stabilityPool.address,
-      walletAddress
+      coreContracts.priceFeedSovryn.address,
+      apr
     );
   }
 }

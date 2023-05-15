@@ -301,6 +301,44 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_depositor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_SOV",
+        "type": "uint256"
+      }
+    ],
+    "name": "SOVPaidToDepositor",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_frontEnd",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_SOV",
+        "type": "uint256"
+      }
+    ],
+    "name": "SOVPaidToFrontEnd",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "uint256",
         "name": "_S",
@@ -429,44 +467,6 @@
       }
     ],
     "name": "WithdrawFromSpAndConvertToDLLR",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_depositor",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_ZERO",
-        "type": "uint256"
-      }
-    ],
-    "name": "ZEROPaidToDepositor",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_frontEnd",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_ZERO",
-        "type": "uint256"
-      }
-    ],
-    "name": "ZEROPaidToFrontEnd",
     "type": "event"
   },
   {
@@ -909,7 +909,7 @@
         "type": "address"
       }
     ],
-    "name": "getDepositorZEROGain",
+    "name": "getDepositorSOVGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -967,7 +967,7 @@
         "type": "address"
       }
     ],
-    "name": "getFrontEndZEROGain",
+    "name": "getFrontEndSOVGain",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1019,7 +1019,7 @@
   },
   {
     "inputs": [],
-    "name": "lastZEROError",
+    "name": "lastSOVError",
     "outputs": [
       {
         "internalType": "uint256",

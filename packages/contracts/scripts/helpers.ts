@@ -186,6 +186,7 @@ const deployWithCustomProxy = async (
     const logicDeployedName = logicName + "_Implementation";
 
     let proxyDeployment = await getOrNull(proxyDeployedName);
+    let isNewProxy = false;
     if (!proxyDeployment) {
         await deploy(proxyDeployedName, {
             contract: proxyName,
@@ -193,13 +194,7 @@ const deployWithCustomProxy = async (
             args: proxyArgs,
             log: true,
         });
-    }
-    const proxy = await ethers.getContract(proxyDeployedName);
-    if (ethers.utils.isAddress(proxyOwner) && (await proxy.getOwner()) !== proxyOwner) {
-        await proxy.transferOwnership(proxyOwner);
-        logger.success(
-            `Proxy ${proxyDeployedName} ownership transferred to ${await proxy.getOwner()}`
-        );
+        isNewProxy = true;
     }
 
     const tx = await deploy(logicDeployedName, {
@@ -209,6 +204,7 @@ const deployWithCustomProxy = async (
         log: true,
     });
 
+    const proxy = await ethers.getContract(proxyDeployedName);
     const prevImpl = await proxy.getImplementation();
     log(`Current ${logicDeployedName}: ${prevImpl}`);
 
@@ -228,7 +224,7 @@ const deployWithCustomProxy = async (
             deployedBytecode: tx.deployedBytecode,
             implementation: tx.address,
         });
-        if (hre.network.tags["testnet"] || isOwnerMultisig) {
+        if ((hre.network.tags["testnet"] || isOwnerMultisig) && !isNewProxy) {
             //multisig is the owner
             const multisigDeployment = await get(multisigName);
             //@todo wrap getting ms tx data into a helper
@@ -243,7 +239,7 @@ const deployWithCustomProxy = async (
                 `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<
                  >>> DON'T PUSH/MERGE ${logicName} TO THE DEVELOPMENT BRANCH REPO UNTIL THE MULTISIG TX SUCCESSFULLY SIGNED & EXECUTED <<<`
             );
-        } else if (hre.network.tags["mainnet"]) {
+        } else if (hre.network.tags["mainnet"] && !isNewProxy) {
             // log(">>> Create a Bitocracy proposal via a SIP <<<");
             logger.information(">>> Create a Bitocracy proposal via a SIP <<<");
             logger.information(
@@ -255,6 +251,12 @@ const deployWithCustomProxy = async (
             await proxy.setImplementation(tx.address);
             logger.information(
                 `>>> New implementation ${await proxy.getImplementation()} is set to the proxy <<<`
+            );
+        }
+        if (ethers.utils.isAddress(proxyOwner) && (await proxy.getOwner()) !== proxyOwner) {
+            await proxy.transferOwnership(proxyOwner);
+            logger.success(
+                `Proxy ${proxyDeployedName} ownership transferred to ${await proxy.getOwner()}`
             );
         }
         log();
