@@ -193,10 +193,73 @@ const sip0054And0055Combo = async (hre: HardhatRuntimeEnvironment): Promise<ISip
     return argsCombo;
 };
 
+const zeroFeesUpdateSip0059 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const zeroBaseParams = await get("LiquityBaseParams");
+    const newBorrowingFeeFloorValue = ethers.utils.parseEther("0.05");
+    const newMaxBorrowingFee = ethers.utils.parseEther("0.075");
+    const newRedemptionFeeFloor = ethers.utils.parseEther("0.019");
+    const iSetFeesFloor = new ethers.utils.Interface([
+        "function setBorrowingFeeFloor(uint256)",
+        "function setMaxBorrowingFee(uint256)",
+        "function setRedemptionFeeFloor(uint256)",
+    ]);
+    const args: ISipArgument = {
+        args: {
+            targets: [zeroBaseParams.address, zeroBaseParams.address, zeroBaseParams.address],
+            values: [0, 0, 0],
+            signatures: [
+                "setBorrowingFeeFloor(uint256)",
+                "setMaxBorrowingFee(uint256)",
+                "setRedemptionFeeFloor(uint256)",
+            ],
+            data: [
+                iSetFeesFloor._abiCoder.encode(["uint256"], [newBorrowingFeeFloorValue]),
+                iSetFeesFloor._abiCoder.encode(["uint256"], [newMaxBorrowingFee]),
+                iSetFeesFloor._abiCoder.encode(["uint256"], [newRedemptionFeeFloor]),
+            ],
+            description:
+                "SIP-0059: Zero Fee Floor Update: March 22, Details: https://github.com/DistributedCollective/SIPS/blob/b22933f/SIP-0059.md, sha256: cf432a01b302b0c21b35f55c423d36233cf2f536a96a4d6cc97b2c5b5bb1fbda",
+        },
+        governorName: "GovernorOwner",
+    };
+
+    return args;
+};
+
+const sip0062 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    // Updating REDEMPTION_FEE_FLOOR from 1.9% to 1%
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const zeroBaseParams = await get("LiquityBaseParams");
+    const newRedemptionFeeFloor = ethers.utils.parseEther("0.01");
+    const iSetFeesFloor = new ethers.utils.Interface(["function setRedemptionFeeFloor(uint256)"]);
+    const args: ISipArgument = {
+        args: {
+            targets: [zeroBaseParams.address],
+            values: [0],
+            signatures: ["setRedemptionFeeFloor(uint256)"],
+            data: [iSetFeesFloor._abiCoder.encode(["uint256"], [newRedemptionFeeFloor])],
+            description:
+                "SIP-0062: Zero Fee Floor Update, May 12, Details: https://github.com/DistributedCollective/SIPS/blob/4fed4b8/SIP-0062.md, sha256: 566e57c2e98c848395b1b6b2d3718175ed592014a33e81c305947e5017b5925e",
+        },
+        governorName: "GovernorOwner",
+    };
+
+    return args;
+};
+
 const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
     sip0054And0055Combo,
+    zeroFeesUpdateSip0059,
+    sip0062,
 };
 
 export default sipArgs;
