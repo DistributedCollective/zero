@@ -1,6 +1,6 @@
 require("cryptoenv").parse();
 import { HardhatNetworkAccountsUserConfig, HardhatUserConfig } from "hardhat/types";
-import { task, /*HardhatUserConfig,*/ } from "hardhat/config";
+import { task /*HardhatUserConfig,*/ } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 
 import "@nomicfoundation/hardhat-toolbox";
@@ -41,6 +41,16 @@ import "@typechain/ethers-v5";
 import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "@primitivefi/hardhat-dodoc";
+
+import { extendEnvironment } from "hardhat/config";
+import { HardhatRuntimeEnvironment, HttpNetworkUserConfig } from "hardhat/types";
+
+extendEnvironment((hre: HardhatRuntimeEnvironment) => {
+    const config = hre.network.config as HttpNetworkUserConfig;
+    if (config?.url) {
+        hre.ethers.provider = new hre.ethers.providers.JsonRpcProvider(config.url);
+    }
+});
 
 // import * as tdly from "@tenderly/hardhat-tenderly";
 // tdly.setup();
