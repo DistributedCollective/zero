@@ -14,7 +14,12 @@ import "@nomiclabs/hardhat-ethers";
 
 import { Decimal } from "@sovryn-zero/lib-base";
 
-import { deployAndSetupContracts, setSilent, OracleAddresses, MyntAddresses } from "./utils/deploy";
+import {
+  deployAndSetupContracts,
+  setSilent,
+  OracleAddresses,
+  MyntAddresses
+} from "./utils/deploy";
 import { _LiquityDeploymentJSON } from "./src/contracts";
 
 import accounts from "./accounts.json";
@@ -240,7 +245,7 @@ const config: HardhatUserConfig = {
       chainId: 31337,
       gasMultiplier: 1.25
     },
-    rsksovrynmainnet: { 
+    rsksovrynmainnet: {
       url: "https://mainnet.sovryn.app/rpc",
       chainId: 30,
       accounts: [getDeployerAccount("rsksovrynmainnet") ?? Wallet.createRandom().privateKey]
@@ -377,11 +382,11 @@ task(
     const deployment = getDeploymentData(hre.network.name, channel);
     const { borrowerOperations: borrowerOperationsAddress } = deployment.addresses;
 
-    const borrowerOperations = ((await hre.ethers.getContractAt(
+    const borrowerOperations = (await hre.ethers.getContractAt(
       "BorrowerOperations",
       borrowerOperationsAddress,
       deployer
-    )) as unknown) as BorrowerOperations;
+    )) as unknown as BorrowerOperations;
 
     const currentMassetAddress = await borrowerOperations.massetManager();
     console.log("Current massetManager address: ", currentMassetAddress);
@@ -414,26 +419,19 @@ task(
   .setAction(async ({ channel, amount }: FundCommunityIssuance, hre) => {
     const [deployer] = await hre.ethers.getSigners();
     const deployment = getDeploymentData(hre.network.name, channel);
-    const {
-      zeroToken: zeroTokenAddress,
-      communityIssuance: communityIssuanceAddress
-    } = deployment.addresses;
+    const { zeroToken: zeroTokenAddress, communityIssuance: communityIssuanceAddress } =
+      deployment.addresses;
 
-    const zeroToken = ((await hre.ethers.getContractAt(
+    const zeroToken = (await hre.ethers.getContractAt(
       "ZEROToken",
       zeroTokenAddress,
       deployer
-    )) as unknown) as ZEROToken;
-    const communityIssuance = ((await hre.ethers.getContractAt(
+    )) as unknown as ZEROToken;
+    const communityIssuance = (await hre.ethers.getContractAt(
       "CommunityIssuance",
       communityIssuanceAddress,
       deployer
-    )) as unknown) as CommunityIssuance;
-
-    const fundingWalletAddress = await communityIssuance.fundingWalletAddress();
-    console.log(
-      `Funding wallet address is ${fundingWalletAddress} and sender is ${deployer.address}`
-    );
+    )) as unknown as CommunityIssuance;
 
     const senderZeroBalance = await zeroToken.balanceOf(deployer.address);
     console.log(`Sender zero balance: ${senderZeroBalance}`);
@@ -446,7 +444,6 @@ task(
     console.log(`Current allowance: ${allowance}`);
     await (await zeroToken.increaseAllowance(communityIssuanceAddress, amount)).wait();
     console.log("Transferring zero");
-    await (await communityIssuance.receiveZero(deployer.address, amount)).wait();
     const communityIssuanceBalanceAfter = await zeroToken.balanceOf(communityIssuanceAddress);
     console.log(`Community issuance balance after: ${communityIssuanceBalanceAfter}`);
   });
@@ -597,22 +594,22 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
     const zusdTokenFactory = await hre.ethers.getContractFactory(tokenContractName);
     const zusdTokenContract = await (await zusdTokenFactory.deploy()).deployed();
 
-    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+    const zusdTokenProxy = (await hre.ethers.getContractAt(
       "UpgradableProxy",
       zusdTokenAddress,
       deployer
-    )) as unknown) as UpgradableProxy;
+    )) as unknown as UpgradableProxy;
 
     //set new implementation
     const oldZUSDAddress = await zusdTokenProxy.getImplementation();
     await zusdTokenProxy.setImplementation(zusdTokenContract.address);
     console.log("Initializing new ZUSD token with the correct dependencies");
 
-    const zusdToken = ((await hre.ethers.getContractAt(
+    const zusdToken = (await hre.ethers.getContractAt(
       tokenContractName,
       zusdTokenAddress,
       deployer
-    )) as unknown) as ZUSDToken;
+    )) as unknown as ZUSDToken;
     //call initialize on the new zusdToken by calling proxy - not possible
 
     if (doInitialize)
@@ -622,7 +619,9 @@ task("deployNewZusdToken", "Deploys new ZUSD token and links it to previous depl
         borrowerOperationsAddress
       );
 
-    console.log("Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address);
+    console.log(
+      "Changing old ZUSD address " + oldZUSDAddress + " to " + zusdTokenContract.address
+    );
     const newZUSDAddress = await zusdTokenProxy.getImplementation();
     console.log("Implementation address changed to " + newZUSDAddress);
   });
@@ -647,7 +646,7 @@ task("getDeployedContractsOwners", "Prints the deployed contracts owner address"
     const obj = Object.entries(deployment.addresses);
     for await (const item of obj) {
       try {
-        const owned = ((await hre.ethers.getContractAt("Ownable", item[1])) as unknown) as Ownable;
+        const owned = (await hre.ethers.getContractAt("Ownable", item[1])) as unknown as Ownable;
         console.log(`${await owned.getOwner()} is owner of ${item[0]} (${item[1]})`);
       } catch (e) {
         console.log(`${item[0]} (${item[1]}) is NOT Ownable`);
@@ -678,11 +677,11 @@ task("transferOwnership", "Transfers contracts ownership from EOA")
     const obj = Object.entries(deployment.addresses);
     for await (const item of obj) {
       try {
-        const owned = ((await hre.ethers.getContractAt(
+        const owned = (await hre.ethers.getContractAt(
           "Ownable",
           item[1],
           deployer
-        )) as unknown) as Ownable;
+        )) as unknown as Ownable;
         const owner = await owned.getOwner();
         if (owner == deployer.address) {
           await (await owned.setOwner(newOwner)).wait();
@@ -706,27 +705,27 @@ task("getCurrentZUSDImplementation", "Logs to console current ZUSD implementatio
     const deployment = getDeploymentData(hre.network.name, channel);
     const { zusdToken: zusdTokenAddress, zeroToken: zeroTokenAddress } = deployment.addresses;
 
-    const zusdTokenProxy = ((await hre.ethers.getContractAt(
+    const zusdTokenProxy = (await hre.ethers.getContractAt(
       "UpgradableProxy",
       zusdTokenAddress,
       deployer
-    )) as unknown) as UpgradableProxy;
+    )) as unknown as UpgradableProxy;
     console.log("ZUSD Proxy adddress: " + zusdTokenProxy.address);
 
     const zusdImplementationAddress = await zusdTokenProxy.getImplementation();
     console.log("ZUSD implelentation address: " + zusdImplementationAddress);
 
-    const zusdToken = ((await hre.ethers.getContractAt(
+    const zusdToken = (await hre.ethers.getContractAt(
       "ZUSDToken",
       zusdTokenAddress,
       deployer
-    )) as unknown) as ZUSDToken;
+    )) as unknown as ZUSDToken;
 
-    const zeroToken = ((await hre.ethers.getContractAt(
+    const zeroToken = (await hre.ethers.getContractAt(
       "ZEROToken",
       zeroTokenAddress,
       deployer
-    )) as unknown) as ZEROToken;
+    )) as unknown as ZEROToken;
 
     /*await zeroToken.mint("0x0", 100);
     await zeroToken.mint(deployer.address, 100);
