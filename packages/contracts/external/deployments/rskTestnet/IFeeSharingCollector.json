@@ -1,0 +1,73 @@
+{
+    "_format": "hh-sol-artifact-1",
+    "contractName": "IFeeSharingCollector",
+    "sourceName": "contracts/Interfaces/IFeeSharingCollector.sol",
+    "address": "0xedD92fb7C556E4A4faf8c4f5A90f471aDCD018f4",
+    "abi": [
+        {
+            "inputs": [],
+            "name": "transferRBTC",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_token",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint96",
+                    "name": "_amount",
+                    "type": "uint96"
+                }
+            ],
+            "name": "transferTokens",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_loanPoolToken",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint32",
+                    "name": "_maxCheckpoints",
+                    "type": "uint32"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_receiver",
+                    "type": "address"
+                }
+            ],
+            "name": "withdraw",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_token",
+                    "type": "address"
+                }
+            ],
+            "name": "withdrawFees",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ],
+    "bytecode": "0x",
+    "deployedBytecode": "0x",
+    "linkReferences": {},
+    "deployedLinkReferences": {}
+}

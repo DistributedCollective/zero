@@ -84,6 +84,7 @@
     "@typechain/hardhat": "^6.1.5",
     "chai": "^4.3.7",
     "chai-bn": "0.2.2",
+    "cryptoenv": "^0.2.0",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.6.0",
     "eth-gas-reporter": "^0.2.22",

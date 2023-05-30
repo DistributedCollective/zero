@@ -109,11 +109,10 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
     let snapshot: SnapshotRestorer;
     before(async () => {
         await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
-    });
-    beforeEach(async () => {
         snapshot = await takeSnapshot();
     });
-    afterEach(async () => {
+
+    after(async () => {
         await snapshot.restore();
     });
 
@@ -255,6 +254,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
 
         it("SIP-0055 is executable", async () => {
             if (!hre.network.tags["forked"]) return;
+            await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
             /*await hre.network.provider.request({
                 method: "hardhat_reset",
                 params: [
@@ -318,11 +318,8 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             await mine();
 
             // CREATE PROPOSAL AND VERIFY
-            console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
-            const sipArgsZFU: ISipArgument = await sipArgs.zeroFeesUpdate(hre);
-            await createSIP(hre, sipArgsZFU);
-            console.log("... after SIP creation");
+            await hre.run("sips:create", { argsFunc: "zeroFeesUpdate" });
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
                 proposalId.toString(),
@@ -364,7 +361,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
 
         it("Combo SIP-0054 and SIP-0055 is executable", async () => {
             if (!hre.network.tags["forked"]) return;
-
+            await reset("https://mainnet-dev.sovryn.app/rpc", 5103312);
             const {
                 deployer,
                 deployerSigner,
@@ -418,9 +415,9 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             // CREATE PROPOSAL AND VERIFY
             console.log("creating proposal");
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
-            //const sipArgs54_55: ISipArgument = await sipArgs.sip0054And0055Combo(hre);
-            //await createSIP(hre, sipArgs54_55, "GovernorOwner");
-            await hre.run("sips:create-sip", { argsFunc: "sip0054And0055Combo" });
+            //const sipArgs: ISipArgument = await SIPArgs.sip0054And0055Combo(hre);
+            //await createSIP(hre, sipArgs, "GovernorOwner");
+            await hre.run("sips:create", { argsFunc: "sip0054And0055Combo" });
             console.log("... after SIP creating");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(
@@ -496,6 +493,107 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             expect(await zeroBaseParams.BORROWING_FEE_FLOOR())
                 .to.equal(await zeroBaseParams.REDEMPTION_FEE_FLOOR())
                 .to.equal(newFeeValue);
+        });
+
+        it("SIP-0059 is executable", async () => {
+            if (!hre.network.tags["forked"]) return;
+            await reset("https://mainnet-dev.sovryn.app/rpc", 5149167);
+            /*await hre.network.provider.request({
+                method: "hardhat_reset",
+                params: [
+                    {
+                        forking: {
+                            jsonRpcUrl: "https://mainnet-dev.sovryn.app/rpc",
+                            blockNumber: 5103227,
+                        },
+                    },
+                ],
+            });*/
+            const {
+                deployer,
+                deployerSigner,
+                stakingProxy,
+                governorOwner,
+                timelockOwnerSigner,
+                multisigSigner,
+            } = await setupTest();
+            // loadFixtureAfterEach = true;
+            // CREATE PROPOSAL
+            const sov = await ethers.getContract("SOV", timelockOwnerSigner);
+            const whaleAmount = (await sov.totalSupply()).mul(ethers.BigNumber.from(5));
+            await sov.mint(deployerSigner.address, whaleAmount);
+
+            /*
+            const quorumVotes = await governorOwner.quorumVotes();
+            console.log('quorumVotes:', quorumVotes);
+            */
+            await sov.connect(deployerSigner).approve(stakingProxy.address, whaleAmount);
+            //const stakeABI = (await hre.artifacts.readArtifact("IStaking")).abi;
+            const stakeABI = (await deployments.getArtifact("IStaking")).abi;
+            // const stakeABI = (await ethers.getContractFactory("IStaking")).interface;
+            // alternatively for stakeABI can be used human readable ABI:
+            /*const stakeABI = [
+                'function stake(uint96 amount,uint256 until,address stakeFor,address delegatee)',
+                'function pauseUnpause(bool _pause)',
+                'function paused() view returns (bool)'
+            ];*/
+            const staking = await ethers.getContractAt(
+                stakeABI,
+                stakingProxy.address,
+                deployerSigner
+            );
+            /*const multisigSigner = await getImpersonatedSignerFromJsonRpcProvider(
+                (
+                    await get("MultiSigWallet")
+                ).address
+            );*/
+            if (await staking.paused()) await staking.connect(multisigSigner).pauseUnpause(false);
+            const kickoffTS = await stakingProxy.kickoffTS();
+            await staking.stake(whaleAmount, kickoffTS.add(MAX_DURATION), deployer, deployer);
+            await mine();
+
+            // CREATE PROPOSAL AND VERIFY
+            const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
+            await hre.run("sips:create", { argsFunc: "zeroFeesUpdateSip0059" });
+            const proposalId = await governorOwner.latestProposalIds(deployer);
+            expect(
+                proposalId.toString(),
+                "Proposal was not created. Check the SIP creation is not commented out."
+            ).not.equal(proposalIdBeforeSIP.toString());
+
+            // VOTE FOR PROPOSAL
+            console.log("voting for proposal");
+            await mine();
+            await governorOwner.connect(deployerSigner).castVote(proposalId, true);
+
+            // QUEUE PROPOSAL
+            let proposal = await governorOwner.proposals(proposalId);
+
+            await mineUpTo(proposal.endBlock);
+            await mine();
+
+            await governorOwner.queue(proposalId);
+
+            // EXECUTE PROPOSAL
+            proposal = await governorOwner.proposals(proposalId);
+            await time.increaseTo(proposal.eta);
+            await expect(governorOwner.execute(proposalId))
+                .to.emit(governorOwner, "ProposalExecuted")
+                .withArgs(proposalId);
+
+            // VALIDATE EXECUTION
+            expect((await governorOwner.proposals(proposalId)).executed).to.be.true;
+
+            const zeroBaseParams: LiquityBaseParams = <LiquityBaseParams>(
+                (<unknown>await ethers.getContract("LiquityBaseParams"))
+            );
+            const newBorrowingFeeFloor = ethers.utils.parseEther("0.05");
+            const newMaxBorrowingFee = ethers.utils.parseEther("0.075");
+            const newRedemptionFeeFloor = ethers.utils.parseEther("0.019");
+
+            expect(await zeroBaseParams.BORROWING_FEE_FLOOR()).to.equal(newBorrowingFeeFloor);
+            expect(await zeroBaseParams.MAX_BORROWING_FEE()).to.equal(newMaxBorrowingFee);
+            expect(await zeroBaseParams.REDEMPTION_FEE_FLOOR()).to.equal(newRedemptionFeeFloor);
         });
     });
 });
