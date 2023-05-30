@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sovryn Zero solidity contracts",
   "main": "truffle-config.js",
   "directories": {
@@ -25,9 +25,10 @@
     "do-prepare:format": "yarn run prettier:write && yarn run lint:fix",
     "prepare:compile": "hardhat compile",
     "prepare:set-version": "node scripts/set-version.js",
-    "prepare:dist": "yarn prepare-dist",
+    "prepare:dist": "yarn prepare-export-deployments && yarn prepare-dist",
     "prepublishOnly": "yarn docgen",
-    "prepare-dist": "rm -rf ./dist && mkdir -p dist/contracts && rsync -a -m --exclude 'ZERO' --exclude 'TestContracts' --exclude '*/*ZERO*.sol' --exclude '*/*Community*' --include '*/' --include '*.sol' --exclude '*' 'contracts/' 'dist/contracts' && cp -R LICENSE docs 'artifacts/version' ./dist && cp ./README.dist.md ./dist/README.md && cp ./package.dist.json ./dist/package.json",
+    "prepare-export-deployments": "yarn hardhat export --export rskSovrynMainnetDeployments.json --network rskSovrynMainnet && yarn hardhat export --export rskSovrynTestnetDeployments.json --network rskSovrynTestnet",
+    "prepare-dist": "rm -rf ./dist && mkdir -p dist/contracts && rsync -a -m --exclude 'ZERO' --exclude 'TestContracts' --exclude '*/*ZERO*.sol' --exclude '*/*Community*' --include '*/' --include '*.sol' --exclude '*' 'contracts/' 'dist/contracts' && cp -R LICENSE docs 'artifacts/version' ./dist && mkdir -p dist/deployment && cp -R 'deployment/deployments/rskSovrynMainnet' 'deployment/deployments/rskSovrynTestnet' dist/deployment && cp ./README.dist.md ./dist/README.md && mv rskSovrynTestnetDeployments.json rskSovrynMainnetDeployments.json ./dist/deployment cp ./package.dist.json ./dist/package.json",
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-contracts-package.tgz",
     "test": "hardhat test",
     "coverage": "hardhat coverage",

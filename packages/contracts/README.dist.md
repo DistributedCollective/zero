@@ -23,7 +23,7 @@
 
 ## **Project Description**  
 
-  Sovryn Zero Solidity Contracts is a full set of Zero solidity contracts.
+  Sovryn Zero Solidity Contracts is a full set of Zero solidity contracts, docs and the contracts deployment .json data: ABIs and deployment addresses.  
   For interaction and integration with Zero it is recommended to use @sovryn-zero/sdk-contracts package.  
    
 

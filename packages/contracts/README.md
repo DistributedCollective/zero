@@ -14,17 +14,12 @@
   npm install @sovryn-zero/contracts
   ```
 
-  To install early access releases (pre-releases) - specify a version:  
-  ```
-  npm install @sovryn-zero/contracts@1.0.0-early.access.0
-  ```  
-
   The actual early access release version is [here](https://github.com/DistributedCollective/zero/blob/sdk-publish/packages/contracts/package.json#L3).  
 
 ## **Project Description**  
 
-  Sovryn Zero Solidity Contracts is a full set of Zero solidity contracts.
-  For interaction and integration with Zero it is recommended to use @sovryn-zero/sdk-contracts package.  
+  Sovryn Zero Solidity Contracts is a full set of Zero solidity contracts, docs and the contracts deployment .json data: ABIs and deployment addresses.  
+  For interaction and integration with Zero in solidity contracts it is recommended to use @sovryn-zero/sdk-contracts package.  
    
 
 ## **Docs**  

@@ -1,6 +1,6 @@
 {
     "name": "@sovryn-zero/contracts",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Sovryn Zero solidity contracts",
     "repository": {
         "type": "git",
