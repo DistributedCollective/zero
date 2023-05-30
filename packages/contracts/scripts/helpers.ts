@@ -5,6 +5,7 @@ import {
     BigNumberish,
     BytesLike,
     Contract,
+    ContractInterface,
     Signer,
     TransactionReceipt,
     TransactionResponse,
@@ -101,8 +102,10 @@ const getEthersLog = async (contract: Contract, filter) => {
     const events = await contract.queryFilter(filter);
     if (events.length === 0) return;
     const parsedEvents: any[] = [];
-    events.forEach((event) => {
-        const ethersParsed = contract.interface.parseLog(event);
+    events.forEach(({ topics: topicsR, data }) => {
+        // const { topics, data } = event;
+        const topics: string[] = topicsR.forEach((el) => el.toString()) as unknown as string[];
+        const ethersParsed = contract.interface.parseLog({ topics, data });
         const customParsed = parseEthersLog(ethersParsed);
         parsedEvents.push(customParsed);
     });
