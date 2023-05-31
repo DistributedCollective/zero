@@ -1,9 +1,6 @@
-import { ParamType } from "@ethersproject/abi";
-import { Contract } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import Logs from "node-logs";
-import { LiquityBaseParams, TroveManager } from "types/generated";
-import { LiquityBaseInterface } from "types/generated/artifacts/contracts/Dependencies/LiquityBase";
+import { TroveManager } from "types/generated";
 const logger = new Logs().showInConsole(true);
 
 export interface ISipArgument {

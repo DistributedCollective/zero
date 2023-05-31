@@ -55,7 +55,7 @@ extendEnvironment((hre: HardhatRuntimeEnvironment) => {
 // import * as tdly from "@tenderly/hardhat-tenderly";
 // tdly.setup();
 
-import "./tasks/sips/createSIP";
+import "./tasks";
 
 const accounts =
     process.env.ACC_QTY === "20"

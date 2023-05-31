@@ -1,14 +1,10 @@
 /* eslint-disable no-plusplus */
 import { Interface } from "@ethersproject/abi/lib/interface";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import {
-    BigNumberish,
-    BytesLike,
-    Contract,
-    Signer,
-    TransactionReceipt,
-    TransactionResponse,
-} from "ethers";
+import { BigNumberish, BytesLike, Contract, ContractInterface, Signer } from "ethers";
+
+import { TransactionReceipt, TransactionResponse } from "@ethersproject/providers";
+import { injectHre } from "./utils";
 import { Address } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { GovernorAlpha, MultiSigWallet } from "types/generated";
@@ -17,12 +13,6 @@ const logger = new Logs().showInConsole(true);
 
 let hre: HardhatRuntimeEnvironment;
 let ethers: HardhatRuntimeEnvironment["ethers"];
-
-// @dev run this function to initialize hre
-const injectHre = (_hre: HardhatRuntimeEnvironment) => {
-    hre = _hre;
-    ethers = hre.ethers;
-};
 
 const sendWithMultisig = async (
     multisigAddress: Address,
@@ -51,6 +41,86 @@ const signWithMultisig = async (multisigAddress, txId, sender) => {
     // console.log("Required signatures:", await multisig.required());
     console.log("Signed. Details:");
     await multisigCheckTx(txId, multisig.address);
+};
+
+const multisigAddOwner = async (addAddress, sender) => {
+    const {
+        ethers,
+        getNamedAccounts,
+        deployments: { get },
+    } = hre;
+    const multisigDeployment = await get("MultiSigWallet");
+    let multisigInterface = new ethers.utils.Interface(multisigDeployment.abi);
+    let data = multisigInterface.encodeFunctionData("addOwner", [addAddress]);
+    ///@todo check if the deployer is one of ms owners
+    console.log(`creating multisig tx to add new owner ${addAddress}...`);
+    await sendWithMultisig(multisigDeployment.address, multisigDeployment.address, data, sender);
+    logger.info(
+        `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<`
+    );
+};
+
+const multisigRemoveOwner = async (removeAddress, sender) => {
+    const {
+        ethers,
+        getNamedAccounts,
+        deployments: { get },
+    } = hre;
+    const multisigDeployment = await get("MultiSigWallet");
+    let multisigInterface = new ethers.utils.Interface(multisigDeployment.abi);
+    let data = multisigInterface.encodeFunctionData("removeOwner", [removeAddress]);
+    console.log(`creating multisig tx to remove owner ${removeAddress}...`);
+    await sendWithMultisig(multisigDeployment.address, multisigDeployment.address, data, sender);
+    logger.info(
+        `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<`
+    );
+};
+
+const multisigExecuteTx = async (txId, sender, multisigAddress = ethers.constants.AddressZero) => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const signer = await ethers.getSigner(sender);
+    const multisig = await ethers.getContractAt(
+        "MultiSigWallet",
+        multisigAddress == ethers.constants.AddressZero
+            ? (
+                  await get("MultiSigWallet")
+              ).address
+            : multisigAddress,
+        signer
+    );
+    console.log("Executing multisig txId", txId, "...");
+    const gasEstimated = (await multisig.estimateGas.executeTransaction(txId)).toNumber();
+    console.log("Estimated Gas:", gasEstimated);
+    const lastBlock = await ethers.provider.getBlock("latest");
+    const lastBlockGasLimit = lastBlock.gasLimit.toNumber();
+    console.log("Last Block Gas Limit:", lastBlockGasLimit);
+    const gasEstimatedMul = gasEstimated * 1.3;
+
+    let receipt;
+    let wontExecute = false;
+    if (gasEstimatedMul < lastBlockGasLimit) {
+        try {
+            await multisig.callStatic.executeTransaction(txId, { gasEstimatedMul });
+            receipt = await (await multisig.executeTransaction(txId, { gasEstimatedMul })).wait();
+        } catch (e) {
+            wontExecute = true;
+        }
+    }
+    if (wontExecute || gasEstimatedMul >= lastBlockGasLimit) {
+        receipt = await (
+            await multisig.executeTransaction(txId, { gasLimit: lastBlockGasLimit })
+        ).wait();
+    }
+
+    logger.warn("===============================================================================");
+    logger.success("DONE. Details:");
+    console.log("Tx hash:", receipt.transactionHash);
+    console.log("Gas used:", receipt.gasUsed.toNumber());
+    await multisigCheckTx(txId, multisig.address);
+    logger.warn("===============================================================================");
 };
 
 const multisigCheckTx = async (txId, multisigAddress = ethers.constants.AddressZero) => {
@@ -85,6 +155,54 @@ const multisigCheckTx = async (txId, multisigAddress = ethers.constants.AddressZ
     );
 };
 
+const isMultisigOwner = async (multisigAddress, checkAddress) => {
+    const { ethers } = hre;
+    const multisig = await ethers.getContractAt("MultiSigWallet", multisigAddress);
+    return await multisig.isOwner(checkAddress);
+};
+
+const multisigRevokeConfirmation = async (
+    txId,
+    sender,
+    multisigAddress = ethers.constants.AddressZero
+) => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const signer = await ethers.getSigner(sender);
+    const multisig = await ethers.getContractAt(
+        "MultiSigWallet",
+        multisigAddress == ethers.constants.AddressZero
+            ? (
+                  await get("MultiSigWallet")
+              ).address
+            : multisigAddress,
+        signer
+    );
+    console.log("Revoking confirmation of txId", txId, "...");
+    await (await multisig.revokeConfirmation(txId)).wait();
+    // console.log("Required signatures:", await multisig.required());
+    console.log(`Confirmation of txId ${txId} revoked.`);
+    console.log("Details:");
+    await multisigCheckTx(txId, multisig.address);
+};
+
+const parseEthersLogToValue = (parsed) => {
+    let parsedEvent = {};
+    for (let i = 0; i < parsed.args.length; i++) {
+        const input = parsed.eventFragment.inputs[i];
+        const arg = parsed.args[i];
+        const newObj = { ...input, ...{ value: arg.toString() } };
+        parsedEvent[input["name"]] = newObj.value;
+    }
+    return parsedEvent;
+};
+
+const getTxLog = (tx, contract) => {
+    return tx.logs.map((log) => parseEthersLogToValue(contract.interface.parseLog(log)));
+};
+
 const parseEthersLog = (parsed) => {
     const parsedEvent: any = {};
     for (let i = 0; i < parsed.args.length; i++) {
@@ -101,8 +219,10 @@ const getEthersLog = async (contract: Contract, filter) => {
     const events = await contract.queryFilter(filter);
     if (events.length === 0) return;
     const parsedEvents: any[] = [];
-    events.forEach((event) => {
-        const ethersParsed = contract.interface.parseLog(event);
+    events.forEach(({ topics: topicsR, data }) => {
+        // const { topics, data } = event;
+        const topics: string[] = topicsR.forEach((el) => el.toString()) as unknown as string[];
+        const ethersParsed = contract.interface.parseLog({ topics, data });
         const customParsed = parseEthersLog(ethersParsed);
         parsedEvents.push(customParsed);
     });
@@ -264,12 +384,19 @@ const deployWithCustomProxy = async (
 };
 
 export {
+    getTxLog,
     parseEthersLog,
+    parseEthersLogToValue,
     getEthersLog,
     getParsedEventLogFromReceipt,
     sendWithMultisig,
     signWithMultisig,
+    multisigExecuteTx,
     multisigCheckTx,
+    multisigAddOwner,
+    multisigRemoveOwner,
+    multisigRevokeConfirmation,
+    isMultisigOwner,
     createProposal,
     injectHre,
     defaultValueMultisigOrSipFlag,

@@ -1,5 +1,5 @@
 import { DeployFunction } from "hardhat-deploy/types";
-import { getContractNameFromScriptFileName } from "../../scripts/utils";
+import { getContractNameFromScriptFileName } from "../../scripts/helpers/utils";
 const path = require("path");
 import Logs from "node-logs";
 import { TroveManager } from "types/generated";
