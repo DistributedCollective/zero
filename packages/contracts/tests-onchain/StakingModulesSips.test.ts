@@ -27,7 +27,6 @@ const {
 
 import sipArgs, { ISipArgument } from "../tasks/sips/args/sipArgs";
 
-import { createSIP } from "../tasks/sips/createSIP";
 import { GovernorAlpha, LiquityBaseParams } from "types/generated";
 import { ERC20 } from "types/generated/external/artifacts";
 // import { SOV } from "hardhat-deploy/types";
@@ -176,7 +175,7 @@ describe("Staking Modules Deployments and Upgrades via Governance", () => {
             const proposalIdBeforeSIP = await governorOwner.latestProposalIds(deployer);
             const sipArgsMyntIntegration: ISipArgument = await sipArgs.zeroMyntIntegrationSIP(hre);
             console.log("... before SIP creation");
-            await createSIP(hre, sipArgsMyntIntegration);
+            await hre.run("sips:create-sip", { argsFunc: "zeroMyntIntegrationSIP" });
             console.log("... after SIP creation");
             const proposalId = await governorOwner.latestProposalIds(deployer);
             expect(

@@ -25,7 +25,6 @@ const {
 
 import sipArgs, { ISipArgument } from "../tasks/sips/args/sipArgs";
 
-import { createSIP } from "../tasks/sips/createSIP";
 import { GovernorAlpha, LiquityBaseParams } from "types/generated";
 import { ERC20 } from "types/generated/external/artifacts";
 

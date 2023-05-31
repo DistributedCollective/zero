@@ -1,6 +1,6 @@
 import { DeployFunction } from "hardhat-deploy/types";
-import { deployWithCustomProxy, injectHre } from "../../scripts/helpers";
-import { getContractNameFromScriptFileName } from "../../scripts/utils";
+import { deployWithCustomProxy, injectHre } from "../../scripts/helpers/helpers";
+import { getContractNameFromScriptFileName } from "../../scripts/helpers/utils";
 import Logs from "node-logs";
 import { CommunityIssuance } from "types/generated";
 import { CommunityIssuanceInterface } from "types/generated/artifacts/contracts/ZERO/CommunityIssuance";
