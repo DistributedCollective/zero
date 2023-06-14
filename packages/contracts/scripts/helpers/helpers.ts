@@ -4,23 +4,27 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumberish, BytesLike, Contract, ContractInterface, Signer } from "ethers";
 
 import { TransactionReceipt, TransactionResponse } from "@ethersproject/providers";
-import { injectHre } from "./utils";
 import { Address } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { GovernorAlpha, MultiSigWallet } from "types/generated";
 import Logs from "node-logs";
 const logger = new Logs().showInConsole(true);
 
-let hre: HardhatRuntimeEnvironment;
-let ethers: HardhatRuntimeEnvironment["ethers"];
+const encodeParameters = (hre: HardhatRuntimeEnvironment, types, values) => {
+    const { ethers } = hre;
+    const abi = new ethers.utils.AbiCoder();
+    return abi.encode(types, values);
+};
 
 const sendWithMultisig = async (
+    hre: HardhatRuntimeEnvironment,
     multisigAddress: Address,
     contractAddress: Address,
     data: BytesLike,
     sender: Address,
     value = 0
 ) => {
+    const { ethers } = hre;
     const multisig = await ethers.getContractAt("MultiSigWallet", multisigAddress);
     const signer = await ethers.getSigner(sender);
     const receipt = await (
@@ -30,10 +34,11 @@ const sendWithMultisig = async (
     const abi = ["event Submission(uint256 indexed transactionId)"];
     const iface = new ethers.utils.Interface(abi);
     const parsedEvent = await getParsedEventLogFromReceipt(receipt, iface, "Submission");
-    await multisigCheckTx(parsedEvent.transactionId.value.toNumber(), multisig.address);
+    await multisigCheckTx(hre, parsedEvent.transactionId.value.toNumber(), multisig.address);
 };
 
-const signWithMultisig = async (multisigAddress, txId, sender) => {
+const signWithMultisig = async (hre: HardhatRuntimeEnvironment, multisigAddress, txId, sender) => {
+    const { ethers } = hre;
     console.log("Signing multisig txId:", txId);
     const multisig = await ethers.getContractAt("MultiSigWallet", multisigAddress);
     const signer = await ethers.getSigner(sender);
@@ -43,10 +48,9 @@ const signWithMultisig = async (multisigAddress, txId, sender) => {
     await multisigCheckTx(txId, multisig.address);
 };
 
-const multisigAddOwner = async (addAddress, sender) => {
+const multisigAddOwner = async (hre: HardhatRuntimeEnvironment, addAddress, sender) => {
     const {
         ethers,
-        getNamedAccounts,
         deployments: { get },
     } = hre;
     const multisigDeployment = await get("MultiSigWallet");
@@ -54,13 +58,19 @@ const multisigAddOwner = async (addAddress, sender) => {
     let data = multisigInterface.encodeFunctionData("addOwner", [addAddress]);
     ///@todo check if the deployer is one of ms owners
     console.log(`creating multisig tx to add new owner ${addAddress}...`);
-    await sendWithMultisig(multisigDeployment.address, multisigDeployment.address, data, sender);
+    await sendWithMultisig(
+        hre,
+        multisigDeployment.address,
+        multisigDeployment.address,
+        data,
+        sender
+    );
     logger.info(
         `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<`
     );
 };
 
-const multisigRemoveOwner = async (removeAddress, sender) => {
+const multisigRemoveOwner = async (hre: HardhatRuntimeEnvironment, removeAddress, sender) => {
     const {
         ethers,
         getNamedAccounts,
@@ -70,13 +80,24 @@ const multisigRemoveOwner = async (removeAddress, sender) => {
     let multisigInterface = new ethers.utils.Interface(multisigDeployment.abi);
     let data = multisigInterface.encodeFunctionData("removeOwner", [removeAddress]);
     console.log(`creating multisig tx to remove owner ${removeAddress}...`);
-    await sendWithMultisig(multisigDeployment.address, multisigDeployment.address, data, sender);
+    await sendWithMultisig(
+        hre,
+        multisigDeployment.address,
+        multisigDeployment.address,
+        data,
+        sender
+    );
     logger.info(
         `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<`
     );
 };
 
-const multisigExecuteTx = async (txId, sender, multisigAddress = ethers.constants.AddressZero) => {
+const multisigExecuteTx = async (
+    hre: HardhatRuntimeEnvironment,
+    txId,
+    sender,
+    multisigAddress: string | undefined = undefined
+) => {
     const {
         ethers,
         deployments: { get },
@@ -84,11 +105,7 @@ const multisigExecuteTx = async (txId, sender, multisigAddress = ethers.constant
     const signer = await ethers.getSigner(sender);
     const multisig = await ethers.getContractAt(
         "MultiSigWallet",
-        multisigAddress == ethers.constants.AddressZero
-            ? (
-                  await get("MultiSigWallet")
-              ).address
-            : multisigAddress,
+        multisigAddress === undefined ? (await get("MultiSigWallet")).address : multisigAddress,
         signer
     );
     console.log("Executing multisig txId", txId, "...");
@@ -123,17 +140,18 @@ const multisigExecuteTx = async (txId, sender, multisigAddress = ethers.constant
     logger.warn("===============================================================================");
 };
 
-const multisigCheckTx = async (txId, multisigAddress = ethers.constants.AddressZero) => {
+const multisigCheckTx = async (
+    hre: HardhatRuntimeEnvironment,
+    txId,
+    multisigAddress: string | undefined = undefined
+) => {
     const {
+        ethers,
         deployments: { get },
     } = hre;
     const multisig = await ethers.getContractAt(
         "MultiSigWallet",
-        multisigAddress === ethers.constants.AddressZero
-            ? (
-                  await get("MultiSigWallet")
-              ).address
-            : multisigAddress
+        multisigAddress === undefined ? (await get("MultiSigWallet")).address : multisigAddress
     );
     const transaction = await multisig.transactions(txId);
     console.log(
@@ -155,16 +173,17 @@ const multisigCheckTx = async (txId, multisigAddress = ethers.constants.AddressZ
     );
 };
 
-const isMultisigOwner = async (multisigAddress, checkAddress) => {
+const isMultisigOwner = async (hre: HardhatRuntimeEnvironment, multisigAddress, checkAddress) => {
     const { ethers } = hre;
     const multisig = await ethers.getContractAt("MultiSigWallet", multisigAddress);
     return await multisig.isOwner(checkAddress);
 };
 
 const multisigRevokeConfirmation = async (
+    hre: HardhatRuntimeEnvironment,
     txId,
     sender,
-    multisigAddress = ethers.constants.AddressZero
+    multisigAddress: string | undefined = undefined
 ) => {
     const {
         ethers,
@@ -173,11 +192,7 @@ const multisigRevokeConfirmation = async (
     const signer = await ethers.getSigner(sender);
     const multisig = await ethers.getContractAt(
         "MultiSigWallet",
-        multisigAddress == ethers.constants.AddressZero
-            ? (
-                  await get("MultiSigWallet")
-              ).address
-            : multisigAddress,
+        multisigAddress === undefined ? (await get("MultiSigWallet")).address : multisigAddress,
         signer
     );
     console.log("Revoking confirmation of txId", txId, "...");
@@ -247,6 +262,7 @@ const getParsedEventLogFromReceipt = async (
 };
 
 const createProposal = async (
+    hre,
     governorAddress,
     targets,
     values,
@@ -255,7 +271,7 @@ const createProposal = async (
     description,
     signer
 ) => {
-    // governorDeployment = (await get("GovernorAlpha")).address;
+    const { ethers } = hre;
     console.log(`=============================================================
     Governor Address:    ${governorAddress}
     Target:              ${targets}
@@ -288,6 +304,7 @@ const defaultValueMultisigOrSipFlag = (
 };
 
 const deployWithCustomProxy = async (
+    hre,
     deployer,
     logicName,
     proxyName,
@@ -354,7 +371,7 @@ const deployWithCustomProxy = async (
                 `Creating multisig tx to set ${logicDeployedName} (${tx.address}) as implementation for ${logicDeployedName} (${proxyDeployment.address}...`
             );
             log();
-            await sendWithMultisig(multisigDeployment.address, proxy.address, data, deployer);
+            await sendWithMultisig(hre, multisigDeployment.address, proxy.address, data, deployer);
             log(
                 `>>> DONE. Requires Multisig (${multisigDeployment.address}) signing to execute tx <<<
                  >>> DON'T PUSH/MERGE ${logicName} TO THE DEVELOPMENT BRANCH REPO UNTIL THE MULTISIG TX SUCCESSFULLY SIGNED & EXECUTED <<<`
@@ -398,7 +415,6 @@ export {
     multisigRevokeConfirmation,
     isMultisigOwner,
     createProposal,
-    injectHre,
     defaultValueMultisigOrSipFlag,
     deployWithCustomProxy,
 };

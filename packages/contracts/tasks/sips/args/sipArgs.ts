@@ -60,18 +60,12 @@ const zeroMyntIntegrationSIP = async (hre: HardhatRuntimeEnvironment): Promise<I
     const iSetImplementationInterface = new ethers.utils.Interface([
         "function setImplementation(address _implementation)",
     ]);
-    /*
-    const encodeParameters = (types, values) => {
-        const abi = new ethers.utils.AbiCoder();
-        return abi.encode(types, values);
-    };*/
 
     const datas = targetsContractProxies.map((val, index) => {
         return iSetImplementationInterface._abiCoder.encode(
             ["address"],
             [contractsImplementations[index]]
         );
-        //return encodeParameters(["address"], [contractsImplementations[index]]);
     });
     const signatures = Array(targetsContractProxies.length).fill("setImplementation(address)");
 

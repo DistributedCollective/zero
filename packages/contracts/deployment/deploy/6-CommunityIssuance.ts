@@ -1,5 +1,5 @@
 import { DeployFunction } from "hardhat-deploy/types";
-import { deployWithCustomProxy, injectHre } from "../../scripts/helpers/helpers";
+import { deployWithCustomProxy } from "../../scripts/helpers/helpers";
 import { getContractNameFromScriptFileName } from "../../scripts/helpers/utils";
 import Logs from "node-logs";
 import { CommunityIssuance } from "types/generated";
@@ -15,7 +15,6 @@ const func: DeployFunction = async (hre) => {
         deployments: { get, getOrNull },
     } = hre;
     const { deployer } = await getNamedAccounts();
-    injectHre(hre);
 
     // Initialize community issuance address
     let sovTokenAddress: string;
@@ -44,7 +43,7 @@ const func: DeployFunction = async (hre) => {
     }
 
     const newlyDeployedProxy = (await getOrNull("CommunityIssuance_Proxy")) ? false : true;
-    await deployWithCustomProxy(deployer, deploymentName, "UpgradableProxy");
+    await deployWithCustomProxy(hre, deployer, deploymentName, "UpgradableProxy");
 
     const communityIssuanceDeployment = await get(deploymentName);
     const communityIssuance = await ethers.getContractAt(

@@ -1,14 +1,5 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-// e.g. 1-deploy-PerpetualDepositManager.ts -> PerpetualDepositManager
-let hre: HardhatRuntimeEnvironment;
-let ethers: HardhatRuntimeEnvironment["ethers"];
-
-const injectHre = (_hre: HardhatRuntimeEnvironment) => {
-    hre = _hre;
-    ethers = hre.ethers;
-};
-
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getContractNameFromScriptFileName = (filename) => {
@@ -17,11 +8,6 @@ const getContractNameFromScriptFileName = (filename) => {
 
 const arrayToUnique = (value, index, self) => {
     return self.indexOf(value) === index;
-};
-
-const encodeParameters = (types, values) => {
-    const abi = new ethers.utils.AbiCoder();
-    return abi.encode(types, values);
 };
 
 const logTimer = (time, passedTime) => {
@@ -41,11 +27,4 @@ const logTimer = (time, passedTime) => {
     process.stdout.write(hoursStr + ":" + minutesStr + ":" + secondsStr);
 };
 
-export {
-    getContractNameFromScriptFileName,
-    arrayToUnique,
-    encodeParameters,
-    injectHre,
-    logTimer,
-    delay,
-};
+export { getContractNameFromScriptFileName, arrayToUnique, logTimer, delay };
