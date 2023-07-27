@@ -399,6 +399,12 @@ const deployWithCustomProxy = async (
         log();
     }
 };
+const getImpersonatedSignerFromJsonRpcProvider = async (hre, addressToImpersonate) => {
+    const { ethers } = hre;
+    const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+    await provider.send("hardhat_impersonateAccount", [addressToImpersonate]);
+    return provider.getSigner(addressToImpersonate);
+};
 
 export {
     getTxLog,
@@ -417,4 +423,5 @@ export {
     createProposal,
     defaultValueMultisigOrSipFlag,
     deployWithCustomProxy,
+    getImpersonatedSignerFromJsonRpcProvider,
 };

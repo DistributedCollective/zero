@@ -285,8 +285,8 @@ const zeroFeesUpdateSip0066 = async (hre: HardhatRuntimeEnvironment): Promise<IS
         deployments: { get },
     } = hre;
     const zeroBaseParams = await get("LiquityBaseParams");
-    const newBorrowingFeeFloorValue = ethers.utils.parseEther("10");
-    const newMaxBorrowingFee = ethers.utils.parseEther("10.01");
+    const newBorrowingFeeFloorValue = ethers.utils.parseEther("0.99");
+    const newMaxBorrowingFee = ethers.utils.parseEther("1.00");
     const args: ISipArgument = {
         args: {
             targets: [zeroBaseParams.address, zeroBaseParams.address],

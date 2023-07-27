@@ -13,7 +13,7 @@ task("sips:create", "Create SIP to Sovryn Governance")
         "Function name from tasks/sips/args/sipArgs.ts which returns the sip arguments"
     )
     .setAction(async ({ argsFunc }, hre) => {
-        const { governor: governorName, args: sipArgs } = await sipArgsList[argsFunc](hre);
+        const { governorName, args: sipArgs } = await sipArgsList[argsFunc](hre);
         const {
             ethers,
             deployments: { get },
