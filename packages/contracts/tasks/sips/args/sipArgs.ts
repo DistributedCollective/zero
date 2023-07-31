@@ -297,7 +297,7 @@ const zeroFeesUpdateSip0066 = async (hre: HardhatRuntimeEnvironment): Promise<IS
                 ethers.utils.defaultAbiCoder.encode(["uint256"], [newMaxBorrowingFee]),
             ],
             description:
-                "SIP-0066: Zero Borrowing Fee Update: July 26, Details: https://github.com/DistributedCollective/SIPS/blob/[TBD]/SIP-0066.md, sha256: [TBD]",
+                "SIP-0066: Curtailing Zero borrowing, Details: https://github.com/DistributedCollective/SIPS/blob/54fe297/SIP-0066.md, sha256: b6aacd47eb5121f4b3c0c835157d3963e4c75354ee008ba717621a32bf9fa745",
         },
         governorName: "GovernorOwner",
     };
