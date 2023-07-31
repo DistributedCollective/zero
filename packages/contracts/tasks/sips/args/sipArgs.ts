@@ -279,6 +279,32 @@ const sip0062 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> =>
     return args;
 };
 
+const zeroFeesUpdateSip0066 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const {
+        ethers,
+        deployments: { get },
+    } = hre;
+    const zeroBaseParams = await get("LiquityBaseParams");
+    const newBorrowingFeeFloorValue = ethers.utils.parseEther("0.99");
+    const newMaxBorrowingFee = ethers.utils.parseEther("1.00");
+    const args: ISipArgument = {
+        args: {
+            targets: [zeroBaseParams.address, zeroBaseParams.address],
+            values: [0, 0],
+            signatures: ["setBorrowingFeeFloor(uint256)", "setMaxBorrowingFee(uint256)"],
+            data: [
+                ethers.utils.defaultAbiCoder.encode(["uint256"], [newBorrowingFeeFloorValue]),
+                ethers.utils.defaultAbiCoder.encode(["uint256"], [newMaxBorrowingFee]),
+            ],
+            description:
+                "SIP-0066: Curtailing Zero borrowing, Details: https://github.com/DistributedCollective/SIPS/blob/54fe297/SIP-0066.md, sha256: b6aacd47eb5121f4b3c0c835157d3963e4c75354ee008ba717621a32bf9fa745",
+        },
+        governorName: "GovernorOwner",
+    };
+
+    return args;
+};
+
 const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
@@ -286,6 +312,7 @@ const sipArgs = {
     sip0061,
     zeroFeesUpdateSip0059,
     sip0062,
+    zeroFeesUpdateSip0066,
 };
 
 export default sipArgs;
