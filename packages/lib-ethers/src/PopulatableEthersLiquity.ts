@@ -1150,14 +1150,15 @@ export class PopulatableEthersLiquity
           : defaultMaxRedemptionRate(truncatedAmount);
 
       return new PopulatedEthersRedemption(
-        await troveManager.estimateAndPopulate.redeemCollateral(
+        await troveManager.estimateAndPopulate.redeemCollateralViaDLLR(
           { ...overrides },
           addGasForPotentialLastFeeOperationTimeUpdate,
           truncatedAmount.hex,
           firstRedemptionHint,
           ...partialHints,
           _redeemMaxIterations,
-          maxRedemptionRateOrDefault.hex
+          maxRedemptionRateOrDefault.hex,
+          permitParams,
         ),
 
         this._readable.connection,
