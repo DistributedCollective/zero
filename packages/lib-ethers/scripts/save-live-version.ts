@@ -24,5 +24,4 @@ const jsonFiles = recursivelyListFilesInDir(contractsDir).filter(([, file]) =>
 fs.removeSync(liveDir);
 fs.mkdirSync(liveDir);
 
-fs.copyFileSync(path.join(artifactsDir, "version"), path.join(liveDir, "version"));
 jsonFiles.forEach(([dir, file]) => fs.copyFileSync(path.join(dir, file), path.join(liveDir, file)));

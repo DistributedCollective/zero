@@ -74,37 +74,24 @@
         {
           "indexed": false,
           "internalType": "address",
+          "name": "_feeDistributorAddress",
+          "type": "address"
+        }
+      ],
+      "name": "FeeDistributorAddressChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
           "name": "_gasPoolAddress",
           "type": "address"
         }
       ],
       "name": "GasPoolAddressChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_zeroStakingAddress",
-          "type": "address"
-        }
-      ],
-      "name": "LQTYStakingAddressChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_zeroTokenAddress",
-          "type": "address"
-        }
-      ],
-      "name": "LQTYTokenAddressChanged",
       "type": "event"
     },
     {
@@ -119,24 +106,11 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_L_LUSDDebt",
+          "name": "_L_ZUSDDebt",
           "type": "uint256"
         }
       ],
       "name": "LTermsUpdated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_newLUSDTokenAddress",
-          "type": "address"
-        }
-      ],
-      "name": "LUSDTokenAddressChanged",
       "type": "event"
     },
     {
@@ -176,11 +150,24 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_LUSDGasCompensation",
+          "name": "_ZUSDGasCompensation",
           "type": "uint256"
         }
       ],
       "name": "Liquidation",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_borrowerOperationsAddress",
+          "type": "address"
+        }
+      ],
+      "name": "LiquityBaseParamsAddressChanges",
       "type": "event"
     },
     {
@@ -202,13 +189,13 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_attemptedLUSDAmount",
+          "name": "_attemptedZUSDAmount",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_actualLUSDAmount",
+          "name": "_actualZUSDAmount",
           "type": "uint256"
         },
         {
@@ -340,6 +327,19 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "address",
+          "name": "_troveManagerRedeemOps",
+          "type": "address"
+        }
+      ],
+      "name": "TroveManagerRedeemOpsAddressChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "internalType": "uint256",
           "name": "_L_ETH",
           "type": "uint256"
@@ -347,7 +347,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_L_LUSDDebt",
+          "name": "_L_ZUSDDebt",
           "type": "uint256"
         }
       ],
@@ -390,6 +390,71 @@
       ],
       "name": "TroveUpdated",
       "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_zeroStakingAddress",
+          "type": "address"
+        }
+      ],
+      "name": "ZEROStakingAddressChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_zeroTokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "ZEROTokenAddressChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_newZUSDTokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "ZUSDTokenAddressChanged",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "CCR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MCR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -508,7 +573,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_collDecrease",
+          "name": "_debtDecrease",
           "type": "uint256"
         }
       ],
@@ -527,7 +592,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "LUSDDebt",
+          "name": "ZUSDDebt",
           "type": "uint256"
         }
       ],
@@ -546,7 +611,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_LUSDDebt",
+          "name": "_ZUSDDebt",
           "type": "uint256"
         }
       ],
@@ -633,7 +698,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "pendingLUSDDebtReward",
+          "name": "pendingZUSDDebtReward",
           "type": "uint256"
         },
         {
@@ -691,7 +756,7 @@
           "type": "address"
         }
       ],
-      "name": "getPendingLUSDDebtReward",
+      "name": "getPendingZUSDDebtReward",
       "outputs": [
         {
           "internalType": "uint256",
@@ -969,36 +1034,10 @@
     },
     {
       "inputs": [],
-      "name": "zeroStaking",
+      "name": "liquityBaseParams",
       "outputs": [
         {
-          "internalType": "contract ILQTYStaking",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "zeroToken",
-      "outputs": [
-        {
-          "internalType": "contract ILQTYToken",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "zusdToken",
-      "outputs": [
-        {
-          "internalType": "contract ILUSDToken",
+          "internalType": "contract ILiquityBaseParams",
           "name": "",
           "type": "address"
         }
@@ -1023,7 +1062,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_LUSDAmount",
+          "name": "_ZUSDAmount",
           "type": "uint256"
         },
         {
@@ -1065,6 +1104,76 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "_dllrAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_firstRedemptionHint",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_upperPartialRedemptionHint",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_lowerPartialRedemptionHint",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_partialRedemptionHintNICR",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxIterations",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxFeePercentage",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct IMassetManager.PermitParams",
+          "name": "_permitParams",
+          "type": "tuple"
+        }
+      ],
+      "name": "redeemCollateralViaDLLR",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "_borrower",
           "type": "address"
@@ -1078,62 +1187,97 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "_borrowerOperationsAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_activePoolAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_defaultPoolAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_stabilityPoolAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_gasPoolAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_collSurplusPoolAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_priceFeedAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_zusdTokenAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_sortedTrovesAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_zeroTokenAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_zeroStakingAddress",
-          "type": "address"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "_feeDistributorAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_troveManagerRedeemOps",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_liquityBaseParamsAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_borrowerOperationsAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_activePoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_defaultPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_stabilityPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_gasPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_collSurplusPoolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_priceFeedAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_zusdTokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_sortedTrovesAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_zeroTokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_zeroStakingAddress",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct ITroveManager.TroveManagerInitAddressesParams",
+          "name": "_troveManagerInitAddresses",
+          "type": "tuple"
         }
       ],
       "name": "setAddresses",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_troveManagerRedeemOps",
+          "type": "address"
+        }
+      ],
+      "name": "setTroveManagerRedeemOps",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1154,19 +1298,6 @@
       "name": "setTroveStatus",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "stabilityPool",
-      "outputs": [
-        {
-          "internalType": "contract IStabilityPool",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {

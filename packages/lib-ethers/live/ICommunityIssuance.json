@@ -9,24 +9,11 @@
         {
           "indexed": false,
           "internalType": "address",
-          "name": "_zeroTokenAddress",
+          "name": "_communityPotAddress",
           "type": "address"
         }
       ],
-      "name": "LQTYTokenAddressSet",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_stabilityPoolAddress",
-          "type": "address"
-        }
-      ],
-      "name": "StabilityPoolAddressSet",
+      "name": "CommunityPotAddressSet",
       "type": "event"
     },
     {
@@ -35,16 +22,52 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_totalLQTYIssued",
+          "name": "_totalZEROIssued",
           "type": "uint256"
         }
       ],
-      "name": "TotalLQTYIssuedUpdated",
+      "name": "TotalZEROIssuedUpdated",
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_zeroTokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "ZEROTokenAddressSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_zeroTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_communityPotAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_fundingWalletAddress",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
-      "name": "issueLQTY",
+      "name": "issueZERO",
       "outputs": [
         {
           "internalType": "uint256",
@@ -64,11 +87,11 @@
         },
         {
           "internalType": "uint256",
-          "name": "_LQTYamount",
+          "name": "_ZEROamount",
           "type": "uint256"
         }
       ],
-      "name": "sendLQTY",
+      "name": "receiveZero",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -77,16 +100,16 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_zeroTokenAddress",
+          "name": "_account",
           "type": "address"
         },
         {
-          "internalType": "address",
-          "name": "_stabilityPoolAddress",
-          "type": "address"
+          "internalType": "uint256",
+          "name": "_ZEROamount",
+          "type": "uint256"
         }
       ],
-      "name": "setAddresses",
+      "name": "sendZERO",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

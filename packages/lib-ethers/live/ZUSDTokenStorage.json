@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ZUSDTokenStorage",
+  "sourceName": "contracts/ZUSDTokenStorage.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212209a680acea503c86ad4c6b063d1fb5f966aa9dc664b59a4560b808e353195e63b64736f6c634300060b0033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212209a680acea503c86ad4c6b063d1fb5f966aa9dc664b59a4560b808e353195e63b64736f6c634300060b0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

@@ -48,11 +48,11 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_LUSDDebt",
+          "name": "_ZUSDDebt",
           "type": "uint256"
         }
       ],
-      "name": "DefaultPoolLUSDDebtUpdated",
+      "name": "DefaultPoolZUSDDebtUpdated",
       "type": "event"
     },
     {
@@ -92,19 +92,6 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "_newBalance",
-          "type": "uint256"
-        }
-      ],
-      "name": "LUSDBalanceUpdated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
           "internalType": "address",
           "name": "_newStabilityPoolAddress",
           "type": "address"
@@ -127,6 +114,19 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_newBalance",
+          "type": "uint256"
+        }
+      ],
+      "name": "ZUSDBalanceUpdated",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -134,7 +134,7 @@
           "type": "uint256"
         }
       ],
-      "name": "decreaseLUSDDebt",
+      "name": "decreaseZUSDDebt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -154,7 +154,7 @@
     },
     {
       "inputs": [],
-      "name": "getLUSDDebt",
+      "name": "getZUSDDebt",
       "outputs": [
         {
           "internalType": "uint256",
@@ -173,7 +173,7 @@
           "type": "uint256"
         }
       ],
-      "name": "increaseLUSDDebt",
+      "name": "increaseZUSDDebt",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

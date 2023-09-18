@@ -4,12 +4,25 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "_APR",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "_communityPotAddress",
+        "type": "address"
       }
     ],
-    "name": "APRSet",
+    "name": "CommunityPotAddressSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_zeroTokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "FundingWalletAddressSet",
     "type": "event"
   },
   {
@@ -36,64 +49,12 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "_priceFeed",
-        "type": "address"
-      }
-    ],
-    "name": "PriceFeedAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_rewardManagerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "RewardManagerAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_sovTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "SOVTokenAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_stabilityPoolAddress",
-        "type": "address"
-      }
-    ],
-    "name": "StabilityPoolAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
-        "name": "_latestSOVIssued",
+        "name": "_fundingWalletAddress",
         "type": "uint256"
       }
     ],
-    "name": "TotalSOVIssuedUpdated",
+    "name": "TotalZEROIssuedUpdated",
     "type": "event"
   },
   {
@@ -102,16 +63,16 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_zusdTokenAddress",
+        "name": "_zeroTokenAddress",
         "type": "address"
       }
     ],
-    "name": "ZUSDTokenAddressSet",
+    "name": "ZEROTokenAddressSet",
     "type": "event"
   },
   {
     "inputs": [],
-    "name": "APR",
+    "name": "DECIMAL_PRECISION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -124,7 +85,7 @@
   },
   {
     "inputs": [],
-    "name": "DECIMAL_PRECISION",
+    "name": "ISSUANCE_FACTOR",
     "outputs": [
       {
         "internalType": "uint256",
@@ -150,6 +111,71 @@
   },
   {
     "inputs": [],
+    "name": "SECONDS_IN_ONE_MINUTE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ZEROSupplyCap",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "communityPotAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deploymentTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fundingWalletAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getOwner",
     "outputs": [
       {
@@ -165,28 +191,18 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_sovTokenAddress",
+        "name": "_zeroTokenAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_zusdTokenAddress",
+        "name": "_communityPotAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_stabilityPoolAddress",
+        "name": "_fundingWalletAddress",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_priceFeed",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_APR",
-        "type": "uint256"
       }
     ],
     "name": "initialize",
@@ -195,14 +211,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_totalZUSDDeposits",
-        "type": "uint256"
-      }
-    ],
-    "name": "issueSOV",
+    "inputs": [],
+    "name": "issueZERO",
     "outputs": [
       {
         "internalType": "uint256",
@@ -211,45 +221,6 @@
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lastIssuanceTime",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "priceFeed",
-    "outputs": [
-      {
-        "internalType": "contract IPriceFeedSovryn",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "rewardManager",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -261,11 +232,11 @@
       },
       {
         "internalType": "uint256",
-        "name": "_SOVamount",
+        "name": "_ZEROamount",
         "type": "uint256"
       }
     ],
-    "name": "sendSOV",
+    "name": "receiveZero",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -273,12 +244,17 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_account",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "_APR",
+        "name": "_ZEROamount",
         "type": "uint256"
       }
     ],
-    "name": "setAPR",
+    "name": "sendZERO",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -297,60 +273,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_priceFeedAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setPriceFeed",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_rewardManagerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setRewardManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "sovToken",
-    "outputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stabilityPoolAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalSOVIssued",
+    "name": "totalZEROIssued",
     "outputs": [
       {
         "internalType": "uint256",
@@ -363,10 +287,10 @@
   },
   {
     "inputs": [],
-    "name": "zusdToken",
+    "name": "zeroToken",
     "outputs": [
       {
-        "internalType": "contract IERC20",
+        "internalType": "contract IZEROToken",
         "name": "",
         "type": "address"
       }

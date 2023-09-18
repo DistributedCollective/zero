@@ -24,28 +24,28 @@
     },
     {
       "inputs": [],
-      "name": "isOwner",
+      "name": "getOwner",
       "outputs": [
         {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
+      "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "_owner",
           "type": "address"
         }
       ],
-      "stateMutability": "view",
+      "name": "setOwner",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],

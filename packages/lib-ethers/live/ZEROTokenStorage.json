@@ -1,0 +1,63 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ZEROTokenStorage",
+  "sourceName": "contracts/ZERO/ZEROTokenStorage.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "ONE_YEAR_IN_SECONDS",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "marketMakerAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "presale",
+      "outputs": [
+        {
+          "internalType": "contract IBalanceRedirectPresale",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "zeroStakingAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5060fc8061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060465760003560e01c80630ff9a51214604b578063cc91058814606d578063e7c8fed4146073578063fdea8e0b14608b575b600080fd5b60516091565b604080516001600160a01b039092168252519081900360200190f35b605160a0565b607960af565b60408051918252519081900360200190f35b605160b7565b603c546001600160a01b031681565b603d546001600160a01b031681565b6301e1338081565b603e546001600160a01b03168156fea264697066735822122044c0f8ee36d1b4ceeba082d8b8d86131fc1e409b5b6a430ec1e90d12b794639c64736f6c634300060b0033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060465760003560e01c80630ff9a51214604b578063cc91058814606d578063e7c8fed4146073578063fdea8e0b14608b575b600080fd5b60516091565b604080516001600160a01b039092168252519081900360200190f35b605160a0565b607960af565b60408051918252519081900360200190f35b605160b7565b603c546001600160a01b031681565b603d546001600160a01b031681565b6301e1338081565b603e546001600160a01b03168156fea264697066735822122044c0f8ee36d1b4ceeba082d8b8d86131fc1e409b5b6a430ec1e90d12b794639c64736f6c634300060b0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

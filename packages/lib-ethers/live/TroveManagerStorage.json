@@ -1,0 +1,385 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "TroveManagerStorage",
+  "sourceName": "contracts/TroveManagerStorage.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "DECIMAL_PRECISION",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "L_ETH",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "L_ZUSDDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "NAME",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "TroveOwners",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "Troves",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "coll",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "stake",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum TroveManagerStorage.Status",
+          "name": "status",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint128",
+          "name": "arrayIndex",
+          "type": "uint128"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_stabilityPool",
+      "outputs": [
+        {
+          "internalType": "contract IStabilityPool",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_zeroStaking",
+      "outputs": [
+        {
+          "internalType": "contract IZEROStaking",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_zeroToken",
+      "outputs": [
+        {
+          "internalType": "contract IZEROToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_zusdToken",
+      "outputs": [
+        {
+          "internalType": "contract IZUSDToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "baseRate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "borrowerOperationsAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeDistributor",
+      "outputs": [
+        {
+          "internalType": "contract IFeeDistributor",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastETHError_Redistribution",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastFeeOperationTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastZUSDDebtError_Redistribution",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "rewardSnapshots",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "ETH",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "ZUSDDebt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "name": "setOwner",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sortedTroves",
+      "outputs": [
+        {
+          "internalType": "contract ISortedTroves",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalCollateralSnapshot",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalStakes",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalStakesSnapshot",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "troveManagerRedeemOps",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b50610023336001600160e01b0361002816565b610110565b6001600160a01b03811661006d5760405162461bcd60e51b81526004018080602001828103825260228152602001806107b86022913960400191505060405180910390fd5b6001600160a01b0381166100886001600160e01b036100e616565b6001600160a01b03167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3604080517035b2bc9737bbb730b136329737bbb732b960791b8152905190819003601101902055565b604080517035b2bc9737bbb730b136329737bbb732b960791b815290519081900360110190205490565b6106998061011f6000396000f3fe608060405234801561001057600080fd5b50600436106101585760003560e01c8063893d20e8116100c3578063ae9187541161007c578063ae91875414610363578063b7f8cf9b1461036b578063be4b033414610373578063bf9befb11461037b578063d380a37c14610383578063d815e8e91461038b57610158565b8063893d20e8146102be57806396d711ff146102c65780639dd233d2146102ce578063a20baee6146102d6578063a3f4df7e146102de578063ae7bec191461035b57610158565b80636ef64338116101155780636ef6433814610212578063716c47e614610281578063756b253e14610289578063797250e3146102a65780637cf54e40146102ae578063807d138d146102b657610158565b80630d43e8ad1461015d57806313af4035146101815780631673c79a146101a95780631f68f20a146101e85780633a128595146102025780636b4449521461020a575b600080fd5b610165610393565b604080516001600160a01b039092168252519081900360200190f35b6101a76004803603602081101561019757600080fd5b50356001600160a01b03166103a2565b005b6101cf600480360360208110156101bf57600080fd5b50356001600160a01b0316610415565b6040805192835260208301919091528051918290030190f35b6101f061042e565b60408051918252519081900360200190f35b610165610434565b6101f0610443565b6102386004803603602081101561022857600080fd5b50356001600160a01b0316610449565b6040518086815260200185815260200184815260200183600481111561025a57fe5b60ff1681526001600160801b03909216602083015250604080519182900301945092505050f35b610165610483565b6101656004803603602081101561029f57600080fd5b5035610492565b6101f06104b9565b6101656104bf565b6101f06104ce565b6101656104d4565b6101f06104fe565b6101f0610504565b6101f061050a565b6102e6610516565b6040805160208082528351818301528351919283929083019185019080838360005b83811015610320578181015183820152602001610308565b50505050905090810190601f16801561034d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b61016561053e565b61016561054d565b61016561055c565b6101f061056b565b6101f0610571565b6101f0610577565b61016561057d565b6008546001600160a01b031681565b6103aa6104d4565b6001600160a01b0316336001600160a01b031614610409576040805162461bcd60e51b815260206004820152601760248201527613dddb98589b194e8e881858d8d95cdcc819195b9a5959604a1b604482015290519081900360640190fd5b6104128161058c565b50565b6012602052600090815260409020805460019091015482565b600a5481565b6007546001600160a01b031681565b60155481565b600c6020526000908152604090208054600182015460028301546003909301549192909160ff81169061010090046001600160801b031685565b6000546001600160a01b031681565b6013818154811061049f57fe5b6000918252602090912001546001600160a01b0316905081565b60145481565b6006546001600160a01b031681565b600e5481565b604080517035b2bc9737bbb730b136329737bbb732b960791b815290519081900360110190205490565b600f5481565b60105481565b670de0b6b3a764000081565b6040518060400160405280600c81526020016b2a3937bb32a6b0b730b3b2b960a11b81525081565b6002546001600160a01b031681565b6009546001600160a01b031681565b6001546001600160a01b031681565b60115481565b600d5481565b600b5481565b6005546001600160a01b031681565b6001600160a01b0381166105d15760405162461bcd60e51b81526004018080602001828103825260228152602001806106426022913960400191505060405180910390fd5b806001600160a01b03166105e36104d4565b6001600160a01b03167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3604080517035b2bc9737bbb730b136329737bbb732b960791b815290519081900360110190205556fe4f776e61626c653a3a7365744f776e65723a20696e76616c69642061646472657373a26469706673582212207ceba897e1502a66af04b6bbcbb432fe97bed847170fb22b434b5f88beef12a264736f6c634300060b00334f776e61626c653a3a7365744f776e65723a20696e76616c69642061646472657373",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106101585760003560e01c8063893d20e8116100c3578063ae9187541161007c578063ae91875414610363578063b7f8cf9b1461036b578063be4b033414610373578063bf9befb11461037b578063d380a37c14610383578063d815e8e91461038b57610158565b8063893d20e8146102be57806396d711ff146102c65780639dd233d2146102ce578063a20baee6146102d6578063a3f4df7e146102de578063ae7bec191461035b57610158565b80636ef64338116101155780636ef6433814610212578063716c47e614610281578063756b253e14610289578063797250e3146102a65780637cf54e40146102ae578063807d138d146102b657610158565b80630d43e8ad1461015d57806313af4035146101815780631673c79a146101a95780631f68f20a146101e85780633a128595146102025780636b4449521461020a575b600080fd5b610165610393565b604080516001600160a01b039092168252519081900360200190f35b6101a76004803603602081101561019757600080fd5b50356001600160a01b03166103a2565b005b6101cf600480360360208110156101bf57600080fd5b50356001600160a01b0316610415565b6040805192835260208301919091528051918290030190f35b6101f061042e565b60408051918252519081900360200190f35b610165610434565b6101f0610443565b6102386004803603602081101561022857600080fd5b50356001600160a01b0316610449565b6040518086815260200185815260200184815260200183600481111561025a57fe5b60ff1681526001600160801b03909216602083015250604080519182900301945092505050f35b610165610483565b6101656004803603602081101561029f57600080fd5b5035610492565b6101f06104b9565b6101656104bf565b6101f06104ce565b6101656104d4565b6101f06104fe565b6101f0610504565b6101f061050a565b6102e6610516565b6040805160208082528351818301528351919283929083019185019080838360005b83811015610320578181015183820152602001610308565b50505050905090810190601f16801561034d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b61016561053e565b61016561054d565b61016561055c565b6101f061056b565b6101f0610571565b6101f0610577565b61016561057d565b6008546001600160a01b031681565b6103aa6104d4565b6001600160a01b0316336001600160a01b031614610409576040805162461bcd60e51b815260206004820152601760248201527613dddb98589b194e8e881858d8d95cdcc819195b9a5959604a1b604482015290519081900360640190fd5b6104128161058c565b50565b6012602052600090815260409020805460019091015482565b600a5481565b6007546001600160a01b031681565b60155481565b600c6020526000908152604090208054600182015460028301546003909301549192909160ff81169061010090046001600160801b031685565b6000546001600160a01b031681565b6013818154811061049f57fe5b6000918252602090912001546001600160a01b0316905081565b60145481565b6006546001600160a01b031681565b600e5481565b604080517035b2bc9737bbb730b136329737bbb732b960791b815290519081900360110190205490565b600f5481565b60105481565b670de0b6b3a764000081565b6040518060400160405280600c81526020016b2a3937bb32a6b0b730b3b2b960a11b81525081565b6002546001600160a01b031681565b6009546001600160a01b031681565b6001546001600160a01b031681565b60115481565b600d5481565b600b5481565b6005546001600160a01b031681565b6001600160a01b0381166105d15760405162461bcd60e51b81526004018080602001828103825260228152602001806106426022913960400191505060405180910390fd5b806001600160a01b03166105e36104d4565b6001600160a01b03167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3604080517035b2bc9737bbb730b136329737bbb732b960791b815290519081900360110190205556fe4f776e61626c653a3a7365744f776e65723a20696e76616c69642061646472657373a26469706673582212207ceba897e1502a66af04b6bbcbb432fe97bed847170fb22b434b5f88beef12a264736f6c634300060b0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
