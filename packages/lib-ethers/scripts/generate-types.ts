@@ -10,7 +10,7 @@ import CommunityIssuance from "../../contracts/deployment/deployments/rskSovrynM
 import DefaultPool from "../../contracts/deployment/deployments/rskSovrynMainnet/DefaultPool.json";
 import GasPool from "../../contracts/deployment/deployments/rskSovrynMainnet/GasPool.json";
 import HintHelpers from "../../contracts/deployment/deployments/rskSovrynMainnet/HintHelpers.json";
-import IERC20 from "../../contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json";
+import IERC20 from "../abi/IERC20.json";
 import ZUSDToken from "../../contracts/deployment/deployments/rskSovrynMainnet/ZUSDToken.json";
 import ZEROStaking from "../../contracts/deployment/deployments/rskSovrynMainnet/ZEROStaking.json";
 import ZEROToken from "../../contracts/deployment/deployments/rskSovrynMainnet/ZEROToken.json";
@@ -20,12 +20,12 @@ import PriceFeedTestnet from "../../contracts/deployment/deployments/rskSovrynTe
 import SortedTroves from "../../contracts/deployment/deployments/rskSovrynMainnet/SortedTroves.json";
 import StabilityPool from "../../contracts/deployment/deployments/rskSovrynMainnet/StabilityPool.json";
 import TroveManager from "../../contracts/deployment/deployments/rskSovrynMainnet/TroveManager.json";
-import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
+import UpgradeableProxy from "../abi/UpgradableProxy.json";
 import LiquityBaseParams from "../../contracts/deployment/deployments/rskSovrynMainnet/LiquityBaseParams.json";
 import TroveManagerRedeemOps from "../../contracts/deployment/deployments/rskSovrynMainnet/TroveManagerRedeemOps.json";
-import MockBalanceRedirectPresale from "../../contracts/artifacts/contracts/TestContracts/MockBalanceRedirectPresale.sol/MockBalanceRedirectPresale.json";
+import MockBalanceRedirectPresale from "../abi/MockBalanceRedirectPresale.json";
 import FeeDistributor from "../../contracts/deployment/deployments/rskSovrynMainnet/FeeDistributor.json";
-import Ownable from "../../contracts/artifacts/contracts/Dependencies/Ownable.sol/Ownable.json";
+import Ownable from "../abi/Ownable.json";
 
 const getTupleType = (components: ParamType[], flexible: boolean) => {
   if (components.every(component => component.name)) {
