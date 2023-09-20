@@ -3,28 +3,28 @@ import path from "path";
 
 import { Interface, ParamType } from "@ethersproject/abi";
 
-import ActivePool from "../../contracts/artifacts/contracts/ActivePool.sol/ActivePool.json";
-import BorrowerOperations from "../../contracts/artifacts/contracts/BorrowerOperations.sol/BorrowerOperations.json";
-import CollSurplusPool from "../../contracts/artifacts/contracts/CollSurplusPool.sol/CollSurplusPool.json";
-import CommunityIssuance from "../../contracts/artifacts/contracts/ZERO/CommunityIssuance.sol/CommunityIssuance.json";
-import DefaultPool from "../../contracts/artifacts/contracts/DefaultPool.sol/DefaultPool.json";
-import GasPool from "../../contracts/artifacts/contracts/GasPool.sol/GasPool.json";
-import HintHelpers from "../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json";
+import ActivePool from "../../contracts/deployment/deployments/rskSovrynMainnet/ActivePool.json";
+import BorrowerOperations from "../../contracts/deployment/deployments/rskSovrynMainnet/BorrowerOperations.json";
+import CollSurplusPool from "../../contracts/deployment/deployments/rskSovrynMainnet/CollSurplusPool.json";
+import CommunityIssuance from "../../contracts/deployment/deployments/rskSovrynMainnet/CommunityIssuance.json";
+import DefaultPool from "../../contracts/deployment/deployments/rskSovrynMainnet/DefaultPool.json";
+import GasPool from "../../contracts/deployment/deployments/rskSovrynMainnet/GasPool.json";
+import HintHelpers from "../../contracts/deployment/deployments/rskSovrynMainnet/HintHelpers.json";
 import IERC20 from "../../contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json";
-import ZUSDToken from "../../contracts/artifacts/contracts/ZUSDToken.sol/ZUSDToken.json";
-import ZEROStaking from "../../contracts/artifacts/contracts/ZERO/ZEROStaking.sol/ZEROStaking.json";
-import ZEROToken from "../../contracts/artifacts/contracts/ZERO/ZEROToken.sol/ZEROToken.json";
-import MultiTroveGetter from "../../contracts/artifacts/contracts/MultiTroveGetter.sol/MultiTroveGetter.json";
-import PriceFeed from "../../contracts/artifacts/contracts/PriceFeed.sol/PriceFeed.json";
-import PriceFeedTestnet from "../../contracts/artifacts/contracts/TestContracts/PriceFeedTestnet.sol/PriceFeedTestnet.json";
-import SortedTroves from "../../contracts/artifacts/contracts/SortedTroves.sol/SortedTroves.json";
-import StabilityPool from "../../contracts/artifacts/contracts/StabilityPool.sol/StabilityPool.json";
-import TroveManager from "../../contracts/artifacts/contracts/TroveManager.sol/TroveManager.json";
+import ZUSDToken from "../../contracts/deployment/deployments/rskSovrynMainnet/ZUSDToken.json";
+import ZEROStaking from "../../contracts/deployment/deployments/rskSovrynMainnet/ZEROStaking.json";
+import ZEROToken from "../../contracts/deployment/deployments/rskSovrynMainnet/ZEROToken.json";
+import MultiTroveGetter from "../../contracts/deployment/deployments/rskSovrynMainnet/MultiTroveGetter.json";
+import PriceFeed from "../../contracts/deployment/deployments/rskSovrynMainnet/PriceFeed.json";
+import PriceFeedTestnet from "../../contracts/deployment/deployments/rskSovrynTestnet/PriceFeedTestnet.json";
+import SortedTroves from "../../contracts/deployment/deployments/rskSovrynMainnet/SortedTroves.json";
+import StabilityPool from "../../contracts/deployment/deployments/rskSovrynMainnet/StabilityPool.json";
+import TroveManager from "../../contracts/deployment/deployments/rskSovrynMainnet/TroveManager.json";
 import UpgradeableProxy from "../../contracts/artifacts/contracts/Proxy/UpgradableProxy.sol/UpgradableProxy.json";
-import LiquityBaseParams from "../../contracts/artifacts/contracts/LiquityBaseParams.sol/LiquityBaseParams.json";
-import TroveManagerRedeemOps from "../../contracts/artifacts/contracts/Dependencies/TroveManagerRedeemOps.sol/TroveManagerRedeemOps.json";
+import LiquityBaseParams from "../../contracts/deployment/deployments/rskSovrynMainnet/LiquityBaseParams.json";
+import TroveManagerRedeemOps from "../../contracts/deployment/deployments/rskSovrynMainnet/TroveManagerRedeemOps.json";
 import MockBalanceRedirectPresale from "../../contracts/artifacts/contracts/TestContracts/MockBalanceRedirectPresale.sol/MockBalanceRedirectPresale.json";
-import FeeDistributor from "../../contracts/artifacts/contracts/FeeDistributor.sol/FeeDistributor.json";
+import FeeDistributor from "../../contracts/deployment/deployments/rskSovrynMainnet/FeeDistributor.json";
 import Ownable from "../../contracts/artifacts/contracts/Dependencies/Ownable.sol/Ownable.json";
 
 const getTupleType = (components: ParamType[], flexible: boolean) => {
@@ -195,8 +195,3 @@ ${contracts.map(declareInterface).join("\n\n")}
 fs.mkdirSync("types", { recursive: true });
 fs.writeFileSync(path.join("types", "index.ts"), output);
 
-fs.removeSync("abi");
-fs.mkdirSync("abi", { recursive: true });
-contractArtifacts.forEach(({ contractName, abi }) =>
-  fs.writeFileSync(path.join("abi", `${contractName}.json`), JSON.stringify(abi, undefined, 2))
-);
