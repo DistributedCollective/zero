@@ -24,12 +24,18 @@
 
 ### Usage example
 
+**Solidity**  
 ```javascript
-// SPDX-License-Identifier: MIT
-
+// SPDX-License-Identifier: MIT  
 pragma solidity 0.6.11;
 import "@sovryn-zero/contracts/contracts/ActivePool.sol";
 import "@sovryn-zero/contracts/contracts/BorrowerOperations.sol";
+```  
+
+**Javascript/typescript**
+```javascript
+import ActivePool from "@sovryn-zero/contracts/artifacts/contracts/ActivePool.sol/ActivePool.json";
+import BorrowerOperations from "@sovryn-zero/contracts/artifacts/contracts/BorrowerOperations.sol/BorrowerOperations.json";
 ```  
 
 [comment]: #solidoc (Start)

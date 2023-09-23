@@ -1,6 +1,6 @@
 {
   "name": "@sovryn-zero/contracts",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Sovryn Zero solidity contracts",
   "main": "index.js",
   "directories": {
@@ -25,10 +25,11 @@
     "do-prepare:format": "yarn run prettier:write && yarn run lint:fix",
     "prepare:compile": "hardhat compile",
     "prepare:set-version": "node scripts/set-version.js",
-    "prepare:dist": "yarn prepare-export-deployments && yarn prepare-dist",
+    "prepare:dist": "yarn prepare-export-deployments && yarn prepare-dist && yarn prepare-artifacts",
     "prepublishOnly": "yarn docgen",
     "prepare-export-deployments": "yarn hardhat export --export rskSovrynMainnetDeployments.json --network rskSovrynMainnet && yarn hardhat export --export rskSovrynTestnetDeployments.json --network rskSovrynTestnet",
-    "prepare-dist": "rm -rf ./dist && mkdir -p dist/contracts && rsync -a -m --exclude 'ZERO' --exclude 'TestContracts' --exclude '*/*ZERO*.sol' --exclude '*/*Community*' --include '*/' --include '*.sol' --exclude '*' 'contracts/' 'dist/contracts' && cp -R LICENSE docs 'artifacts/version' ./dist && mkdir -p dist/deployment && cp -R 'deployment/deployments/rskSovrynMainnet' 'deployment/deployments/rskSovrynTestnet' dist/deployment && cp ./README.md ./dist/README.md && mv rskSovrynTestnetDeployments.json rskSovrynMainnetDeployments.json ./dist/deployment && cp ./package.dist.json ./dist/package.json && cp ./index.dist.js ./dist/index.js",
+    "prepare-dist": "rm -rf ./dist && mkdir -p dist/contracts && rsync -a -m --exclude 'TestContracts' --exclude '**/*ZERO*.sol' --exclude '*/*Community*' --include '*/' --include '*.sol' --exclude '*' 'contracts/' 'dist/contracts' && cp -R LICENSE docs 'artifacts/version' ./dist && mkdir -p dist/deployment && cp -R 'deployment/deployments/rskSovrynMainnet' 'deployment/deployments/rskSovrynTestnet' dist/deployment && cp ./README.md ./dist/README.md && mv rskSovrynTestnetDeployments.json rskSovrynMainnetDeployments.json ./dist/deployment && cp ./package.dist.json ./dist/package.json && cp ./index.dist.js ./dist/index.js",
+    "prepare-artifacts": "node scripts/prepare-artifacts.js",
     "dist-pack": "cd ./dist && yarn pack --filename ../sovryn-zero-contracts-package.tgz",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
