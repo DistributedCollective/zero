@@ -46,7 +46,7 @@ export const transferOwnership = async (
         const multisigAddress = (await get("MultiSigWallet")).address;
         const data = ownable.interface.encodeFunctionData("transferOwnership", [newOwner]);
 
-        await helpers.sendWithMultisig(multisigAddress, contractAddress, data, deployer);
+        await helpers.sendWithMultisig(hre, multisigAddress, contractAddress, data, deployer);
     } else {
         await (await ownable.transferOwnership(newOwner)).wait();
         if ((await ownable.owner()) === newOwner) {

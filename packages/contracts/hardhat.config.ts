@@ -45,13 +45,6 @@ import "@primitivefi/hardhat-dodoc";
 import { extendEnvironment } from "hardhat/config";
 import { HardhatRuntimeEnvironment, HttpNetworkUserConfig } from "hardhat/types";
 
-extendEnvironment((hre: HardhatRuntimeEnvironment) => {
-    const config = hre.network.config as HttpNetworkUserConfig;
-    if (config?.url) {
-        hre.ethers.provider = new hre.ethers.providers.JsonRpcProvider(config.url);
-    }
-});
-
 // import * as tdly from "@tenderly/hardhat-tenderly";
 // tdly.setup();
 

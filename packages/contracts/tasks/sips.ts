@@ -13,7 +13,7 @@ task("sips:create", "Create SIP to Sovryn Governance")
         "Function name from tasks/sips/args/sipArgs.ts which returns the sip arguments"
     )
     .setAction(async ({ argsFunc }, hre) => {
-        const { governor: governorName, args: sipArgs } = await sipArgsList[argsFunc](hre);
+        const { governorName, args: sipArgs } = await sipArgsList[argsFunc](hre);
         const {
             ethers,
             deployments: { get },
@@ -131,7 +131,7 @@ task("sips:cancel", "Queue proposal in the Governor Owner contract")
         }
         const governorInterface = new ethers.utils.Interface((await get(governor)).abi);
         const data = governorInterface.encodeFunctionData("cancel", [proposal]);
-        await sendWithMultisig(msAddress, governorContract.address, data, signer);
+        await sendWithMultisig(hre, msAddress, governorContract.address, data, signer);
     });
 
 task("sips:vote-for", "Vote for or against a proposal in the Governor Owner contract")
