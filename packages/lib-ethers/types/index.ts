@@ -180,42 +180,50 @@ export interface CollSurplusPool
 }
 
 interface CommunityIssuanceCalls {
+  APR(_overrides?: CallOverrides): Promise<BigNumber>;
   DECIMAL_PRECISION(_overrides?: CallOverrides): Promise<BigNumber>;
-  ISSUANCE_FACTOR(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
-  SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
-  ZEROSupplyCap(_overrides?: CallOverrides): Promise<BigNumber>;
-  communityPotAddress(_overrides?: CallOverrides): Promise<string>;
-  deploymentTime(_overrides?: CallOverrides): Promise<BigNumber>;
-  fundingWalletAddress(_overrides?: CallOverrides): Promise<string>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
-  totalZEROIssued(_overrides?: CallOverrides): Promise<BigNumber>;
-  zeroToken(_overrides?: CallOverrides): Promise<string>;
+  lastIssuanceTime(_overrides?: CallOverrides): Promise<BigNumber>;
+  priceFeed(_overrides?: CallOverrides): Promise<string>;
+  rewardManager(_overrides?: CallOverrides): Promise<string>;
+  sovToken(_overrides?: CallOverrides): Promise<string>;
+  stabilityPoolAddress(_overrides?: CallOverrides): Promise<string>;
+  totalSOVIssued(_overrides?: CallOverrides): Promise<BigNumber>;
+  zusdToken(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface CommunityIssuanceTransactions {
-  initialize(_zeroTokenAddress: string, _communityPotAddress: string, _fundingWalletAddress: string, _overrides?: Overrides): Promise<void>;
-  issueZERO(_overrides?: Overrides): Promise<BigNumber>;
-  receiveZero(_account: string, _ZEROamount: BigNumberish, _overrides?: Overrides): Promise<void>;
-  sendZERO(_account: string, _ZEROamount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  initialize(_sovTokenAddress: string, _zusdTokenAddress: string, _stabilityPoolAddress: string, _priceFeed: string, _APR: BigNumberish, _overrides?: Overrides): Promise<void>;
+  issueSOV(_totalZUSDDeposits: BigNumberish, _overrides?: Overrides): Promise<BigNumber>;
+  sendSOV(_account: string, _SOVamount: BigNumberish, _overrides?: Overrides): Promise<void>;
+  setAPR(_APR: BigNumberish, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
+  setPriceFeed(_priceFeedAddress: string, _overrides?: Overrides): Promise<void>;
+  setRewardManager(_rewardManagerAddress: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface CommunityIssuance
   extends _TypedLiquityContract<CommunityIssuanceCalls, CommunityIssuanceTransactions> {
   readonly address: string;
   readonly filters: {
-    CommunityPotAddressSet(_communityPotAddress?: null): EventFilter;
-    FundingWalletAddressSet(_zeroTokenAddress?: null): EventFilter;
+    APRSet(_APR?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    TotalZEROIssuedUpdated(_fundingWalletAddress?: null): EventFilter;
-    ZEROTokenAddressSet(_zeroTokenAddress?: null): EventFilter;
+    PriceFeedAddressSet(_priceFeed?: null): EventFilter;
+    RewardManagerAddressSet(_rewardManagerAddress?: null): EventFilter;
+    SOVTokenAddressSet(_sovTokenAddress?: null): EventFilter;
+    StabilityPoolAddressSet(_stabilityPoolAddress?: null): EventFilter;
+    TotalSOVIssuedUpdated(_latestSOVIssued?: null): EventFilter;
+    ZUSDTokenAddressSet(_zusdTokenAddress?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "CommunityPotAddressSet"): _TypedLogDescription<{ _communityPotAddress: string }>[];
-  extractEvents(logs: Log[], name: "FundingWalletAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "APRSet"): _TypedLogDescription<{ _APR: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "TotalZEROIssuedUpdated"): _TypedLogDescription<{ _fundingWalletAddress: BigNumber }>[];
-  extractEvents(logs: Log[], name: "ZEROTokenAddressSet"): _TypedLogDescription<{ _zeroTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "PriceFeedAddressSet"): _TypedLogDescription<{ _priceFeed: string }>[];
+  extractEvents(logs: Log[], name: "RewardManagerAddressSet"): _TypedLogDescription<{ _rewardManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "SOVTokenAddressSet"): _TypedLogDescription<{ _sovTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityPoolAddressSet"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
+  extractEvents(logs: Log[], name: "TotalSOVIssuedUpdated"): _TypedLogDescription<{ _latestSOVIssued: BigNumber }>[];
+  extractEvents(logs: Log[], name: "ZUSDTokenAddressSet"): _TypedLogDescription<{ _zusdTokenAddress: string }>[];
 }
 
 interface DefaultPoolCalls {
@@ -630,15 +638,15 @@ interface StabilityPoolCalls {
   getCompoundedFrontEndStake(_frontEnd: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getCompoundedZUSDDeposit(_depositor: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getDepositorETHGain(_depositor: string, _overrides?: CallOverrides): Promise<BigNumber>;
-  getDepositorZEROGain(_depositor: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getDepositorSOVGain(_depositor: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getETH(_overrides?: CallOverrides): Promise<BigNumber>;
   getEntireSystemColl(_overrides?: CallOverrides): Promise<BigNumber>;
   getEntireSystemDebt(_overrides?: CallOverrides): Promise<BigNumber>;
-  getFrontEndZEROGain(_frontEnd: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getFrontEndSOVGain(_frontEnd: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getOwner(_overrides?: CallOverrides): Promise<string>;
   getTotalZUSDDeposits(_overrides?: CallOverrides): Promise<BigNumber>;
   lastETHError_Offset(_overrides?: CallOverrides): Promise<BigNumber>;
-  lastZEROError(_overrides?: CallOverrides): Promise<BigNumber>;
+  lastSOVError(_overrides?: CallOverrides): Promise<BigNumber>;
   lastZUSDLossError_Offset(_overrides?: CallOverrides): Promise<BigNumber>;
   liquityBaseParams(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
@@ -653,6 +661,7 @@ interface StabilityPoolTransactions {
   provideToSpFromDLLR(_dllrAmount: BigNumberish, _permitParams: { deadline: BigNumberish; v: BigNumberish; r: BytesLike; s: BytesLike }, _overrides?: Overrides): Promise<void>;
   registerFrontEnd(_kickbackRate: BigNumberish, _overrides?: Overrides): Promise<void>;
   setAddresses(_liquityBaseParamsAddress: string, _borrowerOperationsAddress: string, _troveManagerAddress: string, _activePoolAddress: string, _zusdTokenAddress: string, _sortedTrovesAddress: string, _priceFeedAddress: string, _communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
+  setCommunityIssuanceAddress(_communityIssuanceAddress: string, _overrides?: Overrides): Promise<void>;
   setOwner(_owner: string, _overrides?: Overrides): Promise<void>;
   withdrawETHGainToTrove(_upperHint: string, _lowerHint: string, _overrides?: Overrides): Promise<void>;
   withdrawFromSP(_amount: BigNumberish, _overrides?: Overrides): Promise<void>;
@@ -679,6 +688,8 @@ export interface StabilityPool
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     P_Updated(_P?: null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
+    SOVPaidToDepositor(_depositor?: string | null, _SOV?: null): EventFilter;
+    SOVPaidToFrontEnd(_frontEnd?: string | null, _SOV?: null): EventFilter;
     S_Updated(_S?: null, _epoch?: null, _scale?: null): EventFilter;
     ScaleUpdated(_currentScale?: null): EventFilter;
     SortedTrovesAddressChanged(_newSortedTrovesAddress?: null): EventFilter;
@@ -687,8 +698,6 @@ export interface StabilityPool
     TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
     UserDepositChanged(_depositor?: string | null, _newDeposit?: null): EventFilter;
     WithdrawFromSpAndConvertToDLLR(_depositor?: null, _zusdAmountRequested?: null, _dllrAmountReceived?: null): EventFilter;
-    ZEROPaidToDepositor(_depositor?: string | null, _ZERO?: null): EventFilter;
-    ZEROPaidToFrontEnd(_frontEnd?: string | null, _ZERO?: null): EventFilter;
     ZUSDTokenAddressChanged(_newZUSDTokenAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "ActivePoolAddressChanged"): _TypedLogDescription<{ _newActivePoolAddress: string }>[];
@@ -707,6 +716,8 @@ export interface StabilityPool
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "P_Updated"): _TypedLogDescription<{ _P: BigNumber }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
+  extractEvents(logs: Log[], name: "SOVPaidToDepositor"): _TypedLogDescription<{ _depositor: string; _SOV: BigNumber }>[];
+  extractEvents(logs: Log[], name: "SOVPaidToFrontEnd"): _TypedLogDescription<{ _frontEnd: string; _SOV: BigNumber }>[];
   extractEvents(logs: Log[], name: "S_Updated"): _TypedLogDescription<{ _S: BigNumber; _epoch: BigNumber; _scale: BigNumber }>[];
   extractEvents(logs: Log[], name: "ScaleUpdated"): _TypedLogDescription<{ _currentScale: BigNumber }>[];
   extractEvents(logs: Log[], name: "SortedTrovesAddressChanged"): _TypedLogDescription<{ _newSortedTrovesAddress: string }>[];
@@ -715,8 +726,6 @@ export interface StabilityPool
   extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "UserDepositChanged"): _TypedLogDescription<{ _depositor: string; _newDeposit: BigNumber }>[];
   extractEvents(logs: Log[], name: "WithdrawFromSpAndConvertToDLLR"): _TypedLogDescription<{ _depositor: string; _zusdAmountRequested: BigNumber; _dllrAmountReceived: BigNumber }>[];
-  extractEvents(logs: Log[], name: "ZEROPaidToDepositor"): _TypedLogDescription<{ _depositor: string; _ZERO: BigNumber }>[];
-  extractEvents(logs: Log[], name: "ZEROPaidToFrontEnd"): _TypedLogDescription<{ _frontEnd: string; _ZERO: BigNumber }>[];
   extractEvents(logs: Log[], name: "ZUSDTokenAddressChanged"): _TypedLogDescription<{ _newZUSDTokenAddress: string }>[];
 }
 
@@ -1002,17 +1011,16 @@ export interface LiquityBaseParams
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
 }
 
-interface MockBalanceRedirectPresaleCalls {
-  isClosed(_overrides?: CallOverrides): Promise<boolean>;
+interface MockFeeSharingCollectorCalls {
 }
 
-interface MockBalanceRedirectPresaleTransactions {
-  closePresale(_overrides?: Overrides): Promise<void>;
-  openPresale(_overrides?: Overrides): Promise<void>;
+interface MockFeeSharingCollectorTransactions {
+  transferRBTC(_overrides?: PayableOverrides): Promise<void>;
+  transferTokens(_token: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
 }
 
-export interface MockBalanceRedirectPresale
-  extends _TypedLiquityContract<MockBalanceRedirectPresaleCalls, MockBalanceRedirectPresaleTransactions> {
+export interface MockFeeSharingCollector
+  extends _TypedLiquityContract<MockFeeSharingCollectorCalls, MockFeeSharingCollectorTransactions> {
   readonly address: string;
   readonly filters: {
   };
