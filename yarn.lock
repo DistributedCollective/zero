@@ -5161,6 +5161,11 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
+"@sovryn-zero/contracts@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@sovryn-zero/contracts/-/contracts-0.3.0.tgz#7b54176243c2cd08f0badf380c0a45ac70bdb08c"
+  integrity sha512-cQJsDqHccA1F+7hZGx1aquwqpTcEhgt4jzmKzVXoe44Ga4oDtb6pVHkuZGB4l2qsU56MJ8BWcPHqbCk6va3v6Q==
+
 "@styled-system/background@^5.1.2":
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@styled-system/background/-/background-5.1.2.tgz#75c63d06b497ab372b70186c0bf608d62847a2ba"
