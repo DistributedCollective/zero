@@ -34,7 +34,6 @@ async function example() {
 
 See [packages/examples](https://github.com/DistributedCollective/zero/tree/master/packages/examples) in the repo.
 
-@sovryn-zero's [UI](https://github.com/DistributedCollective/zero/tree/master/packages/dev-frontend) itself contains many examples of `@sovryn-zero/lib-ethers` use.
 
 ## API Reference
 
