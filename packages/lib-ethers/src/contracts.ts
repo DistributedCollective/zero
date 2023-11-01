@@ -12,26 +12,26 @@ import {
   ContractTransaction
 } from "@ethersproject/contracts";
 
-import activePool from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/ActivePool.json";
-import borrowerOperations from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/BorrowerOperations.json";
-import troveManager from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/TroveManager.json";
-import troveManagerRedeemOps from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/TroveManagerRedeemOps.json";
-import zusdToken from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/ZUSDToken.json";
+import activePool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ActivePool.json";
+import borrowerOperations from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/BorrowerOperations.json";
+import troveManager from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/TroveManager.json";
+import troveManagerRedeemOps from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/TroveManagerRedeemOps.json";
+import zusdToken from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ZUSDToken.json";
 import nueToken from "@sovryn-zero/contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json"
-import collSurplusPool from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/CollSurplusPool.json";
-import communityIssuance from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/CommunityIssuance.json";
-import defaultPool from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/DefaultPool.json";
-import zeroToken from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/ZEROToken.json";
-import hintHelpers from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/HintHelpers.json";
-import zeroStaking from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/ZEROStaking.json";
-import multiTroveGetter from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/MultiTroveGetter.json";
-import priceFeed from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/PriceFeed.json";
-import priceFeedTestnet from "@sovryn-zero/contracts/deployment/deployments/rskSovrynTestnet/PriceFeedTestnet.json";
-import sortedTroves from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/SortedTroves.json";
-import stabilityPool from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/StabilityPool.json";
-import gasPool from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/GasPool.json";
-import liquityBaseParams from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/LiquityBaseParams.json";
-import feeDistributor from "@sovryn-zero/contracts/deployment/deployments/rskSovrynMainnet/FeeDistributor.json";
+import collSurplusPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/CollSurplusPool.json";
+import communityIssuance from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/CommunityIssuance.json";
+import defaultPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/DefaultPool.json";
+import zeroToken from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ZEROToken.json";
+import hintHelpers from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/HintHelpers.json";
+import zeroStaking from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ZEROStaking.json";
+import multiTroveGetter from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/MultiTroveGetter.json";
+import priceFeed from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/PriceFeed.json";
+import priceFeedTestnet from "@sovryn-zero/contracts/deployment/rskSovrynTestnet/PriceFeedTestnet.json";
+import sortedTroves from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/SortedTroves.json";
+import stabilityPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/StabilityPool.json";
+import gasPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/GasPool.json";
+import liquityBaseParams from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/LiquityBaseParams.json";
+import feeDistributor from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/FeeDistributor.json";
 
 import {
   ActivePool,
