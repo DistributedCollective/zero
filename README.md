@@ -94,9 +94,6 @@ Visit the [Sovryn website](https://www.sovryn.app/zero) to find out more and joi
       - [Run all tests](#run-all-tests)
       - [Deploy contracts to a testnet](#deploy-contracts-to-a-testnet)
       - [Start a local blockchain and deploy the contracts](#start-a-local-blockchain-and-deploy-the-contracts)
-      - [Start dev-frontend in development mode](#start-dev-frontend-in-development-mode)
-      - [Start dev-frontend in demo mode](#start-dev-frontend-in-demo-mode)
-      - [Build dev-frontend for production](#build-dev-frontend-for-production)
     - [Configuring your custom frontend](#configuring-your-custom-frontend)
   - [Running a frontend with Docker](#running-a-frontend-with-docker)
     - [Prerequisites](#prerequisites-1)
@@ -227,7 +224,6 @@ Economically, Recovery Mode is designed to encourage collateral top-ups and debt
 
 ### Directories
 
-- `packages/dev-frontend/` - Zero Beta: a fully functional React app used for interfacing with the smart contracts during development
 - `packages/fuzzer/` - A very simple, purpose-built tool based on Zero middleware for randomly interacting with the system
 - `packages/lib-base/` - Common interfaces and classes shared by the other `lib-` packages
 - `packages/lib-ethers/` - [ethers](https://github.com/ethers-io/ethers.js)-based middleware that can read Zero state and send transactions
@@ -1153,7 +1149,7 @@ E.g.:
 yarn deploy --network ropsten
 ```
 
-Supported networks are currently: rsk testnet, rsk mainnet. The above command will deploy into the default channel (the one that's used by the public dev-frontend). To deploy into the internal channel instead:
+Supported networks are currently: rsk testnet, rsk mainnet. The above command will deploy into the default channel. To deploy into the internal channel instead:
 
 ```
 yarn deploy --network ropsten --channel internal
@@ -1191,7 +1187,7 @@ yarn start-dev-chain
 
 Starts an RSK node in a Docker container, running the [private development chain](https://github.com/rsksmart/rskj), then deploys the contracts to this chain.
 
-You may want to use this before starting the dev-frontend in development mode. To use the newly deployed contracts, switch MetaMask to the built-in "Localhost 8545" network.
+To use the newly deployed contracts, switch MetaMask to the built-in "Localhost 8545" network.
 
 > Q: How can I get RBTC on the local blockchain?  
 > A: There are some already unlocked accounts 
@@ -1201,52 +1197,6 @@ Once you no longer need the local node, stop it with:
 ```
 yarn stop-dev-chain
 ```
-
-#### Start dev-frontend in development mode
-
-```
-yarn start-dev-frontend
-```
-
-This will start dev-frontend in development mode on http://localhost:3000. The app will automatically be reloaded if you change a source file under `packages/dev-frontend`.
-
-If you make changes to a different package under `packages`, it is recommended to rebuild the entire project with `yarn prepare` in the root directory of the repo. This makes sure that a change in one package doesn't break another.
-
-To stop the dev-frontend running in this mode, bring up the terminal in which you've started the command and press Ctrl+C.
-
-#### Start dev-frontend in demo mode
-
-This will automatically start the local blockchain, so you need to make sure that's not already running before you run the following command.
-
-```
-yarn start-demo
-```
-
-This spawns a modified version of dev-frontend that ignores MetaMask, and directly uses the local blockchain node. Every time the page is reloaded (at http://localhost:3000), a new random account is created with a balance of 100 RBTC. Additionally, transactions are automatically signed, so you no longer need to accept wallet confirmations. This lets you play around with Zero more freely.
-
-When you no longer need the demo mode, press Ctrl+C in the terminal then run:
-
-```
-yarn stop-demo
-```
-
-#### Build dev-frontend for production
-
-In a freshly cloned & installed monorepo, or if you have only modified code inside the dev-frontend package:
-
-```
-yarn build
-```
-
-If you have changed something in one or more packages apart from dev-frontend, it's best to use:
-
-```
-yarn rebuild
-```
-
-This combines the top-level `prepare` and `build` scripts.
-
-You'll find the output in `packages/dev-frontend/build`.
 
 ### Configuring your custom frontend
 
@@ -1259,28 +1209,9 @@ Your custom built frontend can be configured by putting a file named `config.jso
 }
 ```
 
-## Running a frontend with Docker
-
-The quickest way to get a frontend up and running is to use the [prebuilt image](https://hub.docker.com/r/liquity/dev-frontend) available on Docker Hub.
-
 ### Prerequisites
 
 You will need to have [Docker](https://docs.docker.com/get-docker/) installed.
-
-### Running with `docker`
-
-```
-docker pull liquity/dev-frontend
-docker run --name Zero -d --rm -p 3000:80 liquity/dev-frontend
-```
-
-This will start serving your frontend using HTTP on port 3000. If everything went well, you should be able to open http://localhost:3000/ in your browser. To use a different port, just replace 3000 with your desired port number.
-
-To stop the service:
-
-```
-docker kill liquity
-```
 
 ### Configuring a public frontend
 
@@ -1289,41 +1220,6 @@ If you're planning to publicly host a frontend, you might need to pass the Docke
 #### INFURA_API_KEY
 
 This is an optional parameter. If you'd like your frontend to use Infura's [WebSocket endpoint](https://infura.io/docs/RSK#section/Websockets) for receiving blockchain events, set this variable to an Infura Project ID.
-
-### Next steps for hosting a frontend
-
-You'll need to decide how you want to host your frontend. There are way too many options to list here, so these are going to be just a few examples.
-
-#### Example 1: using static website hosting
-
-A frontend doesn't require any database or server-side computation, so the easiest way to host it is to use a service that lets you upload a folder of static files (HTML, CSS, JS, etc).
-
-To obtain the files you need to upload, you need to extract them from a frontend Docker container. If you were following the guide for setting a kickback rate and haven't stopped the container yet, then you already have one! Otherwise, you can create it with a command like this (remember to use your own `FRONTEND_TAG` and `INFURA_API_KEY`):
-
-```
-docker run --name Zero -d --rm \
-  -e FRONTEND_TAG=0x2781fD154358b009abf6280db4Ec066FCC6cb435 \
-  -e INFURA_API_KEY=158b6511a5c74d1ac028a8a2afe8f626 \
-  liquity/dev-frontend
-```
-
-While the container is running, use `docker cp` to extract the frontend's files to a folder of your choosing. For example to extract them to a new folder named "devui" inside the current folder, run:
-
-```
-docker cp liquity:/usr/share/nginx/html ./devui
-```
-
-Upload the contents of this folder to your chosen hosting service (or serve them using your own infrastructure), and you're set!
-
-#### Example 2: wrapping the frontend container in HTTPS
-
-If you have command line access to a server with Docker installed, hosting a frontend from a Docker container is a viable option.
-
-The frontend Docker container simply serves files using plain HTTP, which is susceptible to man-in-the-middle attacks. Therefore it is highly recommended to wrap it in HTTPS using a reverse proxy. You can find an example docker-compose config [here](packages/dev-frontend/docker-compose-example/docker-compose.yml) that secures the frontend using [SWAG (Secure Web Application Gateway)](https://github.com/linuxserver/docker-swag) and uses [watchtower](https://github.com/containrrr/watchtower) for automatically updating the frontend image to the latest version on Docker Hub.
-
-Remember to customize both [docker-compose.yml](packages/dev-frontend/docker-compose-example/docker-compose.yml) and the [site config](packages/dev-frontend/docker-compose-example/config/nginx/site-confs/liquity.example.com).
-
-
 
 ## Disclaimer
 

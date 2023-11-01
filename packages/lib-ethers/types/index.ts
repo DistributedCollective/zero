@@ -1011,17 +1011,16 @@ export interface LiquityBaseParams
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
 }
 
-interface MockBalanceRedirectPresaleCalls {
-  isClosed(_overrides?: CallOverrides): Promise<boolean>;
+interface MockFeeSharingCollectorCalls {
 }
 
-interface MockBalanceRedirectPresaleTransactions {
-  closePresale(_overrides?: Overrides): Promise<void>;
-  openPresale(_overrides?: Overrides): Promise<void>;
+interface MockFeeSharingCollectorTransactions {
+  transferRBTC(_overrides?: PayableOverrides): Promise<void>;
+  transferTokens(_token: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
 }
 
-export interface MockBalanceRedirectPresale
-  extends _TypedLiquityContract<MockBalanceRedirectPresaleCalls, MockBalanceRedirectPresaleTransactions> {
+export interface MockFeeSharingCollector
+  extends _TypedLiquityContract<MockFeeSharingCollectorCalls, MockFeeSharingCollectorTransactions> {
   readonly address: string;
   readonly filters: {
   };
