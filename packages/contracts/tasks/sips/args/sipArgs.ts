@@ -305,6 +305,76 @@ const zeroFeesUpdateSip0066 = async (hre: HardhatRuntimeEnvironment): Promise<IS
     return args;
 };
 
+const sip0071 = async (hre: HardhatRuntimeEnvironment): Promise<ISipArgument> => {
+    const { ethers, deployments } = hre;
+
+    const zeroBaseParamsContract = await deployments.get("LiquityBaseParams");
+    const newBorrowingFeeFloor = ethers.utils.parseEther("0.13");
+    console.log(newBorrowingFeeFloor);
+    const encodedNewBorrowingFeeFloor = ethers.utils.defaultAbiCoder.encode(
+        ["uint256"],
+        [newBorrowingFeeFloor]
+    );
+    const title = "SIP-0071: Free Zero, Free Markets, Free Individuals"
+    const link = "https://forum.sovryn.com/t/sip-0071-free-zero-free-markets-free-individuals/3054"; 
+    const summary = "Reopen ZUSD minting in Zero protocol with a 13% origination fee floor."
+    const text = `
+    Summary
+
+    If approved, this Proposal will reopen ZUSD minting in Zero protocol with a 13% origination fee floor. The goal is to bring back a functional two-sided market, restore user confidence in the system, and generate more revenue for Bitocracy stakers.
+
+    Background
+
+    Four months ago, the origination fee floor of Zero Protocol was raised to 99% with SIP-0066. Essentially, Bitocracy paused the minting of ZUSD to maintain the DLLR peg and minimize ZUSD redemptions.
+    During that four-month time period, several key observations were made:
+
+    - The total supply of ZUSD decreased from approximately 6.69 million to 4.58 million.
+    - Approximately 1 million ZUSD redemptions took place.
+    - Around 1.08 million ZUSD credit repayments were made.
+    - The total collateral ratio increased from around 372% to 530%.
+    - The 90-day moving average daily revenue dropped from 0.03667 BTC to 0.00938 BTC, a reduction of approximately 74.4%.
+
+    Motivation
+
+    We see that the demand and supply market of ZUSD has reached an equilibrium point. There were only around 50K ZUSD redemptions that took place in November. The excess ZUSD supply has been removed. The current 14% interest rate of DLLR also indicates strong demand. Therefore, it is a solid time to restore a functional two-sided market where individuals can take the trade of minting new ZUSD with the risk of getting redeemed.
+
+    All Defi Protocols are confidence games. Bitocracy is a private entity that issues private currencies backed by BTC. Therefore, it is important to consider public optics and present the platform as reliable and trustworthy.
+
+    Reopening ZUSD minting will generate more revenue for Bitocracy stakers. The market will revalue the SOV token to a higher price. With high transaction fees in the Bitcoin network and upcoming halving, the price signal of the SOV token will be the best marketing to bring new users to the Sovryn platform.
+
+    Why 13%
+
+    The number we have chosen is close to the current interest rate of DLLR but not too high that speculators won't pay. The number should be lower than the interest rate of DLLR simply because minting ZUSD requires more collateral (average 530%) to maintain without significant redemption risk.
+
+    The number is derived from the golden ratio.
+    5 * 1.618^2 = 13.08962
+
+    The 13% fee will significantly restrict the growth of the ZUSD supply but not be too high to stop the growth completely.
+
+    Proposed changes
+
+    If approved, the origination fee will fluctuate between 13% and 100%.
+    The following change will be made to the Zero Protocol base parameters:
+
+    - Updating "BORROWING_FEE_FLOOR" from 99% to 13% by calling \`setBorrowingFeeFloor(uint256)\` on the \`0xf8B04A36c36d5DbD1a9Fe7B74897c609d6A17aa2\` contract with the encoded data \`0x00000000000000000000000000000000000000000000000001cdda4faccd0000\`.
+
+    License
+
+    Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+    `;
+    const description: string = `${title}\n${link}\n${summary}\n---\n${text}`;
+    return {
+        args: {
+            targets: [zeroBaseParamsContract.address],
+            values: [0],
+            signatures: ["setBorrowingFeeFloor(uint256)"],
+            data: [encodedNewBorrowingFeeFloor],
+            description: description,
+        },
+        governorName: "GovernorOwner",
+    };
+};
+
 const sipArgs = {
     zeroMyntIntegrationSIP,
     zeroFeesUpdate,
@@ -313,6 +383,7 @@ const sipArgs = {
     zeroFeesUpdateSip0059,
     sip0062,
     zeroFeesUpdateSip0066,
+    sip0071,
 };
 
 export default sipArgs;
