@@ -36,7 +36,8 @@ task("sips:create", "Create SIP to Sovryn Governance")
             sipArgs.values,
             sipArgs.signatures,
             sipArgs.data,
-            sipArgs.description
+            sipArgs.description, 
+            { gasLimit: 1_000_000 }
         );
         const receipt = await tx.wait();
 
