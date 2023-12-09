@@ -4,8 +4,45 @@ import Logs from "node-logs";
 import sipArgsList from "./sips/args/sipArgs";
 import { logTimer, delay } from "scripts/helpers/utils";
 import { parseEthersLogToValue, sendWithMultisig } from "scripts/helpers/helpers";
+import { PopulatedTransaction } from "ethers/lib/ethers";
 
 const logger = new Logs().showInConsole(true);
+task("sips:populateTx", "Populate Transaction that create SIPs to Sovryn Governance")
+    .addParam(
+        "argsFunc",
+        "Function name from tasks/sips/args/sipArgs.ts which returns the sip arguments"
+    )
+    .setAction(async ({ argsFunc }, hre) => {
+        const { governorName, args: sipArgs } = await sipArgsList[argsFunc](hre);
+        const {
+            ethers,
+            deployments: { get },
+        } = hre;
+
+        const governorDeployment = await get(governorName);
+        const governor = await ethers.getContract(governorName);
+        logger.info("=== Populating TX for SIP ===");
+        logger.info(`Governor Address:    ${governorDeployment.address}`);
+        logger.info(`Targets:             ${sipArgs.targets}`);
+        logger.info(`Values:              ${sipArgs.values}`);
+        logger.info(`Signatures:          ${sipArgs.signatures}`);
+        logger.info(`Data:                ${sipArgs.data}`);
+        logger.info(`Description:         ${sipArgs.description}`);
+        logger.info(`============================================================='`);
+        const populatedTx: PopulatedTransaction = await governor.populateTransaction.propose(
+            sipArgs.targets,
+            sipArgs.values,
+            sipArgs.signatures,
+            sipArgs.data,
+            sipArgs.description,
+            { gasLimit: 1_000_000 }
+        );
+        logger.info("=== Populated Tx for SIP ===");
+        logger.info(`From: ${populatedTx.from!}`);
+        logger.info(`To: ${populatedTx.to!}`);
+        logger.info(`Data: ${populatedTx.data!}`);
+        logger.info(`GasLimit: ${populatedTx.gasLimit!}`);
+    });
 
 task("sips:create", "Create SIP to Sovryn Governance")
     .addParam(
@@ -36,7 +73,7 @@ task("sips:create", "Create SIP to Sovryn Governance")
             sipArgs.values,
             sipArgs.signatures,
             sipArgs.data,
-            sipArgs.description, 
+            sipArgs.description,
             { gasLimit: 1_000_000 }
         );
         const receipt = await tx.wait();
