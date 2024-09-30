@@ -43,15 +43,6 @@ const contractsDir = path.join("..", "contracts");
 const artifacts = path.join(contractsDir, "artifacts");
 const cache = path.join(contractsDir, "cache");
 
-const contractsVersion = fs
-  .readFileSync(path.join(useLiveVersion ? "live" : artifacts, "version"))
-  .toString()
-  .trim();
-
-if (useLiveVersion) {
-  console.log(`Using live version of contracts (${contractsVersion}).`.cyan);
-}
-
 const generateRandomAccounts = (numberOfAccounts: number) => {
   const accounts = new Array<string>(numberOfAccounts);
 
@@ -358,7 +349,7 @@ extendEnvironment(env => {
       overrides
     );
 
-    return { ...deployment, version: contractsVersion };
+    return { ...deployment };
   };
 });
 

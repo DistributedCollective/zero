@@ -3,7 +3,6 @@ registry/
 docs/
 packages/decimal/
 packages/frontend/
-packages/dev-frontend/
 packages/examples/
 packages/providers/
 packages/subgraph/

@@ -12,26 +12,26 @@ import {
   ContractTransaction
 } from "@ethersproject/contracts";
 
-import activePoolAbi from "../abi/ActivePool.json";
-import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
-import troveManagerAbi from "../abi/TroveManager.json";
-import troveManagerRedeemOpsAbi from "../abi/TroveManagerRedeemOps.json";
-import zusdTokenAbi from "../abi/ZUSDToken.json";
-import nueTokenAbi from "../abi/IERC20.json";
-import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
-import communityIssuanceAbi from "../abi/CommunityIssuance.json";
-import defaultPoolAbi from "../abi/DefaultPool.json";
-import zeroTokenAbi from "../abi/ZEROToken.json";
-import hintHelpersAbi from "../abi/HintHelpers.json";
-import zeroStakingAbi from "../abi/ZEROStaking.json";
-import multiTroveGetterAbi from "../abi/MultiTroveGetter.json";
-import priceFeedAbi from "../abi/PriceFeed.json";
-import priceFeedTestnetAbi from "../abi/PriceFeedTestnet.json";
-import sortedTrovesAbi from "../abi/SortedTroves.json";
-import stabilityPoolAbi from "../abi/StabilityPool.json";
-import gasPoolAbi from "../abi/GasPool.json";
-import liquityBaseParamsAbi from "../abi/LiquityBaseParams.json";
-import feeDistributorAbi from "../abi/FeeDistributor.json";
+import activePool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ActivePool.json";
+import borrowerOperations from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/BorrowerOperations.json";
+import troveManager from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/TroveManager.json";
+import troveManagerRedeemOps from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/TroveManagerRedeemOps.json";
+import zusdToken from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ZUSDToken.json";
+import nueToken from "@sovryn-zero/contracts/artifacts/contracts/Dependencies/IERC20.sol/IERC20.json"
+import collSurplusPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/CollSurplusPool.json";
+import communityIssuance from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/CommunityIssuance.json";
+import defaultPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/DefaultPool.json";
+import zeroToken from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ZEROToken.json";
+import hintHelpers from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/HintHelpers.json";
+import zeroStaking from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/ZEROStaking.json";
+import multiTroveGetter from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/MultiTroveGetter.json";
+import priceFeed from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/PriceFeed.json";
+import priceFeedTestnet from "@sovryn-zero/contracts/deployment/rskSovrynTestnet/PriceFeedTestnet.json";
+import sortedTroves from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/SortedTroves.json";
+import stabilityPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/StabilityPool.json";
+import gasPool from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/GasPool.json";
+import liquityBaseParams from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/LiquityBaseParams.json";
+import feeDistributor from "@sovryn-zero/contracts/deployment/rskSovrynMainnet/FeeDistributor.json";
 
 import {
   ActivePool,
@@ -186,25 +186,25 @@ export type _LiquityContractAddresses = Record<LiquityContractsKey, string>;
 type LiquityContractAbis = Record<LiquityContractsKey, JsonFragment[]>;
 
 const getAbi = (priceFeedIsTestnet: boolean): LiquityContractAbis => ({
-  activePool: activePoolAbi,
-  borrowerOperations: borrowerOperationsAbi,
-  troveManager: troveManagerAbi,
-  troveManagerRedeemOps: troveManagerRedeemOpsAbi,
-  zusdToken: zusdTokenAbi,
-  nueToken: nueTokenAbi,
-  communityIssuance: communityIssuanceAbi,
-  defaultPool: defaultPoolAbi,
-  zeroToken: zeroTokenAbi,
-  hintHelpers: hintHelpersAbi,
-  zeroStaking: zeroStakingAbi,
-  multiTroveGetter: multiTroveGetterAbi,
-  priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
-  sortedTroves: sortedTrovesAbi,
-  stabilityPool: stabilityPoolAbi,
-  gasPool: gasPoolAbi,
-  collSurplusPool: collSurplusPoolAbi,
-  liquityBaseParams: liquityBaseParamsAbi,
-  feeDistributor: feeDistributorAbi,
+  activePool: activePool.abi,
+  borrowerOperations: borrowerOperations.abi,
+  troveManager: troveManager.abi,
+  troveManagerRedeemOps: troveManagerRedeemOps.abi,
+  zusdToken: zusdToken.abi,
+  nueToken: nueToken.abi,
+  communityIssuance: communityIssuance.abi,
+  defaultPool: defaultPool.abi,
+  zeroToken: zeroToken.abi,
+  hintHelpers: hintHelpers.abi,
+  zeroStaking: zeroStaking.abi,
+  multiTroveGetter: multiTroveGetter.abi,
+  priceFeed: priceFeedIsTestnet ? priceFeedTestnet.abi : priceFeed.abi,
+  sortedTroves: sortedTroves.abi,
+  stabilityPool: stabilityPool.abi,
+  gasPool: gasPool.abi,
+  collSurplusPool: collSurplusPool.abi,
+  liquityBaseParams: liquityBaseParams.abi,
+  feeDistributor: feeDistributor.abi,
 });
 
 const mapLiquityContracts = <T, U>(
